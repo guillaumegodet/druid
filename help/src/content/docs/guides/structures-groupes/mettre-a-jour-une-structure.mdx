@@ -1,0 +1,80 @@
+---
+title: "Consulter et mettre à jour une structure"
+description: "Lire et modifier la fiche d'un labo ou d'une équipe : identifiants, tutelles, hiérarchie, cycle de vie."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Services centraux, administrateurs Druid"
+	menu="Structures › clic sur une ligne"
+/>
+
+La rubrique **Structures** est le référentiel des laboratoires, équipes, composantes et
+établissements. Chaque fiche décrit une structure selon le modèle commun (voir
+[Structures](/donnees/structures/)).
+
+## Trouver une structure
+
+1. Ouvrez **Structures**.
+2. Cherchez par nom, sigle ou RNSR, ou filtrez par **niveau**, **statut**, **pôle** ou
+   **tutelle**.
+3. Le bouton **Dataviz** affiche la **hiérarchie des structures** (inclusions et
+   participations) sous forme de graphique ; **Liste** revient au tableau.
+4. Cliquez sur une ligne pour ouvrir la fiche.
+
+## Mettre à jour la fiche
+
+1. Parcourez les onglets : **Identification**, **Identifiants & liens**, **Missions &
+   thématiques**, **Appartenances**, **Cycle de vie et filiation**.
+2. Modifiez les champs voulus.
+3. Pour rattacher une équipe à son laboratoire, ou un laboratoire à ses tutelles, utilisez
+   l'onglet **Appartenances** :
+   - **Inclusions** : la structure parente (équipe → laboratoire, laboratoire → pôle) ;
+   - **Participations** : les tutelles et les autres liens. Une structure se choisit dans
+     la base, ou s'ajoute par son **code UAI** ou son **identifiant ROR**. Marquez la
+     **tutelle principale**.
+4. Pour une fusion, une scission ou un changement de nom, ajoutez un lien dans **Cycle de
+   vie et filiation** (**+ Ajouter un lien**) et mettez à jour le statut.
+5. Cliquez sur **Enregistrer**.
+
+Le bouton **Tableau de bord** ouvre les indicateurs bibliométriques de la structure, s'ils
+existent.
+
+## Créer une structure
+
+**Nouvelle structure** ouvre une fiche vierge. Choisissez le niveau et le type, renseignez le
+nom et le sigle, puis **Créer**. L'identifiant local est attribué à la création.
+
+## Synchroniser
+
+Le menu **Synchroniser** de la liste propose, selon votre instance :
+
+- **Forcer la mise à jour Grist** : relit les structures depuis l'annuaire partagé ;
+- **Importer LDAP** : compare les structures au référentiel de l'annuaire LDAP et propose
+  les créations et mises à jour ;
+- **Synchroniser avec SoVisu+** : régénère le fichier des structures transmis à CRISalid.
+
+## Ce qui se passe ensuite
+
+Les modifications sont écrites dans l'annuaire partagé. La hiérarchie de la liste est
+recalculée à partir des inclusions. CRISalid reçoit les structures à la prochaine
+synchronisation.
+
+## Limites connues
+
+- **Le laboratoire parent et le pôle sont en lecture seule** dans l'onglet Identification :
+  ils se déduisent des inclusions (onglet Appartenances).
+- **L'identifiant local ne se modifie pas** après la création : c'est lui qui relie la
+  structure aux personnes et à CRISalid.
+- **La suppression et la fusion de structures** ne sont pas disponibles depuis la liste :
+  passez par le [support](/guides/support/).
+- **Créer une structure dans Druid ne crée pas son tableau de bord** : voir
+  [Piloter la console ETL](/guides/administration/console-etl/).
+
+## Voir aussi
+
+- [Structures](/donnees/structures/)
+- [Où corriger quoi](/guides/corriger/ou-corriger-quoi/#les-structures)

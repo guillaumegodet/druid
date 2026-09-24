@@ -1,0 +1,91 @@
+/* Druid palette (tailwind.config.js of the app, « refonte 2026 »): cream background, ink text,
+ * violet links in light mode (yellow accent is unreadable on cream), yellow accent in dark mode. */
+
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/fonts/HankenGrotesk-Regular.ttf') format('truetype');
+	font-weight: 400;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Hanken Grotesk';
+	src: url('/fonts/HankenGrotesk-SemiBold.ttf') format('truetype');
+	font-weight: 600;
+	font-display: swap;
+}
+@font-face {
+	font-family: 'Schibsted Grotesk';
+	src: url('/fonts/SchibstedGrotesk-Bold.ttf') format('truetype');
+	font-weight: 700;
+	font-display: swap;
+}
+
+:root {
+	--sl-font: 'Hanken Grotesk', system-ui, sans-serif;
+	--druid-font-display: 'Schibsted Grotesk', system-ui, sans-serif;
+	--druid-yellow: #f4d24a;
+
+	/* Dark theme (Starlight default) */
+	--sl-color-accent-low: #3a3218;
+	--sl-color-accent: #f4d24a;
+	--sl-color-accent-high: #fbeaa5;
+}
+
+:root[data-theme='light'] {
+	--sl-color-accent-low: #e9e2ff;
+	--sl-color-accent: #7048e8;
+	--sl-color-accent-high: #3d2a8a;
+	--sl-color-white: #1c1b19;
+	--sl-color-gray-1: #2b2925;
+	--sl-color-gray-2: #4b473e;
+	--sl-color-gray-3: #6f6a5e;
+	--sl-color-gray-4: #9a9486;
+	--sl-color-gray-5: #cfcabd;
+	--sl-color-gray-6: #ece7da;
+	--sl-color-gray-7: #f4f0e6;
+	--sl-color-black: #fbf9f3;
+}
+
+h1,
+h2,
+h3,
+.site-title,
+.sl-markdown-content :is(h1, h2, h3, h4) {
+	font-family: var(--druid-font-display);
+	letter-spacing: -0.01em;
+}
+
+/* Pages not written yet (lot 1 skeleton): discreet badge next to the sidebar entry. */
+.sl-badge {
+	font-family: var(--sl-font);
+}
+
+/* Home page hero (the only page with a hero): the illustration is a wide 1200×640 composition
+   (help/src/assets/druid-aide-hero.png, from the « Druid Aide Hero » design), unreadable in
+   Starlight's 25rem side column — stack it full width under the title and actions instead. */
+@media (min-width: 50rem) {
+	.hero {
+		grid-template-columns: 100%;
+		padding-block: clamp(2rem, calc(1rem + 5vmin), 4rem);
+	}
+	.hero > .hero-html {
+		width: min(100%, 60rem);
+	}
+	.hero .stack {
+		text-align: center;
+	}
+	.hero .copy,
+	.hero .actions {
+		align-items: center;
+		justify-content: center;
+	}
+}
+.hero > .hero-html {
+	order: 2;
+	width: 100%;
+}
+.druid-hero-visual {
+	width: 100%;
+	height: auto;
+	filter: drop-shadow(0 30px 50px rgba(40, 32, 8, 0.18));
+}

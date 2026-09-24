@@ -1,0 +1,82 @@
+---
+title: "Rechercher et filtrer les personnels"
+description: "Trouver une personne, filtrer la liste par labo, statut, grade ou identifiant, et passer en vue graphiques."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils (un profil labo ne voit que les personnels de ses laboratoires)"
+	menu="Personnel"
+/>
+
+La rubrique **Personnel** liste toutes les fiches que vous pouvez voir. La recherche et les
+filtres permettent de retrouver une personne ou de constituer une liste (un labo, un
+statut, les fiches à vérifier).
+
+## Rechercher une personne
+
+Tapez dans la zone de recherche en haut de la liste. La recherche porte sur le **nom**, le
+**laboratoire principal** et l'**e-mail**. Cliquez sur une ligne pour ouvrir la fiche.
+
+## Filtrer la liste
+
+Les listes déroulantes combinent plusieurs valeurs (sélection multiple) :
+
+| Filtre | Ce qu'il retient |
+|---|---|
+| **Statut** | Interne, Départ, Parti, Externe. |
+| **Validation** | Fiches **validées**, **validées périmées** (plus de 18 mois) ou **non validées**. |
+| **Employeur** | L'établissement employeur. |
+| **Labo (affil. principale)** | Le laboratoire du rattachement principal. |
+| **Grade / corps**, **Type d'emploi** | Selon la carte Emploi de la fiche. |
+| **Pôle** | Le pôle ou la composante de rattachement. |
+
+En dessous :
+
+- **Identifiants** : cliquez sur **iD ORCID**, **HAL**, **IdRef** ou **Scopus** pour ne
+  garder que les fiches qui **ont** cet identifiant ;
+- **Dates** : ne garde que les personnes dont la période d'emploi recoupe l'intervalle
+  choisi.
+
+Le nombre de fiches retenues s'affiche à côté du titre.
+
+## Passer en vue graphiques
+
+Le bouton **Dataviz** remplace le tableau par des graphiques calculés sur la liste filtrée :
+répartition par statut, parité femmes / hommes, tranches d'âge, grades, employeurs, types
+d'emploi, répartition par labo, taux de HDR et **couverture des identifiants**. **Liste**
+revient au tableau.
+
+## Agir sur une sélection
+
+Cochez des fiches dans la liste pour faire apparaître :
+
+- **Groupe** : ajouter les fiches cochées à un groupe de chercheurs (voir
+  [Créer un groupe](/guides/structures-groupes/creer-un-groupe/)) ;
+- **Fusion** : fusionner exactement deux fiches d'une même personne (voir
+  [Traiter un doublon](/guides/personnes/traiter-un-doublon/)).
+
+## Ce qui se passe ensuite
+
+Rien n'est modifié : la recherche et les filtres ne changent que l'affichage. Les exports
+(**Exporter**) portent sur la liste filtrée (voir [Exporter](/guides/tableau-de-bord/exporter/)).
+
+## Limites connues
+
+- **La recherche ne porte pas sur les identifiants** (ORCID, IdRef…) : pour retrouver une
+  personne par identifiant, passez par son nom.
+- **Les filtres Identifiants ne trouvent que les fiches qui ont l'identifiant.** Pour
+  repérer les identifiants manquants, utilisez la page
+  [Alignement des identifiants](/guides/identifiants/aligner-les-identifiants/) ou la vue
+  graphiques (couverture des identifiants).
+- **Le filtre Labo porte sur le rattachement principal** : une personne rattachée en
+  secondaire à un labo n'apparaît pas dans ce filtre.
+- **Le filtre Dates** ignore les fiches sans date d'emploi, qui restent affichées.
+
+## Voir aussi
+
+- [Lire une fiche chercheur](/guides/personnes/lire-une-fiche/)
+- [Statuts des personnes](/donnees/statuts-des-personnes/)

@@ -1,0 +1,68 @@
+---
+title: "Filtrer la liste des publications"
+description: "Retrouver des publications avec les filtres de la liste et y accéder depuis les autres onglets."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure"
+	menu="Tableau de bord › Liste des publications"
+/>
+
+L'onglet **Liste des publications** affiche une à une les publications derrière les
+chiffres du tableau de bord. C'est l'outil pour vérifier un indicateur, retrouver une
+publication ou préparer une liste.
+
+## Étapes
+
+1. Réglez d'abord la structure, la période et le périmètre en haut du tableau de bord
+   (voir [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)).
+2. Ouvrez l'onglet **Liste des publications**. Le nombre de publications de la période
+   s'affiche.
+3. Tapez dans la zone de recherche un mot du **titre**, un nom de **revue** ou un **DOI**.
+4. Cliquez sur **Afficher les filtres** et combinez les critères dont vous avez besoin :
+
+| Famille | Filtres |
+|---|---|
+| Publication | Année, Type de document, Langue, Domaine, Sous-discipline |
+| Auteurs | Équipe, Laboratoire, Type d'emploi, Doctorant impliqué |
+| Revue | Revue (nom exact), Quartile SJR |
+| Accès | Accès ouvert, APC payés, Licence nationale, accès de l'établissement à la revue |
+| Impact | Top 10 % citations, Top 1 % citations |
+| Collaboration | Collaboration, Collaboration internationale, Pays partenaire |
+| Qualité | Conforme à la charte, Sources (provenance), Axe stratégique |
+
+5. Les filtres actifs apparaissent sous forme d'étiquettes : **Retirer ce filtre** en
+   retire un, **Tout effacer** les retire tous.
+6. Parcourez les résultats page par page (**Précédent**, **Suivant**).
+
+:::tip
+Dans les autres onglets, certains graphiques renvoient vers la liste déjà filtrée : c'est le
+moyen le plus rapide de voir quelles publications composent une barre ou une part.
+:::
+
+## Exporter la liste
+
+**Exporter en CSV (résultats filtrés)** télécharge les publications affichées, avec vos
+filtres, dans un fichier ouvrable avec un tableur.
+
+## Ce qui se passe ensuite
+
+Rien n'est modifié : les filtres ne changent que l'affichage.
+
+## Limites connues
+
+- **Les filtres dépendent des données disponibles** : une publication sans DOI a souvent un
+  statut d'accès ouvert inconnu, une publication hors revue n'a pas de quartile.
+- **Les filtres Équipe et Type d'emploi** ne s'appliquent qu'aux auteurs reconnus parmi les
+  membres de la structure.
+- **Le filtre Revue** attend le nom exact de la revue ; pour une recherche approchée,
+  utilisez la zone de recherche.
+
+## Voir aussi
+
+- [Publications et attribution](/donnees/publications-attribution/)
+- [Une publication manque ou est mal attribuée](/guides/corriger/publication-manquante/)

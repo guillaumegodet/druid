@@ -1,0 +1,335 @@
+{
+ "nguyen-l": {
+  "mode": "search",
+  "queryName": "NGUYEN Lan",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000053",
+    "fullName": "Nguyen, Lan",
+    "job": "",
+    "birth": "1996",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, LIRA (Net-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0050",
+    "idhal": "demo-lan-nguyen",
+    "isni": ""
+   }
+  ]
+ },
+ "petit-l": {
+  "mode": "search",
+  "queryName": "PETIT Léa",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "not_found",
+  "candidates": []
+ },
+ "olivier-s": {
+  "mode": "search",
+  "queryName": "OLIVIER Sami",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000142",
+    "fullName": "Olivier, Sami",
+    "job": "",
+    "birth": "1995",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LMD, Université de Démonstration",
+    "orcid": "0000-0001-9900-0148",
+    "idhal": "demo-sami-olivier",
+    "isni": ""
+   }
+  ]
+ },
+ "brunet-n": {
+  "mode": "search",
+  "queryName": "BRUNET Nicolas",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000177",
+    "fullName": "Brunet, Nicolas",
+    "job": "",
+    "birth": "1991",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LIRA (IA-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0172",
+    "idhal": "demo-nicolas-brunet",
+    "isni": ""
+   }
+  ]
+ },
+ "meunier-s": {
+  "mode": "search",
+  "queryName": "MEUNIER Sarah",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "not_found",
+  "candidates": []
+ },
+ "pasquier-a": {
+  "mode": "search",
+  "queryName": "PASQUIER Aurélie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000223",
+    "fullName": "Pasquier, Aurélie",
+    "job": "",
+    "birth": "1994",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, LIRA (IA-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0228",
+    "idhal": "demo-aurelie-pasquier",
+    "isni": ""
+   }
+  ]
+ },
+ "kerbrat-m": {
+  "mode": "search",
+  "queryName": "KERBRAT Mélanie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000231",
+    "fullName": "Kerbrat, Mélanie",
+    "job": "",
+    "birth": "1997",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, LIRA (IA-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0236",
+    "idhal": "demo-melanie-kerbrat",
+    "isni": ""
+   }
+  ]
+ },
+ "mallet-a": {
+  "mode": "search",
+  "queryName": "MALLET Aurélie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000258",
+    "fullName": "Mallet, Aurélie",
+    "job": "",
+    "birth": "1995",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, LIRA (IA-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0252",
+    "idhal": "demo-aurelie-mallet",
+    "isni": ""
+   }
+  ]
+ },
+ "weber-f": {
+  "mode": "search",
+  "queryName": "WEBER Florian",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000290",
+    "fullName": "Weber, Florian",
+    "job": "",
+    "birth": "1996",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LIRA (Net-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0295",
+    "idhal": "demo-florian-weber",
+    "isni": ""
+   }
+  ]
+ },
+ "sabatier-m": {
+  "mode": "search",
+  "queryName": "SABATIER Maxime",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000312",
+    "fullName": "Sabatier, Maxime",
+    "job": "",
+    "birth": "1987",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LIRA (Net-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0316",
+    "idhal": "demo-maxime-sabatier",
+    "isni": ""
+   }
+  ]
+ },
+ "jacquet-o": {
+  "mode": "search",
+  "queryName": "JACQUET Olivier",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "ambiguous",
+  "candidates": [
+   {
+    "ppn": "990000320",
+    "fullName": "Jacquet, Olivier",
+    "job": "",
+    "birth": "1988",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LIRA (Net-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0324",
+    "idhal": "demo-olivier-jacquet",
+    "isni": ""
+   },
+   {
+    "ppn": "990005322",
+    "fullName": "Jacquet, Olivier",
+    "job": "",
+    "birth": "1957",
+    "death": "",
+    "gender": "M",
+    "description": "Auteur d'une thèse de lettres (1987)",
+    "orcid": "",
+    "idhal": "",
+    "isni": ""
+   }
+  ]
+ },
+ "carpentier-y": {
+  "mode": "search",
+  "queryName": "CARPENTIER Yasmine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000371",
+    "fullName": "Carpentier, Yasmine",
+    "job": "",
+    "birth": "1995",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, BIOS (Gen-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0375",
+    "idhal": "demo-yasmine-carpentier",
+    "isni": ""
+   }
+  ]
+ },
+ "ollivier-e": {
+  "mode": "search",
+  "queryName": "OLLIVIER Élodie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000398",
+    "fullName": "Ollivier, Élodie",
+    "job": "",
+    "birth": "1997",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, BIOS (Gen-Démo), Université de Démonstration",
+    "orcid": "0000-0001-9900-0391",
+    "idhal": "demo-elodie-ollivier",
+    "isni": ""
+   }
+  ]
+ },
+ "bertin-b": {
+  "mode": "search",
+  "queryName": "BERTIN Bastien",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000479",
+    "fullName": "Bertin, Bastien",
+    "job": "",
+    "birth": "1967",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LMD, Université de Démonstration",
+    "orcid": "0000-0001-9900-0471",
+    "idhal": "demo-bastien-bertin",
+    "isni": ""
+   }
+  ]
+ },
+ "huet-m": {
+  "mode": "search",
+  "queryName": "HUET Mehdi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000495",
+    "fullName": "Huet, Mehdi",
+    "job": "",
+    "birth": "1988",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LMD, Université de Démonstration",
+    "orcid": "0000-0001-9900-0498",
+    "idhal": "demo-mehdi-huet",
+    "isni": ""
+   }
+  ]
+ },
+ "gauthier-o": {
+  "mode": "search",
+  "queryName": "GAUTHIER Olivier",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000517",
+    "fullName": "Gauthier, Olivier",
+    "job": "",
+    "birth": "1972",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, LMD, Université de Démonstration",
+    "orcid": "0000-0001-9900-0519",
+    "idhal": "demo-olivier-gauthier",
+    "isni": ""
+   }
+  ]
+ },
+ "noel-i": {
+  "mode": "search",
+  "queryName": "NOËL Irène",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990000533",
+    "fullName": "Noël, Irène",
+    "job": "",
+    "birth": "1980",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, LMD, Université de Démonstration",
+    "orcid": "0000-0001-9900-0535",
+    "idhal": "demo-irene-noel",
+    "isni": ""
+   }
+  ]
+ },
+ "gauthier-h": {
+  "mode": "search",
+  "queryName": "GAUTHIER Hélène",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "not_found",
+  "candidates": []
+ }
+}

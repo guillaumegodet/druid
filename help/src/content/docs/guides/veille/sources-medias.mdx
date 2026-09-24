@@ -1,0 +1,78 @@
+---
+title: "Gérer les sources médias"
+description: "Ajouter ou retirer les sources suivies pour la présence des chercheurs dans les médias."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Chargé·es de communication, administrateurs Druid"
+	menu="Administration › Sources médias"
+/>
+
+La veille médias collecte chaque nuit les mentions de l'établissement, de ses laboratoires et
+de ses chercheurs dans des sources ouvertes. La page **Sources médias** permet de choisir ces
+sources et d'ajouter à la main une mention que la collecte n'a pas trouvée.
+
+## Consulter les sources suivies
+
+La liste **Sources moissonnées** indique pour chaque source son **Type**, sa **Portée** et sa
+**Santé** :
+
+| Santé | Signification |
+|---|---|
+| **OK** | Dernière collecte réussie (date affichée). |
+| **À surveiller** | Plusieurs collectes de suite sans aucun article. |
+| **En panne** | La source ne répond plus. |
+| **Jamais collecté** | Source ajoutée, pas encore passée par une collecte. |
+
+Les sources marquées **intégré** sont fournies avec Druid et ne se suppriment pas.
+
+## Ajouter un flux RSS
+
+1. Dans **Ajouter un flux RSS**, collez l'**URL du flux (RSS/Atom)** et donnez-lui un
+   **Nom** et un **Type de média**.
+2. Choisissez la **Portée** :
+   - **Établissement** : flux propre à l'établissement ou au labo, tous ses articles sont
+     retenus ;
+   - **Générique (filtré par mots-clés)** : média généraliste, seuls les articles qui citent
+     un laboratoire ou l'établissement sont retenus.
+3. Pour un flux de laboratoire, indiquez les **Labos concernés** (sigles séparés par des
+   virgules).
+4. Cliquez sur **Tester et ajouter** : Druid vérifie que le flux répond avant de l'ajouter.
+
+**Supprimer ce flux** retire une source ajoutée.
+
+## Ajouter une mention à la main
+
+Pour un article que la collecte n'a pas trouvé (presse papier numérisée, site sans flux) :
+
+1. Dans **Ajouter une actu depuis une URL**, collez l'**URL de l'article**.
+2. Complétez le **Titre**, le **Média**, la **Date de publication**, un **Extrait** facultatif
+   et les **Labos concernés** (ou cochez **Établissement**).
+3. Cliquez sur **Publier**.
+
+La mention est publiée immédiatement dans l'onglet **Mentions** de la Veille, sans passer par
+la validation.
+
+## Ce qui se passe ensuite
+
+Les nouvelles sources sont collectées dès la nuit suivante. Les mentions détectées arrivent
+dans la file **À valider** de l'onglet Veille (voir
+[Suivre les nouvelles publications](/guides/veille/nouvelles-publications/#suivre-la-présence-dans-les-médias)).
+
+## Limites connues
+
+- **Seules les sources ouvertes** (flux publics) peuvent être suivies : pas de presse sur
+  abonnement.
+- **Un média généraliste** produit des faux positifs quand un nom de laboratoire est aussi un
+  mot courant : la validation les écarte.
+- **Un flux sans article pendant longtemps** passe **À surveiller** sans être forcément en
+  panne (site peu actif).
+
+## Voir aussi
+
+- [Suivre les nouvelles publications](/guides/veille/nouvelles-publications/)
+- [Premiers pas selon votre profil](/demarrer/premiers-pas/#chargées-de-communication)

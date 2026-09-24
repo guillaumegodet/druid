@@ -1,0 +1,85 @@
+---
+title: "Lire une fiche chercheur"
+description: "Ce que contient une fiche : identifiants, emploi, appartenances, validation, présence médias."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils (un profil labo ne voit que les fiches de ses laboratoires)"
+	menu="Personnel › clic sur une ligne de la liste"
+/>
+
+La fiche réunit tout ce que Druid sait d'une personne dans une structure. C'est là que l'on
+vérifie une information, qu'on la corrige et qu'on valide la fiche.
+
+## Ouvrir une fiche
+
+1. Ouvrez **Personnel**.
+2. Retrouvez la personne avec la recherche ou les filtres (voir
+   [Rechercher et filtrer les personnels](/guides/personnes/rechercher-filtrer/)).
+3. Cliquez sur sa ligne. **Retour à la liste** vous ramène à la liste.
+
+## L'en-tête
+
+- **Nom, photo et statut** (Interne, Départ, Parti, Externe), avec la pastille de
+  validation si la fiche a été validée : **Validé**, **Périmé** ou **Validé — conflit**. Le
+  survol de la pastille indique la source et la date de la validation.
+- **UID** : l'identifiant de la personne dans l'annuaire de l'établissement (ou `ext_…`
+  pour une personne extérieure), et la date de dernière synchronisation.
+- Les boutons d'action : **Valider la fiche** (ou **Fiche validée**), **Signaler une
+  correction** (administrateurs), **Export PDF** et **Enregistrer**.
+
+Selon la fiche et votre instance, l'en-tête propose aussi **Annuaire** (la page de la
+personne dans l'annuaire en ligne de l'établissement) et **Grist** (le tableur partagé qui
+contient toutes les fiches, pour les personnes qui y ont accès). Le bouton **?** ouvre cette
+page d'aide.
+
+## Les cartes
+
+| Carte | Contenu |
+|---|---|
+| **Identifiants chercheur** | IdRef, ORCID, IdHAL et son numéro, Scopus, profils OpenAlex. Chaque identifiant est un lien vers le profil. |
+| **État civil** | Civilité, nom, nom d'usage, prénom, date de naissance, nationalité, UID. |
+| **Emploi & contrat** | Établissement employeur, grade / corps, type d'emploi, dates de début et de fin d'emploi, HDR et année d'obtention. |
+| **Pôle, composante, école doctorale, site** | Rattachements administratifs de la personne. |
+| **Appartenances & historique** | Les laboratoires et équipes de la personne, avec le rattachement principal, le type et les dates d'appartenance. |
+| **Présence médias** | Les comptes et profils publics déclarés (CV, réseaux sociaux, blog) et les dernières mentions du laboratoire dans les médias. |
+
+## Modifier une fiche
+
+1. Modifiez les champs voulus directement dans les cartes.
+2. Pour les dates d'emploi et d'appartenance, vous pouvez saisir une année, un mois ou une
+   date complète (voir [Saisir des dates imprécises](/guides/personnes/dates-imprecises/)).
+3. Cliquez sur **Enregistrer** en haut de la fiche.
+
+La photo se change avec le crayon sur la photo (**Modifier la photo (URL)**) : indiquez
+l'adresse d'une image publique (page du labo, annuaire, HAL). Sans photo, Druid affiche les
+initiales.
+
+## Ce qui se passe ensuite
+
+Les modifications sont écrites **immédiatement** dans l'annuaire partagé. Elles sont
+transmises à CRISalid au prochain export (si votre instance le permet), et apparaissent dans
+les tableaux de bord à leur prochaine régénération.
+
+## Limites connues
+
+- **Les données de l'annuaire LDAP priment à l'affichage** pour la civilité, la date de
+  naissance et le grade : une correction faite dans Druid sur ces champs peut être masquée
+  par la valeur de l'annuaire. Pour une erreur de ce type, voir
+  [Où corriger quoi](/guides/corriger/ou-corriger-quoi/).
+- **Une personne peut avoir plusieurs fiches** (une par laboratoire). La fiche affiche
+  toutes ses appartenances, mais la validation et l'enregistrement portent sur la fiche
+  ouverte.
+- **Le statut ne se modifie pas directement** : il est calculé. Pour le corriger, validez la
+  fiche ou renseignez les dates de fin (voir
+  [Corriger le statut ou le rattachement](/guides/personnes/fiabiliser-statut-rattachement/)).
+
+## Voir aussi
+
+- [Statuts des personnes](/donnees/statuts-des-personnes/)
+- [Appartenances et rattachement](/donnees/appartenances-rattachement/)
+- [Identifiants chercheurs](/donnees/identifiants-chercheurs/)

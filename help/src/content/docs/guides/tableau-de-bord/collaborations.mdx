@@ -1,0 +1,74 @@
+---
+title: "Analyser les collaborations"
+description: "Lire les onglets de collaboration : typologie, nationales, internationales, établissements et alliances partenaires."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure"
+	menu="Tableau de bord › Collaborations"
+/>
+
+L'onglet **Collaborations** montre avec qui la structure publie : les autres laboratoires de
+l'établissement, les institutions françaises, les partenaires étrangers, et les alliances
+d'universités. Il se lit sur la période et le périmètre choisis en haut du tableau de bord.
+
+## Les sous-onglets
+
+| Sous-onglet | Ce qu'il montre |
+|---|---|
+| **Typologie** | La part de chaque type de collaboration et son évolution annuelle. |
+| **Dans la structure** | Pour une structure composite : les copublications entre ses laboratoires internes. |
+| **(nom de votre établissement)** | Les autres laboratoires de l'établissement les plus cosignataires, et les thématiques partagées. |
+| **Nationales** | Les institutions françaises (hors établissement) les plus cosignataires. |
+| **Internationales** | Les pays et les organismes étrangers : carte, classement, évolution, flux. |
+| **Institutions partenaires** | Le bilan des copublications avec une institution ou un groupe d'institutions choisi. |
+
+Les types de collaboration sont définis dans
+[Publications et attribution](/donnees/publications-attribution/#collaborations). Une
+publication peut en cumuler plusieurs ; la **Typologie** retient pour chacune la catégorie
+la plus large.
+
+## Faire le bilan avec une institution ou une alliance
+
+1. Ouvrez le sous-onglet **Institutions partenaires**.
+2. Choisissez un **groupe prédéfini** (par exemple une alliance d'universités européennes
+   comme EUniWell), ou cherchez une institution partenaire par son nom. Vous pouvez en
+   ajouter plusieurs pour composer votre propre groupe.
+3. Lisez le bilan : nombre de copublications, évolution annuelle, domaines et
+   sous-disciplines, chercheurs de l'établissement les plus impliqués.
+4. Pour un groupe d'universités, **Par université** détaille les copublications avec chaque
+   membre ; cliquez sur une barre pour voir les publications.
+5. Cochez **Exclure les grandes collaborations** pour écarter les publications à très
+   nombreux auteurs (physique des particules, grands consortiums), qui gonflent les chiffres.
+
+### Analyse thématique
+
+Sur certaines instances, **Analyse thématique (IA)** vous permet de décrire une thématique
+(« décarbonation maritime », « IA et santé »…) : l'assistant propose les sujets
+correspondants parmi ceux réellement présents dans les copublications. Corrigez la liste,
+puis **Générer l'analyse**.
+
+## Ce qui se passe ensuite
+
+Rien n'est modifié. Chaque graphique peut être exporté ou partagé (voir
+[Exporter](/guides/tableau-de-bord/exporter/)), et les publications détaillées ouvertes dans
+la liste.
+
+## Limites connues
+
+- **Une publication cosignée par plusieurs partenaires compte pour chacun** : la somme des
+  barres dépasse le total des copublications.
+- **Les institutions viennent d'OpenAlex** : une affiliation mal reconnue fait disparaître
+  (ou apparaître à tort) un partenaire.
+- **Les co-affiliations d'un même auteur** (un chercheur rattaché à l'université et au CNRS)
+  ne sont pas comptées comme des collaborations.
+- **L'analyse thématique** est une aide : les sujets proposés sont à vérifier.
+
+## Voir aussi
+
+- [Publications et attribution](/donnees/publications-attribution/)
+- [Faire le bilan des collaborations avec une alliance](/tutoriels/bilan-collaborations-alliance/)

@@ -1,0 +1,88 @@
+---
+title: "Aligner les identifiants d'un labo"
+description: "Compléter les identifiants IdRef, ORCID, HAL, OpenAlex et Scopus des chercheurs d'une structure."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Services centraux, administrateurs Druid"
+	menu="Outils d'alignement › Alignement des identifiants chercheurs"
+	disponibilite="toutes les instances ; la relance des recherches depuis Druid dépend de l'instance"
+/>
+
+Les identifiants chercheurs permettent à CRISalid de moissonner les publications de chaque
+personne. La page **Alignement des identifiants chercheurs** réunit les cinq sources (IdRef,
+ORCID, HAL, OpenAlex, Scopus) : **une ligne par personne, une colonne par identifiant**.
+
+## Étapes
+
+### 1. Choisir le périmètre
+
+1. Ouvrez **Outils d'alignement › Alignement des identifiants chercheurs**.
+2. Dans la liste des structures, choisissez le laboratoire. Ce choix limite à la fois
+   l'affichage et les recherches.
+3. Choisissez le groupe : **Personnel**, **Doctorants** ou **Sans obligation de
+   recherche**. Commencez par Personnel : c'est là que les identifiants comptent le plus.
+
+### 2. Lancer les recherches
+
+- **Rechercher manquants** / **Vérifier les existants** : choisissez le mode. Le premier
+  cherche les identifiants absents, le second revérifie ceux qui sont déjà renseignés
+  (notices fusionnées, profils disparus, noms divergents).
+- **Rechercher partout** lance la recherche en parallèle sur toutes les sources, pour la
+  structure choisie. L'avancement s'affiche par source sous le bouton.
+
+Selon le nombre de personnes, comptez de quelques minutes à plus d'une heure. Vous pouvez
+fermer la page : la recherche continue.
+
+:::note
+Sur certaines instances, les recherches sont lancées par l'équipe technique : la page
+affiche alors les résultats du dernier passage.
+:::
+
+### 3. Traiter les résultats
+
+Les compteurs en haut de page résument le travail : **Fiches à traiter**, **Candidats à
+cocher**, **Ambigus**, **Écarts de nom / notices remplacées**, **Conflits**. Cliquez sur un
+compteur pour n'afficher que ce type de cas, ou sur l'en-tête d'une source pour n'afficher
+qu'elle.
+
+1. Cochez les **candidats forts** : un par un dans les lignes, ou tous à la fois avec
+   **Cocher tous les candidats forts**. Une fiche marquée d'un éclair ⚡ partage déjà un
+   identifiant avec le profil proposé : c'est quasi certain.
+2. Ouvrez les autres cas (**candidats à vérifier**, **Ambigu — arbitrer**, **conflit**) en
+   cliquant sur la pastille : voir
+   [Accepter, rejeter ou ignorer un candidat](/guides/identifiants/accepter-rejeter-candidat/).
+3. Cliquez sur **Appliquer (N)** en bas de la page pour écrire vos choix.
+
+## Ce qui se passe ensuite
+
+- Les identifiants choisis sont écrits dans l'annuaire, avec la date et la source.
+- Druid **ne remplit que les cases vides** : aucune valeur existante n'est écrasée. Pour
+  OpenAlex, les profils cochés sont **ajoutés** à la liste de la personne.
+- La page ne liste que les fiches qui demandent encore une action : une fiche complète
+  disparaît de la liste.
+- Les identifiants partent vers CRISalid au prochain export, puis servent au moissonnage des
+  publications.
+
+## Limites connues
+
+- **Relancer une recherche efface les choix non appliqués** : Druid vous prévient.
+  Appliquez d'abord.
+- **« Aucun candidat trouvé »** ne veut pas dire que la personne n'a pas d'identifiant :
+  nom mal orthographié, profil sans affiliation, homonymes trop nombreux. Vérifiez à la main
+  sur la source.
+- **Les quotas des API** (Scopus en particulier) limitent le nombre de recherches par
+  semaine : pour un grand laboratoire, la recherche peut s'étaler sur plusieurs jours.
+- **Les fiches déjà complètes ou sans candidat n'apparaissent pas** : pour vérifier une
+  personne précise, ouvrez sa fiche.
+
+## Voir aussi
+
+- [Identifiants chercheurs](/donnees/identifiants-chercheurs/) : les sources et le calcul
+  des candidats
+- [Compléter les identifiants d'un laboratoire de A à Z](/tutoriels/identifiants-labo-a-z/)
+- [Exporter un fichier pour l'ABES](/guides/identifiants/export-abes/)

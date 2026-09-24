@@ -1,0 +1,19 @@
+node_modules
+dist
+dist-ssr
+*.log
+# Secrets locaux (VITE_GRIST_API_KEY, LDAP_BIND_PASSWORD…) : COPY . . dans le Dockerfile les
+# copierait sinon dans la couche de build stage (revue lot 12). Les vraies valeurs de prod passent
+# par les ARG/environment de druid.yaml, jamais par un .env embarqué dans l'image.
+.env
+.env.*
+# Leftovers of a local Cloudflare build (CF_PAGES=1): Centrale PII that `COPY . .` would
+# otherwise bake into the Nantes image (Vite copies public/ into dist/).
+public/dashboard-data
+public/*_align_cache.json
+# User help centre (separate Starlight site, deployed on its own — docs/plan-documentation-utilisateur.md):
+# only its Markdown pages enter the image, as the source of the « Aide Druid » assistant (/api/help-chat).
+help/*
+!help/src
+help/src/*
+!help/src/content

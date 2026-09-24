@@ -1,0 +1,74 @@
+---
+title: "Aligner avec l'annuaire LDAP"
+description: "Relier les fiches sans identifiant aux comptes de l'annuaire et vérifier les liens existants."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Services centraux, administrateurs Druid"
+	menu="Outils d'alignement › Alignement LDAP"
+	disponibilite="instances reliées à l'annuaire LDAP de l'établissement"
+/>
+
+L'annuaire LDAP de l'établissement dit si un compte est actif et donne le grade, l'employeur
+et les dates d'emploi des agents. Pour en profiter, chaque fiche doit porter l'**uid** de la
+personne. La page **Alignement LDAP** a deux onglets : **Rechercher manquants** (relier les
+fiches sans uid) et **Vérifier les existants** (reporter les changements de l'annuaire).
+
+## Rechercher manquants : relier les fiches sans uid
+
+1. Ouvrez **Rechercher manquants**.
+2. Cliquez sur **Lancer la recherche LDAP**. Druid cherche chaque fiche sans uid dans
+   l'annuaire, par **e-mail** puis par **nom**.
+3. Parcourez les **Candidats** :
+   - les correspondances par e-mail sont cochées ;
+   - les correspondances par **nom** sont **décochées** par défaut (moins sûres) : vérifiez
+     le grade, la civilité, la date de naissance affichés, puis cochez.
+4. Dans **Homonymes à arbitrer**, choisissez le bon compte pour chaque fiche, ou
+   **Aucun (ne pas rattacher)**.
+5. Cliquez sur **Rattacher la sélection**.
+
+Si l'uid est déjà porté par une autre fiche du même laboratoire, Druid le signale
+(**doublon de…**) et propose de **Fusionner** plutôt que de créer un doublon.
+
+En bas de l'onglet, la liste **uid LDAP sans fiche Annuaire** montre les personnes de
+l'annuaire qui n'ont aucune fiche dans Druid.
+
+## Vérifier les existants : reporter les changements
+
+1. Ouvrez **Vérifier les existants**.
+2. Cliquez sur **Relancer la synchronisation LDAP** : Druid relit tout l'annuaire (plusieurs
+   minutes, en arrière-plan) puis le compare aux fiches.
+3. Parcourez **À mettre à jour** : pour chaque fiche, les champs que l'annuaire a changés
+   (statut, emploi, nom…).
+4. Les fiches **validées manuellement** que l'annuaire contredit sont marquées **Validé —
+   conflit** et **décochées** : vérifiez avant de les écraser.
+5. Cochez ou décochez les lignes, puis cliquez sur **Appliquer**.
+
+La liste **Orphelins** montre les fiches dont l'uid n'existe plus dans l'annuaire : départ
+probable, à vérifier sur la fiche (statut, fin d'emploi).
+
+## Ce qui se passe ensuite
+
+- Les uid rattachés et les champs mis à jour sont écrits dans l'annuaire partagé.
+- Seules les fiches cochées sont modifiées ; aucune fiche n'est créée.
+- Les statuts sont recalculés avec les nouvelles données (voir
+  [Statuts des personnes](/donnees/statuts-des-personnes/)).
+
+## Limites connues
+
+- **Les personnes de l'annuaire sans fiche** ne sont pas créées automatiquement : il faut
+  créer leur fiche à la main.
+- **Le rapprochement par nom** peut se tromper entre homonymes : ne cochez qu'après
+  vérification.
+- **Les agents d'autres organismes** (CNRS, Inserm…) ont parfois un compte hébergé : leur
+  statut suit leur employeur, pas l'état du compte (voir
+  [Statuts des personnes](/donnees/statuts-des-personnes/#1-lemployeur)).
+
+## Voir aussi
+
+- [Corriger le statut ou le rattachement](/guides/personnes/fiabiliser-statut-rattachement/)
+- [Traiter un doublon](/guides/personnes/traiter-un-doublon/)

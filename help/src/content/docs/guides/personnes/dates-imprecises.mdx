@@ -1,0 +1,68 @@
+---
+title: "Saisir des dates d'emploi imprécises"
+description: "Saisir une date à l'année, au mois ou au jour, et distinguer dates d'emploi et dates d'appartenance."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la fiche"
+	menu="Personnel › fiche › cartes Emploi & contrat et Appartenances & historique"
+/>
+
+On ne connaît pas toujours la date exacte d'une arrivée ou d'un départ : un laboratoire
+indique « partie en 2025 », une liste RH donne un mois. Druid accepte des dates **à
+l'année, au mois ou au jour**, pour ne pas inventer une précision qu'on n'a pas.
+
+## Les quatre dates de la fiche
+
+| Carte | Dates | Ce qu'elles décrivent |
+|---|---|---|
+| **Emploi & contrat** | **Début d'emploi**, **Fin d'emploi** | Le contrat de travail avec l'employeur. |
+| **Appartenances & historique** | Début et fin d'appartenance | La présence dans le laboratoire ou l'équipe. |
+
+Elles ne coïncident pas toujours : voir
+[Appartenances et rattachement](/donnees/appartenances-rattachement/).
+
+## Étapes
+
+1. Ouvrez la fiche de la personne.
+2. Dans le champ de date, tapez ce que vous savez :
+
+   | Vous savez | Tapez |
+   |---|---|
+   | L'année | `2025` |
+   | Le mois | `2025-09` ou `09/2025` |
+   | Le jour | `2025-09-01` ou `01/09/2025` |
+
+   Pour une date complète, vous pouvez aussi utiliser le calendrier à droite du champ.
+3. Quittez le champ : la date est mise au format de Druid. Une saisie illisible reste en
+   **rouge** et ne sera pas enregistrée.
+4. Pour un départ, renseignez la fin d'appartenance puis cliquez sur **→ fin d'emploi** :
+   la même date est recopiée comme fin d'emploi.
+5. Cliquez sur **Enregistrer**.
+
+## Ce qui se passe ensuite
+
+- La date est enregistrée **avec sa précision** : `2025` reste `2025`.
+- Le **statut** est recalculé : une fin d'emploi **et** une fin d'appartenance passées font
+  passer la personne en **Parti** (voir
+  [Statuts des personnes](/donnees/statuts-des-personnes/#6-le-départ-certain)).
+- Vers CRISalid, une date imprécise est transmise comme la borne de sa période : premier
+  jour pour un début, dernier jour pour une fin.
+
+## Limites connues
+
+- **Une période n'est passée qu'une fois entièrement écoulée** : une fin `2026` ne fait
+  partir la personne qu'à partir du 1er janvier 2027. Si vous savez que le départ a eu lieu
+  en juin, saisissez `2026-06`.
+- **La date de naissance** reste une date complète.
+- **Le bouton → fin d'emploi** remplace une fin d'emploi existante : Druid vous le signale
+  quand elle est différente.
+
+## Voir aussi
+
+- [Corriger le statut ou le rattachement](/guides/personnes/fiabiliser-statut-rattachement/)
+- [Appartenances et rattachement](/donnees/appartenances-rattachement/#dates-imprécises)

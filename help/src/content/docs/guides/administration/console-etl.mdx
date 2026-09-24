@@ -1,0 +1,89 @@
+---
+title: "Piloter la console ETL"
+description: "Configurer les structures du tableau de bord bibliométrique et régénérer leurs données."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs techniques"
+	menu="Administration › Console ETL ; Tableau de bord › Configurer"
+	disponibilite="instances reliées à la chaîne bibliométrique (druid-biblio)"
+/>
+
+La **console ETL** configure, pour chaque structure, la façon dont ses publications sont
+moissonnées, et lance le calcul de son tableau de bord. C'est là qu'on crée le tableau de
+bord d'un nouveau laboratoire, qu'on corrige son périmètre ou qu'on le met à jour.
+
+## Ouvrir une structure
+
+- Depuis **Administration › Console ETL**, choisissez la structure ;
+- ou, depuis son tableau de bord, cliquez sur **Configurer**.
+
+L'en-tête indique l'état de la dernière génération (**Terminée le…**, **Échec le…**, **En
+cours depuis…**) et la date du tableau de bord.
+
+## Configurer
+
+La configuration est organisée en quatre sections :
+
+| Section | Réglages principaux |
+|---|---|
+| **1. Identité de la structure** | Acronyme, nom complet, années de début et de fin, terme pour les regroupements internes (« équipe »), ETP recherche (active les ratios de production). |
+| **2. Sources de données** | Identifiant(s) d'institution OpenAlex, marqueurs d'affiliation BSO (sigle, nom, RNSR…), URL du dump BSO, collection HAL et année de départ, identifiant de la structure dans le graphe CRISalid, e-mail de contact OpenAlex. |
+| **3. Grist et contrôle des affiliations** | Acronyme de la structure dans l'annuaire (champ LABO), mots-clés d'affiliation positifs et négatifs, modèle de signature de la charte. |
+| **4. Sous-structures et affichage** | Laboratoires d'une institution composite, onglets masqués du tableau de bord, restriction du corpus aux publications des effectifs. |
+
+- **Enregistrer la configuration** suffit pour les onglets masqués et l'identité : le tableau
+  de bord en tient compte sans régénération.
+- **Enregistrer et régénérer les données** relance le moissonnage et le calcul.
+
+## Régénérer un tableau de bord
+
+1. Cliquez sur **Enregistrer et régénérer les données**.
+2. Suivez l'avancement et le **Journal de la dernière génération**. Comptez de quelques
+   minutes à une heure selon la taille de la structure.
+3. Une fois terminé, **Voir le tableau de bord**.
+
+À chaque génération, les **effectifs** (fiches validées de la structure dans l'annuaire, hors
+départs), les quartiles des revues et leur accès sont mis à jour automatiquement.
+
+## Créer le tableau de bord d'une nouvelle structure
+
+1. Cliquez sur **➕ Nouvelle structure**, renseignez l'acronyme et le nom, puis **Créer la
+   structure**.
+2. Complétez au moins la section 2 (identifiant OpenAlex, marqueurs BSO, collection HAL) et
+   l'acronyme de la section 3.
+3. **Enregistrer et régénérer les données**.
+
+## Maintenance
+
+- **Effectifs (Annuaire Grist)** : combien de membres ont été retenus (validés, non
+  validés ignorés, départs ignorés). **Resynchroniser depuis Grist** met à jour la liste sans
+  régénérer.
+- **Vérification des affiliations OpenAlex** : détecte les publications à l'affiliation
+  suspecte et suit leur correction (voir
+  [Une affiliation est fausse](/guides/corriger/affiliation-fausse/)).
+
+## Ce qui se passe ensuite
+
+La génération produit les données du tableau de bord. Les utilisateurs voient les nouveaux
+chiffres dès la fin de la génération, en rechargeant la page.
+
+## Limites connues
+
+- **Une seule génération à la fois** pour toute l'instance : une demande attend la fin de
+  la génération en cours.
+- **Les quotas d'OpenAlex** limitent le nombre de régénérations complètes par jour.
+- **Les membres non validés sont ignorés** : un effectif trop faible vient souvent de fiches
+  non validées dans l'annuaire.
+- **Un mauvais identifiant OpenAlex** ou des marqueurs BSO trop larges font entrer des
+  publications d'autres structures : vérifiez l'onglet Sources et la liste des publications
+  après chaque changement.
+
+## Voir aussi
+
+- [Publications et attribution](/donnees/publications-attribution/)
+- [D'où viennent les données](/donnees/sources-des-donnees/)

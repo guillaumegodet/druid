@@ -1,0 +1,89 @@
+---
+title: "Traiter un doublon"
+description: "Fusionner deux fiches d'une même personne ou les qualifier comme appartenances multiples."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs Druid (le bouton À traiter s'affiche si vous êtes aussi administrateur technique)"
+	menu="Personnel › À traiter › Doublons"
+/>
+
+Un **doublon**, ce sont plusieurs fiches qui portent le même uid, c'est-à-dire la même
+personne. Ce n'est pas toujours une erreur : une personne peut appartenir à deux
+laboratoires. Druid vous demande de trancher, groupe par groupe.
+
+## Les trois cas
+
+La page **Doublons** classe les groupes en trois catégories :
+
+| Catégorie | Situation | Que faire |
+|---|---|---|
+| **Même labo** | Deux fiches pour le même laboratoire, en général une ligne issue de l'annuaire LDAP et une ligne créée depuis le site du labo. | **Fusionner** |
+| **Parking** | Une des fiches n'a pas de laboratoire (ou un laboratoire provisoire). | **Fusionner** : la fiche sans labo est absorbée par celle du labo. |
+| **Plusieurs labos** | Une fiche par laboratoire. | **Qualifier** : ce n'est pas forcément une erreur. |
+
+Les groupes apparus depuis votre dernière visite portent la mention **nouveau**. Les groupes
+déjà qualifiés sont rangés dans **Multi-rattachements qualifiés**.
+
+## Fusionner deux fiches
+
+1. Dans le groupe, cliquez sur **Fusionner**. L'assistant **Fusionner deux fiches**
+   s'ouvre.
+2. Vérifiez quelle fiche est **Conservée** : Druid propose celle qui a un laboratoire, puis
+   celle qui est validée, puis la plus complète. Cliquez sur l'autre fiche pour inverser.
+3. Parcourez les **Champs à arbitrer** : pour chaque champ qui diffère, Druid pré-coche une
+   valeur et indique pourquoi (validation la plus récente, mise à jour LDAP la plus récente,
+   union des deux valeurs, complète un champ vide…). Modifiez au besoin.
+4. Cliquez sur **Fusionner**.
+
+La fiche conservée est complétée, l'autre est supprimée. L'opération est **journalisée** :
+le **Journal des fusions**, en bas de la page Doublons, permet de la **Restaurer**.
+
+:::caution
+Si les deux fiches n'ont pas le même uid, Druid vous demande de confirmer qu'il s'agit bien
+de la même personne. En cas de doute, ne fusionnez pas : ouvrez les deux fiches et
+vérifiez.
+:::
+
+## Qualifier un multi-rattachement
+
+1. Dans le groupe, cliquez sur **Qualifier**.
+2. Choisissez la **Ligne principale** : la fiche du laboratoire principal de la personne.
+3. Choisissez le type :
+   - **Concomitant** : la personne appartient aux deux laboratoires en même temps. Les
+     autres fiches deviennent **secondaires** ;
+   - **Successif** : la personne a changé de laboratoire. Les autres fiches deviennent
+     **historiques** ; vous pouvez indiquer la date de fin de l'ancien rattachement ;
+   - **À revoir** : cas indéterminé, mémorisé pour ne plus revenir à chaque revue.
+4. Validez.
+
+Le groupe passe dans **Multi-rattachements qualifiés**. Vous pouvez le **Requalifier** plus
+tard.
+
+## Ce qui se passe ensuite
+
+- Une fusion modifie l'annuaire immédiatement : la fiche absorbée disparaît des listes, et
+  la trace de la fusion est ajoutée à la fiche conservée.
+- Une qualification ne supprime rien : elle indique, sur chaque fiche, si elle est
+  principale, secondaire ou historique. La fiche chercheur affiche alors toutes les
+  appartenances de la personne.
+- Vers CRISalid, une personne n'est exportée qu'une fois, avec sa fiche principale.
+
+## Limites connues
+
+- **Seuls les doublons d'uid sont détectés** : deux fiches d'une même personne sans uid
+  commun (par exemple une personne extérieure saisie deux fois sous deux orthographes) ne
+  sont pas repérées.
+- **Restaurer une fusion remet la fiche conservée dans son état d'avant la fusion** : les
+  modifications faites entre-temps sur cette fiche sont perdues.
+- **Le bouton Actualiser recalcule les groupes depuis l'annuaire**, sans nouvelle
+  synchronisation avec l'annuaire LDAP.
+
+## Voir aussi
+
+- [Appartenances et rattachement](/donnees/appartenances-rattachement/)
+- [Suivre les tâches « À traiter »](/guides/personnes/taches-a-traiter/)

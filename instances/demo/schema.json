@@ -1,0 +1,1382 @@
+{
+ "_comment": "Schema of the Centrale Grist doc (column ids, types, formulas; no data), snapshot of 2026-09-24. Source of the demo doc tables (build_demo_grist.mjs).",
+ "tables": [
+  {
+   "id": "Etablissements",
+   "columns": [
+    {
+     "id": "Employeur",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "UAI",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "ROR",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Libelle",
+     "fields": {
+      "type": "Text",
+      "label": "Libellé"
+     }
+    }
+   ]
+  },
+  {
+   "id": "Structures",
+   "columns": [
+    {
+     "id": "generic_type",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "type",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "local_types",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "main_mission",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "secondary_missions",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "local_id",
+     "fields": {
+      "type": "Numeric"
+     }
+    },
+    {
+     "id": "short_labels",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "long_labels",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "descriptions",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "inclusions",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "participations",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "uai",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "nns",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "ror",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "isni",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "wikidata",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "scopus",
+     "fields": {
+      "type": "Numeric"
+     }
+    },
+    {
+     "id": "erc_research_field",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "hceres_research_areas",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "hal_collection",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "web",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "signature",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "campus",
+     "fields": {
+      "type": "Any"
+     }
+    },
+    {
+     "id": "LDAP_derniere_maj",
+     "fields": {
+      "type": "Date",
+      "label": "LDAP derniere maj",
+      "widgetOptions": "{\"dateFormat\":\"YYYY-MM-DD\",\"timeFormat\":\"\",\"isCustomDateFormat\":false,\"isCustomTimeFormat\":true}"
+     }
+    },
+    {
+     "id": "LDAP_champs_modifies",
+     "fields": {
+      "type": "Text",
+      "label": "LDAP champs modifies"
+     }
+    },
+    {
+     "id": "supann_code_entite",
+     "fields": {
+      "type": "Numeric",
+      "label": "supann code entite"
+     }
+    },
+    {
+     "id": "parent_structure",
+     "fields": {
+      "type": "Text",
+      "label": "parent structure"
+     }
+    }
+   ]
+  },
+  {
+   "id": "Annuaire",
+   "columns": [
+    {
+     "id": "Alignement_annuaire",
+     "fields": {
+      "type": "Text",
+      "label": "Alignement annuaire"
+     }
+    },
+    {
+     "id": "LABO",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "uid_dyna",
+     "fields": {
+      "type": "Text",
+      "label": "uid dyna"
+     }
+    },
+    {
+     "id": "Nom",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Prenom",
+     "fields": {
+      "type": "Text",
+      "label": "Prénom"
+     }
+    },
+    {
+     "id": "Email",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Nationalite",
+     "fields": {
+      "type": "Text",
+      "label": "Nationalité"
+     }
+    },
+    {
+     "id": "DATE_DE_NAISSANCE_JJ_MM_AAAA",
+     "fields": {
+      "type": "Date",
+      "label": "DATE DE NAISSANCE\nJJ/MM/AAAA",
+      "widgetOptions": "{\"dateFormat\":\"DD-MM-YYYY\",\"timeFormat\":\"\",\"isCustomDateFormat\":false,\"isCustomTimeFormat\":true}"
+     }
+    },
+    {
+     "id": "Corps_grade",
+     "fields": {
+      "type": "Text",
+      "label": "Corps-grade",
+      "widgetOptions": "{\"choices\":[\"PREM\",\"MCFEM\",\"DREM\",\"CREM\"]}"
+     }
+    },
+    {
+     "id": "TYPE_EMPLOI",
+     "fields": {
+      "type": "Text",
+      "label": "TYPE EMPLOI"
+     }
+    },
+    {
+     "id": "HDR",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "ANNEE_HDR",
+     "fields": {
+      "type": "Text",
+      "label": "ANNEE HDR"
+     }
+    },
+    {
+     "id": "ED_de_rattachement",
+     "fields": {
+      "type": "Text",
+      "label": "ED de rattachement"
+     }
+    },
+    {
+     "id": "team",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Employeur",
+     "fields": {
+      "type": "Ref:Etablissements",
+      "widgetOptions": "{\"widget\":\"Reference\",\"alignment\":\"left\"}"
+     }
+    },
+    {
+     "id": "employment_start_date",
+     "fields": {
+      "type": "Text",
+      "widgetOptions": "{\"widget\":\"TextBox\",\"alignment\":\"left\"}"
+     }
+    },
+    {
+     "id": "employment_end_date",
+     "fields": {
+      "type": "Text",
+      "widgetOptions": "{\"widget\":\"TextBox\",\"alignment\":\"left\"}"
+     }
+    },
+    {
+     "id": "IdRef",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "IdHAL",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "ORCID",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "ID_SCOPUS",
+     "fields": {
+      "type": "Numeric",
+      "label": "ID SCOPUS"
+     }
+    },
+    {
+     "id": "Commentaires",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Civilite",
+     "fields": {
+      "type": "Text",
+      "label": "Civilité"
+     }
+    },
+    {
+     "id": "campus",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "LDAP_derniere_maj",
+     "fields": {
+      "type": "Date",
+      "label": "LDAP derniere maj",
+      "widgetOptions": "{\"dateFormat\":\"YYYY-MM-DD\",\"timeFormat\":\"\",\"isCustomDateFormat\":false,\"isCustomTimeFormat\":true}"
+     }
+    },
+    {
+     "id": "LDAP_champs_modifies",
+     "fields": {
+      "type": "Text",
+      "label": "LDAP champs modifies"
+     }
+    },
+    {
+     "id": "IdRef_derniere_maj",
+     "fields": {
+      "type": "Date",
+      "widgetOptions": "{\"dateFormat\":\"YYYY-MM-DD\",\"timeFormat\":\"\",\"isCustomDateFormat\":false,\"isCustomTimeFormat\":true}"
+     }
+    },
+    {
+     "id": "IdRef_champs_modifies",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "IdRef_nom_valide",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "validated",
+     "fields": {
+      "type": "Bool"
+     }
+    },
+    {
+     "id": "validated_status",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "validation_date",
+     "fields": {
+      "type": "Date",
+      "widgetOptions": "{\"dateFormat\":\"YYYY-MM-DD\",\"timeFormat\":\"\",\"isCustomDateFormat\":false,\"isCustomTimeFormat\":true}"
+     }
+    },
+    {
+     "id": "validation_source",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "validation_scope",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "validated_by",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "photo_url",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "annuaire_url",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "groupes",
+     "fields": {
+      "type": "Text",
+      "label": "Groupes fonctionnels"
+     }
+    },
+    {
+     "id": "openalex_author_id",
+     "fields": {
+      "type": "Text",
+      "label": "ID auteur OpenAlex"
+     }
+    },
+    {
+     "id": "Bluesky",
+     "fields": {
+      "type": "Text",
+      "label": "Bluesky (compte public déclaré)"
+     }
+    },
+    {
+     "id": "Mastodon",
+     "fields": {
+      "type": "Text",
+      "label": "Mastodon (compte public déclaré)"
+     }
+    },
+    {
+     "id": "YouTube",
+     "fields": {
+      "type": "Text",
+      "label": "YouTube (chaîne publique déclarée)"
+     }
+    },
+    {
+     "id": "Podcast_flux",
+     "fields": {
+      "type": "Text",
+      "label": "Podcast (flux RSS déclaré)"
+     }
+    },
+    {
+     "id": "Blog",
+     "fields": {
+      "type": "Text",
+      "label": "Blog / carnet (URL déclarée)"
+     }
+    },
+    {
+     "id": "LinkedIn",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "CV_institutionnel",
+     "fields": {
+      "type": "Text",
+      "label": "CV institutionnel"
+     }
+    },
+    {
+     "id": "CV_site_labo",
+     "fields": {
+      "type": "Text",
+      "label": "CV site labo"
+     }
+    },
+    {
+     "id": "CV_pdf_docx_",
+     "fields": {
+      "type": "Text",
+      "label": "CV (pdf, docx..)"
+     }
+    },
+    {
+     "id": "CV_HAL",
+     "fields": {
+      "type": "Text",
+      "label": "CV HAL"
+     }
+    },
+    {
+     "id": "Academia",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Researchgate",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Profil_GS",
+     "fields": {
+      "type": "Text",
+      "label": "Profil GS"
+     }
+    },
+    {
+     "id": "Site_web",
+     "fields": {
+      "type": "Text",
+      "label": "Site web"
+     }
+    },
+    {
+     "id": "IdHAL_i",
+     "fields": {
+      "type": "Text",
+      "label": "IdHAL (numérique)"
+     }
+    },
+    {
+     "id": "affiliation_start_date",
+     "fields": {
+      "type": "Text",
+      "label": "Début d'appartenance",
+      "widgetOptions": "{\"widget\":\"TextBox\",\"alignment\":\"left\"}"
+     }
+    },
+    {
+     "id": "affiliation_end_date",
+     "fields": {
+      "type": "Text",
+      "label": "Fin d'appartenance",
+      "widgetOptions": "{\"widget\":\"TextBox\",\"alignment\":\"left\"}"
+     }
+    },
+    {
+     "id": "membership_type",
+     "fields": {
+      "type": "Choice",
+      "label": "Type d'appartenance",
+      "widgetOptions": "{\"choices\":[\"stat_mmb\",\"assoc_mmb\",\"second_mmb\",\"visit_mmb\"]}"
+     }
+    },
+    {
+     "id": "LIB_TYPE_EMPLOI",
+     "fields": {
+      "type": "Text",
+      "label": "Type d'emploi (libellé RH)",
+      "isFormula": true
+     }
+    },
+    {
+     "id": "HAL_derniere_maj",
+     "fields": {
+      "type": "Text",
+      "label": "HAL dernière MAJ"
+     }
+    },
+    {
+     "id": "HAL_champs_modifies",
+     "fields": {
+      "type": "Text",
+      "label": "HAL champs modifiés"
+     }
+    },
+    {
+     "id": "ORCID_derniere_maj",
+     "fields": {
+      "type": "Text",
+      "label": "ORCID dernière MAJ"
+     }
+    },
+    {
+     "id": "ORCID_champs_modifies",
+     "fields": {
+      "type": "Text",
+      "label": "ORCID champs modifiés"
+     }
+    },
+    {
+     "id": "OpenAlex_ids",
+     "fields": {
+      "type": "Text",
+      "label": "OpenAlex ids (A-ids, |)"
+     }
+    },
+    {
+     "id": "OpenAlex_derniere_maj",
+     "fields": {
+      "type": "Text",
+      "label": "OpenAlex dernière MAJ"
+     }
+    },
+    {
+     "id": "OpenAlex_champs_modifies",
+     "fields": {
+      "type": "Text",
+      "label": "OpenAlex champs modifiés"
+     }
+    },
+    {
+     "id": "ABES_export_hash",
+     "fields": {
+      "type": "Text",
+      "label": "ABES export (empreinte)",
+      "isFormula": true
+     }
+    },
+    {
+     "id": "ABES_export_date",
+     "fields": {
+      "type": "Text",
+      "label": "ABES export (date)",
+      "isFormula": true
+     }
+    }
+   ]
+  },
+  {
+   "id": "Alignement_IdRef",
+   "columns": [
+    {
+     "id": "uid_dyna",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Nom_annuaire",
+     "fields": {
+      "type": "Text",
+      "label": "Nom annuaire"
+     }
+    },
+    {
+     "id": "LABO",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Nb_candidats",
+     "fields": {
+      "type": "Int",
+      "label": "Nb candidats"
+     }
+    },
+    {
+     "id": "PPN_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "PPN candidat"
+     }
+    },
+    {
+     "id": "Lien_IdRef",
+     "fields": {
+      "type": "Text",
+      "label": "Lien IdRef",
+      "isFormula": true,
+      "formula": "\"https://www.idref.fr/\" + str($PPN_candidat or \"\")",
+      "widgetOptions": "{\"widget\":\"HyperLink\"}"
+     }
+    },
+    {
+     "id": "Nom_notice",
+     "fields": {
+      "type": "Text",
+      "label": "Nom notice"
+     }
+    },
+    {
+     "id": "Profession",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Naissance",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Description_notice",
+     "fields": {
+      "type": "Text",
+      "label": "Description notice"
+     }
+    },
+    {
+     "id": "ORCID_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "ORCID candidat"
+     }
+    },
+    {
+     "id": "IdHAL_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "IdHAL candidat"
+     }
+    },
+    {
+     "id": "Decision",
+     "fields": {
+      "type": "Choice",
+      "label": "Décision",
+      "widgetOptions": "{\"choices\":[\"À traiter\",\"Validé\",\"Rejeté\",\"Identité mêlée\"],\"choiceOptions\":{\"À traiter\":{\"fillColor\":\"#FFE5B4\",\"textColor\":\"#000000\"},\"Validé\":{\"fillColor\":\"#C7F0C2\",\"textColor\":\"#000000\"},\"Rejeté\":{\"fillColor\":\"#F2C2C2\",\"textColor\":\"#000000\"},\"Identité mêlée\":{\"fillColor\":\"#D9C8F5\",\"textColor\":\"#000000\"}}}"
+     }
+    },
+    {
+     "id": "Applique",
+     "fields": {
+      "type": "Bool",
+      "label": "Appliqué"
+     }
+    },
+    {
+     "id": "Date_application",
+     "fields": {
+      "type": "Text",
+      "label": "Date application"
+     }
+    },
+    {
+     "id": "Pousse_le",
+     "fields": {
+      "type": "Text",
+      "label": "Poussé le"
+     }
+    },
+    {
+     "id": "Note",
+     "fields": {
+      "type": "Text",
+      "label": "Note (identité mêlée : qui possède quoi)"
+     }
+    },
+    {
+     "id": "Signale_le",
+     "fields": {
+      "type": "Text",
+      "label": "Signalé à la source le"
+     }
+    },
+    {
+     "id": "Meler_action",
+     "fields": {
+      "type": "Any",
+      "label": "Identité mêlée (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Identité mêlée\", \"description\": \"Profil qui mélange plusieurs personnes pour %s : ni validé ni rejeté, à démêler à la source (renseigner Note et Signale_le)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_IdRef\", $id, {\"Decision\": \"Identité mêlée\", \"Date_application\": today}]]}"
+     }
+    },
+    {
+     "id": "Valider_action",
+     "fields": {
+      "type": "Any",
+      "label": "Valider (action)",
+      "isFormula": true,
+      "formula": "if $Decision == \"Validé\":\n  return {\"button\": \"Validé ✓\", \"description\": \"Déjà appliqué%s\" % ((\" le \" + $Date_application) if $Date_application else \"\"), \"actions\": []}\nif $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\nann = Annuaire.lookupOne(uid_dyna=$uid_dyna)\nif not ann:\n  return {\"button\": \"Fiche introuvable\", \"description\": \"Aucune fiche Annuaire avec uid_dyna=%s\" % $uid_dyna, \"actions\": []}\nimport re\ndef _ppn(v):\n  m = re.search(r\"([0-9]{6,}[0-9Xx])\", str(v or \"\"))\n  return m.group(1).upper() if m else \"\"\nfields = {}\ndone = []\ncur = str(ann.IdRef or \"\").strip()\nif not cur:\n  fields[\"IdRef\"] = $PPN_candidat\n  done.append(\"IdRef\")\nelif _ppn(cur) != _ppn($PPN_candidat):\n  return {\"button\": \"Conflit IdRef\", \"description\": \"L'Annuaire contient déjà l'IdRef %s (différent de %s) : à régler dans Druid\" % (cur, $PPN_candidat), \"actions\": []}\nif str($ORCID_candidat or \"\").strip() and not str(ann.ORCID or \"\").strip():\n  fields[\"ORCID\"] = $ORCID_candidat\n  done.append(\"ORCID\")\nif str($IdHAL_candidat or \"\").strip() and not str(ann.IdHAL or \"\").strip():\n  fields[\"IdHAL\"] = $IdHAL_candidat\n  done.append(\"IdHAL\")\ntoday = NOW().strftime(\"%Y-%m-%d\")\nactions = []\nif fields:\n  fields[\"IdRef_derniere_maj\"] = today\n  fields[\"IdRef_champs_modifies\"] = \"|\".join(done)\n  note = \"[%s] MAJ IdRef (revue Grist): %s\" % (today, \", \".join(done))\n  com = str(ann.Commentaires or \"\")\n  fields[\"Commentaires\"] = (com + \"\\n\" + note) if com else note\n  actions.append([\"UpdateRecord\", \"Annuaire\", ann.id, fields])\nactions.append([\"UpdateRecord\", \"Alignement_IdRef\", $id, {\"Decision\": \"Validé\", \"Applique\": True, \"Date_application\": today}])\n# Les autres candidats encore en attente pour la même personne sont auto-rejetés.\nfor sib in Alignement_IdRef.lookupRecords(uid_dyna=$uid_dyna):\n  if sib.id != $id and sib.Decision == \"À traiter\":\n    actions.append([\"UpdateRecord\", \"Alignement_IdRef\", sib.id, {\"Decision\": \"Rejeté\", \"Date_application\": today}])\nlabel = (\"Valider \" + \" + \".join(done)) if done else \"Valider (rien à écrire)\"\nreturn {\"button\": label, \"description\": \"%s -> IdRef %s\" % ($Nom_annuaire, $PPN_candidat), \"actions\": actions}"
+     }
+    },
+    {
+     "id": "Rejeter_action",
+     "fields": {
+      "type": "Any",
+      "label": "Rejeter (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Rejeter\", \"description\": \"Écarte ce candidat pour %s (il ne sera plus reproposé)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_IdRef\", $id, {\"Decision\": \"Rejeté\", \"Date_application\": today}]]}"
+     }
+    }
+   ]
+  },
+  {
+   "id": "Alignement_ORCID",
+   "columns": [
+    {
+     "id": "uid_dyna",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Annuaire_id",
+     "fields": {
+      "type": "Int",
+      "label": "Annuaire (ligne)"
+     }
+    },
+    {
+     "id": "Nom_annuaire",
+     "fields": {
+      "type": "Text",
+      "label": "Nom annuaire"
+     }
+    },
+    {
+     "id": "LABO",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Nb_candidats",
+     "fields": {
+      "type": "Int",
+      "label": "Nb candidats"
+     }
+    },
+    {
+     "id": "ORCID_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "ORCID candidat"
+     }
+    },
+    {
+     "id": "Lien_ORCID",
+     "fields": {
+      "type": "Text",
+      "label": "Lien ORCID",
+      "isFormula": true,
+      "formula": "\"https://orcid.org/\" + str($ORCID_candidat or \"\")",
+      "widgetOptions": "{\"widget\":\"HyperLink\"}"
+     }
+    },
+    {
+     "id": "Nom_profil",
+     "fields": {
+      "type": "Text",
+      "label": "Nom profil ORCID"
+     }
+    },
+    {
+     "id": "Autres_noms",
+     "fields": {
+      "type": "Text",
+      "label": "Autres noms"
+     }
+    },
+    {
+     "id": "Score",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Preuves",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Affiliations",
+     "fields": {
+      "type": "Text",
+      "label": "Affiliations (ORCID)"
+     }
+    },
+    {
+     "id": "Emplois",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Emails",
+     "fields": {
+      "type": "Text",
+      "label": "Emails publics"
+     }
+    },
+    {
+     "id": "Scopus_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "Scopus candidat"
+     }
+    },
+    {
+     "id": "Decision",
+     "fields": {
+      "type": "Choice",
+      "label": "Décision",
+      "widgetOptions": "{\"choices\":[\"À traiter\",\"Validé\",\"Rejeté\",\"Identité mêlée\"],\"choiceOptions\":{\"À traiter\":{\"fillColor\":\"#FFE5B4\",\"textColor\":\"#000000\"},\"Validé\":{\"fillColor\":\"#C7F0C2\",\"textColor\":\"#000000\"},\"Rejeté\":{\"fillColor\":\"#F2C2C2\",\"textColor\":\"#000000\"},\"Identité mêlée\":{\"fillColor\":\"#D9C8F5\",\"textColor\":\"#000000\"}}}"
+     }
+    },
+    {
+     "id": "Note",
+     "fields": {
+      "type": "Text",
+      "label": "Note (identité mêlée : qui possède quoi)"
+     }
+    },
+    {
+     "id": "Signale_le",
+     "fields": {
+      "type": "Text",
+      "label": "Signalé à la source le"
+     }
+    },
+    {
+     "id": "Meler_action",
+     "fields": {
+      "type": "Any",
+      "label": "Identité mêlée (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Identité mêlée\", \"description\": \"Profil qui mélange plusieurs personnes pour %s : ni validé ni rejeté, à démêler à la source (renseigner Note et Signale_le)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_ORCID\", $id, {\"Decision\": \"Identité mêlée\", \"Date_application\": today}]]}"
+     }
+    },
+    {
+     "id": "Applique",
+     "fields": {
+      "type": "Bool",
+      "label": "Appliqué"
+     }
+    },
+    {
+     "id": "Date_application",
+     "fields": {
+      "type": "Text",
+      "label": "Date application"
+     }
+    },
+    {
+     "id": "Pousse_le",
+     "fields": {
+      "type": "Text",
+      "label": "Poussé le"
+     }
+    },
+    {
+     "id": "Valider_action",
+     "fields": {
+      "type": "Any",
+      "label": "Valider (action)",
+      "isFormula": true,
+      "formula": "if $Decision == \"Validé\":\n  return {\"button\": \"Validé ✓\", \"description\": \"Déjà appliqué%s\" % ((\" le \" + $Date_application) if $Date_application else \"\"), \"actions\": []}\nif $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\nann = Annuaire.lookupOne(id=$Annuaire_id) if $Annuaire_id else Annuaire.lookupOne(uid_dyna=$uid_dyna)\nif not ann:\n  return {\"button\": \"Fiche introuvable\", \"description\": \"Aucune fiche Annuaire pour %s\" % $uid_dyna, \"actions\": []}\nimport re\ndef _orcid(v):\n  m = re.search(r\"(\\d{4}-\\d{4}-\\d{4}-\\d{3}[\\dXx])\", str(v or \"\"))\n  return m.group(1).upper() if m else \"\"\nfields = {}\ndone = []\ncur = _orcid(ann.ORCID)\ncand = _orcid($ORCID_candidat)\nif not cur:\n  fields[\"ORCID\"] = cand\n  done.append(\"ORCID\")\nelif cur != cand:\n  return {\"button\": \"Conflit ORCID\", \"description\": \"L'Annuaire contient déjà l'ORCID %s (différent de %s) : à régler dans Druid\" % (cur, cand), \"actions\": []}\nif str($Scopus_candidat or \"\").strip() and not str(ann.ID_SCOPUS or \"\").strip():\n  fields[\"ID_SCOPUS\"] = str($Scopus_candidat).strip()\n  done.append(\"ID_SCOPUS\")\ntoday = NOW().strftime(\"%Y-%m-%d\")\nactions = []\nif fields:\n  src = str(ann.Data_source or \"\")\n  parts = [s.strip().upper() for s in re.split(r\"[|,]\", src) if s.strip()]\n  if \"ORCID\" not in parts:\n    fields[\"Data_source\"] = (src + \"|ORCID\") if src else \"ORCID\"\n  fields[\"ORCID_derniere_maj\"] = today\n  fields[\"ORCID_champs_modifies\"] = \"|\".join(done)\n  note = \"[%s] MAJ ORCID (revue Grist): %s\" % (today, \", \".join(done))\n  com = str(ann.Commentaires or \"\")\n  fields[\"Commentaires\"] = (com + \"\\n\" + note) if com else note\n  actions.append([\"UpdateRecord\", \"Annuaire\", ann.id, fields])\nactions.append([\"UpdateRecord\", \"Alignement_ORCID\", $id, {\"Decision\": \"Validé\", \"Applique\": True, \"Date_application\": today}])\nfor sib in Alignement_ORCID.lookupRecords(uid_dyna=$uid_dyna):\n  if sib.id != $id and sib.Decision == \"À traiter\":\n    actions.append([\"UpdateRecord\", \"Alignement_ORCID\", sib.id, {\"Decision\": \"Rejeté\", \"Date_application\": today}])\nlabel = (\"Valider \" + \" + \".join(done)) if done else \"Valider (rien à écrire)\"\nreturn {\"button\": label, \"description\": \"%s -> ORCID %s\" % ($Nom_annuaire, cand), \"actions\": actions}"
+     }
+    },
+    {
+     "id": "Rejeter_action",
+     "fields": {
+      "type": "Any",
+      "label": "Rejeter (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Rejeter\", \"description\": \"Écarte ce candidat pour %s (il ne sera plus reproposé)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_ORCID\", $id, {\"Decision\": \"Rejeté\", \"Date_application\": today}]]}"
+     }
+    }
+   ]
+  },
+  {
+   "id": "Alignement_HAL",
+   "columns": [
+    {
+     "id": "uid_dyna",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Annuaire_id",
+     "fields": {
+      "type": "Int",
+      "label": "Annuaire (ligne)"
+     }
+    },
+    {
+     "id": "Nom_annuaire",
+     "fields": {
+      "type": "Text",
+      "label": "Nom annuaire"
+     }
+    },
+    {
+     "id": "LABO",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Nb_candidats",
+     "fields": {
+      "type": "Int",
+      "label": "Nb candidats"
+     }
+    },
+    {
+     "id": "IdHAL_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "IdHAL candidat"
+     }
+    },
+    {
+     "id": "IdHAL_i_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "IdHAL_i candidat"
+     }
+    },
+    {
+     "id": "Lien_HAL",
+     "fields": {
+      "type": "Text",
+      "label": "Lien HAL",
+      "isFormula": true,
+      "formula": "\"https://hal.science/search/index/q/*/authIdHal_s/\" + str($IdHAL_candidat or \"\")",
+      "widgetOptions": "{\"widget\":\"HyperLink\"}"
+     }
+    },
+    {
+     "id": "Nom_profil",
+     "fields": {
+      "type": "Text",
+      "label": "Nom profil HAL"
+     }
+    },
+    {
+     "id": "Formes",
+     "fields": {
+      "type": "Text",
+      "label": "Formes auteur"
+     }
+    },
+    {
+     "id": "Score",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Preuves",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Domaines_email",
+     "fields": {
+      "type": "Text",
+      "label": "Domaines email"
+     }
+    },
+    {
+     "id": "Labos_HAL",
+     "fields": {
+      "type": "Text",
+      "label": "Labos / structures HAL"
+     }
+    },
+    {
+     "id": "Nb_publis",
+     "fields": {
+      "type": "Int",
+      "label": "Nb publis HAL"
+     }
+    },
+    {
+     "id": "ORCID_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "ORCID candidat"
+     }
+    },
+    {
+     "id": "IdRef_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "IdRef candidat"
+     }
+    },
+    {
+     "id": "Decision",
+     "fields": {
+      "type": "Choice",
+      "label": "Décision",
+      "widgetOptions": "{\"choices\":[\"À traiter\",\"Validé\",\"Rejeté\",\"Identité mêlée\"],\"choiceOptions\":{\"À traiter\":{\"fillColor\":\"#FFE5B4\",\"textColor\":\"#000000\"},\"Validé\":{\"fillColor\":\"#C7F0C2\",\"textColor\":\"#000000\"},\"Rejeté\":{\"fillColor\":\"#F2C2C2\",\"textColor\":\"#000000\"},\"Identité mêlée\":{\"fillColor\":\"#D9C8F5\",\"textColor\":\"#000000\"}}}"
+     }
+    },
+    {
+     "id": "Note",
+     "fields": {
+      "type": "Text",
+      "label": "Note (identité mêlée : qui possède quoi)"
+     }
+    },
+    {
+     "id": "Signale_le",
+     "fields": {
+      "type": "Text",
+      "label": "Signalé à la source le"
+     }
+    },
+    {
+     "id": "Meler_action",
+     "fields": {
+      "type": "Any",
+      "label": "Identité mêlée (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Identité mêlée\", \"description\": \"Profil qui mélange plusieurs personnes pour %s : ni validé ni rejeté, à démêler à la source (renseigner Note et Signale_le)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_HAL\", $id, {\"Decision\": \"Identité mêlée\", \"Date_application\": today}]]}"
+     }
+    },
+    {
+     "id": "Applique",
+     "fields": {
+      "type": "Bool",
+      "label": "Appliqué"
+     }
+    },
+    {
+     "id": "Date_application",
+     "fields": {
+      "type": "Text",
+      "label": "Date application"
+     }
+    },
+    {
+     "id": "Pousse_le",
+     "fields": {
+      "type": "Text",
+      "label": "Poussé le"
+     }
+    },
+    {
+     "id": "Valider_action",
+     "fields": {
+      "type": "Any",
+      "label": "Valider (action)",
+      "isFormula": true,
+      "formula": "if $Decision == \"Validé\":\n  return {\"button\": \"Validé ✓\", \"description\": \"Déjà appliqué%s\" % ((\" le \" + $Date_application) if $Date_application else \"\"), \"actions\": []}\nif $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\nann = Annuaire.lookupOne(id=$Annuaire_id) if $Annuaire_id else Annuaire.lookupOne(uid_dyna=$uid_dyna)\nif not ann:\n  return {\"button\": \"Fiche introuvable\", \"description\": \"Aucune fiche Annuaire pour %s\" % $uid_dyna, \"actions\": []}\nimport re\ndef _slug(v):\n  s = str(v or \"\").strip().rstrip(\"/\").lower()\n  return s.split(\"/\")[-1] if s else \"\"\ndef _ppn(v):\n  m = re.search(r\"([0-9]{6,}[0-9Xx])\", str(v or \"\"))\n  return m.group(1).upper() if m else \"\"\nfields = {}\ndone = []\ncur = _slug(ann.IdHAL)\ncand = _slug($IdHAL_candidat)\nif not cur:\n  fields[\"IdHAL\"] = cand\n  done.append(\"IdHAL\")\nelif cur != cand:\n  return {\"button\": \"Conflit IdHAL\", \"description\": \"L'Annuaire contient déjà l'IdHAL %s (différent de %s) : à régler dans Druid\" % (ann.IdHAL, cand), \"actions\": []}\nif str($IdHAL_i_candidat or \"\").strip() and not str(ann.IdHAL_i or \"\").strip():\n  fields[\"IdHAL_i\"] = str($IdHAL_i_candidat).strip()\n  done.append(\"IdHAL_i\")\nif str($ORCID_candidat or \"\").strip() and not str(ann.ORCID or \"\").strip():\n  fields[\"ORCID\"] = $ORCID_candidat\n  done.append(\"ORCID\")\nif str($IdRef_candidat or \"\").strip() and not _ppn(ann.IdRef):\n  fields[\"IdRef\"] = $IdRef_candidat\n  done.append(\"IdRef\")\ntoday = NOW().strftime(\"%Y-%m-%d\")\nactions = []\nif fields:\n  src = str(ann.Data_source or \"\")\n  parts = [s.strip().upper() for s in re.split(r\"[|,]\", src) if s.strip()]\n  if \"HAL\" not in parts:\n    fields[\"Data_source\"] = (src + \"|HAL\") if src else \"HAL\"\n  fields[\"HAL_derniere_maj\"] = today\n  fields[\"HAL_champs_modifies\"] = \"|\".join(done)\n  note = \"[%s] MAJ HAL (revue Grist): %s\" % (today, \", \".join(done))\n  com = str(ann.Commentaires or \"\")\n  fields[\"Commentaires\"] = (com + \"\\n\" + note) if com else note\n  actions.append([\"UpdateRecord\", \"Annuaire\", ann.id, fields])\nactions.append([\"UpdateRecord\", \"Alignement_HAL\", $id, {\"Decision\": \"Validé\", \"Applique\": True, \"Date_application\": today}])\n# Les autres candidats encore en attente pour la même personne sont auto-rejetés.\nfor sib in Alignement_HAL.lookupRecords(uid_dyna=$uid_dyna):\n  if sib.id != $id and sib.Decision == \"À traiter\":\n    actions.append([\"UpdateRecord\", \"Alignement_HAL\", sib.id, {\"Decision\": \"Rejeté\", \"Date_application\": today}])\nlabel = (\"Valider \" + \" + \".join(done)) if done else \"Valider (rien à écrire)\"\nreturn {\"button\": label, \"description\": \"%s -> IdHAL %s\" % ($Nom_annuaire, cand), \"actions\": actions}"
+     }
+    },
+    {
+     "id": "Rejeter_action",
+     "fields": {
+      "type": "Any",
+      "label": "Rejeter (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Rejeter\", \"description\": \"Écarte ce candidat pour %s (il ne sera plus reproposé)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_HAL\", $id, {\"Decision\": \"Rejeté\", \"Date_application\": today}]]}"
+     }
+    }
+   ]
+  },
+  {
+   "id": "Alignement_OpenAlex",
+   "columns": [
+    {
+     "id": "uid_dyna",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Annuaire_id",
+     "fields": {
+      "type": "Int",
+      "label": "Annuaire (ligne)"
+     }
+    },
+    {
+     "id": "Nom_annuaire",
+     "fields": {
+      "type": "Text",
+      "label": "Nom annuaire"
+     }
+    },
+    {
+     "id": "LABO",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Nb_candidats",
+     "fields": {
+      "type": "Int",
+      "label": "Nb candidats"
+     }
+    },
+    {
+     "id": "OpenAlex_candidat",
+     "fields": {
+      "type": "Text",
+      "label": "A-id candidat"
+     }
+    },
+    {
+     "id": "Lien",
+     "fields": {
+      "type": "Text",
+      "label": "Lien OpenAlex",
+      "isFormula": true,
+      "formula": "\"https://openalex.org/\" + str($OpenAlex_candidat or \"\")",
+      "widgetOptions": "{\"widget\":\"HyperLink\"}"
+     }
+    },
+    {
+     "id": "Nom_profil",
+     "fields": {
+      "type": "Text",
+      "label": "Nom du profil"
+     }
+    },
+    {
+     "id": "Formes",
+     "fields": {
+      "type": "Text",
+      "label": "Formes du nom"
+     }
+    },
+    {
+     "id": "Nb_publications",
+     "fields": {
+      "type": "Int",
+      "label": "Nb works"
+     }
+    },
+    {
+     "id": "Affiliations",
+     "fields": {
+      "type": "Text",
+      "label": "Affiliations (années)"
+     }
+    },
+    {
+     "id": "ORCID_profil",
+     "fields": {
+      "type": "Text",
+      "label": "ORCID du profil"
+     }
+    },
+    {
+     "id": "Score",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Preuves",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Deja_dans_annuaire",
+     "fields": {
+      "type": "Text",
+      "label": "Déjà dans l'Annuaire (OpenAlex_ids)"
+     }
+    },
+    {
+     "id": "Origine",
+     "fields": {
+      "type": "Text"
+     }
+    },
+    {
+     "id": "Decision",
+     "fields": {
+      "type": "Choice",
+      "label": "Décision",
+      "widgetOptions": "{\"choices\":[\"À traiter\",\"Validé\",\"Rejeté\",\"Identité mêlée\"],\"choiceOptions\":{\"À traiter\":{\"fillColor\":\"#FFE5B4\",\"textColor\":\"#000000\"},\"Validé\":{\"fillColor\":\"#C7F0C2\",\"textColor\":\"#000000\"},\"Rejeté\":{\"fillColor\":\"#F2C2C2\",\"textColor\":\"#000000\"},\"Identité mêlée\":{\"fillColor\":\"#D9C8F5\",\"textColor\":\"#000000\"}}}"
+     }
+    },
+    {
+     "id": "Note",
+     "fields": {
+      "type": "Text",
+      "label": "Note (identité mêlée : qui possède quoi)"
+     }
+    },
+    {
+     "id": "Signale_le",
+     "fields": {
+      "type": "Text",
+      "label": "Signalé à la source le"
+     }
+    },
+    {
+     "id": "Meler_action",
+     "fields": {
+      "type": "Any",
+      "label": "Identité mêlée (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Identité mêlée\", \"description\": \"Profil qui mélange plusieurs personnes pour %s : ni validé ni rejeté, à démêler à la source (renseigner Note et Signale_le)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_OpenAlex\", $id, {\"Decision\": \"Identité mêlée\", \"Date_application\": today}]]}"
+     }
+    },
+    {
+     "id": "Applique",
+     "fields": {
+      "type": "Bool",
+      "label": "Appliqué"
+     }
+    },
+    {
+     "id": "Date_application",
+     "fields": {
+      "type": "Text",
+      "label": "Date application"
+     }
+    },
+    {
+     "id": "Pousse_le",
+     "fields": {
+      "type": "Text",
+      "label": "Poussé le"
+     }
+    },
+    {
+     "id": "Valider_action",
+     "fields": {
+      "type": "Any",
+      "label": "Valider (action)",
+      "isFormula": true,
+      "formula": "if $Decision == \"Validé\":\n  return {\"button\": \"Validé ✓\", \"description\": \"Déjà appliqué%s\" % ((\" le \" + $Date_application) if $Date_application else \"\"), \"actions\": []}\nif $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\nann = Annuaire.lookupOne(id=$Annuaire_id) if $Annuaire_id else Annuaire.lookupOne(uid_dyna=$uid_dyna)\nif not ann:\n  return {\"button\": \"Fiche introuvable\", \"description\": \"Aucune fiche Annuaire pour %s\" % $uid_dyna, \"actions\": []}\nimport re\ndef _ids(v):\n  out = []\n  for x in re.split(r\"[|,;\\s]+\", str(v or \"\")):\n    m = re.search(r\"(A\\d{4,})\", x, re.I)\n    if m and m.group(1).upper() not in out: out.append(m.group(1).upper())\n  return out\ncur = _ids(ann.OpenAlex_ids)\ncand = _ids($OpenAlex_candidat)\ncand = cand[0] if cand else \"\"\nif not cand:\n  return {\"button\": \"Candidat invalide\", \"description\": \"OpenAlex_candidat doit être un A-id\", \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nactions = []\nif cand in cur:\n  label = \"Valider (déjà présent)\"\n  new = cur\nelse:\n  new = cur + [cand]\n  fields = {\"OpenAlex_ids\": \"|\".join(new)}\n  src = str(ann.Data_source or \"\")\n  parts = [s.strip().upper() for s in re.split(r\"[|,]\", src) if s.strip()]\n  if \"OPENALEX\" not in parts:\n    fields[\"Data_source\"] = (src + \"|OpenAlex\") if src else \"OpenAlex\"\n  fields[\"OpenAlex_derniere_maj\"] = today\n  fields[\"OpenAlex_champs_modifies\"] = \"OpenAlex_ids\"\n  note = \"[%s] MAJ OpenAlex (revue Grist): OpenAlex_ids += %s\" % (today, cand)\n  com = str(ann.Commentaires or \"\")\n  fields[\"Commentaires\"] = (com + \"\\n\" + note) if com else note\n  actions.append([\"UpdateRecord\", \"Annuaire\", ann.id, fields])\n  label = \"Ajouter \" + cand\nactions.append([\"UpdateRecord\", \"Alignement_OpenAlex\", $id, {\"Decision\": \"Validé\", \"Applique\": True, \"Date_application\": today}])\n# Pas d'auto-rejet des autres candidats : plusieurs profils peuvent être légitimes (fragments).\nreturn {\"button\": label, \"description\": \"%s -> OpenAlex_ids = %s\" % ($Nom_annuaire, \"|\".join(new)), \"actions\": actions}"
+     }
+    },
+    {
+     "id": "Rejeter_action",
+     "fields": {
+      "type": "Any",
+      "label": "Rejeter (action)",
+      "isFormula": true,
+      "formula": "if $Decision != \"À traiter\":\n  return {\"button\": \"—\", \"description\": \"Ligne déjà traitée (%s)\" % $Decision, \"actions\": []}\ntoday = NOW().strftime(\"%Y-%m-%d\")\nreturn {\"button\": \"Rejeter\", \"description\": \"Écarte ce profil pour %s (il ne sera plus reproposé)\" % $Nom_annuaire, \"actions\": [[\"UpdateRecord\", \"Alignement_OpenAlex\", $id, {\"Decision\": \"Rejeté\", \"Date_application\": today}]]}"
+     }
+    }
+   ]
+  }
+ ]
+}

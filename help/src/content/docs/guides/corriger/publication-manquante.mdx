@@ -1,0 +1,106 @@
+---
+title: "Une publication manque ou est mal attribuée"
+description: "Comprendre pourquoi une publication n'apparaît pas pour un chercheur ou une structure, et la faire corriger."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils"
+	menu="Tableau de bord › Liste des publications"
+/>
+
+Une publication que vous attendiez n'apparaît pas dans le tableau de bord, ou une
+publication qui n'a rien à voir avec la structure y figure. Voici comment trouver la cause,
+dans l'ordre des plus fréquentes.
+
+## Une publication manque
+
+### 1. Vérifier les réglages
+
+Dans le tableau de bord :
+
+1. la **période** couvre-t-elle l'année de la publication ?
+2. passez au périmètre **Affiliation** : le périmètre *Effectifs* écarte les publications
+   dont aucun auteur n'est reconnu parmi les membres ;
+3. dans **Liste des publications**, cherchez le titre ou le DOI, **sans aucun filtre**.
+
+Si elle apparaît en *Affiliation* mais pas en *Effectifs*, allez à l'étape 4.
+
+### 2. Vérifier que la publication est récente ou non
+
+Une publication de moins de quelques semaines peut ne pas encore être dans OpenAlex ou le
+Baromètre de la science ouverte. Et le tableau de bord n'est mis à jour qu'à sa
+**régénération**. Attendez, ou demandez une régénération au [support](/guides/support/).
+
+### 3. Vérifier l'affiliation signée
+
+Une publication entre dans le corpus d'une structure si **un auteur a signé avec son
+affiliation**. Ouvrez la publication (chez l'éditeur, dans HAL ou sur openalex.org) et
+regardez l'affiliation écrite par les auteurs :
+
+- **l'affiliation ne mentionne pas la structure** (seulement l'université, ou une autre
+  tutelle) : la publication ne peut pas être retrouvée par affiliation. Déposez-la dans HAL
+  avec la bonne affiliation, ou vérifiez que l'auteur a ses identifiants dans Druid (voir
+  étape 5) ;
+- **l'affiliation est correcte mais mal lue par OpenAlex** : voir
+  [Une affiliation est fausse](/guides/corriger/affiliation-fausse/).
+
+### 4. Vérifier l'auteur (périmètre Effectifs)
+
+Si la publication est présente en *Affiliation* mais pas en *Effectifs*, son auteur n'est
+pas reconnu comme membre :
+
+- sa **fiche n'est pas validée**, ou il est en **départ** : seules les fiches validées
+  comptent comme membres ;
+- il est **parti** : le périmètre *Effectifs* repose sur les membres actuels ;
+- son **nom** dans la publication diffère trop de celui de la fiche (nom d'usage, nom
+  composé abrégé).
+
+Corrigez la fiche (voir [Corriger le statut ou le rattachement](/guides/personnes/fiabiliser-statut-rattachement/)) ;
+la publication sera reconnue à la prochaine régénération.
+
+### 5. Vérifier les identifiants (moissonnage CRISalid)
+
+Si votre établissement utilise CRISalid, les publications d'un chercheur sont aussi
+moissonnées à partir de ses **identifiants** (IdRef, ORCID, IdHAL, OpenAlex, Scopus). Une
+personne sans identifiant n'est retrouvée que par l'affiliation. Complétez ses identifiants
+(voir [Aligner les identifiants d'un labo](/guides/identifiants/aligner-les-identifiants/)).
+L'onglet **Sources** du tableau de bord montre ce que CRISalid trouve par rapport aux autres
+sources.
+
+## Une publication est attribuée à tort
+
+Une publication sans lien avec la structure apparaît dans son tableau de bord. Causes
+possibles :
+
+- **une affiliation mal attribuée par OpenAlex** : l'auteur signe ailleurs, mais OpenAlex a
+  rattaché son affiliation à votre structure. Voir
+  [Une affiliation est fausse](/guides/corriger/affiliation-fausse/) ;
+- **un homonyme** reconnu à tort comme membre (même nom de famille, même initiale) : visible
+  dans les onglets par équipe ou par chercheur ;
+- **une fédération ou un laboratoire multi-tutelles** rattaché dans OpenAlex à votre
+  établissement : l'équipe technique peut exclure l'institution concernée. Signalez-le au
+  [support](/guides/support/) avec le lien de la publication.
+
+## Ce qui se passe ensuite
+
+Les corrections faites dans Druid (fiches, identifiants) ou à la source (HAL, OpenAlex)
+n'apparaissent dans le tableau de bord qu'à sa **prochaine régénération**. Les corrections
+dans OpenAlex peuvent prendre plusieurs semaines.
+
+## Limites connues
+
+- **Les publications sans DOI** (ouvrages, chapitres, communications) sont moins bien
+  couvertes : HAL est souvent la seule source qui les connaît.
+- **Une publication signée sans le nom de la structure** ne peut pas lui être attribuée par
+  affiliation, quelle que soit la source.
+- **Le périmètre Effectifs ignore les anciens membres** : pour un bilan, utilisez le
+  périmètre *Affiliation*.
+
+## Voir aussi
+
+- [Publications et attribution](/donnees/publications-attribution/)
+- [D'où viennent les données](/donnees/sources-des-donnees/)

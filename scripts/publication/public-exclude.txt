@@ -1,0 +1,4 @@
+# Paths kept out of the public repository (docs/plan-instance-demo-cloudflare.md, part B):
+# internal working documentation (decision of 2026-09-24). One git pathspec prefix per line.
+docs/
+CONTEXT_MEMORY.md

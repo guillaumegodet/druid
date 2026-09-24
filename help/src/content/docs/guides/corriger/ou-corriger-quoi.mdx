@@ -1,0 +1,79 @@
+---
+title: "Où corriger quoi"
+description: "Une donnée est fausse : savoir si la correction se fait dans Druid, dans l'annuaire, dans HAL, OpenAlex, ORCID ou IdRef, et qui prévenir."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils"
+	menu="Selon la donnée : fiche chercheur, page d'alignement, fiche structure, ou hors de Druid"
+/>
+
+Druid rassemble des données venues de plusieurs systèmes. Corriger une erreur **dans Druid**
+ne suffit pas toujours : si elle vient d'une source externe, elle reviendra à la prochaine
+mise à jour. Cette page indique, pour chaque type d'erreur, **où** corriger et **qui** le
+fait.
+
+## Les personnes
+
+| L'erreur | Où corriger | Qui |
+|---|---|---|
+| Laboratoire, équipe, rattachement principal | Fiche chercheur › **Appartenances & historique** | Vous, si vous avez accès au labo |
+| Statut (partie, encore présente, extérieure) | Fiche : employeur et dates de fin, puis **Valider la fiche** — voir [Corriger le statut](/guides/personnes/fiabiliser-statut-rattachement/) | Vous |
+| Dates d'emploi ou d'appartenance | Fiche › cartes **Emploi & contrat** et **Appartenances** | Vous |
+| Civilité, date de naissance, grade d'un agent de l'établissement | Annuaire LDAP de l'établissement | Service des ressources humaines |
+| Une personne manque | Création de fiche (bouton **Nouveau**) | Équipe Druid, via le [support](/guides/support/) |
+| Deux fiches pour la même personne | **À traiter › Doublons** — voir [Traiter un doublon](/guides/personnes/traiter-un-doublon/) | Administrateurs Druid |
+
+## Les identifiants chercheurs
+
+| L'erreur | Où corriger | Qui |
+|---|---|---|
+| Identifiant absent ou faux sur la fiche | Page d'alignement ou fiche chercheur — voir [Aligner les identifiants](/guides/identifiants/aligner-les-identifiants/) | Services centraux |
+| Notice IdRef erronée (mauvaises dates, deux personnes mélangées) | IdRef | La bibliothèque (catalogage ABES) |
+| Profil ORCID incomplet ou avec des travaux d'un autre | ORCID | La personne elle-même |
+| IdHAL qui regroupe les dépôts d'un homonyme | HAL (« Mon IdHAL ») | L'auteur, sinon le référent HAL du laboratoire |
+| Profil OpenAlex fragmenté ou mélangé | OpenAlex | L'auteur (curation du profil), sinon le support OpenAlex |
+
+Pour les corrections à faire hors de Druid, un administrateur peut créer une **tâche** avec
+**Signaler une correction** sur la fiche : elle est suivie dans **À traiter › Tâches**.
+
+## Les publications
+
+| L'erreur | Où corriger | Qui |
+|---|---|---|
+| Publication absente du tableau de bord | Selon la cause — voir [Une publication manque](/guides/corriger/publication-manquante/) | Selon la cause |
+| Publication attribuée à tort à la structure | Source de l'affiliation — voir [Une affiliation est fausse](/guides/corriger/affiliation-fausse/) | Selon la source |
+| Dépôt HAL avec une mauvaise affiliation | HAL, dans le dépôt | Le déposant ou le référent HAL |
+| Chiffres qui ne tiennent pas compte d'un changement récent | Régénération du tableau de bord | Équipe technique, via le [support](/guides/support/) |
+
+## Les structures
+
+| L'erreur | Où corriger | Qui |
+|---|---|---|
+| Nom, sigle, identifiants, tutelles d'un laboratoire | Fiche structure — voir [Mettre à jour une structure](/guides/structures-groupes/mettre-a-jour-une-structure/) | Services centraux |
+| Structure absente du référentiel de l'établissement | Référentiel des structures (annuaire LDAP) | Service qui gère le référentiel |
+| Équipe rangée sous le mauvais laboratoire | Fiche de l'équipe › onglet **Appartenances** (inclusion) | Services centraux |
+
+## Les accès
+
+Vous ne voyez pas le bon laboratoire, ou une rubrique vous manque : voir
+[Premiers pas selon votre profil](/demarrer/premiers-pas/#demander-un-accès-supplémentaire).
+
+## Limites connues
+
+- **Une correction dans Druid peut être écrasée à l'affichage** par l'annuaire LDAP pour la
+  civilité, la date de naissance et le grade.
+- **Les corrections dans les bases externes prennent du temps** : plusieurs jours à
+  plusieurs semaines avant d'être visibles dans OpenAlex ou IdRef, puis dans Druid à la
+  mise à jour suivante.
+- **Certaines actions sont réservées** (création de fiche, doublons, tâches) : les autres
+  profils passent par le [support](/guides/support/).
+
+## Voir aussi
+
+- [D'où viennent les données](/donnees/sources-des-donnees/)
+- [Support](/guides/support/)

@@ -1,0 +1,962 @@
+{
+ "--": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Indéterminé"
+ },
+ "AD": {
+  "echarts": "Andorra",
+  "eu": false,
+  "fr": "Andorre"
+ },
+ "AE": {
+  "echarts": "United Arab Emirates",
+  "eu": false,
+  "fr": "Émirats arabes unis"
+ },
+ "AF": {
+  "echarts": "Afghanistan",
+  "eu": false,
+  "fr": "Afghanistan"
+ },
+ "AG": {
+  "echarts": "Antigua and Barb.",
+  "eu": false,
+  "fr": "Antigua-et-Barbuda"
+ },
+ "AL": {
+  "echarts": "Albania",
+  "eu": false,
+  "fr": "Albanie"
+ },
+ "AM": {
+  "echarts": "Armenia",
+  "eu": false,
+  "fr": "Arménie"
+ },
+ "AO": {
+  "echarts": "Angola",
+  "eu": false,
+  "fr": "Angola"
+ },
+ "AR": {
+  "echarts": "Argentina",
+  "eu": false,
+  "fr": "Argentine"
+ },
+ "AT": {
+  "echarts": "Austria",
+  "eu": true,
+  "fr": "Autriche"
+ },
+ "AU": {
+  "echarts": "Australia",
+  "eu": false,
+  "fr": "Australie"
+ },
+ "AZ": {
+  "echarts": "Azerbaijan",
+  "eu": false,
+  "fr": "Azerbaïdjan"
+ },
+ "BA": {
+  "echarts": "Bosnia and Herz.",
+  "eu": false,
+  "fr": "Bosnie-Herzégovine"
+ },
+ "BB": {
+  "echarts": "Barbados",
+  "eu": false,
+  "fr": "Barbade"
+ },
+ "BD": {
+  "echarts": "Bangladesh",
+  "eu": false,
+  "fr": "Bangladesh"
+ },
+ "BE": {
+  "echarts": "Belgium",
+  "eu": true,
+  "fr": "Belgique"
+ },
+ "BF": {
+  "echarts": "Burkina Faso",
+  "eu": false,
+  "fr": "Burkina Faso"
+ },
+ "BG": {
+  "echarts": "Bulgaria",
+  "eu": true,
+  "fr": "Bulgarie"
+ },
+ "BH": {
+  "echarts": "Bahrain",
+  "eu": false,
+  "fr": "Bahreïn"
+ },
+ "BI": {
+  "echarts": "Burundi",
+  "eu": false,
+  "fr": "Burundi"
+ },
+ "BJ": {
+  "echarts": "Benin",
+  "eu": false,
+  "fr": "Bénin"
+ },
+ "BN": {
+  "echarts": "Brunei",
+  "eu": false,
+  "fr": "Brunei"
+ },
+ "BO": {
+  "echarts": "Bolivia",
+  "eu": false,
+  "fr": "Bolivie"
+ },
+ "BR": {
+  "echarts": "Brazil",
+  "eu": false,
+  "fr": "Brésil"
+ },
+ "BW": {
+  "echarts": "Botswana",
+  "eu": false,
+  "fr": "Botswana"
+ },
+ "BY": {
+  "echarts": "Belarus",
+  "eu": false,
+  "fr": "Biélorussie"
+ },
+ "CA": {
+  "echarts": "Canada",
+  "eu": false,
+  "fr": "Canada"
+ },
+ "CD": {
+  "echarts": "Dem. Rep. Congo",
+  "eu": false,
+  "fr": "RD Congo"
+ },
+ "CF": {
+  "echarts": "Central African Rep.",
+  "eu": false,
+  "fr": "République centrafricaine"
+ },
+ "CG": {
+  "echarts": "Congo",
+  "eu": false,
+  "fr": "Congo"
+ },
+ "CH": {
+  "echarts": "Switzerland",
+  "eu": false,
+  "fr": "Suisse"
+ },
+ "CI": {
+  "echarts": "Côte d'Ivoire",
+  "eu": false,
+  "fr": "Côte d'Ivoire"
+ },
+ "CL": {
+  "echarts": "Chile",
+  "eu": false,
+  "fr": "Chili"
+ },
+ "CM": {
+  "echarts": "Cameroon",
+  "eu": false,
+  "fr": "Cameroun"
+ },
+ "CN": {
+  "echarts": "China",
+  "eu": false,
+  "fr": "Chine"
+ },
+ "CO": {
+  "echarts": "Colombia",
+  "eu": false,
+  "fr": "Colombie"
+ },
+ "CR": {
+  "echarts": "Costa Rica",
+  "eu": false,
+  "fr": "Costa Rica"
+ },
+ "CU": {
+  "echarts": "Cuba",
+  "eu": false,
+  "fr": "Cuba"
+ },
+ "CV": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Cap-Vert"
+ },
+ "CW": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Curaçao"
+ },
+ "CY": {
+  "echarts": "Cyprus",
+  "eu": true,
+  "fr": "Chypre"
+ },
+ "CZ": {
+  "echarts": "Czech Rep.",
+  "eu": true,
+  "fr": "Tchéquie"
+ },
+ "DE": {
+  "echarts": "Germany",
+  "eu": true,
+  "fr": "Allemagne"
+ },
+ "DJ": {
+  "echarts": "Djibouti",
+  "eu": false,
+  "fr": "Djibouti"
+ },
+ "DK": {
+  "echarts": "Denmark",
+  "eu": true,
+  "fr": "Danemark"
+ },
+ "DO": {
+  "echarts": "Dominican Rep.",
+  "eu": false,
+  "fr": "République dominicaine"
+ },
+ "DZ": {
+  "echarts": "Algeria",
+  "eu": false,
+  "fr": "Algérie"
+ },
+ "EC": {
+  "echarts": "Ecuador",
+  "eu": false,
+  "fr": "Équateur"
+ },
+ "EE": {
+  "echarts": "Estonia",
+  "eu": true,
+  "fr": "Estonie"
+ },
+ "EG": {
+  "echarts": "Egypt",
+  "eu": false,
+  "fr": "Égypte"
+ },
+ "ER": {
+  "echarts": "Eritrea",
+  "eu": false,
+  "fr": "Érythrée"
+ },
+ "ES": {
+  "echarts": "Spain",
+  "eu": true,
+  "fr": "Espagne"
+ },
+ "ET": {
+  "echarts": "Ethiopia",
+  "eu": false,
+  "fr": "Éthiopie"
+ },
+ "FI": {
+  "echarts": "Finland",
+  "eu": true,
+  "fr": "Finlande"
+ },
+ "FJ": {
+  "echarts": "Fiji",
+  "eu": false,
+  "fr": "Fidji"
+ },
+ "FR": {
+  "echarts": "France",
+  "eu": true,
+  "fr": "France"
+ },
+ "GA": {
+  "echarts": "Gabon",
+  "eu": false,
+  "fr": "Gabon"
+ },
+ "GB": {
+  "echarts": "United Kingdom",
+  "eu": false,
+  "fr": "Royaume-Uni"
+ },
+ "GD": {
+  "echarts": "Grenada",
+  "eu": false,
+  "fr": "Grenade"
+ },
+ "GE": {
+  "echarts": "Georgia",
+  "eu": false,
+  "fr": "Géorgie"
+ },
+ "GF": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Guyane française"
+ },
+ "GH": {
+  "echarts": "Ghana",
+  "eu": false,
+  "fr": "Ghana"
+ },
+ "GI": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Gibraltar"
+ },
+ "GL": {
+  "echarts": "Greenland",
+  "eu": false,
+  "fr": "Groenland"
+ },
+ "GM": {
+  "echarts": "Gambia",
+  "eu": false,
+  "fr": "Gambie"
+ },
+ "GN": {
+  "echarts": "Guinea",
+  "eu": false,
+  "fr": "Guinée"
+ },
+ "GP": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Guadeloupe"
+ },
+ "GR": {
+  "echarts": "Greece",
+  "eu": true,
+  "fr": "Grèce"
+ },
+ "GT": {
+  "echarts": "Guatemala",
+  "eu": false,
+  "fr": "Guatemala"
+ },
+ "GU": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Guam"
+ },
+ "GW": {
+  "echarts": "Guinea-Bissau",
+  "eu": false,
+  "fr": "Guinée-Bissau"
+ },
+ "HK": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Hong Kong"
+ },
+ "HN": {
+  "echarts": "Honduras",
+  "eu": false,
+  "fr": "Honduras"
+ },
+ "HR": {
+  "echarts": "Croatia",
+  "eu": true,
+  "fr": "Croatie"
+ },
+ "HT": {
+  "echarts": "Haiti",
+  "eu": false,
+  "fr": "Haïti"
+ },
+ "HU": {
+  "echarts": "Hungary",
+  "eu": true,
+  "fr": "Hongrie"
+ },
+ "ID": {
+  "echarts": "Indonesia",
+  "eu": false,
+  "fr": "Indonésie"
+ },
+ "IE": {
+  "echarts": "Ireland",
+  "eu": true,
+  "fr": "Irlande"
+ },
+ "IL": {
+  "echarts": "Israel",
+  "eu": false,
+  "fr": "Israël"
+ },
+ "IN": {
+  "echarts": "India",
+  "eu": false,
+  "fr": "Inde"
+ },
+ "IQ": {
+  "echarts": "Iraq",
+  "eu": false,
+  "fr": "Irak"
+ },
+ "IR": {
+  "echarts": "Iran",
+  "eu": false,
+  "fr": "Iran"
+ },
+ "IS": {
+  "echarts": "Iceland",
+  "eu": false,
+  "fr": "Islande"
+ },
+ "IT": {
+  "echarts": "Italy",
+  "eu": true,
+  "fr": "Italie"
+ },
+ "JE": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Jersey"
+ },
+ "JM": {
+  "echarts": "Jamaica",
+  "eu": false,
+  "fr": "Jamaïque"
+ },
+ "JO": {
+  "echarts": "Jordan",
+  "eu": false,
+  "fr": "Jordanie"
+ },
+ "JP": {
+  "echarts": "Japan",
+  "eu": false,
+  "fr": "Japon"
+ },
+ "KE": {
+  "echarts": "Kenya",
+  "eu": false,
+  "fr": "Kenya"
+ },
+ "KG": {
+  "echarts": "Kyrgyzstan",
+  "eu": false,
+  "fr": "Kirghizistan"
+ },
+ "KH": {
+  "echarts": "Cambodia",
+  "eu": false,
+  "fr": "Cambodge"
+ },
+ "KN": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Saint-Christophe-et-Niévès"
+ },
+ "KP": {
+  "echarts": "Dem. Rep. Korea",
+  "eu": false,
+  "fr": "Corée du Nord"
+ },
+ "KR": {
+  "echarts": "Korea",
+  "eu": false,
+  "fr": "Corée du Sud"
+ },
+ "KW": {
+  "echarts": "Kuwait",
+  "eu": false,
+  "fr": "Koweït"
+ },
+ "KY": {
+  "echarts": "Cayman Is.",
+  "eu": false,
+  "fr": "Îles Caïmans"
+ },
+ "KZ": {
+  "echarts": "Kazakhstan",
+  "eu": false,
+  "fr": "Kazakhstan"
+ },
+ "LA": {
+  "echarts": "Lao PDR",
+  "eu": false,
+  "fr": "Laos"
+ },
+ "LB": {
+  "echarts": "Lebanon",
+  "eu": false,
+  "fr": "Liban"
+ },
+ "LI": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Liechtenstein"
+ },
+ "LK": {
+  "echarts": "Sri Lanka",
+  "eu": false,
+  "fr": "Sri Lanka"
+ },
+ "LR": {
+  "echarts": "Liberia",
+  "eu": false,
+  "fr": "Liberia"
+ },
+ "LT": {
+  "echarts": "Lithuania",
+  "eu": true,
+  "fr": "Lituanie"
+ },
+ "LU": {
+  "echarts": "Luxembourg",
+  "eu": true,
+  "fr": "Luxembourg"
+ },
+ "LV": {
+  "echarts": "Latvia",
+  "eu": true,
+  "fr": "Lettonie"
+ },
+ "LY": {
+  "echarts": "Libya",
+  "eu": false,
+  "fr": "Libye"
+ },
+ "MA": {
+  "echarts": "Morocco",
+  "eu": false,
+  "fr": "Maroc"
+ },
+ "MC": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Monaco"
+ },
+ "MD": {
+  "echarts": "Moldova",
+  "eu": false,
+  "fr": "Moldavie"
+ },
+ "ME": {
+  "echarts": "Montenegro",
+  "eu": false,
+  "fr": "Monténégro"
+ },
+ "MG": {
+  "echarts": "Madagascar",
+  "eu": false,
+  "fr": "Madagascar"
+ },
+ "MK": {
+  "echarts": "Macedonia",
+  "eu": false,
+  "fr": "Macédoine du Nord"
+ },
+ "ML": {
+  "echarts": "Mali",
+  "eu": false,
+  "fr": "Mali"
+ },
+ "MM": {
+  "echarts": "Myanmar",
+  "eu": false,
+  "fr": "Birmanie"
+ },
+ "MN": {
+  "echarts": "Mongolia",
+  "eu": false,
+  "fr": "Mongolie"
+ },
+ "MO": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Macao"
+ },
+ "MQ": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Martinique"
+ },
+ "MR": {
+  "echarts": "Mauritania",
+  "eu": false,
+  "fr": "Mauritanie"
+ },
+ "MT": {
+  "echarts": "",
+  "eu": true,
+  "fr": "Malte"
+ },
+ "MU": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Maurice"
+ },
+ "MV": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Maldives"
+ },
+ "MW": {
+  "echarts": "Malawi",
+  "eu": false,
+  "fr": "Malawi"
+ },
+ "MX": {
+  "echarts": "Mexico",
+  "eu": false,
+  "fr": "Mexique"
+ },
+ "MY": {
+  "echarts": "Malaysia",
+  "eu": false,
+  "fr": "Malaisie"
+ },
+ "MZ": {
+  "echarts": "Mozambique",
+  "eu": false,
+  "fr": "Mozambique"
+ },
+ "NA": {
+  "echarts": "Namibia",
+  "eu": false,
+  "fr": "Namibie"
+ },
+ "NC": {
+  "echarts": "New Caledonia",
+  "eu": false,
+  "fr": "Nouvelle-Calédonie"
+ },
+ "NE": {
+  "echarts": "Niger",
+  "eu": false,
+  "fr": "Niger"
+ },
+ "NG": {
+  "echarts": "Nigeria",
+  "eu": false,
+  "fr": "Nigeria"
+ },
+ "NI": {
+  "echarts": "Nicaragua",
+  "eu": false,
+  "fr": "Nicaragua"
+ },
+ "NL": {
+  "echarts": "Netherlands",
+  "eu": true,
+  "fr": "Pays-Bas"
+ },
+ "NO": {
+  "echarts": "Norway",
+  "eu": false,
+  "fr": "Norvège"
+ },
+ "NP": {
+  "echarts": "Nepal",
+  "eu": false,
+  "fr": "Népal"
+ },
+ "NZ": {
+  "echarts": "New Zealand",
+  "eu": false,
+  "fr": "Nouvelle-Zélande"
+ },
+ "OM": {
+  "echarts": "Oman",
+  "eu": false,
+  "fr": "Oman"
+ },
+ "PA": {
+  "echarts": "Panama",
+  "eu": false,
+  "fr": "Panama"
+ },
+ "PE": {
+  "echarts": "Peru",
+  "eu": false,
+  "fr": "Pérou"
+ },
+ "PF": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Polynésie française"
+ },
+ "PH": {
+  "echarts": "Philippines",
+  "eu": false,
+  "fr": "Philippines"
+ },
+ "PK": {
+  "echarts": "Pakistan",
+  "eu": false,
+  "fr": "Pakistan"
+ },
+ "PL": {
+  "echarts": "Poland",
+  "eu": true,
+  "fr": "Pologne"
+ },
+ "PR": {
+  "echarts": "Puerto Rico",
+  "eu": false,
+  "fr": "Porto Rico"
+ },
+ "PS": {
+  "echarts": "Palestine",
+  "eu": false,
+  "fr": "Palestine"
+ },
+ "PT": {
+  "echarts": "Portugal",
+  "eu": true,
+  "fr": "Portugal"
+ },
+ "PW": {
+  "echarts": "Palau",
+  "eu": false,
+  "fr": "Palaos"
+ },
+ "PY": {
+  "echarts": "Paraguay",
+  "eu": false,
+  "fr": "Paraguay"
+ },
+ "QA": {
+  "echarts": "Qatar",
+  "eu": false,
+  "fr": "Qatar"
+ },
+ "RE": {
+  "echarts": "",
+  "eu": false,
+  "fr": "La Réunion"
+ },
+ "RO": {
+  "echarts": "Romania",
+  "eu": true,
+  "fr": "Roumanie"
+ },
+ "RS": {
+  "echarts": "Serbia",
+  "eu": false,
+  "fr": "Serbie"
+ },
+ "RU": {
+  "echarts": "Russia",
+  "eu": false,
+  "fr": "Russie"
+ },
+ "RW": {
+  "echarts": "Rwanda",
+  "eu": false,
+  "fr": "Rwanda"
+ },
+ "SA": {
+  "echarts": "Saudi Arabia",
+  "eu": false,
+  "fr": "Arabie saoudite"
+ },
+ "SC": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Seychelles"
+ },
+ "SD": {
+  "echarts": "Sudan",
+  "eu": false,
+  "fr": "Soudan"
+ },
+ "SE": {
+  "echarts": "Sweden",
+  "eu": true,
+  "fr": "Suède"
+ },
+ "SG": {
+  "echarts": "Singapore",
+  "eu": false,
+  "fr": "Singapour"
+ },
+ "SI": {
+  "echarts": "Slovenia",
+  "eu": true,
+  "fr": "Slovénie"
+ },
+ "SJ": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Svalbard"
+ },
+ "SK": {
+  "echarts": "Slovakia",
+  "eu": true,
+  "fr": "Slovaquie"
+ },
+ "SM": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Saint-Marin"
+ },
+ "SN": {
+  "echarts": "Senegal",
+  "eu": false,
+  "fr": "Sénégal"
+ },
+ "SO": {
+  "echarts": "Somalia",
+  "eu": false,
+  "fr": "Somalie"
+ },
+ "SS": {
+  "echarts": "S. Sudan",
+  "eu": false,
+  "fr": "Soudan du Sud"
+ },
+ "ST": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Sao Tomé-et-Principe"
+ },
+ "SV": {
+  "echarts": "El Salvador",
+  "eu": false,
+  "fr": "Salvador"
+ },
+ "SY": {
+  "echarts": "Syria",
+  "eu": false,
+  "fr": "Syrie"
+ },
+ "TD": {
+  "echarts": "Chad",
+  "eu": false,
+  "fr": "Tchad"
+ },
+ "TG": {
+  "echarts": "Togo",
+  "eu": false,
+  "fr": "Togo"
+ },
+ "TH": {
+  "echarts": "Thailand",
+  "eu": false,
+  "fr": "Thaïlande"
+ },
+ "TJ": {
+  "echarts": "Tajikistan",
+  "eu": false,
+  "fr": "Tadjikistan"
+ },
+ "TL": {
+  "echarts": "Timor-Leste",
+  "eu": false,
+  "fr": "Timor oriental"
+ },
+ "TN": {
+  "echarts": "Tunisia",
+  "eu": false,
+  "fr": "Tunisie"
+ },
+ "TR": {
+  "echarts": "Turkey",
+  "eu": false,
+  "fr": "Turquie"
+ },
+ "TW": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Taïwan"
+ },
+ "TZ": {
+  "echarts": "Tanzania",
+  "eu": false,
+  "fr": "Tanzanie"
+ },
+ "UA": {
+  "echarts": "Ukraine",
+  "eu": false,
+  "fr": "Ukraine"
+ },
+ "UG": {
+  "echarts": "Uganda",
+  "eu": false,
+  "fr": "Ouganda"
+ },
+ "US": {
+  "echarts": "United States",
+  "eu": false,
+  "fr": "États-Unis"
+ },
+ "UY": {
+  "echarts": "Uruguay",
+  "eu": false,
+  "fr": "Uruguay"
+ },
+ "UZ": {
+  "echarts": "Uzbekistan",
+  "eu": false,
+  "fr": "Ouzbékistan"
+ },
+ "VA": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Vatican"
+ },
+ "VE": {
+  "echarts": "Venezuela",
+  "eu": false,
+  "fr": "Venezuela"
+ },
+ "VI": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Îles Vierges américaines"
+ },
+ "VN": {
+  "echarts": "Vietnam",
+  "eu": false,
+  "fr": "Viêt Nam"
+ },
+ "WS": {
+  "echarts": "Samoa",
+  "eu": false,
+  "fr": "Samoa"
+ },
+ "XK": {
+  "echarts": "Kosovo",
+  "eu": false,
+  "fr": "Kosovo"
+ },
+ "YE": {
+  "echarts": "Yemen",
+  "eu": false,
+  "fr": "Yémen"
+ },
+ "ZA": {
+  "echarts": "South Africa",
+  "eu": false,
+  "fr": "Afrique du Sud"
+ },
+ "ZM": {
+  "echarts": "Zambia",
+  "eu": false,
+  "fr": "Zambie"
+ },
+ "ZW": {
+  "echarts": "Zimbabwe",
+  "eu": false,
+  "fr": "Zimbabwe"
+ },
+ "ZZ": {
+  "echarts": "",
+  "eu": false,
+  "fr": "Indéterminé"
+ }
+}

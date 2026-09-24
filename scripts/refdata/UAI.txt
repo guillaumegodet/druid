@@ -1,0 +1,153 @@
+n° UAI	Etablissement ou site
+0752744A	Académie des sciences d'outre-mer
+MANQUANT	Académie des technologies
+0341920C	Agence bibliographique de l'enseignement supérieur
+0755611S	Agence nationale de la recherche
+0671451N	Bibliothèque nationale et universitaire de Strasbourg
+1340004B	Casa de Velázquez de Madrid
+0597139P	Centrale Lille Institut
+0912341A	CentraleSupélec
+0342032Z	Centre informatique national de l'enseignement supérieur
+0772428W	Centre technique du livre de l'enseignement supérieur
+0753480A	Collège de France
+0492498Z	COMUE Angers-Le Mans
+0312758E	COMUE de Toulouse
+0694094A	COMUE Lyon Saint-Etienne
+0753471R	Conservatoire national des arts et métiers 
+0952259P	CY Cergy Paris Université
+0690187D	Ecole centrale de Lyon
+0133774G	Ecole centrale de Marseille (Centrale Méditerranée)
+0440100V	Ecole centrale de Nantes
+0311514C	Ecole d'économie et de sciences sociales quantitatives de Toulouse-TSE
+0753742K	Ecole des hautes études en sciences sociales
+1260001S	Ecole française d'Athènes
+1270009V	Ecole française de Rome
+0751794T	Ecole française d'Extrême-Orient
+0753478Y	Ecole nationale des chartes
+0753237L	Ecole nationale supérieure d'arts et métiers
+0340112M	Ecole nationale supérieure de chimie de Montpellier
+0753375L	Ecole nationale supérieure de chimie de Paris (Chimie ParisTech)
+0350077U	Ecole nationale supérieure de chimie de Rennes
+0951376E	Ecole nationale supérieure de l'électronique et de ses applications
+0860073M	Ecole nationale supérieure de mécanique et d'aérotechnique de Poitiers
+0250082D	Ecole nationale supérieure de mécanique et des microtechniques (Supmicrotech)
+0590338X	Ecole nationale supérieure des arts et industries textiles
+0693735K	Ecole nationale supérieure des arts et techniques du théâtre
+0692459Y	Ecole nationale supérieure des sciences de l'information et des bibliothèques
+0912266U	Ecole nationale supérieure d'informatique pour l'industrie et l'entreprise
+0141720U	Ecole nationale supérieure d'ingénieurs de Caen
+0932066R	Ecole nationale supérieure Louis Lumière
+0753455Y	Ecole normale supérieure (Paris)
+0694123G	Ecole normale supérieure de Lyon
+0352440M	Ecole normale supérieure de Rennes
+0912423P	Ecole normale supérieure Paris-Saclay
+0753486G	Ecole pratique des hautes études
+0932560C	Etablissement public Campus Condorcet
+0754937J	Etablissement public d'aménagement universitaire de la région Ile-de-France
+0753364Z	Institut d'administration des entreprises de Paris
+0753428U	Institut de physique du globe de Paris
+0130221V	Institut d'études politiques d'Aix-en-Provence
+0330192E	Institut d'études politiques de Bordeaux
+0380134P	Institut d'études politiques de Grenoble
+0595876S	Institut d'études politiques de Lille
+0690173N	Institut d'études politiques de Lyon
+0753431X	Institut d'études politiques de Paris
+0352317D	Institut d'études politiques de Rennes
+0310133B	Institut d'études politiques de Toulouse
+3010001R	Institut français d'archéologie orientale du Caire
+0753488J	Institut national des langues et civilisations orientales
+0180974L	Institut national des sciences appliquées Centre Val de Loire
+0690192J	Institut national des sciences appliquées de Lyon
+0350097R	Institut national des sciences appliquées de Rennes
+0760165S	Institut national des sciences appliquées de Rouen
+0670190T	Institut national des sciences appliquées de Strasbourg
+0310152X	Institut national des sciences appliquées de Toulouse
+0597131F	Institut national des sciences appliquées Hauts-de-France
+0292472E	Institut national polytechnique Bretagne
+0632033T	Institut national polytechnique Clermont Auvergne
+0311381H	Institut national polytechnique Toulouse
+0922605G	Institut national supérieur de formation et de recherche pour l'éducation inclusive
+0811293R	Institut national universitaire Jean-François Champollion 
+0333232J	Institut polytechnique de Bordeaux
+0381912X	Institut polytechnique de Grenoble
+0930603A	Institut supérieur de mécanique de Paris
+0753494R	Muséum national d'histoire naturelle
+0442953W	Nantes Université
+0301911P	Nîmes Université
+0142382N	Normandie Université (COMUE)
+0060099A	Observatoire de la Côte d'Azur
+0753496T	Observatoire de Paris
+0331766R	Université Bordeaux-III (Montaigne)
+0212296G	Université Bourgogne Europe
+0561718N	Université Bretagne-Sud
+0632084Y	Université Clermont Auvergne
+0062205P	Université Côte d'Azur
+0134009M	Université d'Aix-Marseille
+0801344B	Université d'Amiens (Picardie Jules Verne)
+0490970N	Université d'Angers
+0623957P	Université d'Artois
+0840685N	Université d'Avignon
+0333298F	Université de Bordeaux
+0292473F	Université de Brest (Bretagne Occidentale)
+0141408E	Université de Caen (Normandie)
+0730858L	Université de Chambéry (Savoie Mont Blanc)
+7200664J	Université de Corse
+9730429D	Université de Guyane
+9830445S	Université de la Nouvelle-Calédonie
+9840349G	Université de la Polynésie Française
+9740478B	Université de La Réunion
+0171463Y	Université de La Rochelle
+0597239Y	Université de Lille
+0870669E	Université de Limoges
+0542493S	Université de Lorraine
+9760358K	Université de Mayotte
+0342490X	Université de Montpellier
+0681166Y	Université de Mulhouse (Haute-Alsace)
+0640251A	Université de Pau (et des Pays de l'Adour)
+0660437S	Université de Perpignan (Via Domitia)
+0860856N	Université de Poitiers
+0511296G	Université de Reims
+0353074B	Université de Rennes
+0761904G	Université de Rouen (Normandie)
+0673021V	Université de Strasbourg
+0900424X	Université de technologie de Belfort-Montbéliard
+0601223D	Université de technologie de Compiègne
+0651124U	Université de technologie de Tarbes (Occitanie Pyrénées)
+0101060Y	Université de technologie de Troyes
+0830766G	Université de Toulon
+0313218E	Université de Toulouse
+0370800U	Université de Tours
+0781944P	Université de Versailles-Saint-Quentin-en-Yvelines
+9710585J	Université des Antilles
+0911975C	Université d'Evry-Val d'Essonne (Paris-Saclay)
+0450855K	Université d'Orléans
+0595964M	Université du Littoral (Côte d'Opale)
+0720916E	Université du Mans
+0383546Y	Université Grenoble Alpes
+0772894C	Université Gustave Eiffel
+0422388T	Université Jean Monnet
+0762762P	Université Le Havre (Normandie)
+0691774D	Université Lyon-I (Claude Bernard)
+0691775E	Université Lyon-II (Lumière)
+0692437Z	Université Lyon-III (Jean Moulin) 
+0252044L	Université Marie et Louis Pasteur
+0342569H	Université Montpellier Paul-Valéry
+0755976N	Université Paris Cité
+0756036D	Université Paris Sciences et Lettres (Université PSL)
+0750736T	Université Paris-Dauphine
+0772710C	Université Paris-Est (COMUE)
+0751717J	Université Paris-I (Panthéon-Sorbonne)
+0751719L	Université Paris-III (Sorbonne Nouvelle)
+0756305W	Université Paris-Panthéon-Assas
+0912408Y	Université Paris-Saclay
+0931827F	Université Paris-VIII
+0921204J	Université Paris-X (Nanterre) 
+0941111X	Université Paris-XII (Est Créteil) 
+0931238R	Université Paris-XIII (Sorbonne Nord)
+0597132G	Université polytechnique Hauts-de-France
+0350937D	Université Rennes-II
+0755890V	Université Sorbonne Université
+0313124C	Université Toulouse Capitole
+0311383K	Université Toulouse-II (Jean Jaurès)
+0753639Y	Centre national de la recherche scientifique (CNRS)
+0755364Y	Institut national de la santé et de la recherche médicale (INSERM)

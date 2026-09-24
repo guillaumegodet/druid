@@ -1,0 +1,76 @@
+---
+title: "Exporter des données et des rapports"
+description: "Exporter en CSV, Excel ou PDF et composer un rapport PDF du tableau de bord."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils, sur les données qu'ils voient"
+	menu="Personnel › Exporter ; fiche › Export PDF ; Tableau de bord › Rapport PDF, graphiques, Liste des publications"
+/>
+
+Druid propose des exports à plusieurs endroits, selon ce que vous voulez emporter : une liste
+de personnes, une fiche, un graphique, une liste de publications ou un rapport complet.
+
+## Récapitulatif
+
+| Quoi | Où | Formats |
+|---|---|---|
+| Liste des personnels | **Personnel › Exporter** | CSV, Excel (.xlsx), PDF |
+| Une fiche chercheur | Fiche › **Export PDF** | PDF |
+| Fichier pour l'ABES | **Personnel › Exporter › Export ABES (IdRef)** | Excel, voir [Exporter un fichier pour l'ABES](/guides/identifiants/export-abes/) |
+| Un graphique | Barre d'outils du graphique › **Télécharger en PNG** | PNG |
+| Une liste de publications | **Liste des publications › Exporter en CSV (résultats filtrés)** | CSV |
+| Un rapport du tableau de bord | **Rapport PDF** | PDF |
+
+## Exporter la liste des personnels
+
+1. Dans **Personnel**, filtrez la liste (laboratoire, statut…).
+2. Ouvrez **Exporter** et choisissez **CSV**, **Excel (.xlsx)** ou **PDF**.
+
+Le fichier contient les personnes **affichées**, avec leur nom, leur e-mail, leur statut et
+leur laboratoire.
+
+## Exporter un graphique
+
+Chaque graphique du tableau de bord a une barre d'outils, en haut à droite :
+
+- **Télécharger en PNG** : l'image du graphique, pour une présentation ;
+- **Plein écran** ;
+- **Partager (lien public / iframe)** : pour intégrer le graphique sur un site (voir
+  [Intégrer une dataviz sur un site](/guides/tableau-de-bord/integrer-une-dataviz/)) ;
+- **Méthodologie** : la description, la méthode et les limites du graphique.
+
+## Composer un rapport PDF
+
+1. Dans le tableau de bord, cliquez sur **Rapport PDF**.
+2. Vérifiez les **Critères** : structure, période et périmètre.
+3. **Choisir les graphiques** : cochez les sections et les graphiques à inclure
+   (**Tout sélectionner**, **Inclure toute la section**, **Retirer la section**).
+4. Passez à l'**Aperçu** : Druid prépare les graphiques. Vous pouvez encore
+   **Écarter du rapport** un graphique ou le **Réintégrer au rapport**.
+5. Cliquez sur **Télécharger le PDF**.
+
+## Ce qui se passe ensuite
+
+Les fichiers sont générés dans votre navigateur et téléchargés sur votre poste. Rien n'est
+modifié dans Druid.
+
+## Limites connues
+
+- **Un export reflète l'affichage** : filtres, période et périmètre en cours. Vérifiez-les
+  avant d'exporter.
+- **L'export de la liste des personnels est succinct** (nom, e-mail, statut, laboratoire) :
+  pour d'autres colonnes, passez par le tableur de l'annuaire si vous y avez accès.
+- **Le rapport PDF peut omettre un graphique** qui n'a pas pu être capturé : Druid indique
+  lesquels à l'aperçu.
+- **Les données exportées sont personnelles** (e-mails, dates) : ne les diffusez qu'aux
+  personnes qui en ont besoin.
+
+## Voir aussi
+
+- [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Préparer le volet bibliométrique d'un bilan](/tutoriels/bilan-bibliometrique/)

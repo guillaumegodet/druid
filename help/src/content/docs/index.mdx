@@ -1,0 +1,52 @@
+---
+title: Aide Druid
+description: "Centre d'aide de Druid : annuaire des personnels et des structures de recherche, alignement des identifiants chercheurs, tableau de bord bibliométrique."
+template: splash
+hero:
+  tagline: "Gérer l'annuaire de la recherche, fiabiliser les identifiants des chercheurs et piloter la production scientifique de votre établissement."
+  image:
+    # « Druid Aide Hero » design (1200×640, rendered at 2×): served from public/ at full resolution —
+    # Starlight's `file` hero image is resized to 400×400. Layout: src/styles/druid.css (.hero).
+    html: '<img class="druid-hero-visual" src="/druid-aide-hero.webp" srcset="/druid-aide-hero-1200.webp 1200w, /druid-aide-hero.webp 2400w" sizes="(min-width: 60rem) 60rem, 100vw" width="1200" height="640" alt="Druid relie trois fonctions : l’annuaire des chercheurs et des structures, des identifiants fiabilisés (ORCID, IdRef, HAL, Scopus) et le pilotage de la recherche (effectifs, couverture ORCID, publications par année)." />'
+  actions:
+    - text: Druid en 5 minutes
+      link: /demarrer/druid-en-5-minutes/
+      icon: right-arrow
+    - text: Glossaire
+      link: /demarrer/glossaire/
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<CardGrid>
+	<Card title="Démarrer" icon="rocket">
+		Une visite de Druid, puis ce que vous pouvez faire selon votre profil.
+		[Premiers pas](/demarrer/premiers-pas/)
+	</Card>
+	<Card title="Guides pratiques" icon="document">
+		Une tâche, une page : valider une fiche, traiter un doublon, aligner des
+		identifiants, exporter. [Tous les guides](/guides/personnes/rechercher-filtrer/)
+	</Card>
+	<Card title="Tutoriels" icon="open-book">
+		Des parcours complets, pas à pas : fiabiliser l'annuaire d'un labo, préparer un
+		bilan. [Tous les tutoriels](/tutoriels/fiabiliser-annuaire-labo/)
+	</Card>
+	<Card title="Comprendre les données" icon="magnifier">
+		D'où viennent les chiffres, comment ils sont calculés et leurs limites connues.
+		[Sources des données](/donnees/sources-des-donnees/)
+	</Card>
+</CardGrid>
+
+## Une donnée vous semble fausse ?
+
+<CardGrid>
+	<LinkCard title="Où corriger quoi" description="Druid, annuaire, HAL, OpenAlex, ORCID ou IdRef : où faire la correction et qui prévenir." href="/guides/corriger/ou-corriger-quoi/" />
+	<LinkCard title="Support" description="Signaler un problème, poser une question ou demander un accès." href="/guides/support/" />
+</CardGrid>
+
+## Pour les assistants IA
+
+Chaque page existe en Markdown (lien « Voir en Markdown » sous le titre). L'index
+[`/llms.txt`](/llms.txt) et l'aide complète [`/llms-full.txt`](/llms-full.txt) permettent de
+donner toute la documentation à un assistant conversationnel.

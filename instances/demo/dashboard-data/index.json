@@ -1,0 +1,23 @@
+{
+ "slugs": [
+  "udemo",
+  "lira",
+  "bios",
+  "lmd"
+ ],
+ "groups": [],
+ "tabsHidden": {
+  "udemo": [
+   "benchmark"
+  ],
+  "lira": [
+   "benchmark"
+  ],
+  "bios": [
+   "benchmark"
+  ],
+  "lmd": [
+   "benchmark"
+  ]
+ }
+}

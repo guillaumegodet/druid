@@ -1,0 +1,75 @@
+---
+title: "Créer un groupe de chercheurs"
+description: "Constituer une sélection transverse de chercheurs (conseil, projet, cohorte) et obtenir son tableau de bord."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs Druid"
+	menu="Groupes ; Personnel › sélection › Groupe"
+/>
+
+Un **groupe** réunit des chercheurs qui n'appartiennent pas forcément à la même structure :
+un conseil scientifique, les porteurs d'un projet, une cohorte de recrutés. Il a son
+propre **tableau de bord bibliométrique**.
+
+## Créer le groupe
+
+**Depuis la liste des personnels** (le plus rapide pour beaucoup de membres) :
+
+1. Dans **Personnel**, filtrez et cochez les personnes.
+2. Cliquez sur **Groupe**.
+3. Choisissez un groupe existant ou tapez le nom d'un nouveau groupe, puis **Valider**.
+
+**Depuis la rubrique Groupes** :
+
+1. Ouvrez **Groupes** et cliquez sur **Nouveau**.
+2. Donnez un nom au groupe.
+3. **Ajouter un membre** : cherchez les personnes par leur nom.
+
+Un nouveau groupe n'est conservé qu'une fois qu'il a au moins un membre.
+
+## Rendre les membres « moissonnables »
+
+Le tableau de bord d'un groupe est construit à partir des **identifiants** de ses membres,
+et non d'une affiliation : chaque membre doit avoir un **ORCID** ou un **auteur OpenAlex**
+identifié. La section **Tableau de bord bibliométrique** du groupe indique combien de
+membres sont moissonnables.
+
+Pour un membre sans ORCID, cliquez sur **Identifier l'auteur** : Druid cherche les profils
+auteurs OpenAlex correspondants (dans son laboratoire si possible) ; choisissez le bon en
+vous aidant du nombre de publications et des variantes du nom.
+
+## Générer le tableau de bord
+
+1. Dans la fiche du groupe, choisissez la **Période**.
+2. Cliquez sur **Générer le tableau de bord**. Le moissonnage prend quelques minutes ; son
+   avancement s'affiche.
+3. Cliquez sur **Voir le tableau de bord**. Le groupe apparaît aussi dans le sélecteur
+   **Structure ou groupe** du tableau de bord.
+
+Après avoir ajouté des membres ou des identifiants, cliquez sur **Régénérer**.
+
+## Ce qui se passe ensuite
+
+- L'appartenance à un groupe est enregistrée sur la fiche de chaque membre.
+- Le tableau de bord du groupe fonctionne comme celui d'une structure (voir
+  [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)).
+
+## Limites connues
+
+- **Les membres sans ORCID ni auteur OpenAlex sont exclus** du corpus du groupe.
+- **Un profil OpenAlex fragmenté** ne ramène qu'une partie des publications : identifiez
+  tous les profils de la personne (voir [Identifiants chercheurs](/donnees/identifiants-chercheurs/)).
+- **Une seule génération à la fois** : si un autre tableau de bord est en cours de calcul,
+  la vôtre attend.
+- **Le tableau de bord ne se met pas à jour tout seul** : régénérez-le après chaque
+  changement de composition.
+
+## Voir aussi
+
+- [Rechercher et filtrer les personnels](/guides/personnes/rechercher-filtrer/)
+- [Aligner les identifiants d'un labo](/guides/identifiants/aligner-les-identifiants/)

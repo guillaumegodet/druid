@@ -1,0 +1,11 @@
+// Cloudflare Workers (static assets only) — worker « druid-aide ».
+// Workers Builds settings: root directory `help`, build `npm run build`,
+// deploy `npx wrangler deploy`.
+{
+  "name": "druid-aide",
+  "compatibility_date": "2026-09-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page"
+  }
+}

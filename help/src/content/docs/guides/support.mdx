@@ -1,0 +1,65 @@
+---
+title: "Support"
+description: "Signaler un problème, poser une question ou demander un accès."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils"
+	menu="Hors de Druid : l'équipe Druid de votre établissement"
+/>
+
+Chaque établissement a sa propre instance de Druid, gérée par une **équipe Druid** locale
+(en général la bibliothèque ou la direction de la recherche). C'est elle qu'il faut
+contacter, par le canal habituel de votre établissement.
+
+## Avant d'écrire
+
+Vérifiez si l'aide répond à votre question :
+
+- une donnée fausse : [Où corriger quoi](/guides/corriger/ou-corriger-quoi/) ;
+- une publication manquante : [Une publication manque](/guides/corriger/publication-manquante/) ;
+- une rubrique ou un laboratoire invisible :
+  [Premiers pas selon votre profil](/demarrer/premiers-pas/#demander-un-accès-supplémentaire) ;
+- un terme inconnu : le [glossaire](/demarrer/glossaire/).
+
+La recherche en haut de cette page parcourt toute l'aide. Dans Druid, l'onglet **Aide Druid**
+de l'assistant (bouton en bas à droite, selon votre instance) répond aussi à partir de ces
+pages.
+
+## Ce qu'il faut indiquer
+
+Pour que votre demande soit traitée vite, précisez :
+
+| Demande | À indiquer |
+|---|---|
+| **Accès** | Votre identifiant, le ou les laboratoires concernés, et ce que vous devez pouvoir faire (consulter, corriger, administrer). |
+| **Donnée fausse** | La fiche concernée (nom et laboratoire, ou uid), la donnée fausse et la bonne valeur, avec sa source si possible. |
+| **Tableau de bord** | Le lien de la vue (bouton **Copier le lien** : il contient la structure, l'onglet, la période et le périmètre) et ce qui vous surprend. |
+| **Publication** | Le DOI ou le lien de la publication, et la structure où elle devrait (ou ne devrait pas) apparaître. |
+| **Bug** | Ce que vous faisiez, ce qui s'est passé, le message d'erreur exact, votre navigateur. |
+
+:::caution
+N'envoyez pas de capture d'écran contenant des données personnelles par un canal non
+sécurisé : décrivez le problème et donnez le lien de la page.
+:::
+
+## Pour les administrateurs Druid
+
+Une correction à faire **hors de Druid** (sur IdRef, ORCID, HAL, OpenAlex, dans l'annuaire
+LDAP) se suit dans Druid : sur la fiche de la personne, **Signaler une correction** crée une
+tâche, visible dans **Personnel › À traiter › Tâches**. Voir
+[Suivre les tâches « À traiter »](/guides/personnes/taches-a-traiter/).
+
+## Suggérer une amélioration de l'aide
+
+Une page est incomplète ou peu claire ? Signalez-le à l'équipe Druid en indiquant l'adresse
+de la page : l'aide évolue avec l'application.
+
+## Voir aussi
+
+- [Instances et fonctionnalités](/donnees/instances-fonctionnalites/)
+- [Nouveautés](/nouveautes/)

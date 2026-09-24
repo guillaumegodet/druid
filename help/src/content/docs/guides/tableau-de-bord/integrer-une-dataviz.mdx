@@ -1,0 +1,50 @@
+---
+title: "Intégrer une dataviz sur un site"
+description: "Publier un graphique du tableau de bord sur un site web avec la page d'intégration publique."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure"
+	menu="Tableau de bord › barre d'outils d'un graphique › Partager (lien public / iframe)"
+/>
+
+Un graphique du tableau de bord peut être affiché sur le site d'un laboratoire, dans une
+page intranet ou une présentation en ligne. Druid fournit pour cela un **lien public** et un
+**code d'intégration** (iframe), qui affichent le graphique à jour, sans connexion.
+
+## Étapes
+
+1. Dans le tableau de bord, réglez la **structure**, la **période** et le **périmètre** :
+   le lien partagé les reprend.
+2. Dans la barre d'outils du graphique, cliquez sur **Partager (lien public / iframe)**.
+3. Choisissez :
+   - **Lien direct** : l'adresse du graphique seul, à ouvrir dans un navigateur ou à mettre
+     dans un courriel ;
+   - **Intégration iframe** : **Copier le code d'intégration**, à coller dans l'éditeur de
+     votre site (bloc « HTML » ou « code intégré »).
+4. **Ouvrir dans un nouvel onglet** permet de vérifier le rendu avant de publier.
+
+## Ce qui se passe ensuite
+
+Le graphique intégré se met à jour tout seul à chaque régénération du tableau de bord de la
+structure. Rien n'est à refaire sur le site.
+
+## Limites connues
+
+- **Le lien est public** : toute personne qui l'a voit le graphique, sans connexion.
+  Vérifiez qu'il ne montre rien qui doive rester interne.
+- **Seuls certains graphiques sont partageables** : ceux qui n'ont pas de bouton
+  **Partager** ne le sont pas.
+- **Les filtres de la liste des publications** ne sont pas repris : seuls la structure, la
+  période et le périmètre le sont.
+- **La période est figée** dans le lien : pour afficher « les cinq dernières années » l'an
+  prochain, il faudra régénérer le code.
+
+## Voir aussi
+
+- [Exporter des données et des rapports](/guides/tableau-de-bord/exporter/)
+- [Indicateurs](/donnees/indicateurs/)

@@ -1,0 +1,1501 @@
+{
+ "nguyen-l": {
+  "mode": "search",
+  "queryName": "NGUYEN Lan",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000005",
+    "fullName": "Lan Nguyen",
+    "forms": [
+     "Lan Nguyen"
+    ],
+    "worksCount": 17,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "17 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000505",
+    "fullName": "Lan Nguyen",
+    "forms": [
+     "Lan Nguyen"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "petit-l": {
+  "mode": "search",
+  "queryName": "PETIT Léa",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000009",
+    "fullName": "Léa Petit",
+    "forms": [
+     "Léa Petit"
+    ],
+    "worksCount": 21,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "21 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000509",
+    "fullName": "Léa Petit",
+    "forms": [
+     "Léa Petit"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "olivier-s": {
+  "mode": "search",
+  "queryName": "OLIVIER Sami",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000014"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000014",
+    "fullName": "Sami Olivier",
+    "forms": [
+     "Sami Olivier"
+    ],
+    "worksCount": 26,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "26 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "brunet-n": {
+  "mode": "search",
+  "queryName": "BRUNET Nicolas",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000017",
+    "fullName": "Nicolas Brunet",
+    "forms": [
+     "Nicolas Brunet"
+    ],
+    "worksCount": 29,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "29 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000517",
+    "fullName": "Nicolas Brunet",
+    "forms": [
+     "Nicolas Brunet"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "meunier-s": {
+  "mode": "search",
+  "queryName": "MEUNIER Sarah",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000018"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000018",
+    "fullName": "Sarah Meunier",
+    "forms": [
+     "Sarah Meunier"
+    ],
+    "worksCount": 30,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "30 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "noel-r": {
+  "mode": "search",
+  "queryName": "NOËL Rémi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000019"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000019",
+    "fullName": "Rémi Noël",
+    "forms": [
+     "Rémi Noël"
+    ],
+    "worksCount": 31,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "31 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "hamon-m": {
+  "mode": "search",
+  "queryName": "HAMON Maëlle",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000020"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000020",
+    "fullName": "Maëlle Hamon",
+    "forms": [
+     "Maëlle Hamon"
+    ],
+    "worksCount": 32,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "32 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "colas-r": {
+  "mode": "search",
+  "queryName": "COLAS Rania",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000021",
+    "fullName": "Rania Colas",
+    "forms": [
+     "Rania Colas"
+    ],
+    "worksCount": 33,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "33 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000521",
+    "fullName": "Rania Colas",
+    "forms": [
+     "Rania Colas"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "pasquier-a": {
+  "mode": "search",
+  "queryName": "PASQUIER Aurélie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000022"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000022",
+    "fullName": "Aurélie Pasquier",
+    "forms": [
+     "Aurélie Pasquier"
+    ],
+    "worksCount": 34,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "34 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "texier-j": {
+  "mode": "search",
+  "queryName": "TEXIER Julien",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "not_found",
+  "best": [],
+  "candidates": []
+ },
+ "mallet-a": {
+  "mode": "search",
+  "queryName": "MALLET Aurélie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000025",
+    "fullName": "Aurélie Mallet",
+    "forms": [
+     "Aurélie Mallet"
+    ],
+    "worksCount": 37,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "37 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000525",
+    "fullName": "Aurélie Mallet",
+    "forms": [
+     "Aurélie Mallet"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "laurent-h": {
+  "mode": "search",
+  "queryName": "LAURENT Hélène",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000027"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000027",
+    "fullName": "Hélène Laurent",
+    "forms": [
+     "Hélène Laurent"
+    ],
+    "worksCount": 39,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "39 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "weber-f": {
+  "mode": "search",
+  "queryName": "WEBER Florian",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000029",
+    "fullName": "Florian Weber",
+    "forms": [
+     "Florian Weber"
+    ],
+    "worksCount": 41,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "41 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000529",
+    "fullName": "Florian Weber",
+    "forms": [
+     "Florian Weber"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "jacquet-o": {
+  "mode": "search",
+  "queryName": "JACQUET Olivier",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000032"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000032",
+    "fullName": "Olivier Jacquet",
+    "forms": [
+     "Olivier Jacquet"
+    ],
+    "worksCount": 14,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "14 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "masson-m": {
+  "mode": "search",
+  "queryName": "MASSON Maxime",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "not_found",
+  "best": [],
+  "candidates": []
+ },
+ "guerin-s": {
+  "mode": "search",
+  "queryName": "GUÉRIN Samuel",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000035"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000035",
+    "fullName": "Samuel Guérin",
+    "forms": [
+     "Samuel Guérin"
+    ],
+    "worksCount": 17,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "17 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "laurent-p": {
+  "mode": "search",
+  "queryName": "LAURENT Pauline",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000036"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000036",
+    "fullName": "Pauline Laurent",
+    "forms": [
+     "Pauline Laurent"
+    ],
+    "worksCount": 18,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "18 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "carpentier-y": {
+  "mode": "search",
+  "queryName": "CARPENTIER Yasmine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000037",
+    "fullName": "Yasmine Carpentier",
+    "forms": [
+     "Yasmine Carpentier"
+    ],
+    "worksCount": 19,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "19 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000537",
+    "fullName": "Yasmine Carpentier",
+    "forms": [
+     "Yasmine Carpentier"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "barbier-a": {
+  "mode": "search",
+  "queryName": "BARBIER Antoine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000038"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000038",
+    "fullName": "Antoine Barbier",
+    "forms": [
+     "Antoine Barbier"
+    ],
+    "worksCount": 20,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "20 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "ollivier-e": {
+  "mode": "search",
+  "queryName": "OLLIVIER Élodie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000039"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000039",
+    "fullName": "Élodie Ollivier",
+    "forms": [
+     "Élodie Ollivier"
+    ],
+    "worksCount": 21,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "21 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "quere-b": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Bastien",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000041",
+    "fullName": "Bastien Quéré",
+    "forms": [
+     "Bastien Quéré"
+    ],
+    "worksCount": 23,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "23 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000541",
+    "fullName": "Bastien Quéré",
+    "forms": [
+     "Bastien Quéré"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "guerin-i": {
+  "mode": "search",
+  "queryName": "GUÉRIN Irène",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "not_found",
+  "best": [],
+  "candidates": []
+ },
+ "noel-p": {
+  "mode": "search",
+  "queryName": "NOËL Pauline",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000044"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000044",
+    "fullName": "Pauline Noël",
+    "forms": [
+     "Pauline Noël"
+    ],
+    "worksCount": 26,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "26 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "vasseur-y": {
+  "mode": "search",
+  "queryName": "VASSEUR Yasmine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000045",
+    "fullName": "Yasmine Vasseur",
+    "forms": [
+     "Yasmine Vasseur"
+    ],
+    "worksCount": 27,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "27 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000545",
+    "fullName": "Yasmine Vasseur",
+    "forms": [
+     "Yasmine Vasseur"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "bertin-b": {
+  "mode": "search",
+  "queryName": "BERTIN Bastien",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000047"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000047",
+    "fullName": "Bastien Bertin",
+    "forms": [
+     "Bastien Bertin"
+    ],
+    "worksCount": 29,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "29 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "hamon-y": {
+  "mode": "search",
+  "queryName": "HAMON Yasmine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000048"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000048",
+    "fullName": "Yasmine Hamon",
+    "forms": [
+     "Yasmine Hamon"
+    ],
+    "worksCount": 30,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "30 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "huet-m": {
+  "mode": "search",
+  "queryName": "HUET Mehdi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000049",
+    "fullName": "Mehdi Huet",
+    "forms": [
+     "Mehdi Huet"
+    ],
+    "worksCount": 31,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "31 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000549",
+    "fullName": "Mehdi Huet",
+    "forms": [
+     "Mehdi Huet"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "ferrand-i": {
+  "mode": "search",
+  "queryName": "FERRAND Irène",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000050"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000050",
+    "fullName": "Irène Ferrand",
+    "forms": [
+     "Irène Ferrand"
+    ],
+    "worksCount": 32,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "32 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "ferrand-p": {
+  "mode": "search",
+  "queryName": "FERRAND Pauline",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000052"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000052",
+    "fullName": "Pauline Ferrand",
+    "forms": [
+     "Pauline Ferrand"
+    ],
+    "worksCount": 34,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "34 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "noel-i": {
+  "mode": "search",
+  "queryName": "NOËL Irène",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000000053",
+    "fullName": "Irène Noël",
+    "forms": [
+     "Irène Noël"
+    ],
+    "worksCount": 35,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "35 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000000553",
+    "fullName": "Irène Noël",
+    "forms": [
+     "Irène Noël"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "gauthier-h": {
+  "mode": "search",
+  "queryName": "GAUTHIER Hélène",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000000054"
+  ],
+  "candidates": [
+   {
+    "id": "A0000000054",
+    "fullName": "Hélène Gauthier",
+    "forms": [
+     "Hélène Gauthier"
+    ],
+    "worksCount": 36,
+    "orcid": "",
+    "affiliations": [
+     "Université de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation Université de Démonstration (2016–2026)",
+     "36 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ }
+}

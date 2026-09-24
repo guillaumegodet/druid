@@ -1,0 +1,77 @@
+---
+title: "Donner des droits à un utilisateur"
+description: "Choisir le bon droit pour un utilisateur, le faire attribuer, et vérifier qui a accès à quoi."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs Druid (consultation) ; administrateurs du service d'authentification (attribution)"
+	menu="Administration › Gestion des droits"
+	disponibilite="instances dont les droits sont gérés par le service d'authentification de l'établissement (Keycloak)"
+/>
+
+Dans Druid, les droits d'un utilisateur viennent des **groupes** auxquels son compte appartient
+dans le service d'authentification de l'établissement (Keycloak). La page **Gestion des
+droits** montre ces groupes et leurs membres ; l'**attribution** se fait dans la console
+d'administration de Keycloak.
+
+## Choisir le bon droit
+
+| Besoin | Droit à attribuer | Où |
+|---|---|---|
+| Voir son propre laboratoire | Aucun : c'est le droit par défaut de tout compte connecté, déduit de sa fiche. | — |
+| Suivre un ou plusieurs laboratoires sans dépendre de sa fiche (direction, gestion) | **Lecteur de tableaux de bord** | Sous le groupe du laboratoire |
+| Voir tout l'établissement (services centraux) | **Lecteur de tableaux de bord** | Au niveau de l'établissement |
+| Administrer Druid (groupes, doublons, tâches) | **Administrateur** | Au niveau de l'établissement |
+| Gérer les sources médias | Chargé·e de communication (groupe média) | Au niveau de l'établissement |
+
+Un même compte peut cumuler plusieurs droits. Voir
+[Instances et fonctionnalités](/donnees/instances-fonctionnalites/#profils-et-droits) pour ce
+que chaque profil permet.
+
+## Vérifier les droits actuels
+
+1. Ouvrez **Administration › Gestion des droits**.
+2. L'arborescence reprend les groupes de l'établissement : pour chaque laboratoire, ses
+   sous-groupes (**Lecteur de son laboratoire**, **Lecteur de tableaux de bord**,
+   **Administrateur**…) et leurs **Utilisateurs**.
+3. Les groupes marqués **interprété par Druid** donnent un droit dans Druid ; les autres
+   (**autre appli**) concernent d'autres applications CRISalid (SoVisu+, Projects).
+
+La page est en **lecture seule**.
+
+## Attribuer un droit
+
+1. Dans la console d'administration de Keycloak (realm de l'établissement), retrouvez
+   l'utilisateur.
+2. Ajoutez-le au groupe voulu : **sous le groupe du laboratoire** pour un droit limité au
+   labo, **directement sous l'établissement** pour un droit sur tout l'établissement.
+3. L'utilisateur se déconnecte et se reconnecte à Druid pour que le droit soit pris en
+   compte.
+
+Si vous n'avez pas accès à la console Keycloak, transmettez la demande à l'équipe technique
+avec l'identifiant de la personne, le laboratoire et le droit voulu.
+
+## Ce qui se passe ensuite
+
+Au prochain login, Druid recalcule les droits de la personne : les rubriques et les données
+correspondantes apparaissent.
+
+## Limites connues
+
+- **Un droit « labo » placé au mauvais niveau** (dans un groupe conteneur plutôt que sous le
+  labo) n'est pas reconnu : vérifiez dans la Gestion des droits que la personne apparaît
+  bien sous le bon laboratoire.
+- **Le droit par défaut dépend de la fiche** : une personne sans fiche, ou dont la fiche
+  indique un ancien laboratoire, ne voit pas le bon labo. Corrigez la fiche plutôt que
+  d'ajouter un droit.
+- **Sur les instances sans Keycloak**, les accès sont gérés par une liste d'adresses
+  autorisées, tenue par l'équipe technique : la Gestion des droits n'y existe pas.
+
+## Voir aussi
+
+- [Premiers pas selon votre profil](/demarrer/premiers-pas/)
+- [Support](/guides/support/)

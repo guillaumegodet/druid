@@ -1,0 +1,103 @@
+---
+title: "Corriger le statut ou le rattachement d'une personne"
+description: "Valider manuellement une fiche ou importer une liste fiabilisée pour qu'elle prime sur l'annuaire."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils pour une fiche ; administrateurs techniques avec un accès à tout l'établissement pour l'import de liste"
+	menu="Personnel › fiche › Valider la fiche ; Personnel › Synchroniser › Importer une liste fiabilisée"
+	disponibilite="instances où les statuts et la validation manuelle sont activés"
+/>
+
+Le statut d'une personne est calculé à partir de l'annuaire LDAP et des dates d'emploi, qui
+sont parfois en retard ou incomplets. Quand vous savez avec certitude qu'une personne est
+présente, partie ou extérieure, vous **validez sa fiche** : votre information l'emporte sur
+le calcul pendant 18 mois.
+
+## Avant de valider : corriger les données
+
+Beaucoup d'erreurs de statut viennent d'une donnée manquante. Vérifiez d'abord sur la fiche :
+
+- l'**établissement employeur** : un chercheur CNRS ou Inserm doit avoir son organisme
+  comme employeur pour être classé Externe ;
+- les **dates de fin** : une personne partie doit avoir une **fin d'emploi** et une **fin
+  d'appartenance**. Le bouton **→ fin d'emploi** recopie l'une dans l'autre ;
+- le **laboratoire et l'équipe** dans la carte Appartenances, et le rattachement principal.
+
+Enregistrez. Si le statut calculé est alors le bon, une validation n'est utile que pour
+protéger la fiche des prochaines mises à jour de l'annuaire.
+
+## Valider une fiche
+
+1. Ouvrez la fiche de la personne.
+2. Cliquez sur **Valider la fiche**.
+3. Choisissez le **Statut validé** : Interne, Départ, Parti ou Externe.
+4. Choisissez la **Portée** : le statut, le rattachement, ou les deux.
+5. Indiquez la **Source** : d'où vient votre information (par exemple « Enquête labo 2026,
+   liste RH »). La date et votre identifiant sont ajoutés automatiquement.
+6. Cliquez sur **Valider**.
+
+La pastille **Validé** apparaît à côté du statut.
+
+### Revoir ou retirer une validation
+
+Sur une fiche validée, le bouton **Valider la fiche** devient **Fiche validée**. Cliquez
+dessus :
+
+- **Revalider** remet la date à aujourd'hui, par exemple après une nouvelle vérification
+  d'une fiche **Périmée** ;
+- **Dévalider** retire la validation : le statut calculé s'applique de nouveau.
+
+## Valider une liste en une fois
+
+Quand un laboratoire envoie la liste de ses membres, vous pouvez valider toutes les fiches
+d'un coup.
+
+1. Dans **Personnel**, ouvrez **Synchroniser › Importer une liste fiabilisée**.
+2. Collez la liste (colonnes **nom**, **email**, **uid**, **statut**, séparées par des
+   virgules, points-virgules ou tabulations) ou chargez un fichier CSV. Une liste de noms
+   seuls, sans en-tête, fonctionne aussi.
+3. Renseignez la **Source (traçabilité)**, la **Date de validation**, la **Portée de la
+   validation** et le **Statut par défaut** (utilisé pour les lignes sans statut).
+4. Cliquez sur **Analyser l'appariement**. Druid retrouve chaque ligne par uid, puis
+   e-mail, puis nom, et affiche trois listes :
+   - **Fiches qui seront validées** ;
+   - **Homonymes** : plusieurs fiches correspondent, rien n'est appliqué ;
+   - **Non trouvés** : aucune fiche ne correspond.
+5. Vérifiez la première liste, puis cliquez sur **Valider N fiches**.
+
+Traitez ensuite les homonymes et les non-trouvés à la main, fiche par fiche.
+
+## Ce qui se passe ensuite
+
+- La validation est écrite immédiatement dans l'annuaire, avec sa source, sa date et son
+  auteur.
+- Lors des synchronisations suivantes avec l'annuaire LDAP, les fiches validées ne sont pas
+  modifiées automatiquement ; si l'annuaire dit autre chose, la pastille devient
+  **Validé — conflit** et la ligne est signalée à arbitrer.
+- Les fiches validées deviennent des **membres** de la structure pour le tableau de bord
+  (périmètre *Effectifs*), à la prochaine régénération.
+- Au bout de **18 mois**, la pastille passe à **Périmé** : la validation s'applique
+  toujours, mais la fiche est à revérifier.
+
+## Limites connues
+
+- **Une fin d'emploi et une fin d'appartenance passées l'emportent sur la validation** : la
+  personne est alors Partie, même validée Interne (pastille **Validé — conflit**).
+- **L'import apparie par nom en dernier recours** : deux personnes au même nom sont
+  classées en homonymes, jamais validées au hasard. Préférez des listes avec e-mail ou uid.
+- **La validation porte sur une fiche** : une personne qui a deux fiches (deux
+  laboratoires) doit être validée sur chacune.
+- **L'import est réservé** aux administrateurs techniques ayant un accès à tout
+  l'établissement. Les autres profils valident fiche par fiche, ou transmettent la liste au
+  [support](/guides/support/).
+
+## Voir aussi
+
+- [Statuts des personnes](/donnees/statuts-des-personnes/)
+- [Appartenances et rattachement](/donnees/appartenances-rattachement/)
+- [Fiabiliser l'annuaire d'un laboratoire](/tutoriels/fiabiliser-annuaire-labo/)

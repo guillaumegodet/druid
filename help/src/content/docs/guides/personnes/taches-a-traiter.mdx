@@ -1,0 +1,91 @@
+---
+title: "Suivre les tâches « À traiter »"
+description: "Signaler une correction à faire hors de Druid (IdRef, ORCID, HAL…) et suivre son avancement."
+sidebar:
+  order: 6
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs Druid"
+	menu="Personnel › À traiter › Tâches ; fiche › Signaler une correction"
+	disponibilite="instances où le suivi des tâches est activé"
+/>
+
+Certaines corrections ne se font pas dans Druid : fusionner deux notices IdRef, demander à
+un chercheur de rattacher son second ORCID, signaler un départ au service RH. Les **tâches**
+permettent de noter ce qu'il faut faire, qui s'en occupe et où on en est.
+
+## Créer une tâche
+
+1. Sur la fiche de la personne, cliquez sur **Signaler une correction**, ou dans
+   **À traiter › Tâches** sur **Nouvelle tâche**.
+2. Choisissez le **Type** : chaque type correspond à une base (IdRef, ORCID, HAL, OpenAlex,
+   Scopus, RH, Annuaire) et propose un **Canal** par défaut.
+3. Complétez la **Description** (ce qu'il faut faire, le second identifiant, la date…), le
+   **Lien** vers la notice ou le profil, la **Priorité** et, si besoin, la personne
+   **Assignée**.
+4. Cliquez sur **Créer la tâche**.
+
+### Les canaux
+
+| Canal | Qui fait la correction |
+|---|---|
+| **Correspondante autorités (IdRef)** | La personne chargée des notices d'autorité à la bibliothèque. |
+| **Lot ABES (export)** | Envoyée à l'ABES avec le prochain [export ABES](/guides/identifiants/export-abes/). |
+| **Email au chercheur** | Le chercheur lui-même (ORCID, IdHAL…). |
+| **Support externe (fournisseur)** | Le support d'OpenAlex ou de Scopus. |
+| **Interne (Druid)** | L'équipe Druid. |
+
+## Suivre une tâche
+
+Dans **À traiter › Tâches**, filtrez par statut, base ou canal, ou affichez **Les miennes**.
+Sur une tâche :
+
+| Action | Effet |
+|---|---|
+| **Prendre en charge** | La tâche passe **En cours** et vous est assignée. |
+| **Mettre en attente** | En attente de quelque chose (réponse du chercheur, lot ABES…) : précisez quoi. |
+| **Reprendre** | Revient **En cours**. |
+| **Marquer fait** | La tâche est **Faite** ; une résolution facultative est notée. |
+| **Abandonner** | La tâche est **Abandonnée**. |
+| **Rouvrir** | Une tâche close redevient à faire. |
+
+Chaque action est inscrite dans l'**Historique** de la tâche ; vous pouvez aussi ajouter
+un commentaire.
+
+### Écrire au chercheur
+
+Pour les types qui passent par le chercheur (ORCID ou IdHAL en double, profil vide…), la
+tâche propose un **Email au chercheur** prêt à envoyer : **Copier l'email** ou **Ouvrir dans
+la messagerie**, puis **Marquer envoyé (tâche en attente)**. Druid n'envoie aucun e-mail
+lui-même.
+
+## Les tâches automatiques
+
+Druid crée aussi des tâches tout seul, par des **règles de détection** : deux profils ORCID,
+IdHAL ou Scopus pour une même personne, départ constaté dans l'annuaire LDAP alors que la
+notice IdRef indique toujours l'affiliation… Ces tâches portent la mention **auto** et se
+**ferment d'elles-mêmes** (**Résolue (vérifiée)**) quand la situation disparaît. La
+détection tourne chaque nuit ; **Lancer la détection** la relance à la demande.
+
+## Ce qui se passe ensuite
+
+Les tâches sont enregistrées dans l'annuaire partagé (tables de suivi) : toute l'équipe
+voit les mêmes. Un export ABES clôt automatiquement les tâches du canal **Lot ABES**
+envoyées.
+
+## Limites connues
+
+- **Réservé aux administrateurs Druid** : les autres profils signalent une correction au
+  [support](/guides/support/).
+- **Une tâche ne corrige rien** : c'est un pense-bête partagé. La correction se fait dans la
+  base concernée.
+- **Les règles automatiques** reposent sur les derniers résultats d'alignement : une
+  situation n'est détectée qu'après une recherche d'identifiants.
+
+## Voir aussi
+
+- [Où corriger quoi](/guides/corriger/ou-corriger-quoi/)
+- [Traiter un doublon](/guides/personnes/traiter-un-doublon/)

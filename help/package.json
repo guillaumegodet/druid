@@ -1,0 +1,23 @@
+{
+  "name": "druid-help",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Druid user help centre (Starlight) — see docs/plan-documentation-utilisateur.md",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && node scripts/check-links.mjs",
+    "preview": "astro preview",
+    "astro": "astro",
+    "check-links": "node scripts/check-links.mjs",
+    "nouveautes": "node scripts/nouveautes-draft.mjs"
+  },
+  "dependencies": {
+    "@astrojs/starlight": "^0.42.3",
+    "astro": "^7.2.10",
+    "sharp": "^0.35.3"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  }
+}

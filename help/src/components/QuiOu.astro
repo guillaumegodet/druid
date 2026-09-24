@@ -1,0 +1,33 @@
+---
+// « Qui / où » box at the top of every how-to guide (template in gabarits/guide.mdx):
+// required profile, menu path, and the instance capability when the feature is optional
+// (profiles and capabilities: docs/documentation-utilisateur-inventaire.md §§ 2-3).
+import { Aside } from '@astrojs/starlight/components';
+
+interface Props {
+	/** Profiles allowed, in help vocabulary (e.g. « Services centraux, administrateurs »). */
+	profils: string;
+	/** Path in the Druid menu (e.g. « Personnel › À traiter › Doublons »). */
+	menu: string;
+	/** Only for optional features (e.g. « instances reliées à un annuaire LDAP »). */
+	disponibilite?: string;
+}
+
+const { profils, menu, disponibilite } = Astro.props;
+---
+
+<Aside type="note" title="Qui peut le faire, et où">
+	<ul class="druid-quiou">
+		<li><strong>Profils :</strong> {profils}</li>
+		<li><strong>Dans Druid :</strong> {menu}</li>
+		{disponibilite && <li><strong>Disponible sur :</strong> {disponibilite}</li>}
+	</ul>
+</Aside>
+
+<style>
+	.druid-quiou {
+		list-style: none;
+		padding-left: 0;
+		margin: 0;
+	}
+</style>

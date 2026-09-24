@@ -1,0 +1,156 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Native widgets (<select> option lists, calendars, scrollbars)
+     rendered in the right color scheme for the current mode. */
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* The native option list does not follow the <select>'s Tailwind classes
+     (it only inherits color): force readable colors.
+     Chrome/Firefox honor these styles; Safari relies on color-scheme. */
+  select option {
+    background-color: #ffffff;
+    color: #1c1b19;
+  }
+  .dark select option {
+    background-color: #2b2a26;
+    color: #f5f2ea;
+  }
+  /* Ink-colored « Appartenances » card (dark even in light mode): its selects
+     use white text → options on an ink background in both modes. */
+  .bg-ink select option {
+    background-color: #1c1b19;
+    color: #f5f2ea;
+  }
+
+  body {
+    @apply text-ink font-sans;
+    background: linear-gradient(158deg, #f4f0e6 0%, #f6f0da 60%, #f2e8ce 100%);
+    background-attachment: fixed;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  .dark body {
+    @apply text-[#f5f2ea];
+    background: radial-gradient(120% 90% at 80% 0%, #2a2823 0%, #201e1a 60%, #17150f 100%);
+    background-attachment: fixed;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Schibsted Grotesk', system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* Legacy aliases of the pixel theme, remapped to the "soft glass" style */
+  .pixel-border {
+    @apply border border-white/70 dark:border-white/10 rounded-card shadow-soft;
+  }
+
+  .image-pixelated {
+    image-rendering: auto;
+  }
+
+  .shadow-pixel-sm {
+    box-shadow: 0 8px 24px -16px rgba(50, 42, 15, 0.4);
+  }
+
+  .lofi-card {
+    @apply bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-white/70 dark:border-white/10 rounded-card shadow-soft hover:shadow-soft-lg transition-all cursor-pointer;
+  }
+
+  /* New components of the redesign */
+  .glass-card {
+    @apply bg-white/60 dark:bg-white/5 backdrop-blur-xl border border-white/70 dark:border-white/10 rounded-panel shadow-soft;
+  }
+
+  .glass-card-strong {
+    @apply bg-white/75 dark:bg-white/10 backdrop-blur-xl border border-white/80 dark:border-white/10 rounded-panel;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full font-disp font-semibold;
+  }
+
+  .btn-pill {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-5 rounded-full font-disp font-semibold text-sm
+      bg-white/75 dark:bg-white/10 border border-white/80 dark:border-white/15
+      text-ink dark:text-[#f5f2ea] hover:bg-white dark:hover:bg-white/15 transition-colors;
+  }
+
+  .btn-pill-dark {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-6 rounded-full font-disp font-semibold text-sm
+      bg-ink text-white hover:bg-black transition-colors
+      dark:bg-accent dark:text-ink dark:hover:bg-accent-strong;
+  }
+
+  .btn-pill-accent {
+    @apply inline-flex items-center justify-center gap-2 h-11 px-6 rounded-full font-disp font-semibold text-sm
+      bg-accent text-ink border border-accent-strong hover:bg-accent-strong transition-colors;
+  }
+
+  .section-label {
+    @apply text-xs font-bold uppercase text-muted-lighter dark:text-[#8f897c];
+    letter-spacing: 0.09em;
+  }
+
+  .count-badge {
+    @apply inline-flex items-center h-7 px-3 rounded-full bg-ink text-accent font-disp font-bold text-sm
+      dark:bg-accent/15 dark:text-accent;
+  }
+
+  .input-soft {
+    @apply w-full box-border rounded-xl bg-white dark:bg-white/10 border border-ink/10 dark:border-white/15
+      px-3 py-2 text-sm font-semibold text-ink dark:text-[#f5f2ea] outline-none
+      focus:border-accent-strong focus:ring-2 focus:ring-accent/40 transition-colors;
+  }
+
+  /* Pastilles de statut */
+  .status-pill-internal {
+    @apply inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-semibold
+      bg-[rgba(46,160,102,.16)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.22)] dark:text-[#5fd39a];
+  }
+
+  .status-pill-external {
+    @apply inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-semibold
+      bg-[rgba(224,158,42,.18)] text-[#9a6a12] dark:bg-[rgba(224,158,42,.22)] dark:text-[#f0c266];
+  }
+
+  .status-pill-leaving {
+    @apply inline-flex items-center gap-1.5 h-7 px-3 rounded-full text-xs font-semibold
+      bg-[rgba(214,69,69,.14)] text-[#b23b3b] dark:bg-[rgba(214,69,69,.22)] dark:text-[#f08c8c];
+  }
+
+  /* Badges identifiants externes */
+  .id-badge {
+    @apply inline-flex items-center h-6 px-2.5 rounded-lg text-[11px] font-bold;
+  }
+  .id-badge-orcid { @apply inline-flex items-center h-6 px-2.5 rounded-lg text-[11px] font-bold bg-orcid text-ink; }
+  .id-badge-hal { @apply inline-flex items-center h-6 px-2.5 rounded-lg text-[11px] font-bold bg-ink text-white dark:bg-[#f5f2ea] dark:text-ink; }
+  .id-badge-idref { @apply inline-flex items-center h-6 px-2.5 rounded-lg text-[11px] font-bold bg-white border border-ink/15 text-ink dark:bg-white/10 dark:border-white/15 dark:text-[#e7e2d6]; }
+  .id-badge-scopus { @apply inline-flex items-center h-6 px-2.5 rounded-lg text-[11px] font-bold bg-scopus text-white; }
+}
+
+/* Collapsible page banner on scroll (hooks/useCompactHeader.ts): same dimensions as before at
+   the top of the page; 22 px title, folded subtitle, reduced margins as soon as you scroll down. */
+.page-header { transition: padding .2s ease, border-color .2s ease; border-bottom: 1px solid transparent; }
+.page-header h1, .page-header h2 { transition: font-size .2s ease; }
+.page-header .page-header-sub { max-height: 6rem; overflow: hidden; transition: max-height .2s ease, opacity .15s ease, margin .2s ease; }
+.page-header .page-header-icon { transition: width .2s ease, height .2s ease; }
+.page-header .page-header-top { transition: margin .2s ease; }
+.page-header[data-compact] { padding-top: .5rem; padding-bottom: .5rem; border-bottom-color: rgba(28, 27, 25, .07); }
+.dark .page-header[data-compact] { border-bottom-color: rgba(255, 255, 255, .07); }
+.page-header[data-compact] h1, .page-header[data-compact] h2 { font-size: 22px; }
+.page-header[data-compact] .page-header-sub { max-height: 0; opacity: 0; margin-top: 0; }
+.page-header[data-compact] .page-header-icon { width: 1.25rem; height: 1.25rem; }
+.page-header[data-compact] .page-header-top { margin-bottom: .5rem; }
+.page-header[data-compact] .count-badge { height: 1.5rem; font-size: 12px; }

@@ -1,0 +1,74 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+# Env
+.env
+.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+*.local
+
+# Caches d'alignement IdRef (générés au runtime par scripts/sync_idref*.cjs).
+# Contiennent des données personnelles réelles (noms/PPN/ORCID) → ne pas versionner.
+idref_align_cache.json
+idref_align_progress.json
+idref_align_qualinka_cache.json
+idref_align_qualinka_progress.json
+
+# Exports RH ponctuels déposés à la racine pour analyse (données nominatives
+# réelles : nom, date de naissance, email, ORCID, nationalité) → ne jamais versionner.
+drpi-*.csv
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+scripts/.build/
+orcid_align_cache.json
+orcid_align_progress.json
+hal_align_cache.json
+hal_align_progress.json
+
+# Exports ABES générés par scripts/export_abes.ts
+exports/
+
+# Sorties des scripts d'inventaire UAI (scripts/list_grist_uais.js, get_structures_columns.js)
+grist_uais.json
+grist_structures_columns.json
+grist_output.txt
+
+# Cache LDAP (scripts/sync_ldap.cjs génère à la racine, vite.config.ts/server.cjs
+# le déplacent dans public/ ou dist/ au build/runtime). Contient ~9000 agents
+# LDAP réels (nom, statut, corps...) → ne jamais versionner (retiré du suivi
+# le 2026-09-18, cf. docs/archive/plan-fusion-centrale-2026-09.md § 2).
+ldap_status_cache.json
+ldap_status_cache.json.bak
+public/ldap_status_cache.json
+public/ldap_status_cache.json.bak
+dist/ldap_status_cache.json
+
+# Dashboard exports of the Cloudflare instances, copied from instances/<slug>/dashboard-data/ or from
+# the private druid-instances repository by scripts/prepare-cloudflare-assets.cjs at build time only
+# (CF_PAGES=1). Named staff inside (Centrale).
+public/dashboard-data/
+# Same for the alignment caches copied at build time (openalex/scopus were not
+# covered by the root patterns above).
+public/*_align_cache.json

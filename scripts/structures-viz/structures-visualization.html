@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Structure Hierarchy</title>
+<script src="https://unpkg.com/cytoscape@3.28.1/dist/cytoscape.min.js"></script>
+<script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+<script src="https://unpkg.com/cytoscape-dagre@2.5.0/cytoscape-dagre.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+       display: flex; height: 100vh; overflow: hidden; background: #f0f2f5; }
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+#sidebar { width: 280px; min-width: 280px; display: flex; flex-direction: column;
+           background: #fff; border-right: 1px solid #dde1e7; overflow: hidden; }
+
+#sidebar-header { padding: 14px 16px; background: #1c2b3a; color: #fff; flex-shrink: 0; }
+#sidebar-header h1 { font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
+#sidebar-header p  { font-size: 11px; color: #8ba0b4; margin-top: 3px; }
+
+#sidebar-body { flex: 1; overflow-y: auto; }
+
+.section  { border-bottom: 1px solid #eef0f3; padding: 12px 14px; }
+.sec-title { font-size: 10px; font-weight: 700; text-transform: uppercase;
+             color: #8ba0b4; letter-spacing: 0.8px; margin-bottom: 8px; }
+
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+.stat-box   { background: #f7f8fa; border-radius: 6px; padding: 8px 10px; }
+.stat-num   { font-size: 20px; font-weight: 700; color: #1c2b3a; line-height: 1; }
+.stat-lbl   { font-size: 10px; color: #8ba0b4; margin-top: 2px; }
+
+#search { width: 100%; padding: 7px 10px; border: 1px solid #dde1e7;
+          border-radius: 6px; font-size: 12px; background: #f7f8fa; }
+#search:focus { outline: none; border-color: #3b82f6; background: #fff; }
+
+#node-info { font-size: 12px; line-height: 1.6; }
+.ni-empty { color: #8ba0b4; font-style: italic; font-size: 12px; }
+.ni-name  { font-size: 13px; font-weight: 700; color: #1c2b3a; margin-bottom: 8px; word-break: break-word; }
+.ni-badge { display: inline-block; padding: 2px 8px; border-radius: 10px;
+            font-size: 10px; font-weight: 700; color: #fff; margin-right: 4px; }
+.ni-row   { display: flex; gap: 8px; margin-bottom: 2px; }
+.ni-key   { color: #8ba0b4; flex: 0 0 72px; font-size: 11px; }
+.ni-val   { color: #1c2b3a; font-size: 11px; word-break: break-all; }
+
+.iso-item { padding: 5px 0; font-size: 12px; border-bottom: 1px solid #f0f2f5;
+            cursor: pointer; color: #374151; display: flex; justify-content: space-between; }
+.iso-item:hover { color: #3b82f6; }
+.iso-item:last-child { border-bottom: none; }
+.iso-type { font-size: 10px; }
+
+/* ── Main ────────────────────────────────────────────────────────────────── */
+#main { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+
+#toolbar { padding: 7px 12px; background: #fff; border-bottom: 1px solid #dde1e7;
+           display: flex; gap: 6px; align-items: center; flex-shrink: 0; flex-wrap: wrap; }
+.btn { padding: 4px 10px; border: 1px solid #dde1e7; border-radius: 5px;
+       background: #fff; cursor: pointer; font-size: 11px; color: #374151;
+       transition: background 0.15s; white-space: nowrap; }
+.btn:hover { background: #f7f8fa; }
+.t-sep   { width: 1px; height: 18px; background: #dde1e7; flex-shrink: 0; }
+.t-label { font-size: 11px; color: #6b7280; display: flex; align-items: center;
+           gap: 4px; cursor: pointer; user-select: none; }
+
+#cy { flex: 1; }
+
+#legend { padding: 5px 12px; background: #fff; border-top: 1px solid #dde1e7;
+          display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+          font-size: 10px; color: #374151; flex-shrink: 0; }
+.leg-item { display: flex; align-items: center; gap: 4px; }
+.leg-dot  { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+.leg-dash { width: 20px; height: 0; border-top: 2px dashed; flex-shrink: 0; }
+.leg-line { width: 20px; height: 2px; flex-shrink: 0; }
+
+#loading { position: absolute; inset: 0; background: rgba(255,255,255,.9);
+           display: flex; align-items: center; justify-content: center;
+           font-size: 14px; color: #6b7280; z-index: 10; }
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="sidebar-header">
+    <h1 id="hdr-title">Structures</h1>
+    <p id="hdr-sub">—</p>
+  </div>
+  <div id="sidebar-body">
+
+    <div class="section">
+      <div class="sec-title">Statistics</div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-num" id="s-total">—</div><div class="stat-lbl">total rows</div></div>
+        <div class="stat-box"><div class="stat-num" id="s-vis">—</div><div class="stat-lbl">graph nodes</div></div>
+        <div class="stat-box"><div class="stat-num" id="s-incl">—</div><div class="stat-lbl">inclusions</div></div>
+        <div class="stat-box"><div class="stat-num" id="s-part">—</div><div class="stat-lbl">participations</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Search</div>
+      <input id="search" type="text" placeholder="Filter by label or ID…">
+    </div>
+
+    <div class="section">
+      <div class="sec-title">Selected node</div>
+      <div id="node-info"><div class="ni-empty">Click a node to see details.</div></div>
+    </div>
+
+    <div class="section" id="iso-section" style="display:none">
+      <div class="sec-title">Isolated structures (<span id="iso-count">0</span>)</div>
+      <div id="iso-list"></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="main">
+  <div id="toolbar">
+    <button class="btn" id="btn-fit">⊡ Fit</button>
+    <div class="t-sep"></div>
+    <button class="btn" id="btn-expand-all">▼ Expand all</button>
+    <button class="btn" id="btn-collapse-all">▶ Collapse all</button>
+    <div class="t-sep"></div>
+    <label class="t-label"><input type="checkbox" id="tog-part" checked> Participations</label>
+    <label class="t-label"><input type="checkbox" id="tog-ext" checked> External nodes</label>
+    <div class="t-sep"></div>
+    <span style="font-size:10px;color:#9ca3af">Double-click a node to expand / collapse its children</span>
+  </div>
+
+  <div id="cy"></div>
+  <div id="loading">Computing layout…</div>
+
+  <div id="legend"></div>
+</div>
+
+<script>
+/* __GRAPH_DATA__ */
+
+// ── Type styles ───────────────────────────────────────────────────────────────
+const TYPE_STYLE = {
+  institution:             { bg:'#1e40af', border:'#1e3a8a', shape:'rectangle',       w:160, h:44, fs:12 },
+  institution_subdivision: { bg:'#2563eb', border:'#1d4ed8', shape:'rectangle',       w:140, h:38, fs:11 },
+  unit:                    { bg:'#166534', border:'#14532d', shape:'round-rectangle', w:130, h:36, fs:11 },
+  unit_subdivision:        { bg:'#16a34a', border:'#15803d', shape:'round-rectangle', w:120, h:32, fs:10 },
+  team:                    { bg:'#c2410c', border:'#9a3412', shape:'ellipse',         w:110, h:30, fs:10 },
+  doctoral_school:         { bg:'#7c3aed', border:'#6d28d9', shape:'round-rectangle', w:130, h:36, fs:11 },
+  external:                { bg:'#e5e7eb', border:'#9ca3af', shape:'round-rectangle', w:240, h:44, fs:10 },
+};
+const FALLBACK = { bg:'#6b7280', border:'#4b5563', shape:'rectangle', w:120, h:34, fs:11 };
+
+const ROLE_COLOR = {
+  main_supervision:          '#dc2626',
+  associated_supervision:    '#2563eb',
+  participating_supervision: '#16a34a',
+};
+
+// ── Header / stats ────────────────────────────────────────────────────────────
+document.getElementById('hdr-title').textContent = DATA.filename;
+document.getElementById('hdr-sub').textContent   = DATA.stats.total + ' structures';
+document.getElementById('s-total').textContent   = DATA.stats.total;
+document.getElementById('s-vis').textContent     = DATA.nodes.length;
+document.getElementById('s-incl').textContent    = DATA.stats.inclusion_edges;
+document.getElementById('s-part').textContent    = DATA.stats.participation_edges;
+
+// ── Cytoscape elements ────────────────────────────────────────────────────────
+cytoscape.use(cytoscapeDagre);
+
+const elements = [];
+
+DATA.nodes.forEach(function(n) {
+  var s = TYPE_STYLE[n.group] || TYPE_STYLE[n.generic_type] || FALLBACK;
+  elements.push({ group:'nodes', data:{
+    id: n.id, local_id: n.local_id,
+    label:        n.label       || n.local_id,
+    long_label:   n.long_label  || '',
+    generic_type: n.generic_type  || '',
+    national_type:n.national_type || '',
+    main_mission: n.main_mission  || '',
+    group:        n.group || 'external',
+    description:  n.description   || '',
+    nns: n.nns||'', ror: n.ror||'', uai: n.uai||'',
+    isni: n.isni||'', wikidata: n.wikidata||'', scopus: n.scopus||'',
+    bg:s.bg, border:s.border, shape:s.shape, nodeW:s.w, nodeH:s.h, nodeFs:s.fs,
+  }});
+});
+
+DATA.edges.forEach(function(e, i) {
+  var rc = ROLE_COLOR[e.label] || '#6b7280';
+  elements.push({ group:'edges', data:{
+    id:'_e'+i, source:e.from, target:e.to,
+    etype: e.dashes ? 'participation' : 'inclusion',
+    role:e.label||'', edgeColor: e.dashes ? rc : '#64748b',
+  }});
+});
+
+// ── Create graph ──────────────────────────────────────────────────────────────
+var cy = cytoscape({
+  container: document.getElementById('cy'),
+  elements:  elements,
+  style: [
+    { selector:'node', style:{
+      'background-color':'data(bg)', 'border-color':'data(border)', 'border-width':2,
+      'shape':'data(shape)', 'width':'data(nodeW)', 'height':'data(nodeH)',
+      'label':'data(label)', 'color':'#fff',
+      'font-size':'data(nodeFs)', 'font-weight':600,
+      'text-valign':'center', 'text-halign':'center',
+      'text-wrap':'wrap', 'text-max-width':110,
+    }},
+    { selector:'node[group="external"]', style:{
+      'color':'#374151', 'font-weight':400, 'border-style':'dashed', 'border-width':1,
+      'text-max-width':228, 'text-wrap':'wrap',
+    }},
+    { selector:'node:selected',  style:{ 'border-color':'#fbbf24', 'border-width':4 }},
+    { selector:'node.collapsed', style:{ 'border-style':'double',  'border-width':5 }},
+    { selector:'node.faded',       style:{ 'opacity':0.2 }},
+    { selector:'node.highlighted', style:{ 'border-color':'#fbbf24', 'border-width':3 }},
+    { selector:'edge', style:{ 'curve-style':'bezier' }},
+    { selector:'edge[etype="inclusion"]', style:{
+      'line-color':'data(edgeColor)', 'target-arrow-color':'data(edgeColor)',
+      'target-arrow-shape':'triangle', 'arrow-scale':0.8, 'width':2,
+    }},
+    { selector:'edge[etype="participation"]', style:{
+      'line-color':'data(edgeColor)', 'target-arrow-color':'data(edgeColor)',
+      'target-arrow-shape':'triangle', 'arrow-scale':0.7, 'width':1.5,
+      'line-style':'dashed', 'line-dash-pattern':[7,4],
+      'curve-style':'unbundled-bezier',
+      'control-point-distances':[50], 'control-point-weights':[0.5],
+      'label':'data(role)', 'font-size':8, 'color':'data(edgeColor)',
+      'text-rotation':'autorotate',
+      'text-background-color':'#fff', 'text-background-opacity':0.75, 'text-background-padding':1,
+    }},
+    { selector:'.hidden', style:{ 'display':'none' }},
+  ],
+  layout:{ name:'preset' },   // no auto-layout; run manually below after registering layoutstop
+  minZoom:0.03, maxZoom:4,
+});
+
+// ── Expand / collapse ─────────────────────────────────────────────────────────
+// Inclusion edges: source=child, target=parent
+// childrenOf[parentId] = [childId, ...]
+var childrenOf = {};
+cy.edges().filter(function(e){ return e.data('etype') === 'inclusion'; }).forEach(function(e) {
+  var p = e.data('target'), c = e.data('source');
+  (childrenOf[p] = childrenOf[p] || []).push(c);
+});
+var hasChildren  = new Set(Object.keys(childrenOf));
+var collapsedSet = new Set();
+
+function descendants(id) {
+  var out=[], q=[].concat(childrenOf[id]||[]), seen=new Set();
+  while (q.length) {
+    var x=q.shift(); if (seen.has(x)) continue;
+    seen.add(x); out.push(x);
+    (childrenOf[x]||[]).forEach(function(c){ q.push(c); });
+  }
+  return out;
+}
+
+// applyVisibility: purely show/hide nodes at their pre-computed positions — no layout re-run.
+function applyVisibility() {
+  var hidden = new Set();
+  collapsedSet.forEach(function(id){ descendants(id).forEach(function(d){ hidden.add(d); }); });
+  cy.batch(function() {
+    cy.nodes().forEach(function(n) {
+      var id=n.id(), hide=hidden.has(id);
+      n.toggleClass('hidden', hide);
+      if (!hide && hasChildren.has(id)) n.toggleClass('collapsed', collapsedSet.has(id));
+    });
+    cy.edges().forEach(function(e) {
+      e.toggleClass('hidden', hidden.has(e.data('source')) || hidden.has(e.data('target')));
+    });
+  });
+}
+
+cy.on('dblclick', 'node', function(evt) {
+  var id = evt.target.id();
+  if (!hasChildren.has(id)) return;
+  collapsedSet.has(id) ? collapsedSet.delete(id) : collapsedSet.add(id);
+  applyVisibility();
+});
+
+document.getElementById('btn-expand-all').addEventListener('click', function() {
+  collapsedSet.clear(); applyVisibility();
+});
+document.getElementById('btn-collapse-all').addEventListener('click', function() {
+  hasChildren.forEach(function(id){ collapsedSet.add(id); }); applyVisibility();
+});
+
+// ── Layout ─────────────────────────────────────────────────────────────────────
+// Dagre runs ONCE on ALL internal nodes (including those initially collapsed) so
+// positions are stable. Expand/collapse only shows/hides at those fixed positions.
+
+function positionExternalNodes() {
+  var showExt = document.getElementById('tog-ext').checked;
+  var externals = cy.nodes('[group="external"]');
+  externals.toggleClass('hidden', !showExt);
+  cy.edges().forEach(function(e) {
+    if (externals.has(e.source()) || externals.has(e.target()))
+      e.toggleClass('hidden', !showExt);
+  });
+  if (!showExt || externals.length === 0) return;
+
+  // Use bounding box of ALL internal nodes (positions computed by dagre, includes hidden)
+  var internals = cy.nodes().not('[group="external"]');
+  if (internals.length === 0) return;
+  var bb = internals.boundingBox();
+
+  var cols  = Math.max(1, Math.ceil(Math.sqrt(externals.length * 3)));
+  var nodeW = 240, nodeH = 50, gapX = 30, gapY = 20;
+  var rows  = Math.ceil(externals.length / cols);
+  var startX = bb.x1 + nodeW / 2;
+  var startY = bb.y1 - 150 - (rows - 1) * (nodeH + gapY) - nodeH / 2;
+  externals.forEach(function(n, i) {
+    n.position({
+      x: startX + (i % cols) * (nodeW + gapX),
+      y: startY + Math.floor(i / cols) * (nodeH + gapY),
+    });
+  });
+}
+
+cy.on('layoutstop', function() {
+  document.getElementById('loading').style.display = 'none';
+  // Apply initial collapse: show root + 1 level, hide the rest
+  var root = DATA.root;
+  hasChildren.forEach(function(id) { if (id !== root) collapsedSet.add(id); });
+  applyVisibility();
+  positionExternalNodes();
+  cy.fit(undefined, 20);
+  cy.zoom(cy.zoom() * 12);
+  if (root) cy.center(cy.getElementById(root));
+  // Detach after first use so subsequent layout events (none expected) don't re-trigger
+  cy.off('layoutstop');
+});
+
+// Run dagre once on all non-external nodes
+(function() {
+  var allInternal = cy.nodes().not('[group="external"]');
+  var allEdges    = cy.edges('[etype="inclusion"]').filter(function(e) {
+    return allInternal.has(e.source()) && allInternal.has(e.target());
+  });
+  allInternal.union(allEdges).layout({
+    name:          'dagre',
+    rankDir:       'RL',
+    spacingFactor: 1.2,
+    nodeSep:       14,
+    rankSep:       110,
+    weight:        function(){ return 1; },
+  }).run();
+}());
+
+// ── Toggles ───────────────────────────────────────────────────────────────────
+document.getElementById('tog-part').addEventListener('change', function(e) {
+  cy.edges('[etype="participation"]').toggleClass('hidden', !e.target.checked);
+});
+document.getElementById('tog-ext').addEventListener('change', function() {
+  positionExternalNodes();
+});
+document.getElementById('btn-fit').addEventListener('click', function() { cy.fit(undefined,40); });
+
+// ── Search ────────────────────────────────────────────────────────────────────
+document.getElementById('search').addEventListener('input', function(e) {
+  var q = e.target.value.trim().toLowerCase();
+  if (!q) { cy.nodes().removeClass('highlighted faded'); return; }
+  cy.nodes().forEach(function(n) {
+    var hit = n.data('label').toLowerCase().includes(q)
+           || n.data('local_id').toLowerCase().includes(q)
+           || n.data('long_label').toLowerCase().includes(q);
+    n.toggleClass('highlighted', hit);
+    n.toggleClass('faded', !hit);
+  });
+});
+
+// ── Node info panel ───────────────────────────────────────────────────────────
+var MISSION_LABEL = {
+  research:'Research', scientific_services:'Scientific services',
+  administrative_services:'Administrative services', teaching:'Teaching',
+};
+
+function infoRow(k, v) {
+  if (!v) return '';
+  return '<div class="ni-row"><span class="ni-key">'+k+'</span><span class="ni-val">'+v+'</span></div>';
+}
+
+cy.on('tap', 'node', function(evt) {
+  var d = evt.target.data();
+  var s = TYPE_STYLE[d.group] || FALLBACK;
+  document.getElementById('node-info').innerHTML =
+    '<div class="ni-name"><span class="ni-badge" style="background:'+s.bg+'">'+
+    (d.generic_type||d.group)+'</span>'+(d.long_label||d.label)+'</div>' +
+    infoRow('ID',         d.local_id) +
+    infoRow('Short name', d.label !== d.long_label ? d.label : '') +
+    infoRow('Type',       d.national_type) +
+    infoRow('Mission',    MISSION_LABEL[d.main_mission]||d.main_mission) +
+    infoRow('Description',d.description) +
+    infoRow('NNS',        d.nns) +
+    infoRow('ROR',        d.ror) +
+    infoRow('UAI',        d.uai) +
+    infoRow('ISNI',       d.isni) +
+    infoRow('Wikidata',   d.wikidata) +
+    infoRow('Scopus',     d.scopus);
+});
+cy.on('tap', function(evt) {
+  if (evt.target !== cy) return;
+  document.getElementById('node-info').innerHTML = '<div class="ni-empty">Click a node to see details.</div>';
+  cy.nodes().removeClass('highlighted faded');
+  document.getElementById('search').value = '';
+});
+
+// ── Isolated structures ───────────────────────────────────────────────────────
+if (DATA.isolated.length) {
+  document.getElementById('iso-section').style.display = '';
+  document.getElementById('iso-count').textContent = DATA.isolated.length;
+  var list = document.getElementById('iso-list');
+  DATA.isolated.forEach(function(n) {
+    var div = document.createElement('div');
+    div.className = 'iso-item';
+    var s = TYPE_STYLE[n.group] || FALLBACK;
+    div.innerHTML = '<span>'+(n.label||n.local_id)+'</span>' +
+      '<span class="iso-type" style="color:'+s.bg+'">'+(n.generic_type||'')+'</span>';
+    div.title = n.long_label || n.local_id;
+    list.appendChild(div);
+  });
+}
+
+// ── Legend ────────────────────────────────────────────────────────────────────
+var leg = document.getElementById('legend');
+[
+  ['institution',             'Institution'],
+  ['institution_subdivision', 'Inst. subdivision'],
+  ['unit',                    'Unit'],
+  ['unit_subdivision',        'Unit subdivision'],
+  ['team',                    'Team'],
+  ['doctoral_school',         'Doctoral school'],
+  ['external',                'External'],
+].forEach(function(pair) {
+  var s = TYPE_STYLE[pair[0]] || FALLBACK;
+  var el = document.createElement('span');
+  el.className = 'leg-item';
+  el.innerHTML = '<span class="leg-dot" style="background:'+s.bg+'"></span>'+pair[1];
+  leg.appendChild(el);
+});
+
+var sep = document.createElement('span');
+sep.style.cssText = 'width:1px;height:14px;background:#dde1e7;flex-shrink:0';
+leg.appendChild(sep);
+
+[
+  ['#64748b',                              false, 'Inclusion'],
+  [ROLE_COLOR.main_supervision,            true,  'Main superv.'],
+  [ROLE_COLOR.associated_supervision,      true,  'Associated superv.'],
+  [ROLE_COLOR.participating_supervision,   true,  'Participating superv.'],
+].forEach(function(t) {
+  var color=t[0], dashed=t[1], label=t[2];
+  var el = document.createElement('span');
+  el.className = 'leg-item';
+  if (dashed) {
+    el.innerHTML = '<span class="leg-dash" style="border-color:'+color+'"></span>'+label;
+  } else {
+    el.innerHTML = '<span class="leg-line" style="background:'+color+'"></span>'+label;
+  }
+  leg.appendChild(el);
+});
+</script>
+</body>
+</html>

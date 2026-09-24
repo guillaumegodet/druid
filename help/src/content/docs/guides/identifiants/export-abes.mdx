@@ -1,0 +1,70 @@
+---
+title: "Exporter un fichier pour l'ABES"
+description: "Produire le fichier des identifiants et affiliations absents des notices IdRef, à transmettre à l'ABES."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils, sur la liste qu'ils voient ; en pratique les services centraux"
+	menu="Personnel › Exporter › Export ABES (IdRef)"
+/>
+
+Druid connaît souvent des informations qui manquent dans les notices IdRef des chercheurs :
+leur ORCID, leur IdHAL, leur affiliation actuelle. L'**Export ABES** produit un classeur
+qui liste ces enrichissements, à transmettre à l'ABES (ou à traiter par la bibliothèque)
+pour mettre à jour les notices.
+
+## Avant l'export
+
+Relisez les notices : l'export s'appuie sur le dernier passage **Vérifier les existants**
+pour IdRef (page [Alignement des identifiants](/guides/identifiants/aligner-les-identifiants/)).
+Druid signale les fiches dont la notice n'a pas été relue.
+
+## Étapes
+
+1. Dans **Personnel**, filtrez la liste : l'export porte sur la **liste filtrée** (par
+   exemple un laboratoire).
+2. Ouvrez **Exporter › Export ABES (IdRef)**.
+3. Réglez les options :
+   - **Préréglage** : limite l'export aux fiches de l'établissement, au statut Interne et
+     validées ;
+   - **Fiches validées seulement**, **Exclure doctorants et vacataires** ;
+   - **Proposer des notes 340** (note biographique avec l'affiliation) ;
+   - **Feuille « sans notice »** : les personnes qui n'ont pas de notice IdRef ;
+   - **Inclure les lignes déjà envoyées**.
+4. Vérifiez l'aperçu et les compteurs (fiches dans le périmètre, lignes à envoyer,
+   conflits, structures à créer).
+5. Téléchargez le **Classeur XLSX**.
+6. Une fois le fichier transmis, cliquez sur **Marquer comme envoyé**.
+
+## Le classeur
+
+| Feuille | Contenu |
+|---|---|
+| **enrichissements** | Pour chaque notice, ce qu'il faut ajouter ou corriger : identifiants (zone 035), affiliation (zone 510), note (zone 340). |
+| **conflits** | Les cas où la notice et Druid se contredisent : à vérifier avant tout envoi. |
+| **sans_notice** | Les personnes sans notice IdRef, candidates à une création. |
+| **structures** | Les structures qui n'ont pas encore de notice IdRef. |
+
+## Ce qui se passe ensuite
+
+- **Marquer comme envoyé** date les fiches exportées : elles ne seront plus reproposées,
+  sauf avec **Inclure les lignes déjà envoyées**.
+- Les tâches du canal **Lot ABES** de ces fiches sont clôturées (voir
+  [Suivre les tâches](/guides/personnes/taches-a-traiter/)).
+- Les notices sont mises à jour par l'ABES ou la bibliothèque ; Druid le constate au
+  passage **Vérifier les existants** suivant.
+
+## Limites connues
+
+- **L'export ne modifie pas IdRef** : il prépare le travail.
+- **Une notice non relue** ne peut pas être comparée : lancez d'abord la vérification IdRef.
+- **Les conflits** demandent une vérification humaine : ne les transmettez pas tels quels.
+
+## Voir aussi
+
+- [Identifiants chercheurs](/donnees/identifiants-chercheurs/)
+- [Compléter les identifiants d'un laboratoire de A à Z](/tutoriels/identifiants-labo-a-z/)

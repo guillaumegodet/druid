@@ -1,0 +1,90 @@
+---
+title: "Choisir une structure, une période, un périmètre"
+description: "Régler le tableau de bord : structure ou groupe, années, périmètre Affiliation ou Effectifs."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils (un profil labo ne voit que ses laboratoires ; les groupes sont réservés aux administrateurs)"
+	menu="Tableau de bord"
+/>
+
+Trois réglages, en haut du tableau de bord, déterminent **toutes** les données affichées
+dans les onglets : la structure, la période et le périmètre.
+
+## Étapes
+
+### 1. La structure ou le groupe
+
+Dans le sélecteur **Structure ou groupe**, choisissez :
+
+- une **structure** : un laboratoire, une composante, un établissement ;
+- ou un **groupe** de chercheurs (un conseil, un projet), si vous y avez accès.
+
+Depuis la fiche d'une structure, le bouton **Tableau de bord** ouvre directement celui de
+la structure.
+
+### 2. La période
+
+Réglez les années avec **De** … **à** …. Tous les indicateurs, graphiques et listes se
+limitent aux publications de ces années.
+
+### 3. Le périmètre
+
+| Périmètre | Publications retenues |
+|---|---|
+| **Affiliation** | Toutes les publications signées avec l'affiliation de la structure. |
+| **Effectifs** | Seulement celles dont au moins un auteur est reconnu parmi les membres fiabilisés de la structure. |
+
+Le survol du sélecteur indique combien de publications le périmètre *Effectifs* écarte. Le
+périmètre par défaut dépend de la configuration de la structure.
+
+Voir [Publications et attribution](/donnees/publications-attribution/#les-deux-périmètres-du-tableau-de-bord)
+pour choisir le bon périmètre.
+
+### 4. Parcourir les onglets
+
+| Onglet | Contenu |
+|---|---|
+| **Vue d'ensemble** | Chiffres clés, évolution, types de publication, accès ouvert. |
+| **Collaborations** | Typologie, collaborations nationales et internationales, établissements partenaires. |
+| **Impact et citations** | FWCI, top 1 % / 10 %, par équipe et par chercheur. |
+| **Ouvrages**, **Revues** | Livres et chapitres ; revues de publication et quartiles. |
+| **Suivi des APC**, **Financements** | Frais de publication ; financeurs cités. |
+| **Axes stratégiques** | Si des axes sont configurés pour la structure. |
+| **Charte de signature** | Conformité des affiliations. |
+| **Équipes**, **Doctorants**, **Chercheurs**, **Réseau** | Production par équipe, par personne, réseau de cosignatures. |
+| **Liste des publications** | Toutes les publications, filtrables et exportables. |
+| **Veille** | Nouvelles publications, mentions dans les médias. |
+| **Sources** | Provenance des publications (CRISalid, BSO, OpenAlex, HAL). |
+
+Certains onglets peuvent être masqués pour une structure par l'équipe technique.
+
+## Partager la vue
+
+**Copier le lien** copie l'adresse de la vue affichée : structure, onglet, période et
+périmètre. La personne qui l'ouvre retrouve exactement les mêmes réglages (si elle a accès à
+la structure).
+
+## Ce qui se passe ensuite
+
+Rien n'est modifié : ces réglages ne changent que l'affichage. Ils sont conservés dans
+l'adresse de la page, que vous pouvez mettre en favori.
+
+## Limites connues
+
+- **Les données datent de la dernière génération** du tableau de bord, pas du jour (voir
+  [D'où viennent les données](/donnees/sources-des-donnees/)).
+- **Le périmètre Effectifs n'est pas disponible** si les membres de la structure ne sont
+  pas reconnus dans le corpus : le tableau de bord reste alors sur *Affiliation*.
+- **Une structure sans données** affiche un message : son tableau de bord n'a pas encore
+  été généré. Voir le [support](/guides/support/).
+
+## Voir aussi
+
+- [Indicateurs](/donnees/indicateurs/)
+- [Filtrer la liste des publications](/guides/tableau-de-bord/liste-des-publications/)
+- [Exporter des données et des rapports](/guides/tableau-de-bord/exporter/)

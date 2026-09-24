@@ -1,0 +1,90 @@
+---
+title: "Accepter, rejeter ou ignorer un candidat"
+description: "Décider pour chaque proposition d'identifiant : candidat fort, ambigu, conflit, notice remplacée."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Services centraux, administrateurs Druid"
+	menu="Outils d'alignement › Alignement des identifiants chercheurs › clic sur une pastille"
+/>
+
+Chaque case de la page d'alignement résume la situation d'une personne pour une source.
+Cliquer sur la pastille ouvre le **détail** : les candidats, leurs preuves et les actions
+possibles.
+
+## Lire un candidat
+
+Pour chaque candidat, le détail affiche :
+
+- son **identifiant**, avec un lien vers le profil (à ouvrir en cas de doute) ;
+- son **niveau** : **fort**, **moyen** ou **faible** ;
+- ses **preuves** : identifiant commun, affiliation retrouvée, publications communes,
+  formes du nom ;
+- ce qui est **Déjà dans l'Annuaire** pour cette personne.
+
+Avant de valider un candidat moyen ou faible, ouvrez le profil : mêmes thématiques, mêmes
+coauteurs, même établissement ?
+
+## Décider selon le cas
+
+| Pastille | Action |
+|---|---|
+| **candidat fort** | Cochez la case dans la pastille. |
+| **candidats à vérifier** | Ouvrez le détail, vérifiez le profil, cochez le bon candidat. |
+| **Ambigu — arbitrer** | Choisissez le bon candidat parmi ceux proposés, ou **Ignorer (ne rien écrire)**. |
+| **conflit** | La fiche a déjà un autre identifiant. Druid n'écrit rien : lisez la raison, puis corrigez la fiche à la main si l'identifiant existant est faux. |
+| **notice remplacée** (IdRef) | L'ABES a fusionné ou supprimé la notice. **Mettre à jour** remplace l'ancien PPN par le nouveau. Si Druid signale un **nom divergent**, vérifiez d'abord sur IdRef. |
+| **Écart de nom** (IdRef) | Le nom de la notice diffère de celui de l'annuaire : confirmez (mariage, nom d'usage) ou détachez la notice. |
+| **renseigné** | Rien à faire. |
+
+Les choix cochés sont écrits en une fois avec **Appliquer (N)**, en bas de la page.
+
+## Écarter un mauvais candidat
+
+Si un candidat est un homonyme, cliquez sur **Mauvais candidat**. Le couple (personne,
+identifiant) est mis sur liste noire : il ne sera **plus jamais proposé**, même après une
+nouvelle recherche.
+
+## Signaler une identité mêlée
+
+Parfois, un profil (IdRef, HAL, OpenAlex, Scopus) **mélange plusieurs personnes** : il
+contient les travaux de la personne et ceux d'un homonyme. Ni valider (on moissonnerait
+les travaux d'un autre), ni rejeter (on perdrait les siens).
+
+1. Cliquez sur **Identité mêlée**.
+2. Le profil sort des propositions ; un signalement est ouvert dans la table de revue.
+3. Faites corriger le profil **à la source** : IdRef par la bibliothèque, HAL par l'auteur
+   ou le référent HAL du laboratoire, OpenAlex par l'auteur ou le support OpenAlex. Notez la
+   demande dans la table de revue.
+
+Les signalements ouverts sont listés dans la section **Identités mêlées — à démêler à la
+source** de la page. Druid signale aussi des **suspicions** (pastille « identité mêlée
+suspectée ») : c'est un indice, jamais une décision.
+
+## Ce qui se passe ensuite
+
+- **Appliquer** écrit les identifiants dans l'annuaire. Pour IdRef, ORCID et HAL, valider un
+  candidat écarte les autres candidats de la même personne ; pour OpenAlex, chaque profil se
+  décide séparément (une personne peut en avoir plusieurs).
+- **Mauvais candidat** et **Identité mêlée** sont enregistrés immédiatement.
+- **Ignorer** n'écrit rien : la fiche reviendra au prochain passage.
+
+## Limites connues
+
+- **Un profil ORCID vide** (« profil vide ») ne peut pas être confirmé : demandez à la
+  personne de rendre ses informations publiques, ou de vous communiquer son ORCID.
+- **Les noms composés et les changements de nom** donnent des scores plus faibles : un bon
+  candidat peut apparaître « à vérifier ».
+- **Une erreur dans la source** (notice IdRef qui mélange deux personnes, profil OpenAlex
+  fragmenté) ne se corrige pas dans Druid.
+
+## Voir aussi
+
+- [Identifiants chercheurs](/donnees/identifiants-chercheurs/)
+- [Aligner les identifiants d'un labo](/guides/identifiants/aligner-les-identifiants/)
+- [Suivre les tâches « À traiter »](/guides/personnes/taches-a-traiter/) : pour les corrections à
+  faire hors de Druid

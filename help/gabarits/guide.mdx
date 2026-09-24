@@ -1,0 +1,37 @@
+---
+# Gabarit d'un guide pratique — copier dans src/content/docs/guides/<rubrique>/<slug>.mdx
+# (plan-documentation-utilisateur.md § 4). Retirer le badge « à venir » de la page remplacée.
+title: "Traiter un doublon"          # verbe à l'infinitif
+description: "Une phrase qui dit ce que la page permet de faire."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Services centraux, administrateurs Druid"
+	menu="Personnel › À traiter › Doublons"
+	disponibilite="instances reliées à un annuaire LDAP"
+/>
+
+Une ou deux phrases de contexte : quand on a besoin de faire cette tâche.
+
+## Étapes
+
+1. Libellés exacts des boutons en **gras**, repris du catalogue `locales/fr/messages.po`.
+2. Une action par étape.
+3. …
+
+## Ce qui se passe ensuite
+
+Où la modification est écrite (Grist, people.csv…) et quand elle apparaît ailleurs.
+
+## Limites connues
+
+Cas où le résultat surprend, erreurs fréquentes, ce que Druid ne sait pas faire.
+
+## Voir aussi
+
+- [Page de référence associée](/donnees/…/)
+- [Tutoriel associé](/tutoriels/…/)

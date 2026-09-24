@@ -1,0 +1,672 @@
+{
+ "nguyen-l": {
+  "mode": "search",
+  "queryName": "NGUYEN Lan",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-lan-nguyen",
+  "candidates": [
+   {
+    "idhal": "demo-lan-nguyen",
+    "idhalI": "900005",
+    "fullName": "Lan Nguyen",
+    "forms": [
+     "Lan Nguyen"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (8 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "petit-l": {
+  "mode": "search",
+  "queryName": "PETIT Léa",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-lea-petit",
+  "candidates": [
+   {
+    "idhal": "demo-lea-petit",
+    "idhalI": "900009",
+    "fullName": "Léa Petit",
+    "forms": [
+     "Léa Petit"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "BIOS"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo BIOS (3 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "morel-j": {
+  "mode": "search",
+  "queryName": "MOREL Julien",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "idhal": "demo-julien-morel",
+    "idhalI": "900010",
+    "fullName": "Julien Morel",
+    "forms": [
+     "Julien Morel"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "BIOS"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "moyen",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo BIOS (4 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "idhal": "demo-julien-morel-1",
+    "idhalI": "900510",
+    "fullName": "Julien Morel",
+    "forms": [
+     "Julien Morel"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "Laboratoire Témoin"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "faible",
+    "evidence": [
+     "nom partiel"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "olivier-s": {
+  "mode": "search",
+  "queryName": "OLIVIER Sami",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "idhal": "demo-sami-olivier",
+    "idhalI": "900014",
+    "fullName": "Sami Olivier",
+    "forms": [
+     "Sami Olivier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LMD"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "moyen",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LMD (8 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "idhal": "demo-sami-olivier-1",
+    "idhalI": "900514",
+    "fullName": "Sami Olivier",
+    "forms": [
+     "Sami Olivier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "Laboratoire Témoin"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "faible",
+    "evidence": [
+     "nom partiel"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "brunet-n": {
+  "mode": "search",
+  "queryName": "BRUNET Nicolas",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-nicolas-brunet",
+  "candidates": [
+   {
+    "idhal": "demo-nicolas-brunet",
+    "idhalI": "900017",
+    "fullName": "Nicolas Brunet",
+    "forms": [
+     "Nicolas Brunet"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (11 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "pasquier-a": {
+  "mode": "search",
+  "queryName": "PASQUIER Aurélie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "idhal": "demo-aurelie-pasquier",
+    "idhalI": "900022",
+    "fullName": "Aurélie Pasquier",
+    "forms": [
+     "Aurélie Pasquier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "moyen",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (7 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "idhal": "demo-aurelie-pasquier-1",
+    "idhalI": "900522",
+    "fullName": "Aurélie Pasquier",
+    "forms": [
+     "Aurélie Pasquier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "Laboratoire Témoin"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "faible",
+    "evidence": [
+     "nom partiel"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "kerbrat-m": {
+  "mode": "search",
+  "queryName": "KERBRAT Mélanie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-melanie-kerbrat",
+  "candidates": [
+   {
+    "idhal": "demo-melanie-kerbrat",
+    "idhalI": "900023",
+    "fullName": "Mélanie Kerbrat",
+    "forms": [
+     "Mélanie Kerbrat"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (8 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "texier-j": {
+  "mode": "search",
+  "queryName": "TEXIER Julien",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-julien-texier",
+  "candidates": [
+   {
+    "idhal": "demo-julien-texier",
+    "idhalI": "900024",
+    "fullName": "Julien Texier",
+    "forms": [
+     "Julien Texier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (9 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "texier-r": {
+  "mode": "search",
+  "queryName": "TEXIER Rémi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-remi-texier",
+  "candidates": [
+   {
+    "idhal": "demo-remi-texier",
+    "idhalI": "900028",
+    "fullName": "Rémi Texier",
+    "forms": [
+     "Rémi Texier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (4 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "weber-f": {
+  "mode": "search",
+  "queryName": "WEBER Florian",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-florian-weber",
+  "candidates": [
+   {
+    "idhal": "demo-florian-weber",
+    "idhalI": "900029",
+    "fullName": "Florian Weber",
+    "forms": [
+     "Florian Weber"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (5 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "jourdan-k": {
+  "mode": "search",
+  "queryName": "JOURDAN Karim",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "idhal": "demo-karim-jourdan",
+    "idhalI": "900030",
+    "fullName": "Karim Jourdan",
+    "forms": [
+     "Karim Jourdan"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "moyen",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (6 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "idhal": "demo-karim-jourdan-1",
+    "idhalI": "900530",
+    "fullName": "Karim Jourdan",
+    "forms": [
+     "Karim Jourdan"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "Laboratoire Témoin"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "faible",
+    "evidence": [
+     "nom partiel"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "sabatier-m": {
+  "mode": "search",
+  "queryName": "SABATIER Maxime",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-maxime-sabatier",
+  "candidates": [
+   {
+    "idhal": "demo-maxime-sabatier",
+    "idhalI": "900031",
+    "fullName": "Maxime Sabatier",
+    "forms": [
+     "Maxime Sabatier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LIRA"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LIRA (7 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "laurent-p": {
+  "mode": "search",
+  "queryName": "LAURENT Pauline",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-pauline-laurent",
+  "candidates": [
+   {
+    "idhal": "demo-pauline-laurent",
+    "idhalI": "900036",
+    "fullName": "Pauline Laurent",
+    "forms": [
+     "Pauline Laurent"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "BIOS"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo BIOS (3 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "ollivier-e": {
+  "mode": "search",
+  "queryName": "OLLIVIER Élodie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-elodie-ollivier",
+  "candidates": [
+   {
+    "idhal": "demo-elodie-ollivier",
+    "idhalI": "900039",
+    "fullName": "Élodie Ollivier",
+    "forms": [
+     "Élodie Ollivier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "BIOS"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo BIOS (6 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "vasseur-y": {
+  "mode": "search",
+  "queryName": "VASSEUR Yasmine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-yasmine-vasseur",
+  "candidates": [
+   {
+    "idhal": "demo-yasmine-vasseur",
+    "idhalI": "900045",
+    "fullName": "Yasmine Vasseur",
+    "forms": [
+     "Yasmine Vasseur"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "BIOS"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo BIOS (3 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "hamon-y": {
+  "mode": "search",
+  "queryName": "HAMON Yasmine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-yasmine-hamon",
+  "candidates": [
+   {
+    "idhal": "demo-yasmine-hamon",
+    "idhalI": "900048",
+    "fullName": "Yasmine Hamon",
+    "forms": [
+     "Yasmine Hamon"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LMD"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LMD (6 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "gauthier-o": {
+  "mode": "search",
+  "queryName": "GAUTHIER Olivier",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo-olivier-gauthier",
+  "candidates": [
+   {
+    "idhal": "demo-olivier-gauthier",
+    "idhalI": "900051",
+    "fullName": "Olivier Gauthier",
+    "forms": [
+     "Olivier Gauthier"
+    ],
+    "emailDomains": [
+     "udemo.example.org"
+    ],
+    "labs": [
+     "LMD"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @udemo.example.org",
+     "labo LMD (9 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ }
+}

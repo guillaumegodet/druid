@@ -1,0 +1,275 @@
+{
+ "brunet-n": {
+  "mode": "search",
+  "queryName": "BRUNET Nicolas",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "not_found",
+  "best": "",
+  "candidates": []
+ },
+ "kerbrat-m": {
+  "mode": "search",
+  "queryName": "KERBRAT Mélanie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9900-0236",
+    "fullName": "Mélanie Kerbrat",
+    "forms": [
+     "Mélanie Kerbrat"
+    ],
+    "institutions": [
+     "Université de Démonstration"
+    ],
+    "employments": [
+     "Université de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "moyen",
+    "evidence": [
+     "site (Université de Démonstration)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   },
+   {
+    "orcid": "0000-0001-9900-5230",
+    "fullName": "Mélanie Kerbrat",
+    "forms": [
+     "Mélanie Kerbrat"
+    ],
+    "institutions": [],
+    "employments": [],
+    "emails": [],
+    "scopus": "",
+    "score": "faible",
+    "evidence": [
+     "non enrichi"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "mallet-a": {
+  "mode": "search",
+  "queryName": "MALLET Aurélie",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9900-0252",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9900-0252",
+    "fullName": "Aurélie Mallet",
+    "forms": [
+     "Aurélie Mallet"
+    ],
+    "institutions": [
+     "Université de Démonstration"
+    ],
+    "employments": [
+     "Université de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (Université de Démonstration)",
+     "labo LIRA"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "masson-m": {
+  "mode": "search",
+  "queryName": "MASSON Maxime",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9900-0332",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9900-0332",
+    "fullName": "Maxime Masson",
+    "forms": [
+     "Maxime Masson"
+    ],
+    "institutions": [
+     "Université de Démonstration"
+    ],
+    "employments": [
+     "Université de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (Université de Démonstration)",
+     "labo LIRA"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "delmas-r": {
+  "mode": "search",
+  "queryName": "DELMAS Rania",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9900-0340",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9900-0340",
+    "fullName": "Rania Delmas",
+    "forms": [
+     "Rania Delmas"
+    ],
+    "institutions": [
+     "Université de Démonstration"
+    ],
+    "employments": [
+     "Université de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (Université de Démonstration)",
+     "labo BIOS"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "carpentier-y": {
+  "mode": "search",
+  "queryName": "CARPENTIER Yasmine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9900-0375",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9900-0375",
+    "fullName": "Yasmine Carpentier",
+    "forms": [
+     "Yasmine Carpentier"
+    ],
+    "institutions": [
+     "Université de Démonstration"
+    ],
+    "employments": [
+     "Université de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (Université de Démonstration)",
+     "labo BIOS"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "texier-y": {
+  "mode": "search",
+  "queryName": "TEXIER Yann",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9900-0439",
+    "fullName": "Yann Texier",
+    "forms": [
+     "Yann Texier"
+    ],
+    "institutions": [
+     "Université de Démonstration"
+    ],
+    "employments": [
+     "Université de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "moyen",
+    "evidence": [
+     "site (Université de Démonstration)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   },
+   {
+    "orcid": "0000-0001-9900-5432",
+    "fullName": "Yann Texier",
+    "forms": [
+     "Yann Texier"
+    ],
+    "institutions": [],
+    "employments": [],
+    "emails": [],
+    "scopus": "",
+    "score": "faible",
+    "evidence": [
+     "non enrichi"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "huet-m": {
+  "mode": "search",
+  "queryName": "HUET Mehdi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9900-0498",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9900-0498",
+    "fullName": "Mehdi Huet",
+    "forms": [
+     "Mehdi Huet"
+    ],
+    "institutions": [
+     "Université de Démonstration"
+    ],
+    "employments": [
+     "Université de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (Université de Démonstration)",
+     "labo LMD"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ }
+}

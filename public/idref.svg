@@ -1,0 +1,8 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Lettre I -->
+  <rect x="15" y="15" width="12" height="70" fill="#212139"/>
+  <!-- Lettre D (Arc) -->
+  <path d="M40 15H55C75 15 85 25 85 50C85 75 75 85 55 85H40V15ZM52 73C65 73 73 68 73 50C73 32 65 27 52 27H52V73Z" fill="#212139"/>
+  <!-- Barre rose IdRef -->
+  <rect x="5" y="45" width="60" height="10" rx="5" fill="#E6007E"/>
+</svg>
