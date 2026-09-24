@@ -22,6 +22,11 @@ dist-ssr
 
 # Caches d'alignement IdRef (générés au runtime par scripts/sync_idref*.cjs).
 # Contiennent des données personnelles réelles (noms/PPN/ORCID) → ne pas versionner.
+# Every runtime cache / progress file written at the app root by the sync scripts (real data:
+# never commit them, this repository is public) — the explicit names below predate this rule.
+/*_cache.json
+/*_cache.json.bak
+/*_progress.json
 idref_align_cache.json
 idref_align_progress.json
 idref_align_qualinka_cache.json
