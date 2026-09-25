@@ -1,0 +1,17 @@
+{
+  "slug": "demo",
+  "label": "Université de Démonstration",
+  "target": "cloudflare",
+  "domains": ["druid-demo.pages.dev"],
+  "access": "public",
+  "readOnly": true,
+  "grist": {
+    "docId": "eXbcyqzLmE1tsRo12WjGyY",
+    "publicRead": true
+  },
+  "capabilities": { "HAS_STATUS_VALIDATION": false },
+  "features": { "news": false, "newsletter": false },
+  "admins": [],
+  "openalexMailto": null,
+  "secrets": []
+}

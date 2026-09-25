@@ -11,7 +11,9 @@
 //  - secret-looking strings (40-hex API keys, GitHub tokens);
 //  - names that must not appear (regression list): read from the file given by PUBLIC_DENYLIST
 //    (one name per line) — kept in the private druid-instances repository (publication/denylist.txt),
-//    since listing them here would publish them.
+//    since listing them here would publish them;
+//  - instances/<slug>/instance.json that do not follow the public rules of the instance registry
+//    (read-only, public access and doc, no admins — scripts/instances/instanceConfig.cjs).
 // Exit 1 with the list of findings (values masked), 0 when clean.
 //
 // Usage (git needed, hence node:20 and not node:20-slim):
@@ -22,6 +24,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
 const excludes = fs.readFileSync(path.join(ROOT, 'scripts/publication/public-exclude.txt'), 'utf8')
@@ -69,6 +72,18 @@ for (const f of files) {
     }
   });
 }
+// Instance registry: an instance of the public repository must not expose a private doc or admins.
+const { publicRepoErrors } = createRequire(import.meta.url)(path.join(ROOT, 'scripts/instances/instanceConfig.cjs'));
+for (const f of files.filter((x) => /^instances\/[^/]+\/instance\.json$/.test(x))) {
+  let errors;
+  try {
+    errors = publicRepoErrors(JSON.parse(fs.readFileSync(path.join(ROOT, f), 'utf8')));
+  } catch (err) {
+    errors = [`invalid JSON (${err.message})`];
+  }
+  for (const e of errors) findings.push(`${f}  instance registry  ${e}`);
+}
+
 console.log(`${files.length} files checked (${excludes.length} excluded path(s), ${denylist.length} denylisted name(s)).`);
 if (!denylist.length) console.log('Warning: no PUBLIC_DENYLIST — names are not checked.');
 if (findings.length) {

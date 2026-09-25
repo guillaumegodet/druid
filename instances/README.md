@@ -13,6 +13,27 @@ time with the `INSTANCES_REPO_TOKEN` secret when `instances/<slug>/` is absent h
 | Centrale Nantes | `centrale/` of `guillaumegodet/druid-instances` (private: real PII) | Cloudflare Access | yes, with an Access identity |
 | Public demo | `demo/` (fictitious data, see its README) | public | no (`READ_ONLY=true`) |
 
+## Instance registry: `instance.json`
+
+Every instance folder holds an `instance.json` describing the instance (docs/plan-architecture-multi-instances.md,
+lot 5): display name, target (`cloudflare` | `docker`), domains, access (`public` | `cloudflare-access` |
+`keycloak`), read-only flag, Grist doc, settable capabilities, `news`/`newsletter` features, admins,
+OpenAlex contact and the **names** of the secrets it needs — never a secret value. Schema and rules:
+`scripts/instances/instanceConfig.cjs`. The public repository only accepts read-only instances with
+public access, a public doc and no admins (also enforced by `scripts/publication/check_public_tree.mjs`).
+The private repository also describes the Docker instance of Nantes (not read by `server.cjs`: inventory
+and drift check only).
+
+Validate (tests: `node scripts/tests/instance-config.cjs`):
+
+```bash
+docker run --rm -v "$PWD":/app -w /app -v /opt/crisalid/work/druid-instances:/instances:ro \
+  -e INSTANCES_DIR=/instances node:20-slim node scripts/instances/validate.cjs
+```
+
+Not read by the build or the Functions yet (lot 5 b/c): until then the Pages variables below remain the
+effective configuration, and `instance.json` must be kept in step with them.
+
 ## Variables of a Pages project
 
 Pages exposes the same variables to the build and to the Functions (`functions/`).
