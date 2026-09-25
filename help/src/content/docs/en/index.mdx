@@ -1,0 +1,51 @@
+---
+title: Druid Help
+description: "Druid help centre: directory of research staff and research structures, researcher identifier alignment, bibliometric dashboard."
+template: splash
+hero:
+  tagline: "Manage your institution's research directory, make researcher identifiers reliable and steer its scientific output."
+  image:
+    # « Druid Aide Hero » design, see ../index.mdx (French visual until an English one is rendered).
+    html: '<img class="druid-hero-visual" src="/druid-aide-hero.webp" srcset="/druid-aide-hero-1200.webp 1200w, /druid-aide-hero.webp 2400w" sizes="(min-width: 60rem) 60rem, 100vw" width="1200" height="640" alt="Druid links three functions: the directory of researchers and structures, reliable identifiers (ORCID, IdRef, HAL, Scopus) and research steering (headcount, ORCID coverage, publications per year)." />'
+  actions:
+    - text: Druid in 5 minutes
+      link: /en/demarrer/druid-en-5-minutes/
+      icon: right-arrow
+    - text: Glossary
+      link: /en/demarrer/glossaire/
+      variant: minimal
+---
+
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
+
+<CardGrid>
+	<Card title="Get started" icon="rocket">
+		A tour of Druid, then what you can do with your profile.
+		[First steps](/en/demarrer/premiers-pas/)
+	</Card>
+	<Card title="How-to guides" icon="document">
+		One task, one page: validate a record, handle a duplicate, align
+		identifiers, export. [All guides](/en/guides/personnes/rechercher-filtrer/)
+	</Card>
+	<Card title="Tutorials" icon="open-book">
+		Complete walkthroughs, step by step: make a lab's directory reliable, prepare an
+		evaluation report. [All tutorials](/en/tutoriels/fiabiliser-annuaire-labo/)
+	</Card>
+	<Card title="Understanding the data" icon="magnifier">
+		Where the figures come from, how they are calculated and their known limitations.
+		[Data sources](/en/donnees/sources-des-donnees/)
+	</Card>
+</CardGrid>
+
+## Does some data look wrong?
+
+<CardGrid>
+	<LinkCard title="Where to fix what" description="Druid, directory, HAL, OpenAlex, ORCID or IdRef: where to make the correction and whom to notify." href="/en/guides/corriger/ou-corriger-quoi/" />
+	<LinkCard title="Support" description="Report a problem, ask a question or request access." href="/en/guides/support/" />
+</CardGrid>
+
+## For AI assistants
+
+Every page is also available in Markdown (“View as Markdown” link under the title). The index
+[`/en/llms.txt`](/en/llms.txt) and the complete help [`/en/llms-full.txt`](/en/llms-full.txt) let you
+give the whole documentation to a chat assistant.

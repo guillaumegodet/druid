@@ -30,7 +30,18 @@ const targetFile = (sitePath) => {
 	return candidates.find((c) => existsSync(c) && statSync(c).isFile()) ?? null;
 };
 
+// Untranslated page served under /en/ with French content (Starlight fallback, docs/plan-aide-anglais.md):
+// its anchors are the French ones, so an English link to one of its sections is only checkable once
+// the page is translated. Not an error while the translation is in progress; counted in the summary.
+const FALLBACK_NOTICE = 'This content is not available in your language yet.';
+const fallbackCache = new Map();
+const isFallback = (file) => {
+	if (!fallbackCache.has(file)) fallbackCache.set(file, readFileSync(file, 'utf8').includes(FALLBACK_NOTICE));
+	return fallbackCache.get(file);
+};
+
 const errors = [];
+const deferred = new Set();
 const pages = htmlFiles(DIST);
 for (const page of pages) {
 	const html = readFileSync(page, 'utf8');
@@ -44,6 +55,10 @@ for (const page of pages) {
 			continue;
 		}
 		if (anchor && file.endsWith('.html') && !idsOf(file).has(decodeURIComponent(anchor))) {
+			if (isFallback(file)) {
+				deferred.add(href);
+				continue;
+			}
 			errors.push(`${relative(DIST, page)} → ${href} : anchor not found`);
 		}
 	}
@@ -53,4 +68,5 @@ if (errors.length) {
 	console.error(`check-links: ${errors.length} broken internal link(s)\n  ${[...new Set(errors)].join('\n  ')}`);
 	process.exit(1);
 }
-console.log(`check-links: ${pages.length} pages, no broken internal link`);
+const pending = deferred.size ? ` (${deferred.size} anchor(s) into untranslated pages not checked yet)` : '';
+console.log(`check-links: ${pages.length} pages, no broken internal link${pending}`);
