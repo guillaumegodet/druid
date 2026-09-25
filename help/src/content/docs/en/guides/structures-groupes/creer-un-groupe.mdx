@@ -1,0 +1,71 @@
+---
+title: "Create a group of researchers"
+description: "Build a cross-cutting selection of researchers (council, project, cohort) and get its dashboard."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Druid administrators"
+	menu="Groups; People › selection › Group"
+/>
+
+A **group** brings together researchers who do not necessarily belong to the same
+structure: a scientific council, the leaders of a project, a cohort of new recruits. It has
+its own **bibliometric dashboard**.
+
+## Create the group
+
+**From the staff list** (the quickest way for many members):
+
+1. In **People**, filter and tick the people.
+2. Click **Group**.
+3. Choose an existing group or type the name of a new group, then **Validate**.
+
+**From the Groups section**:
+
+1. Open **Groups** and click **New**.
+2. Give the group a name.
+3. **Add a member**: search for people by name.
+
+A new group is only kept once it has at least one member.
+
+## Make members “harvestable”
+
+A group's dashboard is built from its members' **identifiers**, not from an affiliation:
+each member must have an identified **ORCID** or **OpenAlex author**. The group's
+**Bibliometric dashboard** section shows how many members are harvestable.
+
+For a member without an ORCID, click **Identify the author**: Druid looks for the matching
+OpenAlex author profiles (in their laboratory if possible); choose the right one using the
+number of publications and the name variants.
+
+## Generate the dashboard
+
+1. In the group's record, choose the **Period**.
+2. Click **Generate the dashboard**. Harvesting takes a few minutes; its progress is shown.
+3. Click **View the dashboard**. The group also appears in the dashboard's **Structure or
+   group** selector.
+
+After adding members or identifiers, click **Regenerate**.
+
+## What happens next
+
+- Group membership is stored on each member's record.
+- The group's dashboard works like a structure's (see
+  [Choose a structure, a period, a scope](/en/guides/tableau-de-bord/structure-periode-perimetre/)).
+
+## Known limitations
+
+- **Members without an ORCID or an OpenAlex author are left out** of the group's corpus.
+- **A fragmented OpenAlex profile** only brings back part of the publications: identify all
+  the person's profiles (see [Researcher identifiers](/en/donnees/identifiants-chercheurs/)).
+- **One generation at a time**: if another dashboard is being calculated, yours waits.
+- **The dashboard does not update itself**: regenerate it after each change in membership.
+
+## See also
+
+- [Search and filter staff](/en/guides/personnes/rechercher-filtrer/)
+- [Align a lab's identifiers](/en/guides/identifiants/aligner-les-identifiants/)

@@ -1,0 +1,78 @@
+---
+title: "View and update a structure"
+description: "Read and edit the record of a lab or a team: identifiers, supervising bodies, hierarchy, lifecycle."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Central services, Druid administrators"
+	menu="Structures › click a row"
+/>
+
+The **Structures** section is the reference list of laboratories, teams, faculties and
+institutions. Each record describes a structure according to the common model (see
+[Structures](/en/donnees/structures/)).
+
+## Find a structure
+
+1. Open **Structures**.
+2. Search by name, acronym or RNSR, or filter by **level**, **status**, **cluster** or
+   **supervising body**.
+3. The **Charts** button shows the **Structure hierarchy** (inclusions and participations)
+   as a chart; **List** goes back to the table.
+4. Click a row to open the record.
+
+## Update the record
+
+1. Go through the tabs: **Identification**, **Identifiers & links**, **Missions & topics**,
+   **Memberships**, **Lifecycle and lineage**.
+2. Change the fields you want.
+3. To attach a team to its laboratory, or a laboratory to its supervising bodies, use the
+   **Memberships** tab:
+   - **Inclusions**: the parent structure (team → laboratory, laboratory → cluster);
+   - **Participations**: supervising bodies and other links. A structure is chosen from the
+     database, or added through its **UAI code** or its **ROR identifier**. Mark the **Main
+     supervision**.
+4. For a merger, a split or a change of name, add a link in **Lifecycle and lineage** (**+ Add
+   a link**) and update the status.
+5. Click **Save**.
+
+The **Dashboard** button opens the structure's bibliometric indicators, if they exist.
+
+## Create a structure
+
+**New structure** opens a blank record. Choose the level and the type, fill in the name and
+the acronym, then **Create**. The local identifier is assigned on creation.
+
+## Synchronise
+
+The list's **Synchronise** menu offers, depending on your instance:
+
+- **Force Grist refresh**: rereads the structures from the shared directory;
+- **Import from LDAP**: compares the structures with the LDAP directory's reference system
+  and suggests creations and updates;
+- **Synchronise with SoVisu+**: regenerates the structures file sent to CRISalid.
+
+## What happens next
+
+Changes are written to the shared directory. The list's hierarchy is recalculated from the
+inclusions. CRISalid receives the structures at the next synchronisation.
+
+## Known limitations
+
+- **The parent laboratory and the cluster are read only** in the Identification tab: they are
+  derived from the inclusions (Memberships tab).
+- **The local identifier cannot be changed** after creation: it is what links the structure
+  to people and to CRISalid.
+- **Deleting and merging structures** is not available from the list: go through
+  [support](/en/guides/support/).
+- **Creating a structure in Druid does not create its dashboard**: see
+  [Run the ETL console](/en/guides/administration/console-etl/).
+
+## See also
+
+- [Structures](/en/donnees/structures/)
+- [Where to fix what](/en/guides/corriger/ou-corriger-quoi/#structures)

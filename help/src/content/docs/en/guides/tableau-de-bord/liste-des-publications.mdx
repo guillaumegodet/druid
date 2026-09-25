@@ -1,0 +1,67 @@
+---
+title: "Filter the list of publications"
+description: "Find publications with the list's filters and reach it from the other tabs."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure"
+	menu="Dashboard › Publication list"
+/>
+
+The **Publication list** tab shows, one by one, the publications behind the dashboard's
+figures. It is the tool for checking an indicator, finding a publication or preparing a
+list.
+
+## Steps
+
+1. First set the structure, the period and the scope at the top of the dashboard (see
+   [Choose a structure, a period, a scope](/en/guides/tableau-de-bord/structure-periode-perimetre/)).
+2. Open the **Publication list** tab. The number of publications in the period is shown.
+3. Type a word of the **title**, a **journal** name or a **DOI** in the search box.
+4. Click **Show filters** and combine the criteria you need:
+
+| Family | Filters |
+|---|---|
+| Publication | Year, Document type, Language, Domain, Subfield |
+| Authors | Team, Lab, Employment type, PhD student involved |
+| Journal | Journal (exact name), SJR quartile |
+| Access | Open access, APC paid, National licence, the institution's access to the journal |
+| Impact | Top 10% citations, Top 1% citations |
+| Collaboration | Collaboration, International collaboration, Partner country |
+| Quality | Compliant with the charter, Sources (provenance), Strategic axis |
+
+5. Active filters appear as tags: **Remove this filter** removes one, **Clear all** removes
+   them all.
+6. Go through the results page by page (**Previous**, **Next**).
+
+:::tip
+In the other tabs, some charts link to the list already filtered: it is the quickest way to
+see which publications make up a bar or a slice.
+:::
+
+## Export the list
+
+**Export as CSV (filtered results)** downloads the publications on display, with your
+filters, as a file you can open in a spreadsheet.
+
+## What happens next
+
+Nothing is changed: filters only change the display.
+
+## Known limitations
+
+- **Filters depend on the data available**: a publication without a DOI often has an unknown
+  open-access status, a publication outside a journal has no quartile.
+- **The Team and Employment type filters** only apply to authors recognised among the
+  structure's members.
+- **The Journal filter** expects the exact name of the journal; for an approximate search,
+  use the search box.
+
+## See also
+
+- [Publications and attribution](/en/donnees/publications-attribution/)
+- [A publication is missing or wrongly attributed](/en/guides/corriger/publication-manquante/)

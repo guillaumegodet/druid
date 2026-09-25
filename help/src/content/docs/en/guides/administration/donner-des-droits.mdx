@@ -1,0 +1,73 @@
+---
+title: "Give rights to a user"
+description: "Choose the right access for a user, have it granted, and check who has access to what."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Druid administrators (viewing); administrators of the authentication service (granting)"
+	menu="Administration › Access rights"
+	disponibilite="instances whose rights are managed by the institution's authentication service (Keycloak)"
+/>
+
+In Druid, a user's rights come from the **groups** their account belongs to in the
+institution's authentication service (Keycloak). The **Access rights** page shows these
+groups and their members; rights are **granted** in the Keycloak administration console.
+
+## Choose the right access
+
+| Need | Right to grant | Where |
+|---|---|---|
+| See one's own laboratory | None: it is the default right of every logged-in account, derived from its record. | — |
+| Follow one or several laboratories without depending on one's record (management, administration) | **Dashboard viewer** | Under the laboratory's group |
+| See the whole institution (central services) | **Dashboard viewer** | At the institution level |
+| Administer Druid (groups, duplicates, tasks) | **Administrator** | At the institution level |
+| Manage media sources | Communication officer (media group) | At the institution level |
+
+The same account can combine several rights. See
+[Instances and features](/en/donnees/instances-fonctionnalites/#profiles-and-rights) for what
+each profile allows.
+
+## Check current rights
+
+1. Open **Administration › Access rights**.
+2. The tree follows the institution's groups: for each laboratory, its sub-groups
+   (**Own-laboratory viewer**, **Dashboard viewer**, **Administrator**…) and their **Users**.
+3. Groups marked **interpreted by Druid** give a right in Druid; the others (**other app**)
+   concern other CRISalid applications (SoVisu+, Projects).
+
+The page is **read only**.
+
+## Grant a right
+
+1. In the Keycloak administration console (the institution's realm), find the user.
+2. Add them to the group you want: **under the laboratory's group** for a right limited to
+   the lab, **directly under the institution** for a right on the whole institution.
+3. The user logs out and back in to Druid for the right to take effect.
+
+If you do not have access to the Keycloak console, pass the request on to the technical
+team with the person's username, the laboratory and the right needed.
+
+## What happens next
+
+At the next login, Druid recalculates the person's rights: the corresponding sections and
+data appear.
+
+## Known limitations
+
+- **A “lab” right placed at the wrong level** (in a container group rather than under the
+  lab) is not recognised: check in Access rights that the person does appear under the right
+  laboratory.
+- **The default right depends on the record**: a person without a record, or whose record
+  mentions a former laboratory, does not see the right lab. Correct the record rather than
+  adding a right.
+- **On instances without Keycloak**, access is managed through a list of authorised
+  addresses kept by the technical team: Access rights does not exist there.
+
+## See also
+
+- [First steps for your profile](/en/demarrer/premiers-pas/)
+- [Support](/en/guides/support/)

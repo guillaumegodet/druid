@@ -1,0 +1,75 @@
+---
+title: "Export data and reports"
+description: "Export as CSV, Excel or PDF and build a PDF report of the dashboard."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles, on the data they see"
+	menu="People › Export; record › Export PDF; Dashboard › PDF report, charts, Publication list"
+/>
+
+Druid offers exports in several places, depending on what you want to take away: a list of
+people, a record, a chart, a list of publications or a complete report.
+
+## Summary
+
+| What | Where | Formats |
+|---|---|---|
+| Staff list | **People › Export** | CSV, Excel (.xlsx), PDF |
+| A researcher record | Record › **Export PDF** | PDF |
+| File for ABES | **People › Export › ABES export (IdRef)** | Excel, see [Export a file for ABES](/en/guides/identifiants/export-abes/) |
+| A chart | Chart toolbar › **Download as PNG** | PNG |
+| A list of publications | **Publication list › Export as CSV (filtered results)** | CSV |
+| A dashboard report | **PDF report** | PDF |
+
+## Export the staff list
+
+1. In **People**, filter the list (laboratory, status…).
+2. Open **Export** and choose **CSV**, **Excel (.xlsx)** or **PDF**.
+
+The file contains the people **on display**, with their name, e-mail, status and laboratory.
+
+## Export a chart
+
+Each chart of the dashboard has a toolbar, at the top right:
+
+- **Download as PNG**: the image of the chart, for a presentation;
+- **Full screen**;
+- **Share (public link / iframe)**: to embed the chart in a website (see
+  [Embed a chart in a website](/en/guides/tableau-de-bord/integrer-une-dataviz/));
+- **Methodology**: the description, method and limitations of the chart.
+
+## Build a PDF report
+
+1. In the dashboard, click **PDF report**.
+2. Check the **Criteria**: structure, period and scope.
+3. **Choose the charts**: tick the sections and charts to include (**Select all**,
+   **Include the whole section**, **Remove the section**).
+4. Move on to the **Preview**: Druid prepares the charts. You can still **Leave out of the
+   report** a chart or **Put back in the report**.
+5. Click **Download the PDF**.
+
+## What happens next
+
+Files are generated in your browser and downloaded to your computer. Nothing is changed in
+Druid.
+
+## Known limitations
+
+- **An export reflects the display**: current filters, period and scope. Check them before
+  exporting.
+- **The staff list export is brief** (name, e-mail, status, laboratory): for other columns,
+  use the directory spreadsheet if you have access to it.
+- **The PDF report can leave out a chart** that could not be captured: Druid says which ones
+  in the preview.
+- **Exported data are personal data** (e-mails, dates): only share them with the people who
+  need them.
+
+## See also
+
+- [Choose a structure, a period, a scope](/en/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Prepare the bibliometric part of an evaluation report](/en/tutoriels/bilan-bibliometrique/)

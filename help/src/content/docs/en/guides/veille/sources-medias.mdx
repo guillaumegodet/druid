@@ -1,0 +1,77 @@
+---
+title: "Manage media sources"
+description: "Add or remove the sources monitored for researchers' presence in the media."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Communication officers, Druid administrators"
+	menu="Administration › Media sources"
+/>
+
+The media watch collects every night the mentions of the institution, its laboratories and
+its researchers in open sources. The **Media sources** page lets you choose these sources and
+add by hand a mention that the collection did not find.
+
+## View the sources monitored
+
+The **Harvested sources** list shows, for each source, its **Type**, its **Scope** and its
+**Health**:
+
+| Health | Meaning |
+|---|---|
+| **OK** | Last collection successful (date shown). |
+| **Watch** | Several collections in a row without any article. |
+| **Down** | The source no longer responds. |
+| **Never collected** | Source added, not yet through a collection. |
+
+Sources marked **built-in** come with Druid and cannot be deleted.
+
+## Add an RSS feed
+
+1. In **Add an RSS feed**, paste the **Feed URL (RSS/Atom)** and give it a **Name** and a
+   **Media type**.
+2. Choose the **Scope**:
+   - **Institution**: a feed of the institution or the lab itself, all its articles are
+     kept;
+   - **Generic (keyword-filtered)**: a general-interest outlet, only the articles that
+     mention a laboratory or the institution are kept.
+3. For a laboratory feed, enter the **Labs concerned** (acronyms separated by commas).
+4. Click **Test and add**: Druid checks that the feed responds before adding it.
+
+**Delete this feed** removes a source you added.
+
+## Add a mention by hand
+
+For an article that the collection did not find (digitised print press, site without a
+feed):
+
+1. In **Add a news item from a URL**, paste the **Article URL**.
+2. Fill in the **Title**, the **Media outlet**, the **Publication date**, an optional
+   **Excerpt** and the **Labs concerned** (or tick **Institution**).
+3. Click **Publish**.
+
+The mention is published immediately in the **Mentions** tab of the Watch, without going
+through validation.
+
+## What happens next
+
+New sources are collected from the following night. Detected mentions arrive in the **To
+review** queue of the Watch tab (see
+[Follow new publications](/en/guides/veille/nouvelles-publications/#follow-media-presence)).
+
+## Known limitations
+
+- **Only open sources** (public feeds) can be followed: no subscription press.
+- **A general-interest outlet** produces false positives when a laboratory's name is also a
+  common word: validation discards them.
+- **A feed without articles for a long time** becomes **Watch** without necessarily being
+  down (a site with little activity).
+
+## See also
+
+- [Follow new publications](/en/guides/veille/nouvelles-publications/)
+- [First steps for your profile](/en/demarrer/premiers-pas/#communication-officers)

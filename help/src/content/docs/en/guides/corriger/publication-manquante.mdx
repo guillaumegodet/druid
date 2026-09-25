@@ -1,0 +1,104 @@
+---
+title: "A publication is missing or wrongly attributed"
+description: "Understand why a publication does not appear for a researcher or a structure, and get it corrected."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles"
+	menu="Dashboard › Publication list"
+/>
+
+A publication you expected does not appear in the dashboard, or a publication that has
+nothing to do with the structure shows up there. Here is how to find the cause, starting with
+the most frequent ones.
+
+## A publication is missing
+
+### 1. Check the settings
+
+In the dashboard:
+
+1. does the **period** cover the year of the publication?
+2. switch to the **Affiliation** scope: the *Headcount* scope leaves out publications none of
+   whose authors is recognised among the members;
+3. in **Publication list**, search for the title or the DOI, **without any filter**.
+
+If it appears under *Affiliation* but not under *Headcount*, go to step 4.
+
+### 2. Check whether the publication is recent
+
+A publication less than a few weeks old may not be in OpenAlex or the French Open Science
+Monitor yet. And the dashboard is only updated when it is **regenerated**. Wait, or ask
+[support](/en/guides/support/) for a regeneration.
+
+### 3. Check the signed affiliation
+
+A publication enters a structure's corpus if **an author signed with its affiliation**. Open
+the publication (at the publisher's, in HAL or on openalex.org) and look at the affiliation
+written by the authors:
+
+- **the affiliation does not mention the structure** (only the university, or another
+  supervising body): the publication cannot be found through the affiliation. Deposit it in
+  HAL with the right affiliation, or check that the author has their identifiers in Druid
+  (see step 5);
+- **the affiliation is correct but misread by OpenAlex**: see
+  [An affiliation is wrong](/en/guides/corriger/affiliation-fausse/).
+
+### 4. Check the author (Headcount scope)
+
+If the publication is present under *Affiliation* but not under *Headcount*, its author is
+not recognised as a member:
+
+- their **record is not validated**, or they are **leaving**: only validated records count
+  as members;
+- they have **left**: the *Headcount* scope relies on current members;
+- their **name** in the publication differs too much from the one on the record (name in
+  use, abbreviated compound name).
+
+Correct the record (see [Correct a person's status or affiliation](/en/guides/personnes/fiabiliser-statut-rattachement/));
+the publication will be recognised at the next regeneration.
+
+### 5. Check the identifiers (CRISalid harvesting)
+
+If your institution uses CRISalid, a researcher's publications are also harvested from their
+**identifiers** (IdRef, ORCID, IdHAL, OpenAlex, Scopus). A person without identifiers is
+only found through the affiliation. Complete their identifiers (see
+[Align a lab's identifiers](/en/guides/identifiants/aligner-les-identifiants/)). The
+dashboard's **Sources** tab shows what CRISalid finds compared with the other sources.
+
+## A publication is wrongly attributed
+
+A publication unrelated to the structure appears in its dashboard. Possible causes:
+
+- **an affiliation wrongly assigned by OpenAlex**: the author signs elsewhere, but OpenAlex
+  linked their affiliation to your structure. See
+  [An affiliation is wrong](/en/guides/corriger/affiliation-fausse/);
+- **a namesake** wrongly recognised as a member (same surname, same initial): visible in the
+  tabs by team or by researcher;
+- **a federation or a laboratory with several supervising bodies** linked in OpenAlex to your
+  institution: the technical team can exclude the institution concerned. Report it to
+  [support](/en/guides/support/) with the link to the publication.
+
+## What happens next
+
+Corrections made in Druid (records, identifiers) or at the source (HAL, OpenAlex) only show
+in the dashboard at its **next regeneration**. Corrections in OpenAlex can take several
+weeks.
+
+## Known limitations
+
+- **Publications without a DOI** (books, chapters, conference papers) are less well covered:
+  HAL is often the only source that knows them.
+- **A publication signed without the structure's name** cannot be attributed to it through
+  the affiliation, whatever the source.
+- **The Headcount scope ignores former members**: for an evaluation report, use the
+  *Affiliation* scope.
+
+## See also
+
+- [Publications and attribution](/en/donnees/publications-attribution/)
+- [Where the data come from](/en/donnees/sources-des-donnees/)

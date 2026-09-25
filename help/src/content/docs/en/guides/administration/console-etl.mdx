@@ -1,0 +1,89 @@
+---
+title: "Run the ETL console"
+description: "Configure the structures of the bibliometric dashboard and regenerate their data."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Technical administrators"
+	menu="Administration › ETL console; Dashboard › Configure"
+	disponibilite="instances connected to the bibliometric chain (druid-biblio)"
+/>
+
+The **ETL console** configures, for each structure, how its publications are harvested, and
+starts the calculation of its dashboard. It is where you create the dashboard of a new
+laboratory, correct its scope or update it.
+
+## Open a structure
+
+- From **Administration › ETL console**, choose the structure;
+- or, from its dashboard, click **Configure**.
+
+The header shows the state of the last generation (**Finished on…**, **Failed on…**,
+**Running since…**) and the date of the dashboard.
+
+## Configure
+
+The configuration is organised in four sections:
+
+| Section | Main settings |
+|---|---|
+| **1. Structure identity** | Acronym, full name, start and end years, term for internal groupings (“team”), research FTE (enables the output ratios). |
+| **2. Data sources** | OpenAlex institution identifier(s), BSO affiliation markers (acronym, name, RNSR…), URL of the BSO dump, HAL collection and start year, identifier of the structure in the CRISalid graph, OpenAlex contact e-mail. |
+| **3. Grist and affiliation checks** | Acronym of the structure in the directory (LABO field), positive and negative affiliation keywords, signature template of the charter. |
+| **4. Sub-structures and display** | Laboratories of a composite institution, hidden tabs of the dashboard, restricting the corpus to the publications of the headcount. |
+
+- **Save the configuration** is enough for hidden tabs and identity: the dashboard takes them
+  into account without a regeneration.
+- **Save and regenerate the data** reruns the harvesting and the calculation.
+
+## Regenerate a dashboard
+
+1. Click **Save and regenerate the data**.
+2. Follow the progress and the **Log of the last generation**. Allow from a few minutes to
+   an hour depending on the size of the structure.
+3. Once finished, **View the dashboard**.
+
+At each generation, the **headcount** (the structure's validated records in the directory,
+excluding people who are leaving), the journal quartiles and their access status are updated
+automatically.
+
+## Create the dashboard of a new structure
+
+1. Click **➕ New structure**, fill in the acronym and the name, then **Create the
+   structure**.
+2. Complete at least section 2 (OpenAlex identifier, BSO markers, HAL collection) and the
+   acronym in section 3.
+3. **Save and regenerate the data**.
+
+## Maintenance
+
+- **Staff (Grist directory)**: how many members were kept (validated, not validated
+  ignored, people leaving ignored). **Resynchronise from Grist** updates the list without
+  regenerating.
+- **OpenAlex affiliation checks**: detects publications with a suspicious affiliation and
+  follows up their correction (see
+  [An affiliation is wrong](/en/guides/corriger/affiliation-fausse/)).
+
+## What happens next
+
+The generation produces the dashboard data. Users see the new figures as soon as the
+generation ends, by reloading the page.
+
+## Known limitations
+
+- **One generation at a time** for the whole instance: a request waits for the current
+  generation to finish.
+- **OpenAlex quotas** limit the number of full regenerations per day.
+- **Members that are not validated are ignored**: a headcount that is too low often comes
+  from records not validated in the directory.
+- **A wrong OpenAlex identifier** or BSO markers that are too broad bring in publications
+  from other structures: check the Sources tab and the publication list after each change.
+
+## See also
+
+- [Publications and attribution](/en/donnees/publications-attribution/)
+- [Where the data come from](/en/donnees/sources-des-donnees/)

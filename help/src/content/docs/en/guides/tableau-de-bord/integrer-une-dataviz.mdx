@@ -1,0 +1,49 @@
+---
+title: "Embed a chart in a website"
+description: "Publish a dashboard chart on a website with the public embed page."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure"
+	menu="Dashboard › a chart's toolbar › Share (public link / iframe)"
+/>
+
+A dashboard chart can be shown on a laboratory's website, on an intranet page or in an
+online presentation. For this, Druid provides a **public link** and an **embed code**
+(iframe), which show the up-to-date chart, without logging in.
+
+## Steps
+
+1. In the dashboard, set the **structure**, the **period** and the **scope**: the shared link
+   keeps them.
+2. In the chart's toolbar, click **Share (public link / iframe)**.
+3. Choose:
+   - **Direct link**: the address of the chart alone, to open in a browser or put in an
+     e-mail;
+   - **Iframe embed**: **Copy the embed code**, to paste into your website's editor (“HTML”
+     or “embedded code” block).
+4. **Open in a new tab** lets you check how it looks before publishing.
+
+## What happens next
+
+The embedded chart updates itself at each regeneration of the structure's dashboard. Nothing
+needs redoing on the website.
+
+## Known limitations
+
+- **The link is public**: anyone who has it sees the chart, without logging in. Check that it
+  shows nothing that should stay internal.
+- **Only some charts can be shared**: those without a **Share** button cannot.
+- **Filters of the publication list** are not kept: only the structure, the period and the
+  scope are.
+- **The period is fixed** in the link: to show “the last five years” next year, you will need
+  to regenerate the code.
+
+## See also
+
+- [Export data and reports](/en/guides/tableau-de-bord/exporter/)
+- [Indicators](/en/donnees/indicateurs/)

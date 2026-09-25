@@ -1,0 +1,73 @@
+---
+title: "Analyse collaborations"
+description: "Read the collaboration tabs: typology, national, international, partner institutions and alliances."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure"
+	menu="Dashboard › Collaborations"
+/>
+
+The **Collaborations** tab shows who the structure publishes with: the institution's other
+laboratories, French institutions, foreign partners, and university alliances. It reads on
+the period and scope chosen at the top of the dashboard.
+
+## The sub-tabs
+
+| Sub-tab | What it shows |
+|---|---|
+| **Typology** | The share of each type of collaboration and its yearly trend. |
+| **Within the structure** | For a composite structure: co-publications between its internal laboratories. |
+| **(name of your institution)** | The institution's other laboratories that co-sign the most, and the shared topics. |
+| **National** | The French institutions (outside the institution) that co-sign the most. |
+| **International** | Foreign countries and organisations: map, ranking, trends, flows. |
+| **Partner institutions** | The review of co-publications with a chosen institution or group of institutions. |
+
+Collaboration types are defined in
+[Publications and attribution](/en/donnees/publications-attribution/#collaborations). A
+publication can combine several; the **Typology** keeps the broadest category for each.
+
+## Review collaborations with an institution or an alliance
+
+1. Open the **Partner institutions** sub-tab.
+2. Choose a **predefined group** (for example an alliance of European universities such as
+   EUniWell), or search for a partner institution by name. You can add several to build your
+   own group.
+3. Read the review: number of co-publications, yearly trend, fields and subfields, the
+   institution's most involved researchers.
+4. For a group of universities, **By university** details the co-publications with each
+   member; click a bar to see the publications.
+5. Tick **Exclude large collaborations** to leave out publications with a very large number
+   of authors (particle physics, large consortia), which inflate the figures.
+
+### Thematic analysis
+
+On some instances, **Thematic analysis (AI)** lets you describe a topic (“maritime
+decarbonisation”, “AI and health”…): the assistant suggests the matching subjects among
+those actually present in the co-publications. Correct the list, then **Generate the
+analysis**.
+
+## What happens next
+
+Nothing is changed. Each chart can be exported or shared (see
+[Export data and reports](/en/guides/tableau-de-bord/exporter/)), and the detailed
+publications opened in the list.
+
+## Known limitations
+
+- **A publication co-signed by several partners counts for each of them**: the sum of the
+  bars exceeds the total of co-publications.
+- **Institutions come from OpenAlex**: a badly recognised affiliation makes a partner
+  disappear (or appear wrongly).
+- **Co-affiliations of the same author** (a researcher attached to both the university and
+  the CNRS) are not counted as collaborations.
+- **Thematic analysis** is an aid: the suggested subjects need checking.
+
+## See also
+
+- [Publications and attribution](/en/donnees/publications-attribution/)
+- [Review collaborations with an alliance](/en/tutoriels/bilan-collaborations-alliance/)

@@ -1,0 +1,89 @@
+---
+title: "Choose a structure, a period, a scope"
+description: "Set up the dashboard: structure or group, years, Affiliation or Headcount scope."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles (a lab profile only sees its laboratories; groups are reserved for administrators)"
+	menu="Dashboard"
+/>
+
+Three settings at the top of the dashboard determine **all** the data shown in the tabs: the
+structure, the period and the scope.
+
+## Steps
+
+### 1. The structure or group
+
+In the **Structure or group** selector, choose:
+
+- a **structure**: a laboratory, a faculty, an institution;
+- or a **group** of researchers (a council, a project), if you have access to it.
+
+From a structure's record, the **Dashboard** button opens that structure's dashboard
+directly.
+
+### 2. The period
+
+Set the years with **From** … **to** …. All indicators, charts and lists are limited to the
+publications of those years.
+
+### 3. The scope
+
+| Scope | Publications kept |
+|---|---|
+| **Affiliation** | All publications signed with the structure's affiliation. |
+| **Headcount** | Only those with at least one author recognised among the structure's validated members. |
+
+Hovering over the selector shows how many publications the *Headcount* scope leaves out. The
+default scope depends on the structure's configuration.
+
+See [Publications and attribution](/en/donnees/publications-attribution/#the-two-scopes-of-the-dashboard)
+to choose the right scope.
+
+### 4. Browse the tabs
+
+| Tab | Content |
+|---|---|
+| **Overview** | Key figures, trends, publication types, open access. |
+| **Collaborations** | Typology, national and international collaborations, partner institutions. |
+| **Impact and citations** | FWCI, top 1% / 10%, by team and by researcher. |
+| **Books**, **Journals** | Books and chapters; publication journals and quartiles. |
+| **APC monitoring**, **Funding** | Publication fees; funders cited. |
+| **Strategic axes** | If axes are configured for the structure. |
+| **Signature charter** | Compliance of affiliations. |
+| **Teams**, **PhD students**, **Researchers**, **Network** | Output by team, by person, co-authorship network. |
+| **Publication list** | All publications, filterable and exportable. |
+| **Watch** | New publications, media mentions. |
+| **Sources** | Where publications come from (CRISalid, BSO, OpenAlex, HAL). |
+
+Some tabs can be hidden for a structure by the technical team.
+
+## Share the view
+
+**Copy link** copies the address of the view on display: structure, tab, period and scope.
+Whoever opens it gets exactly the same settings (if they have access to the structure).
+
+## What happens next
+
+Nothing is changed: these settings only change the display. They are kept in the page
+address, which you can bookmark.
+
+## Known limitations
+
+- **The data date from the last generation** of the dashboard, not from today (see
+  [Where the data come from](/en/donnees/sources-des-donnees/)).
+- **The Headcount scope is not available** if the structure's members are not recognised in
+  the corpus: the dashboard then stays on *Affiliation*.
+- **A structure without data** shows a message: its dashboard has not been generated yet.
+  See [support](/en/guides/support/).
+
+## See also
+
+- [Indicators](/en/donnees/indicateurs/)
+- [Filter the list of publications](/en/guides/tableau-de-bord/liste-des-publications/)
+- [Export data and reports](/en/guides/tableau-de-bord/exporter/)

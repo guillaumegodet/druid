@@ -1,0 +1,77 @@
+---
+title: "Where to fix what"
+description: "Some data are wrong: find out whether the correction is made in Druid, in the directory, in HAL, OpenAlex, ORCID or IdRef, and whom to notify."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles"
+	menu="Depending on the data: researcher record, alignment page, structure record, or outside Druid"
+/>
+
+Druid gathers data from several systems. Correcting an error **in Druid** is not always
+enough: if it comes from an external source, it will come back at the next update. This page
+tells you, for each type of error, **where** to correct it and **who** does it.
+
+## People
+
+| The error | Where to correct | Who |
+|---|---|---|
+| Laboratory, team, primary affiliation | Researcher record › **Affiliations & history** | You, if you have access to the lab |
+| Status (left, still present, external) | Record: employer and end dates, then **Validate the record** — see [Correct a person's status or affiliation](/en/guides/personnes/fiabiliser-statut-rattachement/) | You |
+| Employment or membership dates | Record › **Employment & contract** and **Memberships** cards | You |
+| Title, date of birth, grade of a member of the institution's staff | The institution's LDAP directory | Human resources |
+| A person is missing | Creating a record (**New** button) | Druid team, through [support](/en/guides/support/) |
+| Two records for the same person | **To process › Duplicates** — see [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/) | Druid administrators |
+
+## Researcher identifiers
+
+| The error | Where to correct | Who |
+|---|---|---|
+| Identifier missing or wrong on the record | Alignment page or researcher record — see [Align a lab's identifiers](/en/guides/identifiants/aligner-les-identifiants/) | Central services |
+| Wrong IdRef record (wrong dates, two people mixed up) | IdRef | The library (ABES cataloguing) |
+| ORCID profile incomplete or with someone else's works | ORCID | The person themselves |
+| IdHAL grouping a namesake's deposits | HAL (“My IdHAL”) | The author, otherwise the laboratory's HAL contact |
+| Fragmented or mixed OpenAlex profile | OpenAlex | The author (profile curation), otherwise OpenAlex support |
+
+For corrections to make outside Druid, an administrator can create a **task** with **Report
+a correction** on the record: it is followed up in **To process › Tasks**.
+
+## Publications
+
+| The error | Where to correct | Who |
+|---|---|---|
+| Publication missing from the dashboard | Depends on the cause — see [A publication is missing or wrongly attributed](/en/guides/corriger/publication-manquante/) | Depends on the cause |
+| Publication wrongly attributed to the structure | Source of the affiliation — see [An affiliation is wrong](/en/guides/corriger/affiliation-fausse/) | Depends on the source |
+| HAL deposit with a wrong affiliation | HAL, in the deposit | The depositor or the HAL contact |
+| Figures that do not reflect a recent change | Regenerating the dashboard | Technical team, through [support](/en/guides/support/) |
+
+## Structures
+
+| The error | Where to correct | Who |
+|---|---|---|
+| Name, acronym, identifiers, supervising bodies of a laboratory | Structure record — see [View and update a structure](/en/guides/structures-groupes/mettre-a-jour-une-structure/) | Central services |
+| Structure missing from the institution's reference system | Reference system of structures (LDAP directory) | The department that manages the reference system |
+| Team filed under the wrong laboratory | The team's record › **Memberships** tab (inclusion) | Central services |
+
+## Access
+
+You do not see the right laboratory, or a section is missing: see
+[First steps for your profile](/en/demarrer/premiers-pas/#requesting-additional-access).
+
+## Known limitations
+
+- **A correction in Druid can be overridden on display** by the LDAP directory for title,
+  date of birth and grade.
+- **Corrections in external databases take time**: several days to several weeks before
+  they show in OpenAlex or IdRef, then in Druid at the next update.
+- **Some actions are restricted** (creating a record, duplicates, tasks): other profiles go
+  through [support](/en/guides/support/).
+
+## See also
+
+- [Where the data come from](/en/donnees/sources-des-donnees/)
+- [Support](/en/guides/support/)
