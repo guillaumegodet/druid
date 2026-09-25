@@ -31,8 +31,15 @@ docker run --rm -v "$PWD":/app -w /app -v /opt/crisalid/work/druid-instances:/in
   -e INSTANCES_DIR=/instances node:20-slim node scripts/instances/validate.cjs
 ```
 
-Not read by the build or the Functions yet (lot 5 b/c): until then the Pages variables below remain the
-effective configuration, and `instance.json` must be kept in step with them.
+On a Cloudflare build, `scripts/prepare-cloudflare-assets.cjs` validates it (an invalid file fails the
+build, the previous deployment stays online) and generates:
+- `.env.production.local`: `VITE_GRIST_DOC_ID`, plus `VITE_GRIST_PUBLIC_BASE_URL` for a public doc;
+- `functions/_generated/instance.js`: the validated config (`null` without `instance.json`), bundled with the
+  Functions — Pages compiles `functions/` after the build command. Both files are ignored by git and Docker.
+
+The build log lists the Pages variables that repeat `instance.json` or override it — do not remove them before lot 5 f. A Pages
+variable still wins: Vite gives real environment variables priority over `.env` files, and the Functions do
+not read the generated config yet (lot 5 c) — until then keep `instance.json` in step with the variables below.
 
 ## Variables of a Pages project
 

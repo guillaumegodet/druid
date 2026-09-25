@@ -11,6 +11,7 @@ dist-ssr
 # otherwise bake into the Nantes image (Vite copies public/ into dist/).
 public/dashboard-data
 public/*_align_cache.json
+functions/_generated
 # User help centre (separate Starlight site, deployed on its own — docs/plan-documentation-utilisateur.md):
 # only its Markdown pages enter the image, as the source of the « Aide Druid » assistant (/api/help-chat).
 help/*

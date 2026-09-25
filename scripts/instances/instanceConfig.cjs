@@ -104,10 +104,55 @@ const publicRepoErrors = (raw) => {
   return errors;
 };
 
+/**
+ * Build variables Vite reads from .env.production.local, derived from the registry (lot 5 b).
+ * Real environment variables keep priority over .env files in Vite: a Pages variable still wins.
+ * @returns {Record<string, string>}
+ */
+const viteEnvFromConfig = (c) => ({
+  VITE_GRIST_DOC_ID: c.grist.docId,
+  ...(c.grist.publicRead ? { VITE_GRIST_PUBLIC_BASE_URL: c.grist.apiBase } : {}),
+});
+
+const isTrue = (v) => String(v || '').toLowerCase() === 'true';
+const emailSet = (list) => [...new Set(list.map((e) => e.trim().toLowerCase()).filter(Boolean))].sort().join(',');
+
+// Pages variables that duplicate a registry field during the transition (lot 5 f removes them).
+// `personal`: the value is never printed (build logs).
+const ENV_OVERRIDES = [
+  { name: 'VITE_GRIST_DOC_ID', expected: (c) => c.grist.docId },
+  { name: 'GRIST_DOC_ID', expected: (c) => c.grist.docId },
+  { name: 'VITE_GRIST_PUBLIC_BASE_URL', expected: (c) => (c.grist.publicRead ? c.grist.apiBase : '') },
+  { name: 'GRIST_API_BASE', expected: (c) => c.grist.apiBase },
+  { name: 'INSTANCE_LABEL', expected: (c) => c.label },
+  { name: 'READ_ONLY', expected: (c) => c.readOnly, normalize: isTrue },
+  { name: 'SHOW_STATUS_VALIDATION', expected: (c) => !!c.capabilities.HAS_STATUS_VALIDATION, normalize: isTrue },
+  { name: 'ADMIN_EMAILS', expected: (c) => emailSet(c.admins), normalize: (v) => emailSet(String(v).split(',')), personal: true },
+  { name: 'OPENALEX_MAILTO', expected: (c) => c.openalexMailto || '', personal: true },
+];
+
+/**
+ * Compares the Pages variables present in `env` with the registry. Variables that are absent are
+ * skipped; the others are either `same` (redundant, removable) or `differs` (they override the
+ * registry until lot 5 f).
+ * @returns {{ name: string, status: 'same' | 'differs', detail: string }[]}
+ */
+const compareEnvWithConfig = (c, env) => ENV_OVERRIDES
+  .filter(({ name }) => env[name] !== undefined && env[name] !== '')
+  .map(({ name, expected, normalize = (v) => String(v).trim(), personal }) => {
+    const want = expected(c);
+    const got = normalize(env[name]);
+    const same = got === want;
+    const detail = personal || same ? '' : ` (environment ${JSON.stringify(got)}, instance.json ${JSON.stringify(want)})`;
+    return { name, status: same ? 'same' : 'differs', detail };
+  });
+
 module.exports = {
   ALL_CAPABILITIES,
   DEFAULT_GRIST_API_BASE,
   TUNABLE_CAPABILITIES,
+  compareEnvWithConfig,
   parseInstanceConfig,
   publicRepoErrors,
+  viteEnvFromConfig,
 };

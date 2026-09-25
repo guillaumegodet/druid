@@ -2,7 +2,7 @@
 // Harness: validation of the instance registry instances/<slug>/instance.json
 // (scripts/instances/instanceConfig.cjs, docs/plan-architecture-multi-instances.md, lot 5 a).
 const path = require('path');
-const { parseInstanceConfig, publicRepoErrors, DEFAULT_GRIST_API_BASE } = require(path.join(__dirname, '../instances/instanceConfig.cjs'));
+const { parseInstanceConfig, publicRepoErrors, viteEnvFromConfig, compareEnvWithConfig, DEFAULT_GRIST_API_BASE } = require(path.join(__dirname, '../instances/instanceConfig.cjs'));
 
 let ko = 0;
 const check = (label, got, want) => {
@@ -95,6 +95,27 @@ check('public repo: writable instance refused', publicRepoErrors(privateCloudfla
 check('public repo: admins refused', publicRepoErrors({ ...publicDemo(), admins: ['a@example.org'] }).some((e) => e.includes('no admins')), true);
 check('public repo: private doc refused', publicRepoErrors({ ...publicDemo(), grist: { docId: 'AAAAAAAAAAAAAAAAAAAAAA' } }).some((e) => e.includes('publicRead')), true);
 check('public repo: non-object refused', publicRepoErrors(null), ['not a JSON object']);
+
+// ── build: VITE_* variables and Pages variables overriding the registry (lot 5 b) ──
+{
+  const demo = parseInstanceConfig(publicDemo()).config;
+  const school = parseInstanceConfig(privateCloudflare()).config;
+  check('vite env of a public doc', viteEnvFromConfig(demo), { VITE_GRIST_DOC_ID: 'AAAAAAAAAAAAAAAAAAAAAA', VITE_GRIST_PUBLIC_BASE_URL: DEFAULT_GRIST_API_BASE });
+  check('vite env of a private doc: no public base URL', viteEnvFromConfig(school), { VITE_GRIST_DOC_ID: 'BBBBBBBBBBBBBBBBBBBBBB' });
+  check('no Pages variable: nothing to report', compareEnvWithConfig(school, {}), []);
+  check('empty Pages variable ignored', compareEnvWithConfig(school, { INSTANCE_LABEL: '' }), []);
+  check('same values are redundant', compareEnvWithConfig(demo, {
+    VITE_GRIST_DOC_ID: 'AAAAAAAAAAAAAAAAAAAAAA', READ_ONLY: 'TRUE', INSTANCE_LABEL: 'Demo University',
+    VITE_GRIST_PUBLIC_BASE_URL: DEFAULT_GRIST_API_BASE,
+  }).map((r) => `${r.name}:${r.status}`), ['VITE_GRIST_DOC_ID:same', 'VITE_GRIST_PUBLIC_BASE_URL:same', 'INSTANCE_LABEL:same', 'READ_ONLY:same']);
+  check('differing value reported with both values', compareEnvWithConfig(school, { INSTANCE_LABEL: 'Other' }),
+    [{ name: 'INSTANCE_LABEL', status: 'differs', detail: ' (environment "Other", instance.json "School")' }]);
+  check('READ_ONLY=false on a writable instance is redundant', compareEnvWithConfig(school, { READ_ONLY: 'false' })[0].status, 'same');
+  check('admins compared as a set, case-insensitive', compareEnvWithConfig(school, { ADMIN_EMAILS: ' Admin@Example.org ,admin@example.org' })[0].status, 'same');
+  const adminDiff = compareEnvWithConfig(school, { ADMIN_EMAILS: 'other@example.org' })[0];
+  check('differing admins: values never printed', [adminDiff.status, adminDiff.detail], ['differs', '']);
+  check('public base URL set on a private doc differs', compareEnvWithConfig(school, { VITE_GRIST_PUBLIC_BASE_URL: DEFAULT_GRIST_API_BASE })[0].status, 'differs');
+}
 
 console.log(ko ? `\n${ko} failure(s)` : '\nAll good.');
 process.exit(ko ? 1 : 0);
