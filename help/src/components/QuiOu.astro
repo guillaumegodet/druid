@@ -3,6 +3,7 @@
 // required profile, menu path, and the instance capability when the feature is optional
 // (profiles and capabilities: docs/documentation-utilisateur-inventaire.md §§ 2-3).
 import { Aside } from '@astrojs/starlight/components';
+import { STRINGS, asHelpLang } from '../lib/i18n';
 
 interface Props {
 	/** Profiles allowed, in help vocabulary (e.g. « Services centraux, administrateurs »). */
@@ -14,13 +15,17 @@ interface Props {
 }
 
 const { profils, menu, disponibilite } = Astro.props;
+// Language of the page content (a French fallback page shown under /en/ keeps French labels).
+const lang = asHelpLang(Astro.locals.starlightRoute.entryMeta.lang);
+const s = STRINGS[lang];
+const colon = lang === 'fr' ? ' :' : ':';
 ---
 
-<Aside type="note" title="Qui peut le faire, et où">
+<Aside type="note" title={s.quiOuTitle}>
 	<ul class="druid-quiou">
-		<li><strong>Profils :</strong> {profils}</li>
-		<li><strong>Dans Druid :</strong> {menu}</li>
-		{disponibilite && <li><strong>Disponible sur :</strong> {disponibilite}</li>}
+		<li><strong>{s.profiles}{colon}</strong> {profils}</li>
+		<li><strong>{s.inDruid}{colon}</strong> {menu}</li>
+		{disponibilite && <li><strong>{s.availableOn}{colon}</strong> {disponibilite}</li>}
 	</ul>
 </Aside>
 

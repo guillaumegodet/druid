@@ -47,11 +47,15 @@ const parsePage = (raw) => {
   return { title: field('title'), description: field('description'), body };
 };
 
-/** Every .md/.mdx page under `docsDir`, as [{ slug, file }] (slug = site path without slashes). */
+/**
+ * Every .md/.mdx page under `docsDir`, as [{ slug, file }] (slug = site path without slashes).
+ * French pages only: the English translation (docsDir/en/, docs/plan-aide-anglais.md) is left out
+ * until the assistant picks its index by the user's language.
+ */
 const listPages = (docsDir, dir = docsDir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => {
     const p = path.join(dir, d.name);
-    if (d.isDirectory()) return listPages(docsDir, p);
+    if (d.isDirectory()) return dir === docsDir && d.name === 'en' ? [] : listPages(docsDir, p);
     if (!/\.mdx?$/.test(d.name)) return [];
     return [{ slug: path.relative(docsDir, p).replace(/\.mdx?$/, '').split(path.sep).join('/'), file: p }];
   });

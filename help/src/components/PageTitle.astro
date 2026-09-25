@@ -3,13 +3,14 @@
 // src/pages/[...slug].md.ts), as on help.openalex.org — handy to paste a page into an AI assistant.
 import Default from '@astrojs/starlight/components/PageTitle.astro';
 import { markdownHref } from '../lib/markdown';
+import { STRINGS, asHelpLang } from '../lib/i18n';
 
-const { entry } = Astro.locals.starlightRoute;
+const { entry, lang } = Astro.locals.starlightRoute;
 ---
 
 <Default />
 <p class="druid-page-actions">
-	<a href={markdownHref(entry.id)} type="text/markdown">Voir en Markdown</a>
+	<a href={markdownHref(entry.id)} type="text/markdown">{STRINGS[asHelpLang(lang)].viewMarkdown}</a>
 </p>
 
 <style>

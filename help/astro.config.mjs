@@ -11,16 +11,17 @@ export default defineConfig({
 	site,
 	integrations: [
 		starlight({
-			title: 'Aide Druid',
+			title: { fr: 'Aide Druid', en: 'Druid Help' },
 			description:
 				"Centre d'aide de Druid : annuaire des personnels et des structures de recherche, alignement des identifiants, tableau de bord bibliométrique.",
 			logo: { src: './src/assets/druid-logo.png', alt: 'Druid' },
 			favicon: '/favicon.png',
-			// French first (decision D2). To add English: add `en: { label: 'English', lang: 'en' }`
-			// and translated pages under src/content/docs/en/ — untranslated pages fall back to French.
+			// French at the root, English under /en/ (docs/plan-aide-anglais.md): translated pages live
+			// under src/content/docs/en/ with the same file paths; untranslated ones fall back to French.
 			defaultLocale: 'root',
 			locales: {
 				root: { label: 'Français', lang: 'fr' },
+				en: { label: 'English', lang: 'en' },
 			},
 			lastUpdated: true,
 			customCss: ['./src/styles/druid.css'],
@@ -30,31 +31,31 @@ export default defineConfig({
 			},
 			sidebar: [
 				{
-					label: 'Démarrer',
+					label: 'Démarrer', translations: { en: 'Get started' },
 					items: [{ autogenerate: { directory: 'demarrer' } }],
 				},
 				{
-					label: 'Guides pratiques',
+					label: 'Guides pratiques', translations: { en: 'How-to guides' },
 					items: [
-						{ label: 'Personnes', items: [{ autogenerate: { directory: 'guides/personnes' } }] },
-						{ label: 'Identifiants', items: [{ autogenerate: { directory: 'guides/identifiants' } }] },
-						{ label: 'Structures et groupes', items: [{ autogenerate: { directory: 'guides/structures-groupes' } }] },
-						{ label: 'Tableau de bord', items: [{ autogenerate: { directory: 'guides/tableau-de-bord' } }] },
-						{ label: 'Veille et communication', items: [{ autogenerate: { directory: 'guides/veille' } }] },
-						{ label: 'Administration', items: [{ autogenerate: { directory: 'guides/administration' } }] },
-						{ label: 'Corriger une donnée', items: [{ autogenerate: { directory: 'guides/corriger' } }] },
-						{ label: 'Support', slug: 'guides/support' },
+						{ label: 'Personnes', translations: { en: 'People' }, items: [{ autogenerate: { directory: 'guides/personnes' } }] },
+						{ label: 'Identifiants', translations: { en: 'Identifiers' }, items: [{ autogenerate: { directory: 'guides/identifiants' } }] },
+						{ label: 'Structures et groupes', translations: { en: 'Structures and groups' }, items: [{ autogenerate: { directory: 'guides/structures-groupes' } }] },
+						{ label: 'Tableau de bord', translations: { en: 'Dashboard' }, items: [{ autogenerate: { directory: 'guides/tableau-de-bord' } }] },
+						{ label: 'Veille et communication', translations: { en: 'Monitoring and communication' }, items: [{ autogenerate: { directory: 'guides/veille' } }] },
+						{ label: 'Administration', translations: { en: 'Administration' }, items: [{ autogenerate: { directory: 'guides/administration' } }] },
+						{ label: 'Corriger une donnée', translations: { en: 'Fix a data error' }, items: [{ autogenerate: { directory: 'guides/corriger' } }] },
+						{ label: 'Support', translations: { en: 'Support' }, slug: 'guides/support' },
 					],
 				},
 				{
-					label: 'Tutoriels',
+					label: 'Tutoriels', translations: { en: 'Tutorials' },
 					items: [{ autogenerate: { directory: 'tutoriels' } }],
 				},
 				{
-					label: 'Comprendre les données',
+					label: 'Comprendre les données', translations: { en: 'Understanding the data' },
 					items: [{ autogenerate: { directory: 'donnees' } }],
 				},
-				{ label: 'Nouveautés', slug: 'nouveautes' },
+				{ label: 'Nouveautés', translations: { en: "What's new" }, slug: 'nouveautes' },
 			],
 		}),
 	],
