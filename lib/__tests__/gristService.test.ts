@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
-  parseOpenalexIds, groupQualifiedRows, alignGroupOf, gristDateToIso, pivotUnifiedAlignDiffs,
+  parseOpenalexIds, groupQualifiedRows, planAffiliationRows, alignGroupOf, gristDateToIso, pivotUnifiedAlignDiffs,
   buildUnifiedUpdates, unifiedFillKey, unifiedAmbigKey,
 } from '../gristService';
 import type { AlignDiff, IdrefDiff, UnifiedAlignDiff, PersonAlignRow } from '../gristService';
@@ -113,6 +113,58 @@ describe('groupQualifiedRows', () => {
   it('ignores records without uid', () => {
     const rows = [row(1, ''), row(2, '')];
     expect(groupQualifiedRows(rows, { 1: 'PRINCIPAL' as const, 2: 'SECONDAIRE' as const }, {})).toBe(rows);
+  });
+});
+
+describe('planAffiliationRows', () => {
+  const TODAY = '2026-09-25';
+  const aff = (structureName: string, over: any = {}) => ({ structureName, team: '', startDate: '', isPrimary: false, ...over });
+
+  it('single membership, no other row: only the record row, rattachement untouched', () => {
+    const plan = planAffiliationRows(10, [aff('DCS', { isPrimary: true })], [], TODAY);
+    expect(plan.primary?.structureName).toBe('DCS');
+    expect(plan).toMatchObject({ mainRole: undefined, patches: [], creates: [], deletes: [] });
+  });
+
+  it('new past membership → created as HISTORIQUE, record row becomes PRINCIPAL', () => {
+    const plan = planAffiliationRows(10, [
+      aff('DCS', { isPrimary: true, startDate: '2023' }),
+      aff('CDMO', { startDate: '2004', endDate: '2022' }),
+    ], [], TODAY);
+    expect(plan.primary?.structureName).toBe('DCS');
+    expect(plan.mainRole).toBe('PRINCIPAL');
+    expect(plan.creates).toEqual([{ affiliation: expect.objectContaining({ structureName: 'CDMO' }), role: 'HISTORIQUE' }]);
+  });
+
+  it('primary is the isPrimary one, not the first; an ongoing one is SECONDAIRE', () => {
+    const plan = planAffiliationRows(10, [aff('CDMO'), aff('DCS', { isPrimary: true })], [], TODAY);
+    expect(plan.primary?.structureName).toBe('DCS');
+    expect(plan.creates[0]).toMatchObject({ role: 'SECONDAIRE' });
+  });
+
+  it('existing rows reused by gristRowId, removed ones deleted', () => {
+    const plan = planAffiliationRows(10, [
+      aff('LS2N', { isPrimary: true, gristRowId: 10 }),
+      aff('GeM', { gristRowId: 12, endDate: '2020' }),
+    ], [11, 12], TODAY);
+    expect(plan.patches).toEqual([{ rowId: 12, affiliation: expect.objectContaining({ structureName: 'GeM' }), role: 'HISTORIQUE' }]);
+    expect(plan.creates).toEqual([]);
+    expect(plan.deletes).toEqual([11]);
+  });
+
+  it('primary switch: the freed row receives the former primary membership (no create/delete)', () => {
+    const plan = planAffiliationRows(10, [
+      aff('LS2N', { gristRowId: 10 }),
+      aff('GeM', { isPrimary: true, gristRowId: 12 }),
+    ], [12], TODAY);
+    expect(plan.primary?.structureName).toBe('GeM');
+    expect(plan.patches).toEqual([{ rowId: 12, affiliation: expect.objectContaining({ structureName: 'LS2N' }), role: 'SECONDAIRE' }]);
+    expect(plan).toMatchObject({ creates: [], deletes: [], mainRole: 'PRINCIPAL' });
+  });
+
+  it('back to a single membership: other rows deleted, rattachement cleared', () => {
+    const plan = planAffiliationRows(10, [aff('LS2N', { isPrimary: true, gristRowId: 10 })], [12], TODAY);
+    expect(plan).toMatchObject({ mainRole: '', patches: [], creates: [], deletes: [12] });
   });
 });
 

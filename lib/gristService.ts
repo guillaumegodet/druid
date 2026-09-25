@@ -1,5 +1,5 @@
 import { t } from '@lingui/core/macro';
-import { Researcher, ResearcherStatus, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
+import { Researcher, ResearcherStatus, Affiliation, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
 import { getPoleFromLab } from './mappings';
 import { hasCapability } from './auth';
 import { ResearcherListSchema, StructureListSchema } from './schemas';
@@ -700,6 +700,53 @@ export function groupQualifiedRows(researchers: any[], rowRole: Record<number, R
     for (const o of others) drop.add(o.gristRowId);
   }
   return drop.size ? researchers.filter((r) => !drop.has(r.gristRowId)) : researchers;
+}
+
+/** Row plan of a record's memberships, the write-side counterpart of `groupQualifiedRows`. */
+export interface AffiliationRowPlan {
+  /** Membership written on the record's own row (the PRINCIPAL one). */
+  primary: Affiliation | undefined;
+  /** `rattachement` of the record's row: PRINCIPAL when other rows exist, '' when the record is back to
+   * a single row after carrying several, undefined = column left untouched. */
+  mainRole: RattachementRole | '' | undefined;
+  /** Existing qualified rows rewritten with a non-primary membership. */
+  patches: { rowId: number; affiliation: Affiliation; role: RattachementRole }[];
+  /** Non-primary memberships without a row to reuse → new Annuaire rows. */
+  creates: { affiliation: Affiliation; role: RattachementRole }[];
+  /** Qualified rows whose membership was removed from the record. */
+  deletes: number[];
+}
+
+/**
+ * Maps the memberships edited in a record onto Annuaire rows: the primary one on the record's row,
+ * each other one on its own row (same uid_dyna), qualified HISTORIQUE when its end date is past,
+ * SECONDAIRE otherwise. Rows are reused before any creation (a primary switch swaps the contents of
+ * two rows instead of deleting + recreating), leftover qualified rows are deleted.
+ * `qualifiedRowIds`: the person's other rows carrying a `rattachement` (excluding the record's row).
+ */
+export function planAffiliationRows(
+  mainRowId: number, affiliations: Affiliation[], qualifiedRowIds: number[], todayIso: string,
+): AffiliationRowPlan {
+  const primary = affiliations.find((a) => a.isPrimary) ?? affiliations[0];
+  const others = affiliations.filter((a) => a !== primary);
+  const roleOf = (a: Affiliation): RattachementRole =>
+    isFuzzyDatePast(normalizeFuzzyDate(a.endDate) ?? '', todayIso) ? 'HISTORIQUE' : 'SECONDAIRE';
+  const pool = qualifiedRowIds.filter((id) => id !== mainRowId);
+  const patches: AffiliationRowPlan['patches'] = [];
+  const pending: Affiliation[] = [];
+  for (const a of others) {
+    const i = a.gristRowId ? pool.indexOf(a.gristRowId) : -1;
+    if (i >= 0) patches.push({ rowId: pool.splice(i, 1)[0], affiliation: a, role: roleOf(a) });
+    else pending.push(a);
+  }
+  const creates: AffiliationRowPlan['creates'] = [];
+  for (const a of pending) {
+    const rowId = pool.shift();
+    if (rowId !== undefined) patches.push({ rowId, affiliation: a, role: roleOf(a) });
+    else creates.push({ affiliation: a, role: roleOf(a) });
+  }
+  const mainRole = others.length > 0 ? 'PRINCIPAL' : qualifiedRowIds.length > 0 ? '' : undefined;
+  return { primary, mainRole, patches, creates, deletes: pool };
 }
 
 /** Cache of the Annuaire columns (rarely changes). */
@@ -1815,6 +1862,29 @@ export const GristService = {
     if (!gristId || isNaN(gristId)) throw new Error(t`Invalid Grist ID (gristRowId missing)`);
     const encodeDate = await fuzzyDateCellEncoder();
 
+    // One Annuaire row per membership (grouped back by groupQualifiedRows on read): before
+    // 2026-09-25 only affiliations[0] was written, every other membership entered was silently lost.
+    const uid = String(researcher.uid || '').trim();
+    const siblings = uid
+      ? (await GristService.fetchAnnuaireRowsByUid(uid)).filter((r) => r.rowId !== gristId)
+      : [];
+    const qualified = siblings.filter((r) => String(r.fields[RATTACHEMENT_COL] || '').trim()).map((r) => r.rowId);
+    const plan = planAffiliationRows(gristId, researcher.affiliations || [], qualified, new Date().toISOString().slice(0, 10));
+    if (plan.patches.length + plan.creates.length > 0) {
+      if (!uid) throw new Error(t`Several affiliations can only be saved for a person with a directory identifier (uid_dyna).`);
+      if (qualified.length < siblings.length) {
+        throw new Error(t`This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation.`);
+      }
+      await ensureAffiliationColumns();
+    }
+    const membershipFields = (a: Affiliation | undefined) => ({
+      'LABO': a?.structureName || '',
+      'team': a?.team || '',
+      [AFFILIATION_START_COL]: encodeDate(AFFILIATION_START_COL, a?.startDate),
+      [AFFILIATION_END_COL]: encodeDate(AFFILIATION_END_COL, a?.endDate),
+      [MEMBERSHIP_TYPE_COL]: a?.membershipType || null,
+    });
+
     const fields = {
       'Nom': researcher.lastName,
       'Prenom': researcher.firstName,
@@ -1823,18 +1893,15 @@ export const GristService = {
       'Nationalite': researcher.nationality,
       'DATE_DE_NAISSANCE_JJ_MM_AAAA': toGristDateCell(researcher.birthDate),
       // Affiliations: LABO (text, acronym) + Employeur (Reference, resolved by label)
-      'LABO': researcher.affiliations[0]?.structureName || '',
+      ...membershipFields(plan.primary),
+      ...(plan.mainRole !== undefined ? { [RATTACHEMENT_COL]: plan.mainRole || null } : {}),
       ...(await employerToGristFields(researcher.employment.employer)),
-      'team': researcher.affiliations[0]?.team || '',
       'ORCID': researcher.identifiers.orcid || null,
       'IdRef': researcher.identifiers.idref || null,
       'IdHAL': researcher.identifiers.halId || null,
       'IdHAL_i': researcher.identifiers.halIdNum?.replace(/\D/g, '') || null,   // entered in the record or by sync_hal (verify)
       'ID_SCOPUS': researcher.identifiers.scopusId || null,
       'photo_url': researcher.photoUrl?.trim() || null,   // editable from the record's tile
-      [AFFILIATION_START_COL]: encodeDate(AFFILIATION_START_COL, researcher.affiliations[0]?.startDate),
-      [AFFILIATION_END_COL]: encodeDate(AFFILIATION_END_COL, researcher.affiliations[0]?.endDate),
-      [MEMBERSHIP_TYPE_COL]: researcher.affiliations[0]?.membershipType || null,
       'employment_start_date': encodeDate('employment_start_date', researcher.employment.startDate),
       'employment_end_date': encodeDate('employment_end_date', researcher.employment.endDate),
       'Corps_grade': researcher.employment.grade || null,
@@ -1868,6 +1935,54 @@ export const GristService = {
     });
 
     if (!resp.ok) throw new Error('Erreur UPDATE Grist');
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (plan.patches.length > 0) {
+      const pr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+        method: 'PATCH', headers,
+        body: JSON.stringify({ records: plan.patches.map((p) => ({
+          id: p.rowId, fields: { ...membershipFields(p.affiliation), [RATTACHEMENT_COL]: p.role },
+        })) }),
+      });
+      if (!pr.ok) throw new Error(t`Grist error (writing the secondary affiliations): ${await pr.text()}`);
+    }
+    if (plan.creates.length > 0) {
+      // Identity copied on creation only: an existing row (from a merge) keeps its own values.
+      const identity = {
+        'uid_dyna': uid,
+        'Nom': researcher.lastName,
+        'Prenom': researcher.firstName,
+        'Civilite': researcher.civility,
+        'Email': researcher.email,
+        'ORCID': researcher.identifiers.orcid || null,
+        'IdRef': researcher.identifiers.idref || null,
+        'IdHAL': researcher.identifiers.halId || null,
+        'ID_SCOPUS': researcher.identifiers.scopusId || null,
+      };
+      const cr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+        method: 'POST', headers,
+        body: JSON.stringify({ records: plan.creates.map((c) => ({
+          fields: { ...identity, ...membershipFields(c.affiliation), [RATTACHEMENT_COL]: c.role },
+        })) }),
+      });
+      if (!cr.ok) throw new Error(t`Grist error (creating the secondary affiliations): ${await cr.text()}`);
+    }
+    if (plan.deletes.length > 0) {
+      // Snapshot in Fusions_log before deleting (restorable like a merge).
+      await ensureMergeLogTable();
+      const keep = { rowId: gristId, fields: { uid_dyna: uid, Nom: researcher.lastName, Prenom: researcher.firstName } };
+      const logs = siblings.filter((r) => plan.deletes.includes(r.rowId)).map((drop) => ({
+        fields: buildMergeLogRow({ keep, drop, patch: {}, author: 'druid', note: 'affiliation removed from the record' }),
+      }));
+      const lr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${MERGE_LOG_TABLE}/records`, {
+        method: 'POST', headers, body: JSON.stringify({ records: logs }),
+      });
+      if (!lr.ok) throw new Error(t`Grist error (merge log): ${await lr.text()}`);
+      const dr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/data/delete`, {
+        method: 'POST', headers, body: JSON.stringify(plan.deletes),
+      });
+      if (!dr.ok) throw new Error(t`Grist error (deleting the removed affiliations): ${await dr.text()}`);
+    }
   },
 
   /**
@@ -2367,6 +2482,15 @@ export const GristService = {
   /** Raw Annuaire rows (unconverted Grist values) for given rowIds. */
   fetchAnnuaireRows: async (rowIds: number[]): Promise<{ rowId: number; fields: Record<string, any> }[]> => {
     const filter = encodeURIComponent(JSON.stringify({ id: rowIds }));
+    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records?filter=${filter}`);
+    if (!resp.ok) throw new Error('Erreur Grist (lecture Annuaire)');
+    const { records } = await resp.json();
+    return records.map((r: any) => ({ rowId: r.id, fields: r.fields }));
+  },
+
+  /** Raw Annuaire rows of a person (every row sharing this uid_dyna). */
+  fetchAnnuaireRowsByUid: async (uid: string): Promise<{ rowId: number; fields: Record<string, any> }[]> => {
+    const filter = encodeURIComponent(JSON.stringify({ uid_dyna: [uid] }));
     const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records?filter=${filter}`);
     if (!resp.ok) throw new Error('Erreur Grist (lecture Annuaire)');
     const { records } = await resp.json();
