@@ -15,6 +15,7 @@ n'existent que sur les instances qui en disposent (voir
 
 - **Ce centre d'aide** est en ligne : démarrage, guides pratiques, tutoriels et pages
   expliquant les données.
+- **Version anglaise du centre d'aide** : sélecteur de langue en haut de chaque page.
 - **Un bouton « ? » sur chaque page de Druid** ouvre l'aide de la page (ou de l'onglet)
   affichée ; un lien vers le centre d'aide est dans la barre du haut.
 - **Assistant « Aide Druid »** : dans l'assistant (bouton en bas à droite), un onglet répond

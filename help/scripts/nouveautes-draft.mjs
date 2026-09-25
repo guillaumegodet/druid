@@ -2,7 +2,8 @@
 // Draft of a monthly « Nouveautés » section from the git history (plan-documentation-utilisateur.md,
 // lot 7). Lists the user-visible commits (feat/fix) of a month, grouped by help section, with their
 // hash: a starting point to rewrite in plain French in src/content/docs/nouveautes.md — never paste
-// it as is (commit subjects are technical and mostly English).
+// it as is (commit subjects are technical and mostly English). The English page
+// (src/content/docs/en/nouveautes.md, docs/plan-aide-anglais.md) gets the same section, translated.
 //
 // Usage (from the repository root or help/): node help/scripts/nouveautes-draft.mjs [YYYY-MM]
 // Default month: the previous calendar month.
@@ -58,5 +59,6 @@ for (const section of [...SECTIONS.map(([name]) => name), 'Autres']) {
 }
 if (groups.size === 0) out.push('_Aucun commit feat/fix visible ce mois-ci._', '');
 out.push(`<!-- Brouillon généré par help/scripts/nouveautes-draft.mjs : ${skipped} commit(s) technique(s) écarté(s).`);
-out.push('     À réécrire en français, du point de vue de l\'utilisateur, avec un lien vers le guide concerné. -->');
+out.push('     À réécrire en français, du point de vue de l\'utilisateur, avec un lien vers le guide concerné,');
+out.push('     puis à traduire dans en/nouveautes.md (liens en /en/…). -->');
 console.log(out.join('\n'));
