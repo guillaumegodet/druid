@@ -9,11 +9,11 @@ import { helpUrl } from '../lib/helpLinks';
  * btn-pill actions; default = small round button placed next to a page title.
  */
 export const HelpButton: React.FC<{ path: string; pill?: boolean }> = ({ path, pill }) => {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const title = t`Help for this page (opens the help centre in a new tab)`;
   return (
     <a
-      href={helpUrl(path)}
+      href={helpUrl(path, i18n.locale)}
       target="_blank"
       rel="noopener noreferrer"
       title={title}

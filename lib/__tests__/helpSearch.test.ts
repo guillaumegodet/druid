@@ -47,3 +47,38 @@ describe('help_search', () => {
     expect(searchHelp(index, 'recette du far breton', 3)).toEqual([]);
   });
 });
+
+// English help centre (`help/src/content/docs/en`): the same pages, served under `/en/`.
+const indexEn = loadHelpIndex(path.resolve(__dirname, '../../help/src/content/docs'), 'en');
+
+const REFERENCE_EN: [string, string][] = [
+  ['How do I validate a record?', '/en/guides/personnes/fiabiliser-statut-rattachement/'],
+  ['What does the status Left mean?', '/en/donnees/statuts-des-personnes/'],
+  ['How do I merge two duplicate records?', '/en/guides/personnes/traiter-un-doublon/'],
+  ['Who can give rights to a colleague?', '/en/guides/administration/donner-des-droits/'],
+  ['What is the FWCI?', '/en/donnees/indicateurs/'],
+  ['Why is a publication missing from the dashboard?', '/en/guides/corriger/publication-manquante/'],
+  ['How do I create a group of researchers?', '/en/guides/structures-groupes/creer-un-groupe/'],
+  ['Embed a chart in the lab website', '/en/guides/tableau-de-bord/integrer-une-dataviz/'],
+];
+
+describe('help_search (English)', () => {
+  it('indexes the English pages only, under /en/', () => {
+    expect(indexEn.pageCount).toBeGreaterThan(40);
+    expect(indexEn.docs.every((d: { url: string }) => d.url.startsWith('/en/'))).toBe(true);
+    expect(index.docs.some((d: { url: string }) => d.url.startsWith('/en/'))).toBe(false);
+    expect(indexEn.docs.some((d: { heading: string }) => /^see also$/i.test(d.heading))).toBe(false);
+  });
+
+  it.each(REFERENCE_EN)('« %s » → %s first', (question, page) => {
+    const [best] = searchHelp(indexEn, question, 3);
+    expect(best.url.split('#')[0]).toBe(page);
+  });
+
+  it('asks for an English answer', () => {
+    const hits = searchHelp(indexEn, 'How do I validate a record?', 2);
+    const prompt = buildHelpSystemPrompt(hits, 'https://help.example', undefined, 'en');
+    expect(prompt).toContain(`(https://help.example${hits[0].url})`);
+    expect(prompt).toContain('Answer in English');
+  });
+});

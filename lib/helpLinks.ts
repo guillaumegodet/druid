@@ -6,7 +6,10 @@
  *
  * The tables are `Record`s keyed by the view / tab unions: adding a view or a tab without a
  * help link fails the type check. lib/__tests__/helpLinks.test.ts checks that every target
- * page (and anchor) exists in help/src/content/docs.
+ * page (and anchor) exists in help/src/content/docs, in French and in English.
+ *
+ * Paths and anchors are the French ones. The English help (docs/plan-aide-anglais.md) lives under
+ * /en/ with the same paths but translated headings: helpUrl() maps the anchors through EN_ANCHORS.
  */
 import { ViewState } from '../types';
 import type { AdminTab } from './auth';
@@ -67,5 +70,27 @@ export const ADMIN_TAB_HELP: Record<AdminTab, string> = {
   media: '/guides/veille/sources-medias/',
 };
 
-/** Absolute URL of a help page (path from the tables above; '' or '/' = home page). */
-export const helpUrl = (path = '/'): string => `${HELP_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`;
+/**
+ * English anchor of each French anchor used above whose heading translates differently
+ * (an anchor missing here is the same in both languages, e.g. `impact`).
+ */
+export const EN_ANCHORS: Record<string, string> = {
+  'volume-et-profil': 'volume-and-profile',
+  'quartiles-des-revues': 'journal-quartiles',
+  apc: 'apcs',
+  'charte-de-signature': 'signature-charter',
+  'comment-les-auteurs-sont-reconnus': 'how-authors-are-recognised',
+  'longlet-sources-du-tableau-de-bord': 'the-sources-tab-of-the-dashboard',
+};
+
+/**
+ * Absolute URL of a help page (path from the tables above; '' or '/' = home page), in the
+ * interface language: English pages are served under /en/ with their own anchors.
+ */
+export const helpUrl = (path = '/', locale = 'fr'): string => {
+  const rel = path.startsWith('/') ? path : `/${path}`;
+  if (locale !== 'en') return `${HELP_BASE_URL}${rel}`;
+  const [page, anchor] = rel.split('#');
+  const enAnchor = anchor ? (EN_ANCHORS[anchor] ?? anchor) : '';
+  return `${HELP_BASE_URL}/en${page}${enAnchor ? `#${enAnchor}` : ''}`;
+};

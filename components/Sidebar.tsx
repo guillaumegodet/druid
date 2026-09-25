@@ -126,7 +126,7 @@ const LocaleToggle: React.FC = () => {
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isOpen, onClose, isDarkMode, toggleTheme }) => {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const userInfo = getUserInfo() as any;
   const isResearchers = currentView === ViewState.RESEARCHERS_LIST || currentView === ViewState.RESEARCHER_DETAIL;
   const isStructures = currentView === ViewState.STRUCTURES_LIST || currentView === ViewState.STRUCTURE_DETAIL;
@@ -193,7 +193,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isO
           </button>
 
           <a
-            href={helpUrl()}
+            href={helpUrl('/', i18n.locale)}
             target="_blank"
             rel="noopener noreferrer"
             title={t`Help centre (new tab)`}

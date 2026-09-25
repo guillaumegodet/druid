@@ -3,8 +3,9 @@
  * (docs/plan-documentation-utilisateur.md, lot 8).
  *
  * The help pages (help/src/content/docs/**.md|.mdx, copied into the Docker image) are split into
- * sections (one per `##` heading, `###` kept inside), indexed with BM25 over accent-folded French
- * tokens, and the best sections of a question are handed to the LLM as the only allowed source.
+ * sections (one per `##` heading, `###` kept inside), indexed with BM25 over accent-folded tokens,
+ * and the best sections of a question are handed to the LLM as the only allowed source. One index
+ * per language: French pages at the root, English ones under en/ (docs/plan-aide-anglais.md).
  * Pure apart from the file reads of loadHelpIndex(): no network, testable offline.
  */
 const fs = require('fs');
@@ -17,7 +18,9 @@ const STOPWORDS = new Set((
   // Question words and generic verbs: frequent in questions, meaningless for retrieval.
   'veut veux dire signifie difference entre ajouter avoir mettre savoir trouver voir utiliser peux puisse ' +
   'possible besoin chose ' +
-  'the of to and in for is how what'
+  // English (help pages under en/).
+  'the of to and in for is are be can do does how what which who where when why an it its this that ' +
+  'with from by at as or my your you me we our if there get need want mean'
 ).split(' '));
 
 /** Lower case, accents removed, split on non-letters, stop words dropped, light plural stemming. */
@@ -49,8 +52,7 @@ const parsePage = (raw) => {
 
 /**
  * Every .md/.mdx page under `docsDir`, as [{ slug, file }] (slug = site path without slashes).
- * French pages only: the English translation (docsDir/en/, docs/plan-aide-anglais.md) is left out
- * until the assistant picks its index by the user's language.
+ * The en/ folder of the French root is left out: it is the English index's own root.
  */
 const listPages = (docsDir, dir = docsDir) =>
   fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => {
@@ -66,22 +68,25 @@ const slugify = (heading) =>
     .toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, '').replace(/\s/g, '-');
 
 /**
- * Builds the index: one entry per `##` section of every page (the intro before the first `##`
- * is its own section). Pages still marked « à venir » are skipped.
+ * Builds the index of one language (`fr`: pages of `docsDir`, `en`: pages of `docsDir/en`, served
+ * under /en/): one entry per `##` section of every page (the intro before the first `##` is its own
+ * section). Pages still marked « à venir » are skipped.
  */
-const loadHelpIndex = (docsDir) => {
+const loadHelpIndex = (docsDir, lang = 'fr') => {
+  const root = lang === 'en' ? path.join(docsDir, 'en') : docsDir;
+  const prefix = lang === 'en' ? '/en' : '';
   const sections = [];
-  for (const { slug, file } of listPages(docsDir)) {
+  for (const { slug, file } of listPages(root)) {
     const raw = fs.readFileSync(file, 'utf8');
     if (/badge:\s*\n\s*text:\s*à venir/.test(raw)) continue;
     const { title, description, body } = parsePage(raw);
-    const url = slug === 'index' ? '/' : `/${slug}/`;
+    const url = slug === 'index' ? `${prefix}/` : `${prefix}/${slug}/`;
     const parts = body.split(/^## /m);
     parts.forEach((part, i) => {
       const heading = i === 0 ? '' : part.split('\n')[0].trim();
       const text = (i === 0 ? part : part.slice(part.indexOf('\n') + 1)).trim();
-      // « Voir aussi » lists only repeat page titles: noise for retrieval.
-      if (!text || /^voir aussi$/i.test(heading)) return;
+      // « Voir aussi » / « See also » lists only repeat page titles: noise for retrieval.
+      if (!text || /^(voir aussi|see also)$/i.test(heading)) return;
       sections.push({
         url: heading ? `${url}#${slugify(heading)}` : url,
         pageTitle: title,
@@ -124,8 +129,8 @@ const searchHelp = (index, query, k = 6) => {
     .map(({ d, score }) => ({ url: d.url, pageTitle: d.pageTitle, heading: d.heading, text: d.text, score }));
 };
 
-/** System prompt of the help assistant: the retrieved sections are the only allowed source. */
-const buildHelpSystemPrompt = (hits, helpBaseUrl, maxChars = 14000) => {
+/** System prompt of the help assistant (French or English): the retrieved sections are the only allowed source. */
+const buildHelpSystemPrompt = (hits, helpBaseUrl, maxChars = 14000, lang = 'fr') => {
   let budget = maxChars;
   const excerpts = [];
   for (const h of hits) {
@@ -134,6 +139,23 @@ const buildHelpSystemPrompt = (hits, helpBaseUrl, maxChars = 14000) => {
     if (!text) break;
     budget -= text.length;
     excerpts.push(`### [${label}](${helpBaseUrl}${h.url})\n${text}`);
+  }
+  if (lang === 'en') {
+    return [
+      "You are the help assistant of Druid, the application that manages an institution's research directory.",
+      'Answer in English, concisely and practically (numbered steps for a procedure), repeating the exact labels of',
+      'buttons and menus in bold.',
+      'Rely ONLY on the help centre excerpts below. Cite the page or pages used with their exact Markdown link, for',
+      'example: “See [Handle a duplicate](https://…)”.',
+      'If the excerpts do not answer the question, say so simply and suggest the closest page or support; never',
+      'invent a feature, a button or a rule.',
+      "You do not know the institution's data (people, publications, figures): for such questions, explain where to",
+      'find them in Druid and mention that the “CRISalid data” tab of the assistant can answer them.',
+      '',
+      '## Help centre excerpts',
+      '',
+      excerpts.length ? excerpts.join('\n\n') : '(no relevant excerpt found)',
+    ].join('\n');
   }
   return [
     "Tu es l'assistant d'aide de Druid, l'application de gestion de l'annuaire de la recherche d'un établissement.",

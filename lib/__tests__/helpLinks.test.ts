@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { ViewState } from '../../types';
-import { ADMIN_TAB_HELP, DASHBOARD_TAB_HELP, HELP_BASE_URL, TODO_TAB_HELP, VIEW_HELP, helpUrl } from '../helpLinks';
+import { ADMIN_TAB_HELP, DASHBOARD_TAB_HELP, EN_ANCHORS, HELP_BASE_URL, TODO_TAB_HELP, VIEW_HELP, helpUrl } from '../helpLinks';
 
 const DOCS = path.resolve(__dirname, '../../help/src/content/docs');
 
@@ -47,9 +47,19 @@ describe('helpLinks', () => {
     if (anchor) expect([...anchorsOf(file!)]).toContain(anchor);
   });
 
+  it.each(ALL_LINKS)('%s → %s exists in the English help centre', (_, link) => {
+    const [pagePath, anchor] = link.split('#');
+    const file = pageFile(`/en${pagePath}`);
+    expect(file, `no English page for ${pagePath}`).not.toBeNull();
+    if (anchor) expect([...anchorsOf(file!)]).toContain(EN_ANCHORS[anchor] ?? anchor);
+  });
+
   it('builds absolute URLs on the help site', () => {
     expect(HELP_BASE_URL.endsWith('/')).toBe(false);
     expect(helpUrl()).toBe(`${HELP_BASE_URL}/`);
     expect(helpUrl('/donnees/indicateurs/#apc')).toBe(`${HELP_BASE_URL}/donnees/indicateurs/#apc`);
+    expect(helpUrl('/', 'en')).toBe(`${HELP_BASE_URL}/en/`);
+    expect(helpUrl('/donnees/indicateurs/#apc', 'en')).toBe(`${HELP_BASE_URL}/en/donnees/indicateurs/#apcs`);
+    expect(helpUrl('/donnees/indicateurs/#impact', 'en')).toBe(`${HELP_BASE_URL}/en/donnees/indicateurs/#impact`);
   });
 });

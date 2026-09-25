@@ -183,7 +183,7 @@ function loadMessages(mode: ChatMode): ChatMessage[] {
 }
 
 export const ChatWidget: React.FC = () => {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   // Modes offered by this instance; no mode at all ⇒ no widget.
   const modes: ChatMode[] = [
     ...(hasCapability('HAS_PIPELINES_CHAT') ? (['data'] as const) : []),
@@ -239,6 +239,8 @@ export const ChatWidget: React.FC = () => {
             role,
             content: role === 'assistant' ? parseAssistant(c).text : c,
           })),
+          // The help assistant searches and answers in the interface language.
+          ...(mode === 'help' ? { lang: i18n.locale } : {}),
         }),
         signal: controller.signal,
       });

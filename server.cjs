@@ -1009,14 +1009,17 @@ const GRIST_API_BASE = 'https://grist.numerique.gouv.fr/api';
 // answers from the retrieved excerpts only and cites them; the list of the pages consulted is
 // always appended to the stream, so the sources show even if the model forgets to cite them.
 // Same OpenAI-format SSE as /api/chat, so the ChatWidget reads both the same way.
+// One index per language: the interface language picks it (English pages under en/, falling back to
+// French when they are absent — docs/plan-aide-anglais.md).
 const helpSearch = require('./scripts/lib/help_search.cjs');
-let helpIndex = null;
-const getHelpIndex = () => {
-  if (!helpIndex) {
-    helpIndex = helpSearch.loadHelpIndex(HELP_DOCS_DIR);
-    console.log(`[HelpChat] help index: ${helpIndex.docs.length} sections, ${helpIndex.pageCount} pages`);
+const helpIndexes = {};
+const getHelpIndex = (lang) => {
+  if (!helpIndexes[lang]) {
+    helpIndexes[lang] = helpSearch.loadHelpIndex(HELP_DOCS_DIR, lang);
+    const { docs, pageCount } = helpIndexes[lang];
+    console.log(`[HelpChat] help index (${lang}): ${docs.length} sections, ${pageCount} pages`);
   }
-  return helpIndex;
+  return helpIndexes[lang];
 };
 
 app.post('/api/help-chat', async (req, res) => {
@@ -1027,12 +1030,13 @@ app.post('/api/help-chat', async (req, res) => {
     .map((m) => ({ role: m.role, content: m.content.slice(0, 4000) }));
   const userTurns = messages.filter((m) => m.role === 'user');
   if (!userTurns.length) return res.status(400).json({ error: 'messages[] required' });
+  const lang = req.body?.lang === 'en' && fs.existsSync(path.join(HELP_DOCS_DIR, 'en')) ? 'en' : 'fr';
 
   let hits;
   try {
     // The previous question gives context to a short follow-up (« et pour un doublon ? »).
     const query = userTurns.slice(-2).map((m) => m.content).join('\n');
-    hits = helpSearch.searchHelp(getHelpIndex(), query, 6);
+    hits = helpSearch.searchHelp(getHelpIndex(lang), query, 6);
   } catch (err) {
     console.error('[HelpChat] help index unavailable:', err.message);
     return res.status(503).json({ error: 'Help assistant not configured' });
@@ -1049,7 +1053,7 @@ app.post('/api/help-chat', async (req, res) => {
         model: ILAAS_MODEL,
         stream: true,
         temperature: 0.2,
-        messages: [{ role: 'system', content: helpSearch.buildHelpSystemPrompt(hits, HELP_SITE_URL) }, ...messages],
+        messages: [{ role: 'system', content: helpSearch.buildHelpSystemPrompt(hits, HELP_SITE_URL, undefined, lang) }, ...messages],
       }),
       signal: controller.signal,
     });
@@ -1081,7 +1085,8 @@ app.post('/api/help-chat', async (req, res) => {
     }
     if (pages.length) {
       const list = pages.map((p) => `[${p.title}](${HELP_SITE_URL}${p.url})`).join(' · ');
-      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: `\n\n*Pages de l’aide consultées : ${list}*` } }] })}\n\n`);
+      const label = lang === 'en' ? 'Help pages consulted:' : 'Pages de l’aide consultées :';
+      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: `\n\n*${label} ${list}*` } }] })}\n\n`);
     }
     res.write('data: [DONE]\n\n');
     res.end();
