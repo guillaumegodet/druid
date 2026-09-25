@@ -1,0 +1,73 @@
+---
+title: "Align with the LDAP directory"
+description: "Link records without an identifier to directory accounts and check existing links."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Central services, Druid administrators"
+	menu="Alignment tools › LDAP alignment"
+	disponibilite="instances connected to the institution's LDAP directory"
+/>
+
+The institution's LDAP directory says whether an account is active and gives the grade,
+employer and employment dates of staff. To benefit from it, each record must hold the
+person's **uid**. The **LDAP alignment** page has two tabs: **Find missing** (link records
+without a uid) and **Check existing ones** (carry over the directory's changes).
+
+## Find missing: link records without a uid
+
+1. Open **Find missing**.
+2. Click **Run LDAP search**. Druid looks for each record without a uid in the directory, by
+   **e-mail** then by **name**.
+3. Go through the **Candidates**:
+   - matches by e-mail are ticked;
+   - matches by **name** are **unticked** by default (less certain): check the grade, title
+     and date of birth shown, then tick.
+4. In **Homonyms to decide**, choose the right account for each record, or **None (do not
+   link)**.
+5. Click **Link selection**.
+
+If the uid is already held by another record of the same laboratory, Druid says so
+(**duplicate of…**) and offers to **Merge** rather than create a duplicate.
+
+At the bottom of the tab, the **LDAP uid without Directory record** list shows the people in
+the directory who have no record in Druid.
+
+## Check existing ones: carry over changes
+
+1. Open **Check existing ones**.
+2. Click **Re-run the LDAP sync**: Druid rereads the whole directory (several minutes, in the
+   background) then compares it with the records.
+3. Go through **To update**: for each record, the fields the directory has changed (status,
+   employment, name…).
+4. **Manually validated** records contradicted by the directory are marked **Validated —
+   conflict** and **unticked**: check before overwriting them.
+5. Tick or untick the rows, then click **Apply**.
+
+The **Orphans** list shows the records whose uid no longer exists in the directory: probable
+departure, to be checked on the record (status, employment end).
+
+## What happens next
+
+- The linked uids and updated fields are written to the shared directory.
+- Only ticked records are changed; no record is created.
+- Statuses are recalculated with the new data (see
+  [Statuses of people](/en/donnees/statuts-des-personnes/)).
+
+## Known limitations
+
+- **People in the directory without a record** are not created automatically: their record
+  must be created by hand.
+- **Matching by name** can get namesakes wrong: only tick after checking.
+- **Staff of other organisations** (CNRS, Inserm…) sometimes have a hosted account: their
+  status follows their employer, not the state of the account (see
+  [Statuses of people](/en/donnees/statuts-des-personnes/#1-the-employer)).
+
+## See also
+
+- [Correct a person's status or affiliation](/en/guides/personnes/fiabiliser-statut-rattachement/)
+- [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/)

@@ -1,0 +1,87 @@
+---
+title: "Accept, reject or ignore a candidate"
+description: "Decide on each identifier suggestion: strong candidate, ambiguous, conflict, replaced entry."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Central services, Druid administrators"
+	menu="Alignment tools › Researcher identifier alignment › click a badge"
+/>
+
+Each cell of the alignment page sums up a person's situation for one source. Clicking the
+badge opens the **details**: the candidates, their evidence and the possible actions.
+
+## Read a candidate
+
+For each candidate, the details show:
+
+- its **identifier**, with a link to the profile (open it if in doubt);
+- its **level**: **strong**, **medium** or **weak**;
+- its **evidence**: shared identifier, affiliation found, shared publications, name forms;
+- what is **Already in the Directory** for this person.
+
+Before validating a medium or weak candidate, open the profile: same topics, same
+co-authors, same institution?
+
+## Decide case by case
+
+| Badge | Action |
+|---|---|
+| **strong candidate** | Tick the box in the badge. |
+| **candidates to check** | Open the details, check the profile, tick the right candidate. |
+| **Ambiguous — decide** | Choose the right candidate among those suggested, or **Ignore (write nothing)**. |
+| **conflict** | The record already has another identifier. Druid writes nothing: read the reason, then correct the record by hand if the existing identifier is wrong. |
+| **replaced entry** (IdRef) | ABES has merged or deleted the authority record. **Update** replaces the old PPN with the new one. If Druid reports a **name mismatch**, check on IdRef first. |
+| **Name mismatch** (IdRef) | The name of the authority record differs from the directory's: confirm (marriage, name in use) or detach the record. |
+| **filled in** | Nothing to do. |
+
+The ticked choices are written in one go with **Apply (N)**, at the bottom of the page.
+
+## Discard a wrong candidate
+
+If a candidate is a namesake, click **Wrong candidate**. The (person, identifier) pair is
+blacklisted: it will **never be suggested again**, even after a new search.
+
+## Report a mixed identity
+
+Sometimes a profile (IdRef, HAL, OpenAlex, Scopus) **mixes up several people**: it holds the
+works of the person and those of a namesake. Neither validate it (you would harvest someone
+else's works) nor reject it (you would lose theirs).
+
+1. Click **Mixed identity**.
+2. The profile leaves the suggestions; a report is opened in the review table.
+3. Have the profile corrected **at the source**: IdRef by the library, HAL by the author or
+   the laboratory's HAL contact, OpenAlex by the author or OpenAlex support. Note the request
+   in the review table.
+
+Open reports are listed in the **Mixed identities — to untangle at the source** section of
+the page. Druid also flags **suspicions** (“suspected mixed identity” badge): it is a clue,
+never a decision.
+
+## What happens next
+
+- **Apply** writes the identifiers to the directory. For IdRef, ORCID and HAL, validating a
+  candidate discards the person's other candidates; for OpenAlex, each profile is decided
+  separately (a person can have several).
+- **Wrong candidate** and **Mixed identity** are saved immediately.
+- **Ignore** writes nothing: the record will come back at the next run.
+
+## Known limitations
+
+- **An empty ORCID profile** (“empty record”) cannot be confirmed: ask the person to make
+  their information public, or to send you their ORCID.
+- **Compound names and name changes** give lower scores: a good candidate can appear as
+  “to check”.
+- **An error in the source** (an IdRef record mixing two people, a fragmented OpenAlex
+  profile) cannot be fixed in Druid.
+
+## See also
+
+- [Researcher identifiers](/en/donnees/identifiants-chercheurs/)
+- [Align a lab's identifiers](/en/guides/identifiants/aligner-les-identifiants/)
+- [Follow up “To process” tasks](/en/guides/personnes/taches-a-traiter/): for corrections to
+  make outside Druid

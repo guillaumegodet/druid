@@ -1,0 +1,85 @@
+---
+title: "Align a lab's identifiers"
+description: "Complete the IdRef, ORCID, HAL, OpenAlex and Scopus identifiers of a structure's researchers."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Central services, Druid administrators"
+	menu="Alignment tools › Researcher identifier alignment"
+	disponibilite="all instances; rerunning searches from Druid depends on the instance"
+/>
+
+Researcher identifiers allow CRISalid to harvest each person's publications. The
+**Researcher identifier alignment** page brings the five sources together (IdRef, ORCID, HAL,
+OpenAlex, Scopus): **one row per person, one column per identifier**.
+
+## Steps
+
+### 1. Choose the scope
+
+1. Open **Alignment tools › Researcher identifier alignment**.
+2. In the list of structures, choose the laboratory. This choice limits both the display and
+   the searches.
+3. Choose the group: **Staff**, **PhD students** or **No research duty**. Start with Staff:
+   that is where identifiers matter most.
+
+### 2. Run the searches
+
+- **Find missing** / **Check existing ones**: choose the mode. The first looks for missing
+  identifiers, the second rechecks those already filled in (merged authority records,
+  profiles that have disappeared, diverging names).
+- **Search everywhere** runs the search in parallel on all sources, for the chosen
+  structure. Progress is shown per source under the button.
+
+Depending on the number of people, allow from a few minutes to more than an hour. You can
+close the page: the search goes on.
+
+:::note
+On some instances, searches are run by the technical team: the page then shows the results
+of the last run.
+:::
+
+### 3. Process the results
+
+The counters at the top of the page sum up the work: **Records to process**, **Candidates to
+check**, **Ambiguous**, **Name mismatches / replaced entries**, **Conflicts**. Click a
+counter to show only that type of case, or a source's header to show only that source.
+
+1. Tick the **strong candidates**: one by one in the rows, or all at once with **Check all
+   strong candidates**. A record marked with a lightning bolt ⚡ already shares an
+   identifier with the suggested profile: it is almost certain.
+2. Open the other cases (**candidates to check**, **Ambiguous — decide**, **conflict**) by
+   clicking the badge: see
+   [Accept, reject or ignore a candidate](/en/guides/identifiants/accepter-rejeter-candidat/).
+3. Click **Apply (N)** at the bottom of the page to write your choices.
+
+## What happens next
+
+- The chosen identifiers are written to the directory, with the date and the source.
+- Druid **only fills empty fields**: no existing value is overwritten. For OpenAlex, the
+  ticked profiles are **added** to the person's list.
+- The page only lists the records that still need an action: a complete record disappears
+  from the list.
+- The identifiers go to CRISalid at the next export, and are then used to harvest
+  publications.
+
+## Known limitations
+
+- **Rerunning a search clears the choices not yet applied**: Druid warns you. Apply first.
+- **“No candidate found”** does not mean the person has no identifier: misspelt name,
+  profile without an affiliation, too many namesakes. Check by hand on the source.
+- **API quotas** (Scopus in particular) limit the number of searches per week: for a large
+  laboratory, the search can spread over several days.
+- **Records that are already complete or have no candidate do not appear**: to check a
+  specific person, open their record.
+
+## See also
+
+- [Researcher identifiers](/en/donnees/identifiants-chercheurs/): the sources and how
+  candidates are calculated
+- [Complete a laboratory's identifiers from A to Z](/en/tutoriels/identifiants-labo-a-z/)
+- [Export a file for ABES](/en/guides/identifiants/export-abes/)

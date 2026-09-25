@@ -1,0 +1,82 @@
+---
+title: "Read a researcher record"
+description: "What a record contains: identifiers, employment, memberships, validation, media presence."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles (a lab profile only sees the records of its laboratories)"
+	menu="People › click a row of the list"
+/>
+
+The record brings together everything Druid knows about a person in a structure. It is where
+you check a piece of information, correct it and validate the record.
+
+## Open a record
+
+1. Open **People**.
+2. Find the person with the search or the filters (see
+   [Search and filter staff](/en/guides/personnes/rechercher-filtrer/)).
+3. Click their row. **Back to the list** takes you back to the list.
+
+## The header
+
+- **Name, photo and status** (Internal, Leaving, Left, External), with the validation badge
+  if the record has been validated: **Validated**, **Expired** or **Validated — conflict**.
+  Hovering over the badge shows the source and date of the validation.
+- **UID**: the person's identifier in the institution's directory (or `ext_…` for an
+  external person), and the date of the last synchronisation.
+- The action buttons: **Validate the record** (or **Validated record**), **Report a
+  correction** (administrators), **Export PDF** and **Save**.
+
+Depending on the record and your instance, the header also offers **Directory** (the
+person's page in the institution's online directory) and **Grist** (the shared spreadsheet
+holding all the records, for those who have access to it). The **?** button opens this help
+page.
+
+## The cards
+
+| Card | Content |
+|---|---|
+| **Researcher identifiers** | IdRef, ORCID, IdHAL and its number, Scopus, OpenAlex profiles. Each identifier links to the profile. |
+| **Personal details** | Title, name, name in use, first name, date of birth, nationality, UID. |
+| **Employment & contract** | Employing institution, grade / rank, employment type, employment start and end dates, HDR and year obtained. |
+| **Cluster, faculty, doctoral school, site** | The person's administrative affiliations. |
+| **Affiliations & history** | The person's laboratories and teams, with the primary affiliation, the type and the membership dates. |
+| **Media presence** | The declared public accounts and profiles (CV, social networks, blog) and the latest mentions of the laboratory in the media. |
+
+## Edit a record
+
+1. Change the fields you want directly in the cards.
+2. For employment and membership dates, you can enter a year, a month or a full date (see
+   [Enter imprecise employment dates](/en/guides/personnes/dates-imprecises/)).
+3. Click **Save** at the top of the record.
+
+The photo is changed with the pencil on the photo (**Edit photo (URL)**): enter the address
+of a public image (lab page, directory, HAL). Without a photo, Druid shows the initials.
+
+## What happens next
+
+Changes are written **immediately** to the shared directory. They are passed on to CRISalid
+at the next export (if your instance allows it), and appear in the dashboards at their next
+regeneration.
+
+## Known limitations
+
+- **LDAP directory data take precedence on display** for title, date of birth and grade: a
+  correction made in Druid on these fields can be hidden by the directory's value. For an
+  error of this kind, see [Where to fix what](/en/guides/corriger/ou-corriger-quoi/).
+- **A person can have several records** (one per laboratory). The record shows all their
+  memberships, but validation and saving apply to the record that is open.
+- **The status cannot be edited directly**: it is calculated. To correct it, validate the
+  record or fill in the end dates (see
+  [Correct a person's status or affiliation](/en/guides/personnes/fiabiliser-statut-rattachement/)).
+
+## See also
+
+- [Statuses of people](/en/donnees/statuts-des-personnes/)
+- [Memberships and affiliation](/en/donnees/appartenances-rattachement/)
+- [Researcher identifiers](/en/donnees/identifiants-chercheurs/)

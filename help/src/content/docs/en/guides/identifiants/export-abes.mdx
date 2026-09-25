@@ -1,0 +1,71 @@
+---
+title: "Export a file for ABES"
+description: "Produce the file of identifiers and affiliations missing from IdRef records, to send to ABES."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles, on the list they see; in practice central services"
+	menu="People › Export › ABES export (IdRef)"
+/>
+
+Druid often knows information that is missing from researchers' IdRef records: their ORCID,
+their IdHAL, their current affiliation. The **ABES export** produces a workbook listing these
+enrichments, to send to ABES (or to be handled by the library) to update the records.
+
+## Before the export
+
+Review the records: the export relies on the last **Check existing ones** run for IdRef
+([identifier alignment](/en/guides/identifiants/aligner-les-identifiants/) page). Druid flags
+the records whose IdRef entry has not been reread.
+
+## Steps
+
+1. In **People**, filter the list: the export applies to the **filtered list** (for example
+   one laboratory).
+2. Open **Export › ABES export (IdRef)**.
+3. Set the options:
+   - **Preset**: limits the export to the institution's records, with Internal status and
+     validated;
+   - **Validated records only**, **Exclude PhD students and adjuncts**;
+   - **Propose 340 notes** (biographical note with the affiliation);
+   - **“No record” sheet**: the people who have no IdRef record;
+   - **Include rows already sent**.
+4. Check the preview and the counters (records in scope, rows to send, conflicts, structures
+   to create).
+5. Download the **XLSX workbook**.
+6. Once the file has been sent, click **Mark as sent**.
+
+## The workbook
+
+The sheet names are in French, the format expected by ABES:
+
+| Sheet | Content |
+|---|---|
+| **enrichissements** | For each record, what needs to be added or corrected: identifiers (field 035), affiliation (field 510), note (field 340). |
+| **conflits** | The cases where the IdRef record and Druid contradict each other: to check before sending anything. |
+| **sans_notice** | People without an IdRef record, candidates for a creation. |
+| **structures** | Structures that do not yet have an IdRef record. |
+
+## What happens next
+
+- **Mark as sent** dates the exported records: they will not be suggested again, except with
+  **Include rows already sent**.
+- The tasks of the **ABES batch** channel for these records are closed (see
+  [Follow up “To process” tasks](/en/guides/personnes/taches-a-traiter/)).
+- The records are updated by ABES or the library; Druid notices it at the next **Check
+  existing ones** run.
+
+## Known limitations
+
+- **The export does not change IdRef**: it prepares the work.
+- **A record that has not been reread** cannot be compared: run the IdRef check first.
+- **Conflicts** need a human check: do not send them as they are.
+
+## See also
+
+- [Researcher identifiers](/en/donnees/identifiants-chercheurs/)
+- [Complete a laboratory's identifiers from A to Z](/en/tutoriels/identifiants-labo-a-z/)

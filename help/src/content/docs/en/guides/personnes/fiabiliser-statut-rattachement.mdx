@@ -1,0 +1,101 @@
+---
+title: "Correct a person's status or affiliation"
+description: "Validate a record by hand or import a validated list so that it prevails over the directory."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles for a single record; technical administrators with access to the whole institution for importing a list"
+	menu="People › record › Validate the record; People › Synchronise › Import a validated list"
+	disponibilite="instances where statuses and manual validation are enabled"
+/>
+
+A person's status is calculated from the LDAP directory and the employment dates, which are
+sometimes late or incomplete. When you know for sure that a person is present, has left or
+is external, you **validate their record**: your information prevails over the calculation
+for 18 months.
+
+## Before validating: correct the data
+
+Many status errors come from missing data. First check on the record:
+
+- the **employing institution**: a CNRS or Inserm researcher must have their organisation as
+  employer to be classified External;
+- the **end dates**: a person who has left must have an **employment end** and a
+  **membership end**. The **→ employment end** button copies one into the other;
+- the **laboratory and team** in the Memberships card, and the primary affiliation.
+
+Save. If the calculated status is then correct, a validation is only useful to protect the
+record from the next directory updates.
+
+## Validate a record
+
+1. Open the person's record.
+2. Click **Validate the record**.
+3. Choose the **Validated status**: Internal, Leaving, Left or External.
+4. Choose the **Scope**: the status, the affiliation, or both.
+5. Enter the **Source**: where your information comes from (for example “Lab survey 2026,
+   HR list”). The date and your identifier are added automatically.
+6. Click **Validate**.
+
+The **Validated** badge appears next to the status.
+
+### Review or remove a validation
+
+On a validated record, the **Validate the record** button becomes **Validated record**.
+Click it:
+
+- **Revalidate** resets the date to today, for example after checking an **Expired** record
+  again;
+- **Unvalidate** removes the validation: the calculated status applies again.
+
+## Validate a list in one go
+
+When a laboratory sends the list of its members, you can validate all the records at once.
+
+1. In **People**, open **Synchronise › Import a validated list**.
+2. Paste the list (columns **name**, **email**, **uid**, **status**, separated by commas,
+   semicolons or tabs) or load a CSV file. A list of names only, without a header, also
+   works.
+3. Fill in the **Source (traceability)**, the **Validation date**, the **Validation scope**
+   and the **Default status** (used for rows without a status).
+4. Click **Analyse matching**. Druid finds each row by uid, then e-mail, then name, and
+   shows three lists:
+   - **Records that will be validated**;
+   - **Homonyms**: several records match, nothing is applied;
+   - **Not found**: no record matches.
+5. Check the first list, then click **Validate N records**.
+
+Then handle the homonyms and the rows not found by hand, record by record.
+
+## What happens next
+
+- The validation is written immediately to the directory, with its source, date and author.
+- During the following synchronisations with the LDAP directory, validated records are not
+  changed automatically; if the directory says otherwise, the badge becomes **Validated —
+  conflict** and the row is flagged for a decision.
+- Validated records become **members** of the structure for the dashboard (*Headcount*
+  scope), at the next regeneration.
+- After **18 months**, the badge changes to **Expired**: the validation still applies, but
+  the record needs checking again.
+
+## Known limitations
+
+- **A past employment end and a past membership end prevail over the validation**: the
+  person is then Left, even if validated as Internal (**Validated — conflict** badge).
+- **The import matches by name as a last resort**: two people with the same name are
+  classified as homonyms, never validated at random. Prefer lists with e-mail or uid.
+- **A validation applies to one record**: a person with two records (two laboratories) must
+  be validated on each.
+- **The import is reserved** for technical administrators with access to the whole
+  institution. Other profiles validate record by record, or send the list to
+  [support](/en/guides/support/).
+
+## See also
+
+- [Statuses of people](/en/donnees/statuts-des-personnes/)
+- [Memberships and affiliation](/en/donnees/appartenances-rattachement/)
+- [Make a laboratory's directory reliable](/en/tutoriels/fiabiliser-annuaire-labo/)

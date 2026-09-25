@@ -1,0 +1,89 @@
+---
+title: "Follow up “To process” tasks"
+description: "Report a correction to be made outside Druid (IdRef, ORCID, HAL…) and follow its progress."
+sidebar:
+  order: 6
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Druid administrators"
+	menu="People › To process › Tasks; record › Report a correction"
+	disponibilite="instances where task tracking is enabled"
+/>
+
+Some corrections are not made in Druid: merging two IdRef records, asking a researcher to
+link their second ORCID, reporting a departure to HR. **Tasks** let you note what needs to
+be done, who is dealing with it and where things stand.
+
+## Create a task
+
+1. On the person's record, click **Report a correction**, or in **To process › Tasks**,
+   click **New task**.
+2. Choose the **Type**: each type corresponds to a database (IdRef, ORCID, HAL, OpenAlex,
+   Scopus, HR, Directory) and suggests a default **Channel**.
+3. Fill in the **Description** (what needs to be done, the second identifier, the date…), the
+   **Link** to the record or profile, the **Priority** and, if needed, the **Assigned**
+   person.
+4. Click **Create the task**.
+
+### Channels
+
+| Channel | Who makes the correction |
+|---|---|
+| **Authorities correspondent (IdRef)** | The person in charge of authority records at the library. |
+| **ABES batch (export)** | Sent to ABES with the next [ABES export](/en/guides/identifiants/export-abes/). |
+| **Email to the researcher** | The researcher themselves (ORCID, IdHAL…). |
+| **External support (provider)** | OpenAlex or Scopus support. |
+| **Internal (Druid)** | The Druid team. |
+
+## Follow a task
+
+In **To process › Tasks**, filter by status, database or channel, or show **Mine**. On a
+task:
+
+| Action | Effect |
+|---|---|
+| **Take over** | The task becomes **In progress** and is assigned to you. |
+| **Put on hold** | Waiting for something (researcher's reply, ABES batch…): say what. |
+| **Resume** | Goes back to **In progress**. |
+| **Mark as done** | The task is **Done**; an optional resolution is recorded. |
+| **Drop** | The task is **Dropped**. |
+| **Reopen** | A closed task is to be done again. |
+
+Each action is recorded in the task's **History**; you can also add a comment.
+
+### Write to the researcher
+
+For the types that go through the researcher (duplicate ORCID or IdHAL, empty profile…), the
+task offers an **Email to the researcher** ready to send: **Copy the email** or **Open in the
+mail client**, then **Mark as sent (task on hold)**. Druid does not send any e-mail itself.
+
+## Automatic tasks
+
+Druid also creates tasks on its own, through **detection rules**: two ORCID, IdHAL or Scopus
+profiles for the same person, a departure seen in the LDAP directory while the IdRef record
+still shows the affiliation… These tasks are labelled **auto** and **close by themselves**
+(**Resolved (verified)**) when the situation disappears. Detection runs every night; **Run
+detection** reruns it on demand.
+
+## What happens next
+
+Tasks are stored in the shared directory (tracking tables): the whole team sees the same
+ones. An ABES export automatically closes the tasks of the **ABES batch** channel that were
+sent.
+
+## Known limitations
+
+- **Reserved for Druid administrators**: other profiles report a correction to
+  [support](/en/guides/support/).
+- **A task does not correct anything**: it is a shared reminder. The correction is made in
+  the database concerned.
+- **Automatic rules** rely on the latest alignment results: a situation is only detected
+  after an identifier search.
+
+## See also
+
+- [Where to fix what](/en/guides/corriger/ou-corriger-quoi/)
+- [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/)

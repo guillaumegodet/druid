@@ -69,7 +69,7 @@ a record that is already complete, or for which nothing was found, does not appe
 
 | Tab | Who |
 |---|---|
-| **People** | Academics, researchers and other research staff. |
+| **Staff** | Academics, researchers and other research staff. |
 | **PhD students** | PhD students. |
 | **No research duty** | Staff with no statutory research duty: they can have identifiers, but it is a low priority. |
 

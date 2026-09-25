@@ -1,0 +1,84 @@
+---
+title: "Handle a duplicate"
+description: "Merge two records of the same person, or qualify them as multiple memberships."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Druid administrators (the To process button appears if you are also a technical administrator)"
+	menu="People › To process › Duplicates"
+/>
+
+A **duplicate** is several records with the same uid, i.e. the same person. It is not always
+a mistake: a person can belong to two laboratories. Druid asks you to decide, group by group.
+
+## The three cases
+
+The **Duplicates** page sorts the groups into three categories:
+
+| Category | Situation | What to do |
+|---|---|---|
+| **Same lab** | Two records for the same laboratory, usually one row from the LDAP directory and one row created from the lab's website. | **Merge** |
+| **Holding area** | One of the records has no laboratory (or a temporary one). | **Merge**: the record without a lab is absorbed by the lab's record. |
+| **Several labs** | One record per laboratory. | **Qualify**: it is not necessarily a mistake. |
+
+Groups that appeared since your last visit are labelled **new**. Groups already qualified are
+filed under **Qualified multiple affiliations**.
+
+## Merge two records
+
+1. In the group, click **Merge**. The **Merge two records** wizard opens.
+2. Check which record is **Kept**: Druid suggests the one with a laboratory, then the
+   validated one, then the most complete. Click the other record to swap.
+3. Go through the **Fields to decide**: for each field that differs, Druid pre-selects a
+   value and says why (most recent validation, most recent LDAP update, union of both
+   values, fills an empty field…). Change it if needed.
+4. Click **Merge**.
+
+The kept record is completed, the other one is deleted. The operation is **logged**: the
+**Merge log**, at the bottom of the Duplicates page, lets you **Restore** it.
+
+:::caution
+If the two records do not have the same uid, Druid asks you to confirm that they really are
+the same person. If in doubt, do not merge: open both records and check.
+:::
+
+## Qualify a multiple affiliation
+
+1. In the group, click **Qualify**.
+2. Choose the **Main row**: the record of the person's main laboratory.
+3. Choose the type:
+   - **Concurrent**: the person belongs to both laboratories at the same time. The other
+     records become **secondary**;
+   - **Successive**: the person moved to another laboratory. The other records become
+     **former**; you can enter the end date of the former affiliation;
+   - **To review**: undetermined case, remembered so that it does not come back at every
+     review.
+4. Confirm.
+
+The group moves to **Qualified multiple affiliations**. You can **Requalify** it later.
+
+## What happens next
+
+- A merge changes the directory immediately: the absorbed record disappears from the lists,
+  and a trace of the merge is added to the kept record.
+- A qualification deletes nothing: it states, on each record, whether it is primary,
+  secondary or former. The researcher record then shows all the person's memberships.
+- Towards CRISalid, a person is exported only once, with their primary record.
+
+## Known limitations
+
+- **Only uid duplicates are detected**: two records of the same person with no shared uid
+  (for example an external person entered twice under two spellings) are not spotted.
+- **Restoring a merge puts the kept record back in its state before the merge**: changes
+  made to that record in the meantime are lost.
+- **The Refresh button recalculates the groups from the directory**, without a new
+  synchronisation with the LDAP directory.
+
+## See also
+
+- [Memberships and affiliation](/en/donnees/appartenances-rattachement/)
+- [Follow up “To process” tasks](/en/guides/personnes/taches-a-traiter/)

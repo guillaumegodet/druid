@@ -1,0 +1,67 @@
+---
+title: "Enter imprecise employment dates"
+description: "Enter a date to the year, the month or the day, and tell employment dates apart from membership dates."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the record"
+	menu="People › record › Employment & contract and Affiliations & history cards"
+/>
+
+The exact date of an arrival or a departure is not always known: a laboratory says “left in
+2025”, an HR list gives a month. Druid accepts dates **to the year, the month or the day**,
+so as not to invent a precision you do not have.
+
+## The four dates of the record
+
+| Card | Dates | What they describe |
+|---|---|---|
+| **Employment & contract** | **Employment start**, **Employment end** | The employment contract with the employer. |
+| **Affiliations & history** | Membership start and end | Presence in the laboratory or the team. |
+
+They do not always coincide: see
+[Memberships and affiliation](/en/donnees/appartenances-rattachement/).
+
+## Steps
+
+1. Open the person's record.
+2. In the date field, type what you know:
+
+   | You know | Type |
+   |---|---|
+   | The year | `2025` |
+   | The month | `2025-09` or `09/2025` |
+   | The day | `2025-09-01` or `01/09/2025` (day/month/year) |
+
+   For a full date, you can also use the calendar on the right of the field.
+3. Leave the field: the date is put into Druid's format. An unreadable entry stays **red**
+   and will not be saved.
+4. For a departure, fill in the membership end and then click **→ employment end**: the same
+   date is copied as the employment end.
+5. Click **Save**.
+
+## What happens next
+
+- The date is saved **with its precision**: `2025` stays `2025`.
+- The **status** is recalculated: a past employment end **and** a past membership end make
+  the person **Left** (see
+  [Statuses of people](/en/donnees/statuts-des-personnes/#6-certain-departure)).
+- Towards CRISalid, an imprecise date is sent as the bound of its period: first day for a
+  start, last day for an end.
+
+## Known limitations
+
+- **A period is only past once it is entirely over**: an end of `2026` only makes the person
+  leave from 1 January 2027. If you know the departure took place in June, enter `2026-06`.
+- **The date of birth** remains a full date.
+- **The → employment end button** replaces an existing employment end: Druid warns you when
+  it is different.
+
+## See also
+
+- [Correct a person's status or affiliation](/en/guides/personnes/fiabiliser-statut-rattachement/)
+- [Memberships and affiliation](/en/donnees/appartenances-rattachement/#imprecise-dates)

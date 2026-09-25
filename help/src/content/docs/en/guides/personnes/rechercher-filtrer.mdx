@@ -1,0 +1,79 @@
+---
+title: "Search and filter staff"
+description: "Find a person, filter the list by lab, status, grade or identifier, and switch to the charts view."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles (a lab profile only sees the staff of its laboratories)"
+	menu="People"
+/>
+
+The **People** section lists all the records you can see. Search and filters let you find a
+person or build a list (a lab, a status, the records to check).
+
+## Find a person
+
+Type in the search box at the top of the list. The search covers the **name**, the **main
+laboratory** and the **e-mail**. Click a row to open the record.
+
+## Filter the list
+
+The drop-down lists combine several values (multiple selection):
+
+| Filter | What it keeps |
+|---|---|
+| **Status** | Internal, Leaving, Left, External. |
+| **Validation** | **Validated**, **Validated (expired)** (more than 18 months) or **Not validated** records. |
+| **Employer** | The employing institution. |
+| **Lab (primary affil.)** | The laboratory of the primary affiliation. |
+| **Grade / rank**, **Employment type** | From the Employment card of the record. |
+| **Cluster** | The cluster or faculty of affiliation. |
+
+Below:
+
+- **Identifiers**: click **ORCID iD**, **HAL**, **IdRef** or **Scopus** to keep only the
+  records that **have** this identifier;
+- **Dates**: keeps only the people whose employment period overlaps the chosen interval.
+
+The number of records kept is shown next to the title.
+
+## Switch to the charts view
+
+The **Charts** button replaces the table with charts calculated on the filtered list:
+breakdown by status, gender balance, age brackets, grades, employers, employment types,
+breakdown by lab, HDR rate and **identifier coverage**. **List** goes back to the table.
+
+## Act on a selection
+
+Tick records in the list to show:
+
+- **Group**: add the ticked records to a group of researchers (see
+  [Create a group of researchers](/en/guides/structures-groupes/creer-un-groupe/));
+- **Merge**: merge exactly two records of the same person (see
+  [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/)).
+
+## What happens next
+
+Nothing is changed: search and filters only change the display. Exports (**Export**) apply
+to the filtered list (see [Export data and reports](/en/guides/tableau-de-bord/exporter/)).
+
+## Known limitations
+
+- **The search does not cover identifiers** (ORCID, IdRef…), despite what the search box
+  suggests: to find a person by identifier, go through their name.
+- **The Identifiers filters only find the records that have the identifier.** To spot
+  missing identifiers, use the
+  [identifier alignment](/en/guides/identifiants/aligner-les-identifiants/) page or the charts
+  view (identifier coverage).
+- **The Lab filter uses the primary affiliation**: a person with a secondary affiliation to a
+  lab does not appear in this filter.
+- **The Dates filter** ignores records without an employment date, which remain displayed.
+
+## See also
+
+- [Read a researcher record](/en/guides/personnes/lire-une-fiche/)
+- [Statuses of people](/en/donnees/statuts-des-personnes/)
