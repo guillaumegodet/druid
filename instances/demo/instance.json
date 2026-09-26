@@ -2,7 +2,7 @@
   "slug": "demo",
   "label": "Université de Démonstration",
   "target": "cloudflare",
-  "domains": ["druid-demo.pages.dev"],
+  "domains": ["druid-demo.pages.dev", "demo.dirladata.fr"],
   "access": "public",
   "readOnly": true,
   "grist": {
