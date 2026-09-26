@@ -23,7 +23,7 @@
 // auth.ts (frontend) redirects to /auth/login when /api/me is not OK:
 // so we always answer 200 here; access control happens at the edge (Access).
 
-import { instanceConfig, parseAdminEmails, publicInstanceInfo, resolveInstance } from '../_lib/instance.js';
+import { instanceOf, parseAdminEmails, publicInstanceInfo, resolveInstance } from '../_lib/instance.js';
 
 export { parseAdminEmails };
 
@@ -79,9 +79,9 @@ export const buildUser = (email, adminEmails, capabilities = CAPABILITIES, insta
 };
 
 export async function onRequest(context) {
-  const { request, env } = context;
+  const { request } = context;
   const email = request.headers.get('Cf-Access-Authenticated-User-Email');
-  const instance = instanceConfig(env);
+  const instance = instanceOf(context);
   // Read-only instance: nobody is admin (the Administration section only holds write tools).
   const adminEmails = instance.readOnly ? [] : instance.admins;
   const user = buildUser(email, adminEmails, capabilitiesFor(instance), instance);

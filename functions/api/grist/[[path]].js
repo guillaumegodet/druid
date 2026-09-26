@@ -26,7 +26,7 @@
 //    ALLOW_ANONYMOUS_WRITES).
 // Centrale has no lab scope (every account = institution-wide rights).
 
-import { instanceConfig } from '../../_lib/instance.js';
+import { instanceOf, secretOf } from '../../_lib/instance.js';
 
 const PATH_RE = /^docs\/([A-Za-z0-9_-]+)(?:\/(tables)(?:\/([A-Za-z0-9_]+)(?:\/(records|columns|data\/delete))?)?)?$/;
 const GRIST_TABLES = new Set([
@@ -67,9 +67,10 @@ export const gristGuard = ({ method, path, doc, hasIdentity, allowAnonymousWrite
 export async function onRequest(context) {
   const { request, env, params } = context;
 
-  const instance = instanceConfig(env);
+  const instance = instanceOf(context);
   const { readOnly } = instance;
-  const apiKey = env.GRIST_API_KEY;
+  // Key of the instance serving the request (GRIST_API_KEY__<SLUG> on a shared deployment).
+  const apiKey = secretOf(env, instance, 'GRIST_API_KEY');
   // Without a key, only a read-only instance may relay (anonymous reads of a public doc):
   // a writable instance without a key is a configuration error.
   if (!apiKey && !readOnly) return json(500, { error: 'GRIST_API_KEY not configured on Cloudflare' });
@@ -87,7 +88,8 @@ export async function onRequest(context) {
     path: gristPath,
     doc: instance.grist.docId,
     hasIdentity: !!request.headers.get('Cf-Access-Authenticated-User-Email'),
-    allowAnonymousWrites: env.ALLOW_ANONYMOUS_WRITES === 'true',
+    // Local `wrangler pages dev` only; never on a deployment shared by several instances.
+    allowAnonymousWrites: !instance.shared && env.ALLOW_ANONYMOUS_WRITES === 'true',
     readOnly,
     tableIdOfBody: () => {
       try { return (JSON.parse(body).tables || []).map((t) => String(t.id || '')); } catch { return []; }

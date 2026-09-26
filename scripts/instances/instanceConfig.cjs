@@ -4,8 +4,8 @@
 // repository guillaumegodet/druid-instances otherwise (Centrale, Nantes).
 //
 // CommonJS so that scripts/prepare-cloudflare-assets.cjs (build) and the CLI validator
-// (scripts/instances/validate.cjs) can require it; the Functions will receive the config already
-// validated by the build (lot 5 b), they do not import this module.
+// (scripts/instances/validate.cjs) can require it; the Functions receive the registry already validated
+// by the build (functions/_generated/registry.js, lots 5 b and 6 b), they do not import this module.
 const { z } = require('zod');
 
 // Capabilities an instance may set itself. The others are structural: fixed to false on
@@ -147,10 +147,41 @@ const compareEnvWithConfig = (c, env) => ENV_OVERRIDES
     return { name, status: same ? 'same' : 'differs', detail };
   });
 
+/**
+ * Registry of the Functions (functions/_generated/registry.js, lot 6 b), from validated configs.
+ *  - mode "single": one Pages project = one instance (DRUID_INSTANCE), served on every host;
+ *  - mode "multi": one deployment for several instances (DRUID_INSTANCES), chosen by request host.
+ * A host declared by two instances is an error: it would serve one instance's data under the other.
+ * @param {object[]} configs validated instance.json contents
+ * @param {{ mode: 'single' | 'multi' }} opts
+ * @returns {{ ok: true, registry: object } | { ok: false, errors: string[] }}
+ */
+const buildRegistry = (configs, { mode }) => {
+  const errors = [];
+  if (!['single', 'multi'].includes(mode)) errors.push(`unknown mode "${mode}"`);
+  if (!configs.length) errors.push('no instance');
+  if (mode === 'single' && configs.length > 1) errors.push('mode "single" takes exactly one instance');
+  const instances = {};
+  const byHost = {};
+  for (const c of configs) {
+    if (instances[c.slug]) { errors.push(`instance "${c.slug}" listed twice`); continue; }
+    if (c.target !== 'cloudflare') errors.push(`instance "${c.slug}" has target "${c.target}", not "cloudflare"`);
+    instances[c.slug] = c;
+    for (const host of c.domains) {
+      const h = host.toLowerCase();
+      if (byHost[h] && byHost[h] !== c.slug) errors.push(`domain ${h} claimed by both "${byHost[h]}" and "${c.slug}"`);
+      else byHost[h] = c.slug;
+    }
+  }
+  if (errors.length) return { ok: false, errors };
+  return { ok: true, registry: { mode, defaultSlug: mode === 'single' ? configs[0].slug : null, instances, byHost } };
+};
+
 module.exports = {
   ALL_CAPABILITIES,
   DEFAULT_GRIST_API_BASE,
   TUNABLE_CAPABILITIES,
+  buildRegistry,
   compareEnvWithConfig,
   parseInstanceConfig,
   publicRepoErrors,

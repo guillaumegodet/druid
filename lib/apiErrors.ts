@@ -32,6 +32,7 @@ export const API_ERRORS = [
   msg`Invalid id`,
   msg`Not found`,
   msg`Unknown structure`,
+  msg`Unknown Druid instance for this host`,
   // configuration
   msg`ILAAS_API_KEY not configured (druid service env)`,
   msg`ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)`,

@@ -14,6 +14,8 @@
 //   ILAAS_API_BASE  (var, opt) — default https://llm.ilaas.fr/v1
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 
+import { instanceEnv, instanceOf } from '../../_lib/instance.js'
+
 const MAX_THEME_TOPICS = 60
 
 const json = (body, status = 200) =>
@@ -78,7 +80,9 @@ async function selectThemeTopics(env, theme, { domains, subfields, topics }) {
 }
 
 export async function onRequestPost(context) {
-  const { request, env } = context
+  const { request } = context
+  // ILAAS key of the instance serving the request (per instance on a shared deployment).
+  const env = instanceEnv(context.env, instanceOf(context))
   if (!env.ILAAS_API_KEY) {
     return json({ error: 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)' }, 500)
   }

@@ -90,9 +90,24 @@ const EMPTY_CAPABILITIES: DruidCapabilities = {
 
 let _userInfo: UserInfo | null = null;
 
+/** Deployment shared by several instances (plan-architecture-multi-instances lot 6 b): /api/me answers 404
+ * for a host that no instance declares. A redirection to /auth/login would loop, so the page says it
+ * (plain text, before the language catalog is loaded). */
+const showUnknownInstance = (): void => {
+  const root = document.getElementById('root') ?? document.body;
+  const p = document.createElement('p');
+  p.style.cssText = 'font-family:sans-serif;max-width:40rem;margin:4rem auto;padding:0 1rem;line-height:1.5';
+  p.textContent = `Aucune instance Druid n'est déclarée pour ${window.location.hostname}. — No Druid instance is declared for this address.`;
+  root.replaceChildren(p);
+};
+
 export const initKeycloak = (onAuthenticated: () => void): void => {
   fetch('/api/me')
     .then((res) => {
+      if (res.status === 404) {
+        showUnknownInstance();
+        return null;
+      }
       if (!res.ok) {
         window.location.href = '/auth/login';
         return null;

@@ -8,7 +8,7 @@
 // (same values as data/<slug>/config.yaml on the biblio-metrics side). No
 // Druid groups on this instance. Cache: Cloudflare Cache API, 1 h.
 
-import { instanceConfig } from '../../_lib/instance.js'
+import { instanceEnv, instanceOf } from '../../_lib/instance.js'
 
 const NEWS_MAX_WORKS = 600
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
@@ -63,9 +63,9 @@ const normName = (s) =>
     .join(' ')
 
 /** Grist Annuaire → Map normalized name → record (name, email, photo, url). */
-async function fetchEffectifs(env, slug) {
+async function fetchEffectifs(env, slug, grist) {
   const labos = SLUG_LABOS[slug]
-  const { apiBase: base, docId: doc } = instanceConfig(env).grist
+  const { apiBase: base, docId: doc } = grist
   const r = await fetch(`${base}/docs/${doc}/tables/Annuaire/records`, {
     headers: { Authorization: `Bearer ${env.GRIST_API_KEY}` },
   })
@@ -160,7 +160,8 @@ const json = (body, status = 200, extraHeaders = {}) =>
 // answers 404, like a structure this function does not know.
 export async function onRequestGet(context) {
   const { request, params } = context
-  const instance = instanceConfig(context.env)
+  const instance = instanceOf(context)
+  const env = instanceEnv(context.env, instance)
   if (!instance.features.news) return json({ error: 'Unknown structure' }, 404)
   const slug = String(params.slug || '')
   const institutionId = NEWS_STRUCTS[slug]
@@ -189,7 +190,7 @@ export async function onRequestGet(context) {
 
   // Premium OpenAlex key (Cloudflare variable OPENALEX_API_KEY): priority rate
   // limit + fresher index. Without it, the shared pool (mailto).
-  const apiKey = context.env?.OPENALEX_API_KEY || ''
+  const apiKey = env.OPENALEX_API_KEY || ''
 
   try {
     const works = []
@@ -211,9 +212,9 @@ export async function onRequestGet(context) {
     // Restrict to Centrale staff. If the directory is unavailable, degrade to
     // unfiltered monitoring (effectifsFilter=false, shown by the UI).
     let byName = null
-    if (context.env?.GRIST_API_KEY) {
+    if (env.GRIST_API_KEY) {
       try {
-        byName = await fetchEffectifs(context.env, slug)
+        byName = await fetchEffectifs(env, slug, instance.grist)
       } catch (e) {
         byName = null
       }

@@ -21,7 +21,7 @@
 //   ILAAS_API_BASE  (var, opt) — default https://llm.ilaas.fr/v1
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 
-import { instanceConfig } from '../../_lib/instance.js'
+import { instanceEnv, instanceOf } from '../../_lib/instance.js'
 
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
@@ -162,8 +162,9 @@ async function generateBreve(env, title, abstract, chars) {
 // `features.newsletter` in its instance.json (docs/plan-architecture-multi-instances.md, lot 5 c)
 // answers 404, like a structure this function does not know.
 export async function onRequestPost(context) {
-  const { request, env } = context
-  const instance = instanceConfig(env)
+  const { request } = context
+  const instance = instanceOf(context)
+  const env = instanceEnv(context.env, instance)
   if (!instance.features.newsletter) return json({ error: 'Newsletter not available on this instance' }, 404)
   if (!env.ILAAS_API_KEY) {
     return json({ error: 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)' }, 500)

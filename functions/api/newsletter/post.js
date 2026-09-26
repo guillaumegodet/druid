@@ -15,7 +15,7 @@
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 //   OPENALEX_API_KEY(var, opt) — OpenAlex premium key
 
-import { instanceConfig } from '../../_lib/instance.js'
+import { instanceEnv, instanceOf } from '../../_lib/instance.js'
 
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
@@ -49,10 +49,10 @@ function linkedinMention(url) {
 }
 
 /** Resolves author names to their declared LinkedIn accounts (Annuaire). */
-async function resolveAuthorMentions(env, authorNames) {
+async function resolveAuthorMentions(env, grist, authorNames) {
   const names = (Array.isArray(authorNames) ? authorNames : []).filter(Boolean)
   if (names.length === 0 || !env.GRIST_API_KEY) return []
-  const { apiBase: base, docId: doc } = instanceConfig(env).grist
+  const { apiBase: base, docId: doc } = grist
   try {
     const resp = await fetch(`${base}/docs/${doc}/tables/Annuaire/records`, {
       headers: { Authorization: `Bearer ${env.GRIST_API_KEY}` },
@@ -144,8 +144,9 @@ async function generateSocialPost(env, { title, abstract, authors, labs, journal
 // `features.newsletter` in its instance.json (docs/plan-architecture-multi-instances.md, lot 5 c)
 // answers 404.
 export async function onRequestPost(context) {
-  const { request, env } = context
-  const instance = instanceConfig(env)
+  const { request } = context
+  const instance = instanceOf(context)
+  const env = instanceEnv(context.env, instance)
   if (!instance.features.newsletter) return json({ error: 'Newsletter not available on this instance' }, 404)
   if (!env.ILAAS_API_KEY) {
     return json({ error: 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)' }, 500)
@@ -166,7 +167,7 @@ export async function onRequestPost(context) {
       if (r.ok) abstract = abstractOf(await r.json())
     }
     // Authors' LinkedIn accounts (Annuaire profile record) → @vanity mentions.
-    const mentions = await resolveAuthorMentions(env, body.authorNames)
+    const mentions = await resolveAuthorMentions(env, instance.grist, body.authorNames)
     const post = await generateSocialPost(env, {
       title: String(body.title || ''),
       abstract,

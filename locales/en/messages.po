@@ -201,7 +201,7 @@ msgstr "Loading dashboard…"
 
 #: App.tsx:898
 #: components/dashboard/EmbedPage.tsx:68
-#: components/dashboard/NewsletterPanel.tsx:325
+#: components/dashboard/NewsletterPanel.tsx:326
 #: components/etl/EtlConsolePage.tsx:457
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:334
@@ -558,9 +558,9 @@ msgid "The group will be kept as soon as it has at least one member."
 msgstr "The group will be kept as soon as it has at least one member."
 
 #: components/GroupList.tsx:168
-#: components/ResearcherDetail.tsx:268
-#: components/ResearcherDetail.tsx:419
-#: components/ResearcherDetail.tsx:522
+#: components/ResearcherDetail.tsx:262
+#: components/ResearcherDetail.tsx:413
+#: components/ResearcherDetail.tsx:516
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/MergeResearchersModal.tsx:291
 #: components/researchers/TaskForm.tsx:163
@@ -734,161 +734,161 @@ msgstr "Employment types (top 10)"
 msgid "Breakdown by lab (top 8)"
 msgstr "Breakdown by lab (top 8)"
 
-#: components/ResearcherDetail.tsx:118
+#: components/ResearcherDetail.tsx:110
 msgid "Manual validation (Druid)"
 msgstr "Manual validation (Druid)"
 
-#: components/ResearcherDetail.tsx:210
+#: components/ResearcherDetail.tsx:202
 msgid "Back to the list"
 msgstr "Back to the list"
 
-#: components/ResearcherDetail.tsx:216
+#: components/ResearcherDetail.tsx:208
 #: components/Sidebar.tsx:154
 msgid "People"
 msgstr "People"
 
-#: components/ResearcherDetail.tsx:228
+#: components/ResearcherDetail.tsx:220
 #: components/researchers/DuplicatesPage.tsx:142
 msgid "Directory"
 msgstr "Directory"
 
-#: components/ResearcherDetail.tsx:236
+#: components/ResearcherDetail.tsx:230
 msgid "Open the Grist document (Annuaire table)"
 msgstr "Open the Grist document (Annuaire table)"
 
-#: components/ResearcherDetail.tsx:245
+#: components/ResearcherDetail.tsx:239
 msgid "Validated record — click to review / unvalidate"
 msgstr "Validated record — click to review / unvalidate"
 
-#: components/ResearcherDetail.tsx:245
+#: components/ResearcherDetail.tsx:239
 msgid "Validate this record"
 msgstr "Validate this record"
 
-#: components/ResearcherDetail.tsx:248
+#: components/ResearcherDetail.tsx:242
 msgid "Validated record"
 msgstr "Validated record"
 
-#: components/ResearcherDetail.tsx:248
-#: components/ResearcherDetail.tsx:438
+#: components/ResearcherDetail.tsx:242
+#: components/ResearcherDetail.tsx:432
 msgid "Validate the record"
 msgstr "Validate the record"
 
-#: components/ResearcherDetail.tsx:254
+#: components/ResearcherDetail.tsx:248
 msgid "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 msgstr "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 
-#: components/ResearcherDetail.tsx:257
+#: components/ResearcherDetail.tsx:251
 msgid "Report a correction"
 msgstr "Report a correction"
 
-#: components/ResearcherDetail.tsx:265
+#: components/ResearcherDetail.tsx:259
 msgid "Export PDF"
 msgstr "Export PDF"
 
-#: components/ResearcherDetail.tsx:273
+#: components/ResearcherDetail.tsx:267
 #: components/StructureDetail.tsx:139
-#: components/dashboard/NewsletterPanel.tsx:399
+#: components/dashboard/NewsletterPanel.tsx:400
 msgid "Save"
 msgstr "Save"
 
-#: components/ResearcherDetail.tsx:273
+#: components/ResearcherDetail.tsx:267
 msgid "Create the record"
 msgstr "Create the record"
 
-#: components/ResearcherDetail.tsx:305
-#: components/ResearcherDetail.tsx:306
+#: components/ResearcherDetail.tsx:299
+#: components/ResearcherDetail.tsx:300
 msgid "Edit photo (URL)"
 msgstr "Edit photo (URL)"
 
-#: components/ResearcherDetail.tsx:313
+#: components/ResearcherDetail.tsx:307
 msgid "Photo unavailable"
 msgstr "Photo unavailable"
 
 #. placeholder {0}: researcher.uid || t`not provided`
 #. placeholder {1}: researcher.lastSync
-#: components/ResearcherDetail.tsx:331
+#: components/ResearcherDetail.tsx:325
 msgid "UID: {0} · Last sync: {1}"
 msgstr "UID: {0} · Last sync: {1}"
 
-#: components/ResearcherDetail.tsx:331
+#: components/ResearcherDetail.tsx:325
 msgid "not provided"
 msgstr "not provided"
 
-#: components/ResearcherDetail.tsx:370
+#: components/ResearcherDetail.tsx:364
 msgid "Profile photo"
 msgstr "Profile photo"
 
-#: components/ResearcherDetail.tsx:385
+#: components/ResearcherDetail.tsx:379
 msgid "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 msgstr "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 
-#: components/ResearcherDetail.tsx:390
+#: components/ResearcherDetail.tsx:384
 msgid "Photo URL"
 msgstr "Photo URL"
 
-#: components/ResearcherDetail.tsx:401
+#: components/ResearcherDetail.tsx:395
 msgid "The URL must start with http:// or https://."
 msgstr "The URL must start with http:// or https://."
 
-#: components/ResearcherDetail.tsx:405
+#: components/ResearcherDetail.tsx:399
 msgid "The change will be written to Grist (photo_url column) when you click “Save”."
 msgstr "The change will be written to Grist (photo_url column) when you click “Save”."
 
-#: components/ResearcherDetail.tsx:415
+#: components/ResearcherDetail.tsx:409
 msgid "Remove photo"
 msgstr "Remove photo"
 
-#: components/ResearcherDetail.tsx:421
+#: components/ResearcherDetail.tsx:415
 msgid "Apply"
 msgstr "Apply"
 
-#: components/ResearcherDetail.tsx:450
+#: components/ResearcherDetail.tsx:444
 msgid "Validated status"
 msgstr "Validated status"
 
-#: components/ResearcherDetail.tsx:464
+#: components/ResearcherDetail.tsx:458
 #: components/dashboard/MediaSourcesAdmin.tsx:217
 msgid "Scope"
 msgstr "Scope"
 
-#: components/ResearcherDetail.tsx:477
+#: components/ResearcherDetail.tsx:471
 msgid "Source"
 msgstr "Source"
 
-#: components/ResearcherDetail.tsx:482
+#: components/ResearcherDetail.tsx:476
 msgid "E.g. 2026 lab survey, HR list…"
 msgstr "E.g. 2026 lab survey, HR list…"
 
-#: components/ResearcherDetail.tsx:490
+#: components/ResearcherDetail.tsx:484
 msgid "Date (auto)"
 msgstr "Date (auto)"
 
-#: components/ResearcherDetail.tsx:494
+#: components/ResearcherDetail.tsx:488
 msgid "Validated by (auto)"
 msgstr "Validated by (auto)"
 
 #. placeholder {0}: existingValidation.validationDate
 #. placeholder {1}: existingValidation.validatedBy
-#: components/ResearcherDetail.tsx:502
+#: components/ResearcherDetail.tsx:496
 msgid "Already validated on {0} by {1}."
 msgstr "Already validated on {0} by {1}."
 
 #. placeholder {0}: existingValidation.validationDate
-#: components/ResearcherDetail.tsx:503
+#: components/ResearcherDetail.tsx:497
 msgid "Already validated on {0}."
 msgstr "Already validated on {0}."
 
-#: components/ResearcherDetail.tsx:514
+#: components/ResearcherDetail.tsx:508
 msgid "Unvalidate"
 msgstr "Unvalidate"
 
-#: components/ResearcherDetail.tsx:530
+#: components/ResearcherDetail.tsx:524
 msgid "Revalidate"
 msgstr "Revalidate"
 
-#: components/ResearcherDetail.tsx:530
+#: components/ResearcherDetail.tsx:524
 #: components/dashboard/MediaMentionsPanel.tsx:317
-#: components/dashboard/NewsletterPanel.tsx:436
+#: components/dashboard/NewsletterPanel.tsx:437
 #: components/researchers/GroupModal.tsx:65
 msgid "Validate"
 msgstr "Validate"
@@ -2564,7 +2564,7 @@ msgstr "About “{title}”"
 #: components/dashboard/EChartCard.tsx:251
 #: components/dashboard/EChartCard.tsx:316
 #: components/dashboard/NewsTab.tsx:815
-#: components/dashboard/NewsletterPanel.tsx:483
+#: components/dashboard/NewsletterPanel.tsx:484
 #: components/dashboard/report/ReportWizard.tsx:246
 #: components/researchers/UnifiedAlignPage.tsx:603
 msgid "Close"
@@ -3811,170 +3811,170 @@ msgstr "Generate another proposal"
 msgid "Regenerate"
 msgstr "Regenerate"
 
-#: components/dashboard/NewsletterPanel.tsx:46
+#: components/dashboard/NewsletterPanel.tsx:47
 msgid "Generated"
 msgstr "Generated"
 
-#: components/dashboard/NewsletterPanel.tsx:47
+#: components/dashboard/NewsletterPanel.tsx:48
 msgid "Under review"
 msgstr "Under review"
 
-#: components/dashboard/NewsletterPanel.tsx:48
+#: components/dashboard/NewsletterPanel.tsx:49
 #: components/researchers/LdapVerifyPanel.tsx:124
 #: components/researchers/StatusBadge.tsx:80
 msgid "Validated"
 msgstr "Validated"
 
-#: components/dashboard/NewsletterPanel.tsx:49
+#: components/dashboard/NewsletterPanel.tsx:50
 msgid "Discarded"
 msgstr "Discarded"
 
-#: components/dashboard/NewsletterPanel.tsx:50
+#: components/dashboard/NewsletterPanel.tsx:51
 msgid "Published"
 msgstr "Published"
 
-#: components/dashboard/NewsletterPanel.tsx:121
+#: components/dashboard/NewsletterPanel.tsx:122
 msgid "Could not load"
 msgstr "Could not load"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:158
+#: components/dashboard/NewsletterPanel.tsx:159
 msgid "Could not write to Grist: {0}"
 msgstr "Could not write to Grist: {0}"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:184
+#: components/dashboard/NewsletterPanel.tsx:185
 msgid "Generation: {0}"
 msgstr "Generation: {0}"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:248
+#: components/dashboard/NewsletterPanel.tsx:249
 msgid "Recipients: {0}"
 msgstr "Recipients: {0}"
 
-#: components/dashboard/NewsletterPanel.tsx:260
+#: components/dashboard/NewsletterPanel.tsx:261
 msgid "Back to the watch"
 msgstr "Back to the watch"
 
-#: components/dashboard/NewsletterPanel.tsx:265
+#: components/dashboard/NewsletterPanel.tsx:266
 msgid "Public newsletter — {structName}"
 msgstr "Public newsletter — {structName}"
 
-#: components/dashboard/NewsletterPanel.tsx:268
+#: components/dashboard/NewsletterPanel.tsx:269
 msgid "Briefs generated from the last 30 days' articles, validated by the researchers, then distributed."
 msgstr "Briefs generated from the last 30 days' articles, validated by the researchers, then distributed."
 
-#: components/dashboard/NewsletterPanel.tsx:277
+#: components/dashboard/NewsletterPanel.tsx:278
 msgid "Newsletter issue (month)"
 msgstr "Newsletter issue (month)"
 
-#: components/dashboard/NewsletterPanel.tsx:283
+#: components/dashboard/NewsletterPanel.tsx:284
 msgid "Target length of the generated brief (only affects new briefs)"
 msgstr "Target length of the generated brief (only affects new briefs)"
 
-#: components/dashboard/NewsletterPanel.tsx:285
+#: components/dashboard/NewsletterPanel.tsx:286
 msgid "Length: {chars} chars"
 msgstr "Length: {chars} chars"
 
-#: components/dashboard/NewsletterPanel.tsx:302
+#: components/dashboard/NewsletterPanel.tsx:303
 msgid "Generates a public brief (LLM) for each new OpenAlex article ≤ 30 days old"
 msgstr "Generates a public brief (LLM) for each new OpenAlex article ≤ 30 days old"
 
 #. placeholder {0}: generating.done
 #. placeholder {1}: generating.remaining
-#: components/dashboard/NewsletterPanel.tsx:305
+#: components/dashboard/NewsletterPanel.tsx:306
 msgid "{0} brief(s)… ({1} remaining)"
 msgstr "{0} brief(s)… ({1} remaining)"
 
-#: components/dashboard/NewsletterPanel.tsx:306
+#: components/dashboard/NewsletterPanel.tsx:307
 msgid "Generate briefs"
 msgstr "Generate briefs"
 
-#: components/dashboard/NewsletterPanel.tsx:313
+#: components/dashboard/NewsletterPanel.tsx:314
 msgid "Newsletter preview (validated briefs)"
 msgstr "Newsletter preview (validated briefs)"
 
-#: components/dashboard/NewsletterPanel.tsx:313
+#: components/dashboard/NewsletterPanel.tsx:314
 msgid "No validated brief for this issue"
 msgstr "No validated brief for this issue"
 
 #. placeholder {0}: valides.length
-#: components/dashboard/NewsletterPanel.tsx:315
+#: components/dashboard/NewsletterPanel.tsx:316
 msgid "Preview ({0})"
 msgstr "Preview ({0})"
 
-#: components/dashboard/NewsletterPanel.tsx:328
+#: components/dashboard/NewsletterPanel.tsx:329
 msgid "No brief for issue {numero}. Click “Generate briefs” to popularise the articles published in the last 30 days."
 msgstr "No brief for issue {numero}. Click “Generate briefs” to popularise the articles published in the last 30 days."
 
-#: components/dashboard/NewsletterPanel.tsx:376
+#: components/dashboard/NewsletterPanel.tsx:377
 msgid "Hook (emoji + question or concrete sentence)"
 msgstr "Hook (emoji + question or concrete sentence)"
 
-#: components/dashboard/NewsletterPanel.tsx:383
+#: components/dashboard/NewsletterPanel.tsx:384
 msgid "Public brief (2-3 sentences)"
 msgstr "Public brief (2-3 sentences)"
 
 #. placeholder {0}: item.titre
-#: components/dashboard/NewsletterPanel.tsx:387
+#: components/dashboard/NewsletterPanel.tsx:388
 msgid "Original title: {0}"
 msgstr "Original title: {0}"
 
-#: components/dashboard/NewsletterPanel.tsx:410
+#: components/dashboard/NewsletterPanel.tsx:411
 msgid "Open the mail client and mark this item as “sent”?"
 msgstr "Open the mail client and mark this item as “sent”?"
 
 #. placeholder {0}: item.chercheur_nom || item.chercheur_email
-#: components/dashboard/NewsletterPanel.tsx:415
+#: components/dashboard/NewsletterPanel.tsx:416
 msgid "Request validation from {0}"
 msgstr "Request validation from {0}"
 
 #. placeholder {0}: item.chercheur_nom || item.chercheur_email
-#: components/dashboard/NewsletterPanel.tsx:417
+#: components/dashboard/NewsletterPanel.tsx:418
 msgid "Request validation ({0})"
 msgstr "Request validation ({0})"
 
-#: components/dashboard/NewsletterPanel.tsx:421
+#: components/dashboard/NewsletterPanel.tsx:422
 msgid "No researcher matched in the directory"
 msgstr "No researcher matched in the directory"
 
-#: components/dashboard/NewsletterPanel.tsx:445
+#: components/dashboard/NewsletterPanel.tsx:446
 msgid "Discard"
 msgstr "Discard"
 
-#: components/dashboard/NewsletterPanel.tsx:453
+#: components/dashboard/NewsletterPanel.tsx:454
 #: components/researchers/TasksPage.tsx:262
 msgid "Reopen"
 msgstr "Reopen"
 
-#: components/dashboard/NewsletterPanel.tsx:470
+#: components/dashboard/NewsletterPanel.tsx:471
 #: components/dashboard/report/ReportWizard.tsx:51
 #: components/dashboard/report/ReportWizard.tsx:490
 msgid "Preview"
 msgstr "Preview"
 
 #. placeholder {0}: valides.length
-#: components/dashboard/NewsletterPanel.tsx:470
+#: components/dashboard/NewsletterPanel.tsx:471
 msgid "{0, plural, one {# validated brief} other {# validated briefs}}"
 msgstr "{0, plural, one {# validated brief} other {# validated briefs}}"
 
-#: components/dashboard/NewsletterPanel.tsx:474
+#: components/dashboard/NewsletterPanel.tsx:475
 msgid "Download the HTML"
 msgstr "Download the HTML"
 
-#: components/dashboard/NewsletterPanel.tsx:477
+#: components/dashboard/NewsletterPanel.tsx:478
 msgid "Recipients copied ✓"
 msgstr "Recipients copied ✓"
 
-#: components/dashboard/NewsletterPanel.tsx:477
+#: components/dashboard/NewsletterPanel.tsx:478
 msgid "Copy recipients"
 msgstr "Copy recipients"
 
-#: components/dashboard/NewsletterPanel.tsx:480
+#: components/dashboard/NewsletterPanel.tsx:481
 msgid "Mark as published"
 msgstr "Mark as published"
 
-#: components/dashboard/NewsletterPanel.tsx:487
+#: components/dashboard/NewsletterPanel.tsx:488
 msgid "Newsletter preview"
 msgstr "Newsletter preview"
 
@@ -6594,8 +6594,8 @@ msgid "Save to Grist"
 msgstr "Save to Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3405
-#: lib/gristService.ts:3514
+#: lib/gristService.ts:3404
+#: lib/gristService.ts:3513
 msgid "Search error"
 msgstr "Search error"
 
@@ -8819,8 +8819,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Namesake with no affiliation evidence"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3416
-#: lib/gristService.ts:3542
+#: lib/gristService.ts:3415
+#: lib/gristService.ts:3541
 msgid "Suspected mixed identity"
 msgstr "Suspected mixed identity"
 
@@ -9329,552 +9329,556 @@ msgstr "Not found"
 msgid "Unknown structure"
 msgstr "Unknown structure"
 
-#: lib/apiErrors.ts:36
+#: lib/apiErrors.ts:35
+msgid "Unknown Druid instance for this host"
+msgstr "Unknown Druid instance for this host"
+
+#: lib/apiErrors.ts:37
 msgid "ILAAS_API_KEY not configured (druid service env)"
 msgstr "ILAAS_API_KEY not configured (druid service env)"
 
-#: lib/apiErrors.ts:37
+#: lib/apiErrors.ts:38
 msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 
-#: lib/apiErrors.ts:38
+#: lib/apiErrors.ts:39
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID not configured"
 
-#: lib/apiErrors.ts:39
+#: lib/apiErrors.ts:40
 msgid "VITE_GRIST_DOC_ID / GRIST_API_KEY not configured"
 msgstr "VITE_GRIST_DOC_ID / GRIST_API_KEY not configured"
 
-#: lib/apiErrors.ts:40
+#: lib/apiErrors.ts:41
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY not configured"
 
-#: lib/apiErrors.ts:41
+#: lib/apiErrors.ts:42
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY not configured on Cloudflare"
 
-#: lib/apiErrors.ts:42
+#: lib/apiErrors.ts:43
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "No OpenAlex identifier configured for this structure"
 
-#: lib/apiErrors.ts:43
+#: lib/apiErrors.ts:44
 msgid "No dashboard data for this structure"
 msgstr "No dashboard data for this structure"
 
-#: lib/apiErrors.ts:45
+#: lib/apiErrors.ts:46
 msgid "messages[] required"
 msgstr "messages[] required"
 
-#: lib/apiErrors.ts:46
+#: lib/apiErrors.ts:47
 msgid "Assistant unavailable"
 msgstr "Assistant unavailable"
 
-#: lib/apiErrors.ts:47
+#: lib/apiErrors.ts:48
 msgid "Help assistant not configured"
 msgstr "Help assistant not configured"
 
-#: lib/apiErrors.ts:48
+#: lib/apiErrors.ts:49
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 
-#: lib/apiErrors.ts:49
+#: lib/apiErrors.ts:50
 msgid "Generation interrupted"
 msgstr "Generation interrupted"
 
-#: lib/apiErrors.ts:50
+#: lib/apiErrors.ts:51
 msgid "Generation failed"
 msgstr "Generation failed"
 
-#: lib/apiErrors.ts:51
+#: lib/apiErrors.ts:52
 msgid "Analysis failed"
 msgstr "Analysis failed"
 
-#: lib/apiErrors.ts:52
+#: lib/apiErrors.ts:53
 msgid "Missing theme"
 msgstr "Missing theme"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:54
 msgid "No publication to analyze"
 msgstr "No publication to analyze"
 
-#: lib/apiErrors.ts:54
+#: lib/apiErrors.ts:55
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex unreachable"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:57
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:58
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:59
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:60
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:61
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:62
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:63
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:64
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:66
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:67
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:68
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:69
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:70
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:71
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:72
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:73
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:75
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:76
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:77
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:78
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:79
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:80
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:81
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:82
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:83
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:84
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:85
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:86
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:87
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:88
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:89
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:90
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:91
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:92
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:94
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:95
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:96
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:97
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:98
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:99
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:100
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:102
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:103
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:104
 msgid "Load failed"
 msgstr "Load failed"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:671
+#: lib/gristService.ts:670
 msgid "Error creating the affiliation columns: {0}"
 msgstr "Error creating the affiliation columns: {0}"
 
-#: lib/gristService.ts:780
-#: lib/gristService.ts:2553
-#: lib/gristService.ts:3221
-#: lib/gristService.ts:3835
+#: lib/gristService.ts:779
+#: lib/gristService.ts:2552
+#: lib/gristService.ts:3220
+#: lib/gristService.ts:3834
 msgid "Grist error (table list)"
 msgstr "Grist error (table list)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:787
+#: lib/gristService.ts:786
 msgid "Error creating table {MERGE_LOG_TABLE}: {0}"
 msgstr "Error creating table {MERGE_LOG_TABLE}: {0}"
 
-#: lib/gristService.ts:1862
+#: lib/gristService.ts:1861
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "Invalid Grist ID (gristRowId missing)"
 
-#: lib/gristService.ts:1874
+#: lib/gristService.ts:1873
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 
-#: lib/gristService.ts:1876
+#: lib/gristService.ts:1875
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1947
+#: lib/gristService.ts:1946
 msgid "Grist error (writing the secondary affiliations): {0}"
 msgstr "Grist error (writing the secondary affiliations): {0}"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:1968
+#: lib/gristService.ts:1967
 msgid "Grist error (creating the secondary affiliations): {0}"
 msgstr "Grist error (creating the secondary affiliations): {0}"
 
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:1980
-#: lib/gristService.ts:2534
+#: lib/gristService.ts:1979
+#: lib/gristService.ts:2533
 msgid "Grist error (merge log): {0}"
 msgstr "Grist error (merge log): {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:1984
+#: lib/gristService.ts:1983
 msgid "Grist error (deleting the removed affiliations): {0}"
 msgstr "Grist error (deleting the removed affiliations): {0}"
 
-#: lib/gristService.ts:2010
+#: lib/gristService.ts:2009
 msgid "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2031
+#: lib/gristService.ts:2030
 msgid "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2143
+#: lib/gristService.ts:2142
 msgid "The acronym / short name is required"
 msgstr "The acronym / short name is required"
 
-#: lib/gristService.ts:2146
+#: lib/gristService.ts:2145
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "A team must be included in a lab (Memberships tab)"
 
 #. placeholder {0}: dup.acronym
 #. placeholder {1}: level === StructureLevel.EQUIPE ? t` in ${parent}` : ''
-#: lib/gristService.ts:2152
+#: lib/gristService.ts:2151
 msgid "A structure “{0}” already exists{1}"
 msgstr "A structure “{0}” already exists{1}"
 
-#: lib/gristService.ts:2152
+#: lib/gristService.ts:2151
 msgid " in {parent}"
 msgstr " in {parent}"
 
-#: lib/gristService.ts:2161
+#: lib/gristService.ts:2160
 msgid "local_id “{localId}” already used"
 msgstr "local_id “{localId}” already used"
 
 #. placeholder {0}: await resp.text()
-#: lib/gristService.ts:2194
+#: lib/gristService.ts:2193
 msgid "Error creating the Grist structure: {0}"
 msgstr "Error creating the Grist structure: {0}"
 
-#: lib/gristService.ts:2202
+#: lib/gristService.ts:2201
 msgid "Invalid ID"
 msgstr "Invalid ID"
 
-#: lib/gristService.ts:2433
+#: lib/gristService.ts:2432
 msgid "Qualification: primary row required"
 msgstr "Qualification: primary row required"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2475
+#: lib/gristService.ts:2474
 msgid "Grist error (de-qualification): {0}"
 msgstr "Grist error (de-qualification): {0}"
 
-#: lib/gristService.ts:2517
+#: lib/gristService.ts:2516
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
-#: lib/gristService.ts:2521
+#: lib/gristService.ts:2520
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Merge: one of the rows no longer exists in Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2541
+#: lib/gristService.ts:2540
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Grist error (writing the kept row, log #{logId}): {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2546
+#: lib/gristService.ts:2545
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Grist error (deleting the absorbed row, log #{logId}): {0}"
 
-#: lib/gristService.ts:2557
-#: lib/gristService.ts:2579
+#: lib/gristService.ts:2556
+#: lib/gristService.ts:2578
 msgid "Grist error (merge log)"
 msgstr "Grist error (merge log)"
 
-#: lib/gristService.ts:2581
+#: lib/gristService.ts:2580
 msgid "Merge #{logId} not found"
 msgstr "Merge #{logId} not found"
 
-#: lib/gristService.ts:2582
+#: lib/gristService.ts:2581
 msgid "Merge #{logId} already restored"
 msgstr "Merge #{logId} already restored"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2592
+#: lib/gristService.ts:2591
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Grist error (re-creating the row): {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2602
+#: lib/gristService.ts:2601
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2610
+#: lib/gristService.ts:2609
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 
-#: lib/gristService.ts:2623
-#: lib/gristService.ts:3150
-#: lib/gristService.ts:3620
-#: lib/gristService.ts:3699
+#: lib/gristService.ts:2622
+#: lib/gristService.ts:3149
+#: lib/gristService.ts:3619
+#: lib/gristService.ts:3698
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Grist error (reading the Annuaire before writing)"
 
-#: lib/gristService.ts:2907
-#: lib/gristService.ts:2946
-#: lib/gristService.ts:3108
-#: lib/gristService.ts:3521
-#: lib/gristService.ts:3549
+#: lib/gristService.ts:2906
+#: lib/gristService.ts:2945
+#: lib/gristService.ts:3107
+#: lib/gristService.ts:3520
+#: lib/gristService.ts:3548
 msgid "Identifier mismatch"
 msgstr "Identifier mismatch"
 
-#: lib/gristService.ts:2925
+#: lib/gristService.ts:2924
 msgid "Record deleted"
 msgstr "Record deleted"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2925
+#: lib/gristService.ts:2924
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 
-#: lib/gristService.ts:2929
+#: lib/gristService.ts:2928
 msgid "Record unreadable"
 msgstr "Record unreadable"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2929
+#: lib/gristService.ts:2928
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 
-#: lib/gristService.ts:3214
+#: lib/gristService.ts:3213
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "The Grist review only applies to the “search for missing” mode"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3229
-#: lib/gristService.ts:3843
+#: lib/gristService.ts:3228
+#: lib/gristService.ts:3842
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 
-#: lib/gristService.ts:3405
-#: lib/gristService.ts:3412
-#: lib/gristService.ts:3514
-#: lib/gristService.ts:3536
+#: lib/gristService.ts:3404
+#: lib/gristService.ts:3411
+#: lib/gristService.ts:3513
+#: lib/gristService.ts:3535
 msgid "API unreachable during the run — rerun."
 msgstr "API unreachable during the run — rerun."
 
-#: lib/gristService.ts:3412
-#: lib/gristService.ts:3536
+#: lib/gristService.ts:3411
+#: lib/gristService.ts:3535
 msgid "Verification error"
 msgstr "Verification error"
 
-#: lib/gristService.ts:3415
-#: lib/gristService.ts:3544
+#: lib/gristService.ts:3414
+#: lib/gristService.ts:3543
 msgid "Name mismatch"
 msgstr "Name mismatch"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3415
+#: lib/gristService.ts:3414
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} “{1}” ≠ Annuaire “{displayName}”"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3416
+#: lib/gristService.ts:3415
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 
-#: lib/gristService.ts:3419
+#: lib/gristService.ts:3418
 msgid "{a} merged into {b}"
 msgstr "{a} merged into {b}"
 
-#: lib/gristService.ts:3420
+#: lib/gristService.ts:3419
 msgid "{a} gone"
 msgstr "{a} gone"
 
-#: lib/gristService.ts:3421
+#: lib/gristService.ts:3420
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = missing ORCID profile"
 
-#: lib/gristService.ts:3423
+#: lib/gristService.ts:3422
 msgid "List to fix (not written)"
 msgstr "List to fix (not written)"
 
-#: lib/gristService.ts:3423
+#: lib/gristService.ts:3422
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → rerun (direct write) or fix OpenAlex_ids"
 
-#: lib/gristService.ts:3527
+#: lib/gristService.ts:3526
 msgid "Unknown ORCID"
 msgstr "Unknown ORCID"
 
-#: lib/gristService.ts:3527
+#: lib/gristService.ts:3526
 msgid "Unknown Scopus Author ID"
 msgstr "Unknown Scopus Author ID"
 
-#: lib/gristService.ts:3527
+#: lib/gristService.ts:3526
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL unknown to HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3528
+#: lib/gristService.ts:3527
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0}: no profile — fix it in the Annuaire"
 
-#: lib/gristService.ts:3532
+#: lib/gristService.ts:3531
 msgid "Invalid ID_SCOPUS"
 msgstr "Invalid ID_SCOPUS"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3532
+#: lib/gristService.ts:3531
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 
-#: lib/gristService.ts:3533
+#: lib/gristService.ts:3532
 msgid "Invalid ORCID"
 msgstr "Invalid ORCID"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3533
+#: lib/gristService.ts:3532
 msgid "{0}: wrong format or check digit"
 msgstr "{0}: wrong format or check digit"
 
-#: lib/gristService.ts:3541
+#: lib/gristService.ts:3540
 msgid "Profile merged by Scopus"
 msgstr "Profile merged by Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3541
+#: lib/gristService.ts:3540
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3542
+#: lib/gristService.ts:3541
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — check the profile, flag it “Mixed identity” if needed"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3544
+#: lib/gristService.ts:3543
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3792
+#: lib/gristService.ts:3791
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} missing: run {1} first (the script creates it)."
 

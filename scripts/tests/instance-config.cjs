@@ -2,7 +2,7 @@
 // Harness: validation of the instance registry instances/<slug>/instance.json
 // (scripts/instances/instanceConfig.cjs, docs/plan-architecture-multi-instances.md, lot 5 a).
 const path = require('path');
-const { parseInstanceConfig, publicRepoErrors, viteEnvFromConfig, compareEnvWithConfig, DEFAULT_GRIST_API_BASE } = require(path.join(__dirname, '../instances/instanceConfig.cjs'));
+const { buildRegistry, parseInstanceConfig, publicRepoErrors, viteEnvFromConfig, compareEnvWithConfig, DEFAULT_GRIST_API_BASE } = require(path.join(__dirname, '../instances/instanceConfig.cjs'));
 
 let ko = 0;
 const check = (label, got, want) => {
@@ -115,6 +115,25 @@ check('public repo: non-object refused', publicRepoErrors(null), ['not a JSON ob
   const adminDiff = compareEnvWithConfig(school, { ADMIN_EMAILS: 'other@example.org' })[0];
   check('differing admins: values never printed', [adminDiff.status, adminDiff.detail], ['differs', '']);
   check('public base URL set on a private doc differs', compareEnvWithConfig(school, { VITE_GRIST_PUBLIC_BASE_URL: DEFAULT_GRIST_API_BASE })[0].status, 'differs');
+}
+
+// ── registry of the Functions: single and shared deployments (lot 6 b) ──────
+{
+  const demo = parseInstanceConfig(publicDemo()).config;
+  const school = parseInstanceConfig(privateCloudflare()).config;
+  const demo2 = parseInstanceConfig({ ...publicDemo(), slug: 'demo-2', domains: ['demo-2.example.org'] }).config;
+  const single = buildRegistry([school], { mode: 'single' });
+  check('single: default slug and hosts', [single.ok, single.registry.defaultSlug, single.registry.byHost], [true, 'school', { 'druid-school.pages.dev': 'school' }]);
+  const multi = buildRegistry([demo, demo2], { mode: 'multi' });
+  check('multi: no default slug, one host per domain', [multi.ok, multi.registry.defaultSlug, multi.registry.byHost],
+    [true, null, { 'druid-demo.pages.dev': 'demo', 'demo-2.example.org': 'demo-2' }]);
+  check('multi: instances keyed by slug', Object.keys(multi.registry.instances), ['demo', 'demo-2']);
+  const clash = buildRegistry([demo, { ...demo2, domains: ['druid-demo.pages.dev'] }], { mode: 'multi' });
+  check('multi: a domain claimed twice is refused', [clash.ok, clash.errors], [false, ['domain druid-demo.pages.dev claimed by both "demo" and "demo-2"']]);
+  check('multi: an instance listed twice is refused', buildRegistry([demo, demo], { mode: 'multi' }).errors, ['instance "demo" listed twice']);
+  check('single: one instance only', buildRegistry([demo, demo2], { mode: 'single' }).errors, ['mode "single" takes exactly one instance']);
+  check('no instance refused', buildRegistry([], { mode: 'multi' }).errors, ['no instance']);
+  check('docker target refused', buildRegistry([parseInstanceConfig(docker()).config], { mode: 'single' }).errors.some((e) => e.includes('not "cloudflare"')), true);
 }
 
 console.log(ko ? `\n${ko} failure(s)` : '\nAll good.');

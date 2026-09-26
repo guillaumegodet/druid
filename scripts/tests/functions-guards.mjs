@@ -4,26 +4,28 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 
-// The Functions import the registry written by a Cloudflare build (functions/_generated/, ignored by
-// git). Absent here, it is created empty (`null`: no instance.json) so that the handlers below run
-// on their Pages variables only; a leftover of a local Cloudflare build is refused, since the
-// handler checks would then depend on that instance.
-const GENERATED = new URL('../../functions/_generated/instance.js', import.meta.url);
+// The Functions import the registry written by a Cloudflare build (functions/_generated/registry.js,
+// ignored by git). Absent here, it is created empty (`null`: no instance.json) so that the handlers
+// below run on their Pages variables only; a leftover of a local Cloudflare build is refused, since
+// the handler checks would then depend on that instance. Registries of single and shared deployments
+// are tested through the pure resolveForHost below.
+const GENERATED = new URL('../../functions/_generated/registry.js', import.meta.url);
 if (!fs.existsSync(GENERATED)) {
   fs.mkdirSync(new URL('.', GENERATED), { recursive: true });
   fs.writeFileSync(GENERATED, '// Written by scripts/tests/functions-guards.mjs: no instance.json.\nexport default null;\n');
 } else if (!/^export default null;$/m.test(fs.readFileSync(GENERATED, 'utf8'))) {
-  console.error('functions/_generated/instance.js comes from a local Cloudflare build: delete functions/_generated/ first');
+  console.error('functions/_generated/registry.js comes from a local Cloudflare build: delete functions/_generated/ first');
   process.exit(1);
 }
 
 const { gristGuard, onRequest: gristProxy } = await import('../../functions/api/grist/[[path]].js');
 const { buildUser, parseAdminEmails, capabilitiesFor, onRequest: me } = await import('../../functions/api/me.js');
-const { resolveInstance, publicInstanceInfo } = await import('../../functions/_lib/instance.js');
+const { resolveInstance, resolveForHost, publicInstanceInfo, secretOf, secretSuffix, instanceEnv } = await import('../../functions/_lib/instance.js');
+const { onRequest: middleware } = await import('../../functions/api/_middleware.js');
 const { onRequestGet: news } = await import('../../functions/api/news/[slug].js');
 const { onRequestPost: newsletterGenerate } = await import('../../functions/api/newsletter/generate.js');
 const { onRequestPost: newsletterPost } = await import('../../functions/api/newsletter/post.js');
-const { parseInstanceConfig } = createRequire(import.meta.url)('../instances/instanceConfig.cjs');
+const { buildRegistry, parseInstanceConfig } = createRequire(import.meta.url)('../instances/instanceConfig.cjs');
 
 let ko = 0;
 const check = (label, got, want) => {
@@ -91,7 +93,7 @@ const pick = (i) => ({ slug: i.slug, label: i.label, readOnly: i.readOnly });
 check('no registry: defaults', resolveInstance({}), {
   slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false,
   grist: { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null },
-  features: { news: true, newsletter: true }, admins: [], openalexMailto: null, fromRegistry: false,
+  features: { news: true, newsletter: true }, admins: [], openalexMailto: null, fromRegistry: false, shared: false,
 });
 check('no registry: demo variables', pick(resolveInstance({ DRUID_INSTANCE: 'demo', INSTANCE_LABEL: 'Université de Démonstration', READ_ONLY: 'TRUE' })),
   { slug: 'demo', label: 'Université de Démonstration', readOnly: true });
@@ -146,6 +148,34 @@ const blank = resolveInstance({ INSTANCE_LABEL: '', READ_ONLY: ' ', ADMIN_EMAILS
 check('registry + empty variables: registry kept', [blank.label, blank.readOnly, blank.admins, blank.grist.docId], ['École fictive', false, ['admin@example.org'], 'docEcole0001']);
 check('registry: features not overridable by the slug', resolveInstance({ DRUID_INSTANCE: 'centrale' }, demoReg).features, { news: false, newsletter: false });
 
+// Host resolution: single and shared deployments (lot 6 b)
+const demo2Reg = parseInstanceConfig({ ...demoRaw, slug: 'demo-2', label: 'Démo 2', domains: ['demo-2.example.org'],
+  grist: { docId: 'docDemo20002', publicRead: true } }).config;
+const multiReg = buildRegistry([demoReg, demo2Reg], { mode: 'multi' }).registry;
+const singleReg = buildRegistry([privReg], { mode: 'single' }).registry;
+check('shared: each host gets its instance',
+  [resolveForHost('druid-demo.pages.dev', {}, multiReg)?.slug, resolveForHost('DEMO-2.example.org.', {}, multiReg)?.slug], ['demo', 'demo-2']);
+check('shared: unknown host gets no instance', resolveForHost('other.example.org', {}, multiReg), null);
+check('shared: object keys are not hosts', [resolveForHost('__proto__', {}, multiReg), resolveForHost('constructor', {}, multiReg)], [null, null]);
+const d2 = resolveForHost('demo-2.example.org', {
+  INSTANCE_LABEL: 'X', READ_ONLY: 'false', VITE_GRIST_DOC_ID: 'docOther0001', ADMIN_EMAILS: 'a@example.org', DRUID_INSTANCE: 'centrale',
+}, multiReg);
+check('shared: variables override nothing', [d2.slug, d2.label, d2.readOnly, d2.grist.docId, d2.admins, d2.shared],
+  ['demo-2', 'Démo 2', true, 'docDemo20002', [], true]);
+check('single: every host serves the instance, variables still override',
+  [resolveForHost('branch.druid-school.pages.dev', {}, singleReg).slug, resolveForHost('any.host', { INSTANCE_LABEL: 'Y' }, singleReg).label, resolveForHost('x', {}, singleReg).shared],
+  ['ecole', 'Y', false]);
+check('no registry: any host, from the variables', resolveForHost('x', { DRUID_INSTANCE: 'demo' }, null).slug, 'demo');
+
+// Secrets per instance
+check('secretSuffix', secretSuffix('demo-2'), 'DEMO_2');
+check('shared: own secret only, never the common one',
+  [secretOf({ GRIST_API_KEY: 'common', GRIST_API_KEY__DEMO_2: 'k2' }, d2, 'GRIST_API_KEY'), secretOf({ GRIST_API_KEY: 'common' }, d2, 'GRIST_API_KEY')], ['k2', undefined]);
+check('single: own secret, then the plain one',
+  [secretOf({ GRIST_API_KEY: 'common', GRIST_API_KEY__ECOLE: 'ke' }, ecole, 'GRIST_API_KEY'), secretOf({ GRIST_API_KEY: 'common' }, ecole, 'GRIST_API_KEY')], ['ke', 'common']);
+const d2env = instanceEnv({ GRIST_API_KEY: 'common', ILAAS_API_KEY__DEMO_2: 'i2', ILAAS_MODEL: 'm' }, d2);
+check('instanceEnv on a shared deployment', [d2env.GRIST_API_KEY, d2env.ILAAS_API_KEY, d2env.ILAAS_MODEL], [undefined, 'i2', 'm']);
+
 // Handlers (no network: fetch is stubbed and records the upstream call)
 let upstream = null;
 globalThis.fetch = async (url, init) => { upstream = { url: String(url), init }; return new Response('{"records":[]}', { status: 200 }); };
@@ -176,6 +206,35 @@ check('proxy Centrale without key: still a configuration error', r.status, 500);
 upstream = null;
 r = await proxy('GET', `docs/${DOC}/tables/Annuaire/records`, { VITE_GRIST_DOC_ID: DOC, GRIST_API_KEY: 'k' });
 check('proxy Centrale with key: Authorization sent', upstream?.init.headers.Authorization, 'Bearer k');
+
+// Shared deployment: the middleware hands the host's instance to the handlers (context.data)
+{
+  let nextCalled = false;
+  const c = { request: req('/api/me'), env: { DRUID_INSTANCE: 'demo' }, data: {}, next: async () => { nextCalled = true; return new Response('next'); } };
+  await middleware(c);
+  check('middleware: instance handed to the handlers', [nextCalled, c.data.instance?.slug], [true, 'demo']);
+}
+const sharedCall = (handler, host, path, instance, env, init = {}, params = {}) =>
+  handler({ request: new Request(`https://${host}${path}`, init), env, params, data: { instance } });
+const ecoleShared = resolveInstance({}, privReg, { shared: true });
+const meD2 = await asJson(await sharedCall(me, 'demo-2.example.org', '/api/me', d2, { ADMIN_EMAILS: 'a@x.fr' }));
+check('shared /api/me: instance block of the host', [meD2.body.instance.slug, meD2.body.instance.gristDocId, meD2.body.capabilities.READ_ONLY], ['demo-2', 'docDemo20002', true]);
+const gp = (instance, method, path, env, init = {}) => sharedCall(gristProxy, 'h.example.org', `/api/grist/${path}`, instance, env,
+  { method, ...init }, { path: path.split('/') });
+upstream = null;
+r = await gp(d2, 'GET', 'docs/eXbcyqzLmE1tsRo12WjGyY/tables/Annuaire/records', { GRIST_API_KEY: 'common' });
+check('shared proxy: the doc of another instance is refused', [r.status, upstream], [403, null]);
+r = await gp(d2, 'GET', 'docs/docDemo20002/tables/Annuaire/records', { GRIST_API_KEY: 'common' });
+check('shared proxy: own public doc read without the common key', [r.status, upstream?.init.headers.Authorization, upstream?.init.headers['User-Agent']],
+  [200, undefined, 'Druid-CRISalid-demo-2/1.0']);
+const accessId = { 'Cf-Access-Authenticated-User-Email': 'a@example.org' };
+r = await gp(ecoleShared, 'PATCH', 'docs/docEcole0001/tables/Annuaire/records', { GRIST_API_KEY: 'common' }, { headers: accessId, body: '{"records":[]}' });
+check('shared proxy: writable instance without its own key → configuration error', r.status, 500);
+upstream = null;
+r = await gp(ecoleShared, 'PATCH', 'docs/docEcole0001/tables/Annuaire/records', { GRIST_API_KEY: 'common', GRIST_API_KEY__ECOLE: 'ke' }, { headers: accessId, body: '{"records":[]}' });
+check('shared proxy: own key sent', [r.status, upstream?.init.headers.Authorization], [200, 'Bearer ke']);
+r = await gp(ecoleShared, 'PATCH', 'docs/docEcole0001/tables/Annuaire/records', { GRIST_API_KEY__ECOLE: 'ke', ALLOW_ANONYMOUS_WRITES: 'true' }, { body: '{"records":[]}' });
+check('shared proxy: ALLOW_ANONYMOUS_WRITES ignored', r.status, 403);
 
 // Centrale-only routes answer 404 on another instance (no upstream call)
 upstream = null;

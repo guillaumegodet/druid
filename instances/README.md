@@ -67,6 +67,25 @@ names each one found (« repeats instance.json » or « overrides instance.json 
 moving its value into `instance.json` when it differs. Without `instance.json` (instance not migrated yet), they
 remain the only source, with the historical defaults (Centrale).
 
+## Shared deployment (prototype, lot 6 of docs/plan-architecture-multi-instances.md)
+
+One Pages project can serve several instances: set `DRUID_INSTANCES=<slug>,<slug>` instead of
+`DRUID_INSTANCE`. The build validates every `instance.json` (required), refuses a domain claimed by two
+instances and generates `functions/_generated/registry.js` in mode `multi`; the Functions then pick the
+instance whose `domains` list the request host (`functions/api/_middleware.js`) and answer **404 for any
+other host** — the front shows « No Druid instance is declared for this address ». On such a deployment:
+
+- no variable overrides an instance (settings come only from `instance.json`);
+- secrets are per instance, `<NAME>__<SLUG>` with the slug upper-cased and `-` → `_`
+  (`GRIST_API_KEY__DEMO_2`); the plain `GRIST_API_KEY` is never used, so an instance without its own key
+  cannot borrow another's;
+- nothing instance-specific is built into the bundle or copied into `public/` (a file there is served on
+  every host): the dashboard exports and alignment caches of the single-instance projects are not
+  available yet (lot 6 D5, and `plan-alignement-cloudflare.md` for the caches);
+- `ALLOW_ANONYMOUS_WRITES` is ignored.
+
+Every domain of every instance must also be attached to the Pages project (Custom domains).
+
 `/api/news/*` and `/api/newsletter/*` hold Centrale structures and staff filters in their code:
 they answer 404 unless `features.news` / `features.newsletter` is true in `instance.json` (without
 `instance.json`: Centrale only).
