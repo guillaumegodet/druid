@@ -106,8 +106,8 @@ if (registry) {
     + Object.entries(viteEnv).map(([k, v]) => `${k}=${v}`).join('\n') + '\n');
   console.log(`[prepare-cloudflare-assets] .env.production.local: ${Object.keys(viteEnv).join(', ')}`);
   for (const { name, status, detail } of compareEnvWithConfig(registry, process.env)) {
-    if (status === 'same') console.log(`[prepare-cloudflare-assets] Pages variable ${name} repeats instance.json (keep it until lot 5 f: the Functions still read it)`);
-    else console.warn(`[prepare-cloudflare-assets] Pages variable ${name} overrides instance.json${detail}`);
+    if (status === 'same') console.warn(`[prepare-cloudflare-assets] Pages variable ${name} repeats instance.json: remove it from the Pages dashboard`);
+    else console.warn(`[prepare-cloudflare-assets] Pages variable ${name} overrides instance.json${detail}: move its value into instance.json, then remove it`);
   }
 }
 // No Qualinka cache: the Cloudflare instances have no Qualinka engine (HAS_QUALINKA false), their

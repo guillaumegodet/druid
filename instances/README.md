@@ -11,7 +11,7 @@ time with the `INSTANCES_REPO_TOKEN` secret when `instances/<slug>/` is absent h
 | Instance | Folder | Access | Grist writes |
 | --- | --- | --- | --- |
 | Centrale Nantes | `centrale/` of `guillaumegodet/druid-instances` (private: real PII) | Cloudflare Access | yes, with an Access identity |
-| Public demo | `demo/` (fictitious data, see its README) | public | no (`READ_ONLY=true`) |
+| Public demo | `demo/` (fictitious data, see its README) | public | no (`readOnly` in its `instance.json`) |
 
 ## Instance registry: `instance.json`
 
@@ -39,30 +39,33 @@ build, the previous deployment stays online) and generates:
 
 The Functions read that generated config (`functions/_lib/instance.js`, lot 5 c): label, read-only mode,
 status/validation capability, Grist doc and API base, admins, OpenAlex contact and the `news`/`newsletter`
-features all come from `instance.json`. A Pages variable, when present and non-empty, still wins field by field
-(Vite also gives real environment variables priority over `.env` files); the build log lists the variables that
-repeat `instance.json` or override it. They can be removed from the dashboard in lot 5 f; without
-`instance.json`, the Functions keep the historical defaults below.
+features all come from `instance.json`. **Any change of these settings goes through `instance.json`** (a commit
+here for the demo, in `druid-instances` for the others), then a new build.
 
 ## Variables of a Pages project
 
-Pages exposes the same variables to the build and to the Functions (`functions/`).
+Pages exposes the same variables to the build and to the Functions (`functions/`). Since lot 5 f, a project only
+holds the instance slug and the secrets its `instance.json` lists (`secrets`), in both its Production and
+Preview environments:
 
 | Variable | Used by | Centrale | Demo |
 | --- | --- | --- | --- |
-| `DRUID_INSTANCE` | build (assets), Functions | unset (= `centrale`) | `demo` |
-| `INSTANCE_LABEL` | `/api/me` (anonymous user name) | unset (= « Centrale Nantes ») | display name of the demo |
-| `READ_ONLY` | `/api/me` (capability, no admin), Grist proxy (403 on writes) | unset | `true` |
-| `VITE_GRIST_DOC_ID` | build, Grist proxy (only proxied doc), news/newsletter | Centrale doc | demo doc (public read) |
-| `VITE_GRIST_PUBLIC_BASE_URL` | build (`lib/gristService.ts`, `lib/readOnly.ts`) | unset (reads through `/api/grist`) | `https://grist.numerique.gouv.fr/api`: the browser reads the public doc directly, no Functions request. **Never on a writable instance** |
+| `DRUID_INSTANCE` | build (instance folder), Functions | `centrale` (default when unset) | `demo` |
 | `GRIST_API_KEY` (secret) | Grist proxy, news/newsletter | required | **unset**: the public doc is read anonymously |
-| `ADMIN_EMAILS` | `/api/me` | admin e-mails | ignored when `READ_ONLY=true` |
-| `SHOW_STATUS_VALIDATION` | `/api/me` | unset | unset |
 | `INSTANCES_REPO_TOKEN` (secret) | build: clone of the private instances repository | fine-grained token, read-only Contents on `druid-instances` | unset (data in this repository) |
-| `INSTANCES_REPO` | build | unset (= `guillaumegodet/druid-instances`) | unset |
 | `ILAAS_API_KEY` (secret) | collab-theme, newsletter | set | **unset**: a public site without Access would expose the LLM quota |
-| `OPENALEX_API_KEY` | news, newsletter | set | unset |
-| `OPENALEX_MAILTO` | news, newsletter (OpenAlex polite pool) | unset (= `bu-science-ouverte@univ-nantes.fr`) | unset |
+| `OPENALEX_API_KEY` (secret) | news, newsletter | set | unset |
+
+Optional technical variables, not described by the registry: `INSTANCES_REPO` (default
+`guillaumegodet/druid-instances`), `ILAAS_API_BASE`, `ILAAS_MODEL`, and `ALLOW_ANONYMOUS_WRITES=true` for local
+`wrangler pages dev` only.
+
+**Overrides (transition only).** These variables are still honoured, field by field, when present and non-empty,
+and win over `instance.json`: `INSTANCE_LABEL`, `READ_ONLY`, `SHOW_STATUS_VALIDATION`, `VITE_GRIST_DOC_ID`,
+`GRIST_DOC_ID`, `VITE_GRIST_PUBLIC_BASE_URL`, `GRIST_API_BASE`, `ADMIN_EMAILS`, `OPENALEX_MAILTO`. The build log
+names each one found (« repeats instance.json » or « overrides instance.json »): remove it from the dashboard, after
+moving its value into `instance.json` when it differs. Without `instance.json` (instance not migrated yet), they
+remain the only source, with the historical defaults (Centrale).
 
 `/api/news/*` and `/api/newsletter/*` hold Centrale structures and staff filters in their code:
 they answer 404 unless `features.news` / `features.newsletter` is true in `instance.json` (without
