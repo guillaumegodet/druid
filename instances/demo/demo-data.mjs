@@ -12,6 +12,8 @@
 // Deterministic (seeded generator): two runs produce the same records.
 // Run directly, prints the researchers as JSON (input of gen_demo_dashboards.py):
 //   node instances/demo/demo-data.mjs > /tmp/demo-people.json
+// The generator (buildResearchersFor) is shared with the other fictitious instances
+// (instances/demo-2/demo-data.mjs): each one passes its own universe (labs, seed, id range, domains).
 
 import { pathToFileURL } from 'node:url';
 
@@ -88,7 +90,7 @@ export const fakePpn = (n) => {
 };
 
 const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-export const fakeIdHal = (first, last) => `demo-${slug(first)}-${slug(last)}`;
+export const fakeIdHal = (first, last, prefix = 'demo') => `${prefix}-${slug(first)}-${slug(last)}`;
 export const fakeOpenAlex = (n) => `A${String(n).padStart(10, '0')}`;
 
 // ── Fictitious profile photos ────────────────────────────────────────────────
@@ -141,7 +143,7 @@ const FIRST_M = ['Julien', 'Maxime', 'Karim', 'Bastien', 'Antoine', 'Romain', 'Y
 const LAST = ['Arnaud', 'Barbier', 'Carpentier', 'Delmas', 'Esnault', 'Fournier', 'Gauthier', 'Hamon', 'Jacquet', 'Kerbrat', 'Laurent', 'Mallet', 'Noël', 'Ollivier', 'Pasquier', 'Quéré', 'Renaud', 'Sabatier', 'Tessier', 'Vidal', 'Weber', 'Boucher', 'Colas', 'Duval', 'Évrard', 'Ferrand', 'Guérin', 'Huet', 'Jourdan', 'Leclerc', 'Masson', 'Poirier', 'Riviere', 'Simon', 'Texier', 'Vasseur', 'Aubert', 'Bertin', 'Charpentier', 'Dumont'];
 
 /** Composition of each lab/team: [LABO, team, campus, grades drawn from]. */
-const UNITS = [
+const DEMO_UNITS = [
   { labo: 'LIRA', team: 'IA-Démo', campus: 'Campus UDémo', count: 8 },
   { labo: 'LIRA', team: 'Net-Démo', campus: 'Campus UDémo', count: 7 },
   { labo: 'BIOS', team: 'Gen-Démo', campus: 'Campus Santé', count: 7 },
@@ -164,7 +166,7 @@ const GRADES = [
  * One researcher. Identifier coverage is controlled by `ids` (subset of orcid/idref/idhal/openalex)
  * so that the alignment view has records to complete.
  */
-const person = ({ n, first, last, civ, birth, grade, typeEmploi, employer, hdr, hdrYear = '', labo, team = '', campus,
+const person = (u, { n, first, last, civ, birth, grade, typeEmploi, employer, hdr, hdrYear = '', labo, team = '', campus,
   start, end = '', affEnd = '', ids = ['orcid', 'idref', 'idhal', 'openalex'], ed = '', groupes = '' }) => {
   const uid = `${slug(last).replace(/-/g, '')}-${slug(first)[0]}`;
   return {
@@ -172,7 +174,7 @@ const person = ({ n, first, last, civ, birth, grade, typeEmploi, employer, hdr, 
     Nom: last,
     Prenom: first,
     Civilite: civ,
-    Email: `${uid}@udemo.example.org`,
+    Email: `${uid}@${u.emailDomain}`,
     Nationalite: 'Française',
     DATE_DE_NAISSANCE_JJ_MM_AAAA: birth,
     Corps_grade: grade,
@@ -191,18 +193,18 @@ const person = ({ n, first, last, civ, birth, grade, typeEmploi, employer, hdr, 
     membership_type: 'stat_mmb',
     ORCID: ids.includes('orcid') ? fakeOrcid(n) : '',
     IdRef: ids.includes('idref') ? fakePpn(n) : '',
-    IdHAL: ids.includes('idhal') ? fakeIdHal(first, last) : '',
+    IdHAL: ids.includes('idhal') ? fakeIdHal(first, last, u.idhalPrefix) : '',
     openalex_author_id: ids.includes('openalex') ? fakeOpenAlex(n) : '',
     // Reviewed list read by the alignment view (multi-valued target, pipe-separated).
     OpenAlex_ids: ids.includes('openalex') ? fakeOpenAlex(n) : '',
     groupes,
-    annuaire_url: `https://example.org/udemo/annuaire/${uid}`,
+    annuaire_url: `${u.annuaireBase}/${uid}`,
     photo_url: fakePhotoUrl(uid, civ, birth),
   };
 };
 
 /** The 14 researchers of the former demo, kept for continuity (same names, labs, grades). */
-const CORE = [
+const DEMO_CORE = [
   { first: 'Camille', last: 'Roussel', civ: 'F', birth: '1974-04-12', grade: 'PR', hdr: true, hdrYear: '2008', labo: 'LIRA', team: 'IA-Démo', start: '2006-09-01' },
   { first: 'Hugo', last: 'Lefèvre', civ: 'M', birth: '1985-01-30', grade: 'MCF', labo: 'LIRA', team: 'IA-Démo', start: '2014-09-01' },
   { first: 'Inês', last: 'Da Silva', civ: 'F', birth: '1989-06-08', grade: 'CR', employer: 'CNR', labo: 'LIRA', team: 'IA-Démo', start: '2017-01-01' },
@@ -221,7 +223,7 @@ const CORE = [
 ];
 
 /** Cases the demo must show: emeritus, departure, imprecise dates, researcher with no identifier. */
-const SPECIAL = [
+const DEMO_SPECIAL = [
   { first: 'Gérard', last: 'Lambert', civ: 'M', birth: '1950-02-11', grade: 'PREM', typeEmploi: 'EMERITE', hdr: true, hdrYear: '1988', labo: 'LMD', start: '1985-09-01' },
   { first: 'Odile', last: 'Perrin', civ: 'F', birth: '1962-06-30', grade: 'MCF', labo: 'BIOS', team: 'Gen-Démo', start: '1995-09-01', end: '2024-08-31', affEnd: '2024-08-31' },
   { first: 'Nicolas', last: 'Brunet', civ: 'M', birth: '1991-04-03', grade: 'Post-doc', typeEmploi: 'CDD UNIVERSITE', labo: 'LIRA', team: 'IA-Démo', start: '2024', ids: [] },
@@ -230,26 +232,43 @@ const SPECIAL = [
 
 const defaultsFor = (grade) => GRADES.find((g) => g.grade === grade) || GRADES[1];
 
-/** All researchers (Annuaire rows before the Employeur reference is resolved). */
-export const buildResearchers = () => {
+/**
+ * Universe of the demo: who works where, and the ranges that keep its identifiers apart from
+ * the other fictitious instances (firstNumber feeds the ORCID / PPN / OpenAlex numbers).
+ */
+const DEMO = {
+  core: DEMO_CORE,
+  special: DEMO_SPECIAL,
+  units: DEMO_UNITS,
+  seed: 20260924,
+  firstNumber: 1,
+  emailDomain: 'udemo.example.org',
+  idhalPrefix: 'demo',
+  annuaireBase: 'https://example.org/udemo/annuaire',
+  campusFor: (labo) => (labo === 'BIOS' ? 'Campus Santé' : 'Campus UDémo'),
+  doctoralSchool: 'ED Démo-STIC',
+};
+
+/** All researchers of a universe (Annuaire rows before the Employeur reference is resolved). */
+export const buildResearchersFor = (u) => {
   const out = [];
-  let n = 1;
+  let n = u.firstNumber;
   const add = (p) => {
     const d = defaultsFor(p.grade);
-    const campus = p.campus || (p.labo === 'BIOS' ? 'Campus Santé' : 'Campus UDémo');
-    out.push(person({
+    const campus = p.campus || u.campusFor(p.labo);
+    out.push(person(u, {
       n: n++, typeEmploi: d.typeEmploi, employer: d.employer, hdr: false, campus,
-      ed: p.grade === 'Doctorant' ? 'ED Démo-STIC' : '', ...p,
+      ed: p.grade === 'Doctorant' ? u.doctoralSchool : '', ...p,
     }));
   };
-  CORE.forEach(add);
-  SPECIAL.forEach(add);
+  u.core.forEach(add);
+  u.special.forEach(add);
 
-  const rand = rng(20260924);
+  const rand = rng(u.seed);
   const pick = (arr) => arr[Math.floor(rand() * arr.length)];
   const weighted = GRADES.flatMap((g) => Array(g.weight).fill(g));
   const used = new Set(out.map((r) => `${r.Nom}|${r.Prenom}`));
-  for (const unit of UNITS) {
+  for (const unit of u.units) {
     for (let i = 0; i < unit.count; i++) {
       const g = pick(weighted);
       const civ = rand() < 0.5 ? 'F' : 'M';
@@ -275,6 +294,9 @@ export const buildResearchers = () => {
   }
   return out;
 };
+
+/** All researchers of the demo. */
+export const buildResearchers = () => buildResearchersFor(DEMO);
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   process.stdout.write(JSON.stringify(buildResearchers(), null, 1) + '\n');

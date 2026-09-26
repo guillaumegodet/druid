@@ -8,7 +8,7 @@ labs LIRA / BIOS / LMD, teams IA-Démo / Net-Démo / Gen-Démo.
 | --- | --- |
 | `demo-data.mjs` | Fictitious researchers (54), structures (13), institutions (3). ORCID and IdRef ids have a deliberately wrong check character, IdHAL are prefixed `demo-`, OpenAlex ids are `A00000…`, e-mails under `example.org`: nothing can point to a real person. Deterministic. |
 | `schema.json` | Snapshot of the Centrale doc schema (2026-09-24): tables, column types, formulas — no data. |
-| `build_demo_grist.mjs` | Creates or refreshes the Grist doc from the two files above (dry run by default). |
+| `build_demo_grist.mjs` | Creates or refreshes the Grist doc from the two files above (dry run by default); `--instance demo-2` does the same for `../demo-2/`. |
 | `gen_demo_dashboards.py` + `country_names.json` | Writes `dashboard-data/`: fictitious dashboards (udemo, lira, bios, lmd) whose members are the researchers above, `news.json` per structure (« Veille » tab), `mentions.json` (« Médias » panel), `index.json` (Benchmark hidden). |
 | `gen_demo_align_caches.mjs` | Writes `demo-*_cache.json`: fictitious candidates for the researchers missing an identifier (unified alignment view, search mode). |
 

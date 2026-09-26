@@ -1,0 +1,17 @@
+{
+  "slug": "demo-2",
+  "label": "École d'Ingénieurs de Démonstration",
+  "target": "cloudflare",
+  "domains": ["demo-2.dirladata.fr"],
+  "access": "public",
+  "readOnly": true,
+  "grist": {
+    "docId": "7LPh1eN5pL8UqSx7osVrwD",
+    "publicRead": true
+  },
+  "capabilities": { "HAS_STATUS_VALIDATION": false },
+  "features": { "news": false, "newsletter": false },
+  "admins": [],
+  "openalexMailto": null,
+  "secrets": []
+}

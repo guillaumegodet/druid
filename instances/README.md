@@ -12,6 +12,7 @@ time with the `INSTANCES_REPO_TOKEN` secret when `instances/<slug>/` is absent h
 | --- | --- | --- | --- |
 | Centrale Nantes | `centrale/` of `guillaumegodet/druid-instances` (private: real PII) | Cloudflare Access | yes, with an Access identity |
 | Public demo | `demo/` (fictitious data, see its README) | public | no (`readOnly` in its `instance.json`) |
+| Second demo (shared deployment prototype) | `demo-2/` (fictitious data, see its README) | public | no |
 
 ## Instance registry: `instance.json`
 
