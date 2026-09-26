@@ -7,7 +7,8 @@
 //  - ORCID and IdRef identifiers built with a deliberately WRONG check character, so they can
 //    never resolve to a real record;
 //  - IdHAL prefixed `demo-`, OpenAlex ids `A00000…` (outside the range OpenAlex assigns);
-//  - no Scopus id.
+//  - no Scopus id;
+//  - profile photos are generated illustrations (see fakePhotoUrl).
 // Deterministic (seeded generator): two runs produce the same records.
 // Run directly, prints the researchers as JSON (input of gen_demo_dashboards.py):
 //   node instances/demo/demo-data.mjs > /tmp/demo-people.json
@@ -90,6 +91,41 @@ const slug = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().rep
 export const fakeIdHal = (first, last) => `demo-${slug(first)}-${slug(last)}`;
 export const fakeOpenAlex = (n) => `A${String(n).padStart(10, '0')}`;
 
+// ── Fictitious profile photos ────────────────────────────────────────────────
+
+// Illustrated avatars (DiceBear « avataaars », free for commercial use), seeded by uid_dyna so each
+// researcher keeps the same face. Options keep them sober and consistent with the record: natural
+// skin and hair tones, hairstyle and facial hair by civility, grey hair for those born before 1965.
+const AVATAR_BASE = 'https://api.dicebear.com/9.x/avataaars/svg';
+const AVATAR_COMMON = {
+  backgroundColor: 'e8e1d3,d6e4ea,e6d9e8,dde8d6',
+  skinColor: '614335,ae5d29,d08b5b,edb98a,ffdbb4',
+  clothing: 'blazerAndShirt,blazerAndSweater,collarAndSweater,shirtCrewNeck,shirtVNeck',
+  clothesColor: '262e33,3c4f5c,25557c,5199e4,929598,e6e6e6',
+  hatColor: '262e33,3c4f5c,25557c,929598',
+  mouth: 'default,smile,twinkle,serious',
+  eyes: 'default,happy,side,squint',
+  eyebrows: 'default,defaultNatural,raisedExcitedNatural,upDownNatural,flatNatural',
+  accessoriesProbability: '25',
+  accessories: 'prescription01,prescription02,round',
+  accessoriesColor: '262e33,3c4f5c',
+};
+const AVATAR_BY_CIV = {
+  F: { top: 'bigHair,bob,bun,curly,curvy,frida,longButNotTooLong,miaWallace,straight01,straight02,straightAndStrand,fro,hijab', facialHairProbability: '0' },
+  M: {
+    top: 'shortFlat,shortRound,shortWaved,shortCurly,sides,theCaesar,theCaesarAndSidePart,dreads01,frizzle',
+    facialHairProbability: '35', facialHair: 'beardLight,beardMedium,moustacheFancy', facialHairColor: '2c1b18,4a312c,724133,a55728',
+  },
+};
+export const fakePhotoUrl = (uid, civ, birth) => {
+  const grey = Number(String(birth).slice(0, 4)) < 1965;
+  const params = new URLSearchParams({
+    seed: uid, ...AVATAR_COMMON, ...(AVATAR_BY_CIV[civ] || AVATAR_BY_CIV.M),
+    hairColor: grey ? 'e8e1e1,d6d6d6' : '2c1b18,4a312c,724133,a55728,b58143,d6b370',
+  });
+  return `${AVATAR_BASE}?${params.toString().replace(/%2C/g, ',')}`;
+};
+
 // ── Researchers ──────────────────────────────────────────────────────────────
 
 /** Deterministic PRNG (mulberry32). */
@@ -161,6 +197,7 @@ const person = ({ n, first, last, civ, birth, grade, typeEmploi, employer, hdr, 
     OpenAlex_ids: ids.includes('openalex') ? fakeOpenAlex(n) : '',
     groupes,
     annuaire_url: `https://example.org/udemo/annuaire/${uid}`,
+    photo_url: fakePhotoUrl(uid, civ, birth),
   };
 };
 
