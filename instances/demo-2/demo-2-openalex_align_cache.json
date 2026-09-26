@@ -1,0 +1,658 @@
+{
+ "caron-e": {
+  "mode": "search",
+  "queryName": "CARON Emma",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "not_found",
+  "best": [],
+  "candidates": []
+ },
+ "maillard-i": {
+  "mode": "search",
+  "queryName": "MAILLARD Inès",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001008"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001008",
+    "fullName": "Inès Maillard",
+    "forms": [
+     "Inès Maillard"
+    ],
+    "worksCount": 30,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "30 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "kerbrat-k": {
+  "mode": "search",
+  "queryName": "KERBRAT Karim",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001010"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001010",
+    "fullName": "Karim Kerbrat",
+    "forms": [
+     "Karim Kerbrat"
+    ],
+    "worksCount": 32,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "32 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "carpentier-q": {
+  "mode": "search",
+  "queryName": "CARPENTIER Quentin",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001012"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001012",
+    "fullName": "Quentin Carpentier",
+    "forms": [
+     "Quentin Carpentier"
+    ],
+    "worksCount": 34,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "34 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "quere-s": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Samuel",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000001013",
+    "fullName": "Samuel Quéré",
+    "forms": [
+     "Samuel Quéré"
+    ],
+    "worksCount": 35,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "35 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000001513",
+    "fullName": "Samuel Quéré",
+    "forms": [
+     "Samuel Quéré"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "guerin-b": {
+  "mode": "search",
+  "queryName": "GUÉRIN Bastien",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001015"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001015",
+    "fullName": "Bastien Guérin",
+    "forms": [
+     "Bastien Guérin"
+    ],
+    "worksCount": 37,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "37 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "quere-p": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Pauline",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001016"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001016",
+    "fullName": "Pauline Quéré",
+    "forms": [
+     "Pauline Quéré"
+    ],
+    "worksCount": 38,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "38 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "gauthier-r": {
+  "mode": "search",
+  "queryName": "GAUTHIER Rémi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000001017",
+    "fullName": "Rémi Gauthier",
+    "forms": [
+     "Rémi Gauthier"
+    ],
+    "worksCount": 39,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "39 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000001517",
+    "fullName": "Rémi Gauthier",
+    "forms": [
+     "Rémi Gauthier"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "riviere-s": {
+  "mode": "search",
+  "queryName": "RIVIERE Salomé",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001018"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001018",
+    "fullName": "Salomé Riviere",
+    "forms": [
+     "Salomé Riviere"
+    ],
+    "worksCount": 40,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "40 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "renaud-a": {
+  "mode": "search",
+  "queryName": "RENAUD Antoine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001019"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001019",
+    "fullName": "Antoine Renaud",
+    "forms": [
+     "Antoine Renaud"
+    ],
+    "worksCount": 41,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "41 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "duval-m": {
+  "mode": "search",
+  "queryName": "DUVAL Maëlle",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001020"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001020",
+    "fullName": "Maëlle Duval",
+    "forms": [
+     "Maëlle Duval"
+    ],
+    "worksCount": 12,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "12 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "gauthier-m": {
+  "mode": "search",
+  "queryName": "GAUTHIER Maxime",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "not_found",
+  "best": [],
+  "candidates": []
+ },
+ "poirier-r": {
+  "mode": "search",
+  "queryName": "POIRIER Rania",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001024"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001024",
+    "fullName": "Rania Poirier",
+    "forms": [
+     "Rania Poirier"
+    ],
+    "worksCount": 16,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "16 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "jacquet-l": {
+  "mode": "search",
+  "queryName": "JACQUET Laure",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "ambiguous",
+  "best": [],
+  "candidates": [
+   {
+    "id": "A0000001025",
+    "fullName": "Laure Jacquet",
+    "forms": [
+     "Laure Jacquet"
+    ],
+    "worksCount": 17,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "moyen",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "17 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "id": "A0000001525",
+    "fullName": "Laure Jacquet",
+    "forms": [
+     "Laure Jacquet"
+    ],
+    "worksCount": 3,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "faible",
+    "evidence": [
+     "3 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "dumont-y": {
+  "mode": "search",
+  "queryName": "DUMONT Yann",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "direct": [],
+  "derivedFrom": [],
+  "ikg": false,
+  "refSource": "none",
+  "refDois": 0,
+  "netError": false,
+  "status": "found",
+  "best": [
+   "A0000001026"
+  ],
+  "candidates": [
+   {
+    "id": "A0000001026",
+    "fullName": "Yann Dumont",
+    "forms": [
+     "Yann Dumont"
+    ],
+    "worksCount": 18,
+    "orcid": "",
+    "affiliations": [
+     "École d'Ingénieurs de Démonstration (2016–2026)"
+    ],
+    "origins": [
+     "name"
+    ],
+    "ikgRefs": 0,
+    "sharedDois": 0,
+    "doisChecked": false,
+    "score": "fort",
+    "evidence": [
+     "affiliation École d'Ingénieurs de Démonstration (2016–2026)",
+     "18 works"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ }
+}

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fictitious bibliometric dashboards of the public demo instance.
+"""Fictitious bibliometric dashboards of the fictitious instances (demo, demo-2).
 
 docs/plan-instance-demo-cloudflare.md, lot A4. The demo runs on Cloudflare Pages without the
 druid-biblio backend: /api/dashboard/:slug/publications does not exist and the frontend reads
@@ -18,6 +18,10 @@ DOIs under the 10.5555 test prefix, partners, funders, media). Seeded: a rebuild
 Usage (no node on the host: the researchers are exported by a node container):
   docker run --rm -v "$PWD":/app -w /app node:20-slim node instances/demo/demo-data.mjs > /tmp/demo-people.json
   python3 instances/demo/gen_demo_dashboards.py /tmp/demo-people.json
+The second demo (docs/plan-architecture-multi-instances.md, lot 6) has its own universe (UNIVERSES):
+  docker run --rm -v "$PWD":/app -w /app node:20-slim node instances/demo-2/demo-data.mjs > /tmp/demo-2-people.json
+  python3 instances/demo/gen_demo_dashboards.py --instance demo-2 /tmp/demo-2-people.json
+It writes instances/<instance>/dashboard-data/.
 Adapted from scripts/gen_demo_dashboards.py of the former demo fork (guillaumegodet/Druid).
 """
 import json
@@ -26,10 +30,7 @@ import random
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-OUT = os.path.join(HERE, "dashboard-data")
 COUNTRY_NAMES = json.load(open(os.path.join(HERE, "country_names.json"), encoding="utf-8"))
-
-random.seed(20260708)
 
 # ── Vocabulary: the aggregators map exact strings, so these are the real corpus values ──
 PUB_TYPES = [
@@ -77,11 +78,9 @@ NAT_PARTNERS = [
     ("Université Témoin de Strasbourg", "Strasbourg", 48.5734, 7.7521),
 ]
 
-EMPLOYERS = {1: "UNIVERSITÉ DE DÉMONSTRATION", 2: "ENS-DÉMO", 3: "CNRD"}
-EMPLOYER_BY_KEY = {"UNIV": EMPLOYERS[1], "ENS": EMPLOYERS[2], "CNR": EMPLOYERS[3]}
 TODAY = "2026-09-24"
 
-LABS = {
+DEMO_LABS = {
     "lira": {
         "acronym": "LIRA", "name": "Laboratoire d'Informatique et Réseaux Appliqués", "etpr": 42,
         "axes": [
@@ -131,8 +130,60 @@ LABS = {
     },
 }
 
+DEMO2_LABS = {
+    "mecademo": {
+        "acronym": "MécaDémo", "name": "Laboratoire de Mécanique et Matériaux de Démonstration", "etpr": 24,
+        "axes": [
+            ("Matériaux composites", ["composite", "fibre", "fatigue"]),
+            ("Mécanique des fluides", ["écoulement", "turbulence", "aérodynamique"]),
+            ("Procédés de fabrication", ["fabrication additive", "usinage", "procédé"]),
+        ],
+        "domains": ["Physical Sciences"],
+        "subfields": ["Mechanics of Materials", "Fluid Flow and Transfer Processes",
+                      "Industrial and Manufacturing Engineering", "Materials Chemistry"],
+        "topics": ["Fatigue of composite structures", "Turbulent flow simulation",
+                   "Additive manufacturing processes", "Fibre-reinforced polymers"],
+        "journals": [("Journal of Fictional Mechanics", "2000-3001", "Demo Engineering Press"),
+                     ("Composite Structures (échantillon)", "2000-3002", "Sample Publishing"),
+                     ("Review of Demonstrative Fluid Dynamics", "2000-3003", "Mock Journals")],
+    },
+    "syndemo": {
+        "acronym": "SynDémo", "name": "Laboratoire des Systèmes Numériques de Démonstration", "etpr": 17,
+        "axes": [
+            ("Systèmes embarqués", ["embarqué", "temps réel", "capteur"]),
+            ("Jumeaux numériques", ["jumeau numérique", "simulation", "industrie"]),
+            ("Robotique", ["robot", "commande", "vision"]),
+        ],
+        "domains": ["Physical Sciences"],
+        "subfields": ["Control and Systems Engineering", "Hardware and Architecture",
+                      "Artificial Intelligence", "Industrial and Manufacturing Engineering"],
+        "topics": ["Real-time embedded systems", "Digital twins for manufacturing",
+                   "Robot motion planning", "Sensor networks"],
+        "journals": [("Journal of Fictional Embedded Systems", "2000-4001", "Demo Press"),
+                     ("Transactions on Sample Robotics", "2000-4002", "Example Publishing"),
+                     ("Digital Twin Review (démo)", "2000-4003", "Mock Journals")],
+    },
+}
+
+# One universe per fictitious instance: labs, publication volumes, employers of demo-data.mjs
+# (employerKey), aggregate structure and names used in signatures and media.
+UNIVERSES = {
+    "demo": {
+        "seed": 20260708, "labs": DEMO_LABS, "pub_count": {"lira": 148, "bios": 112, "lmd": 96},
+        "employers": {"UNIV": "UNIVERSITÉ DE DÉMONSTRATION", "ENS": "ENS-DÉMO", "CNR": "CNRD"},
+        "aggregate": {"slug": "udemo", "lab": "UDémo", "name": "Université de Démonstration"},
+    },
+    "demo-2": {
+        "seed": 20260926, "labs": DEMO2_LABS, "pub_count": {"mecademo": 84, "syndemo": 62},
+        "employers": {"UNIV": "ÉCOLE D'INGÉNIEURS DE DÉMONSTRATION", "ENS": "UNIVERSITÉ DE DÉMONSTRATION", "CNR": "CNRD"},
+        "aggregate": {"slug": "eidemo", "lab": "EIDémo", "name": "École d'Ingénieurs de Démonstration"},
+    },
+}
+# Universe being generated (set by main).
+U = UNIVERSES["demo"]
+LABS = U["labs"]
+
 YEAR_FROM, YEAR_TO = 2019, 2026
-PUB_COUNT = {"lira": 148, "bios": 112, "lmd": 96}
 
 
 def load_members(path):
@@ -146,7 +197,7 @@ def load_members(path):
             "team": r.get("team") or None,
             "isPhd": r["Corps_grade"] == "Doctorant",
             "type": "Titulaire" if r.get("TYPE_EMPLOI") in ("TITULAIRE", "EMERITE") else "Contractuel",
-            "employer": EMPLOYER_BY_KEY.get(r.get("employerKey"), ""),
+            "employer": U["employers"].get(r.get("employerKey"), ""),
             "departed": departed,
         })
         if r.get("team"):
@@ -214,7 +265,7 @@ def make_charte(modele, nu_seul):
     }
     score = round(sum(1 for v in crit.values() if v) / 5, 2)
     return {"score": score, "conforme": score >= 0.8, "nuSeul": nu_seul,
-            "signature": f"{modele}, Université de Démonstration, F-44000 Démoville, France",
+            "signature": f"{modele}, {U['aggregate']['name']}, F-44000 Démoville, France",
             "modele": modele, "criteres": crit}
 
 
@@ -384,7 +435,7 @@ def make_pub(lab_slug, cfg, lab_teams, member_ids, extra_ids, sibling_labs):
 def build_lab(slug, cfg, members, lab_teams, sibling_names):
     authors, member_out, effectifs, member_ids, extra_ids = build_authors(members)
     pubs = [make_pub(slug, cfg, lab_teams, member_ids, extra_ids, sibling_names)
-            for _ in range(PUB_COUNT[slug])]
+            for _ in range(U["pub_count"][slug])]
     return {
         "lab": cfg["acronym"], "name": cfg["name"], "slug": slug,
         "teamLabel": "équipe", "etpr": cfg["etpr"], "filterToEffectifs": False,
@@ -429,11 +480,12 @@ def build_news(slug, cfg, data):
             "total": len(items), "truncated": False, "items": items}
 
 
-MEDIA = [
-    ("Le Courrier de Démoville", "presse_regionale"), ("Radio Démo", "radio"),
-    ("Sciences & Démo", "presse_specialisee"), ("Le Journal de l'UDémo", "institutionnel"),
-    ("Démo TV", "television"), ("The Sample Times", "presse_internationale"),
-]
+def media_outlets():
+    return [
+        ("Le Courrier de Démoville", "presse_regionale"), ("Radio Démo", "radio"),
+        ("Sciences & Démo", "presse_specialisee"), (f"Le Journal de l'{U['aggregate']['lab']}", "institutionnel"),
+        ("Démo TV", "television"), ("The Sample Times", "presse_internationale"),
+    ]
 MEDIA_TYPES = ["tribune", "interview", "citation_expert", "vulgarisation", "mention_travaux", ""]
 
 
@@ -442,14 +494,14 @@ def build_mentions():
     items = []
     for i in range(18):
         slug = random.choice(list(LABS))
-        media, mtype = random.choice(MEDIA)
+        media, mtype = random.choice(media_outlets())
         day = random.randint(1, 170)
         date = f"2026-{3 + day // 30:02d}-{1 + day % 28:02d}T08:00:00+00:00"
         subject = random.choice(TITLE_SUBJECTS)
         items.append({
             "id": f"demo-mention-{i + 1:03d}",
             "url": f"https://example.org/media/{slug}/{i + 1}",
-            "title": f"{LABS[slug]['acronym']} : des chercheurs de l'UDémo travaillent sur {subject}",
+            "title": f"{LABS[slug]['acronym']} : des chercheurs de l'{U['aggregate']['lab']} travaillent sur {subject}",
             "excerpt": f"Article fictif de démonstration ({LABS[slug]['name']}).",
             "media_name": media, "media_type": mtype,
             "published_at": date, "collected_at": date, "collector": "rss", "language": "fr",
@@ -471,26 +523,35 @@ def write_json(path, data, indent=None):
 
 
 def main():
-    if len(sys.argv) != 2:
+    global U, LABS
+    args = sys.argv[1:]
+    instance = "demo"
+    if len(args) == 3 and args[0] == "--instance" and args[1] in UNIVERSES:
+        instance, args = args[1], args[2:]
+    if len(args) != 1:
         sys.exit(__doc__)
-    members_by_lab, teams_by_lab = load_members(sys.argv[1])
+    U, LABS = UNIVERSES[instance], UNIVERSES[instance]["labs"]
+    out = os.path.join(HERE, "..", instance, "dashboard-data")
+    random.seed(U["seed"])
+    members_by_lab, teams_by_lab = load_members(args[0])
     sibling_names = {s: [LABS[o]["acronym"] for o in LABS if o != s] for s in LABS}
     built = {}
     for slug, cfg in LABS.items():
         members = members_by_lab.get(cfg["acronym"], [])
         if not members:
-            sys.exit(f"No researcher for {cfg['acronym']} in {sys.argv[1]}")
+            sys.exit(f"No researcher for {cfg['acronym']} in {args[0]}")
         data = build_lab(slug, cfg, members, teams_by_lab.get(cfg["acronym"], []), sibling_names[slug])
-        write_json(os.path.join(OUT, slug, "dashboard.json"), data)
-        write_json(os.path.join(OUT, slug, "news.json"), build_news(slug, cfg, data))
+        write_json(os.path.join(out, slug, "dashboard.json"), data)
+        write_json(os.path.join(out, slug, "news.json"), build_news(slug, cfg, data))
         built[slug] = data
         print(f"{slug}: {len(data['publications'])} publications, {len(data['members'])} members")
 
-    # University-level aggregate « udemo »: union of the three labs.
+    # Institution-level aggregate (« udemo » for the demo): union of the labs.
+    agg = U["aggregate"]
     udemo = {
-        "lab": "UDémo", "name": "Université de Démonstration", "slug": "udemo",
+        "lab": agg["lab"], "name": agg["name"], "slug": agg["slug"],
         "teamLabel": "laboratoire", "etpr": sum(c["etpr"] for c in LABS.values()),
-        "filterToEffectifs": False, "charteModele": "UDémo", "charteComposite": True,
+        "filterToEffectifs": False, "charteModele": agg["lab"], "charteComposite": True,
         "strategicAxes": [],
         "publications": [p for d in built.values() for p in d["publications"]],
         "authors": [a for d in built.values() for a in d["authors"]],
@@ -499,21 +560,21 @@ def main():
         "countryNames": COUNTRY_NAMES,
     }
     udemo_cfg = {
-        "acronym": "UDémo",
+        "acronym": agg["lab"],
         "journals": [j for c in LABS.values() for j in c["journals"]],
         "topics": [t for c in LABS.values() for t in c["topics"]],
         "subfields": [s for c in LABS.values() for s in c["subfields"]],
         "axes": [ax for c in LABS.values() for ax in c["axes"]],
     }
-    write_json(os.path.join(OUT, "udemo", "dashboard.json"), udemo)
-    write_json(os.path.join(OUT, "udemo", "news.json"), build_news("udemo", udemo_cfg, udemo))
-    print(f"udemo (aggregate): {len(udemo['publications'])} publications, {len(udemo['members'])} members")
+    write_json(os.path.join(out, agg["slug"], "dashboard.json"), udemo)
+    write_json(os.path.join(out, agg["slug"], "news.json"), build_news(agg["slug"], udemo_cfg, udemo))
+    print(f"{agg['slug']} (aggregate): {len(udemo['publications'])} publications, {len(udemo['members'])} members")
 
-    slugs = ["udemo"] + list(LABS)
+    slugs = [agg["slug"]] + list(LABS)
     # Benchmark needs server routes (/api/benchmark/*): hidden, like on Centrale.
-    write_json(os.path.join(OUT, "index.json"),
+    write_json(os.path.join(out, "index.json"),
                {"slugs": slugs, "groups": [], "tabsHidden": {s: ["benchmark"] for s in slugs}}, indent=1)
-    write_json(os.path.join(OUT, "mentions.json"), build_mentions())
+    write_json(os.path.join(out, "mentions.json"), build_mentions())
     print(f"index.json: {slugs}; mentions.json")
 
 

@@ -25,6 +25,7 @@ const { onRequest: middleware } = await import('../../functions/api/_middleware.
 const { onRequestGet: news } = await import('../../functions/api/news/[slug].js');
 const { onRequestPost: newsletterGenerate } = await import('../../functions/api/newsletter/generate.js');
 const { onRequestPost: newsletterPost } = await import('../../functions/api/newsletter/post.js');
+const { instanceAssetPath, serveInstanceAsset, denyDirectAccess } = await import('../../functions/_lib/instanceAssets.js');
 const { buildRegistry, parseInstanceConfig } = createRequire(import.meta.url)('../instances/instanceConfig.cjs');
 
 let ko = 0;
@@ -244,6 +245,37 @@ r = await newsletterGenerate({ request: req('/api/newsletter/generate', { method
 check('newsletter/generate on demo: 404', r.status, 404);
 r = await newsletterPost({ request: req('/api/newsletter/post', { method: 'POST', body: '{}' }), env: DEMO_ENV });
 check('newsletter/post on demo: 404', r.status, 404);
+
+// Per-instance files of a shared deployment (functions/_lib/instanceAssets.js, lot 6 D5)
+check('assets: dashboard file of the instance', instanceAssetPath('demo-2', '/dashboard-data/eidemo/dashboard.json.gz'),
+  '/instance-assets/demo-2/dashboard-data/eidemo/dashboard.json.gz');
+check('assets: alignment cache', instanceAssetPath('demo', '/idref_align_cache.json'), '/instance-assets/demo/idref_align_cache.json');
+check('assets: refused paths', ['/dashboard-data/../../demo/x.json', '/dashboard-data/%2e%2e/x.json', '/dashboard-data/a%2F..%2F..%2Fdemo/x.json',
+  '/dashboard-data', '/dashboard-data/', '/index.html', '/ldap_status_cache.json', '/instance-assets/demo/idref_align_cache.json', '/dashboard-data/%E0%A4%A']
+  .map((p) => instanceAssetPath('demo-2', p)), [null, null, null, null, null, null, null, null, null]);
+let assetFetched = null;
+const fakeAssets = (files) => ({
+  fetch: async (r) => {
+    assetFetched = new URL(r.url).pathname;
+    return assetFetched in files
+      ? new Response(files[assetFetched], { status: 200, headers: { 'Content-Type': 'application/json' } })
+      : new Response('<!doctype html><html></html>', { status: 200, headers: { 'Content-Type': 'text/html; charset=utf-8' } });
+  },
+});
+const ASSET_FILES = { '/instance-assets/demo-2/dashboard-data/index.json': '{"who":"demo-2"}', '/instance-assets/demo/dashboard-data/index.json': '{"who":"demo"}' };
+const assetCall = (instance, path, method = 'GET') =>
+  serveInstanceAsset({ request: new Request(`https://h.example.org${path}`, { method }), env: { ASSETS: fakeAssets(ASSET_FILES) }, data: { instance } });
+r = await assetCall(d2, '/dashboard-data/index.json');
+check('assets: each host reads its own copy', [r.status, await r.text(), assetFetched], [200, '{"who":"demo-2"}', '/instance-assets/demo-2/dashboard-data/index.json']);
+r = await assetCall(d2, '/dashboard-data/eidemo/news.json');
+check('assets: missing file → 404, not the SPA page', r.status, 404);
+assetFetched = null;
+r = await assetCall(d2, '/dashboard-data/..%2Findex.json');
+check('assets: escaping path → 404 without fetching', [r.status, assetFetched], [404, null]);
+r = await assetCall(d2, '/dashboard-data/index.json', 'POST');
+check('assets: write method → 405', r.status, 405);
+r = await denyDirectAccess({ request: new Request('https://h.example.org/instance-assets/demo/dashboard-data/index.json') });
+check('assets: direct access to the copies → 404', r.status, 404);
 
 console.log(ko ? `\n${ko} KO` : '\nAll OK');
 process.exit(ko ? 1 : 0);

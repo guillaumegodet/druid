@@ -4,7 +4,8 @@
 // SynDémo) — the second tenant of the shared deployment prototype. Same rules as the demo
 // (instances/demo/demo-data.mjs, whose generator it reuses): e-mails under example.org, ORCID and
 // IdRef identifiers with a WRONG check character, IdHAL prefixed `demo2-`, OpenAlex ids `A00000…`.
-// Identifier numbers start at 501, outside the range of the demo, so the two docs never share one.
+// Identifier numbers start at 1001, outside the ranges of the demo (1-54, homonyms of its alignment
+// caches 501-554), so the two instances never share one.
 // Deterministic. Run directly, prints the researchers as JSON:
 //   node instances/demo-2/demo-data.mjs > /tmp/demo-2-people.json
 
@@ -43,27 +44,28 @@ export const STRUCTURES = [
   { generic_type: 'unit', type: 'ER', main_mission: 'research', local_id: 'MECAD-FLU', short_labels: 'Fluides-Démo[fr]', long_labels: 'Équipe Mécanique des Fluides[fr]', inclusions: 'local-MECAD[20180101-]' },
 ];
 
-const DEMO2 = {
+export const UNIVERSE = {
+  site: "École d'Ingénieurs de Démonstration",
   core: [
-    { first: 'Margaux', last: 'Lemoine', civ: 'F', birth: '1972-05-21', grade: 'PR', hdr: true, hdrYear: '2006', labo: 'MECAD', team: 'Matériaux-Démo', start: '2008-09-01' },
-    { first: 'Thomas', last: 'Giraud', civ: 'M', birth: '1984-11-02', grade: 'MCF', labo: 'MECAD', team: 'Matériaux-Démo', start: '2013-09-01' },
-    { first: 'Fatima', last: 'Benali', civ: 'F', birth: '1987-03-14', grade: 'CR', employer: 'CNR', labo: 'MECAD', team: 'Fluides-Démo', start: '2018-01-01' },
-    { first: 'Vincent', last: 'Roche', civ: 'M', birth: '1976-08-09', grade: 'PR', hdr: true, hdrYear: '2011', labo: 'SYND', start: '2009-09-01' },
-    { first: 'Emma', last: 'Caron', civ: 'F', birth: '1998-01-27', grade: 'Doctorant', labo: 'SYND', start: '2023-10-01', ids: ['orcid'] },
-    { first: 'Lucas', last: 'Perret', civ: 'M', birth: '1981-06-30', grade: 'IR', employer: 'ENS', labo: 'SYND', start: '2016-02-01' },
+    { first: 'Margaux', last: 'Lemoine', civ: 'F', birth: '1972-05-21', grade: 'PR', hdr: true, hdrYear: '2006', labo: 'MécaDémo', team: 'Matériaux-Démo', start: '2008-09-01' },
+    { first: 'Thomas', last: 'Giraud', civ: 'M', birth: '1984-11-02', grade: 'MCF', labo: 'MécaDémo', team: 'Matériaux-Démo', start: '2013-09-01' },
+    { first: 'Fatima', last: 'Benali', civ: 'F', birth: '1987-03-14', grade: 'CR', employer: 'CNR', labo: 'MécaDémo', team: 'Fluides-Démo', start: '2018-01-01' },
+    { first: 'Vincent', last: 'Roche', civ: 'M', birth: '1976-08-09', grade: 'PR', hdr: true, hdrYear: '2011', labo: 'SynDémo', start: '2009-09-01' },
+    { first: 'Emma', last: 'Caron', civ: 'F', birth: '1998-01-27', grade: 'Doctorant', labo: 'SynDémo', start: '2023-10-01', ids: ['orcid'] },
+    { first: 'Lucas', last: 'Perret', civ: 'M', birth: '1981-06-30', grade: 'IR', employer: 'ENS', labo: 'SynDémo', start: '2016-02-01' },
   ],
   special: [
     // Departure (end of employment passed) and a researcher with no identifier: alignment cases.
-    { first: 'Bernard', last: 'Lucas', civ: 'M', birth: '1958-10-05', grade: 'PR', hdr: true, hdrYear: '1996', labo: 'MECAD', team: 'Fluides-Démo', start: '1992-09-01', end: '2023-08-31', affEnd: '2023-08-31' },
-    { first: 'Inès', last: 'Maillard', civ: 'F', birth: '1993-07-11', grade: 'Post-doc', typeEmploi: 'CDD UNIVERSITE', labo: 'SYND', start: '2025', ids: [] },
+    { first: 'Bernard', last: 'Lucas', civ: 'M', birth: '1958-10-05', grade: 'PR', hdr: true, hdrYear: '1996', labo: 'MécaDémo', team: 'Fluides-Démo', start: '1992-09-01', end: '2023-08-31', affEnd: '2023-08-31' },
+    { first: 'Inès', last: 'Maillard', civ: 'F', birth: '1993-07-11', grade: 'Post-doc', typeEmploi: 'CDD UNIVERSITE', labo: 'SynDémo', start: '2025', ids: [] },
   ],
   units: [
-    { labo: 'MECAD', team: 'Matériaux-Démo', campus: 'Campus EIDémo', count: 6 },
-    { labo: 'MECAD', team: 'Fluides-Démo', campus: 'Campus EIDémo', count: 5 },
-    { labo: 'SYND', team: '', campus: 'Campus EIDémo', count: 7 },
+    { labo: 'MécaDémo', team: 'Matériaux-Démo', campus: 'Campus EIDémo', count: 6 },
+    { labo: 'MécaDémo', team: 'Fluides-Démo', campus: 'Campus EIDémo', count: 5 },
+    { labo: 'SynDémo', team: '', campus: 'Campus EIDémo', count: 7 },
   ],
   seed: 20260926,
-  firstNumber: 501,
+  firstNumber: 1001,
   emailDomain: 'eidemo.example.org',
   idhalPrefix: 'demo2',
   annuaireBase: 'https://example.org/eidemo/annuaire',
@@ -72,7 +74,7 @@ const DEMO2 = {
 };
 
 /** All researchers of the second demo. */
-export const buildResearchers = () => buildResearchersFor(DEMO2);
+export const buildResearchers = () => buildResearchersFor(UNIVERSE);
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   process.stdout.write(JSON.stringify(buildResearchers(), null, 1) + '\n');

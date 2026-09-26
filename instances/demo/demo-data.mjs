@@ -236,7 +236,8 @@ const defaultsFor = (grade) => GRADES.find((g) => g.grade === grade) || GRADES[1
  * Universe of the demo: who works where, and the ranges that keep its identifiers apart from
  * the other fictitious instances (firstNumber feeds the ORCID / PPN / OpenAlex numbers).
  */
-const DEMO = {
+export const UNIVERSE = {
+  site: 'Université de Démonstration',
   core: DEMO_CORE,
   special: DEMO_SPECIAL,
   units: DEMO_UNITS,
@@ -296,7 +297,7 @@ export const buildResearchersFor = (u) => {
 };
 
 /** All researchers of the demo. */
-export const buildResearchers = () => buildResearchersFor(DEMO);
+export const buildResearchers = () => buildResearchersFor(UNIVERSE);
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   process.stdout.write(JSON.stringify(buildResearchers(), null, 1) + '\n');

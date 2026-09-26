@@ -80,9 +80,13 @@ other host** — the front shows « No Druid instance is declared for this addre
 - secrets are per instance, `<NAME>__<SLUG>` with the slug upper-cased and `-` → `_`
   (`GRIST_API_KEY__DEMO_2`); the plain `GRIST_API_KEY` is never used, so an instance without its own key
   cannot borrow another's;
-- nothing instance-specific is built into the bundle or copied into `public/` (a file there is served on
-  every host): the dashboard exports and alignment caches of the single-instance projects are not
-  available yet (lot 6 D5, and `plan-alignement-cloudflare.md` for the caches);
+- nothing instance-specific is built into the bundle; the files of each instance (dashboard exports,
+  alignment caches) are copied into `public/instance-assets/<slug>/` and the build writes route files
+  (`functions/dashboard-data/`, `functions/<name>_align_cache.json.js`, `functions/instance-assets/`, ignored
+  by git) that serve, at the usual URLs, the copy of the request host's instance only
+  (`functions/_lib/instanceAssets.js`); `/instance-assets/*` itself answers 404. Only **public** instances may
+  have such files: a file of `public/` is still a static file of the deployment, so the build fails for a
+  non-public instance with files — private files wait for the R2 store (lot 7);
 - `ALLOW_ANONYMOUS_WRITES` is ignored.
 
 Every domain of every instance must also be attached to the Pages project (Custom domains).

@@ -1,0 +1,19 @@
+{
+ "slugs": [
+  "eidemo",
+  "mecademo",
+  "syndemo"
+ ],
+ "groups": [],
+ "tabsHidden": {
+  "eidemo": [
+   "benchmark"
+  ],
+  "mecademo": [
+   "benchmark"
+  ],
+  "syndemo": [
+   "benchmark"
+  ]
+ }
+}

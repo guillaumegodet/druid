@@ -1,0 +1,522 @@
+{
+ "caron-e": {
+  "mode": "search",
+  "queryName": "CARON Emma",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-emma-caron",
+  "candidates": [
+   {
+    "idhal": "demo2-emma-caron",
+    "idhalI": "901005",
+    "fullName": "Emma Caron",
+    "forms": [
+     "Emma Caron"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "SynDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo SynDémo (9 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "maillard-i": {
+  "mode": "search",
+  "queryName": "MAILLARD Inès",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-ines-maillard",
+  "candidates": [
+   {
+    "idhal": "demo2-ines-maillard",
+    "idhalI": "901008",
+    "fullName": "Inès Maillard",
+    "forms": [
+     "Inès Maillard"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "SynDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo SynDémo (3 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "aubert-q": {
+  "mode": "search",
+  "queryName": "AUBERT Quentin",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-quentin-aubert",
+  "candidates": [
+   {
+    "idhal": "demo2-quentin-aubert",
+    "idhalI": "901011",
+    "fullName": "Quentin Aubert",
+    "forms": [
+     "Quentin Aubert"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "MécaDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo MécaDémo (6 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "carpentier-q": {
+  "mode": "search",
+  "queryName": "CARPENTIER Quentin",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-quentin-carpentier",
+  "candidates": [
+   {
+    "idhal": "demo2-quentin-carpentier",
+    "idhalI": "901012",
+    "fullName": "Quentin Carpentier",
+    "forms": [
+     "Quentin Carpentier"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "MécaDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo MécaDémo (7 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "quere-s": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Samuel",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-samuel-quere",
+  "candidates": [
+   {
+    "idhal": "demo2-samuel-quere",
+    "idhalI": "901013",
+    "fullName": "Samuel Quéré",
+    "forms": [
+     "Samuel Quéré"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "MécaDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo MécaDémo (8 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "quere-p": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Pauline",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-pauline-quere",
+  "candidates": [
+   {
+    "idhal": "demo2-pauline-quere",
+    "idhalI": "901016",
+    "fullName": "Pauline Quéré",
+    "forms": [
+     "Pauline Quéré"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "MécaDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo MécaDémo (11 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "gauthier-r": {
+  "mode": "search",
+  "queryName": "GAUTHIER Rémi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-remi-gauthier",
+  "candidates": [
+   {
+    "idhal": "demo2-remi-gauthier",
+    "idhalI": "901017",
+    "fullName": "Rémi Gauthier",
+    "forms": [
+     "Rémi Gauthier"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "MécaDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo MécaDémo (3 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "riviere-s": {
+  "mode": "search",
+  "queryName": "RIVIERE Salomé",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "idhal": "demo2-salome-riviere",
+    "idhalI": "901018",
+    "fullName": "Salomé Riviere",
+    "forms": [
+     "Salomé Riviere"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "MécaDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "moyen",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo MécaDémo (4 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "idhal": "demo2-salome-riviere-1",
+    "idhalI": "901518",
+    "fullName": "Salomé Riviere",
+    "forms": [
+     "Salomé Riviere"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "Laboratoire Témoin"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "faible",
+    "evidence": [
+     "nom partiel"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "quere-o": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Olivier",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-olivier-quere",
+  "candidates": [
+   {
+    "idhal": "demo2-olivier-quere",
+    "idhalI": "901021",
+    "fullName": "Olivier Quéré",
+    "forms": [
+     "Olivier Quéré"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "SynDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo SynDémo (7 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "jacquet-m": {
+  "mode": "search",
+  "queryName": "JACQUET Maëlle",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "idhal": "demo2-maelle-jacquet",
+    "idhalI": "901022",
+    "fullName": "Maëlle Jacquet",
+    "forms": [
+     "Maëlle Jacquet"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "SynDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "moyen",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo SynDémo (8 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "idhal": "demo2-maelle-jacquet-1",
+    "idhalI": "901522",
+    "fullName": "Maëlle Jacquet",
+    "forms": [
+     "Maëlle Jacquet"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "Laboratoire Témoin"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "faible",
+    "evidence": [
+     "nom partiel"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "gauthier-m": {
+  "mode": "search",
+  "queryName": "GAUTHIER Maxime",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-maxime-gauthier",
+  "candidates": [
+   {
+    "idhal": "demo2-maxime-gauthier",
+    "idhalI": "901023",
+    "fullName": "Maxime Gauthier",
+    "forms": [
+     "Maxime Gauthier"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "SynDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo SynDémo (9 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "poirier-r": {
+  "mode": "search",
+  "queryName": "POIRIER Rania",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "not_found",
+  "best": "",
+  "candidates": []
+ },
+ "jacquet-l": {
+  "mode": "search",
+  "queryName": "JACQUET Laure",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "found",
+  "best": "demo2-laure-jacquet",
+  "candidates": [
+   {
+    "idhal": "demo2-laure-jacquet",
+    "idhalI": "901025",
+    "fullName": "Laure Jacquet",
+    "forms": [
+     "Laure Jacquet"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "SynDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "fort",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo SynDémo (11 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ },
+ "dumont-y": {
+  "mode": "search",
+  "queryName": "DUMONT Yann",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "idhal": "demo2-yann-dumont",
+    "idhalI": "901026",
+    "fullName": "Yann Dumont",
+    "forms": [
+     "Yann Dumont"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "SynDémo"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "moyen",
+    "evidence": [
+     "mail @eidemo.example.org",
+     "labo SynDémo (3 publis)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   },
+   {
+    "idhal": "demo2-yann-dumont-1",
+    "idhalI": "901526",
+    "fullName": "Yann Dumont",
+    "forms": [
+     "Yann Dumont"
+    ],
+    "emailDomains": [
+     "eidemo.example.org"
+    ],
+    "labs": [
+     "Laboratoire Témoin"
+    ],
+    "orcid": "",
+    "idref": "",
+    "score": "faible",
+    "evidence": [
+     "nom partiel"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact",
+    "suspect": []
+   }
+  ]
+ }
+}

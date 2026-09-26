@@ -1,0 +1,232 @@
+{
+ "caron-e": {
+  "mode": "search",
+  "queryName": "CARON Emma",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990010059",
+    "fullName": "Caron, Emma",
+    "job": "",
+    "birth": "1998",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, SynDémo, École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0055",
+    "idhal": "demo2-emma-caron",
+    "isni": ""
+   }
+  ]
+ },
+ "maillard-i": {
+  "mode": "search",
+  "queryName": "MAILLARD Inès",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "not_found",
+  "candidates": []
+ },
+ "aubert-r": {
+  "mode": "search",
+  "queryName": "AUBERT Rania",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990010091",
+    "fullName": "Aubert, Rania",
+    "job": "",
+    "birth": "1982",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, MécaDémo (Matériaux-Démo), École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0098",
+    "idhal": "demo2-rania-aubert",
+    "isni": ""
+   }
+  ]
+ },
+ "kerbrat-k": {
+  "mode": "search",
+  "queryName": "KERBRAT Karim",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990010105",
+    "fullName": "Kerbrat, Karim",
+    "job": "",
+    "birth": "1985",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, MécaDémo (Matériaux-Démo), École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0100",
+    "idhal": "demo2-karim-kerbrat",
+    "isni": ""
+   }
+  ]
+ },
+ "aubert-q": {
+  "mode": "search",
+  "queryName": "AUBERT Quentin",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990010113",
+    "fullName": "Aubert, Quentin",
+    "job": "",
+    "birth": "1994",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, MécaDémo (Matériaux-Démo), École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0119",
+    "idhal": "demo2-quentin-aubert",
+    "isni": ""
+   }
+  ]
+ },
+ "carpentier-q": {
+  "mode": "search",
+  "queryName": "CARPENTIER Quentin",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "ambiguous",
+  "candidates": [
+   {
+    "ppn": "990010121",
+    "fullName": "Carpentier, Quentin",
+    "job": "",
+    "birth": "1998",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, MécaDémo (Matériaux-Démo), École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0127",
+    "idhal": "demo2-quentin-carpentier",
+    "isni": ""
+   },
+   {
+    "ppn": "990015123",
+    "fullName": "Carpentier, Quentin",
+    "job": "",
+    "birth": "1967",
+    "death": "",
+    "gender": "M",
+    "description": "Auteur d'une thèse de lettres (1987)",
+    "orcid": "",
+    "idhal": "",
+    "isni": ""
+   }
+  ]
+ },
+ "quere-s": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Samuel",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990010130",
+    "fullName": "Quéré, Samuel",
+    "job": "",
+    "birth": "1998",
+    "death": "",
+    "gender": "M",
+    "description": "Enseignant-chercheur, MécaDémo (Matériaux-Démo), École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0135",
+    "idhal": "demo2-samuel-quere",
+    "isni": ""
+   }
+  ]
+ },
+ "quere-p": {
+  "mode": "search",
+  "queryName": "QUÉRÉ Pauline",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "ambiguous",
+  "candidates": [
+   {
+    "ppn": "990010164",
+    "fullName": "Quéré, Pauline",
+    "job": "",
+    "birth": "1997",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, MécaDémo (Fluides-Démo), École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0160",
+    "idhal": "demo2-pauline-quere",
+    "isni": ""
+   },
+   {
+    "ppn": "990015166",
+    "fullName": "Quéré, Pauline",
+    "job": "",
+    "birth": "1966",
+    "death": "",
+    "gender": "F",
+    "description": "Auteur d'une thèse de lettres (1987)",
+    "orcid": "",
+    "idhal": "",
+    "isni": ""
+   }
+  ]
+ },
+ "gauthier-r": {
+  "mode": "search",
+  "queryName": "GAUTHIER Rémi",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "not_found",
+  "candidates": []
+ },
+ "riviere-s": {
+  "mode": "search",
+  "queryName": "RIVIERE Salomé",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "found",
+  "candidates": [
+   {
+    "ppn": "990010180",
+    "fullName": "Riviere, Salomé",
+    "job": "",
+    "birth": "1995",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, MécaDémo (Fluides-Démo), École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0186",
+    "idhal": "demo2-salome-riviere",
+    "isni": ""
+   }
+  ]
+ },
+ "poirier-r": {
+  "mode": "search",
+  "queryName": "POIRIER Rania",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "status": "ambiguous",
+  "candidates": [
+   {
+    "ppn": "990010245",
+    "fullName": "Poirier, Rania",
+    "job": "",
+    "birth": "1974",
+    "death": "",
+    "gender": "F",
+    "description": "Enseignant-chercheur, SynDémo, École d'Ingénieurs de Démonstration",
+    "orcid": "0000-0001-9901-0240",
+    "idhal": "demo2-rania-poirier",
+    "isni": ""
+   },
+   {
+    "ppn": "990015247",
+    "fullName": "Poirier, Rania",
+    "job": "",
+    "birth": "1943",
+    "death": "",
+    "gender": "F",
+    "description": "Auteur d'une thèse de lettres (1987)",
+    "orcid": "",
+    "idhal": "",
+    "isni": ""
+   }
+  ]
+ }
+}

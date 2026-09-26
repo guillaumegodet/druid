@@ -1,28 +1,35 @@
 #!/usr/bin/env node
-// Fictitious alignment caches of the public demo instance (docs/plan-instance-demo-cloudflare.md,
-// lot A4), read by the unified view « Alignement des identifiants chercheurs » in search mode:
+// Fictitious alignment caches of a fictitious instance — the demo (docs/plan-instance-demo-cloudflare.md,
+// lot A4) or demo-2 (--instance demo-2, docs/plan-architecture-multi-instances.md, lot 6) — read by the unified view « Alignement des identifiants chercheurs » in search mode:
 //   demo-idref_align_cache.json           IdRef   (computeIdrefDiff: mode 'search', generic pipeline —
 //                                         the demo has no Qualinka engine, HAS_QUALINKA false)
 //   demo-orcid_align_cache.json           ORCID   (computeAlignDiff: mode 'search')
 //   demo-hal_align_cache.json             HAL
 //   demo-openalex_align_cache.json        OpenAlex
-// copied into public/ without the `demo-` prefix by scripts/prepare-cloudflare-assets.cjs.
+// (prefix = instance slug, files written in instances/<slug>/), copied without the prefix by
+// scripts/prepare-cloudflare-assets.cjs.
 //
 // Only researchers MISSING an identifier get an entry (actionable records only). The « true »
-// identifier of researcher n is the one demo-data.mjs would have given (fakeOrcid(n), fakePpn(n)…),
+// identifier of researcher n (UNIVERSE.firstNumber + index) is the one demo-data.mjs would have given (fakeOrcid(n), fakePpn(n)…),
 // so the sources agree with each other; homonyms get ids from another range. Most records get a
 // single strong candidate, some are ambiguous (homonyms), a few are not found. Deterministic.
 //
-// Usage: docker run --rm -v "$PWD":/app -w /app node:20-slim node instances/demo/gen_demo_align_caches.mjs
+// Usage: docker run --rm -v "$PWD":/app -w /app node:20-slim node instances/demo/gen_demo_align_caches.mjs [--instance demo-2]
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { buildResearchers, fakeOrcid, fakePpn, fakeIdHal, fakeOpenAlex } from './demo-data.mjs';
+import { fakeOrcid, fakePpn, fakeIdHal, fakeOpenAlex } from './demo-data.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
+const argInstance = process.argv.indexOf('--instance');
+const INSTANCE = argInstance > 0 ? process.argv[argInstance + 1] : 'demo';
+if (!['demo', 'demo-2'].includes(INSTANCE)) { console.error('--instance must be demo or demo-2'); process.exit(1); }
+const OUT_DIR = path.join(HERE, '..', INSTANCE);
+const { buildResearchers, UNIVERSE } = await import(`../${INSTANCE}/demo-data.mjs`);
 const CHECKED_AT = '2026-09-24T06:00:00.000Z';
 const HOMONYM = 500;   // id offset of the homonym candidates
-const SITE = 'Université de Démonstration';
+const SITE = UNIVERSE.site;
+const EMAIL_DOMAIN = UNIVERSE.emailDomain;
 
 const researchers = buildResearchers();
 const fullName = (r) => `${r.Nom}, ${r.Prenom}`;
@@ -39,7 +46,7 @@ const hal = {};
 const openalex = {};
 
 researchers.forEach((r, i) => {
-  const n = i + 1;
+  const n = UNIVERSE.firstNumber + i;
   const uid = r.uid_dyna;
 
   // ── IdRef (generic pipeline, scripts/sync_idref.cjs) ──
@@ -49,7 +56,7 @@ researchers.forEach((r, i) => {
     // Identifiers read on the IdRef record (ORCID, IdHAL): proposed where the Annuaire is empty.
     const main = {
       ppn: fakePpn(n), fullName: fullName(r), job: '', birth: birthYear(r), death: '', gender,
-      description: `Enseignant-chercheur, ${lab(r)}, ${SITE}`, orcid: fakeOrcid(n), idhal: fakeIdHal(r.Prenom, r.Nom), isni: '',
+      description: `Enseignant-chercheur, ${lab(r)}, ${SITE}`, orcid: fakeOrcid(n), idhal: fakeIdHal(r.Prenom, r.Nom, UNIVERSE.idhalPrefix), isni: '',
     };
     const homonym = {
       ppn: fakePpn(n + HOMONYM), fullName: fullName(r), job: '', birth: String(Number(birthYear(r)) - 31), death: '', gender,
@@ -83,10 +90,10 @@ researchers.forEach((r, i) => {
   if (!r.IdHAL) {
     const c = caseOf(n, 2);
     const cand = (idhal, idhalI, score, evidence, labs) => ({
-      idhal, idhalI, fullName: `${r.Prenom} ${r.Nom}`, forms: [`${r.Prenom} ${r.Nom}`], emailDomains: ['udemo.example.org'],
+      idhal, idhalI, fullName: `${r.Prenom} ${r.Nom}`, forms: [`${r.Prenom} ${r.Nom}`], emailDomains: [EMAIL_DOMAIN],
       labs, orcid: '', idref: '', score, evidence, matchedIds: [], nameMatch: 'exact', suspect: [],
     });
-    const good = cand(fakeIdHal(r.Prenom, r.Nom), String(900000 + n), 'fort', ['mail @udemo.example.org', `labo ${r.LABO} (${3 + (n % 9)} publis)`], [r.LABO]);
+    const good = cand(fakeIdHal(r.Prenom, r.Nom, UNIVERSE.idhalPrefix), String(900000 + n), 'fort', [`mail @${EMAIL_DOMAIN}`, `labo ${r.LABO} (${3 + (n % 9)} publis)`], [r.LABO]);
     hal[uid] = {
       mode: 'search', queryName: displayName(r), checkedAt: CHECKED_AT, derivedFrom: [],
       ...(c === 'found' ? { status: 'found', best: good.idhal, candidates: [good] }
@@ -114,11 +121,11 @@ researchers.forEach((r, i) => {
 });
 
 const write = (name, data) => {
-  fs.writeFileSync(path.join(HERE, name), JSON.stringify(data, null, 1) + '\n');
+  fs.writeFileSync(path.join(OUT_DIR, `${INSTANCE}-${name}`), JSON.stringify(data, null, 1) + '\n');
   const counts = Object.values(data).reduce((acc, e) => ({ ...acc, [e.status]: (acc[e.status] || 0) + 1 }), {});
-  console.log(`${name}: ${Object.keys(data).length} entries ${JSON.stringify(counts)}`);
+  console.log(`${INSTANCE}-${name}: ${Object.keys(data).length} entries ${JSON.stringify(counts)}`);
 };
-write('demo-idref_align_cache.json', idref);
-write('demo-orcid_align_cache.json', orcid);
-write('demo-hal_align_cache.json', hal);
-write('demo-openalex_align_cache.json', openalex);
+write('idref_align_cache.json', idref);
+write('orcid_align_cache.json', orcid);
+write('hal_align_cache.json', hal);
+write('openalex_align_cache.json', openalex);

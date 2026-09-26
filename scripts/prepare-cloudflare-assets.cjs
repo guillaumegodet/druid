@@ -19,9 +19,11 @@
 //
 // Shared deployment (docs/plan-architecture-multi-instances.md, lot 6 b): DRUID_INSTANCES=a,b lists
 // several instances served by one Pages project, chosen at runtime by request host (`domains` of
-// each instance.json, all required). Nothing instance-specific goes into the bundle or public/: no
-// .env.production.local and no asset copy (a file of public/ is served on every host — assets of a
-// shared deployment move behind a Function, lot 6 D5).
+// each instance.json, all required). Nothing instance-specific goes into the bundle: no
+// .env.production.local. The files of each instance go to public/instance-assets/<slug>/ and are
+// only served through the route files written here (ASSET_ROUTE_FILES → functions/_lib/instanceAssets.js),
+// which pick the copy of the request host's instance (lot 6 D5, light version); only public instances
+// are accepted there — a file of public/ is still a static file of the deployment.
 // Instances with personal data (Centrale) are not in this repository: when instances/<slug>/
 // does not exist here, the folder <slug>/ of the PRIVATE repository INSTANCES_REPO (default
 // guillaumegodet/druid-instances) is shallow-cloned with the INSTANCES_REPO_TOKEN build secret
@@ -129,18 +131,68 @@ fs.writeFileSync(path.join(generatedDir, 'registry.js'),
   + `export default ${JSON.stringify(registry, null, 2)};\n`);
 console.log('[prepare-cloudflare-assets] functions/_generated/registry.js written');
 
+// No Qualinka cache: the Cloudflare instances have no Qualinka engine (HAS_QUALINKA false), their
+// unified view reads the search entries of idref_align_cache.json.
+const CACHES = ['idref_align_cache', 'orcid_align_cache', 'hal_align_cache', 'openalex_align_cache', 'scopus_align_cache'];
+const publicDir = path.join(__dirname, '..', 'public');
+const functionsDir = path.join(__dirname, '..', 'functions');
+
+/** Files of an instance that the front reads: [source, path relative to the destination]. */
+const instanceFiles = (slug, srcDir) => {
+  const files = CACHES.map((name) => [path.join(srcDir, `${slug}-${name}.json`), `${name}.json`]);
+  files.push([path.join(srcDir, 'dashboard-data'), 'dashboard-data']);
+  return files;
+};
+
+/** Copies the files of an instance into destDir (same layout as the public URLs). */
+const copyInstanceFiles = (slug, srcDir, destDir) => {
+  fs.mkdirSync(destDir, { recursive: true });
+  for (const [src, rel] of instanceFiles(slug, srcDir)) {
+    if (!fs.existsSync(src)) {
+      console.warn(`[prepare-cloudflare-assets] missing, skipped: ${src}`);
+      continue;
+    }
+    const dest = path.join(destDir, rel);
+    fs.rmSync(dest, { recursive: true, force: true });
+    fs.cpSync(src, dest, { recursive: true });
+    console.log(`[prepare-cloudflare-assets] ${slug}: ${path.relative(srcDir, src)} -> ${path.relative(path.join(__dirname, '..'), dest)}`);
+  }
+};
+
+// Route files of the per-instance files of a shared deployment (functions/_lib/instanceAssets.js).
+// Written on a shared build only (a single-instance deployment serves its files as plain static
+// files, without spending Functions requests), removed otherwise; ignored by git.
+const ASSET_ROUTE_FILES = {
+  'dashboard-data/[[path]].js': "export { serveInstanceAsset as onRequest } from '../_lib/instanceAssets.js';\n",
+  'instance-assets/[[path]].js': "export { denyDirectAccess as onRequest } from '../_lib/instanceAssets.js';\n",
+  ...Object.fromEntries(CACHES.map((name) => [`${name}.json.js`, "export { serveInstanceAsset as onRequest } from './_lib/instanceAssets.js';\n"])),
+};
+fs.rmSync(path.join(publicDir, 'instance-assets'), { recursive: true, force: true });
+for (const rel of Object.keys(ASSET_ROUTE_FILES)) fs.rmSync(path.join(functionsDir, rel.split('/')[0]), { recursive: true, force: true });
+
 const envFile = path.join(__dirname, '..', '.env.production.local');
 if (shared) {
   fs.rmSync(envFile, { force: true });
   const settings = compareEnvWithConfig(configs[0], process.env).map(({ name }) => name);
   if (settings.length) console.warn(`[prepare-cloudflare-assets] ignored on a shared deployment (settings come from each instance.json): ${settings.join(', ')}`);
-  console.log('[prepare-cloudflare-assets] shared deployment: no instance asset copied into public/');
+  for (const config of configs) {
+    const has = instanceFiles(config.slug, dirs[config.slug]).filter(([src]) => fs.existsSync(src));
+    if (has.length && config.access !== 'public') {
+      fail(`instance "${config.slug}" (access "${config.access}") has files (${has.map(([, rel]) => rel).join(', ')}): a shared deployment only serves the files of public instances from public/ — private files need the R2 store (lot 7)`);
+    }
+  }
+  for (const config of configs) copyInstanceFiles(config.slug, dirs[config.slug], path.join(publicDir, 'instance-assets', config.slug));
+  for (const [rel, body] of Object.entries(ASSET_ROUTE_FILES)) {
+    const file = path.join(functionsDir, rel);
+    fs.mkdirSync(path.dirname(file), { recursive: true });
+    fs.writeFileSync(file, `// Generated by scripts/prepare-cloudflare-assets.cjs (shared deployment) — do not edit.\n${body}`);
+  }
+  console.log(`[prepare-cloudflare-assets] shared deployment: instance files under public/instance-assets/, routes ${Object.keys(ASSET_ROUTE_FILES).join(', ')}`);
   process.exit(0);
 }
 
 const instance = slugs[0];
 const srcDir = dirs[instance];
-const destDir = path.join(__dirname, '..', 'public');
 if (registry) {
   const config = registry.instances[instance];
   const viteEnv = viteEnvFromConfig(config);
@@ -153,28 +205,4 @@ if (registry) {
     else console.warn(`[prepare-cloudflare-assets] Pages variable ${name} overrides instance.json${detail}: move its value into instance.json, then remove it`);
   }
 }
-// No Qualinka cache: the Cloudflare instances have no Qualinka engine (HAS_QUALINKA false), their
-// unified view reads the search entries of idref_align_cache.json.
-const CACHES = ['idref_align_cache', 'orcid_align_cache', 'hal_align_cache', 'openalex_align_cache', 'scopus_align_cache'];
-const mapping = Object.fromEntries(CACHES.map((name) => [`${instance}-${name}.json`, `${name}.json`]));
-
-for (const [src, dest] of Object.entries(mapping)) {
-  const srcPath = path.join(srcDir, src);
-  const destPath = path.join(destDir, dest);
-  if (!fs.existsSync(srcPath)) {
-    console.warn(`[prepare-cloudflare-assets] missing, skipped: ${srcPath}`);
-    continue;
-  }
-  fs.copyFileSync(srcPath, destPath);
-  console.log(`[prepare-cloudflare-assets] ${src} -> public/${dest}`);
-}
-
-const dashboardSrc = path.join(srcDir, 'dashboard-data');
-const dashboardDest = path.join(destDir, 'dashboard-data');
-if (fs.existsSync(dashboardSrc)) {
-  fs.rmSync(dashboardDest, { recursive: true, force: true });
-  fs.cpSync(dashboardSrc, dashboardDest, { recursive: true });
-  console.log('[prepare-cloudflare-assets] dashboard-data/ -> public/dashboard-data/');
-} else {
-  console.warn(`[prepare-cloudflare-assets] missing, skipped: ${dashboardSrc}`);
-}
+copyInstanceFiles(instance, srcDir, publicDir);

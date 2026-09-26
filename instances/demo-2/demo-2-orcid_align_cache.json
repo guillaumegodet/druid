@@ -1,0 +1,150 @@
+{
+ "maillard-i": {
+  "mode": "search",
+  "queryName": "MAILLARD Inès",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9901-0080",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9901-0080",
+    "fullName": "Inès Maillard",
+    "forms": [
+     "Inès Maillard"
+    ],
+    "institutions": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "employments": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (École d'Ingénieurs de Démonstration)",
+     "labo SynDémo"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "kerbrat-k": {
+  "mode": "search",
+  "queryName": "KERBRAT Karim",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9901-0100",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9901-0100",
+    "fullName": "Karim Kerbrat",
+    "forms": [
+     "Karim Kerbrat"
+    ],
+    "institutions": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "employments": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (École d'Ingénieurs de Démonstration)",
+     "labo MécaDémo"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "renaud-a": {
+  "mode": "search",
+  "queryName": "RENAUD Antoine",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "ambiguous",
+  "best": "",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9901-0194",
+    "fullName": "Antoine Renaud",
+    "forms": [
+     "Antoine Renaud"
+    ],
+    "institutions": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "employments": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "moyen",
+    "evidence": [
+     "site (École d'Ingénieurs de Démonstration)"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   },
+   {
+    "orcid": "0000-0001-9901-5198",
+    "fullName": "Antoine Renaud",
+    "forms": [
+     "Antoine Renaud"
+    ],
+    "institutions": [],
+    "employments": [],
+    "emails": [],
+    "scopus": "",
+    "score": "faible",
+    "evidence": [
+     "non enrichi"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ },
+ "jacquet-m": {
+  "mode": "search",
+  "queryName": "JACQUET Maëlle",
+  "checkedAt": "2026-09-24T06:00:00.000Z",
+  "derivedFrom": [],
+  "fallback": false,
+  "status": "found",
+  "best": "0000-0001-9901-0223",
+  "candidates": [
+   {
+    "orcid": "0000-0001-9901-0223",
+    "fullName": "Maëlle Jacquet",
+    "forms": [
+     "Maëlle Jacquet"
+    ],
+    "institutions": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "employments": [
+     "École d'Ingénieurs de Démonstration"
+    ],
+    "emails": [],
+    "scopus": "",
+    "score": "fort",
+    "evidence": [
+     "site (École d'Ingénieurs de Démonstration)",
+     "labo SynDémo"
+    ],
+    "matchedIds": [],
+    "nameMatch": "exact"
+   }
+  ]
+ }
+}
