@@ -2,16 +2,15 @@
 // Equivalent of `app.all('/api/grist/*')` + `gristProxyGuard` in server.cjs (Nantes 77a3f44).
 // The Grist API key stays ONLY on the edge (CF secret), never in the bundle.
 //
-// Environment variables (Pages dashboard or .dev.vars):
+// Settings (functions/_lib/instance.js: instance.json, overridden by the Pages variables):
 //   GRIST_API_KEY   (secret)   — key of a Grist account with access to the Centrale doc;
-//                                optional when READ_ONLY=true (public doc read anonymously)
-//   GRIST_API_BASE  (var, opt) — default https://grist.numerique.gouv.fr/api
-//   GRIST_DOC_ID    (var, opt) — the only proxied doc; default = VITE_GRIST_DOC_ID (build var,
-//                                also exposed to Functions)
+//                                optional on a read-only instance (public doc read anonymously)
+//   grist.apiBase              — GRIST_API_BASE, default https://grist.numerique.gouv.fr/api
+//   grist.docId                — the only proxied doc (GRIST_DOC_ID, then VITE_GRIST_DOC_ID)
 //   ALLOW_ANONYMOUS_WRITES     — "true" locally only: writes without an Access identity
-//   READ_ONLY                  — "true" (public demo, docs/plan-instance-demo-cloudflare.md):
+//   readOnly                   — READ_ONLY (public demo, docs/plan-instance-demo-cloudflare.md):
 //                                every write is refused, whatever the identity
-//   DRUID_INSTANCE  (var, opt) — instance slug, only used in the User-Agent (default centrale)
+//   slug                       — DRUID_INSTANCE, only used in the User-Agent (default centrale)
 //
 // Scope (the key has full rights on the Grist account, so the proxy must restrict it):
 //  - path: docs/<allowed doc>[/tables[/<table>[/records|/columns|/data/delete]]];
@@ -23,9 +22,11 @@
 //    frontend on first use;
 //  - every write requires a Cloudflare Access identity (header
 //    Cf-Access-Authenticated-User-Email), unless ALLOW_ANONYMOUS_WRITES=true;
-//  - READ_ONLY=true: every write → 403, checked before anything else (overrides
+//  - read-only instance: every write → 403, checked before anything else (overrides
 //    ALLOW_ANONYMOUS_WRITES).
 // Centrale has no lab scope (every account = institution-wide rights).
+
+import { instanceConfig } from '../../_lib/instance.js';
 
 const PATH_RE = /^docs\/([A-Za-z0-9_-]+)(?:\/(tables)(?:\/([A-Za-z0-9_]+)(?:\/(records|columns|data\/delete))?)?)?$/;
 const GRIST_TABLES = new Set([
@@ -66,13 +67,14 @@ export const gristGuard = ({ method, path, doc, hasIdentity, allowAnonymousWrite
 export async function onRequest(context) {
   const { request, env, params } = context;
 
-  const readOnly = String(env.READ_ONLY || '').toLowerCase() === 'true';
+  const instance = instanceConfig(env);
+  const { readOnly } = instance;
   const apiKey = env.GRIST_API_KEY;
   // Without a key, only a read-only instance may relay (anonymous reads of a public doc):
   // a writable instance without a key is a configuration error.
   if (!apiKey && !readOnly) return json(500, { error: 'GRIST_API_KEY not configured on Cloudflare' });
 
-  const base = (env.GRIST_API_BASE || 'https://grist.numerique.gouv.fr/api').replace(/\/$/, '');
+  const base = instance.grist.apiBase;
   // params.path = segments after /api/grist/  (e.g. ['docs','abc','tables','Annuaire','records'])
   const segments = Array.isArray(params.path) ? params.path : [params.path].filter(Boolean);
   const gristPath = segments.join('/');
@@ -83,7 +85,7 @@ export async function onRequest(context) {
   const refusal = gristGuard({
     method,
     path: gristPath,
-    doc: env.GRIST_DOC_ID || env.VITE_GRIST_DOC_ID || '',
+    doc: instance.grist.docId,
     hasIdentity: !!request.headers.get('Cf-Access-Authenticated-User-Email'),
     allowAnonymousWrites: env.ALLOW_ANONYMOUS_WRITES === 'true',
     readOnly,
@@ -100,7 +102,7 @@ export async function onRequest(context) {
     method,
     headers: {
       Accept: 'application/json',
-      'User-Agent': `Druid-CRISalid-${env.DRUID_INSTANCE || 'centrale'}/1.0`,
+      'User-Agent': `Druid-CRISalid-${instance.slug}/1.0`,
     },
   };
   if (apiKey) init.headers.Authorization = `Bearer ${apiKey}`;

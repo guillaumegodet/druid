@@ -11,19 +11,21 @@
 //
 // Rights: Centrale has no lab scope — every Access account sees everything
 // (`allowedSlugs: 'all'`). Admins (Administration section, `admin` role)
-// are listed in the `ADMIN_EMAILS` variable (comma-separated e-mails).
+// are the `admins` of instance.json (or the `ADMIN_EMAILS` variable, comma-separated e-mails).
 //
-// Instance (docs/plan-instance-demo-cloudflare.md, lot A1): the same Functions serve every
-// Cloudflare instance (Centrale, public demo), told apart by environment variables:
-//   DRUID_INSTANCE  — slug (default `centrale`), also used by the build and the Grist proxy
-//   INSTANCE_LABEL  — display name of the anonymous user (default « Centrale Nantes »)
-//   READ_ONLY       — "true": public read-only instance (no admin, the proxy refuses writes)
+// Instance (docs/plan-architecture-multi-instances.md, lot 5 c): the same Functions serve every
+// Cloudflare instance (Centrale, public demo), told apart by their instance.json
+// (functions/_lib/instance.js), Pages variables overriding it during the transition:
+//   slug     — DRUID_INSTANCE (default `centrale`), also used by the build and the Grist proxy
+//   label    — INSTANCE_LABEL: display name of the anonymous user (default « Centrale Nantes »)
+//   readOnly — READ_ONLY: public read-only instance (no admin, the proxy refuses writes)
 //
 // auth.ts (frontend) redirects to /auth/login when /api/me is not OK:
 // so we always answer 200 here; access control happens at the edge (Access).
 
-export const parseAdminEmails = (raw) =>
-  String(raw || '').split(',').map((e) => e.trim().toLowerCase()).filter(Boolean);
+import { instanceConfig, parseAdminEmails, resolveInstance } from '../_lib/instance.js';
+
+export { parseAdminEmails };
 
 // Capabilities (docs/plan-architecture-multi-instances.md, lot 1, Nantes repo): all set to
 // false here, independently of any env variable — this runtime (Cloudflare
@@ -42,34 +44,24 @@ export const CAPABILITIES = {
   HAS_BENCHMARK: false,
   HAS_QUALINKA: false,
   // Internal/external status + manual validation: irrelevant for an instance that only records
-  // its own internal researchers (Centrale). Can be re-enabled with SHOW_STATUS_VALIDATION=true.
+  // its own internal researchers (Centrale). Tunable per instance (capabilities of instance.json).
   HAS_STATUS_VALIDATION: false,
   // « À traiter › Tâches »: needs the /api/tasks routes of server.cjs (no Functions port).
   HAS_TASKS: false,
-  // Public read-only instance (demo): READ_ONLY=true. Not a HAS_* flag — it removes features
+  // Public read-only instance (demo): readOnly in instance.json. Not a HAS_* flag — it removes features
   // rather than adding an integration; the Grist proxy enforces it server-side.
   READ_ONLY: false,
 };
 
-const isTrue = (v) => String(v || '').toLowerCase() === 'true';
-
-/** Instance settings read from the Pages environment (build variables are also exposed
- * to Functions). */
-export const instanceFromEnv = (env = {}) => ({
-  slug: String(env.DRUID_INSTANCE || 'centrale').trim() || 'centrale',
-  label: String(env.INSTANCE_LABEL || 'Centrale Nantes'),
-  readOnly: isTrue(env.READ_ONLY),
-});
-
 /** Capabilities of this instance: the structural ones are fixed (see above), the others
- * come from the environment. */
-export const capabilitiesFromEnv = (env = {}) => ({
+ * come from its settings (functions/_lib/instance.js). */
+export const capabilitiesFor = (instance) => ({
   ...CAPABILITIES,
-  HAS_STATUS_VALIDATION: isTrue(env.SHOW_STATUS_VALIDATION),
-  READ_ONLY: isTrue(env.READ_ONLY),
+  HAS_STATUS_VALIDATION: instance.statusValidation,
+  READ_ONLY: instance.readOnly,
 });
 
-export const buildUser = (email, adminEmails, capabilities = CAPABILITIES, instance = instanceFromEnv()) => {
+export const buildUser = (email, adminEmails, capabilities = CAPABILITIES, instance = resolveInstance()) => {
   const isAdmin = !!email && adminEmails.includes(String(email).toLowerCase());
   const roles = isAdmin ? ['user', 'admin'] : ['user'];
   const access = {
@@ -87,10 +79,10 @@ export const buildUser = (email, adminEmails, capabilities = CAPABILITIES, insta
 export async function onRequest(context) {
   const { request, env } = context;
   const email = request.headers.get('Cf-Access-Authenticated-User-Email');
-  const instance = instanceFromEnv(env);
+  const instance = instanceConfig(env);
   // Read-only instance: nobody is admin (the Administration section only holds write tools).
-  const adminEmails = instance.readOnly ? [] : parseAdminEmails(env.ADMIN_EMAILS);
-  const user = buildUser(email, adminEmails, capabilitiesFromEnv(env), instance);
+  const adminEmails = instance.readOnly ? [] : instance.admins;
+  const user = buildUser(email, adminEmails, capabilitiesFor(instance), instance);
   return new Response(JSON.stringify(user), {
     status: 200,
     headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },

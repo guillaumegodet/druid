@@ -8,8 +8,10 @@
 // (same values as data/<slug>/config.yaml on the biblio-metrics side). No
 // Druid groups on this instance. Cache: Cloudflare Cache API, 1 h.
 
+import { instanceConfig } from '../../_lib/instance.js'
+
 const NEWS_MAX_WORKS = 600
-// OpenAlex polite-pool contact: OPENALEX_MAILTO (Pages variable) overrides this service address.
+// OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
 
 // slug -> OpenAlex institution (source: EC-Nantes biblio-metrics configs)
@@ -41,7 +43,6 @@ const oaShortId = (u) => (u ? String(u).split('/').pop() : '')
 // author present in the Grist Annuaire (matching by normalized name, LABO
 // scope for the lab views — aligned with inject_effectifs_centrale.py).
 
-const DEFAULT_DOC = 'vBpWuYg3n1tPn38CGMMAXS'
 const SLUG_LABOS = {
   'ec-nantes': null, // whole directory
   gem: ['GEM'],
@@ -64,8 +65,7 @@ const normName = (s) =>
 /** Grist Annuaire → Map normalized name → record (name, email, photo, url). */
 async function fetchEffectifs(env, slug) {
   const labos = SLUG_LABOS[slug]
-  const base = (env.GRIST_API_BASE || 'https://grist.numerique.gouv.fr/api').replace(/\/$/, '')
-  const doc = env.GRIST_DOC_ID || DEFAULT_DOC
+  const { apiBase: base, docId: doc } = instanceConfig(env).grist
   const r = await fetch(`${base}/docs/${doc}/tables/Annuaire/records`, {
     headers: { Authorization: `Bearer ${env.GRIST_API_KEY}` },
   })
@@ -155,12 +155,13 @@ const json = (body, status = 200, extraHeaders = {}) =>
     headers: { 'Content-Type': 'application/json', ...extraHeaders },
   })
 
-// Centrale-only route (hard-coded structures and staff filter above): any other Cloudflare
-// instance (DRUID_INSTANCE, docs/plan-instance-demo-cloudflare.md) answers 404, like a
-// structure this function does not know.
+// Centrale-only route (hard-coded structures and staff filter above): an instance without
+// `features.news` in its instance.json (docs/plan-architecture-multi-instances.md, lot 5 c)
+// answers 404, like a structure this function does not know.
 export async function onRequestGet(context) {
   const { request, params } = context
-  if ((context.env?.DRUID_INSTANCE || 'centrale') !== 'centrale') return json({ error: 'Unknown structure' }, 404)
+  const instance = instanceConfig(context.env)
+  if (!instance.features.news) return json({ error: 'Unknown structure' }, 404)
   const slug = String(params.slug || '')
   const institutionId = NEWS_STRUCTS[slug]
   if (!institutionId) return json({ error: 'Unknown structure' }, 404)
@@ -197,7 +198,7 @@ export async function onRequestGet(context) {
       const apiUrl =
         `https://api.openalex.org/works?filter=${encodeURIComponent(filter)}` +
         `&sort=publication_date:desc&per-page=200&page=${page}` +
-        `&mailto=${encodeURIComponent(context.env?.OPENALEX_MAILTO || DEFAULT_MAILTO)}` +
+        `&mailto=${encodeURIComponent(instance.openalexMailto || DEFAULT_MAILTO)}` +
         (apiKey ? `&api_key=${encodeURIComponent(apiKey)}` : '')
       const r = await fetch(apiUrl)
       if (!r.ok) throw new Error(`OpenAlex HTTP ${r.status}`)

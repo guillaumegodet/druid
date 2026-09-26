@@ -15,9 +15,10 @@
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 //   OPENALEX_API_KEY(var, opt) — OpenAlex premium key
 
-// OpenAlex polite-pool contact: OPENALEX_MAILTO (Pages variable) overrides this service address.
+import { instanceConfig } from '../../_lib/instance.js'
+
+// OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
-const DEFAULT_DOC = 'vBpWuYg3n1tPn38CGMMAXS'
 
 const json = (body, status = 200) =>
   new Response(JSON.stringify(body), {
@@ -51,8 +52,7 @@ function linkedinMention(url) {
 async function resolveAuthorMentions(env, authorNames) {
   const names = (Array.isArray(authorNames) ? authorNames : []).filter(Boolean)
   if (names.length === 0 || !env.GRIST_API_KEY) return []
-  const base = (env.GRIST_API_BASE || 'https://grist.numerique.gouv.fr/api').replace(/\/$/, '')
-  const doc = env.GRIST_DOC_ID || DEFAULT_DOC
+  const { apiBase: base, docId: doc } = instanceConfig(env).grist
   try {
     const resp = await fetch(`${base}/docs/${doc}/tables/Annuaire/records`, {
       headers: { Authorization: `Bearer ${env.GRIST_API_KEY}` },
@@ -140,12 +140,13 @@ async function generateSocialPost(env, { title, abstract, authors, labs, journal
   return (data.choices?.[0]?.message?.content || '').trim()
 }
 
-// Centrale-only route (Centrale doc by default, ILAAS relay part of the Veille newsletter):
-// any other Cloudflare instance (DRUID_INSTANCE, docs/plan-instance-demo-cloudflare.md)
+// Centrale-only route (ILAAS relay part of the Veille newsletter): an instance without
+// `features.newsletter` in its instance.json (docs/plan-architecture-multi-instances.md, lot 5 c)
 // answers 404.
 export async function onRequestPost(context) {
   const { request, env } = context
-  if ((env.DRUID_INSTANCE || 'centrale') !== 'centrale') return json({ error: 'Newsletter not available on this instance' }, 404)
+  const instance = instanceConfig(env)
+  if (!instance.features.newsletter) return json({ error: 'Newsletter not available on this instance' }, 404)
   if (!env.ILAAS_API_KEY) {
     return json({ error: 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)' }, 500)
   }
@@ -159,7 +160,7 @@ export async function onRequestPost(context) {
       const apiKey = env.OPENALEX_API_KEY || ''
       const url =
         `https://api.openalex.org/works/${workId}?select=abstract_inverted_index` +
-        `&mailto=${encodeURIComponent(context.env?.OPENALEX_MAILTO || DEFAULT_MAILTO)}` +
+        `&mailto=${encodeURIComponent(instance.openalexMailto || DEFAULT_MAILTO)}` +
         (apiKey ? `&api_key=${encodeURIComponent(apiKey)}` : '')
       const r = await fetch(url)
       if (r.ok) abstract = abstractOf(await r.json())

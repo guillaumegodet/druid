@@ -1,11 +1,29 @@
 // Run: docker run --rm -v "$PWD":/app -w /app node:20-slim node scripts/tests/functions-guards.mjs
 // Harness for the Pages Functions: Grist proxy guard (functions/api/grist/[[path]].js) and
 // shape of /api/me (functions/api/me.js). No network: the guards are called directly.
-import { gristGuard, onRequest as gristProxy } from '../../functions/api/grist/[[path]].js';
-import { buildUser, parseAdminEmails, capabilitiesFromEnv, instanceFromEnv, onRequest as me } from '../../functions/api/me.js';
-import { onRequestGet as news } from '../../functions/api/news/[slug].js';
-import { onRequestPost as newsletterGenerate } from '../../functions/api/newsletter/generate.js';
-import { onRequestPost as newsletterPost } from '../../functions/api/newsletter/post.js';
+import fs from 'node:fs';
+import { createRequire } from 'node:module';
+
+// The Functions import the registry written by a Cloudflare build (functions/_generated/, ignored by
+// git). Absent here, it is created empty (`null`: no instance.json) so that the handlers below run
+// on their Pages variables only; a leftover of a local Cloudflare build is refused, since the
+// handler checks would then depend on that instance.
+const GENERATED = new URL('../../functions/_generated/instance.js', import.meta.url);
+if (!fs.existsSync(GENERATED)) {
+  fs.mkdirSync(new URL('.', GENERATED), { recursive: true });
+  fs.writeFileSync(GENERATED, '// Written by scripts/tests/functions-guards.mjs: no instance.json.\nexport default null;\n');
+} else if (!/^export default null;$/m.test(fs.readFileSync(GENERATED, 'utf8'))) {
+  console.error('functions/_generated/instance.js comes from a local Cloudflare build: delete functions/_generated/ first');
+  process.exit(1);
+}
+
+const { gristGuard, onRequest: gristProxy } = await import('../../functions/api/grist/[[path]].js');
+const { buildUser, parseAdminEmails, capabilitiesFor, onRequest: me } = await import('../../functions/api/me.js');
+const { resolveInstance } = await import('../../functions/_lib/instance.js');
+const { onRequestGet: news } = await import('../../functions/api/news/[slug].js');
+const { onRequestPost: newsletterGenerate } = await import('../../functions/api/newsletter/generate.js');
+const { onRequestPost: newsletterPost } = await import('../../functions/api/newsletter/post.js');
+const { parseInstanceConfig } = createRequire(import.meta.url)('../instances/instanceConfig.cjs');
 
 let ko = 0;
 const check = (label, got, want) => {
@@ -68,12 +86,51 @@ check('ADMIN_EMAILS missing', buildUser('a@example.org', parseAdminEmails(undefi
 
 check('anonymous, default instance label', w.name, 'Centrale Nantes');
 
-// Instance settings and capabilities from the Pages environment
-check('instanceFromEnv default', instanceFromEnv({}), { slug: 'centrale', label: 'Centrale Nantes', readOnly: false });
-check('instanceFromEnv demo', instanceFromEnv({ DRUID_INSTANCE: 'demo', INSTANCE_LABEL: 'Université de Démonstration', READ_ONLY: 'TRUE' }),
+// Instance settings: registry absent = Pages variables and historical defaults
+const pick = (i) => ({ slug: i.slug, label: i.label, readOnly: i.readOnly });
+check('no registry: defaults', resolveInstance({}), {
+  slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false,
+  grist: { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api' },
+  features: { news: true, newsletter: true }, admins: [], openalexMailto: null, fromRegistry: false,
+});
+check('no registry: demo variables', pick(resolveInstance({ DRUID_INSTANCE: 'demo', INSTANCE_LABEL: 'Université de Démonstration', READ_ONLY: 'TRUE' })),
   { slug: 'demo', label: 'Université de Démonstration', readOnly: true });
-check('capabilities default', [capabilitiesFromEnv({}).READ_ONLY, capabilitiesFromEnv({}).HAS_STATUS_VALIDATION], [false, false]);
-check('capabilities demo', [capabilitiesFromEnv({ READ_ONLY: 'true' }).READ_ONLY, capabilitiesFromEnv({ SHOW_STATUS_VALIDATION: 'true' }).HAS_STATUS_VALIDATION], [true, true]);
+check('no registry: news/newsletter only on centrale', resolveInstance({ DRUID_INSTANCE: 'demo' }).features, { news: false, newsletter: false });
+check('no registry: Grist doc from VITE_GRIST_DOC_ID, GRIST_DOC_ID first',
+  [resolveInstance({ VITE_GRIST_DOC_ID: 'docV' }).grist.docId, resolveInstance({ VITE_GRIST_DOC_ID: 'docV', GRIST_DOC_ID: 'docG' }).grist.docId], ['docV', 'docG']);
+check('no registry: ADMIN_EMAILS', resolveInstance({ ADMIN_EMAILS: ' A@example.org,b@example.org ' }).admins, ['a@example.org', 'b@example.org']);
+check('capabilities default', [capabilitiesFor(resolveInstance({})).READ_ONLY, capabilitiesFor(resolveInstance({})).HAS_STATUS_VALIDATION], [false, false]);
+check('capabilities from variables', [capabilitiesFor(resolveInstance({ READ_ONLY: 'true' })).READ_ONLY, capabilitiesFor(resolveInstance({ SHOW_STATUS_VALIDATION: 'true' })).HAS_STATUS_VALIDATION], [true, true]);
+
+// Registry only (the demo instance.json of this repository, as validated by the build)
+const demoRaw = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
+const demoReg = parseInstanceConfig(demoRaw).config;
+const demo = resolveInstance({}, demoReg);
+check('registry only: demo', [pick(demo), demo.grist, demo.features, demo.admins, demo.fromRegistry],
+  [{ slug: 'demo', label: demoReg.label, readOnly: true }, { docId: demoReg.grist.docId, apiBase: 'https://grist.numerique.gouv.fr/api' },
+    { news: false, newsletter: false }, [], true]);
+const privReg = parseInstanceConfig({
+  slug: 'ecole', label: 'École fictive', target: 'cloudflare', domains: ['ecole.example.org'], access: 'cloudflare-access',
+  readOnly: false, grist: { docId: 'docEcole0001', apiBase: 'https://grist.example.org/api/' },
+  capabilities: { HAS_STATUS_VALIDATION: true }, features: { news: true, newsletter: false },
+  admins: ['Admin@Example.org'], openalexMailto: 'veille@example.org', secrets: ['GRIST_API_KEY'],
+}).config;
+const ecole = resolveInstance({}, privReg);
+check('registry only: private instance', [ecole.slug, ecole.readOnly, ecole.statusValidation, ecole.grist, ecole.features, ecole.admins, ecole.openalexMailto],
+  ['ecole', false, true, { docId: 'docEcole0001', apiBase: 'https://grist.example.org/api' }, { news: true, newsletter: false }, ['admin@example.org'], 'veille@example.org']);
+check('registry only: capabilities', [capabilitiesFor(ecole).HAS_STATUS_VALIDATION, capabilitiesFor(ecole).READ_ONLY, capabilitiesFor(ecole).HAS_LDAP], [true, false, false]);
+
+// Registry + Pages variables: a present, non-empty variable overrides its field
+const over = resolveInstance({
+  INSTANCE_LABEL: 'Autre nom', READ_ONLY: 'true', SHOW_STATUS_VALIDATION: 'false', ADMIN_EMAILS: 'c@example.org',
+  OPENALEX_MAILTO: 'autre@example.org', VITE_GRIST_DOC_ID: 'docOverride1', GRIST_API_BASE: 'https://g.example.org/api',
+}, privReg);
+check('registry + variables: overrides', [over.label, over.readOnly, over.statusValidation, over.admins, over.openalexMailto, over.grist],
+  ['Autre nom', true, false, ['c@example.org'], 'autre@example.org', { docId: 'docOverride1', apiBase: 'https://g.example.org/api' }]);
+check('registry + variables: READ_ONLY=false overrides readOnly true', resolveInstance({ READ_ONLY: 'false' }, demoReg).readOnly, false);
+const blank = resolveInstance({ INSTANCE_LABEL: '', READ_ONLY: ' ', ADMIN_EMAILS: '', VITE_GRIST_DOC_ID: '' }, privReg);
+check('registry + empty variables: registry kept', [blank.label, blank.readOnly, blank.admins, blank.grist.docId], ['École fictive', false, ['admin@example.org'], 'docEcole0001']);
+check('registry: features not overridable by the slug', resolveInstance({ DRUID_INSTANCE: 'centrale' }, demoReg).features, { news: false, newsletter: false });
 
 // Handlers (no network: fetch is stubbed and records the upstream call)
 let upstream = null;

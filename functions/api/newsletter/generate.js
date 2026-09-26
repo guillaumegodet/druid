@@ -16,15 +16,15 @@
 //
 // Environment variables:
 //   GRIST_API_KEY   (secret)   — already required by the Grist proxy
-//   GRIST_API_BASE  (var, opt) — default https://grist.numerique.gouv.fr/api
-//   GRIST_DOC_ID    (var, opt) — default: Centrale doc (aligned with VITE_GRIST_DOC_ID)
+//   Grist doc and API base: grist of instance.json (functions/_lib/instance.js)
 //   ILAAS_API_KEY   (secret)   — ILAAS API key (https://llm.ilaas.fr)
 //   ILAAS_API_BASE  (var, opt) — default https://llm.ilaas.fr/v1
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 
-// OpenAlex polite-pool contact: OPENALEX_MAILTO (Pages variable) overrides this service address.
+import { instanceConfig } from '../../_lib/instance.js'
+
+// OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
-const DEFAULT_DOC = 'vBpWuYg3n1tPn38CGMMAXS'
 
 // slug -> OpenAlex institution + label (source: biblio-metrics configs,
 // same values as functions/api/news/[slug].js — keep them in sync).
@@ -158,12 +158,13 @@ async function generateBreve(env, title, abstract, chars) {
   return { accroche: '', resume: content.trim(), raw: content }
 }
 
-// Centrale-only route (hard-coded structures and staff filter above): any other Cloudflare
-// instance (DRUID_INSTANCE, docs/plan-instance-demo-cloudflare.md) answers 404, like a
-// structure this function does not know.
+// Centrale-only route (hard-coded structures and staff filter above): an instance without
+// `features.newsletter` in its instance.json (docs/plan-architecture-multi-instances.md, lot 5 c)
+// answers 404, like a structure this function does not know.
 export async function onRequestPost(context) {
   const { request, env } = context
-  if ((env.DRUID_INSTANCE || 'centrale') !== 'centrale') return json({ error: 'Newsletter not available on this instance' }, 404)
+  const instance = instanceConfig(env)
+  if (!instance.features.newsletter) return json({ error: 'Newsletter not available on this instance' }, 404)
   if (!env.ILAAS_API_KEY) {
     return json({ error: 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)' }, 500)
   }
@@ -180,8 +181,7 @@ export async function onRequestPost(context) {
   const limit = Math.min(6, Math.max(1, parseInt(body.limit, 10) || 4))
   const chars = Math.min(1000, Math.max(300, parseInt(body.chars, 10) || 300))
 
-  const gristBase = (env.GRIST_API_BASE || 'https://grist.numerique.gouv.fr/api').replace(/\/$/, '')
-  const doc = env.GRIST_DOC_ID || DEFAULT_DOC
+  const { apiBase: gristBase, docId: doc } = instance.grist
   const gristHeaders = {
     Authorization: `Bearer ${env.GRIST_API_KEY}`,
     'Content-Type': 'application/json',
@@ -206,7 +206,7 @@ export async function onRequestPost(context) {
       `https://api.openalex.org/works?filter=${encodeURIComponent(filter)}` +
       '&sort=publication_date:desc&per-page=100' +
       '&select=id,title,doi,publication_date,authorships,primary_location,abstract_inverted_index' +
-      `&mailto=${encodeURIComponent(context.env?.OPENALEX_MAILTO || DEFAULT_MAILTO)}` +
+      `&mailto=${encodeURIComponent(instance.openalexMailto || DEFAULT_MAILTO)}` +
       (apiKey ? `&api_key=${encodeURIComponent(apiKey)}` : '')
     const oaResp = await fetch(oaUrl)
     if (!oaResp.ok) throw new Error(`OpenAlex HTTP ${oaResp.status}`)

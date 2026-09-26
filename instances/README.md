@@ -37,9 +37,12 @@ build, the previous deployment stays online) and generates:
 - `functions/_generated/instance.js`: the validated config (`null` without `instance.json`), bundled with the
   Functions — Pages compiles `functions/` after the build command. Both files are ignored by git and Docker.
 
-The build log lists the Pages variables that repeat `instance.json` or override it — do not remove them before lot 5 f. A Pages
-variable still wins: Vite gives real environment variables priority over `.env` files, and the Functions do
-not read the generated config yet (lot 5 c) — until then keep `instance.json` in step with the variables below.
+The Functions read that generated config (`functions/_lib/instance.js`, lot 5 c): label, read-only mode,
+status/validation capability, Grist doc and API base, admins, OpenAlex contact and the `news`/`newsletter`
+features all come from `instance.json`. A Pages variable, when present and non-empty, still wins field by field
+(Vite also gives real environment variables priority over `.env` files); the build log lists the variables that
+repeat `instance.json` or override it. They can be removed from the dashboard in lot 5 f; without
+`instance.json`, the Functions keep the historical defaults below.
 
 ## Variables of a Pages project
 
@@ -50,7 +53,7 @@ Pages exposes the same variables to the build and to the Functions (`functions/`
 | `DRUID_INSTANCE` | build (assets), Functions | unset (= `centrale`) | `demo` |
 | `INSTANCE_LABEL` | `/api/me` (anonymous user name) | unset (= « Centrale Nantes ») | display name of the demo |
 | `READ_ONLY` | `/api/me` (capability, no admin), Grist proxy (403 on writes) | unset | `true` |
-| `VITE_GRIST_DOC_ID` | build, Grist proxy (only proxied doc) | Centrale doc | demo doc (public read) |
+| `VITE_GRIST_DOC_ID` | build, Grist proxy (only proxied doc), news/newsletter | Centrale doc | demo doc (public read) |
 | `VITE_GRIST_PUBLIC_BASE_URL` | build (`lib/gristService.ts`, `lib/readOnly.ts`) | unset (reads through `/api/grist`) | `https://grist.numerique.gouv.fr/api`: the browser reads the public doc directly, no Functions request. **Never on a writable instance** |
 | `GRIST_API_KEY` (secret) | Grist proxy, news/newsletter | required | **unset**: the public doc is read anonymously |
 | `ADMIN_EMAILS` | `/api/me` | admin e-mails | ignored when `READ_ONLY=true` |
@@ -62,7 +65,8 @@ Pages exposes the same variables to the build and to the Functions (`functions/`
 | `OPENALEX_MAILTO` | news, newsletter (OpenAlex polite pool) | unset (= `bu-science-ouverte@univ-nantes.fr`) | unset |
 
 `/api/news/*` and `/api/newsletter/*` hold Centrale structures and staff filters in their code:
-they answer 404 on any other instance.
+they answer 404 unless `features.news` / `features.newsletter` is true in `instance.json` (without
+`instance.json`: Centrale only).
 
 A `DRUID_INSTANCE` without a matching `instances/<slug>/` folder fails the build on purpose, so
 a typo cannot silently deploy a site without data.
