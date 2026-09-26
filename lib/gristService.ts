@@ -21,6 +21,7 @@ import { PARKING_LABOS, classifyDuplicate, LdapDuplicateKind } from './mergeProp
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from './mergeLog';
 import { withDerivedParents } from './structureHierarchy';
 import { gristDocUrl } from './instanceRuntime';
+import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
 
@@ -109,16 +110,6 @@ export function computeDuplicateGroups(records: any[]): { doublonsUid: LdapDiff[
   doublonsUid.sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind] || a.names[0].localeCompare(b.names[0]));
   return { doublonsUid, duplicatesByKind };
 }
-
-/** Mapping dynaEtat code (LDAP) -> statut_dyna label (Grist). */
-const STATUT_DYNA_MAP: Record<string, string> = { N: 'NORMAL', D: 'DEPART', A: 'ANTICIPE' };
-/** Druid status derived from an LDAP dynaEtat code (N → `Interne`, D → `Départ`, other → `Externe`). */
-const statusFromEtat = (etat: any): ResearcherStatus => {
-  const c = String(etat ?? '').trim().toUpperCase().charAt(0);
-  if (c === 'N') return ResearcherStatus.INTERNE;
-  if (c === 'D') return ResearcherStatus.DEPART;
-  return ResearcherStatus.EXTERNE;
-};
 
 /** Diff structures LDAP (supannEntite) ↔ table Grist Structures. */
 export interface StructuresLdapDiff {
@@ -942,14 +933,6 @@ function assignPublicIds(researchers: any[]): void {
 /** LDAP civility / free input → Grist Choice `Civilite` (F / M). A single definition: the LDAP
  * review, the LDAP diff and the attachment of LDAP candidates (which wrote a raw « Mme », review lot 2,
  * finding 2) doivent normaliser pareil. */
-const normalizeCivility = (val: string): string => {
-  if (!val) return '';
-  const v = val.toUpperCase().trim();
-  if (v === 'F' || v === 'FEMME' || v.startsWith('MME') || v.startsWith('MLLE') || v.startsWith('MADAME')) return 'F';
-  if (v === 'M' || v === 'HOMME' || v.startsWith('M.') || v.startsWith('MONSIEUR') || v.startsWith('MR')) return 'M';
-  return v.charAt(0);
-};
-
 // --- Helpers for Grist <-> Druid date conversion ---
 
 const fromGristDate = (rawDate: any): string => {
@@ -1840,6 +1823,12 @@ export const GristService = {
       'Site_web': researcher.profiles?.website || null,
       // Reliability layer (validated status/affiliation).
       ...validationToGristFields(researcher.validation, toGristDateCell),
+      // Record filled from LDAP (« Fill from LDAP »): same traceability as the directory sync.
+      ...(researcher.ldapPrefill ? {
+        'statut_dyna': STATUT_DYNA_MAP[researcher.ldapPrefill.etat.toUpperCase()] || researcher.ldapPrefill.etat || null,
+        'Data_source': 'LDAP',
+        'LDAP_derniere_maj': researcher.ldapPrefill.date,
+      } : {}),
     };
 
     const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {

@@ -152,6 +152,9 @@ export interface Researcher {
   ldapFields?: string[];   // Root fields whose value comes from LDAP (not editable)
   lastSync?: string;       // Date of the last update from an external source
   validation?: ValidationInfo; // Manual reliability layer (takes precedence over the derived status)
+  /** Set by « Fill from LDAP » on a record being created (lib/ldapPerson.ts): createResearcher then
+   *  writes the LDAP traceability (statut_dyna, Data_source, LDAP_derniere_maj). Never read from Grist. */
+  ldapPrefill?: { etat: string; date: string };
 }
 
 /** Cross-cutting functional group (members = column `groupes` of the Grist Annuaire) */

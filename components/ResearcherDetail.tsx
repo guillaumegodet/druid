@@ -15,6 +15,8 @@ import { ValidationMark } from './researchers/StatusBadge';
 import { HelpButton } from './HelpButton';
 import { VIEW_HELP } from '../lib/helpLinks';
 import { gristUiDocUrl } from '../lib/instanceRuntime';
+import { fetchLdapPerson, prefillFromLdap } from '../lib/ldapPerson';
+import type { LdapLookupOutcome } from './researchers/LdapUidLookup';
 
 
 /** Status badge overlaid on the hero photo (photo background → opaque pills). */
@@ -180,6 +182,36 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
     });
   };
 
+  /** « Fill from LDAP » (record being created): LDAP entry → civil status, employment, lab. */
+  const handleLdapLookup = async (uid: string): Promise<LdapLookupOutcome> => {
+    const person = await fetchLdapPerson(uid);
+    const { researcher: next, lab, otherLabs } = prefillFromLdap(localResearcher, person, structures, employerOptions);
+    setLocalResearcher(next);
+    const lines = [t`Filled from LDAP: ${next.displayName}.`];
+    let tone: LdapLookupOutcome['tone'] = 'ok';
+    if (lab) {
+      // Only an empty membership is filled: a lab chosen by hand is kept.
+      if (!affiliations.some((a) => a.structureName)) {
+        setAffiliations(affiliations.length
+          ? affiliations.map((a, i) => (i === 0 ? { ...a, structureName: lab, team: '' } : a))
+          : [{ structureName: lab, team: '', startDate: '', isPrimary: true }]);
+        lines.push(t`Lab: ${lab}.`);
+      }
+      if (otherLabs.length) lines.push(t`Other labs in LDAP: ${otherLabs.join(', ')} — add them as memberships if relevant.`);
+    } else {
+      const affectation = person.affectationPrincipaleLabel || t`none`;
+      lines.push(t`No known lab among the LDAP affectations (principal: ${affectation}): choose it in Memberships.`);
+      tone = 'warn';
+    }
+    const existing = await GristService.fetchAnnuaireRowsByUid(person.uid).catch(() => []);
+    if (existing.length) {
+      const labs = existing.map((r) => String(r.fields['LABO'] || '—')).join(', ');
+      lines.push(t`This uid already has a directory record (${labs}): check it before creating a duplicate.`);
+      tone = 'warn';
+    }
+    return { tone, lines };
+  };
+
   /** Summary and save */
   const handleSave = () => {
     const updated: Researcher = {
@@ -339,6 +371,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
             teamOptions={teamOptions}
             onCreateTeam={onCreateTeam}
             employerOptions={employerOptions}
+            onLdapLookup={onSave && localResearcher.id.startsWith('NEW-') && hasCapability('HAS_LDAP') ? handleLdapLookup : undefined}
           />
           {/* Media monitoring: social networks + editable profiles/CV + lab mentions
               — full width (both grid columns). */}

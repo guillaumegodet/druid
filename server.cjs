@@ -2588,6 +2588,30 @@ app.get('/api/sync-ldap-progress', requireEstablishmentScope, (req, res) => {
   }
 });
 
+// ── Single-person LDAP lookup (researcher creation form) ─────────────────────
+// « Fill from LDAP » button: live search by uid (scripts/lib/ldap_person.cjs). Open to every
+// right that can create an Annuaire record (institution or lab), not only institution tools.
+app.get('/api/ldap/person/:uid', async (req, res) => {
+  const access = req.session.user?.access;
+  if (!access?.allSlugs && !access?.labAnchors?.length && !access?.annuaireLabs?.length) {
+    return res.status(403).json({ error: 'Forbidden' });
+  }
+  if (!process.env.LDAP_URL || !process.env.LDAP_BIND_DN || !process.env.LDAP_BIND_PASSWORD) {
+    return res.status(404).json({ error: 'LDAP not configured on this instance' });
+  }
+  const { lookupLdapPerson, isValidUid } = require('./scripts/lib/ldap_person.cjs');
+  const uid = String(req.params.uid || '').trim();
+  if (!isValidUid(uid)) return res.status(400).json({ error: 'Invalid uid' });
+  try {
+    const person = await lookupLdapPerson(uid);
+    if (!person) return res.status(404).json({ error: 'No LDAP entry for this uid' });
+    res.json(person);
+  } catch (err) {
+    console.error('[LDAP lookup]', err.message);
+    res.status(502).json({ error: 'LDAP directory unreachable' });
+  }
+});
+
 // ── LDAP Structures sync ────────────────────────────────────────────────────
 app.get('/api/sync-structures-ldap-trigger', requireEstablishmentScope, (req, res) => {
   const running = runningProgress(STRUCT_LDAP_PROGRESS_PATH);

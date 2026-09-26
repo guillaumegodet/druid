@@ -1,20 +1,8 @@
 const fs = require('fs');
-const { BIND_DN, BIND_PW, createLdapClient, getArg, writeProgress } = require('./lib/ldap_common.cjs');
+const { BIND_DN, BIND_PW, createLdapClient, getArg, writeProgress, extractDateFin } = require('./lib/ldap_common.cjs');
 
 const PROGRESS_PATH = getArg('progress', 'ldap_status_progress.json');
 const client = createLdapClient();
-
-/** « [datefin=20260831000000Z] » → « 2026-08-31 » (the latest one if several profiles, '' if a profile has none). */
-function extractDateFin(profils) {
-    if (!profils.length) return '';
-    const fins = [];
-    for (const prof of profils) {
-        const m = /\[datefin=(\d{4})(\d{2})(\d{2})/.exec(String(prof));
-        if (!m) return '';
-        fins.push(`${m[1]}-${m[2]}-${m[3]}`);
-    }
-    return fins.sort().pop();
-}
 
 async function syncAllStatuses() {
     writeProgress(PROGRESS_PATH, { running: true, startedAt: new Date().toISOString() });

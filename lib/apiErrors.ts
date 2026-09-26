@@ -98,6 +98,11 @@ export const API_ERRORS = [
   msg`Alignment already running`,
   msg`Unknown alignment source`,
   msg`No run yet`,
+  // single-person LDAP lookup (researcher creation form)
+  msg`LDAP not configured on this instance`,
+  msg`Invalid uid`,
+  msg`No LDAP entry for this uid`,
+  msg`LDAP directory unreachable`,
   // browser / network
   msg`Failed to fetch`,
   msg`NetworkError when attempting to fetch resource.`,

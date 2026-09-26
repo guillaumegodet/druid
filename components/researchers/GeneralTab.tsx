@@ -4,6 +4,7 @@ import { Researcher, Affiliation } from '../../types';
 import { AffiliationsTable, TeamOption } from './AffiliationsTable';
 import { GradeSelect } from './GradeSelect';
 import { FuzzyDateInput } from './FuzzyDateInput';
+import { LdapUidLookup, LdapLookupOutcome } from './LdapUidLookup';
 import { Trans, useLingui } from '@lingui/react/macro';
 
 const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean }> = ({ label, fromLdap }) => (
@@ -47,6 +48,8 @@ interface GeneralTabProps {
   employerOptions?: string[];
   /** « Ajouter une équipe… » (Team menu) → creation page of a team of the lab. */
   onCreateTeam?: (structureName: string) => void;
+  /** « Fill from LDAP » on a record being created (LDAP instances only) — undefined hides it. */
+  onLdapLookup?: (uid: string) => Promise<LdapLookupOutcome>;
 }
 
 export const GeneralTab: React.FC<GeneralTabProps> = ({
@@ -61,6 +64,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
   teamOptions = [],
   employerOptions = [],
   onCreateTeam,
+  onLdapLookup,
 }) => {
   const { t } = useLingui();
   return (
@@ -178,6 +182,9 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
        <div className="glass-card p-5 md:p-6 lg:col-start-2 lg:row-start-2 min-w-0">
          <div className="section-label mb-4"><Trans>Personal details</Trans></div>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {onLdapLookup && (
+              <LdapUidLookup uid={researcher.uid || ''} onUidChange={(v) => onUpdateField('uid', v)} onLookup={onLdapLookup} />
+            )}
             <div>
               <label className={fieldLabel}><Trans context="honorific">Title</Trans></label>
               <select value={researcher.civility} onChange={(e) => onUpdateField('civility', e.target.value)} className="input-soft">
@@ -208,6 +215,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 className={`input-soft${researcher.ldapFields?.includes('birthDate') ? ' opacity-60 cursor-not-allowed' : ''}`}
               />
             </div>
+            {!onLdapLookup && (
             <div>
               <label className={fieldLabel}><Trans>UID (Dyna)</Trans></label>
               <input
@@ -218,6 +226,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 readOnly={!researcher.id.startsWith('NEW-')}
               />
             </div>
+            )}
          </div>
        </div>
 

@@ -47,4 +47,16 @@ function writeProgress(progressPath, data) {
   try { fs.writeFileSync(progressPath, JSON.stringify(data)); } catch (e) { /* noop */ }
 }
 
-module.exports = { LDAP_URL, BIND_DN, BIND_PW, createLdapClient, getArg, writeProgress };
+/** « [datefin=20260831000000Z] » → « 2026-08-31 » (the latest one if several profiles, '' if a profile has none). */
+function extractDateFin(profils) {
+    if (!profils.length) return '';
+    const fins = [];
+    for (const prof of profils) {
+        const m = /\[datefin=(\d{4})(\d{2})(\d{2})/.exec(String(prof));
+        if (!m) return '';
+        fins.push(`${m[1]}-${m[2]}-${m[3]}`);
+    }
+    return fins.sort().pop();
+}
+
+module.exports = { LDAP_URL, BIND_DN, BIND_PW, createLdapClient, getArg, writeProgress, extractDateFin };
