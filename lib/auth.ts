@@ -44,6 +44,9 @@ export interface DruidCapabilities {
   HAS_SERVER_JOBS: boolean;
   /** Benchmark module (external collaboration) — not merged yet (lot 3 of the plan). */
   HAS_BENCHMARK: boolean;
+  /** Inter-lab mode of the « Réseau » tab: /api/network of server.cjs, fed by the network.json of
+   * druid-biblio (docs/plan-reseau-inter-labos.md) — false on Cloudflare. */
+  HAS_NETWORK_API: boolean;
   /** IdRef alignment enriched by the Neo4j context (scripts/sync_idref_qualinka.cjs,
    * `align` mode of /api/sync-idref-trigger) — without it, IdRef alignment remains available
    * through the generic Solr pipeline (scripts/sync_idref.cjs, search/verify modes). */
@@ -82,6 +85,7 @@ const EMPTY_CAPABILITIES: DruidCapabilities = {
   HAS_SOVISU_EXPORT: false,
   HAS_SERVER_JOBS: false,
   HAS_BENCHMARK: false,
+  HAS_NETWORK_API: false,
   HAS_QUALINKA: false,
   HAS_STATUS_VALIDATION: false,
   HAS_TASKS: false,

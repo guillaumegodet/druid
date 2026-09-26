@@ -1,0 +1,70 @@
+---
+title: "Explorer le réseau de co-signatures"
+description: "Lire le graphe des co-signatures d'un labo et l'ouvrir aux autres labos de l'université pour voir les passerelles."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure"
+	menu="Tableau de bord › Réseau"
+/>
+
+L'onglet **Réseau** dessine qui publie avec qui. Chaque rond est un chercheur (sa taille
+suit son nombre de publications), chaque trait une ou plusieurs publications cosignées. Le
+graphe se lit sur la période choisie en haut du tableau de bord.
+
+## Le réseau du labo
+
+Par défaut, le graphe montre les chercheurs du labo et leurs co-signatures, colorés par
+équipe. Le curseur **Publications min.** masque les auteurs les moins actifs pour garder un
+graphe lisible. Faites glisser les ronds, zoomez à la molette ; survolez un chercheur pour
+faire ressortir ses cosignataires.
+
+## Ouvrir le réseau à d'autres labos
+
+1. Dans le bandeau au-dessus du graphe, cliquez sur un labo suggéré (**+ IETR**…) : les
+   suggestions sont les labos avec lesquels votre labo copublie le plus sur la période. Le
+   champ **Autre labo…** permet d'en chercher un autre.
+2. Le graphe montre alors les chercheurs de votre labo **et** ceux des labos ajoutés,
+   **colorés par labo**. Les traits entre deux labos différents sont accentués, ceux
+   internes à un labo sont atténués.
+3. Cochez **Liens inter-labos seulement** pour ne garder que les passerelles : les
+   chercheurs qui ont cosigné avec un autre labo.
+4. Cochez **Afficher les autres labos en nœuds regroupés** pour voir d'un coup d'œil tous
+   les labos de l'université : chaque labo non sélectionné devient un losange, relié aux
+   chercheurs de votre labo qui ont publié avec lui.
+5. **Cliquez sur un trait** pour lister les publications communes, avec leur lien DOI.
+
+Les chercheurs **cerclés** appartiennent à plusieurs labos : ce sont souvent eux qui font le
+lien. La sélection est conservée dans l'adresse de la page : copiez-la pour partager la vue.
+
+## Qui voit quoi
+
+- Avec un droit sur **tout l'établissement**, tous les chercheurs des labos choisis sont
+  visibles.
+- Avec un droit limité à **votre labo**, les chercheurs des autres labos n'apparaissent que
+  s'ils ont copublié avec votre labo, et seules les publications cosignées par votre labo
+  sont listées.
+
+## Limites connues
+
+- **Le mode inter-labos s'appuie sur le corpus de l'université** : il peut différer un peu du
+  réseau du seul labo (dates de mise à jour différentes, orthographes de noms abrégées).
+- **Environ un quart des signatures n'est rattaché à aucun labo** (noms abrégés dans
+  OpenAlex, personnes absentes des effectifs) : ces auteurs ne sont pas affichés. Le taux
+  est indiqué sous le bandeau.
+- **Un chercheur est identifié par son nom** : deux homonymes de labos différents peuvent
+  être confondus.
+- **Les grandes collaborations** (plus de 50 auteurs) sont exclues par défaut, car une
+  seule publication y relie des dizaines de personnes ; décochez la case pour les inclure.
+- **Au-delà de 400 chercheurs**, les moins actifs sont masqués : relevez le seuil ou réduisez
+  la sélection.
+- Le mode inter-labos n'est pas disponible sur toutes les instances.
+
+## Voir aussi
+
+- [Analyser les collaborations](/guides/tableau-de-bord/collaborations/)
+- [Publications et attribution](/donnees/publications-attribution/#collaborations)

@@ -1,0 +1,68 @@
+---
+title: "Explore the co-authorship network"
+description: "Read the co-authorship graph of a lab and open it to the university's other labs to see the bridges."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure"
+	menu="Dashboard › Network"
+/>
+
+The **Network** tab draws who publishes with whom. Each circle is a researcher (its size
+follows their number of publications), each line one or more co-signed publications. The
+graph reads on the period chosen at the top of the dashboard.
+
+## The lab's network
+
+By default, the graph shows the lab's researchers and their co-authorships, coloured by
+team. The **Min. publications** slider hides the least active authors to keep the graph
+readable. Drag the circles, zoom with the mouse wheel; hover over a researcher to bring out
+their co-authors.
+
+## Open the network to other labs
+
+1. In the banner above the graph, click a suggested lab (**+ IETR**…): the suggestions are
+   the labs your lab co-publishes with most over the period. The **Other lab…** field lets
+   you search for another one.
+2. The graph then shows the researchers of your lab **and** of the added labs,
+   **coloured by lab**. Lines between two different labs are emphasized, lines inside a lab
+   fade.
+3. Tick **Cross-lab links only** to keep only the bridges: the researchers who co-signed
+   with another lab.
+4. Tick **Show the other labs as grouped nodes** to see all the university's labs at a
+   glance: every lab not selected becomes a diamond, linked to the researchers of your lab
+   who published with it.
+5. **Click a line** to list the common publications, with their DOI link.
+
+**Outlined** researchers belong to several labs: they are often the ones making the link.
+The selection is kept in the page address: copy it to share the view.
+
+## Who sees what
+
+- With a right on **the whole institution**, every researcher of the chosen labs is visible.
+- With a right limited to **your lab**, researchers of other labs only appear when they
+  co-published with your lab, and only the publications co-signed by your lab are listed.
+
+## Known limitations
+
+- **The inter-lab mode relies on the university corpus**: it may differ slightly from the
+  lab-only network (different update dates, abbreviated name spellings).
+- **About a quarter of the signatures are linked to no lab** (abbreviated names in OpenAlex,
+  people missing from the staff lists): these authors are not shown. The rate is given below
+  the banner.
+- **A researcher is identified by their name**: two namesakes from different labs may be
+  merged.
+- **Large collaborations** (more than 50 authors) are excluded by default, since a single
+  publication links dozens of people there; untick the box to include them.
+- **Beyond 400 researchers**, the least active are hidden: raise the threshold or narrow the
+  selection.
+- The inter-lab mode is not available on every instance.
+
+## See also
+
+- [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/)
+- [Publications and attribution](/en/donnees/publications-attribution/#collaborations)

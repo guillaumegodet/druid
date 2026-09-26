@@ -50,7 +50,7 @@ export const DASHBOARD_TAB_HELP: Record<DashboardTab, string> = {
   teams: '/donnees/publications-attribution/#comment-les-auteurs-sont-reconnus',
   phd: '/donnees/publications-attribution/#comment-les-auteurs-sont-reconnus',
   researchers: '/donnees/publications-attribution/#comment-les-auteurs-sont-reconnus',
-  network: '/donnees/publications-attribution/#collaborations',
+  network: '/guides/tableau-de-bord/reseau/',
   list: '/guides/tableau-de-bord/liste-des-publications/',
   news: '/guides/veille/nouvelles-publications/',
   sources: '/donnees/sources-des-donnees/#longlet-sources-du-tableau-de-bord',

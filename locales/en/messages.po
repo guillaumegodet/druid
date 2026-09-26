@@ -201,6 +201,7 @@ msgstr "Loading dashboard…"
 
 #: App.tsx:898
 #: components/dashboard/EmbedPage.tsx:68
+#: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
 #: components/etl/EtlConsolePage.tsx:457
 #: components/researchers/MergeLogPanel.tsx:64
@@ -511,7 +512,7 @@ msgid "Copied!"
 msgstr "Copied!"
 
 #: components/DashboardPage.tsx:376
-#: components/dashboard/EChartCard.tsx:325
+#: components/dashboard/EChartCard.tsx:332
 msgid "Copy link"
 msgstr "Copy link"
 
@@ -1110,7 +1111,7 @@ msgid "Open full screen / regenerate from the current structures.csv"
 msgstr "Open full screen / regenerate from the current structures.csv"
 
 #: components/StructureList.tsx:348
-#: components/dashboard/EChartCard.tsx:503
+#: components/dashboard/EChartCard.tsx:516
 msgid "Full screen"
 msgstr "Full screen"
 
@@ -2583,12 +2584,13 @@ msgstr "Co-signing French institutions (outside Nantes Université) — <0>{0}</
 msgid "Most co-signing institutions"
 msgstr "Most co-signing institutions"
 
-#: components/dashboard/EChartCard.tsx:245
+#: components/dashboard/EChartCard.tsx:252
 msgid "About “{title}”"
 msgstr "About “{title}”"
 
-#: components/dashboard/EChartCard.tsx:251
-#: components/dashboard/EChartCard.tsx:316
+#: components/dashboard/EChartCard.tsx:258
+#: components/dashboard/EChartCard.tsx:323
+#: components/dashboard/NetworkTab.tsx:356
 #: components/dashboard/NewsTab.tsx:815
 #: components/dashboard/NewsletterPanel.tsx:484
 #: components/dashboard/report/ReportWizard.tsx:246
@@ -2596,59 +2598,59 @@ msgstr "About “{title}”"
 msgid "Close"
 msgstr "Close"
 
-#: components/dashboard/EChartCard.tsx:258
+#: components/dashboard/EChartCard.tsx:265
 #: components/researchers/TaskForm.tsx:147
 #: components/structures/IdentificationTab.tsx:57
 msgid "Description"
 msgstr "Description"
 
-#: components/dashboard/EChartCard.tsx:262
+#: components/dashboard/EChartCard.tsx:269
 #: components/dashboard/report/pdfDoc.ts:196
 msgid "Method"
 msgstr "Method"
 
-#: components/dashboard/EChartCard.tsx:267
+#: components/dashboard/EChartCard.tsx:274
 #: components/dashboard/report/pdfDoc.ts:197
 msgid "Limitations"
 msgstr "Limitations"
 
-#: components/dashboard/EChartCard.tsx:310
+#: components/dashboard/EChartCard.tsx:317
 msgid "Share “{title}”"
 msgstr "Share “{title}”"
 
-#: components/dashboard/EChartCard.tsx:313
+#: components/dashboard/EChartCard.tsx:320
 msgid "Public link: accessible without authentication, with the current filters (structure and year range)."
 msgstr "Public link: accessible without authentication, with the current filters (structure and year range)."
 
-#: components/dashboard/EChartCard.tsx:322
+#: components/dashboard/EChartCard.tsx:329
 msgid "Direct link"
 msgstr "Direct link"
 
-#: components/dashboard/EChartCard.tsx:328
+#: components/dashboard/EChartCard.tsx:335
 msgid "Open in a new tab"
 msgstr "Open in a new tab"
 
-#: components/dashboard/EChartCard.tsx:335
+#: components/dashboard/EChartCard.tsx:342
 msgid "Iframe embed"
 msgstr "Iframe embed"
 
-#: components/dashboard/EChartCard.tsx:346
+#: components/dashboard/EChartCard.tsx:353
 msgid "Copy the embed code"
 msgstr "Copy the embed code"
 
-#: components/dashboard/EChartCard.tsx:486
+#: components/dashboard/EChartCard.tsx:499
 msgid "Methodology (description, method, limitations)"
 msgstr "Methodology (description, method, limitations)"
 
-#: components/dashboard/EChartCard.tsx:493
+#: components/dashboard/EChartCard.tsx:506
 msgid "Share (public link / iframe)"
 msgstr "Share (public link / iframe)"
 
-#: components/dashboard/EChartCard.tsx:497
+#: components/dashboard/EChartCard.tsx:510
 msgid "Download as PNG"
 msgstr "Download as PNG"
 
-#: components/dashboard/EChartCard.tsx:503
+#: components/dashboard/EChartCard.tsx:516
 msgid "Exit full screen"
 msgstr "Exit full screen"
 
@@ -2910,7 +2912,9 @@ msgstr "Most cited publications"
 
 #. placeholder {0}: c.works_count
 #. placeholder {0}: rows.length
+#. placeholder {0}: state.total
 #: components/dashboard/ImpactTab.tsx:184
+#: components/dashboard/NetworkTab.tsx:352
 #: components/groups/AuthorResolveModal.tsx:124
 msgid "{0, plural, one {# publication} other {# publications}}"
 msgstr "{0, plural, one {# publication} other {# publications}}"
@@ -3548,13 +3552,104 @@ msgstr "Concerns the institution (Nantes Université)"
 msgid "Publish"
 msgstr "Publish"
 
-#: components/dashboard/NetworkTab.tsx:25
+#: components/dashboard/NetworkTab.tsx:111
+msgid "Other labs (grouped)"
+msgstr "Other labs (grouped)"
+
+#: components/dashboard/NetworkTab.tsx:117
+msgid "Loading"
+msgstr "Loading"
+
+#: components/dashboard/NetworkTab.tsx:119
 msgid "Min. publications: {minPubs}"
 msgstr "Min. publications: {minPubs}"
 
-#: components/dashboard/NetworkTab.tsx:41
+#: components/dashboard/NetworkTab.tsx:152
+msgid "The university network could not be loaded."
+msgstr "The university network could not be loaded."
+
+#: components/dashboard/NetworkTab.tsx:153
+msgid "Loading the university network…"
+msgstr "Loading the university network…"
+
+#: components/dashboard/NetworkTab.tsx:156
+msgid "No co-publication between these labs over the period."
+msgstr "No co-publication between these labs over the period."
+
+#: components/dashboard/NetworkTab.tsx:157
 msgid "No author above the threshold over the period."
 msgstr "No author above the threshold over the period."
+
+#: components/dashboard/NetworkTab.tsx:230
+msgid "Open to other labs of the university"
+msgstr "Open to other labs of the university"
+
+#: components/dashboard/NetworkTab.tsx:230
+msgid "Labs to show"
+msgstr "Labs to show"
+
+#: components/dashboard/NetworkTab.tsx:237
+msgid "Remove this lab"
+msgstr "Remove this lab"
+
+#: components/dashboard/NetworkTab.tsx:249
+msgid "Add this lab"
+msgstr "Add this lab"
+
+#: components/dashboard/NetworkTab.tsx:254
+#: components/dashboard/NetworkTab.tsx:276
+msgid "{copubs, plural, one {# co-pub.} other {# co-pubs}}"
+msgstr "{copubs, plural, one {# co-pub.} other {# co-pubs}}"
+
+#: components/dashboard/NetworkTab.tsx:262
+msgid "Other lab…"
+msgstr "Other lab…"
+
+#: components/dashboard/NetworkTab.tsx:284
+msgid "Clear"
+msgstr "Clear"
+
+#: components/dashboard/NetworkTab.tsx:289
+msgid "Every lab not selected above becomes a single node"
+msgstr "Every lab not selected above becomes a single node"
+
+#: components/dashboard/NetworkTab.tsx:291
+msgid "Show the other labs as grouped nodes"
+msgstr "Show the other labs as grouped nodes"
+
+#: components/dashboard/NetworkTab.tsx:295
+msgid "Cross-lab links only"
+msgstr "Cross-lab links only"
+
+#: components/dashboard/NetworkTab.tsx:299
+msgid "Exclude large collaborations (more than {LARGE_COLLAB_MAX_AUTHORS} authors)"
+msgstr "Exclude large collaborations (more than {LARGE_COLLAB_MAX_AUTHORS} authors)"
+
+#. placeholder {0}: meta.source
+#: components/dashboard/NetworkTab.tsx:304
+msgid "Source: university-wide corpus ({0}) of {generated}; {coveragePct}% of the internal signatures are linked to a lab, the others are not shown. Outlined authors belong to several labs."
+msgstr "Source: university-wide corpus ({0}) of {generated}; {coveragePct}% of the internal signatures are linked to a lab, the others are not shown. Outlined authors belong to several labs."
+
+#: components/dashboard/NetworkTab.tsx:309
+msgid "Authors of other labs only appear when they co-published with your lab."
+msgstr "Authors of other labs only appear when they co-published with your lab."
+
+#: components/dashboard/NetworkTab.tsx:312
+msgid "{truncated, plural, one {# less active author hidden: raise the threshold or narrow the selection.} other {# less active authors hidden: raise the threshold or narrow the selection.}}"
+msgstr "{truncated, plural, one {# less active author hidden: raise the threshold or narrow the selection.} other {# less active authors hidden: raise the threshold or narrow the selection.}}"
+
+#: components/dashboard/NetworkTab.tsx:349
+msgid "Co-publications {from} — {to}"
+msgstr "Co-publications {from} — {to}"
+
+#: components/dashboard/NetworkTab.tsx:361
+msgid "The publications could not be loaded."
+msgstr "The publications could not be loaded."
+
+#: components/dashboard/NetworkTab.tsx:374
+#: components/dashboard/NewsTab.tsx:707
+msgid "(untitled)"
+msgstr "(untitled)"
 
 #: components/dashboard/NewsTab.tsx:43
 msgid "Media"
@@ -3776,10 +3871,6 @@ msgstr "Cit."
 #: components/dashboard/NewsTab.tsx:698
 msgid "Link"
 msgstr "Link"
-
-#: components/dashboard/NewsTab.tsx:707
-msgid "(untitled)"
-msgstr "(untitled)"
 
 #: components/dashboard/NewsTab.tsx:735
 #: components/researchers/TasksPage.tsx:108
@@ -4850,12 +4941,32 @@ msgstr "Other"
 msgid "Publication languages"
 msgstr "Publication languages"
 
-#: components/dashboard/charts/NetworkChart.tsx:63
+#: components/dashboard/charts/NetworkChart.tsx:44
+msgid "{from} — {to}: {count} co-publications"
+msgstr "{from} — {to}: {count} co-publications"
+
+#: components/dashboard/charts/NetworkChart.tsx:47
+msgid "{name} (lab): {count} co-publications"
+msgstr "{name} (lab): {count} co-publications"
+
+#: components/dashboard/charts/NetworkChart.tsx:49
+msgid "{name} ({labs}): {count} publications"
+msgstr "{name} ({labs}): {count} publications"
+
+#: components/dashboard/charts/NetworkChart.tsx:137
+msgid "Co-authorship network between labs"
+msgstr "Co-authorship network between labs"
+
+#: components/dashboard/charts/NetworkChart.tsx:137
 #: components/dashboard/embedRegistry.tsx:349
 msgid "Co-authorship network"
 msgstr "Co-authorship network"
 
-#: components/dashboard/charts/NetworkChart.tsx:64
+#: components/dashboard/charts/NetworkChart.tsx:139
+msgid "University authors; size = number of publications, colour = lab. Click a link to list the co-publications."
+msgstr "University authors; size = number of publications, colour = lab. Click a link to list the co-publications."
+
+#: components/dashboard/charts/NetworkChart.tsx:140
 msgid "Internal authors; size = number of publications, colour = team"
 msgstr "Internal authors; size = number of publications, colour = team"
 
@@ -9625,14 +9736,30 @@ msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
 #: lib/apiErrors.ts:107
+msgid "No network data"
+msgstr "No network data"
+
+#: lib/apiErrors.ts:108
+msgid "Unreadable network data"
+msgstr "Unreadable network data"
+
+#: lib/apiErrors.ts:109
+msgid "Structure not in the university network"
+msgstr "Structure not in the university network"
+
+#: lib/apiErrors.ts:110
+msgid "Invalid node ids"
+msgstr "Invalid node ids"
+
+#: lib/apiErrors.ts:112
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:113
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:114
 msgid "Load failed"
 msgstr "Load failed"
 

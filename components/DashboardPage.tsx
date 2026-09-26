@@ -452,7 +452,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               {tab === 'researchers' && (
                 <ResearchersTab dataset={scopedData} range={range} onOpenList={openList} />
               )}
-              {tab === 'network' && <NetworkTab dataset={scopedData} range={range} />}
+              {tab === 'network' && <NetworkTab dataset={scopedData} range={range} slug={slug} />}
               {tab === 'journals' && (
                 <JournalsTab publications={scopedData.publications} range={range} slug={slug} onOpenList={openList} />
               )}

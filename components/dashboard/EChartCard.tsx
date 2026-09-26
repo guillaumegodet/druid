@@ -220,7 +220,14 @@ interface EChartCardProps {
   shareable?: boolean;
   /** Click on a series element (bar, donut slice…) — lets the
    * tabs open the pre-filtered publication list. */
-  onSeriesClick?: (params: { name: string; seriesName?: string; dataIndex: number }) => void;
+  onSeriesClick?: (params: {
+    name: string;
+    seriesName?: string;
+    dataIndex: number;
+    /** Graph series: 'node' or 'edge'. */
+    dataType?: string;
+    data?: unknown;
+  }) => void;
 }
 
 /** « Méthodologie » dialog: description / method / limits sheet of the
@@ -419,8 +426,14 @@ export const EChartCard: React.FC<EChartCardProps> = ({
   useEffect(() => {
     const chart = chartRef.current;
     if (!chart || !onSeriesClick) return;
-    const handler = (p: { name?: unknown; seriesName?: string; dataIndex: number }) =>
-      onSeriesClick({ name: String(p.name ?? ''), seriesName: p.seriesName, dataIndex: p.dataIndex });
+    const handler = (p: { name?: unknown; seriesName?: string; dataIndex: number; dataType?: string; data?: unknown }) =>
+      onSeriesClick({
+        name: String(p.name ?? ''),
+        seriesName: p.seriesName,
+        dataIndex: p.dataIndex,
+        dataType: p.dataType,
+        data: p.data,
+      });
     chart.on('click', handler);
     return () => {
       if (!chart.isDisposed()) chart.off('click', handler);

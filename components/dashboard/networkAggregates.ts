@@ -10,12 +10,18 @@ export interface NetworkNode {
   name: string;
   value: number; // number of publications
   category: number;
+  /** Inter-lab mode: `lab` = aggregated node of a lab not expanded (plan-reseau-inter-labos.md, lot 4). */
+  kind?: 'author' | 'lab';
+  /** Inter-lab mode: labs of the author (several = a bridge between labs). */
+  labs?: string[];
 }
 
 export interface NetworkLink {
   source: string;
   target: string;
   value: number; // co-publications
+  /** Inter-lab mode: the two ends share no lab. */
+  cross?: boolean;
 }
 
 export interface NetworkData {

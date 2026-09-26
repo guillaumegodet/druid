@@ -103,6 +103,11 @@ export const API_ERRORS = [
   msg`Invalid uid`,
   msg`No LDAP entry for this uid`,
   msg`LDAP directory unreachable`,
+  // inter-lab « Réseau » (docs/plan-reseau-inter-labos.md)
+  msg`No network data`,
+  msg`Unreadable network data`,
+  msg`Structure not in the university network`,
+  msg`Invalid node ids`,
   // browser / network
   msg`Failed to fetch`,
   msg`NetworkError when attempting to fetch resource.`,

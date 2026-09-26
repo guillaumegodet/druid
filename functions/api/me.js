@@ -42,6 +42,8 @@ export const CAPABILITIES = {
   HAS_SOVISU_EXPORT: false,
   HAS_SERVER_JOBS: false,
   HAS_BENCHMARK: false,
+  // Inter-lab « Réseau » (/api/network of server.cjs, reads druid-biblio's network.json): no Functions port.
+  HAS_NETWORK_API: false,
   HAS_QUALINKA: false,
   // Internal/external status + manual validation: irrelevant for an instance that only records
   // its own internal researchers (Centrale). Tunable per instance (capabilities of instance.json).
