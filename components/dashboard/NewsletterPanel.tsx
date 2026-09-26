@@ -8,6 +8,7 @@ import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { apiErrorText } from '../../lib/apiErrors';
+import { gristDocId } from '../../lib/instanceRuntime';
 
 // Editorial workflow of the general-public newsletter: news items are generated
 // by /api/newsletter/generate (ILAAS LLM, OpenAlex articles ≤ 30 days) and
@@ -17,8 +18,8 @@ import { apiErrorText } from '../../lib/apiErrors';
 // newsletter (phase 1: HTML export + recipients to paste into the mailing
 // mail institutionnel).
 
+// Always through the proxy (writes); doc of the instance from /api/me (lib/instanceRuntime.ts).
 const GRIST = '/api/grist';
-const DOC = import.meta.env.VITE_GRIST_DOC_ID;
 
 type Statut = 'genere' | 'envoye' | 'valide' | 'rejete' | 'publie';
 
@@ -51,7 +52,7 @@ const STATUT_META: Record<Statut, { label: MessageDescriptor; cls: string }> = {
 };
 
 async function gristFetch(path: string, init?: RequestInit): Promise<any> {
-  const r = await fetch(`${GRIST}/docs/${DOC}/${path}`, {
+  const r = await fetch(`${GRIST}/docs/${gristDocId()}/${path}`, {
     ...init,
     headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
   });

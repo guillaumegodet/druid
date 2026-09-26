@@ -5,7 +5,7 @@
 // (`null` when the instance has no instance.json yet). Pages variables still override it during
 // the transition, field by field, when they are present and non-empty (lot 5 f removes them):
 //   DRUID_INSTANCE, INSTANCE_LABEL, READ_ONLY, SHOW_STATUS_VALIDATION, ADMIN_EMAILS,
-//   OPENALEX_MAILTO, GRIST_DOC_ID / VITE_GRIST_DOC_ID, GRIST_API_BASE.
+//   OPENALEX_MAILTO, GRIST_DOC_ID / VITE_GRIST_DOC_ID, GRIST_API_BASE, VITE_GRIST_PUBLIC_BASE_URL.
 // Without registry nor variable, the defaults are the historical ones (Centrale).
 //
 // No route: this module exports no onRequest handler, so Pages does not serve it.
@@ -29,13 +29,17 @@ export const resolveInstance = (env = {}, reg = null) => {
   const slug = (isSet(env.DRUID_INSTANCE) ? String(env.DRUID_INSTANCE).trim() : reg?.slug) || DEFAULT_SLUG;
   const envBool = (name, fallback) => (isSet(env[name]) ? isTrue(env[name]) : fallback);
   const docId = [env.GRIST_DOC_ID, env.VITE_GRIST_DOC_ID, reg?.grist?.docId].find(isSet) || '';
-  const apiBase = [env.GRIST_API_BASE, reg?.grist?.apiBase].find(isSet) || DEFAULT_GRIST_API_BASE;
+  const apiBase = String([env.GRIST_API_BASE, reg?.grist?.apiBase].find(isSet) || DEFAULT_GRIST_API_BASE).trim().replace(/\/$/, '');
+  // Public doc read directly by the browser (read-only instance): its API base, else null (proxy).
+  const publicBaseUrl = isSet(env.VITE_GRIST_PUBLIC_BASE_URL)
+    ? String(env.VITE_GRIST_PUBLIC_BASE_URL).trim().replace(/\/$/, '')
+    : (reg?.grist?.publicRead ? apiBase : null);
   return {
     slug,
     label: String([env.INSTANCE_LABEL, reg?.label].find(isSet) || 'Centrale Nantes'),
     readOnly: envBool('READ_ONLY', !!reg?.readOnly),
     statusValidation: envBool('SHOW_STATUS_VALIDATION', !!reg?.capabilities?.HAS_STATUS_VALIDATION),
-    grist: { docId: String(docId).trim(), apiBase: String(apiBase).trim().replace(/\/$/, '') },
+    grist: { docId: String(docId).trim(), apiBase, publicBaseUrl },
     // Without registry, news and newsletter keep their historical rule: Centrale only.
     features: {
       news: reg ? !!reg.features?.news : slug === DEFAULT_SLUG,
@@ -49,3 +53,12 @@ export const resolveInstance = (env = {}, reg = null) => {
 
 /** Settings of the running instance: generated registry + Pages environment. */
 export const instanceConfig = (env = {}) => resolveInstance(env, registry);
+
+/** Instance block of /api/me (lib/instanceRuntime.ts): what the browser needs, nothing private. */
+export const publicInstanceInfo = (instance) => ({
+  slug: instance.slug,
+  label: instance.label,
+  gristDocId: instance.grist.docId,
+  gristPublicBaseUrl: instance.grist.publicBaseUrl,
+  gristUiUrl: instance.grist.apiBase.replace(/\/api$/, ''),
+});

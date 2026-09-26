@@ -20,6 +20,7 @@ export interface LdapFieldChange {
 import { PARKING_LABOS, classifyDuplicate, LdapDuplicateKind } from './mergeProposal';
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from './mergeLog';
 import { withDerivedParents } from './structureHierarchy';
+import { gristDocUrl } from './instanceRuntime';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
 
@@ -583,12 +584,10 @@ const toGristEpoch = (ymd: string): number | null => {
   return Math.floor(Date.UTC(+m[1], +m[2] - 1, +m[3]) / 1000);
 };
 
-const GRIST_DOC_ID = import.meta.env.VITE_GRIST_DOC_ID;
-// The Grist API key never reaches the client: the /api/grist proxy (server.cjs) injects it.
+// Grist doc and API base come from /api/me at runtime (lib/instanceRuntime.ts): gristDocUrl().
+// The Grist API key never reaches the client: the /api/grist proxy (server.cjs, functions/) injects it.
 // A read-only instance whose doc is public (demo, docs/plan-instance-demo-cloudflare.md lot A2)
-// reads Grist directly (VITE_GRIST_PUBLIC_BASE_URL): no request against the account-wide quota of
-// Cloudflare Functions. Never set it on a writable instance — writes would go out without a key.
-const GRIST_BASE_URL = (import.meta.env.VITE_GRIST_PUBLIC_BASE_URL || '/api/grist').replace(/\/+$/, ''); // Proxy configured in vite.config.ts
+// reads Grist directly: no request against the account-wide quota of Cloudflare Functions.
 
 /** Grist write error carrying what was actually written before the failure. */
 export interface PartialWriteError extends Error {
@@ -613,7 +612,7 @@ async function patchAnnuaireInChunks(
   for (const group of groups.values()) {
     for (let i = 0; i < group.length; i += 100) {
       const chunk = group.slice(i, i + 100);
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+      const r = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ records: chunk }),
@@ -665,7 +664,7 @@ async function ensureAffiliationColumns(): Promise<void> {
   if (!have.has(RATTACHEMENT_COL)) missing.push({ id: RATTACHEMENT_COL, fields: { label: 'Rattachement (multi-lignes)', type: 'Choice', widgetOptions: JSON.stringify({ choices: RATTACHEMENT_CHOICES }) } });
   if (!have.has(DUPLICATE_DECISION_COL)) missing.push({ id: DUPLICATE_DECISION_COL, fields: { label: 'Décision doublon', type: 'Text' } });
   if (missing.length === 0) return;
-  const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/columns`, {
+  const r = await fetch(`${gristDocUrl()}/tables/Annuaire/columns`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ columns: missing }),
   });
   if (!r.ok) throw new Error(t`Error creating the affiliation columns: ${await r.text()}`);
@@ -753,7 +752,7 @@ export function planAffiliationRows(
 let _annuaireColumnsCache: AnnuaireColumnMeta[] | null = null;
 async function fetchAnnuaireColumnsInternal(): Promise<AnnuaireColumnMeta[]> {
   if (_annuaireColumnsCache) return _annuaireColumnsCache;
-  const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/columns`);
+  const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/columns`);
   if (!resp.ok) throw new Error('Erreur Grist (colonnes Annuaire)');
   const { columns } = await resp.json();
   _annuaireColumnsCache = columns.map((c: any) => ({
@@ -776,11 +775,11 @@ function coerceNumericColumns(cols: AnnuaireColumnMeta[], fields: Record<string,
 }
 
 async function ensureMergeLogTable(): Promise<void> {
-  const tablesResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables`);
+  const tablesResp = await fetch(`${gristDocUrl()}/tables`);
   if (!tablesResp.ok) throw new Error(t`Grist error (table list)`);
   const { tables } = await tablesResp.json();
   if (tables.some((t: any) => t.id === MERGE_LOG_TABLE)) return;
-  const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables`, {
+  const r = await fetch(`${gristDocUrl()}/tables`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ tables: [{ id: MERGE_LOG_TABLE, columns: buildMergeLogColumns() }] }),
   });
@@ -836,7 +835,7 @@ let institutionsCache: Institution[] | null = null;
 
 async function fetchInstitutionsInternal(): Promise<Institution[]> {
   if (institutionsCache) return institutionsCache;
-  const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Etablissements/records`);
+  const resp = await fetch(`${gristDocUrl()}/tables/Etablissements/records`);
   if (!resp.ok) throw new Error('Erreur Grist (Etablissements)');
   const { records } = await resp.json();
   const all = (records || [])
@@ -1406,7 +1405,7 @@ export const GristService = {
    */
   getDocUpdatedAt: async (): Promise<string> => {
     try {
-      const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}`);
+      const resp = await fetch(`${gristDocUrl()}`);
       if (resp.ok) {
         const data = await resp.json();
         return data.updatedAt || '';
@@ -1445,7 +1444,7 @@ export const GristService = {
       }
 
       // 3. Fetch the institutions
-      const institutionsResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Etablissements/records`);
+      const institutionsResp = await fetch(`${gristDocUrl()}/tables/Etablissements/records`);
       const institutionsMap: Record<number, string> = {};
       const institutionsUaiMap: Record<number, string> = {};
       if (institutionsResp.ok) {
@@ -1457,7 +1456,7 @@ export const GristService = {
       }
 
       // 4. Fetch the researchers
-      const recordsResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+      const recordsResp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
       if (!recordsResp.ok) throw new Error('Erreur Grist');
       const { records } = await recordsResp.json();
       if (!records || records.length === 0) return [];
@@ -1701,7 +1700,7 @@ export const GristService = {
 
       console.log('Fetching fresh structures from Grist...');
       // V2 « Structures » table: mirrors structures.csv of the CRISalid directory bridge.
-      const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Structures/records`);
+      const resp = await fetch(`${gristDocUrl()}/tables/Structures/records`);
       if (!resp.ok) throw new Error('Erreur Structures Grist');
       const { records } = await resp.json();
       if (!records || records.length === 0) return [];
@@ -1843,7 +1842,7 @@ export const GristService = {
       ...validationToGristFields(researcher.validation, toGristDateCell),
     };
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json' 
@@ -1926,7 +1925,7 @@ export const GristService = {
       ...validationToGristFields(researcher.validation, toGristDateCell),
     };
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json'
@@ -1938,7 +1937,7 @@ export const GristService = {
 
     const headers = { 'Content-Type': 'application/json' };
     if (plan.patches.length > 0) {
-      const pr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
         method: 'PATCH', headers,
         body: JSON.stringify({ records: plan.patches.map((p) => ({
           id: p.rowId, fields: { ...membershipFields(p.affiliation), [RATTACHEMENT_COL]: p.role },
@@ -1959,7 +1958,7 @@ export const GristService = {
         'IdHAL': researcher.identifiers.halId || null,
         'ID_SCOPUS': researcher.identifiers.scopusId || null,
       };
-      const cr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+      const cr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
         method: 'POST', headers,
         body: JSON.stringify({ records: plan.creates.map((c) => ({
           fields: { ...identity, ...membershipFields(c.affiliation), [RATTACHEMENT_COL]: c.role },
@@ -1974,11 +1973,11 @@ export const GristService = {
       const logs = siblings.filter((r) => plan.deletes.includes(r.rowId)).map((drop) => ({
         fields: buildMergeLogRow({ keep, drop, patch: {}, author: 'druid', note: 'affiliation removed from the record' }),
       }));
-      const lr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${MERGE_LOG_TABLE}/records`, {
+      const lr = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`, {
         method: 'POST', headers, body: JSON.stringify({ records: logs }),
       });
       if (!lr.ok) throw new Error(t`Grist error (merge log): ${await lr.text()}`);
-      const dr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/data/delete`, {
+      const dr = await fetch(`${gristDocUrl()}/tables/Annuaire/data/delete`, {
         method: 'POST', headers, body: JSON.stringify(plan.deletes),
       });
       if (!dr.ok) throw new Error(t`Grist error (deleting the removed affiliations): ${await dr.text()}`);
@@ -1998,7 +1997,7 @@ export const GristService = {
       .map((e) => ({ id: e.gristRowId, fields: { groupes: e.groups.join('|') } }));
     if (records.length === 0) return;
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -2017,7 +2016,7 @@ export const GristService = {
    * without ORCID, group dashboards). Single-column PATCH by gristRowId.
    */
   updateResearcherOpenalexId: async (gristRowId: number, openalexId: string): Promise<void> => {
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -2046,7 +2045,7 @@ export const GristService = {
       .map((e) => ({ id: e.gristRowId, fields: validationToGristFields(e.validation, toGristDateCell) }));
     if (records.length === 0) return;
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
@@ -2062,7 +2061,7 @@ export const GristService = {
    * scripts/add_abes_columns.cjs; missing ⇒ empty object).
    */
   fetchAbesSent: async (): Promise<Record<string, { hash: string; date: string }>> => {
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
     const { records } = await resp.json();
     const out: Record<string, { hash: string; date: string }> = {};
@@ -2081,7 +2080,7 @@ export const GristService = {
       .filter((e) => e.gristRowId && !Number.isNaN(e.gristRowId))
       .map((e) => ({ id: e.gristRowId, fields: { ABES_export_hash: e.hash, ABES_export_date: date } }));
     for (let i = 0; i < records.length; i += 200) {
-      const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+      const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ records: records.slice(i, i + 200) }),
       });
@@ -2186,7 +2185,7 @@ export const GristService = {
       'hceres_research_areas': (structure as any).hceresAreas || '',
       'campus': (structure as any).campus || '',
     };
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Structures/records`, {
+    const resp = await fetch(`${gristDocUrl()}/tables/Structures/records`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ records: [{ fields }] }),
@@ -2234,7 +2233,7 @@ export const GristService = {
       'campus': structure.campus || ''
     };
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Structures/records`, {
+    const resp = await fetch(`${gristDocUrl()}/tables/Structures/records`, {
       method: 'PATCH',
       headers: { 
         'Content-Type': 'application/json' 
@@ -2252,7 +2251,7 @@ export const GristService = {
   /** « Doublons » page (docs/archive/plan-reorganisation-sync-ldap.md, lot 3): uid_dyna groups computed
    * on the Annuaire alone — no LDAP run needed, unlike computeLdapDiff. */
   computeDuplicatesDiff: async (): Promise<DuplicatesDiff> => {
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
     const { records } = await resp.json();
     const { doublonsUid, duplicatesByKind } = computeDuplicateGroups(records);
@@ -2274,11 +2273,11 @@ export const GristService = {
     }
 
     // 2. Annuaire (raw Grist values) + Etablissements (employer: external ≠ Nantes Université)
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
     const etabs: Record<number, { name: string; uai: string }> = {};
     try {
-      const er = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Etablissements/records`);
+      const er = await fetch(`${gristDocUrl()}/tables/Etablissements/records`);
       if (er.ok) for (const r of (await er.json()).records) etabs[r.id] = { name: String(r.fields['Employeur'] || ''), uai: String(r.fields['UAI'] || '') };
     } catch (e) { console.warn('Etablissements unreadable — external employers not detected'); }
     const hasExternalEmployer = (f: any): boolean => {
@@ -2457,7 +2456,7 @@ export const GristService = {
     });
     // Different column signatures possible (employment_end_date) → one PATCH per row.
     for (const rec of records) {
-      const pr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
         method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ records: [rec] }),
       });
       if (!pr.ok) throw new Error(`Erreur Grist (qualification G-${rec.id}) : ${await pr.text()}`);
@@ -2468,7 +2467,7 @@ export const GristService = {
   /** Removes the qualification of a group (roles and decision cleared) → it becomes a pending duplicate again. */
   unqualifyDoublon: async (rowIds: number[]): Promise<{ updated: number }> => {
     await ensureAffiliationColumns();
-    const pr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+    const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
       method: 'PATCH', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ records: rowIds.map((id) => ({ id, fields: { [RATTACHEMENT_COL]: null, [DUPLICATE_DECISION_COL]: '' } })) }),
     });
@@ -2482,7 +2481,7 @@ export const GristService = {
   /** Raw Annuaire rows (unconverted Grist values) for given rowIds. */
   fetchAnnuaireRows: async (rowIds: number[]): Promise<{ rowId: number; fields: Record<string, any> }[]> => {
     const filter = encodeURIComponent(JSON.stringify({ id: rowIds }));
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records?filter=${filter}`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records?filter=${filter}`);
     if (!resp.ok) throw new Error('Erreur Grist (lecture Annuaire)');
     const { records } = await resp.json();
     return records.map((r: any) => ({ rowId: r.id, fields: r.fields }));
@@ -2491,7 +2490,7 @@ export const GristService = {
   /** Raw Annuaire rows of a person (every row sharing this uid_dyna). */
   fetchAnnuaireRowsByUid: async (uid: string): Promise<{ rowId: number; fields: Record<string, any> }[]> => {
     const filter = encodeURIComponent(JSON.stringify({ uid_dyna: [uid] }));
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records?filter=${filter}`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records?filter=${filter}`);
     if (!resp.ok) throw new Error('Erreur Grist (lecture Annuaire)');
     const { records } = await resp.json();
     return records.map((r: any) => ({ rowId: r.id, fields: r.fields }));
@@ -2527,7 +2526,7 @@ export const GristService = {
     for (const [k, v] of Object.entries(fields)) if (writable.has(k)) patch[k] = v;
     await ensureMergeLogTable();
     const headers = { 'Content-Type': 'application/json' };
-    const logResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${MERGE_LOG_TABLE}/records`, {
+    const logResp = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`, {
       method: 'POST', headers,
       body: JSON.stringify({ records: [{ fields: buildMergeLogRow({ keep, drop, patch, author, note }) }] }),
     });
@@ -2535,12 +2534,12 @@ export const GristService = {
     const logId: number = (await logResp.json()).records[0].id;
 
     if (Object.keys(patch).length > 0) {
-      const pr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
         method: 'PATCH', headers, body: JSON.stringify({ records: [{ id: keepRowId, fields: patch }] }),
       });
       if (!pr.ok) throw new Error(t`Grist error (writing the kept row, log #${logId}): ${await pr.text()}`);
     }
-    const dr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/data/delete`, {
+    const dr = await fetch(`${gristDocUrl()}/tables/Annuaire/data/delete`, {
       method: 'POST', headers, body: JSON.stringify([dropRowId]),
     });
     if (!dr.ok) throw new Error(t`Grist error (deleting the absorbed row, log #${logId}): ${await dr.text()}`);
@@ -2549,11 +2548,11 @@ export const GristService = {
 
   /** Merge log, most recent first. */
   listMerges: async (limit = 50): Promise<MergeLogEntry[]> => {
-    const tablesResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables`);
+    const tablesResp = await fetch(`${gristDocUrl()}/tables`);
     if (!tablesResp.ok) throw new Error(t`Grist error (table list)`);
     const { tables } = await tablesResp.json();
     if (!tables.some((t: any) => t.id === MERGE_LOG_TABLE)) return [];
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${MERGE_LOG_TABLE}/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`);
     if (!resp.ok) throw new Error(t`Grist error (merge log)`);
     const { records } = await resp.json();
     return records
@@ -2575,7 +2574,7 @@ export const GristService = {
   restoreFusion: async (logId: number): Promise<{ restoredRowId: number }> => {
     const headers = { 'Content-Type': 'application/json' };
     const filter = encodeURIComponent(JSON.stringify({ id: [logId] }));
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${MERGE_LOG_TABLE}/records?filter=${filter}`);
+    const resp = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records?filter=${filter}`);
     if (!resp.ok) throw new Error(t`Grist error (merge log)`);
     const rec = (await resp.json()).records[0];
     if (!rec) throw new Error(t`Merge #${logId} not found`);
@@ -2586,7 +2585,7 @@ export const GristService = {
     const dropped = JSON.parse(rec.fields.dropped_json || '{}');
     const fields: Record<string, any> = {};
     for (const [k, v] of Object.entries(dropped)) if (writable.has(k) && v !== null) fields[k] = v;
-    const cr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+    const cr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
       method: 'POST', headers, body: JSON.stringify({ records: [{ fields }] }),
     });
     if (!cr.ok) throw new Error(t`Grist error (re-creating the row): ${await cr.text()}`);
@@ -2595,7 +2594,7 @@ export const GristService = {
     // The log is flagged AS SOON AS the row is recreated (and its PATCH checked): otherwise a later
     // failure left `restaure=false` and a second click recreated the row a second time (review lot 2,
     // finding 6). The next steps raise an explicit error without undoing what is done.
-    const lr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${MERGE_LOG_TABLE}/records`, {
+    const lr = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`, {
       method: 'PATCH', headers, body: JSON.stringify({ records: [{ id: logId, fields: { restaure: true, restored_rowid: restoredRowId } }] }),
     });
     if (!lr.ok) {
@@ -2603,7 +2602,7 @@ export const GristService = {
     }
     const before = JSON.parse(rec.fields.kept_before_json || '{}');
     if (Object.keys(before).length > 0) {
-      const pr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`, {
+      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
         method: 'PATCH', headers, body: JSON.stringify({ records: [{ id: rec.fields.kept_rowid, fields: before }] }),
       });
       if (!pr.ok) {
@@ -2619,7 +2618,7 @@ export const GristService = {
     if (entries.length === 0) return { updated: 0 };
 
     // Current values (to append to Data_source / Commentaires without overwriting)
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error(t`Grist error (reading the Annuaire before writing)`);
     const { records } = await resp.json();
     const byId: Record<number, any> = {};
@@ -2692,7 +2691,7 @@ export const GristService = {
     const proposals: LdapCandidate[] = Array.isArray(cache.proposals) ? cache.proposals : [];
     const ambiguous: LdapAmbiguous[] = Array.isArray(cache.ambiguous) ? cache.ambiguous : [];
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     const linked = new Set<number>();
     // uid::LABO → row already carrying this uid in this lab (duplicate prevention)
     const uidTaken: Record<string, { gristRowId: number; name: string }> = {};
@@ -2724,7 +2723,7 @@ export const GristService = {
   applyLdapCandidates: async (entries: LdapResolved[]): Promise<{ updated: number; skippedDuplicates: { gristRowId: number; uid: string; existingRowId: number }[] }> => {
     if (!entries || entries.length === 0) return { updated: 0, skippedDuplicates: [] };
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
     const { records } = await resp.json();
     const byId: Record<number, any> = {};
@@ -2811,7 +2810,7 @@ export const GristService = {
     // preloadedRecords: avoids one Annuaire fetch per source from computeUnifiedAlignDiff (verify mode).
     let records = preloadedRecords;
     if (!records) {
-      const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+      const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
       if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
       ({ records } = await resp.json());
     }
@@ -2829,7 +2828,7 @@ export const GristService = {
     const rejected = new Set<string>();
     const melees: IdrefDiff['melees'] = [];
     try {
-      const rr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`);
+      const rr = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`);
       if (rr.ok) {
         const { records: revRecs } = await rr.json();
         for (const r of revRecs) {
@@ -2989,7 +2988,7 @@ export const GristService = {
     // computeUnifiedAlignDiff (cf. docs/plan-alignement-unifie.md, lot 0).
     let records = preloadedRecords;
     if (!records) {
-      const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+      const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
       if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
       ({ records } = await resp.json());
     }
@@ -3009,7 +3008,7 @@ export const GristService = {
     const rejected = new Set<string>();
     const melees: IdrefDiff['melees'] = [];
     try {
-      const rr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`);
+      const rr = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`);
       if (rr.ok) {
         const { records: revRecs } = await rr.json();
         for (const r of revRecs) {
@@ -3146,7 +3145,7 @@ export const GristService = {
     const hasDataSourceCol = cols.some((c) => c.id === 'Data_source');
     const lastUpdateIsDate = cols.find((c) => c.id === 'IdRef_derniere_maj')?.type === 'Date';
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error(t`Grist error (reading the Annuaire before writing)`);
     const { records } = await resp.json();
     const byId: Record<number, any> = {};
@@ -3217,12 +3216,12 @@ export const GristService = {
     const authHeaders = { 'Content-Type': 'application/json' };
 
     // 1. Does the table exist? Otherwise create it (data columns + button formulas).
-    const tablesResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables`);
+    const tablesResp = await fetch(`${gristDocUrl()}/tables`);
     if (!tablesResp.ok) throw new Error(t`Grist error (table list)`);
     const { tables } = await tablesResp.json();
     const tableCreated = !tables.some((t: any) => t.id === IDREF_REVIEW_TABLE);
     if (tableCreated) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables`, {
+      const r = await fetch(`${gristDocUrl()}/tables`, {
         method: 'POST', headers: authHeaders,
         body: JSON.stringify({ tables: [{ id: IDREF_REVIEW_TABLE, columns: buildIdrefReviewColumns() }] }),
       });
@@ -3250,8 +3249,8 @@ export const GristService = {
 
     // 3. Existing rows (for the upsert) + Annuaire (to purge obsolete ones).
     const [revResp, annResp] = await Promise.all([
-      fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`),
-      fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`),
+      fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`),
+      fetch(`${gristDocUrl()}/tables/Annuaire/records`),
     ]);
     if (!revResp.ok) throw new Error(`Erreur Grist (${IDREF_REVIEW_TABLE})`);
     if (!annResp.ok) throw new Error('Erreur Grist (Annuaire)');
@@ -3286,21 +3285,21 @@ export const GristService = {
 
     // 5. Writes in batches of 100 (same columns everywhere → no grouping by signature).
     for (let i = 0; i < toCreate.length; i += 100) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`, {
+      const r = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`, {
         method: 'POST', headers: authHeaders,
         body: JSON.stringify({ records: toCreate.slice(i, i + 100).map((fields) => ({ fields })) }),
       });
       if (!r.ok) throw new Error(`Erreur POST ${IDREF_REVIEW_TABLE}: ${await r.text()}`);
     }
     for (let i = 0; i < toPatch.length; i += 100) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`, {
+      const r = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`, {
         method: 'PATCH', headers: authHeaders,
         body: JSON.stringify({ records: toPatch.slice(i, i + 100) }),
       });
       if (!r.ok) throw new Error(`Erreur PATCH ${IDREF_REVIEW_TABLE}: ${await r.text()}`);
     }
     if (toDelete.length) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/data/delete`, {
+      const r = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/data/delete`, {
         method: 'POST', headers: authHeaders, body: JSON.stringify(toDelete),
       });
       if (!r.ok) throw new Error(`Erreur purge ${IDREF_REVIEW_TABLE}: ${await r.text()}`);
@@ -3335,7 +3334,7 @@ export const GristService = {
     // computeUnifiedAlignDiff (cf. docs/plan-alignement-unifie.md, lot 0).
     let records = preloadedRecords;
     if (!records) {
-      const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+      const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
       if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
       ({ records } = await resp.json());
     }
@@ -3357,7 +3356,7 @@ export const GristService = {
     const rejected = new Set<string>();
     const melees: AlignDiff['melees'] = [];
     try {
-      const rr = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${meta.table}/records`);
+      const rr = await fetch(`${gristDocUrl()}/tables/${meta.table}/records`);
       if (rr.ok) {
         const { records: revRecs } = await rr.json();
         for (const r of revRecs) {
@@ -3569,7 +3568,7 @@ export const GristService = {
     sources: UnifiedAlignSource[] = UNIFIED_ALIGN_SOURCES,
     mode: AlignMode = 'search',
   ): Promise<UnifiedAlignDiff> => {
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
     const { records } = await resp.json();
 
@@ -3616,7 +3615,7 @@ export const GristService = {
     const hasDataSourceCol = cols.some((c) => c.id === 'Data_source');
     const lastUpdateIsDate = (label: string) => cols.find((c) => c.id === `${label}_derniere_maj`)?.type === 'Date';
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error(t`Grist error (reading the Annuaire before writing)`);
     const { records } = await resp.json();
     const byId: Record<number, any> = {};
@@ -3695,7 +3694,7 @@ export const GristService = {
     const cols = await fetchAnnuaireColumnsInternal();
     const hasDataSourceCol = cols.some((c) => c.id === 'Data_source');
     const lastUpdateIsDate = cols.find((c) => c.id === `${label}_derniere_maj`)?.type === 'Date';
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Annuaire/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error(t`Grist error (reading the Annuaire before writing)`);
     const { records } = await resp.json();
     const byId: Record<number, any> = {};
@@ -3788,7 +3787,7 @@ export const GristService = {
         : source === 'scopus'
           ? (v: any) => String(v || '').replace(/\D/g, '')
           : (v: any) => String(v || '').trim().replace(/\/+$/, '').split('/').pop()!.trim().toLowerCase();
-    const revResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${meta.table}/records`);
+    const revResp = await fetch(`${gristDocUrl()}/tables/${meta.table}/records`);
     if (!revResp.ok) throw new Error(t`Table ${meta.table} missing: run ${meta.label} first (the script creates it).`);
     const { records: revRecs } = await revResp.json();
     const existing = new Map<string, { id: number; decision: string }>();
@@ -3811,11 +3810,11 @@ export const GristService = {
     }
     const headers = { 'Content-Type': 'application/json' };
     if (toCreate.length) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${meta.table}/records`, { method: 'POST', headers, body: JSON.stringify({ records: toCreate.map((fields) => ({ fields })) }) });
+      const r = await fetch(`${gristDocUrl()}/tables/${meta.table}/records`, { method: 'POST', headers, body: JSON.stringify({ records: toCreate.map((fields) => ({ fields })) }) });
       if (!r.ok) throw new Error(`Erreur POST ${meta.table}: ${await r.text()}`);
     }
     if (toPatch.length) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${meta.table}/records`, { method: 'PATCH', headers, body: JSON.stringify({ records: toPatch }) });
+      const r = await fetch(`${gristDocUrl()}/tables/${meta.table}/records`, { method: 'PATCH', headers, body: JSON.stringify({ records: toPatch }) });
       if (!r.ok) throw new Error(`Erreur PATCH ${meta.table}: ${await r.text()}`);
     }
     return { rejected: toCreate.length + toPatch.length };
@@ -3831,19 +3830,19 @@ export const GristService = {
     const ppnDigits = (v: any) => String(v || '').match(/([0-9]{6,}[0-9X])/i)?.[1]?.toUpperCase() || '';
     const authHeaders = { 'Content-Type': 'application/json' };
 
-    const tablesResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables`);
+    const tablesResp = await fetch(`${gristDocUrl()}/tables`);
     if (!tablesResp.ok) throw new Error(t`Grist error (table list)`);
     const { tables } = await tablesResp.json();
     const tableCreated = !tables.some((t: any) => t.id === IDREF_REVIEW_TABLE);
     if (tableCreated) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables`, {
+      const r = await fetch(`${gristDocUrl()}/tables`, {
         method: 'POST', headers: authHeaders,
         body: JSON.stringify({ tables: [{ id: IDREF_REVIEW_TABLE, columns: buildIdrefReviewColumns() }] }),
       });
       if (!r.ok) throw new Error(t`Error creating table ${IDREF_REVIEW_TABLE}: ${await r.text()}`);
     }
 
-    const revResp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`);
+    const revResp = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`);
     if (!revResp.ok) throw new Error(`Erreur Grist (${IDREF_REVIEW_TABLE})`);
     const { records: revRecs } = await revResp.json();
     const existing = new Map<string, { id: number; decision: string }>();
@@ -3877,14 +3876,14 @@ export const GristService = {
       }
     }
     if (toCreate.length) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`, {
+      const r = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`, {
         method: 'POST', headers: authHeaders,
         body: JSON.stringify({ records: toCreate.map((fields) => ({ fields })) }),
       });
       if (!r.ok) throw new Error(`Erreur POST ${IDREF_REVIEW_TABLE}: ${await r.text()}`);
     }
     if (toPatch.length) {
-      const r = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/${IDREF_REVIEW_TABLE}/records`, {
+      const r = await fetch(`${gristDocUrl()}/tables/${IDREF_REVIEW_TABLE}/records`, {
         method: 'PATCH', headers: authHeaders,
         body: JSON.stringify({ records: toPatch }),
       });
@@ -3905,7 +3904,7 @@ export const GristService = {
       if (r.ok) cache = await r.json();
     } catch (e) { console.warn('LDAP structures cache not found'); }
 
-    const resp = await fetch(`${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Structures/records`);
+    const resp = await fetch(`${gristDocUrl()}/tables/Structures/records`);
     if (!resp.ok) throw new Error('Erreur Grist (Structures)');
     const { records } = await resp.json();
     const byLid: Record<string, any> = {};
@@ -3995,7 +3994,7 @@ export const GristService = {
     const today = new Date().toISOString().slice(0, 10);
     const upSel = new Set(updateIds);
     const crSel = new Set(createKeys);
-    const URL = `${GRIST_BASE_URL}/docs/${GRIST_DOC_ID}/tables/Structures/records`;
+    const URL = `${gristDocUrl()}/tables/Structures/records`;
     const headers = { 'Content-Type': 'application/json' };
 
     // --- MAJ (PATCH) ---

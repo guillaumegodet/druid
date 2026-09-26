@@ -14,16 +14,8 @@ import { MediaPresenceSection } from './researchers/MediaPresenceSection';
 import { ValidationMark } from './researchers/StatusBadge';
 import { HelpButton } from './HelpButton';
 import { VIEW_HELP } from '../lib/helpLinks';
+import { gristUiDocUrl } from '../lib/instanceRuntime';
 
-/**
- * Human-facing link to the Grist document hosting the directory (`Annuaire` table).
- * Base URL overridable via `VITE_GRIST_UI_URL`; defaults to the French State instance
- * `grist.numerique.gouv.fr`. We open the document; Grist exposes no stable link
- * to a specific row without the internal section id.
- */
-const GRIST_DOC_ID = import.meta.env.VITE_GRIST_DOC_ID as string | undefined;
-const GRIST_UI_BASE = (import.meta.env.VITE_GRIST_UI_URL as string | undefined) || 'https://grist.numerique.gouv.fr';
-const GRIST_DOC_URL = GRIST_DOC_ID ? `${GRIST_UI_BASE.replace(/\/$/, '')}/${GRIST_DOC_ID}` : null;
 
 /** Status badge overlaid on the hero photo (photo background → opaque pills). */
 const heroStatusPill =
@@ -228,9 +220,11 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
                 <ExternalLink className="w-4 h-4" /> <Trans>Directory</Trans>
               </a>
             )}
-            {GRIST_DOC_URL && (
+            {/* Human-facing link to the Grist document (Annuaire table): Grist exposes no stable
+                link to a row without the internal section id, so we open the document. */}
+            {gristUiDocUrl() && (
               <a
-                href={GRIST_DOC_URL}
+                href={gristUiDocUrl()!}
                 target="_blank"
                 rel="noopener noreferrer"
                 title={t`Open the Grist document (Annuaire table)`}

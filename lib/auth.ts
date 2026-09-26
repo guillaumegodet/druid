@@ -1,5 +1,6 @@
 import { normalizeAcronym } from './normalize';
 import { installReadOnlyFetchGuard } from './readOnly';
+import { gristPublicBaseUrl, setInstanceInfo, type InstanceInfo } from './instanceRuntime';
 
 /** Scope resolved server-side from the `groups` claim of the Keycloak token
  * (group tree institution > lab > role, see server.cjs parseDruidAccess)
@@ -67,6 +68,8 @@ interface UserInfo {
   roles: string[];
   access: DruidAccess;
   capabilities: DruidCapabilities;
+  /** Settings of the instance (lib/instanceRuntime.ts, plan-architecture-multi-instances lot 6 a). */
+  instance?: InstanceInfo;
 }
 
 const EMPTY_ACCESS: DruidAccess = { isSuperAdmin: false, isMediaAdmin: false, isLabViewer: false, annuaireLabs: [], allowedSlugs: [] };
@@ -99,8 +102,9 @@ export const initKeycloak = (onAuthenticated: () => void): void => {
     .then((data) => {
       if (data) {
         _userInfo = data;
+        setInstanceInfo(data.instance);
         // Read-only instance: reject every write before it leaves the browser (lib/readOnly.ts).
-        if (data.capabilities?.READ_ONLY) installReadOnlyFetchGuard(import.meta.env.VITE_GRIST_PUBLIC_BASE_URL);
+        if (data.capabilities?.READ_ONLY) installReadOnlyFetchGuard(gristPublicBaseUrl());
         onAuthenticated();
       }
     })

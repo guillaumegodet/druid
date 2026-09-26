@@ -1,10 +1,13 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_GRIST_DOC_ID: string
+  // Build-time fallbacks of the instance settings sent by /api/me (lib/instanceRuntime.ts).
+  readonly VITE_GRIST_DOC_ID?: string
   /** Public Grist API read directly by the browser (read-only instance, e.g.
    * https://grist.numerique.gouv.fr/api); unset = through the /api/grist proxy. */
   readonly VITE_GRIST_PUBLIC_BASE_URL?: string
+  /** Grist web interface hosting the doc (default https://grist.numerique.gouv.fr). */
+  readonly VITE_GRIST_UI_URL?: string
   readonly VITE_KEYCLOAK_URL: string
   readonly VITE_KEYCLOAK_REALM: string
   readonly VITE_KEYCLOAK_CLIENT_ID: string

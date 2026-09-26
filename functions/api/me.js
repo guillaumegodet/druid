@@ -23,7 +23,7 @@
 // auth.ts (frontend) redirects to /auth/login when /api/me is not OK:
 // so we always answer 200 here; access control happens at the edge (Access).
 
-import { instanceConfig, parseAdminEmails, resolveInstance } from '../_lib/instance.js';
+import { instanceConfig, parseAdminEmails, publicInstanceInfo, resolveInstance } from '../_lib/instance.js';
 
 export { parseAdminEmails };
 
@@ -71,9 +71,11 @@ export const buildUser = (email, adminEmails, capabilities = CAPABILITIES, insta
     annuaireLabs: [],
     allowedSlugs: 'all',
   };
+  // Instance settings the front used to read from the bundle (plan-architecture-multi-instances lot 6 a).
+  const info = publicInstanceInfo(instance);
   return email
-    ? { name: email, email, preferred_username: email, roles, access, capabilities }
-    : { name: instance.label, email: '', preferred_username: instance.slug, roles, access, capabilities, anonymous: true };
+    ? { name: email, email, preferred_username: email, roles, access, capabilities, instance: info }
+    : { name: instance.label, email: '', preferred_username: instance.slug, roles, access, capabilities, instance: info, anonymous: true };
 };
 
 export async function onRequest(context) {

@@ -19,7 +19,7 @@ if (!fs.existsSync(GENERATED)) {
 
 const { gristGuard, onRequest: gristProxy } = await import('../../functions/api/grist/[[path]].js');
 const { buildUser, parseAdminEmails, capabilitiesFor, onRequest: me } = await import('../../functions/api/me.js');
-const { resolveInstance } = await import('../../functions/_lib/instance.js');
+const { resolveInstance, publicInstanceInfo } = await import('../../functions/_lib/instance.js');
 const { onRequestGet: news } = await import('../../functions/api/news/[slug].js');
 const { onRequestPost: newsletterGenerate } = await import('../../functions/api/newsletter/generate.js');
 const { onRequestPost: newsletterPost } = await import('../../functions/api/newsletter/post.js');
@@ -90,7 +90,7 @@ check('anonymous, default instance label', w.name, 'Centrale Nantes');
 const pick = (i) => ({ slug: i.slug, label: i.label, readOnly: i.readOnly });
 check('no registry: defaults', resolveInstance({}), {
   slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false,
-  grist: { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api' },
+  grist: { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null },
   features: { news: true, newsletter: true }, admins: [], openalexMailto: null, fromRegistry: false,
 });
 check('no registry: demo variables', pick(resolveInstance({ DRUID_INSTANCE: 'demo', INSTANCE_LABEL: 'Université de Démonstration', READ_ONLY: 'TRUE' })),
@@ -107,7 +107,8 @@ const demoRaw = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instanc
 const demoReg = parseInstanceConfig(demoRaw).config;
 const demo = resolveInstance({}, demoReg);
 check('registry only: demo', [pick(demo), demo.grist, demo.features, demo.admins, demo.fromRegistry],
-  [{ slug: 'demo', label: demoReg.label, readOnly: true }, { docId: demoReg.grist.docId, apiBase: 'https://grist.numerique.gouv.fr/api' },
+  [{ slug: 'demo', label: demoReg.label, readOnly: true },
+    { docId: demoReg.grist.docId, apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: 'https://grist.numerique.gouv.fr/api' },
     { news: false, newsletter: false }, [], true]);
 const privReg = parseInstanceConfig({
   slug: 'ecole', label: 'École fictive', target: 'cloudflare', domains: ['ecole.example.org'], access: 'cloudflare-access',
@@ -117,7 +118,7 @@ const privReg = parseInstanceConfig({
 }).config;
 const ecole = resolveInstance({}, privReg);
 check('registry only: private instance', [ecole.slug, ecole.readOnly, ecole.statusValidation, ecole.grist, ecole.features, ecole.admins, ecole.openalexMailto],
-  ['ecole', false, true, { docId: 'docEcole0001', apiBase: 'https://grist.example.org/api' }, { news: true, newsletter: false }, ['admin@example.org'], 'veille@example.org']);
+  ['ecole', false, true, { docId: 'docEcole0001', apiBase: 'https://grist.example.org/api', publicBaseUrl: null }, { news: true, newsletter: false }, ['admin@example.org'], 'veille@example.org']);
 check('registry only: capabilities', [capabilitiesFor(ecole).HAS_STATUS_VALIDATION, capabilitiesFor(ecole).READ_ONLY, capabilitiesFor(ecole).HAS_LDAP], [true, false, false]);
 
 // Registry + Pages variables: a present, non-empty variable overrides its field
@@ -126,7 +127,20 @@ const over = resolveInstance({
   OPENALEX_MAILTO: 'autre@example.org', VITE_GRIST_DOC_ID: 'docOverride1', GRIST_API_BASE: 'https://g.example.org/api',
 }, privReg);
 check('registry + variables: overrides', [over.label, over.readOnly, over.statusValidation, over.admins, over.openalexMailto, over.grist],
-  ['Autre nom', true, false, ['c@example.org'], 'autre@example.org', { docId: 'docOverride1', apiBase: 'https://g.example.org/api' }]);
+  ['Autre nom', true, false, ['c@example.org'], 'autre@example.org', { docId: 'docOverride1', apiBase: 'https://g.example.org/api', publicBaseUrl: null }]);
+check('registry + VITE_GRIST_PUBLIC_BASE_URL: public base overridden',
+  resolveInstance({ VITE_GRIST_PUBLIC_BASE_URL: 'https://p.example.org/api/' }, privReg).grist.publicBaseUrl, 'https://p.example.org/api');
+
+// Instance block of /api/me (front runtime settings, lot 6 a): nothing private, same for anonymous
+check('publicInstanceInfo demo', publicInstanceInfo(demo), {
+  slug: 'demo', label: demoReg.label, gristDocId: demoReg.grist.docId,
+  gristPublicBaseUrl: 'https://grist.numerique.gouv.fr/api', gristUiUrl: 'https://grist.numerique.gouv.fr',
+});
+check('publicInstanceInfo private instance: proxy, UI of its Grist', publicInstanceInfo(ecole),
+  { slug: 'ecole', label: 'École fictive', gristDocId: 'docEcole0001', gristPublicBaseUrl: null, gristUiUrl: 'https://grist.example.org' });
+check('buildUser carries the instance block (user and anonymous)',
+  [buildUser('a@example.org', [], undefined, ecole).instance?.gristDocId, buildUser(null, [], undefined, ecole).instance?.gristDocId, Object.keys(buildUser(null, []).instance)],
+  ['docEcole0001', 'docEcole0001', ['slug', 'label', 'gristDocId', 'gristPublicBaseUrl', 'gristUiUrl']]);
 check('registry + variables: READ_ONLY=false overrides readOnly true', resolveInstance({ READ_ONLY: 'false' }, demoReg).readOnly, false);
 const blank = resolveInstance({ INSTANCE_LABEL: '', READ_ONLY: ' ', ADMIN_EMAILS: '', VITE_GRIST_DOC_ID: '' }, privReg);
 check('registry + empty variables: registry kept', [blank.label, blank.readOnly, blank.admins, blank.grist.docId], ['École fictive', false, ['admin@example.org'], 'docEcole0001']);
@@ -143,6 +157,7 @@ const meDemo = await asJson(await me({ request: req('/api/me', { headers: { 'Cf-
 check('/api/me demo: listed admin is not admin when read-only', [meDemo.body.roles, meDemo.body.access.isSuperAdmin, meDemo.body.capabilities.READ_ONLY], [['user'], false, true]);
 const meAnon = await asJson(await me({ request: req('/api/me'), env: DEMO_ENV }));
 check('/api/me demo anonymous', [meAnon.body.anonymous, meAnon.body.name, meAnon.body.preferred_username], [true, 'Université de Démonstration', 'demo']);
+check('/api/me demo: instance block from the variables', [meAnon.body.instance.gristDocId, meAnon.body.instance.gristPublicBaseUrl], [DOC, null]);
 const meCentrale = await asJson(await me({ request: req('/api/me', { headers: { 'Cf-Access-Authenticated-User-Email': 'a@x.fr' } }), env: { ADMIN_EMAILS: 'a@x.fr' } }));
 check('/api/me Centrale unchanged: admin', [meCentrale.body.roles, meCentrale.body.capabilities.READ_ONLY], [['user', 'admin'], false]);
 

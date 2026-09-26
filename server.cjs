@@ -86,6 +86,18 @@ const CAPABILITIES = {
   READ_ONLY: false,
 };
 
+// Instance settings sent to the front by /api/me (lib/instanceRuntime.ts,
+// docs/plan-architecture-multi-instances.md lot 6 a) — same shape as
+// functions/_lib/instance.js::publicInstanceInfo. The browser always reads Grist through the
+// /api/grist proxy of this server (no public base).
+const INSTANCE_INFO = {
+  slug: process.env.DRUID_INSTANCE || 'nantes',
+  label: process.env.INSTANCE_LABEL || 'Nantes Université',
+  gristDocId: process.env.VITE_GRIST_DOC_ID || '',
+  gristPublicBaseUrl: null,
+  gristUiUrl: (process.env.VITE_GRIST_UI_URL || 'https://grist.numerique.gouv.fr').replace(/\/+$/, ''),
+};
+
 // Parses the token's `groups` claim into Druid access. An `admin` or
 // `dashboard_viewer` leaf directly under /NantesUniversite opens every slug
 // (+ super admin status for `admin`); a leaf at lab level
@@ -335,6 +347,7 @@ app.get('/api/me', (req, res) => {
       allowedSlugs: access?.allSlugs ? 'all' : (access?.labAnchors ?? []),
     },
     capabilities: CAPABILITIES,
+    instance: INSTANCE_INFO,
   });
 });
 
