@@ -17,9 +17,12 @@
 //    Pages variables).
 // Pages variables that duplicate a registry field are listed in the build log (same / overrides).
 //
-// Shared deployment (docs/plan-architecture-multi-instances.md, lot 6 b): DRUID_INSTANCES=a,b lists
-// several instances served by one Pages project, chosen at runtime by request host (`domains` of
-// each instance.json, all required). Nothing instance-specific goes into the bundle: no
+// Shared deployment (docs/plan-architecture-multi-instances.md, lot 6 b): several instances served by
+// one Pages project, chosen at runtime by request host (`domains` of each instance.json, all required).
+// The instances are either listed by DRUID_INSTANCES=a,b (prototype) or, since lot 7 a (F3), selected
+// by DRUID_DEPLOYMENT=<project>: every instance.json of instances/ and of the private repository
+// (cloned when INSTANCES_REPO_TOKEN is set) whose `deployment` field has that value — adding an
+// instance then needs no change to the Pages project. Nothing instance-specific goes into the bundle: no
 // .env.production.local. The files of each instance go to public/instance-assets/<slug>/ and are
 // only served through the route files written here (ASSET_ROUTE_FILES → functions/_lib/instanceAssets.js),
 // which pick the copy of the request host's instance (lot 6 D5, light version); only public instances
@@ -37,7 +40,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('child_process');
-const { buildRegistry, parseInstanceConfig, viteEnvFromConfig, compareEnvWithConfig } = require('./instances/instanceConfig.cjs');
+const { buildRegistry, parseInstanceConfig, selectDeploymentInstances, viteEnvFromConfig, compareEnvWithConfig } = require('./instances/instanceConfig.cjs');
 
 if (process.env.CF_PAGES !== '1') {
   console.log('[prepare-cloudflare-assets] CF_PAGES not set: Docker/Nantes build, nothing to copy.');
@@ -50,23 +53,23 @@ const fail = (msg) => {
 };
 
 const SLUG_RE = /^[a-z0-9-]+$/;
-const shared = !!(process.env.DRUID_INSTANCES || '').trim();
-const slugs = shared
-  ? [...new Set(process.env.DRUID_INSTANCES.split(',').map((x) => x.trim()).filter(Boolean))]
-  : [(process.env.DRUID_INSTANCE || 'centrale').trim()];
-for (const slug of slugs) if (!SLUG_RE.test(slug)) fail(`invalid instance slug: "${slug}" (expected [a-z0-9-]+)`);
-if (shared && process.env.DRUID_INSTANCE) console.warn('[prepare-cloudflare-assets] DRUID_INSTANCE ignored: DRUID_INSTANCES is set (shared deployment)');
+const localInstancesDir = path.join(__dirname, '..', 'instances');
+const deployment = (process.env.DRUID_DEPLOYMENT || '').trim();
+const listed = (process.env.DRUID_INSTANCES || '').trim();
+if (deployment && listed) fail('DRUID_DEPLOYMENT and DRUID_INSTANCES are both set: keep only DRUID_DEPLOYMENT');
+const shared = !!(deployment || listed);
+if (shared && process.env.DRUID_INSTANCE) console.warn(`[prepare-cloudflare-assets] DRUID_INSTANCE ignored: ${deployment ? 'DRUID_DEPLOYMENT' : 'DRUID_INSTANCES'} is set (shared deployment)`);
 
 /** Clone of the private instances repository, made once, on first need. */
 let privateClone = null;
-const privateRepoDir = (slug) => {
+const privateRepoDir = (why) => {
   if (privateClone) return privateClone;
   const token = process.env.INSTANCES_REPO_TOKEN;
   const repo = process.env.INSTANCES_REPO || 'guillaumegodet/druid-instances';
   if (!/^[\w.-]+\/[\w.-]+$/.test(repo)) fail(`invalid INSTANCES_REPO: "${repo}"`);
   // Fail loudly: a typo in the slug or a missing secret would otherwise deploy a site
   // without data; a failed build keeps the previous deployment online.
-  if (!token) fail(`instance "${slug}" is not in instances/ and INSTANCES_REPO_TOKEN is not set`);
+  if (!token) fail(`${why} and INSTANCES_REPO_TOKEN is not set`);
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'druid-instances-'));
   try {
     execFileSync('git', ['clone', '--quiet', '--depth', '1', `https://x-access-token:${token}@github.com/${repo}.git`, dir], {
@@ -85,9 +88,9 @@ const privateRepoDir = (slug) => {
 
 /** Folder of an instance: local, otherwise from the private instances repository. */
 const resolveInstanceDir = (slug) => {
-  const local = path.join(__dirname, '..', 'instances', slug);
+  const local = path.join(localInstancesDir, slug);
   if (fs.existsSync(local)) return local;
-  const remote = path.join(privateRepoDir(slug), slug);
+  const remote = path.join(privateRepoDir(`instance "${slug}" is not in instances/`), slug);
   if (!fs.existsSync(remote)) fail(`unknown instance "${slug}": no ${slug}/ folder in the instances repository`);
   return remote;
 };
@@ -108,14 +111,48 @@ const loadConfig = (slug, dir) => {
   return result.config;
 };
 
+/** instance.json of every instance folder of `root`, for the DRUID_DEPLOYMENT selection. */
+const deploymentCandidates = (root, source) => fs.readdirSync(root, { withFileTypes: true })
+  .filter((d) => d.isDirectory() && SLUG_RE.test(d.name) && fs.existsSync(path.join(root, d.name, 'instance.json')))
+  .map((d) => {
+    try {
+      return { folder: d.name, source, raw: JSON.parse(fs.readFileSync(path.join(root, d.name, 'instance.json'), 'utf8')) };
+    } catch (err) {
+      // Unreadable: its deployment is unknown, and skipping it could drop an instance of this one.
+      return fail(`${source}: ${d.name}/instance.json is not valid JSON: ${err.message}`);
+    }
+  });
+
+/** Instances of a DRUID_DEPLOYMENT: this repository, plus the private one when its token is set. */
+const deploymentSlugs = () => {
+  const candidates = deploymentCandidates(localInstancesDir, 'instances/');
+  const withPrivate = !!process.env.INSTANCES_REPO_TOKEN || !!process.env.INSTANCES_REPO;
+  if (withPrivate) {
+    const repo = process.env.INSTANCES_REPO || 'guillaumegodet/druid-instances';
+    candidates.push(...deploymentCandidates(privateRepoDir(`INSTANCES_REPO ${repo} is needed by DRUID_DEPLOYMENT`), repo));
+  } else {
+    console.log('[prepare-cloudflare-assets] INSTANCES_REPO_TOKEN not set: instances of this repository only');
+  }
+  const selected = selectDeploymentInstances(candidates, deployment);
+  if (!selected.ok) fail(`deployment "${deployment}":\n  - ${selected.errors.join('\n  - ')}`);
+  return selected.slugs;
+};
+
+const slugs = deployment
+  ? deploymentSlugs()
+  : listed
+    ? [...new Set(listed.split(',').map((x) => x.trim()).filter(Boolean))]
+    : [(process.env.DRUID_INSTANCE || 'centrale').trim()];
+for (const slug of slugs) if (!SLUG_RE.test(slug)) fail(`invalid instance slug: "${slug}" (expected [a-z0-9-]+)`);
+
 const dirs = Object.fromEntries(slugs.map((slug) => [slug, resolveInstanceDir(slug)]));
 const configs = slugs.map((slug) => {
   const config = loadConfig(slug, dirs[slug]);
-  if (!config && shared) fail(`${slug}/instance.json is required on a shared deployment (DRUID_INSTANCES)`);
+  if (!config && shared) fail(`${slug}/instance.json is required on a shared deployment`);
   if (!config) console.warn('[prepare-cloudflare-assets] no instance.json: configuration from the Pages variables only');
   return config;
 });
-console.log(`[prepare-cloudflare-assets] ${shared ? 'shared deployment, instances' : 'instance'}: ${slugs.join(', ')}`);
+console.log(`[prepare-cloudflare-assets] ${shared ? `shared deployment${deployment ? ` "${deployment}"` : ''}, instances` : 'instance'}: ${slugs.join(', ')}`);
 
 let registry = null;
 if (configs[0]) {

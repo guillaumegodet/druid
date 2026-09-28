@@ -2,7 +2,7 @@
 
 Fictitious engineering school « EIDémo » (labs MécaDémo / SynDémo, teams Matériaux-Démo / Fluides-Démo),
 second tenant of the shared Cloudflare deployment (docs/plan-architecture-multi-instances.md, lot 6 c): one
-Pages project, `DRUID_INSTANCES=demo,demo-2`, each instance chosen by request host. **Fictitious data only**,
+Pages project (`DRUID_DEPLOYMENT=druid-saas`, which both `instance.json` declare), each instance chosen by request host. **Fictitious data only**,
 same rules as `../demo/` (whose generator it reuses): wrong check characters on ORCID and IdRef, IdHAL
 prefixed `demo2-`, e-mails under `example.org`, identifier numbers from 1001 (the demo uses 1-54, and 501-554
 for the homonyms of its alignment caches).

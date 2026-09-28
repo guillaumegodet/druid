@@ -3,7 +3,7 @@
 //
 // On a deployment that serves one instance, its dashboards (dashboard-data/) and alignment caches
 // (<name>_cache.json) are copied straight into public/ and served as static files. On a shared
-// deployment (DRUID_INSTANCES) a file of public/ would be served on every host, so the build copies the
+// deployment (DRUID_DEPLOYMENT or DRUID_INSTANCES) a file of public/ would be served on every host, so the build copies the
 // files of each instance into public/instance-assets/<slug>/ and generates, for the URLs the front
 // already uses, route files that call serveInstanceAsset: the instance of the request host is
 // resolved, and only its own copy is read (env.ASSETS). Direct requests to /instance-assets/ get 404.

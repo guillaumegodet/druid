@@ -2,7 +2,7 @@
 // Harness: validation of the instance registry instances/<slug>/instance.json
 // (scripts/instances/instanceConfig.cjs, docs/plan-architecture-multi-instances.md, lot 5 a).
 const path = require('path');
-const { buildRegistry, parseInstanceConfig, publicRepoErrors, viteEnvFromConfig, compareEnvWithConfig, DEFAULT_GRIST_API_BASE } = require(path.join(__dirname, '../instances/instanceConfig.cjs'));
+const { buildRegistry, parseInstanceConfig, publicRepoErrors, selectDeploymentInstances, viteEnvFromConfig, compareEnvWithConfig, DEFAULT_GRIST_API_BASE } = require(path.join(__dirname, '../instances/instanceConfig.cjs'));
 
 let ko = 0;
 const check = (label, got, want) => {
@@ -55,7 +55,7 @@ const docker = () => ({
   check('public demo is valid', r.ok, true);
   check('defaults: Grist API base', r.config.grist.apiBase, DEFAULT_GRIST_API_BASE);
   check('defaults: features off', r.config.features, { news: false, newsletter: false });
-  check('defaults: no admins, no secrets, no mailto', [r.config.admins, r.config.secrets, r.config.openalexMailto], [[], [], null]);
+  check('defaults: no admins, no secrets, no mailto, no deployment', [r.config.admins, r.config.secrets, r.config.openalexMailto, r.config.deployment], [[], [], null, null]);
   check('public demo passes the public rules', publicRepoErrors(publicDemo()), []);
 }
 check('private Cloudflare instance is valid', parseInstanceConfig(privateCloudflare()).ok, true);
@@ -88,6 +88,9 @@ check('structural capability not settable on Cloudflare', rejects({ ...privateCl
 check('tunable capability settable on Cloudflare', parseInstanceConfig({ ...privateCloudflare(), capabilities: { HAS_STATUS_VALIDATION: true } }).ok, true);
 check('extra docs not supported on Cloudflare', rejects({ ...privateCloudflare(), grist: { docId: 'BBBBBBBBBBBBBBBBBBBBBB', extraDocIds: ['DDDDDDDDDDDDDDDDDDDDDD'] } }, 'extraDocIds'), true);
 check('private doc needs GRIST_API_KEY', rejects({ ...privateCloudflare(), secrets: [] }, 'GRIST_API_KEY'), true);
+check('deployment accepted on Cloudflare', parseInstanceConfig({ ...publicDemo(), deployment: 'druid-saas' }).config.deployment, 'druid-saas');
+check('deployment must be a Pages project name', rejects({ ...publicDemo(), deployment: 'Druid SaaS' }, 'deployment'), true);
+check('deployment only on Cloudflare', rejects({ ...docker(), deployment: 'druid-saas' }, 'deployment only exists'), true);
 check('news only on Cloudflare', rejects({ ...docker(), features: { news: true, newsletter: false } }, 'news/newsletter'), true);
 
 // ── public repository rules ──────────────────────────────────────────────────
@@ -134,6 +137,21 @@ check('public repo: non-object refused', publicRepoErrors(null), ['not a JSON ob
   check('single: one instance only', buildRegistry([demo, demo2], { mode: 'single' }).errors, ['mode "single" takes exactly one instance']);
   check('no instance refused', buildRegistry([], { mode: 'multi' }).errors, ['no instance']);
   check('docker target refused', buildRegistry([parseInstanceConfig(docker()).config], { mode: 'single' }).errors.some((e) => e.includes('not "cloudflare"')), true);
+}
+
+// ── shared deployment selected by DRUID_DEPLOYMENT (lot 7 a, F3) ──────────────
+{
+  const saas = (folder) => ({ folder, source: 'instances/', raw: { slug: folder, deployment: 'druid-saas' } });
+  const priv = (folder, dep = 'druid-saas') => ({ folder, source: 'private', raw: { slug: folder, deployment: dep } });
+  check('deployment: instances that declare it, sorted', selectDeploymentInstances([
+    saas('demo-2'), saas('demo'), { folder: 'centrale', source: 'private', raw: { slug: 'centrale' } }, priv('acme'), priv('other', 'druid-other'),
+  ], 'druid-saas'), { ok: true, slugs: ['acme', 'demo', 'demo-2'] });
+  check('deployment: none declared is an error', selectDeploymentInstances([saas('demo')], 'druid-other').errors, ['no instance declares deployment "druid-other"']);
+  check('deployment: same folder in two sources refused', selectDeploymentInstances([saas('demo'), priv('demo', null)], 'druid-saas').errors,
+    ['instance "demo" exists in several sources (instances/, private)']);
+  check('deployment: same folder elsewhere, not claimed, ignored', selectDeploymentInstances([saas('demo'), priv('x', null), { folder: 'x', source: 'instances/', raw: {} }], 'druid-saas').slugs, ['demo']);
+  check('deployment: invalid name', selectDeploymentInstances([saas('demo')], 'Druid SaaS').ok, false);
+  check('deployment: non-object instance.json ignored', selectDeploymentInstances([saas('demo'), { folder: 'y', source: 'instances/', raw: null }], 'druid-saas').slugs, ['demo']);
 }
 
 console.log(ko ? `\n${ko} failure(s)` : '\nAll good.');

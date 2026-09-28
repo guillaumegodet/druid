@@ -23,6 +23,8 @@ const SLUG_RE = /^[a-z0-9-]+$/;
 const GRIST_DOC_RE = /^[A-Za-z0-9]{10,}$/;
 const HOST_RE = /^(?=.{1,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/;
 const SECRET_NAME_RE = /^[A-Z][A-Z0-9_]*$/;
+// Name of a shared deployment = its Cloudflare Pages project name (lowercase, digits, dashes, ≤ 58).
+const DEPLOYMENT_RE = /^[a-z0-9](?:[a-z0-9-]{0,56}[a-z0-9])?$/;
 const DEFAULT_GRIST_API_BASE = 'https://grist.numerique.gouv.fr/api';
 
 const capabilitiesSchema = z.strictObject(Object.fromEntries(ALL_CAPABILITIES.map((k) => [k, z.boolean().optional()])));
@@ -52,6 +54,10 @@ const instanceSchema = z.strictObject({
   // OpenAlex polite-pool contact; null = the default address of the code.
   openalexMailto: z.email().nullable().default(null),
   secrets: z.array(z.string().regex(SECRET_NAME_RE, 'expected an environment variable name')).default([]),
+  // Shared deployment that serves this instance (lot 7 a, F3): the build of the Pages project whose
+  // DRUID_DEPLOYMENT has this value takes every instance that declares it. null = none. A dedicated
+  // project (DRUID_INSTANCE) ignores the field, so one instance can be on both.
+  deployment: z.string().regex(DEPLOYMENT_RE, 'expected a Pages project name').nullable().default(null),
 });
 
 /** Rules spanning several fields. Returns a list of messages (empty = consistent). */
@@ -69,6 +75,7 @@ const crossFieldErrors = (c) => {
   }
   if (!c.grist.publicRead && !c.secrets.includes('GRIST_API_KEY')) errors.push('a doc without publicRead needs the GRIST_API_KEY secret');
   if ((c.features.news || c.features.newsletter) && c.target !== 'cloudflare') errors.push('features news/newsletter only exist on target "cloudflare"');
+  if (c.deployment && c.target !== 'cloudflare') errors.push('deployment only exists on target "cloudflare"');
   return errors;
 };
 
@@ -150,7 +157,8 @@ const compareEnvWithConfig = (c, env) => ENV_OVERRIDES
 /**
  * Registry of the Functions (functions/_generated/registry.js, lot 6 b), from validated configs.
  *  - mode "single": one Pages project = one instance (DRUID_INSTANCE), served on every host;
- *  - mode "multi": one deployment for several instances (DRUID_INSTANCES), chosen by request host.
+ *  - mode "multi": one deployment for several instances (DRUID_DEPLOYMENT or DRUID_INSTANCES), chosen by
+ *    request host.
  * A host declared by two instances is an error: it would serve one instance's data under the other.
  * @param {object[]} configs validated instance.json contents
  * @param {{ mode: 'single' | 'multi' }} opts
@@ -177,6 +185,34 @@ const buildRegistry = (configs, { mode }) => {
   return { ok: true, registry: { mode, defaultSlug: mode === 'single' ? configs[0].slug : null, instances, byHost } };
 };
 
+/**
+ * Instances of a shared deployment (lot 7 a, F3): the folders whose instance.json declares
+ * `deployment`. Only that field is read here; the build then validates the selected files in full.
+ * A folder present in two sources (this repository and a private one) is refused when either copy
+ * claims the deployment: which one would be built would depend on lookup order.
+ * @param {{ folder: string, source: string, raw: unknown }[]} candidates parsed instance.json per folder
+ * @param {string} deployment value of DRUID_DEPLOYMENT
+ * @returns {{ ok: true, slugs: string[] } | { ok: false, errors: string[] }}
+ */
+const selectDeploymentInstances = (candidates, deployment) => {
+  const errors = [];
+  if (!DEPLOYMENT_RE.test(deployment || '')) return { ok: false, errors: [`invalid deployment name "${deployment}"`] };
+  const claims = (raw) => !!raw && typeof raw === 'object' && raw.deployment === deployment;
+  const sources = {};
+  for (const { folder, source, raw } of candidates) {
+    (sources[folder] ||= []).push({ source, claimed: claims(raw) });
+  }
+  const slugs = [];
+  for (const folder of Object.keys(sources).sort()) {
+    const found = sources[folder];
+    if (!found.some((f) => f.claimed)) continue;
+    if (found.length > 1) errors.push(`instance "${folder}" exists in several sources (${found.map((f) => f.source).join(', ')})`);
+    else slugs.push(folder);
+  }
+  if (!errors.length && !slugs.length) errors.push(`no instance declares deployment "${deployment}"`);
+  return errors.length ? { ok: false, errors } : { ok: true, slugs };
+};
+
 module.exports = {
   ALL_CAPABILITIES,
   DEFAULT_GRIST_API_BASE,
@@ -185,5 +221,6 @@ module.exports = {
   compareEnvWithConfig,
   parseInstanceConfig,
   publicRepoErrors,
+  selectDeploymentInstances,
   viteEnvFromConfig,
 };

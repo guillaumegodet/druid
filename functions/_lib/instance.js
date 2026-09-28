@@ -9,7 +9,7 @@
 //    registry field by field when present and non-empty (transition of lot 5):
 //      DRUID_INSTANCE, INSTANCE_LABEL, READ_ONLY, SHOW_STATUS_VALIDATION, ADMIN_EMAILS,
 //      OPENALEX_MAILTO, GRIST_DOC_ID / VITE_GRIST_DOC_ID, GRIST_API_BASE, VITE_GRIST_PUBLIC_BASE_URL;
-//  - mode "multi" (one deployment for several instances, DRUID_INSTANCES): the instance is the one
+//  - mode "multi" (one deployment for several instances, DRUID_DEPLOYMENT or DRUID_INSTANCES): the instance is the one
 //    declaring the request host in its `domains`; an unknown host gets no instance (404). No
 //    variable overrides an instance, and secrets are only read per instance (see secretOf).
 // Without registry nor variable, the defaults are the historical ones (Centrale).

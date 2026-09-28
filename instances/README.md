@@ -19,7 +19,8 @@ time with the `INSTANCES_REPO_TOKEN` secret when `instances/<slug>/` is absent h
 Every instance folder holds an `instance.json` describing the instance (docs/plan-architecture-multi-instances.md,
 lot 5): display name, target (`cloudflare` | `docker`), domains, access (`public` | `cloudflare-access` |
 `keycloak`), read-only flag, Grist doc, settable capabilities, `news`/`newsletter` features, admins,
-OpenAlex contact and the **names** of the secrets it needs — never a secret value. Schema and rules:
+OpenAlex contact, the **names** of the secrets it needs — never a secret value — and, optionally, the shared
+deployment that serves it (`deployment`, see below). Schema and rules:
 `scripts/instances/instanceConfig.cjs`. The public repository only accepts read-only instances with
 public access, a public doc and no admins (also enforced by `scripts/publication/check_public_tree.mjs`).
 The private repository also describes the Docker instance of Nantes (not read by `server.cjs`: inventory
@@ -70,8 +71,13 @@ remain the only source, with the historical defaults (Centrale).
 
 ## Shared deployment (prototype, lot 6 of docs/plan-architecture-multi-instances.md)
 
-One Pages project can serve several instances: set `DRUID_INSTANCES=<slug>,<slug>` instead of
-`DRUID_INSTANCE`. The build validates every `instance.json` (required), refuses a domain claimed by two
+One Pages project can serve several instances: set `DRUID_DEPLOYMENT=<project name>` instead of
+`DRUID_INSTANCE`. The build takes every instance whose `instance.json` declares `"deployment": "<project name>"`,
+in `instances/` and, when `INSTANCES_REPO_TOKEN` is set, in the private repository `INSTANCES_REPO` (a folder
+present in both and claimed by either fails the build). **Adding an instance is then a new folder with its
+`instance.json`, its secrets and its domain — no change to the Pages variables.** The demos declare
+`druid-saas`. `DRUID_INSTANCES=<slug>,<slug>` (explicit list, prototype of lot 6) still works; setting it
+together with `DRUID_DEPLOYMENT` fails the build. The build validates every `instance.json` (required), refuses a domain claimed by two
 instances and generates `functions/_generated/registry.js` in mode `multi`; the Functions then pick the
 instance whose `domains` list the request host (`functions/api/_middleware.js`) and answer **404 for any
 other host** — the front shows « No Druid instance is declared for this address ». On such a deployment:
