@@ -19,6 +19,8 @@ import {
   Building2,
   Unlock,
   Network,
+  Landmark,
+  Library,
 } from 'lucide-react';
 import { OverviewKpis, YearRange } from './overviewAggregates';
 import { ImpactKpis } from './impactAggregates';
@@ -103,6 +105,18 @@ const KPI_STYLES: Record<string, { Icon: React.FC<{ className?: string }>; slot:
   large: { Icon: Network, slot: 7 },
   'fwci-median': { Icon: Gauge, slot: 6 },
   'top10-share': { Icon: Award, slot: 5 },
+  // Funding and journals (themeKpis.ts)
+  funded: { Icon: Landmark, slot: 0 },
+  funders: { Icon: Building2, slot: 3 },
+  anr: { Icon: Landmark, slot: 2 },
+  europe: { Icon: Globe2, slot: 5 },
+  'fwci-funded': { Icon: Gauge, slot: 6 },
+  'top10-funded': { Icon: Award, slot: 4 },
+  journals: { Icon: BookOpen, slot: 0 },
+  q1: { Icon: Medal, slot: 4 },
+  accessible: { Icon: Unlock, slot: 2 },
+  'national-licence': { Icon: Library, slot: 3 },
+  charter: { Icon: Award, slot: 1 },
 };
 
 /** Grid of key-figure cards (tabs and report `kpis` blocks). */

@@ -157,8 +157,8 @@ export const CHART_META: Record<string, ChartMeta> = {
   'apc-par-revue': { tab: 'apc' },
   'apc-elsevier-par-labo': { tab: 'apc', requires: ['composite'] },
   // ── Funding
-  'funders-top': { tab: 'funders' },
-  'funders-categories': { tab: 'funders' },
+  'funders-top': { tab: 'funders', trivialUnder: ['funder'] },
+  'funders-categories': { tab: 'funders', trivialUnder: ['funderCategory', 'funder'] },
   'funders-evolution': { tab: 'funders' },
   'funders-par-labo': { tab: 'funders', requires: ['composite'] },
   // ── Strategic axes

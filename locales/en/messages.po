@@ -367,8 +367,8 @@ msgstr "Send"
 #: components/DashboardPage.tsx:78
 #: components/dashboard/InternationalTab.tsx:128
 #: components/dashboard/report/reportCatalog.ts:25
-#: components/dashboard/report/templates.ts:138
-#: components/dashboard/report/templates.ts:205
+#: components/dashboard/report/templates.ts:142
+#: components/dashboard/report/templates.ts:209
 msgid "Overview"
 msgstr "Overview"
 
@@ -389,6 +389,7 @@ msgstr "Books"
 
 #: components/DashboardPage.tsx:82
 #: components/dashboard/report/reportCatalog.ts:65
+#: components/dashboard/report/templates.ts:298
 msgid "Journals"
 msgstr "Journals"
 
@@ -413,6 +414,7 @@ msgstr "Benchmark"
 
 #: components/DashboardPage.tsx:87
 #: components/dashboard/report/reportCatalog.ts:87
+#: components/dashboard/report/templates.ts:304
 msgid "Signature charter"
 msgstr "Signature charter"
 
@@ -585,7 +587,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/ResearcherDetail.tsx:549
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
-#: components/reports/NewReportDialog.tsx:285
+#: components/reports/NewReportDialog.tsx:311
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:194
 #: components/researchers/GroupModal.tsx:64
@@ -598,7 +600,7 @@ msgstr "Cancel"
 
 #: components/GroupList.tsx:169
 #: components/StructureDetail.tsx:139
-#: components/reports/NewReportDialog.tsx:293
+#: components/reports/NewReportDialog.tsx:319
 msgid "Create"
 msgstr "Create"
 
@@ -1078,7 +1080,7 @@ msgstr "Acronym"
 #: components/StructureList.tsx:201
 #: components/dashboard/MediaSourcesAdmin.tsx:215
 #: components/dashboard/MediaSourcesAdmin.tsx:288
-#: components/reports/NewReportDialog.tsx:262
+#: components/reports/NewReportDialog.tsx:288
 #: components/researchers/ListHeader.tsx:46
 msgid "Name"
 msgstr "Name"
@@ -1196,7 +1198,7 @@ msgstr "Structure deletion: not available"
 #: components/StructureList.tsx:436
 #: components/dashboard/report/ReportWizard.tsx:271
 #: components/dashboard/report/composeReportPdf.ts:63
-#: components/reports/NewReportDialog.tsx:216
+#: components/reports/NewReportDialog.tsx:224
 msgid "Structure"
 msgstr "Structure"
 
@@ -1233,7 +1235,7 @@ msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 #: components/dashboard/ApcTab.tsx:839
 #: components/dashboard/AxesTab.tsx:276
 #: components/dashboard/CharteTab.tsx:442
-#: components/dashboard/FundersTab.tsx:404
+#: components/dashboard/FundersTab.tsx:396
 #: components/dashboard/ImpactTab.tsx:248
 #: components/dashboard/JournalsTab.tsx:283
 #: components/dashboard/NewsTab.tsx:781
@@ -1247,7 +1249,7 @@ msgstr "Previous"
 #: components/dashboard/ApcTab.tsx:845
 #: components/dashboard/AxesTab.tsx:282
 #: components/dashboard/CharteTab.tsx:448
-#: components/dashboard/FundersTab.tsx:415
+#: components/dashboard/FundersTab.tsx:407
 #: components/dashboard/ImpactTab.tsx:254
 #: components/dashboard/JournalsTab.tsx:289
 #: components/dashboard/NewsTab.tsx:792
@@ -1368,7 +1370,7 @@ msgstr "Total actually paid"
 
 #: components/dashboard/ApcTab.tsx:442
 #: components/dashboard/PublicationsListTab.tsx:397
-#: components/dashboard/publicationFilters.ts:227
+#: components/dashboard/publicationFilters.ts:240
 msgid "APC paid"
 msgstr "APC paid"
 
@@ -1445,6 +1447,7 @@ msgstr "Type"
 
 #: components/dashboard/ApcTab.tsx:483
 #: components/dashboard/JournalsTab.tsx:202
+#: components/reports/NewReportDialog.tsx:246
 msgid "Publisher"
 msgstr "Publisher"
 
@@ -1461,7 +1464,7 @@ msgstr "hybrid"
 #: components/dashboard/ApcTab.tsx:842
 #: components/dashboard/AxesTab.tsx:279
 #: components/dashboard/CharteTab.tsx:445
-#: components/dashboard/FundersTab.tsx:407
+#: components/dashboard/FundersTab.tsx:399
 #: components/dashboard/ImpactTab.tsx:251
 #: components/dashboard/JournalsTab.tsx:286
 #: components/dashboard/NewsTab.tsx:784
@@ -2501,7 +2504,7 @@ msgstr "Compliance by team unavailable: no team with at least 3 analysable publi
 #: components/dashboard/CollaborationsTab.tsx:46
 #: components/dashboard/CollaborationsTab.tsx:284
 #: components/dashboard/charts/IntlVsNationalChart.tsx:35
-#: components/dashboard/kpiItems.ts:36
+#: components/dashboard/kpiItems.ts:37
 msgctxt "feminine plural"
 msgid "International"
 msgstr "International"
@@ -2583,7 +2586,7 @@ msgstr "National"
 
 #: components/dashboard/CollaborationsTab.tsx:285
 #: components/dashboard/PartnerInstitutionPicker.tsx:39
-#: components/dashboard/report/templates.ts:142
+#: components/dashboard/report/templates.ts:146
 msgid "Partner institutions"
 msgstr "Partner institutions"
 
@@ -2646,7 +2649,7 @@ msgstr "About “{title}”"
 #: components/reports/AddToReportDialog.tsx:122
 #: components/reports/ChartPicker.tsx:60
 #: components/reports/HistoryDialog.tsx:72
-#: components/reports/NewReportDialog.tsx:162
+#: components/reports/NewReportDialog.tsx:170
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/UnifiedAlignPage.tsx:603
 msgid "Close"
@@ -2741,108 +2744,76 @@ msgstr "filters:"
 msgid "Source: Druid / druid-biblio (OpenAlex, BSO)"
 msgstr "Source: Druid / druid-biblio (OpenAlex, BSO)"
 
-#: components/dashboard/FundersTab.tsx:34
-msgid "ANR"
-msgstr "ANR"
-
-#: components/dashboard/FundersTab.tsx:35
-msgid "Europe"
-msgstr "Europe"
-
-#: components/dashboard/FundersTab.tsx:36
-msgid "National research"
-msgstr "National research"
-
-#: components/dashboard/FundersTab.tsx:37
-msgid "Regional"
-msgstr "Regional"
-
-#: components/dashboard/FundersTab.tsx:38
-msgid "International"
-msgstr "International"
-
-#: components/dashboard/FundersTab.tsx:39
-msgid "Private / foundations"
-msgstr "Private / foundations"
-
-#: components/dashboard/FundersTab.tsx:40
-#: components/dashboard/MediaMentionsPanel.tsx:91
-#: components/dashboard/NewsTab.tsx:116
-#: components/dashboard/NewsTab.tsx:126
-#: lib/tasks.ts:55
-msgid "Other"
-msgstr "Other"
-
 #. placeholder {0}: nf(d.count)
 #. placeholder {0}: nf(p.value)
 #. placeholder {0}: row.item.count
-#: components/dashboard/FundersTab.tsx:56
-#: components/dashboard/FundersTab.tsx:100
+#: components/dashboard/FundersTab.tsx:48
+#: components/dashboard/FundersTab.tsx:92
 #: components/dashboard/ResearchersTab.tsx:66
 msgid "{0} publication(s)"
 msgstr "{0} publication(s)"
 
-#: components/dashboard/FundersTab.tsx:61
-#: components/dashboard/FundersTab.tsx:210
+#: components/dashboard/FundersTab.tsx:53
+#: components/dashboard/FundersTab.tsx:202
 msgid "publications"
 msgstr "publications"
 
-#: components/dashboard/FundersTab.tsx:81
+#: components/dashboard/FundersTab.tsx:73
 #: components/dashboard/embedRegistry.tsx:716
 msgid "Main funders"
 msgstr "Main funders"
 
-#: components/dashboard/FundersTab.tsx:82
+#: components/dashboard/FundersTab.tsx:74
 msgid "Number of publications acknowledging each funder · colour = category · top 15"
 msgstr "Number of publications acknowledging each funder · colour = category · top 15"
 
-#: components/dashboard/FundersTab.tsx:131
+#: components/dashboard/FundersTab.tsx:123
 #: components/dashboard/embedRegistry.tsx:720
 msgid "Breakdown by funder category"
 msgstr "Breakdown by funder category"
 
-#: components/dashboard/FundersTab.tsx:132
+#: components/dashboard/FundersTab.tsx:124
 msgid "ANR / Europe / national research / regional / international / private · a publication may count in several categories"
 msgstr "ANR / Europe / national research / regional / international / private · a publication may count in several categories"
 
 #. placeholder {0}: d.year
 #. placeholder {1}: nf(d.funded)
 #. placeholder {2}: nf(d.total)
-#: components/dashboard/FundersTab.tsx:153
+#: components/dashboard/FundersTab.tsx:145
 msgid "{0}: {1} funded publication(s) out of {2} — {pct}%"
 msgstr "{0}: {1} funded publication(s) out of {2} — {pct}%"
 
-#: components/dashboard/FundersTab.tsx:161
+#: components/dashboard/FundersTab.tsx:153
 msgid "funded publications"
 msgstr "funded publications"
 
-#: components/dashboard/FundersTab.tsx:186
+#: components/dashboard/FundersTab.tsx:178
 #: components/dashboard/embedRegistry.tsx:724
 msgid "Funded publications per year"
 msgstr "Funded publications per year"
 
-#: components/dashboard/FundersTab.tsx:187
+#: components/dashboard/FundersTab.tsx:179
 msgid "Bars = publications acknowledging ≥ 1 funder · label = share of the year's corpus"
 msgstr "Bars = publications acknowledging ≥ 1 funder · label = share of the year's corpus"
 
-#: components/dashboard/FundersTab.tsx:227
+#: components/dashboard/FundersTab.tsx:219
 #: components/dashboard/embedRegistry.tsx:728
 msgid "Breakdown of funders by lab"
 msgstr "Breakdown of funders by lab"
 
-#: components/dashboard/FundersTab.tsx:228
+#: components/dashboard/FundersTab.tsx:220
 msgid "Funded publications by lab, broken down by category · a co-signed publication counts in each lab · top 15"
 msgstr "Funded publications by lab, broken down by category · a co-signed publication counts in each lab · top 15"
 
-#: components/dashboard/FundersTab.tsx:283
+#: components/dashboard/FundersTab.tsx:275
 msgid "No funding data in the selection. Funders come from OpenAlex (funders/awards) and ANR/European projects declared in HAL — they may be missing from an old export or a poorly covered corpus."
 msgstr "No funding data in the selection. Funders come from OpenAlex (funders/awards) and ANR/European projects declared in HAL — they may be missing from an old export or a poorly covered corpus."
 
-#: components/dashboard/FundersTab.tsx:295
+#: components/dashboard/FundersTab.tsx:287
 msgid "Funders and research projects <0>acknowledged</0> by the publications, according to OpenAlex (<1>funders / awards</1>) and ANR / European projects declared in HAL. ⚠️ A funder associated with a publication means the publication<2> acknowledges</2> it — it is <3>neither</3> “this funder paid Nantes Université” <4>nor</4> “a Nantes researcher holds the grant”. Declarative view (acknowledgements), not to be read as a budget. Coverage depends on the quality of funding metadata (variable across disciplines)."
 msgstr "Funders and research projects <0>acknowledged</0> by the publications, according to OpenAlex (<1>funders / awards</1>) and ANR / European projects declared in HAL. ⚠️ A funder associated with a publication means the publication<2> acknowledges</2> it — it is <3>neither</3> “this funder paid Nantes Université” <4>nor</4> “a Nantes researcher holds the grant”. Declarative view (acknowledgements), not to be read as a budget. Coverage depends on the quality of funding metadata (variable across disciplines)."
 
-#: components/dashboard/FundersTab.tsx:302
+#: components/dashboard/FundersTab.tsx:294
 msgid "Funder coverage"
 msgstr "Funder coverage"
 
@@ -2850,62 +2821,63 @@ msgstr "Funder coverage"
 #. placeholder {0}: selected.toLocaleString(numberLocale())
 #. placeholder {1}: nf(agg.totalPubs)
 #. placeholder {1}: total.toLocaleString(numberLocale())
-#: components/dashboard/FundersTab.tsx:304
+#: components/dashboard/FundersTab.tsx:296
 #: components/dashboard/MarketShareSection.tsx:73
 msgid "{0} / {1} publications"
 msgstr "{0} / {1} publications"
 
-#: components/dashboard/FundersTab.tsx:309
+#: components/dashboard/FundersTab.tsx:301
+#: components/dashboard/themeKpis.ts:57
 msgid "Distinct funders"
 msgstr "Distinct funders"
 
-#: components/dashboard/FundersTab.tsx:315
+#: components/dashboard/FundersTab.tsx:307
 msgid "Identified projects"
 msgstr "Identified projects"
 
-#: components/dashboard/FundersTab.tsx:317
+#: components/dashboard/FundersTab.tsx:309
 msgid "ANR / H2020 codes / grants"
 msgstr "ANR / H2020 codes / grants"
 
-#: components/dashboard/FundersTab.tsx:322
+#: components/dashboard/FundersTab.tsx:314
 msgid "Main funder"
 msgstr "Main funder"
 
-#: components/dashboard/FundersTab.tsx:340
+#: components/dashboard/FundersTab.tsx:332
 msgid "Most frequent projects and grants"
 msgstr "Most frequent projects and grants"
 
 #. placeholder {0}: agg.distinctProjects
-#: components/dashboard/FundersTab.tsx:343
+#: components/dashboard/FundersTab.tsx:335
 msgid "{0, plural, one {# identified project} other {# identified projects}}"
 msgstr "{0, plural, one {# identified project} other {# identified projects}}"
 
 #. placeholder {0}: projects.length
-#: components/dashboard/FundersTab.tsx:343
+#: components/dashboard/FundersTab.tsx:335
 msgid "top {0} by number of publications"
 msgstr "top {0} by number of publications"
 
-#: components/dashboard/FundersTab.tsx:349
+#: components/dashboard/FundersTab.tsx:341
 msgid "Export projects (CSV)"
 msgstr "Export projects (CSV)"
 
-#: components/dashboard/FundersTab.tsx:359
+#: components/dashboard/FundersTab.tsx:351
 msgid "Reference"
 msgstr "Reference"
 
-#: components/dashboard/FundersTab.tsx:360
+#: components/dashboard/FundersTab.tsx:352
 msgid "Project title"
 msgstr "Project title"
 
-#: components/dashboard/FundersTab.tsx:361
+#: components/dashboard/FundersTab.tsx:353
 msgid "Funder"
 msgstr "Funder"
 
-#: components/dashboard/FundersTab.tsx:362
+#: components/dashboard/FundersTab.tsx:354
 msgid "Category"
 msgstr "Category"
 
-#: components/dashboard/FundersTab.tsx:363
+#: components/dashboard/FundersTab.tsx:355
 #: components/dashboard/JournalsTab.tsx:204
 msgid "Pubs"
 msgstr "Pubs"
@@ -3070,6 +3042,7 @@ msgid "Journal publications"
 msgstr "Journal publications"
 
 #: components/dashboard/JournalsTab.tsx:336
+#: components/dashboard/themeKpis.ts:87
 msgid "Distinct journals"
 msgstr "Distinct journals"
 
@@ -3178,7 +3151,7 @@ msgid "Top 25 keywords"
 msgstr "Top 25 keywords"
 
 #: components/dashboard/MarketShareSection.tsx:23
-#: components/reports/NewReportDialog.tsx:229
+#: components/reports/NewReportDialog.tsx:255
 msgid "Country"
 msgstr "Country"
 
@@ -3251,6 +3224,14 @@ msgstr "Appearance"
 #: components/dashboard/MediaMentionsPanel.tsx:90
 msgid "Hearing"
 msgstr "Hearing"
+
+#: components/dashboard/MediaMentionsPanel.tsx:91
+#: components/dashboard/NewsTab.tsx:116
+#: components/dashboard/NewsTab.tsx:126
+#: components/dashboard/fundersAggregates.ts:42
+#: lib/tasks.ts:55
+msgid "Other"
+msgstr "Other"
 
 #: components/dashboard/MediaMentionsPanel.tsx:166
 msgid "Error saving the decision."
@@ -3367,7 +3348,7 @@ msgstr "Last collection: {0}."
 #: components/dashboard/report/pdfDoc.ts:126
 #: components/groups/GroupDashboardSection.tsx:145
 #: components/reports/HistoryDialog.tsx:105
-#: components/reports/NewReportDialog.tsx:220
+#: components/reports/NewReportDialog.tsx:228
 #: components/reports/ReportControls.tsx:83
 msgid "Period"
 msgstr "Period"
@@ -3657,7 +3638,7 @@ msgstr "(untitled)"
 #: components/dashboard/NewsTab.tsx:42
 #: components/dashboard/NewsTab.tsx:585
 #: components/dashboard/charts/YearlyEvolutionChart.tsx:41
-#: components/dashboard/kpiItems.ts:33
+#: components/dashboard/kpiItems.ts:34
 #: components/dashboard/report/composeReportPdf.ts:70
 #: components/dashboard/report/pdfDoc.ts:128
 #: components/reports/HistoryDialog.tsx:106
@@ -3818,6 +3799,7 @@ msgstr "1 active filter"
 #: components/dashboard/charts/OpenAccessDonutChart.tsx:55
 #: components/dashboard/embedRegistry.tsx:259
 #: components/dashboard/partnerKpis.ts:182
+#: components/dashboard/themeKpis.ts:98
 msgid "Open access"
 msgstr "Open access"
 
@@ -4453,22 +4435,22 @@ msgid "Sources (provenance)"
 msgstr "Sources (provenance)"
 
 #: components/dashboard/PublicationsListTab.tsx:387
-#: components/dashboard/publicationFilters.ts:225
+#: components/dashboard/publicationFilters.ts:238
 msgid "PhD student involved"
 msgstr "PhD student involved"
 
 #: components/dashboard/PublicationsListTab.tsx:392
-#: components/dashboard/publicationFilters.ts:226
+#: components/dashboard/publicationFilters.ts:239
 msgid "International collaboration"
 msgstr "International collaboration"
 
 #: components/dashboard/PublicationsListTab.tsx:402
-#: components/dashboard/publicationFilters.ts:228
+#: components/dashboard/publicationFilters.ts:241
 msgid "Top 10% citations"
 msgstr "Top 10% citations"
 
 #: components/dashboard/PublicationsListTab.tsx:407
-#: components/dashboard/publicationFilters.ts:229
+#: components/dashboard/publicationFilters.ts:242
 msgid "Top 1% citations"
 msgstr "Top 1% citations"
 
@@ -4552,7 +4534,7 @@ msgstr "Seen by the CRISalid harvester"
 #. placeholder {0}: agg.inCrisalidPct
 #. placeholder {0}: kpis.pctFwci
 #: components/dashboard/SourcesTab.tsx:49
-#: components/dashboard/kpiItems.ts:92
+#: components/dashboard/kpiItems.ts:93
 msgid "{0}% of the corpus"
 msgstr "{0}% of the corpus"
 
@@ -4931,7 +4913,7 @@ msgstr "{0}: mean FWCI {1} ({2} publications)"
 
 #: components/dashboard/charts/ImpactGroupCharts.tsx:37
 #: components/dashboard/charts/ImpactGroupCharts.tsx:62
-#: components/dashboard/kpiItems.ts:108
+#: components/dashboard/kpiItems.ts:109
 msgid "Mean FWCI"
 msgstr "Mean FWCI"
 
@@ -5262,76 +5244,109 @@ msgstr "Publications per member lab (a co-signed publication counts for each lab
 msgid "Source coverage by year"
 msgstr "Source coverage by year"
 
+#: components/dashboard/fundersAggregates.ts:36
+msgid "ANR"
+msgstr "ANR"
+
+#: components/dashboard/fundersAggregates.ts:37
+msgid "Europe"
+msgstr "Europe"
+
+#: components/dashboard/fundersAggregates.ts:38
+msgid "National research"
+msgstr "National research"
+
+#: components/dashboard/fundersAggregates.ts:39
+msgid "Regional"
+msgstr "Regional"
+
+#: components/dashboard/fundersAggregates.ts:40
+msgid "International"
+msgstr "International"
+
+#: components/dashboard/fundersAggregates.ts:41
+msgid "Private / foundations"
+msgstr "Private / foundations"
+
 #. placeholder {0}: kpis.intlPct
-#: components/dashboard/kpiItems.ts:30
+#: components/dashboard/kpiItems.ts:31
 msgid "{0}% (excluding undetermined)"
 msgstr "{0}% (excluding undetermined)"
 
-#: components/dashboard/kpiItems.ts:43
+#: components/dashboard/kpiItems.ts:44
 msgid "In a foreign language"
 msgstr "In a foreign language"
 
-#: components/dashboard/kpiItems.ts:49
+#: components/dashboard/kpiItems.ts:50
+#: components/dashboard/themeKpis.ts:107
 msgid "Publications with APC"
 msgstr "Publications with APC"
 
-#: components/dashboard/kpiItems.ts:56
+#: components/dashboard/kpiItems.ts:57
 msgid "In French"
 msgstr "In French"
 
-#: components/dashboard/kpiItems.ts:63
+#: components/dashboard/kpiItems.ts:64
 msgid "Total citations"
 msgstr "Total citations"
 
 #. placeholder {0}: kpis.citationsPerPub.toLocaleString(numberLocale())
-#: components/dashboard/kpiItems.ts:66
+#: components/dashboard/kpiItems.ts:67
 msgid "{0} / publication"
 msgstr "{0} / publication"
 
-#: components/dashboard/kpiItems.ts:71
+#: components/dashboard/kpiItems.ts:72
 msgid "Conference papers"
 msgstr "Conference papers"
 
-#: components/dashboard/kpiItems.ts:78
+#: components/dashboard/kpiItems.ts:79
 msgid "Involving PhD students"
 msgstr "Involving PhD students"
 
-#: components/dashboard/kpiItems.ts:80
+#: components/dashboard/kpiItems.ts:81
 msgid "staff not matched"
 msgstr "staff not matched"
 
-#: components/dashboard/kpiItems.ts:90
+#: components/dashboard/kpiItems.ts:91
 #: components/dashboard/partnerKpis.ts:218
 msgid "Known FWCI"
 msgstr "Known FWCI"
 
-#: components/dashboard/kpiItems.ts:96
+#: components/dashboard/kpiItems.ts:97
 msgid "Top 10% most cited"
 msgstr "Top 10% most cited"
 
-#: components/dashboard/kpiItems.ts:102
+#: components/dashboard/kpiItems.ts:103
 msgid "Top 1% most cited"
 msgstr "Top 1% most cited"
 
-#: components/dashboard/kpiItems.ts:110
+#: components/dashboard/kpiItems.ts:111
 msgid "World reference = 1.00"
 msgstr "World reference = 1.00"
 
-#: components/dashboard/kpiItems.ts:129
+#: components/dashboard/kpiItems.ts:130
 msgid "Key figures — overview"
 msgstr "Key figures — overview"
 
-#: components/dashboard/kpiItems.ts:133
+#: components/dashboard/kpiItems.ts:134
 msgid "Key figures — impact"
 msgstr "Key figures — impact"
 
-#: components/dashboard/kpiItems.ts:137
+#: components/dashboard/kpiItems.ts:138
 msgid "Key figures — collaboration"
 msgstr "Key figures — collaboration"
 
-#: components/dashboard/kpiItems.ts:141
+#: components/dashboard/kpiItems.ts:142
 msgid "Key figures — impact of the collaboration"
 msgstr "Key figures — impact of the collaboration"
+
+#: components/dashboard/kpiItems.ts:146
+msgid "Key figures — funding"
+msgstr "Key figures — funding"
+
+#: components/dashboard/kpiItems.ts:150
+msgid "Key figures — journals"
+msgstr "Key figures — journals"
 
 #: components/dashboard/labels.ts:12
 msgid "French"
@@ -5524,7 +5539,8 @@ msgid "Archives (former subscription)"
 msgstr "Archives (former subscription)"
 
 #: components/dashboard/phase4Aggregates.ts:27
-#: components/dashboard/publicationFilters.ts:224
+#: components/dashboard/publicationFilters.ts:237
+#: components/dashboard/themeKpis.ts:103
 msgid "National licence (ISTEX)"
 msgstr "National licence (ISTEX)"
 
@@ -5544,146 +5560,159 @@ msgstr "Closed access, unavailable at NU"
 msgid "Access not determined"
 msgstr "Access not determined"
 
-#: components/dashboard/publicationFilters.ts:230
+#: components/dashboard/publicationFilters.ts:243
 msgid "Signature compliant with the charter"
 msgstr "Signature compliant with the charter"
 
+#: components/dashboard/publicationFilters.ts:244
+msgid "Acknowledges a funder"
+msgstr "Acknowledges a funder"
+
 #. placeholder {0}: f.year
-#: components/dashboard/publicationFilters.ts:245
+#: components/dashboard/publicationFilters.ts:259
 msgid "Year: {0}"
 msgstr "Year: {0}"
 
 #. placeholder {0}: f.pubType
-#: components/dashboard/publicationFilters.ts:246
+#: components/dashboard/publicationFilters.ts:260
 msgid "Type: {0}"
 msgstr "Type: {0}"
 
 #. placeholder {0}: oaLabel(f.oaStatus)
-#: components/dashboard/publicationFilters.ts:247
+#: components/dashboard/publicationFilters.ts:261
 msgid "Open access: {0}"
 msgstr "Open access: {0}"
 
 #. placeholder {0}: languageLabel(f.language)
-#: components/dashboard/publicationFilters.ts:248
+#: components/dashboard/publicationFilters.ts:262
 msgid "Language: {0}"
 msgstr "Language: {0}"
 
 #. placeholder {0}: f.journal
-#: components/dashboard/publicationFilters.ts:249
+#: components/dashboard/publicationFilters.ts:263
 msgid "Journal: {0}"
 msgstr "Journal: {0}"
 
 #. placeholder {0}: f.publisher
-#: components/dashboard/publicationFilters.ts:250
+#: components/dashboard/publicationFilters.ts:264
 msgid "Publisher: {0}"
 msgstr "Publisher: {0}"
 
 #. placeholder {0}: f.quartile
-#: components/dashboard/publicationFilters.ts:251
+#: components/dashboard/publicationFilters.ts:265
 msgid "Quartile: {0}"
 msgstr "Quartile: {0}"
 
 #. placeholder {0}: accessLabel(f.journalAccess)
-#: components/dashboard/publicationFilters.ts:252
+#: components/dashboard/publicationFilters.ts:266
 msgid "NU access: {0}"
 msgstr "NU access: {0}"
 
 #. placeholder {0}: f.team
-#: components/dashboard/publicationFilters.ts:253
+#: components/dashboard/publicationFilters.ts:267
 msgid "Team: {0}"
 msgstr "Team: {0}"
 
 #. placeholder {0}: f.sousStructure
-#: components/dashboard/publicationFilters.ts:254
+#: components/dashboard/publicationFilters.ts:268
 msgid "Lab: {0}"
 msgstr "Lab: {0}"
 
 #. placeholder {0}: f.memberType
-#: components/dashboard/publicationFilters.ts:255
+#: components/dashboard/publicationFilters.ts:269
 msgid "Employment type: {0}"
 msgstr "Employment type: {0}"
 
-#: components/dashboard/publicationFilters.ts:258
+#: components/dashboard/publicationFilters.ts:272
 msgid "Author: {author}"
 msgstr "Author: {author}"
 
 #. placeholder {0}: f.collabType
-#: components/dashboard/publicationFilters.ts:260
+#: components/dashboard/publicationFilters.ts:274
 msgid "Collaboration: {0}"
 msgstr "Collaboration: {0}"
 
 #. placeholder {0}: ctx.countryLabel(f.country)
-#: components/dashboard/publicationFilters.ts:261
+#: components/dashboard/publicationFilters.ts:275
 msgid "Country: {0}"
 msgstr "Country: {0}"
 
 #. placeholder {0}: f.nantesPartner
-#: components/dashboard/publicationFilters.ts:262
+#: components/dashboard/publicationFilters.ts:276
 msgid "NU lab: {0}"
 msgstr "NU lab: {0}"
 
 #. placeholder {0}: f.nationalPartner
-#: components/dashboard/publicationFilters.ts:263
+#: components/dashboard/publicationFilters.ts:277
 msgid "National partner: {0}"
 msgstr "National partner: {0}"
 
 #. placeholder {0}: f.partnerInstitution
-#: components/dashboard/publicationFilters.ts:265
+#: components/dashboard/publicationFilters.ts:279
 msgid "Partner: {0}"
 msgstr "Partner: {0}"
 
 #. placeholder {0}: names[0]
-#: components/dashboard/publicationFilters.ts:271
+#: components/dashboard/publicationFilters.ts:285
 msgid "Partner institution: {0}"
 msgstr "Partner institution: {0}"
 
-#: components/dashboard/publicationFilters.ts:271
+#: components/dashboard/publicationFilters.ts:285
 msgid "Partner institutions: {joined}"
 msgstr "Partner institutions: {joined}"
 
 #. placeholder {0}: f.domain
-#: components/dashboard/publicationFilters.ts:274
+#: components/dashboard/publicationFilters.ts:288
 msgid "Domain: {0}"
 msgstr "Domain: {0}"
 
 #. placeholder {0}: f.subfield
-#: components/dashboard/publicationFilters.ts:275
+#: components/dashboard/publicationFilters.ts:289
 msgid "Subfield: {0}"
 msgstr "Subfield: {0}"
 
 #. placeholder {0}: f.topic
-#: components/dashboard/publicationFilters.ts:276
+#: components/dashboard/publicationFilters.ts:290
 msgid "Topic: {0}"
 msgstr "Topic: {0}"
 
 #. placeholder {0}: f.themeKeys[0]
-#: components/dashboard/publicationFilters.ts:281
+#: components/dashboard/publicationFilters.ts:295
 msgid "Subject: {0}"
 msgstr "Subject: {0}"
 
-#: components/dashboard/publicationFilters.ts:281
+#: components/dashboard/publicationFilters.ts:295
 msgid "Subjects: {joined}"
 msgstr "Subjects: {joined}"
 
 #. placeholder {0}: f.theme
-#: components/dashboard/publicationFilters.ts:284
+#: components/dashboard/publicationFilters.ts:298
 msgid "Axis: {0}"
 msgstr "Axis: {0}"
 
 #. placeholder {0}: f.axe
-#: components/dashboard/publicationFilters.ts:285
+#: components/dashboard/publicationFilters.ts:299
 msgid "Strategic axis: {0}"
 msgstr "Strategic axis: {0}"
 
 #. placeholder {0}: f.sourceCombo
-#: components/dashboard/publicationFilters.ts:286
+#: components/dashboard/publicationFilters.ts:300
 msgid "Sources: {0}"
 msgstr "Sources: {0}"
 
 #. placeholder {0}: f.maxAuthors
-#: components/dashboard/publicationFilters.ts:287
+#: components/dashboard/publicationFilters.ts:301
 msgid "Excluding large collaborations (≤ {0} authors)"
 msgstr "Excluding large collaborations (≤ {0} authors)"
+
+#: components/dashboard/publicationFilters.ts:304
+msgid "Funders: {category}"
+msgstr "Funders: {category}"
+
+#. placeholder {0}: f.funder
+#: components/dashboard/publicationFilters.ts:306
+msgid "Funder: {0}"
+msgstr "Funder: {0}"
 
 #: components/dashboard/report/ReportWizard.tsx:52
 msgid "Criteria"
@@ -5706,7 +5735,7 @@ msgstr "PDF report — {0}"
 #: components/dashboard/report/ReportWizard.tsx:282
 #: components/dashboard/report/composeReportPdf.ts:65
 #: components/dashboard/report/pdfDoc.ts:127
-#: components/reports/NewReportDialog.tsx:224
+#: components/reports/NewReportDialog.tsx:232
 #: components/reports/ReportControls.tsx:151
 msgctxt "perimeter"
 msgid "Scope"
@@ -6641,37 +6670,41 @@ msgstr "median FWCI {0}"
 msgid "*{0} publications do not fall into any of these themes.*"
 msgstr "*{0} publications do not fall into any of these themes.*"
 
-#: components/dashboard/report/reportAi.ts:182
+#: components/dashboard/report/reportAi.ts:193
 msgid "Impact indicators"
 msgstr "Impact indicators"
 
-#: components/dashboard/report/reportAi.ts:183
+#: components/dashboard/report/reportAi.ts:194
 msgid "without the publications of more than {maxAuthors} authors"
 msgstr "without the publications of more than {maxAuthors} authors"
 
-#: components/dashboard/report/reportAi.ts:208
-msgid "Key points"
-msgstr "Key points"
-
-#: components/dashboard/report/reportAi.ts:209
+#: components/dashboard/report/reportAi.ts:222
 msgid "Cooperation leads"
 msgstr "Cooperation leads"
 
+#: components/dashboard/report/reportAi.ts:222
+msgid "Leads for action"
+msgstr "Leads for action"
+
+#: components/dashboard/report/reportAi.ts:225
+msgid "Key points"
+msgstr "Key points"
+
 #. placeholder {0}: b.reviewedBy
 #. placeholder {1}: b.reviewedAt ?? ''
-#: components/dashboard/report/reportAi.ts:229
+#: components/dashboard/report/reportAi.ts:246
 msgid "Text generated by AI ({who}) — reviewed by {0} on {1}"
 msgstr "Text generated by AI ({who}) — reviewed by {0} on {1}"
 
-#: components/dashboard/report/reportAi.ts:230
+#: components/dashboard/report/reportAi.ts:247
 msgid "Text generated by AI ({who}) — not reviewed yet"
 msgstr "Text generated by AI ({who}) — not reviewed yet"
 
-#: components/dashboard/report/reportAi.ts:234
+#: components/dashboard/report/reportAi.ts:251
 msgid "AI summary"
 msgstr "AI summary"
 
-#: components/dashboard/report/reportAi.ts:235
+#: components/dashboard/report/reportAi.ts:252
 msgid "AI analysis by major theme"
 msgstr "AI analysis by major theme"
 
@@ -6687,103 +6720,211 @@ msgstr "Browser storage unavailable: reports cannot be saved here."
 msgid "Sharing and history are not available on this read-only instance."
 msgstr "Sharing and history are not available on this read-only instance."
 
-#: components/dashboard/report/templates.ts:77
+#: components/dashboard/report/templates.ts:81
 msgid "Empty report"
 msgstr "Empty report"
 
-#: components/dashboard/report/templates.ts:78
+#: components/dashboard/report/templates.ts:82
 msgid "Start from scratch and add charts, key figures and text yourself."
 msgstr "Start from scratch and add charts, key figures and text yourself."
 
-#: components/dashboard/report/templates.ts:93
+#: components/dashboard/report/templates.ts:97
 msgid "Structure report"
 msgstr "Structure report"
 
-#: components/dashboard/report/templates.ts:94
+#: components/dashboard/report/templates.ts:98
 msgid "Every tab of the dashboard of a structure: output, collaborations, impact, journals, funding, teams…"
 msgstr "Every tab of the dashboard of a structure: output, collaborations, impact, journals, funding, teams…"
 
-#: components/dashboard/report/templates.ts:124
+#: components/dashboard/report/templates.ts:128
 msgid "International collaborations"
 msgstr "International collaborations"
 
-#: components/dashboard/report/templates.ts:125
+#: components/dashboard/report/templates.ts:129
 msgid "Share and evolution of international co-publications, partner countries and institutions, themes and impact — optionally for one country."
 msgstr "Share and evolution of international co-publications, partner countries and institutions, themes and impact — optionally for one country."
 
-#: components/dashboard/report/templates.ts:140
+#: components/dashboard/report/templates.ts:144
 msgid "Partner countries"
 msgstr "Partner countries"
 
-#: components/dashboard/report/templates.ts:144
+#: components/dashboard/report/templates.ts:148
 msgid "Themes of international co-publications"
 msgstr "Themes of international co-publications"
 
-#: components/dashboard/report/templates.ts:146
+#: components/dashboard/report/templates.ts:150
 msgid "Impact of international co-publications"
 msgstr "Impact of international co-publications"
 
-#: components/dashboard/report/templates.ts:164
+#: components/dashboard/report/templates.ts:168
 msgid "Collaboration with a university or group"
 msgstr "Collaboration with a university or group"
 
-#: components/dashboard/report/templates.ts:165
+#: components/dashboard/report/templates.ts:169
 msgid "Co-publications with one or several institutions: key figures, impact against a comparable reference, themes, people and labs involved, per-university breakdown, list of publications."
 msgstr "Co-publications with one or several institutions: key figures, impact against a comparable reference, themes, people and labs involved, per-university breakdown, list of publications."
 
-#: components/dashboard/report/templates.ts:191
-#: components/dashboard/report/templates.ts:225
+#: components/dashboard/report/templates.ts:195
+#: components/dashboard/report/templates.ts:229
 msgid "Co-publications of {lab} with {partnersLabel}."
 msgstr "Co-publications of {lab} with {partnersLabel}."
 
-#: components/dashboard/report/templates.ts:193
+#: components/dashboard/report/templates.ts:197
 msgid "Partner scope: {scopeList}."
 msgstr "Partner scope: {scopeList}."
 
-#: components/dashboard/report/templates.ts:194
+#: components/dashboard/report/templates.ts:198
 msgid "Publications with more than {LARGE_COLLAB_AUTHORS} authors (large consortia) are counted in the volumes but left out of the impact indicators and charts."
 msgstr "Publications with more than {LARGE_COLLAB_AUTHORS} authors (large consortia) are counted in the volumes but left out of the impact indicators and charts."
 
-#: components/dashboard/report/templates.ts:195
+#: components/dashboard/report/templates.ts:199
 msgid "The impact reference is the international co-publications of {lab} in the same subfields, weighted like the collaboration."
 msgstr "The impact reference is the international co-publications of {lab} in the same subfields, weighted like the collaboration."
 
-#: components/dashboard/report/templates.ts:200
+#: components/dashboard/report/templates.ts:204
+#: components/dashboard/report/templates.ts:263
+#: components/dashboard/report/templates.ts:294
 msgid "Summary"
 msgstr "Summary"
 
-#: components/dashboard/report/templates.ts:202
+#: components/dashboard/report/templates.ts:206
+#: components/dashboard/report/templates.ts:265
+#: components/dashboard/report/templates.ts:296
 #: components/reports/ReportEditor.tsx:414
 msgid "Key figures"
 msgstr "Key figures"
 
-#: components/dashboard/report/templates.ts:207
+#: components/dashboard/report/templates.ts:211
 msgid "Journals and impact"
 msgstr "Journals and impact"
 
-#: components/dashboard/report/templates.ts:210
+#: components/dashboard/report/templates.ts:214
 msgid "People and labs involved"
 msgstr "People and labs involved"
 
-#: components/dashboard/report/templates.ts:213
+#: components/dashboard/report/templates.ts:217
 msgid "Breakdown by university"
 msgstr "Breakdown by university"
 
-#: components/dashboard/report/templates.ts:215
+#: components/dashboard/report/templates.ts:219
 msgid "Analysis by major theme"
 msgstr "Analysis by major theme"
 
-#: components/dashboard/report/templates.ts:217
+#: components/dashboard/report/templates.ts:221
 msgid "Other partners in these co-publications"
 msgstr "Other partners in these co-publications"
 
-#: components/dashboard/report/templates.ts:219
+#: components/dashboard/report/templates.ts:223
 msgid "Annex"
 msgstr "Annex"
 
-#: components/dashboard/report/templates.ts:226
+#: components/dashboard/report/templates.ts:230
 msgid "Internal working document"
 msgstr "Internal working document"
+
+#: components/dashboard/report/templates.ts:247
+msgid "Funding analysis"
+msgstr "Funding analysis"
+
+#: components/dashboard/report/templates.ts:248
+msgid "Funders acknowledged by the publications, categories (ANR, Europe…), evolution, labs, and the themes and impact of funded publications — optionally for one category of funders."
+msgstr "Funders acknowledged by the publications, categories (ANR, Europe…), evolution, labs, and the themes and impact of funded publications — optionally for one category of funders."
+
+#: components/dashboard/report/templates.ts:259
+msgid "Funding is what the publications acknowledge (OpenAlex funders, ANR and European projects from HAL): it says neither that the funder paid the structure nor that one of its members holds the grant."
+msgstr "Funding is what the publications acknowledge (OpenAlex funders, ANR and European projects from HAL): it says neither that the funder paid the structure nor that one of its members holds the grant."
+
+#: components/dashboard/report/templates.ts:260
+msgid "Only part of the publications acknowledge a funder (see the key figures): the figures describe that part, not the whole funding of the structure."
+msgstr "Only part of the publications acknowledge a funder (see the key figures): the figures describe that part, not the whole funding of the structure."
+
+#: components/dashboard/report/templates.ts:261
+msgid "Funder categories are assigned from the funder names, on a best-effort basis."
+msgstr "Funder categories are assigned from the funder names, on a best-effort basis."
+
+#: components/dashboard/report/templates.ts:267
+#: components/reports/NewReportDialog.tsx:237
+msgid "Funders"
+msgstr "Funders"
+
+#: components/dashboard/report/templates.ts:269
+msgid "What the funded publications are about"
+msgstr "What the funded publications are about"
+
+#: components/dashboard/report/templates.ts:271
+msgid "Impact and partners of the funded publications"
+msgstr "Impact and partners of the funded publications"
+
+#: components/dashboard/report/templates.ts:285
+msgid "Journals and publishing policy"
+msgstr "Journals and publishing policy"
+
+#: components/dashboard/report/templates.ts:286
+msgid "Journals used, quartiles, open access and access at NU, APC spending, signature charter — optionally for one publisher."
+msgstr "Journals used, quartiles, open access and access at NU, APC spending, signature charter — optionally for one publisher."
+
+#: components/dashboard/report/templates.ts:300
+msgid "Open access and access at NU"
+msgstr "Open access and access at NU"
+
+#: components/dashboard/report/templates.ts:302
+msgid "Article processing charges (APC)"
+msgstr "Article processing charges (APC)"
+
+#: components/dashboard/themeKpis.ts:48
+msgid "articles without funder: {text}"
+msgstr "articles without funder: {text}"
+
+#: components/dashboard/themeKpis.ts:52
+msgid "Funded publications"
+msgstr "Funded publications"
+
+#: components/dashboard/themeKpis.ts:54
+msgid "{coverage}% of the corpus acknowledges a funder"
+msgstr "{coverage}% of the corpus acknowledges a funder"
+
+#: components/dashboard/themeKpis.ts:58
+msgid "ANR-funded"
+msgstr "ANR-funded"
+
+#: components/dashboard/themeKpis.ts:59
+msgid "European funding"
+msgstr "European funding"
+
+#: components/dashboard/themeKpis.ts:62
+msgid "Median FWCI of funded articles"
+msgstr "Median FWCI of funded articles"
+
+#: components/dashboard/themeKpis.ts:68
+msgid "Top 10% share of funded articles"
+msgstr "Top 10% share of funded articles"
+
+#. placeholder {0}: j.topJournal.name
+#: components/dashboard/themeKpis.ts:89
+msgid "most frequent: {0}"
+msgstr "most frequent: {0}"
+
+#: components/dashboard/themeKpis.ts:93
+msgid "Q1 journals"
+msgstr "Q1 journals"
+
+#. placeholder {0}: fmt(withQuartile.length)
+#: components/dashboard/themeKpis.ts:95
+msgid "of the {0} publications with a quartile"
+msgstr "of the {0} publications with a quartile"
+
+#: components/dashboard/themeKpis.ts:102
+msgid "Accessible at NU"
+msgstr "Accessible at NU"
+
+#: components/dashboard/themeKpis.ts:115
+msgid "Signature charter compliance"
+msgstr "Signature charter compliance"
+
+#. placeholder {0}: fmt(charte.analysable)
+#: components/dashboard/themeKpis.ts:117
+msgid "of the {0} analysable publications"
+msgstr "of the {0} analysable publications"
 
 #: components/etl/EtlConsolePage.tsx:191
 msgid "ETL API unreachable"
@@ -7337,7 +7478,7 @@ msgid "by {0}"
 msgstr "by {0}"
 
 #: components/reports/AddToReportDialog.tsx:158
-#: components/reports/NewReportDialog.tsx:161
+#: components/reports/NewReportDialog.tsx:169
 #: components/reports/ReportsPage.tsx:110
 msgid "New report"
 msgstr "New report"
@@ -7470,35 +7611,43 @@ msgstr "Restore the blocks, texts and scope of this version (period fixed as gen
 msgid "Restore"
 msgstr "Restore"
 
-#: components/reports/NewReportDialog.tsx:167
+#: components/reports/NewReportDialog.tsx:175
 msgid "Template"
 msgstr "Template"
 
-#: components/reports/NewReportDialog.tsx:190
+#: components/reports/NewReportDialog.tsx:198
 msgid "Templates of the institution"
 msgstr "Templates of the institution"
 
-#: components/reports/NewReportDialog.tsx:231
+#: components/reports/NewReportDialog.tsx:239
+msgid "All funders"
+msgstr "All funders"
+
+#: components/reports/NewReportDialog.tsx:248
+msgid "All publishers"
+msgstr "All publishers"
+
+#: components/reports/NewReportDialog.tsx:257
 msgid "All partner countries"
 msgstr "All partner countries"
 
-#: components/reports/NewReportDialog.tsx:247
+#: components/reports/NewReportDialog.tsx:273
 msgid "Affiliated institutions (ROR) that also co-signed:"
 msgstr "Affiliated institutions (ROR) that also co-signed:"
 
-#: components/reports/NewReportDialog.tsx:255
+#: components/reports/NewReportDialog.tsx:281
 msgid "Add them"
 msgstr "Add them"
 
-#: components/reports/NewReportDialog.tsx:268
+#: components/reports/NewReportDialog.tsx:294
 msgid "e.g. Collaborations with the University of Ottawa"
 msgstr "e.g. Collaborations with the University of Ottawa"
 
-#: components/reports/NewReportDialog.tsx:275
+#: components/reports/NewReportDialog.tsx:301
 msgid "Loading the structure's data to choose the charts…"
 msgstr "Loading the structure's data to choose the charts…"
 
-#: components/reports/NewReportDialog.tsx:280
+#: components/reports/NewReportDialog.tsx:306
 msgid "No data for this structure: the report will list every chart of the template."
 msgstr "No data for this structure: the report will list every chart of the template."
 

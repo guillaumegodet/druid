@@ -168,7 +168,7 @@ describe('reportAi (client)', () => {
   it('builds the executive summary from the key figures and the theme analysis', async () => {
     const bodies = stubAnswers({ summary: 'Summary.', keyPoints: ['Point A'], leads: ['Lead A'] });
     const r = await generateExecutiveText(rbOf('x'), def, 'en');
-    expect(r.text).toBe('Summary.\n\n### Key points\n\n- Point A\n\n### Cooperation leads\n\n- Lead A');
+    expect(r.text).toBe('Summary.\n\n### Key points\n\n- Point A\n\n### Leads for action\n\n- Lead A');
     expect(bodies[0].domainTexts).toBe('## Heart\n\nPrevious analysis.');
     expect((bodies[0].keyFigures as { label: string }[]).map((f) => f.label)).toContain('Publications');
   });

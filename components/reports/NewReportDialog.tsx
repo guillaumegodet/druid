@@ -13,6 +13,7 @@ import type { ReportsBackend } from '../dashboard/report/reportsApi';
 import {
   DEFAULT_PERIOD,
   instantiateReportTemplate,
+  datasetPublishers,
   partnerCountries,
   REPORT_TEMPLATES,
   templateById,
@@ -23,6 +24,7 @@ import { buildPartnerCatalog, type PartnerCatalogEntry } from '../dashboard/coll
 import { consortiumPartnerGroups } from '../dashboard/consortia';
 import { PartnerInstitutionPicker } from '../dashboard/PartnerInstitutionPicker';
 import { affiliatedPartners } from '../dashboard/report/rorAffiliates';
+import { FUNDER_CATEGORIES, FUNDER_CATEGORY_LABELS } from '../dashboard/fundersAggregates';
 import { loadDashboardDataset } from '../dashboard/useDashboardData';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect, useStructureSlugs } from './ReportControls';
 
@@ -55,6 +57,8 @@ export const NewReportDialog: React.FC<{
   const [period, setPeriod] = useState<ReportPeriod>(initial?.period ?? DEFAULT_PERIOD);
   const [perimetre, setPerimetre] = useState<'affiliation' | 'effectifs'>(initial?.perimetre ?? 'affiliation');
   const [country, setCountry] = useState('');
+  const [funderCat, setFunderCat] = useState('');
+  const [publisher, setPublisher] = useState('');
   const [name, setName] = useState('');
   const [nameTouched, setNameTouched] = useState(false);
   const [dataset, setDataset] = useState<DashboardDataset | null | undefined>(undefined);
@@ -80,7 +84,8 @@ export const NewReportDialog: React.FC<{
       .catch(() => { if (!cancelled) setDataset(null); });
     return () => { cancelled = true; };
   }, [slug]);
-  useEffect(() => { setCountry(''); setPartners([]); }, [slug]);
+  useEffect(() => { setCountry(''); setPartners([]); setPublisher(''); }, [slug]);
+  const publishers = useMemo(() => datasetPublishers(dataset ?? null), [dataset]);
 
   const countries = useMemo(() => partnerCountries(dataset ?? null), [dataset]);
   const countryName = (cc: string) => (dataset ? countryLabel(cc, dataset.countryNames) : cc);
@@ -109,14 +114,16 @@ export const NewReportDialog: React.FC<{
     const label = t(template.label);
     const where = dataset ? dataset.lab : slug;
     const withCountry = template.params.includes('country') && country ? ` — ${countryName(country)}` : '';
+    const withFunder = template.params.includes('funderCategory') && funderCat ? ` — ${t(FUNDER_CATEGORY_LABELS[funderCat])}` : '';
+    const withPublisher = template.params.includes('publisher') && publisher ? ` — ${publisher}` : '';
     if (template.params.includes('partners')) {
       const first = partners[0] ? partnerName(partners[0]) : '';
       const more = partners.length > 1 ? ` (+${partners.length - 1})` : '';
       return first ? `${where} × ${first}${more}` : '';
     }
-    return template.id === 'blank' ? '' : `${label} — ${where}${withCountry}`;
+    return template.id === 'blank' ? '' : `${label} — ${where}${withCountry}${withFunder}${withPublisher}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [template, instanceTemplate, dataset, slug, country, partners, catalog, t]);
+  }, [template, instanceTemplate, dataset, slug, country, funderCat, publisher, partners, catalog, t]);
   useEffect(() => {
     if (!nameTouched) setName(suggestedName);
   }, [suggestedName, nameTouched]);
@@ -127,6 +134,7 @@ export const NewReportDialog: React.FC<{
     try {
       const input = {
         name, slug, period, perimetre, country: country || undefined, partners,
+        funderCategory: funderCat || undefined, publisher: publisher || undefined,
         lang: i18n.locale === 'en' ? 'en' as const : 'fr' as const,
       };
       let definition;
@@ -224,6 +232,24 @@ export const NewReportDialog: React.FC<{
             <span className={label}>{t({ message: `Scope`, context: "perimeter" })}</span>
             <PerimetreSelect value={perimetre} onChange={setPerimetre} />
           </div>
+          {template.params.includes('funderCategory') && (
+            <div className={row}>
+              <span className={label}><Trans>Funders</Trans></span>
+              <select className={selectCls} value={funderCat} onChange={(e) => setFunderCat(e.target.value)}>
+                <option value="">{t`All funders`}</option>
+                {FUNDER_CATEGORIES.map((c) => <option key={c} value={c}>{t(FUNDER_CATEGORY_LABELS[c])}</option>)}
+              </select>
+            </div>
+          )}
+          {template.params.includes('publisher') && (
+            <div className={row}>
+              <span className={label}><Trans>Publisher</Trans></span>
+              <select className={selectCls} value={publisher} onChange={(e) => setPublisher(e.target.value)} disabled={!dataset}>
+                <option value="">{t`All publishers`}</option>
+                {publishers.map((name) => <option key={name} value={name}>{name}</option>)}
+              </select>
+            </div>
+          )}
           {template.params.includes('country') && (
             <div className={row}>
               <span className={label}><Trans>Country</Trans></span>

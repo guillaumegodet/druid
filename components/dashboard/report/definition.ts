@@ -64,6 +64,9 @@ export const pubFiltersSchema = z.strictObject({
   charterCompliant: z.boolean().optional(),
   charteSeuil: z.number().min(0).max(1).optional(),
   maxAuthors: z.number().int().min(1).optional(),
+  funded: z.boolean().optional(),
+  funderCategory: str.optional(),
+  funder: str.optional(),
 });
 
 // Compile-time guard: the schema covers every PubFilters field, and only those.

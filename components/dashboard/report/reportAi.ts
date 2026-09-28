@@ -160,7 +160,15 @@ export async function generateDomainsText(
 }
 
 /** Key figures handed to the executive summary: the collaboration sets, else overview + impact. */
-function keyFigures(rb: ResolvedBlock): KpiItem[] {
+/** Key-figure sets computed on the block scope with its large-collaboration exclusion (D2). */
+const IMPACT_SETS = new Set(['impact', 'partner-impact']);
+
+/**
+ * Key figures handed to the executive summary: the key-figure sets the report itself shows (its
+ * `kpis` blocks, whatever the template), else overview + impact — or the collaboration sets when the
+ * scope names partners.
+ */
+function keyFigures(rb: ResolvedBlock, def: ReportDefinition): KpiItem[] {
   const ds = rb.dataset!;
   const range = rb.scope!.range;
   const filters = rb.scope!.filters;
@@ -171,11 +179,14 @@ function keyFigures(rb: ResolvedBlock): KpiItem[] {
   const volume = maxAuthors != null && rb.source
     ? restrictDataset(rb.source, { filters: volumeFilters })
     : ds;
-  const [volumeSet, impactSet] = filters.partnerKeys?.length ? ['partner', 'partner-impact'] : ['overview', 'impact'];
-  const items = [
-    ...KPI_SETS[volumeSet].items(volume, range, { ...ctx, filters: volumeFilters }),
-    ...KPI_SETS[impactSet].items(ds, range, ctx),
-  ];
+  const reportSets = [...new Set(def.blocks.flatMap((b) => (b.kind === 'kpis' && !b.hidden ? [b.setId] : [])))];
+  const sets = reportSets.length
+    ? reportSets
+    : filters.partnerKeys?.length ? ['partner', 'partner-impact'] : ['overview', 'impact'];
+  const items = sets.flatMap((id) =>
+    IMPACT_SETS.has(id)
+      ? KPI_SETS[id].items(ds, range, ctx)
+      : KPI_SETS[id].items(volume, range, { ...ctx, filters: volumeFilters }));
   if (maxAuthors != null) {
     items.push({
       key: 'impact-scope',
@@ -186,7 +197,10 @@ function keyFigures(rb: ResolvedBlock): KpiItem[] {
   return items;
 }
 
-/** Executive summary, key points and cooperation leads (Markdown). */
+/**
+ * Executive summary, key points and leads (Markdown): cooperation leads when the scope names
+ * partner institutions, leads for action otherwise (funding, journals, structure reports).
+ */
 export async function generateExecutiveText(
   rb: ResolvedBlock,
   def: ReportDefinition,
@@ -194,19 +208,22 @@ export async function generateExecutiveText(
   onProgress: (p: AiProgress) => void = () => {},
 ): Promise<AiResult> {
   const { structureLabel, partnerLabel } = labels(rb);
+  const collaboration = (rb.scope?.filters.partnerKeys?.length ?? 0) > 0;
   const domains = def.blocks.find((b) => b.kind === 'ai' && b.task === 'domains' && b.text?.trim());
   onProgress({ done: 0, total: 1 });
   const r = await callAi<{ summary: string; keyPoints: string[]; leads: string[] }>({
     task: 'executive', lang, structureLabel, partnerLabel,
-    keyFigures: keyFigures(rb).map((f) => ({ label: f.label, value: f.value, hint: f.hint })),
+    focus: collaboration ? 'collaboration' : 'general',
+    keyFigures: keyFigures(rb, def).map((f) => ({ label: f.label, value: f.value, hint: f.hint })),
     domainTexts: domains && domains.kind === 'ai' ? domains.text : '',
   });
   onProgress({ done: 1, total: 1 });
   const bullets = (xs: string[]) => xs.map((x) => `- ${x}`).join('\n');
+  const leadsTitle = collaboration ? i18n._(msg`Cooperation leads`) : i18n._(msg`Leads for action`);
   const text = [
     r.summary,
     r.keyPoints.length ? `### ${i18n._(msg`Key points`)}\n\n${bullets(r.keyPoints)}` : '',
-    r.leads.length ? `### ${i18n._(msg`Cooperation leads`)}\n\n${bullets(r.leads)}` : '',
+    r.leads.length ? `### ${leadsTitle}\n\n${bullets(r.leads)}` : '',
   ].filter(Boolean).join('\n\n');
   return { text, model: r.model };
 }

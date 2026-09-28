@@ -8,6 +8,7 @@ import {
   aggregateFunders,
   aggregateCategoryByLabo,
   FUNDER_CATEGORIES,
+  FUNDER_CATEGORY_LABELS,
   CATEGORY_COLOR_SLOT,
   FunderCount,
   LaboCategoryRow,
@@ -29,16 +30,7 @@ import type { MessageDescriptor } from '@lingui/core';
 const PAGE_SIZE = 25;
 const nf = (v: number) => v.toLocaleString(numberLocale());
 
-/** Displayed labels of the funder categories (keys = FunderCategory, stable in the data). */
-const CATEGORY_LABELS: Record<string, MessageDescriptor> = {
-  ANR: msg`ANR`,
-  Europe: msg`Europe`,
-  'Recherche nationale': msg`National research`,
-  Régional: msg`Regional`,
-  International: msg`International`,
-  'Privé / fondations': msg`Private / foundations`,
-  Autre: msg`Other`,
-};
+const CATEGORY_LABELS: Record<string, MessageDescriptor> = FUNDER_CATEGORY_LABELS;
 
 /** Top funders (horizontal bars), each bar colored by category. */
 export const FundersTopChart: React.FC<{ data: FunderCount[] }> = ({ data }) => {

@@ -15,7 +15,7 @@ import { newBlockId, type ReportBlock, type ReportDefinition, type ReportPeriod 
 import { REPORT_SECTIONS } from './reportCatalog';
 
 /** Parameters a template asks for, in form order. */
-export type TemplateParam = 'structure' | 'period' | 'perimetre' | 'country' | 'partners';
+export type TemplateParam = 'structure' | 'period' | 'perimetre' | 'country' | 'partners' | 'funderCategory' | 'publisher';
 
 export interface TemplateInput {
   name: string;
@@ -26,6 +26,10 @@ export interface TemplateInput {
   country?: string;
   /** Partner institutions (catalog keys: ROR, else `<scope>:<name>`) — collaboration template. */
   partners?: string[];
+  /** FunderCategory key (funding template), empty = every funder. */
+  funderCategory?: string;
+  /** Journal publisher (journals template), empty = every publisher. */
+  publisher?: string;
   lang: 'fr' | 'en';
 }
 
@@ -228,7 +232,93 @@ const partnerReport: ReportTemplate = {
   },
 };
 
-export const REPORT_TEMPLATES: ReportTemplate[] = [partnerReport, structureReport, internationalReport, blank];
+const text = (markdown: string): ReportBlock => ({ id: newBlockId(), kind: 'text', markdown });
+/** Drops the sections left empty by the structure or the filters. */
+const withoutEmptySections = (blocks: ReportBlock[]) =>
+  blocks.filter((b, i) => b.kind !== 'section' || (blocks[i + 1] && blocks[i + 1].kind !== 'section'));
+
+/**
+ * « Analyse des financements » (plan § 5.4): funders, categories, funded publications per year and
+ * per lab, then what the funded publications are about and how they are cited — optionally for one
+ * category of funders (ANR, Europe…). Funding data are declarative and partial: said upfront.
+ */
+const fundingReport: ReportTemplate = {
+  id: 'funding',
+  label: msg`Funding analysis`,
+  description: msg`Funders acknowledged by the publications, categories (ANR, Europe…), evolution, labs, and the themes and impact of funded publications — optionally for one category of funders.`,
+  params: ['structure', 'period', 'perimetre', 'funderCategory'],
+  needsDataset: true,
+  build(input, env) {
+    const category = input.funderCategory?.trim() || undefined;
+    const filters: PubFilters = category ? { funderCategory: category } : {};
+    const pick = (ids: string[]) => usable(ids, env, filters).map(chart);
+    // Themes and impact of the funded publications only (their filter adds to the report's).
+    const fundedOnly = (b: ReportBlock): ReportBlock => (b.kind === 'chart' ? { ...b, override: { filters: { funded: true } } } : b);
+    const blocks: ReportBlock[] = [
+      text([
+        `- ${i18n._(msg`Funding is what the publications acknowledge (OpenAlex funders, ANR and European projects from HAL): it says neither that the funder paid the structure nor that one of its members holds the grant.`)}`,
+        `- ${i18n._(msg`Only part of the publications acknowledge a funder (see the key figures): the figures describe that part, not the whole funding of the structure.`)}`,
+        `- ${i18n._(msg`Funder categories are assigned from the funder names, on a best-effort basis.`)}`,
+      ].join('\n')),
+      section(msg`Summary`),
+      { id: newBlockId(), kind: 'ai', task: 'executive' },
+      section(msg`Key figures`),
+      kpis('funding'),
+      section(msg`Funders`),
+      ...pick(['funders-top', 'funders-categories', 'funders-evolution', 'funders-par-labo']),
+      section(msg`What the funded publications are about`),
+      ...pick(['domaines', 'top-sous-domaines', 'top-mots-cles']).map(fundedOnly),
+      section(msg`Impact and partners of the funded publications`),
+      ...pick(['quartiles-scimago', 'distribution-fwci', 'top-pays', 'top-partenaires']).map(fundedOnly),
+    ];
+    return base(fundingReport, input, filters, withoutEmptySections(blocks), category ? { funderCategory: category } : {});
+  },
+};
+
+/**
+ * « Analyse des revues et de la politique de publication » (plan § 5.5): where the structure
+ * publishes, quartiles, open access and access at NU, APC, signature charter — optionally for one
+ * publisher.
+ */
+const journalsReport: ReportTemplate = {
+  id: 'journals',
+  label: msg`Journals and publishing policy`,
+  description: msg`Journals used, quartiles, open access and access at NU, APC spending, signature charter — optionally for one publisher.`,
+  params: ['structure', 'period', 'perimetre', 'publisher'],
+  needsDataset: true,
+  build(input, env) {
+    const publisher = input.publisher?.trim() || undefined;
+    const filters: PubFilters = publisher ? { publisher } : {};
+    const pick = (ids: string[]) => usable(ids, env, filters).map(chart);
+    const blocks: ReportBlock[] = [
+      section(msg`Summary`),
+      { id: newBlockId(), kind: 'ai', task: 'executive' },
+      section(msg`Key figures`),
+      kpis('journals'),
+      section(msg`Journals`),
+      ...pick(['top-revues', 'quartiles-scimago']),
+      section(msg`Open access and access at NU`),
+      ...pick(['acces-ouvert', 'acces-revues', 'acces-revues-barres', 'acces-revues-evolution']),
+      section(msg`Article processing charges (APC)`),
+      ...pick(['apc-evolution', 'apc-par-revue', 'apc-elsevier-par-labo']),
+      section(msg`Signature charter`),
+      ...pick(['charte-conformite', 'charte-evolution']),
+    ];
+    return base(journalsReport, input, filters, withoutEmptySections(blocks), publisher ? { publisher } : {});
+  },
+};
+
+export const REPORT_TEMPLATES: ReportTemplate[] = [
+  partnerReport, structureReport, internationalReport, fundingReport, journalsReport, blank,
+];
+
+/** Publishers of a dataset, most frequent first (publisher parameter). */
+export function datasetPublishers(dataset: DashboardDataset | null, limit = 60): string[] {
+  if (!dataset) return [];
+  const counts = new Map<string, number>();
+  for (const p of dataset.publications) if (p.journalPublisher) counts.set(p.journalPublisher, (counts.get(p.journalPublisher) ?? 0) + 1);
+  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, limit).map(([name]) => name);
+}
 
 export const templateById = (id: string): ReportTemplate | undefined => REPORT_TEMPLATES.find((t) => t.id === id);
 

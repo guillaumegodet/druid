@@ -9,6 +9,7 @@ import { numberLocale } from '../../lib/i18n';
 import { aggregateImpact, type ImpactKpis } from './impactAggregates';
 import { aggregateOverview, CONFERENCE_LABEL, type OverviewKpis, type YearRange } from './overviewAggregates';
 import { partnerImpactItems, partnerKpiItems, type PartnerKpiContext } from './partnerKpis';
+import { fundingKpiItems, journalsKpiItems } from './themeKpis';
 import type { PubFilters } from './publicationFilters';
 import type { DashboardDataset } from './types';
 
@@ -140,5 +141,13 @@ export const KPI_SETS: Record<string, KpiSet> = {
   'partner-impact': {
     label: msg`Key figures — impact of the collaboration`,
     items: (dataset, range, ctx) => partnerImpactItems(dataset, range, ctx ?? noContext),
+  },
+  funding: {
+    label: msg`Key figures — funding`,
+    items: (dataset, range, ctx) => fundingKpiItems(dataset, range, ctx ?? noContext),
+  },
+  journals: {
+    label: msg`Key figures — journals`,
+    items: (dataset, range) => journalsKpiItems(dataset, range),
   },
 };

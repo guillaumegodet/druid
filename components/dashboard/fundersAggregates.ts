@@ -6,6 +6,8 @@
 // It means neither "paid `Nantes Université`" nor "a Nantes researcher holds the
 // grant". Declarative view (acknowledgements), not an accounting one.
 
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { DashboardPublication } from './types';
 import { YearRange } from './overviewAggregates';
 
@@ -28,6 +30,17 @@ export const FUNDER_CATEGORIES: FunderCategory[] = [
   'Privé / fondations',
   'Autre',
 ];
+
+/** Displayed labels of the funder categories (keys = FunderCategory, stable in the data). */
+export const FUNDER_CATEGORY_LABELS: Record<string, MessageDescriptor> = {
+  ANR: msg`ANR`,
+  Europe: msg`Europe`,
+  'Recherche nationale': msg`National research`,
+  Régional: msg`Regional`,
+  International: msg`International`,
+  'Privé / fondations': msg`Private / foundations`,
+  Autre: msg`Other`,
+};
 
 /** Palette slot (VizTheme.series) per category — color-blindness order preserved. */
 export const CATEGORY_COLOR_SLOT: Record<FunderCategory, number> = {
@@ -91,14 +104,14 @@ const inRange = (p: DashboardPublication, range: YearRange) =>
   typeof p.year === 'number' && p.year >= range.start && p.year <= range.end;
 
 /** Distinct canonical funders of a publication (funders + funderName of the awards). */
-function fundersOf(p: DashboardPublication): string[] {
+export function fundersOf(p: DashboardPublication): string[] {
   const names = new Set<string>();
   for (const f of p.funders ?? []) if (f?.name) names.add(canonFunderName(f.name));
   for (const a of p.awards ?? []) if (a?.funderName) names.add(canonFunderName(a.funderName));
   return Array.from(names);
 }
 
-const hasFunding = (p: DashboardPublication) =>
+export const hasFunding = (p: DashboardPublication) =>
   (p.funders?.length ?? 0) > 0 || (p.awards?.length ?? 0) > 0;
 
 export interface FunderCount {

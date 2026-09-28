@@ -161,14 +161,23 @@ function createReportAi({ apiBase, apiKey, model, fetchImpl = fetch, sleep = (ms
     const figures = list(body.keyFigures, MAX_FIGURES)
       .map((f) => `${str(f?.label, 120)} : ${str(f?.value, 60)}${f?.hint ? ` (${str(f.hint, 160)})` : ''}`);
     if (!figures.length) throw ERRORS.empty;
+    // focus: « collaboration » (report on partner institutions) or « general » (funding, journals…).
+    const collaboration = body.focus !== 'general';
     const system =
-      "Tu es analyste bibliométrique pour la direction des relations internationales d'un " +
-      "établissement de recherche. À partir des chiffres clés (calculés, à reprendre tels quels sans " +
-      "en ajouter) et des synthèses par domaine d'une collaboration, rédige en " +
-      `${language(body.lang)} : un paragraphe de synthèse (4 à 6 phrases), 3 à 5 points clés, et 2 à 4 ` +
-      "pistes de coopération concrètes. Reste factuel et prudent ; signale les domaines portés par peu " +
-      "de chercheur·euses ou par de grands consortiums. Ne cite aucun nom qui n'apparaît pas dans les " +
-      "synthèses fournies. " +
+      (collaboration
+        ? "Tu es analyste bibliométrique pour la direction des relations internationales d'un " +
+          "établissement de recherche. À partir des chiffres clés (calculés, à reprendre tels quels sans " +
+          "en ajouter) et des synthèses par domaine d'une collaboration, rédige en " +
+          `${language(body.lang)} : un paragraphe de synthèse (4 à 6 phrases), 3 à 5 points clés, et 2 à 4 ` +
+          "pistes de coopération concrètes. Reste factuel et prudent ; signale les domaines portés par peu " +
+          "de chercheur·euses ou par de grands consortiums. "
+        : "Tu es analyste bibliométrique pour la direction de la recherche d'un établissement. À partir " +
+          "des chiffres clés d'un rapport (calculés, à reprendre tels quels sans en ajouter) et, s'il y en " +
+          `a, des synthèses par domaine, rédige en ${language(body.lang)} : un paragraphe de synthèse (4 à 6 ` +
+          "phrases), 3 à 5 points clés, et 2 à 4 pistes d'action concrètes. Reste factuel et prudent ; " +
+          "signale les limites des données quand elles sont indiquées (couverture partielle, effectifs " +
+          "faibles). ") +
+      "Ne cite aucun nom qui n'apparaît pas dans les éléments fournis. " +
       'Réponds UNIQUEMENT en JSON : {"summary": "...", "keyPoints": ["..."], "leads": ["..."]}.';
     const user =
       `Structure : ${str(body.structureLabel)}\nPartenaire(s) : ${str(body.partnerLabel) || '(non précisé)'}\n\n` +

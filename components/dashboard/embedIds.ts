@@ -53,7 +53,7 @@ export const EMBEDDABLE_IDS = new Set<string>([
  * Key-figure rows a report `kpis` block can show (kpiItems.ts, KPI_SETS).
  * ⚠️ Keep in sync with the keys of KPI_SETS.
  */
-export const KPI_SET_IDS = new Set<string>(['overview', 'impact', 'partner', 'partner-impact']);
+export const KPI_SET_IDS = new Set<string>(['overview', 'impact', 'partner', 'partner-impact', 'funding', 'journals']);
 
 /**
  * Tables a report `table` block can show (reportTables.ts, REPORT_TABLES).

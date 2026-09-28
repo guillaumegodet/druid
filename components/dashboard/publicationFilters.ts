@@ -15,6 +15,7 @@ import { msg } from '@lingui/core/macro';
 import { accessLabel, AXE_OTHER, charterCompliant } from './phase4Aggregates';
 import { comboLabelOf } from './sourcesAggregates';
 import { buildPartnerCatalog, partnerKey } from './collabAggregates';
+import { FUNDER_CATEGORY_LABELS, funderCategory, fundersOf, hasFunding } from './fundersAggregates';
 
 /** Effective strategic axis of a publication (1st axis if multiple, « Autre » otherwise). */
 export function axeOfPub(p: DashboardPublication): string {
@@ -113,6 +114,15 @@ export interface PubFilters {
    * of PartnerBreakdownSection (lot 4, docs/archive/plan-collab-consortium.md).
    */
   maxAuthors?: number;
+  /**
+   * Acknowledges at least one funder (OpenAlex funders or HAL projects — declarative, see
+   * DashboardPublication.funders). « Analyse des financements » template, docs/plan-mes-rapports.md lot 10.
+   */
+  funded?: boolean;
+  /** Acknowledges a funder of this category (FunderCategory key, funderCategory()). */
+  funderCategory?: string;
+  /** Acknowledges this funder (canonical name, canonFunderName()). */
+  funder?: string;
 }
 
 /** Resolution context built once per dataset (headcount matches). */
@@ -216,6 +226,9 @@ export function matchesFilters(
   }
   if (f.maxAuthors != null && typeof p.authorCount === 'number' && p.authorCount > f.maxAuthors)
     return false;
+  if (f.funded && !hasFunding(p)) return false;
+  if (f.funderCategory && !fundersOf(p).some((name) => funderCategory(name) === f.funderCategory)) return false;
+  if (f.funder && !fundersOf(p).includes(f.funder)) return false;
   return true;
 }
 
@@ -228,6 +241,7 @@ const FLAG_LABELS: Partial<Record<keyof PubFilters, MessageDescriptor>> = {
   top10: msg`Top 10% citations`,
   top1: msg`Top 1% citations`,
   charterCompliant: msg`Signature compliant with the charter`,
+  funded: msg`Acknowledges a funder`,
 };
 
 export interface FilterChip {
@@ -285,6 +299,11 @@ export function describeFilters(f: PubFilters, ctx: FilterContext): FilterChip[]
   if (f.axe) push('axe', _(msg`Strategic axis: ${f.axe}`));
   if (f.sourceCombo) push('sourceCombo', _(msg`Sources: ${f.sourceCombo}`));
   if (f.maxAuthors != null) push('maxAuthors', _(msg`Excluding large collaborations (≤ ${f.maxAuthors} authors)`));
+  if (f.funderCategory) {
+    const category = FUNDER_CATEGORY_LABELS[f.funderCategory] ? _(FUNDER_CATEGORY_LABELS[f.funderCategory]) : f.funderCategory;
+    push('funderCategory', _(msg`Funders: ${category}`));
+  }
+  if (f.funder) push('funder', _(msg`Funder: ${f.funder}`));
   for (const [key, label] of Object.entries(FLAG_LABELS) as [keyof PubFilters, MessageDescriptor][]) {
     if (f[key]) push(key, _(label));
   }
