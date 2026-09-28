@@ -53,8 +53,9 @@ const DIRECTIVE = /^(eslint|@ts-|prettier|biome|noqa|type:|pylint|fmt:|istanbul|
 // span two comment lines: the opening or closing half is stripped on its own.
 const QUOTED = /«[^»]*»|“[^”]*”|"[^"]*"|`[^`]*`|«[^»]*$|^[^«]*»/g;
 // Proper nouns and institutional names that legitimately keep their accents in
-// English prose (no \b: JavaScript word boundaries are ASCII-only).
-const PROPER_NOUNS = /Conseil National des Universités|Nantes\s+Universit[ée]s?|Universit[ée]s?|Établissements?|HCÉRES|PÔLE|Prénom|École|Centrale|Référence|É[A-Z]{2,}/g;
+// English prose, and the fictitious names of the demos and test fixtures (no \b: JavaScript word
+// boundaries are ASCII-only).
+const PROPER_NOUNS = /Conseil National des Universités|Nantes\s+Universit[ée]s?|Universit[ée]s?|Établissements?|HCÉRES|PÔLE|Prénom|École|Centrale|Référence|É[A-Z]{2,}|Chloé|[\wÀ-ÿ-]*Démo/g;
 
 function isFrench(text) {
   const stripped = text.replace(QUOTED, ' ').replace(PROPER_NOUNS, ' ').trim();

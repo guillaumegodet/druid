@@ -1,0 +1,71 @@
+# Checks run on every push to main and every pull request (docs/plan-architecture-multi-instances.md,
+# lot 7 c). A shared Cloudflare deployment (druid-saas) serves several instances from one build and has
+# no branch previews: a broken build or a failed guard blocks every instance, so nothing reaches main
+# without these checks. No secret is needed: only the public instances of instances/ are built.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+
+      - name: Types
+        run: npx tsc --noEmit
+      - name: Unit tests
+        run: npm test
+      - name: Comment language
+        run: npm run lint:comments
+
+      - name: Instance registry
+        run: |
+          node scripts/instances/validate.cjs
+          node scripts/tests/instance-config.cjs
+      - name: Server and Functions guards
+        env:
+          VITE_GRIST_DOC_ID: docA
+          GRIST_API_KEY: k
+        run: |
+          node scripts/tests/functions-guards.mjs
+          node scripts/tests/server-guards.cjs
+          GRIST_EXTRA_DOC_IDS=5aREUrB1kuFAcVY4GTUDfA,docB node scripts/tests/grist-proxy-guard.cjs
+          node scripts/tests/cdb-export.cjs
+          node scripts/tests/idref-qualinka.cjs
+      # Structural rules only: the list of names lives in a private repository (local pre-push hook).
+      - name: Publication guard
+        run: node scripts/publication/check_public_tree.mjs
+
+      - name: Build of the shared deployment (druid-saas)
+        env:
+          CF_PAGES: '1'
+          DRUID_DEPLOYMENT: druid-saas
+        run: |
+          npm run build
+          # Nothing instance-specific in the bundle: every doc id must come from /api/me.
+          for id in $(jq -r .grist.docId instances/*/instance.json); do
+            if grep -rqF "$id" dist; then echo "doc id $id found in the shared bundle"; exit 1; fi
+          done
+          npx --yes wrangler@3 pages functions build --outdir /tmp/functions-build
+      - name: Build of a dedicated project (druid-demo)
+        env:
+          CF_PAGES: '1'
+          DRUID_INSTANCE: demo
+        run: npm run build
