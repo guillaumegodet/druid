@@ -13,6 +13,9 @@ const DashboardPage = React.lazy(() =>
   import('./components/DashboardPage').then((m) => ({ default: m.DashboardPage }))
 );
 // Administration section (ETL console, rights, media sources) — admins only.
+const ReportsPage = React.lazy(() =>
+  import('./components/reports/ReportsPage').then((m) => ({ default: m.ReportsPage }))
+);
 const AdminPage = React.lazy(() =>
   import('./components/admin/AdminPage').then((m) => ({ default: m.AdminPage }))
 );
@@ -162,6 +165,8 @@ function App() {
   // « Tableau de bord » section (druid-biblio): available slugs + preselected structure.
   const [dashboardSlugs, setDashboardSlugs] = useState<string[]>([]);
   const [dashboardStruct, setDashboardStruct] = useState<string | null>(null);
+  // Report open in the « Mes rapports » editor (null = the list).
+  const [reportId, setReportId] = useState<number | null>(null);
 
   useEffect(() => {
     fetchDashboardStructures()
@@ -202,9 +207,18 @@ function App() {
       // Legacy « Doublons » page URL → « À traiter » section, Doublons tab.
       if (String(newState.page) === 'DUPLICATES') { setCurrentView(ViewState.TASKS); setTodoTab('doublons'); return; }
       if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'affiliations')) setTodoTab(newState.tab);
+      if (newState.page === ViewState.REPORTS) {
+        const n = Number(newState.id);
+        setReportId(Number.isInteger(n) && n > 0 ? n : null);
+      }
       if (newState.page) setCurrentView(newState.page as ViewState);
     }
   );
+  const openReport = (id: number | null) => {
+    setReportId(id);
+    setCurrentView(ViewState.REPORTS);
+    setUrlState({ page: ViewState.REPORTS, id: id == null ? null : String(id) });
+  };
 
   // Effect selecting the entity when an ID is present in the URL (once the data is loaded)
   useEffect(() => {
@@ -361,6 +375,7 @@ function App() {
 
   const setViewAndUrl = (view: ViewState) => {
     setCurrentView(view);
+    if (view === ViewState.REPORTS) setReportId(null); // the menu opens the list
     setUrlState({ page: view, id: null });
   };
 
@@ -888,6 +903,18 @@ function App() {
               onOpenResearcher={handleResearcherSelect}
               onOpenAdmin={(slug) => openAdmin('console', slug)}
             />
+          </React.Suspense>
+        );
+      case ViewState.REPORTS:
+        return (
+          <React.Suspense
+            fallback={
+              <div className="h-full flex items-center justify-center text-sm font-semibold text-muted-light dark:text-[#8f897c]">
+                <Trans>Loading…</Trans>
+              </div>
+            }
+          >
+            <ReportsPage reportId={reportId} onOpenReport={openReport} />
           </React.Suspense>
         );
       case ViewState.ADMIN:

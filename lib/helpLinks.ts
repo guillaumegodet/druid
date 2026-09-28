@@ -32,6 +32,8 @@ export const VIEW_HELP: Record<ViewState, string> = {
   [ViewState.LDAP_ALIGN]: '/guides/identifiants/aligner-ldap/',
   [ViewState.TASKS]: '/guides/personnes/taches-a-traiter/',
   [ViewState.DASHBOARD]: '/guides/tableau-de-bord/structure-periode-perimetre/',
+  // Dedicated « Créer et partager un rapport » page: lot 11 of docs/plan-mes-rapports.md.
+  [ViewState.REPORTS]: '/guides/tableau-de-bord/exporter/',
   [ViewState.ADMIN]: '/guides/administration/console-etl/',
 };
 

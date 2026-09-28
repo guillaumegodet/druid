@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Users, Building2, Layers, Moon, Sun, LogOut, UserSearch, Wrench, ChevronDown, BarChart3, Languages, Library, Settings, Sparkles, CircleHelp } from 'lucide-react';
+import { Users, Building2, Layers, Moon, Sun, LogOut, UserSearch, Wrench, ChevronDown, BarChart3, Languages, Library, Settings, Sparkles, CircleHelp, FileText } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { ViewState } from '../types';
 import { canSeeAdmin, canUseEstablishmentTools, getUserInfo, isSuperAdmin, logout, hasCapability } from '../lib/auth';
@@ -132,6 +132,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isO
   const isStructures = currentView === ViewState.STRUCTURES_LIST || currentView === ViewState.STRUCTURE_DETAIL;
   const isGroups = currentView === ViewState.GROUPS_LIST;
   const isDashboard = currentView === ViewState.DASHBOARD;
+  const isReports = currentView === ViewState.REPORTS;
   const isUnified = currentView === ViewState.UNIFIED_ALIGN;
   const isLdapCandidates = currentView === ViewState.LDAP_ALIGN;
   const isAdmin = currentView === ViewState.ADMIN;
@@ -160,6 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isO
         <NavPill active={isGroups} onClick={() => handleNavClick(ViewState.GROUPS_LIST)} label={t`Groups`} icon={<Layers className="w-4 h-4 md:hidden" />} />
       )}
       <NavPill active={isDashboard} onClick={() => handleNavClick(ViewState.DASHBOARD)} label={t`Dashboard`} icon={<BarChart3 className="w-4 h-4 md:hidden" />} />
+      <NavPill active={isReports} onClick={() => handleNavClick(ViewState.REPORTS)} label={t`My reports`} icon={<FileText className="w-4 h-4 md:hidden" />} />
       {/* Administration: ETL console (admin), rights (super admin), media sources (media admin). */}
       {canSeeAdmin() && (
         <NavPill active={isAdmin} onClick={() => handleNavClick(ViewState.ADMIN)} label={t`Administration`} icon={<Settings className="w-4 h-4 md:hidden" />} />

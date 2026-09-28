@@ -4,6 +4,8 @@
 // (« finished » event — maps load their GeoJSON asynchronously, force graphs
 // never « finish » → maximum delay per chart), then rasterizes each instance
 // to a high-resolution PNG via getDataURL().
+// Each item has its own capture key: a report may show the same chart twice with different
+// filters, and the charts register under their exportName (EChartCard).
 
 import React, { useEffect, useMemo, useRef } from 'react';
 import {
@@ -16,9 +18,22 @@ import {
 import { EMBED_CHARTS } from '../embedRegistry';
 import { DashboardDataset } from '../types';
 import { YearRange } from '../overviewAggregates';
+import type { ChartParams } from '../chartMeta';
+
+/** One chart to capture: registry id + the data, period and parameters it is drawn with. */
+export interface RenderItem {
+  /** Capture key, unique in the batch (report block id, or the chart id in the wizard). */
+  key: string;
+  chartId: string;
+  dataset: DashboardDataset;
+  range: YearRange;
+  params?: ChartParams;
+}
 
 export interface CapturedChart {
+  /** RenderItem.key. */
   id: string;
+  chartId: string;
   title: string;
   subtitle?: string;
   /** Data-URL PNG (pixelRatio 2, fond blanc). */
@@ -44,26 +59,35 @@ interface Entry {
 }
 
 interface ReportRendererProps {
-  dataset: DashboardDataset;
-  range: YearRange;
-  /** EMBED_CHARTS ids to render, in report order. */
-  chartIds: string[];
-  /** Captures in chartIds order + ids not rendered (unknown component, failure). */
+  /** Charts to render, in report order. */
+  items: RenderItem[];
+  /** Captures in items order + keys not rendered (unknown component, failure). */
   onDone: (captures: CapturedChart[], missing: string[]) => void;
 }
 
-export const ReportRenderer: React.FC<ReportRendererProps> = ({
-  dataset,
-  range,
-  chartIds,
-  onDone,
+/** Registers the chart of one item under the item key instead of its exportName. */
+const ItemCapture: React.FC<{ itemKey: string; parent: ReportCapture; children: React.ReactNode }> = ({
+  itemKey,
+  parent,
+  children,
 }) => {
+  const capture = useMemo<ReportCapture>(
+    () => ({
+      register: (_exportName, handle) => parent.register(itemKey, handle),
+      unregister: () => parent.unregister(itemKey),
+    }),
+    [itemKey, parent],
+  );
+  return <ReportCaptureContext.Provider value={capture}>{children}</ReportCaptureContext.Provider>;
+};
+
+export const ReportRenderer: React.FC<ReportRendererProps> = ({ items, onDone }) => {
   const entriesRef = useRef(new Map<string, Entry>());
   const doneRef = useRef(false);
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
-  const validIds = useMemo(() => chartIds.filter((id) => EMBED_CHARTS[id]), [chartIds]);
+  const validItems = useMemo(() => items.filter((it) => EMBED_CHARTS[it.chartId]), [items]);
 
   const capture = useMemo<ReportCapture>(
     () => ({
@@ -94,8 +118,8 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({
       if (doneRef.current) return;
       const now = performance.now();
       const entries = entriesRef.current;
-      const settled = validIds.every((id) => {
-        const e = entries.get(id);
+      const settled = validItems.every(({ key }) => {
+        const e = entries.get(key);
         // Not mounted yet (map waiting for its GeoJSON…): give it
         // 2 × MAX_CHART_MS from the start, then give up on it (missing).
         if (!e) return now - start > MAX_CHART_MS * 2;
@@ -107,8 +131,8 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({
       window.clearInterval(timer);
 
       const captures: CapturedChart[] = [];
-      const missing: string[] = chartIds.filter((id) => !EMBED_CHARTS[id]);
-      for (const id of validIds) {
+      const missing: string[] = items.filter((it) => !EMBED_CHARTS[it.chartId]).map((it) => it.key);
+      for (const { key: id, chartId } of validItems) {
         const e = entries.get(id);
         if (!e) {
           missing.push(id);
@@ -117,6 +141,7 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({
         try {
           captures.push({
             id,
+            chartId,
             title: e.handle.title,
             subtitle: e.handle.subtitle,
             png: e.handle.chart.getDataURL({
@@ -135,7 +160,7 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({
       onDoneRef.current(captures, missing);
     }, 250);
     return () => window.clearInterval(timer);
-  }, [chartIds, validIds]);
+  }, [items, validItems]);
 
   return (
     <div
@@ -151,11 +176,13 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({
       <ForcedVizThemeContext.Provider value="light">
         <EmbedModeContext.Provider value={true}>
           <ReportCaptureContext.Provider value={capture}>
-            {validIds.map((id) => {
-              const { Chart } = EMBED_CHARTS[id];
+            {validItems.map((it) => {
+              const { Chart } = EMBED_CHARTS[it.chartId];
               return (
-                <div key={id} style={{ width: CHART_WIDTH, marginBottom: 16 }}>
-                  <Chart dataset={dataset} range={range} />
+                <div key={it.key} style={{ width: CHART_WIDTH, marginBottom: 16 }}>
+                  <ItemCapture itemKey={it.key} parent={capture}>
+                    <Chart dataset={it.dataset} range={it.range} params={it.params} />
+                  </ItemCapture>
                 </div>
               );
             })}

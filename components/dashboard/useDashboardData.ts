@@ -24,6 +24,21 @@ const cacheSet = (slug: string, data: DashboardDataset): void => {
 };
 
 /**
+ * Dataset of a structure through the same cache as useDashboardData (null when the
+ * structure has no data). For callers needing several structures at once (reports).
+ */
+export async function loadDashboardDataset(slug: string, isPublic = false): Promise<DashboardDataset | null> {
+  const cached = cache.get(slug);
+  if (cached) {
+    cacheSet(slug, cached);
+    return cached;
+  }
+  const json = await fetchDashboardData<DashboardDataset>(slug, isPublic);
+  if (json) cacheSet(slug, json);
+  return json;
+}
+
+/**
  * Loads the publication dataset of a structure (with in-memory cache per slug).
  * `isPublic` switches to the unauthenticated endpoint (/embed page).
  */

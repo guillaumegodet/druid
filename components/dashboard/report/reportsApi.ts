@@ -116,9 +116,18 @@ function withValidatedDefinition(raw: Omit<StoredReport, 'definition' | 'definit
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
   const resp = await fetch(url, { ...init, headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) } });
   const data = await resp.json().catch(() => ({}));
-  if (!resp.ok) throw new Error(translateApiError(String((data as { error?: unknown }).error || '')) || `HTTP ${resp.status}`);
+  if (!resp.ok) {
+    const err: Error & { status?: number } = new Error(
+      translateApiError(String((data as { error?: unknown }).error || '')) || `HTTP ${resp.status}`,
+    );
+    err.status = resp.status;
+    throw err;
+  }
   return data as T;
 }
+
+/** HTTP status of an API refusal (409 = the report changed since it was loaded). */
+export const errorStatus = (e: unknown): number | undefined => (e as { status?: number } | null)?.status;
 const post = (body: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(body ?? {}) });
 type RawReport = { report: Omit<StoredReport, 'definitionError'> & { definition: unknown } };
 
@@ -231,7 +240,9 @@ export function browserReportsBackend(storage: () => Storage | null, now: () => 
       const state = read();
       const r = find(state, id);
       if (update.expectedUpdatedAt && update.expectedUpdatedAt !== r.updatedAt) {
-        throw new Error(translateApiError('Report changed since it was loaded'));
+        const err: Error & { status?: number } = new Error(translateApiError('Report changed since it was loaded'));
+        err.status = 409;
+        throw err;
       }
       const next: LocalReport = {
         ...r,

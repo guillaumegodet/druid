@@ -154,6 +154,14 @@ export const ReportWizard: React.FC<ReportWizardProps> = ({
   const [saving, setSaving] = useState(false);
 
   const rendering = renderIdx != null && renderIdx < selectedSections.length;
+  // Charts of the section being rendered (the chart id is the capture key: one chart per id here).
+  const renderItems = useMemo(
+    () =>
+      rendering
+        ? selectedSections[renderIdx!].ids.map((id) => ({ key: id, chartId: id, dataset: scopedDataset, range }))
+        : [],
+    [rendering, selectedSections, renderIdx, scopedDataset, range],
+  );
   const capturedCount = Object.values<CapturedChart[]>(captures).reduce(
     (n, c) => n + c.length,
     0,
@@ -520,9 +528,7 @@ export const ReportWizard: React.FC<ReportWizardProps> = ({
       {rendering && (
         <ReportRenderer
           key={`${slug}-${scope}-${range.start}-${range.end}-${selectedSections[renderIdx!].tab}`}
-          dataset={scopedDataset}
-          range={range}
-          chartIds={selectedSections[renderIdx!].ids}
+          items={renderItems}
           onDone={(caps, miss) => onSectionDone(selectedSections[renderIdx!], caps, miss)}
         />
       )}

@@ -18,6 +18,8 @@ export enum ViewState {
    * Druid (?tab=doublons|taches). Replaces DUPLICATES (legacy URL redirected in App.tsx). */
   TASKS = 'TASKS',
   DASHBOARD = 'DASHBOARD',
+  /** « Mes rapports » (docs/plan-mes-rapports.md); ?id=<n> opens a report in the editor. */
+  REPORTS = 'REPORTS',
   ADMIN = 'ADMIN',
 }
 

@@ -9,6 +9,7 @@ import { FontData, registerReportFonts } from './fonts';
 import { numberLocale } from '../../../lib/i18n';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
+import { parseMarkdownLite, plainText } from './markdownLite';
 
 const PAGE_W = 210;
 const PAGE_H = 297;
@@ -39,6 +40,21 @@ export interface CoverMeta {
   publicationCount: number;
   generatedAt: Date;
   sourceLine: string;
+}
+
+/** Cover of a saved report (« Mes rapports »): its own name and description, free rows. */
+export interface ReportCoverMeta {
+  title: string;
+  description?: string;
+  rows: [string, string][];
+  generatedAt: Date;
+  sourceLine: string;
+}
+
+export interface KpiCell {
+  label: string;
+  value: string;
+  hint?: string;
 }
 
 export class ReportPdf {
@@ -131,6 +147,126 @@ export class ReportPdf {
     this.y = MARGIN + 4;
   }
 
+  /** Cover page of a saved report (must be called first). */
+  reportCover(meta: ReportCoverMeta) {
+    const d = this.doc;
+    d.setFillColor(...CREAM);
+    d.rect(0, 0, PAGE_W, PAGE_H, 'F');
+    d.setFillColor(...ACCENT);
+    d.rect(0, 0, PAGE_W, 5, 'F');
+
+    let y = 64;
+    this.text('semi', 11, INK_SECONDARY);
+    d.text(i18n._(msg`BIBLIOMETRIC REPORT`).toUpperCase(), MARGIN, y, { charSpace: 0.6 });
+
+    y += 15;
+    this.text('disp', 26, INK);
+    const titleLines = d.splitTextToSize(meta.title, CONTENT_W) as string[];
+    d.text(titleLines, MARGIN, y);
+    y += titleLines.length * lh(26, 1.15);
+
+    if (meta.description) {
+      y += 2;
+      this.text('body', 11.5, INK_SECONDARY);
+      const lines = (d.splitTextToSize(meta.description, CONTENT_W) as string[]).slice(0, 8);
+      d.text(lines, MARGIN, y);
+      y += lines.length * lh(11.5);
+    }
+
+    y += 8;
+    d.setDrawColor(...ACCENT);
+    d.setLineWidth(1.2);
+    d.line(MARGIN, y, MARGIN + 26, y);
+
+    y += 13;
+    const rows: [string, string][] = [
+      ...meta.rows,
+      [
+        i18n._(msg`Generated on`),
+        meta.generatedAt.toLocaleDateString(numberLocale(), { day: 'numeric', month: 'long', year: 'numeric' }),
+      ],
+    ];
+    for (const [label, value] of rows) {
+      this.text('semi', 10.5, INK_MUTED);
+      d.text(label, MARGIN, y);
+      this.text('body', 10.5, INK);
+      const lines = (d.splitTextToSize(value, CONTENT_W - 38) as string[]).slice(0, 4);
+      d.text(lines, MARGIN + 38, y);
+      y += Math.max(1, lines.length) * lh(10.5, 1.35) + lh(10.5, 0.4);
+    }
+
+    this.text('body', 8.5, INK_MUTED);
+    const src = d.splitTextToSize(meta.sourceLine, CONTENT_W) as string[];
+    d.text(src, MARGIN, PAGE_H - 22);
+
+    d.addPage();
+    this.y = MARGIN + 4;
+  }
+
+  /** Grid of key figures (4 per row): label, value, hint. */
+  kpiGrid(title: string, cells: KpiCell[]) {
+    const d = this.doc;
+    const cols = 4;
+    const gap = 3;
+    const w = (CONTENT_W - gap * (cols - 1)) / cols;
+    const h = 21;
+    const rows = Math.ceil(cells.length / cols);
+    this.ensureSpace(lh(12, 1.25) + 3 + Math.min(rows, 2) * (h + gap));
+    this.text('semi', 12, INK);
+    d.text(title, MARGIN, this.y);
+    this.y += lh(12, 1.25) + 1;
+    for (let r = 0; r < rows; r++) {
+      this.ensureSpace(h + gap);
+      cells.slice(r * cols, r * cols + cols).forEach((c, i) => {
+        const x = MARGIN + i * (w + gap);
+        d.setFillColor(...CREAM);
+        d.roundedRect(x, this.y, w, h, 1.5, 1.5, 'F');
+        this.text('semi', 7, INK_MUTED);
+        d.text((d.splitTextToSize(c.label.toUpperCase(), w - 5) as string[]).slice(0, 2), x + 2.5, this.y + 4.5);
+        this.text('disp', 15, INK);
+        d.text(c.value, x + 2.5, this.y + 14);
+        if (c.hint) {
+          this.text('body', 7, INK_SECONDARY);
+          d.text((d.splitTextToSize(c.hint, w - 5) as string[])[0], x + 2.5, this.y + 18.5);
+        }
+      });
+      this.y += h + gap;
+    }
+    this.y += 4;
+  }
+
+  /** Text block in the Markdown subset of markdownLite.ts (inline marks flattened). */
+  markdown(md: string) {
+    const d = this.doc;
+    for (const node of parseMarkdownLite(md)) {
+      if (node.kind === 'heading') {
+        const size = node.level === 1 ? 13 : 11.5;
+        this.ensureSpace(lh(size) + 8);
+        this.y += 1.5;
+        this.text('semi', size, INK);
+        for (const line of d.splitTextToSize(plainText(node.inline), CONTENT_W) as string[]) {
+          d.text(line, MARGIN, this.y);
+          this.y += lh(size, 1.3);
+        }
+        this.y += 0.8;
+      } else if (node.kind === 'bullets') {
+        this.text('body', 9.5, INK_SECONDARY);
+        for (const item of node.items) {
+          const lines = d.splitTextToSize(plainText(item), CONTENT_W - 5) as string[];
+          lines.forEach((line, i) => {
+            this.ensureSpace(lh(9.5));
+            if (i === 0) d.text('•', MARGIN + 1, this.y);
+            d.text(line, MARGIN + 5, this.y);
+            this.y += lh(9.5);
+          });
+        }
+        this.y += 2;
+      } else {
+        this.paragraph(plainText(node.inline));
+      }
+    }
+  }
+
   /** Section title (= tab). Keeps ~55 mm together with the following content. */
   sectionTitle(title: string) {
     this.ensureSpace(14 + 55);
@@ -175,6 +311,10 @@ export class ReportPdf {
     caveats?: string;
     /** /embed URL of the interactive version (printed below the chart). */
     link?: string;
+    /** Scope of a block departing from the report context (structure, period, filters). */
+    context?: string;
+    /** Author's note, printed below the image. */
+    note?: string;
   }) {
     const d = this.doc;
 
@@ -196,8 +336,20 @@ export class ReportPdf {
     if (block.method) notes.push(d.splitTextToSize(`${i18n._(msg`Method`)} — ${block.method}`, CONTENT_W) as string[]);
     if (block.caveats) notes.push(d.splitTextToSize(`${i18n._(msg`Limitations`)} — ${block.caveats}`, CONTENT_W) as string[]);
 
+    let contextLines: string[] = [];
+    if (block.context) {
+      this.text('semi', 8, INK_MUTED);
+      contextLines = d.splitTextToSize(block.context, CONTENT_W) as string[];
+    }
+    let noteLines: string[] = [];
+    if (block.note) {
+      this.text('body', 9.5, INK);
+      noteLines = d.splitTextToSize(block.note, CONTENT_W) as string[];
+    }
     const titleH =
-      titleLines.length * lh(12, 1.25) + (subLines.length ? subLines.length * lh(8.5, 1.3) + 1 : 0);
+      titleLines.length * lh(12, 1.25) + (subLines.length ? subLines.length * lh(8.5, 1.3) + 1 : 0) +
+      (contextLines.length ? contextLines.length * lh(8, 1.3) + 1 : 0);
+    const noteH = noteLines.length ? noteLines.length * lh(9.5, 1.35) + 2 : 0;
     const descH = descLines.length ? descLines.length * lh(9.5, 1.35) + 1.5 : 0;
     const notesH = notes.reduce((h, ls) => h + ls.length * lh(8, 1.3) + 1.2, 0);
     const linkH = block.link ? lh(7.5) + 1.5 : 0;
@@ -210,12 +362,12 @@ export class ReportPdf {
     // can, with long enough text, leave a negative budget — imgW/imgH would become negative
     // and jsPDF would crash or render a corrupted image (review lot 10). The block may then
     // slightly overflow the page rather than breaking the rendering.
-    const maxImgH = Math.max(20, BOTTOM - (MARGIN + 4) - titleH - descH - notesH - linkH - 12);
+    const maxImgH = Math.max(20, BOTTOM - (MARGIN + 4) - titleH - descH - notesH - noteH - linkH - 12);
     if (imgH > maxImgH) {
       imgW = imgW * (maxImgH / imgH);
       imgH = maxImgH;
     }
-    this.ensureSpace(titleH + descH + 2.5 + imgH + notesH + linkH + 8);
+    this.ensureSpace(titleH + descH + 2.5 + imgH + noteH + notesH + linkH + 8);
 
     this.text('semi', 12, INK);
     d.text(titleLines, MARGIN, this.y);
@@ -224,6 +376,11 @@ export class ReportPdf {
       this.text('body', 8.5, INK_SECONDARY);
       d.text(subLines, MARGIN, this.y);
       this.y += subLines.length * lh(8.5, 1.3) + 1;
+    }
+    if (contextLines.length) {
+      this.text('semi', 8, INK_MUTED);
+      d.text(contextLines, MARGIN, this.y);
+      this.y += contextLines.length * lh(8, 1.3) + 1;
     }
     if (descLines.length) {
       this.text('body', 9.5, INK_SECONDARY);
@@ -238,6 +395,13 @@ export class ReportPdf {
     d.roundedRect(imgX - 1, this.y - 1, imgW + 2, imgH + 2, 1.5, 1.5, 'S');
     d.addImage(block.png, 'PNG', imgX, this.y, imgW, imgH, undefined, 'FAST');
     this.y += imgH + 2;
+
+    if (noteLines.length) {
+      this.y += 2;
+      this.text('body', 9.5, INK);
+      d.text(noteLines, MARGIN, this.y);
+      this.y += noteLines.length * lh(9.5, 1.35);
+    }
 
     for (const ls of notes) {
       this.y += 1.2;
