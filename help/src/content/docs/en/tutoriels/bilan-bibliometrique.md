@@ -70,8 +70,10 @@ If major corrections are made (HAL deposits, OpenAlex affiliations), the dashboa
 
 ## Step 5 — Produce the deliverables
 
-- **PDF report**: build a report with the useful charts, on the chosen period and scope (see
-  [Export data and reports](/en/guides/tableau-de-bord/exporter/)).
+- **PDF report**: click **PDF report** in the dashboard to create a **Structure report** on
+  the chosen period and scope, remove the sections you do not need, add your texts, then
+  **Generate the PDF** (see [Create a report](/en/guides/rapports/creer-un-rapport/)). The
+  report stays in **My reports**: next year, change the period and generate it again.
 - **Individual charts**: **Download as PNG** from each chart's toolbar, to insert them into
   the report.
 - **List of publications**: the reviewed CSV from step 4.
@@ -93,10 +95,11 @@ In the report, state:
 - [ ] Period and scope chosen, link to the view kept
 - [ ] Key figures noted with their limitations
 - [ ] List of publications reviewed by the unit
-- [ ] PDF report and charts exported
+- [ ] Report created in My reports, PDF and charts exported
 - [ ] Methodology documented
 
 ## See also
 
 - [Publications and attribution](/en/donnees/publications-attribution/)
 - [Choose a structure, a period, a scope](/en/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Report templates](/en/guides/rapports/modeles/)

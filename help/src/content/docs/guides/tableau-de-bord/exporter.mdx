@@ -1,6 +1,6 @@
 ---
 title: "Exporter des données et des rapports"
-description: "Exporter en CSV, Excel ou PDF et composer un rapport PDF du tableau de bord."
+description: "Exporter en CSV, Excel, PNG ou PDF : listes, fiches, graphiques, publications et rapports."
 sidebar:
   order: 6
 ---
@@ -9,7 +9,7 @@ import QuiOu from '../../../../components/QuiOu.astro';
 
 <QuiOu
 	profils="Tous les profils, sur les données qu'ils voient"
-	menu="Personnel › Exporter ; fiche › Export PDF ; Tableau de bord › Rapport PDF, graphiques, Liste des publications"
+	menu="Personnel › Exporter ; fiche › Export PDF ; Tableau de bord › graphiques, Liste des publications ; Mes rapports"
 />
 
 Druid propose des exports à plusieurs endroits, selon ce que vous voulez emporter : une liste
@@ -24,7 +24,7 @@ de personnes, une fiche, un graphique, une liste de publications ou un rapport c
 | Fichier pour l'ABES | **Personnel › Exporter › Export ABES (IdRef)** | Excel, voir [Exporter un fichier pour l'ABES](/guides/identifiants/export-abes/) |
 | Un graphique | Barre d'outils du graphique › **Télécharger en PNG** | PNG |
 | Une liste de publications | **Liste des publications › Exporter en CSV (résultats filtrés)** | CSV |
-| Un rapport du tableau de bord | **Rapport PDF** | PDF |
+| Un rapport (graphiques, chiffres clés, textes) | **Mes rapports** › un rapport › **Générer le PDF** | PDF, voir [Créer un rapport](/guides/rapports/creer-un-rapport/) |
 
 ## Exporter la liste des personnels
 
@@ -42,22 +42,22 @@ Chaque graphique du tableau de bord a une barre d'outils, en haut à droite :
 - **Plein écran** ;
 - **Partager (lien public / iframe)** : pour intégrer le graphique sur un site (voir
   [Intégrer une dataviz sur un site](/guides/tableau-de-bord/integrer-une-dataviz/)) ;
+- **Ajouter à un rapport** : pour le reprendre dans l'un de vos rapports (voir
+  [Ajouter un graphique à un rapport](/guides/rapports/ajouter-un-graphique/)) ;
 - **Méthodologie** : la description, la méthode et les limites du graphique.
 
-## Composer un rapport PDF
+## Produire un rapport PDF
 
-1. Dans le tableau de bord, cliquez sur **Rapport PDF**.
-2. Vérifiez les **Critères** : structure, période et périmètre.
-3. **Choisir les graphiques** : cochez les sections et les graphiques à inclure
-   (**Tout sélectionner**, **Inclure toute la section**, **Retirer la section**).
-4. Passez à l'**Aperçu** : Druid prépare les graphiques. Vous pouvez encore
-   **Écarter du rapport** un graphique ou le **Réintégrer au rapport**.
-5. Cliquez sur **Télécharger le PDF**.
+Les rapports PDF se composent dans **Mes rapports** : un rapport y est enregistré, modifiable,
+partageable, et son PDF se régénère en un clic. Le bouton **Rapport PDF** du tableau de bord
+ouvre la fenêtre **Nouveau rapport**, réglée sur le modèle **Bilan de structure** et sur la
+structure, la période et le périmètre affichés. Voir [Créer un rapport](/guides/rapports/creer-un-rapport/).
 
 ## Ce qui se passe ensuite
 
 Les fichiers sont générés dans votre navigateur et téléchargés sur votre poste. Rien n'est
-modifié dans Druid.
+modifié dans Druid, sauf pour un rapport : il reste enregistré dans **Mes rapports**, et son
+PDF peut être archivé dans son historique.
 
 ## Limites connues
 
@@ -65,12 +65,11 @@ modifié dans Druid.
   avant d'exporter.
 - **L'export de la liste des personnels est succinct** (nom, e-mail, statut, laboratoire) :
   pour d'autres colonnes, passez par le tableur de l'annuaire si vous y avez accès.
-- **Le rapport PDF peut omettre un graphique** qui n'a pas pu être capturé : Druid indique
-  lesquels à l'aperçu.
 - **Les données exportées sont personnelles** (e-mails, dates) : ne les diffusez qu'aux
   personnes qui en ont besoin.
 
 ## Voir aussi
 
 - [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Créer un rapport](/guides/rapports/creer-un-rapport/)
 - [Préparer le volet bibliométrique d'un bilan](/tutoriels/bilan-bibliometrique/)

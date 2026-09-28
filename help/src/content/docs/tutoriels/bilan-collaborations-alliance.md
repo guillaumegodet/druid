@@ -71,7 +71,10 @@ le nombre de copublications avec le groupe.
 2. Exportez :
    - les graphiques en **PNG** pour un diaporama ;
    - la liste des publications en **CSV** depuis la liste ;
-   - un **Rapport PDF** du tableau de bord.
+   - un rapport complet : dans **Mes rapports › Nouveau rapport**, le modèle **Collaboration
+     avec une université ou un groupe**, sur les mêmes partenaires, rassemble
+     chiffres clés, comparaison d'impact, analyse par thème et liste des co-publications
+     (voir [Modèles de rapport](/guides/rapports/modeles/#collaboration-avec-une-université-ou-un-groupe)).
 3. **Copier le lien** pour partager la vue avec un collègue qui a accès à Druid.
 
 ## Récapitulatif

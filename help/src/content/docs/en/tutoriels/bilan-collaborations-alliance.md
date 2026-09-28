@@ -69,7 +69,10 @@ number of co-publications with the group.
 2. Export:
    - the charts as **PNG** for a slide show;
    - the list of publications as **CSV** from the list;
-   - a **PDF report** of the dashboard.
+   - a complete report: in **My reports › New report**, the **Collaboration with a university
+     or group** template, on the same partners, brings together key figures, an impact
+     comparison, an analysis by theme and the list of co-publications (see
+     [Report templates](/en/guides/rapports/modeles/#collaboration-with-a-university-or-group)).
 3. **Copy link** to share the view with a colleague who has access to Druid.
 
 ## Summary

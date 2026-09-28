@@ -67,6 +67,20 @@ n'existent que sur les instances qui en disposent (voir
 - **Console ETL** intégrée à Druid (administrateurs techniques), avec le contrôle des
   affiliations OpenAlex.
 
+### Rapports
+
+- **Mes rapports** : des rapports bibliométriques enregistrés, modifiables et partageables,
+  composés de graphiques, chiffres clés, textes et listes de publications, exportés en PDF.
+  Voir [Créer un rapport](/guides/rapports/creer-un-rapport/).
+- **Modèles en deux clics** : bilan de structure, collaborations internationales,
+  collaboration avec une université ou un groupe, analyse des financements, revues et
+  politique de publication. Voir [Modèles de rapport](/guides/rapports/modeles/).
+- **Ajouter à un rapport** depuis la barre d'outils de chaque graphique du tableau de bord.
+- **Partage** avec des collègues ou avec toute l'instance, historique et archivage des PDF.
+  Voir [Partager un rapport](/guides/rapports/partager-un-rapport/).
+- **Textes rédigés par IA**, relus avant impression : synthèse et analyse par grand thème.
+  Voir [Rédiger les textes par IA](/guides/rapports/textes-ia/).
+
 ### Interface
 
 - **Druid en anglais** : bascule FR / EN dans la barre du haut.

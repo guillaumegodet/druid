@@ -1,0 +1,51 @@
+---
+title: "Ajouter un graphique à un rapport"
+description: "Envoyer un graphique du tableau de bord dans l'un de vos rapports, avec ou sans son contexte."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils, sur les structures qu'ils voient"
+	menu="Tableau de bord › barre d'outils d'un graphique › Ajouter à un rapport"
+/>
+
+En parcourant le tableau de bord, vous repérez un graphique utile pour un rapport en cours.
+Vous pouvez l'y envoyer directement, sans repasser par l'éditeur du rapport.
+
+## Étapes
+
+1. Dans le tableau de bord, réglez la **structure**, la **période**, le **périmètre** et, le
+   cas échéant, les filtres (partenaires, pays…) du graphique.
+2. Dans la barre d'outils du graphique, cliquez sur **Ajouter à un rapport**.
+3. Choisissez le rapport : l'un des vôtres, un rapport partagé avec vous en modification, ou
+   **Nouveau rapport** (saisissez alors son **Nom du rapport**).
+4. Si le rapport porte sur une autre structure, une autre période ou d'autres filtres, Druid
+   le signale (« Le rapport porte sur… ») et vous demande :
+   - **Suivre le périmètre du rapport** : le graphique est recalculé sur la structure, les
+     années et les filtres du rapport ;
+   - **Garder ce qu'affiche le tableau de bord** : le graphique garde son propre périmètre,
+     par exemple pour comparer deux laboratoires dans un même rapport.
+5. Cliquez sur **Ajouter**, puis **Ouvrir le rapport** ou **Retour au tableau de bord**.
+
+## Ce qui se passe ensuite
+
+Le graphique est ajouté **à la fin du rapport**. Dans l'éditeur, déplacez-le avec **Monter**
+et **Descendre**, ou rangez-le sous une section. Comme tout bloc, il est recalculé à chaque
+ouverture du rapport.
+
+## Limites connues
+
+- **Seuls les graphiques du catalogue des rapports** ont le bouton : ceux qui dépendent
+  d'une sélection faite en cours de session (groupe de comparaison du Benchmark, par exemple)
+  ne l'ont pas encore.
+- **Un rapport compte au plus 150 blocs** : au-delà, Druid refuse l'ajout.
+- **Un rapport partagé en lecture seule** n'apparaît pas dans la liste : dupliquez-le d'abord
+  pour en faire votre version.
+
+## Voir aussi
+
+- [Créer un rapport](/guides/rapports/creer-un-rapport/)
+- [Intégrer une dataviz sur un site](/guides/tableau-de-bord/integrer-une-dataviz/)

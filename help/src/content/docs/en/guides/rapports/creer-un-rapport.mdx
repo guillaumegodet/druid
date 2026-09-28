@@ -1,0 +1,96 @@
+---
+title: "Create a report"
+description: "Create a bibliometric report from a template, complete it and generate its PDF."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles, on the structures they see"
+	menu="My reports › New report; Dashboard › PDF report"
+/>
+
+A report brings together charts, key figures, texts and a list of publications about a
+structure and a period. Druid **saves** it: you find it again in **My reports**, edit it, share
+it and generate its PDF as often as you need. The figures are **recomputed every time the
+report is opened**, from the dashboard data.
+
+## Steps
+
+1. Open **My reports** in the menu, then **New report**. From a dashboard, the **PDF report**
+   button opens the same window, already set to the structure, period and scope shown.
+2. Choose a **Template**: **Structure report**, **International collaborations**,
+   **Collaboration with a university or group**, **Funding analysis**, **Journals and
+   publishing policy**, or **Empty report** to start from scratch (see
+   [Report templates](/en/guides/rapports/modeles/)).
+3. Set the **Structure**, the **Period** and the **Scope**, then the parameters of the template
+   (partner institutions, country, funder category, publisher).
+   - **Fixed years**: for instance 2021 to 2025, for a review;
+   - **Last years**: for instance the last 5 years, possibly **incl. current year**. The period
+     moves forward by itself from one year to the next.
+4. Give the report a **Name** and click **Create**. The report opens in the editor.
+5. Read the preview, on the right. In the left-hand column, for each block:
+   - **Move up** / **Move down** to change the order;
+   - **Hide from the PDF** to keep it without printing it;
+   - **Delete**;
+   - a click on the block opens its settings (title, note printed under the chart,
+     parameters).
+6. Add blocks with the buttons at the top of the left-hand column:
+
+   | Button | What it adds |
+   |---|---|
+   | **Chart** | A dashboard chart, picked from a searchable list. |
+   | **Key figures** | A row of indicators: overview, impact, collaboration, funding, journals. |
+   | **Section** | A heading that starts a new part of the report. |
+   | **Text** | A free paragraph (headings, lists, bold, links). |
+   | **Publication list** | A table of the report's publications, printed as an annex. |
+   | **AI text** | A summary or an analysis by theme written by AI (see [Write the texts with AI](/en/guides/rapports/textes-ia/)). |
+
+7. If needed, fill in the **Description (printed on the cover page)** and the **Footer note**
+   (for instance « Internal working document »).
+8. Click **Generate the PDF**. Druid renders the charts, then downloads the file.
+
+## Filters and scope of a block
+
+The report filters (a partner, a country, a funder category…) are shown as chips next to the
+period; the cross of a chip removes the filter. They apply to every block.
+
+A block can have **its own scope**: another structure, another period or extra filters. This is
+the case of a chart added from the dashboard while keeping what it showed (see
+[Add a chart to a report](/en/guides/rapports/ajouter-un-graphique/)), or of the impact blocks
+of a template, which leave out large collaborations. The block settings say so (« This chart
+has its own scope »); **Use the report scope** removes it.
+
+## What happens next
+
+- The report is **saved automatically**: the indicator at the top goes from « Unsaved
+  changes… » to « Saved ».
+- Every generated PDF is recorded in the report **History** and, on the instances that allow
+  it, **archived** (see [Share a report](/en/guides/rapports/partager-un-rapport/#pdf-history)).
+- Only you see the report until you share it.
+
+## Known limitations
+
+- **A greyed-out chart in the preview** makes no sense for the chosen structure (« Not
+  available for… »): no strategic axes, no identified teams, no charter scores… It is not
+  printed. The chart list flags these cases before you add one.
+- **« This chart says little under the current filters »**: for instance the breakdown by
+  funder category when the report is already restricted to ANR.
+- **A chart may be missing from the PDF** if it could not be captured: Druid says so after the
+  generation. Generate again.
+- **The figures change with the data**: a report opened again after a dashboard regeneration
+  shows the new figures. To keep a frozen version, keep the PDF (or its archive in the
+  history).
+- **On a read-only instance** (demo), reports are kept in your browser only: no sharing and no
+  history.
+- **If two people edit the same report**, the second one sees « Changed elsewhere » and must
+  **Reload the saved version** before going on.
+
+## See also
+
+- [Report templates](/en/guides/rapports/modeles/)
+- [Add a chart to a report](/en/guides/rapports/ajouter-un-graphique/)
+- [Share a report](/en/guides/rapports/partager-un-rapport/)
+- [Choose a structure, a period, a scope](/en/guides/tableau-de-bord/structure-periode-perimetre/)

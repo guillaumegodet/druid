@@ -1,0 +1,100 @@
+---
+title: "Créer un rapport"
+description: "Créer un rapport bibliométrique à partir d'un modèle, le compléter et en générer le PDF."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils, sur les structures qu'ils voient"
+	menu="Mes rapports › Nouveau rapport ; Tableau de bord › Rapport PDF"
+/>
+
+Un rapport rassemble des graphiques, des chiffres clés, des textes et une liste de
+publications sur une structure et une période. Druid l'**enregistre** : vous le retrouvez dans
+**Mes rapports**, vous le modifiez, vous le partagez et vous en générez le PDF autant de fois
+que nécessaire. Les chiffres sont **recalculés à chaque ouverture**, sur les données du
+tableau de bord.
+
+## Étapes
+
+1. Ouvrez **Mes rapports** dans le menu, puis **Nouveau rapport**. Depuis un tableau de bord,
+   le bouton **Rapport PDF** ouvre la même fenêtre, déjà réglée sur la structure, la période
+   et le périmètre affichés.
+2. Choisissez un **Modèle** : **Bilan de structure**, **Collaborations internationales**,
+   **Collaboration avec une université ou un groupe**, **Analyse des financements**,
+   **Revues et politique de publication**, ou **Rapport vide** pour partir de zéro (voir
+   [Modèles de rapport](/guides/rapports/modeles/)).
+3. Réglez la **Structure**, la **Période** et le **Périmètre**, puis les paramètres propres au
+   modèle (établissements partenaires, pays, catégorie de financeurs, éditeur).
+   - **Années fixes** : par exemple 2021 à 2025, pour un bilan ;
+   - **Dernières années** : par exemple les 5 dernières années, éventuellement **y compris
+     l'année en cours**. La période avance toute seule d'une année sur l'autre.
+4. Donnez un **Nom** au rapport et cliquez sur **Créer**. Le rapport s'ouvre dans l'éditeur.
+5. Relisez l'aperçu, à droite. Dans la colonne de gauche, pour chaque bloc :
+   - **Monter** / **Descendre** pour changer l'ordre ;
+   - **Masquer dans le PDF** pour le garder sans l'imprimer ;
+   - **Supprimer** ;
+   - un clic sur le bloc ouvre ses réglages (titre, note imprimée sous le graphique,
+     paramètres).
+6. Ajoutez des blocs avec les boutons en haut de la colonne de gauche :
+
+   | Bouton | Ce qu'il ajoute |
+   |---|---|
+   | **Graphique** | Un graphique du tableau de bord, choisi dans une liste avec recherche. |
+   | **Chiffres clés** | Une ligne d'indicateurs : vue d'ensemble, impact, collaboration, financements, revues. |
+   | **Section** | Un titre qui ouvre une nouvelle partie du rapport. |
+   | **Texte** | Un paragraphe libre (titres, listes, gras, liens). |
+   | **Liste des publications** | Un tableau des publications du rapport, imprimé en annexe. |
+   | **Texte IA** | Une synthèse ou une analyse par thème rédigée par l'IA (voir [Rédiger les textes par IA](/guides/rapports/textes-ia/)). |
+
+7. Complétez au besoin la **Description (imprimée en couverture)** et la **Mention de pied de
+   page** (par exemple « Document de travail interne »).
+8. Cliquez sur **Générer le PDF**. Druid prépare les graphiques, puis télécharge le fichier.
+
+## Filtres et périmètre d'un bloc
+
+Les filtres du rapport (un partenaire, un pays, une catégorie de financeurs…) s'affichent en
+pastilles à côté de la période ; la croix d'une pastille retire le filtre. Ils valent pour
+tous les blocs.
+
+Un bloc peut avoir **son propre périmètre** : une autre structure, une autre période ou des
+filtres en plus. C'est le cas d'un graphique ajouté depuis le tableau de bord en gardant ce
+qu'il affichait (voir [Ajouter un graphique à un rapport](/guides/rapports/ajouter-un-graphique/)),
+ou des blocs d'impact d'un modèle, qui écartent les grandes collaborations. Les réglages du
+bloc l'indiquent (« Ce graphique a son propre périmètre ») ; **Revenir au périmètre du
+rapport** le supprime.
+
+## Ce qui se passe ensuite
+
+- Le rapport est **enregistré automatiquement** : l'indication en haut passe de
+  « Modifications non enregistrées… » à « Enregistré ».
+- Chaque PDF généré est noté dans l'**Historique** du rapport et, sur les instances qui le
+  permettent, **archivé** (voir [Partager un rapport](/guides/rapports/partager-un-rapport/#historique-des-pdf)).
+- Le rapport n'est visible que par vous tant que vous ne le partagez pas.
+
+## Limites connues
+
+- **Un graphique grisé à l'aperçu** n'a pas de sens sur la structure choisie (« Indisponible
+  pour… ») : pas d'axes stratégiques, pas d'équipes identifiées, pas de scores de charte…
+  Il n'est pas imprimé. La liste des graphiques signale ces cas avant l'ajout.
+- **« Ce graphique apporte peu avec les filtres actuels »** : par exemple la répartition
+  par catégorie de financeurs quand le rapport ne porte déjà que sur l'ANR.
+- **Un graphique peut manquer au PDF** s'il n'a pas pu être capturé : Druid l'indique après la
+  génération. Relancez la génération.
+- **Les chiffres changent avec les données** : un rapport rouvert après une régénération du
+  tableau de bord montre les nouveaux chiffres. Pour garder une version figée, conservez le
+  PDF (ou son archive dans l'historique).
+- **Sur une instance en lecture seule** (démonstration), les rapports sont conservés dans
+  votre navigateur seulement : pas de partage ni d'historique.
+- **Si deux personnes modifient le même rapport**, la seconde voit « Modifié ailleurs » et doit
+  **Recharger la version enregistrée** avant de continuer.
+
+## Voir aussi
+
+- [Modèles de rapport](/guides/rapports/modeles/)
+- [Ajouter un graphique à un rapport](/guides/rapports/ajouter-un-graphique/)
+- [Partager un rapport](/guides/rapports/partager-un-rapport/)
+- [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)

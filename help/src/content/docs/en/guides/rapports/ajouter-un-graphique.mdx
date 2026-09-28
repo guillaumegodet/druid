@@ -1,0 +1,50 @@
+---
+title: "Add a chart to a report"
+description: "Send a dashboard chart to one of your reports, with or without its context."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles, on the structures they see"
+	menu="Dashboard › chart toolbar › Add to a report"
+/>
+
+While browsing the dashboard, you spot a chart that would fit a report in progress. You can send
+it there directly, without going back to the report editor.
+
+## Steps
+
+1. In the dashboard, set the **structure**, the **period**, the **scope** and, if needed, the
+   filters (partners, country…) of the chart.
+2. In the chart toolbar, click **Add to a report**.
+3. Choose the report: one of yours, a report shared with you for editing, or **New report**
+   (then type its **Report name**).
+4. If the report covers another structure, another period or other filters, Druid says so
+   (« The report covers… ») and asks you:
+   - **Follow the report scope**: the chart is recomputed on the report structure, years and
+     filters;
+   - **Keep what the dashboard shows**: the chart keeps its own scope, for instance to compare
+     two laboratories in the same report.
+5. Click **Add**, then **Open the report** or **Back to the dashboard**.
+
+## What happens next
+
+The chart is added **at the end of the report**. In the editor, move it with **Move up** and
+**Move down**, or put it under a section. Like every block, it is recomputed each time the
+report is opened.
+
+## Known limitations
+
+- **Only the charts of the report catalogue** have the button: those that depend on a selection
+  made during the session (Benchmark peer group, for instance) do not have it yet.
+- **A report holds at most 150 blocks**: beyond that, Druid refuses the addition.
+- **A report shared with you read-only** is not in the list: duplicate it first to make your
+  own version.
+
+## See also
+
+- [Create a report](/en/guides/rapports/creer-un-rapport/)
+- [Embed a chart in a website](/en/guides/tableau-de-bord/integrer-une-dataviz/)

@@ -1,0 +1,77 @@
+---
+title: "Share a report"
+description: "Share a report with colleagues, make it visible to everyone, find and share its PDFs."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Owner of the report; instance templates: super administrators"
+	menu="My reports › a report › Share, History"
+	disponibilite="instances that save reports (not the read-only demos)"
+/>
+
+A shared report stays **live**: each reader opens it in **My reports › Shared with me** and sees
+it recomputed on the current data, **with their own access rights**. To pass on a frozen
+version, share a PDF from the history.
+
+## Share with people
+
+1. Open the report and click **Share**.
+2. In **Person to add**, type the person's **Login (uid)** (or **E-mail address**, depending on
+   the instance), choose **Can view** or **Can edit**, then **Add**.
+3. Click **Save**. **Copy link** gives the address of the report, to send by e-mail: Druid does
+   not notify the person.
+
+- **Can view**: the person reads the report and generates its PDF. They can **Duplicate** it to
+  make their own version.
+- **Can edit**: the person can also edit the report. Only the owner shares or deletes it.
+
+## Make a report visible to everyone
+
+In **Share**, tick **Visible to every user of this instance**. The report shows up in the
+**Visible to everyone** tab of **My reports**, read-only.
+
+## Publish an instance template
+
+*Super administrators only.* Tick **Publish as a template of the instance**: the report is
+offered to everyone in **New report**, under **Templates of the institution**, on the structure
+and period they choose. Blocks, texts and filters are copied; blocks set to a given structure
+keep it.
+
+## PDF history
+
+**History** lists the PDFs generated from the report: date, author, period and number of
+publications.
+
+- **PDF** (download): on the instances that archive PDFs, the **last 20** are kept, for **two
+  years** at most.
+- **shared with readers** (checkbox, owner): the readers of the report can download **this
+  frozen PDF**, with the figures as you generated them.
+- **Restore** (people allowed to edit): brings back the blocks, texts and scope of that version,
+  with its period fixed. Confirm with **Replace the current content**.
+
+## What happens next
+
+Shares take effect immediately. Removing a person (**Remove**, then **Save**) closes their
+access to the report, but not to the PDFs they already downloaded.
+
+## Known limitations
+
+- **Each reader sees their own data**: a block about a structure they cannot see shows « No
+  data available… or no access to it »; nothing leaks. Only a shared frozen PDF shows figures
+  computed with your rights: share that way only what the readers may see.
+- **A report that names people** (researcher ranking, co-authorship network) is flagged when
+  you open the sharing window: share it with care.
+- **No public link**: only people with an account on the instance can open a report. For a
+  public chart, see
+  [Embed a chart in a website](/en/guides/tableau-de-bord/integrer-une-dataviz/).
+- **Without PDF archiving** on your instance, the history keeps the date, author and scope of
+  each generation, without the file.
+
+## See also
+
+- [Create a report](/en/guides/rapports/creer-un-rapport/)
+- [Instances and features](/en/donnees/instances-fonctionnalites/)

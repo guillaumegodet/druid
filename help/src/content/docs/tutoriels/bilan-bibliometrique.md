@@ -72,8 +72,11 @@ Si des corrections importantes sont faites (dépôts HAL, affiliations OpenAlex)
 
 ## Étape 5 — Produire les livrables
 
-- **Rapport PDF** : composez un rapport avec les graphiques utiles, sur la période et le
-  périmètre choisis (voir [Exporter](/guides/tableau-de-bord/exporter/)).
+- **Rapport PDF** : cliquez sur **Rapport PDF** dans le tableau de bord pour créer un
+  **Bilan de structure** sur la période et le périmètre choisis, retirez les sections
+  inutiles, ajoutez vos textes, puis **Générer le PDF** (voir
+  [Créer un rapport](/guides/rapports/creer-un-rapport/)). Le rapport reste dans **Mes
+  rapports** : l'an prochain, changez la période et régénérez-le.
 - **Graphiques isolés** : **Télécharger en PNG** depuis la barre d'outils de chaque
   graphique, pour les insérer dans le rapport.
 - **Liste des publications** : le CSV de l'étape 4, relu.
@@ -95,10 +98,11 @@ Dans le rapport, précisez :
 - [ ] Période et périmètre choisis, lien de la vue conservé
 - [ ] Chiffres clés relevés avec leurs limites
 - [ ] Liste des publications relue par l'unité
-- [ ] Rapport PDF et graphiques exportés
+- [ ] Rapport créé dans Mes rapports, PDF et graphiques exportés
 - [ ] Méthodologie documentée
 
 ## Voir aussi
 
 - [Publications et attribution](/donnees/publications-attribution/)
 - [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Modèles de rapport](/guides/rapports/modeles/)

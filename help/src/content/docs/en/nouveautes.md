@@ -67,6 +67,20 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
 - **ETL console** built into Druid (technical administrators), with OpenAlex affiliation
   checks.
 
+### Reports
+
+- **My reports**: saved, editable and shareable bibliometric reports, made of charts, key
+  figures, texts and publication lists, exported as PDF. See
+  [Create a report](/en/guides/rapports/creer-un-rapport/).
+- **Two-click templates**: structure report, international collaborations, collaboration with
+  a university or group, funding analysis, journals and publishing policy. See
+  [Report templates](/en/guides/rapports/modeles/).
+- **Add to a report** from the toolbar of every dashboard chart.
+- **Sharing** with colleagues or with the whole instance, PDF history and archive. See
+  [Share a report](/en/guides/rapports/partager-un-rapport/).
+- **AI-written texts**, reviewed before printing: summary and analysis by major theme. See
+  [Write the texts with AI](/en/guides/rapports/textes-ia/).
+
 ### Interface
 
 - **Druid in English**: FR / EN switch in the top bar.

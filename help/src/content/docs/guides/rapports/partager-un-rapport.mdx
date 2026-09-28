@@ -1,0 +1,80 @@
+---
+title: "Partager un rapport"
+description: "Partager un rapport avec des collègues, le rendre visible par tous, retrouver et partager ses PDF."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Propriétaire du rapport ; modèles de l'établissement : super-administrateurs"
+	menu="Mes rapports › un rapport › Partager, Historique"
+	disponibilite="instances qui enregistrent les rapports (pas les démonstrations en lecture seule)"
+/>
+
+Un rapport partagé reste **vivant** : chaque lecteur l'ouvre dans **Mes rapports › Partagés
+avec moi** et le voit recalculé sur les données du moment, **avec ses propres droits**. Pour
+transmettre une version figée, partagez un PDF de l'historique.
+
+## Partager avec des personnes
+
+1. Ouvrez le rapport et cliquez sur **Partager**.
+2. Dans **Personne à ajouter**, saisissez l'**Identifiant (uid)** de la personne (ou son
+   **Adresse e-mail**, selon l'instance), choisissez **Lecture** ou **Modification**, puis
+   **Ajouter**.
+3. Cliquez sur **Enregistrer**. **Copier le lien** donne l'adresse du rapport, à envoyer par
+   courriel : Druid ne prévient pas la personne.
+
+- **Lecture** : la personne consulte le rapport et génère son PDF. Elle peut le **Dupliquer**
+  pour en faire sa propre version.
+- **Modification** : la personne modifie aussi le rapport. Seul le propriétaire le partage ou
+  le supprime.
+
+## Rendre un rapport visible par tous
+
+Dans **Partager**, cochez **Visible par tous les utilisateurs de cette instance**. Le rapport
+apparaît dans l'onglet **Visibles par tous** de **Mes rapports**, en lecture seule.
+
+## Publier un modèle de l'établissement
+
+*Super-administrateurs seulement.* Cochez **Publier comme modèle de l'établissement** : le
+rapport est proposé à tous dans **Nouveau rapport**, rubrique **Modèles de l'établissement**,
+sur la structure et la période de leur choix. Les blocs, les textes et les filtres sont
+repris ; les blocs réglés sur une structure précise la gardent.
+
+## Historique des PDF
+
+**Historique** liste les PDF générés à partir du rapport : date, auteur, période et nombre de
+publications.
+
+- **PDF** (téléchargement) : sur les instances qui archivent les PDF, les **20 derniers** sont
+  conservés, **deux ans** au plus.
+- **partagé avec les lecteurs** (case à cocher, propriétaire) : les lecteurs du rapport
+  peuvent télécharger **ce PDF figé**, avec les chiffres tels que vous les avez générés.
+- **Restaurer** (personnes autorisées à modifier) : rétablit les blocs, les textes et le
+  périmètre de cette version, avec sa période figée. Confirmez avec **Remplacer le contenu
+  actuel**.
+
+## Ce qui se passe ensuite
+
+Les partages prennent effet immédiatement. Retirer une personne (**Retirer**, puis
+**Enregistrer**) lui ferme l'accès au rapport, mais pas aux PDF qu'elle a déjà téléchargés.
+
+## Limites connues
+
+- **Chaque lecteur voit ses propres données** : un bloc portant sur une structure qu'il ne
+  voit pas affiche « Aucune donnée disponible… ou pas d'accès » ; rien ne fuit. Seul un PDF
+  figé partagé montre les chiffres calculés avec vos droits : ne partagez ainsi que ce que les lecteurs peuvent voir.
+- **Un rapport qui nomme des personnes** (classement des chercheurs, réseau de cosignatures)
+  est signalé à l'ouverture du partage : partagez-le avec discernement.
+- **Pas de lien public** : seules les personnes qui ont un compte sur l'instance ouvrent un
+  rapport. Pour un graphique public, voir
+  [Intégrer une dataviz sur un site](/guides/tableau-de-bord/integrer-une-dataviz/).
+- **Sans archivage des PDF** sur votre instance, l'historique garde la date, l'auteur et le
+  périmètre de chaque génération, sans le fichier.
+
+## Voir aussi
+
+- [Créer un rapport](/guides/rapports/creer-un-rapport/)
+- [Instances et fonctionnalités](/donnees/instances-fonctionnalites/)

@@ -1,0 +1,59 @@
+---
+title: "Rédiger les textes par IA"
+description: "Faire rédiger la synthèse et l'analyse par thème d'un rapport par l'IA, puis les relire."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Personnes autorisées à modifier le rapport"
+	menu="Mes rapports › un rapport › Texte IA"
+	disponibilite="instances reliées au service d'IA ILAAS (pas les démonstrations en lecture seule)"
+/>
+
+Deux textes d'un rapport peuvent être rédigés par l'IA (service ILAAS) : une **synthèse** et
+une **analyse par grand thème**. **Tous les chiffres sont calculés par Druid** ; l'IA regroupe
+des sujets existants et rédige. Chaque texte est modifiable et doit être relu.
+
+## Les deux textes
+
+| Texte | Ce qu'il contient |
+|---|---|
+| **Analyse par grand thème (IA)** | Les sujets du corpus regroupés en grands thèmes ; pour chacun, le nombre de publications, la tendance, les personnes et publications marquantes, et une synthèse. Les petits thèmes n'ont que leurs chiffres. |
+| **Synthèse (IA)** | Un résumé, les points clés et des pistes (de coopération pour un rapport de collaboration, d'action sinon), rédigés à partir des chiffres clés et de l'analyse par thème du rapport. |
+
+## Étapes
+
+1. Ajoutez un bloc **Texte IA** (les modèles de collaboration, de financements et de revues en
+   contiennent déjà) et cliquez dessus pour ouvrir ses réglages.
+2. Choisissez le texte : **Synthèse (IA)** ou **Analyse par grand thème (IA)**.
+3. Cliquez sur **Générer**. L'analyse par thème prend une à deux minutes (« Rédaction… »
+   indique l'avancement). Générez-la **avant** la synthèse, qui s'appuie dessus.
+4. Relisez le texte dans l'aperçu ; corrigez-le directement dans ses réglages.
+5. Cochez **J'ai relu ce texte (mention imprimée dans le PDF)**.
+
+## Ce qui se passe ensuite
+
+Le texte est enregistré avec le rapport ; il ne change plus tant que vous ne cliquez pas sur
+**Régénérer**. Dans le PDF, il est encadré avec la mention « Texte généré par IA (ILAAS,
+modèle) — pas encore relu » ou « — relu par … le … ».
+
+## Limites connues
+
+- **Un texte IA non généré n'est pas imprimé** : l'aperçu l'indique (« pas encore généré »).
+- **Régénérer remplace vos corrections** : relisez à nouveau après chaque régénération.
+- **L'IA peut se tromper d'interprétation** : Druid écarte les thèmes, noms et titres qu'elle
+  invente, mais pas un contresens. Vérifiez chaque affirmation avec les graphiques du rapport.
+- **Les tendances ne sont commentées** qu'à partir de 10 publications, les comparaisons d'impact
+  qu'à partir de 5 valeurs.
+- **Le service peut être lent ou indisponible** : Druid relance l'appel automatiquement ; en cas
+  d'échec, réessayez plus tard.
+- **Les données envoyées** à ILAAS sont des chiffres, des libellés de sujets, des titres de
+  publications et des noms d'auteurs.
+
+## Voir aussi
+
+- [Créer un rapport](/guides/rapports/creer-un-rapport/)
+- [Modèles de rapport](/guides/rapports/modeles/)

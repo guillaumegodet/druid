@@ -1,0 +1,114 @@
+---
+title: "Report templates"
+description: "What each report template contains, its parameters and its methodological choices."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles, on the structures they see"
+	menu="My reports › New report › Template"
+/>
+
+A template creates a complete report in two clicks: you choose the structure, the period, the
+scope and, depending on the template, one or two parameters. The resulting report is then **a
+report like any other**: add, remove or move blocks as you like.
+
+All templates **leave out the charts that do not apply** to the structure (no teams, no
+strategic axes, no charter scores…) and the sections left empty.
+
+## Structure report
+
+**For**: a complete review of a laboratory, a faculty or the institution, for instance for an
+evaluation report.
+
+**Contents**: one section per visible dashboard tab (overview, collaborations, impact and
+citations, books, journals, APC, funding, strategic axes, signature charter, teams, PhD
+students, researchers, network, sources), with its charts, and key figures at the top of the
+overview and impact sections.
+
+This is the template offered by the **PDF report** button of the dashboard. The report is long:
+hide or delete the sections you do not need.
+
+## International collaborations
+
+**Parameter**: a partner **Country**, or **All partner countries**.
+
+**Contents**:
+- overview: share and evolution of international co-publications, types of collaboration;
+- partner countries: map, main countries, evolution, European Union share;
+- partner institutions: main partners, flows, network;
+- themes and impact of the **international co-publications** only (a filter of those blocks).
+
+## Collaboration with a university or group
+
+**Parameter**: one or several **partner institutions**, or a predefined group (EUniWell for
+instance). Druid suggests adding the **affiliated institutions** (hospitals, institutes) that
+also co-signed (**Add them**).
+
+**Contents**: an introductory paragraph, an AI summary, the key figures of the collaboration
+and of its impact, the overview, journals, people and labs involved, a breakdown by university
+(from two partners), an AI analysis by major theme, the other partners of these co-publications
+and, as an annex, the list of co-publications.
+
+**Methodological choices**, recalled in the report:
+- publications with **more than 50 authors** (large consortia) count in the volumes but are
+  **left out of the impact indicators**;
+- impact is compared with a **comparable reference**: the international co-publications of the
+  structure in the same subfields, weighted like the collaboration;
+- the footer reads « Internal working document ».
+
+## Funding analysis
+
+**Parameter**: a category of **Funders** (ANR, Europe…), or **All funders**.
+
+**Contents**: a note on funding data, an AI summary, the key figures (funded publications and
+share of the corpus, distinct funders, ANR, Europe, impact of funded articles), the main
+funders, categories, evolution, funding by lab, then the themes, impact and partners of the
+**funded publications**.
+
+**Good to know**:
+- funding is what the publication **acknowledges** (OpenAlex funders, ANR and European projects
+  from HAL); only part of the publications acknowledge one;
+- the impact of funded articles is compared with that of the structure's **articles** without a
+  funder (chapters and conference papers, often without FWCI, would distort the comparison);
+- categories are assigned from the funder names, on a best-effort basis.
+
+## Journals and publishing policy
+
+**Parameter**: a **Publisher**, or **All publishers**.
+
+**Contents**: an AI summary, the key figures (distinct journals, Q1 share, open access, access
+at NU and national licences, APC, signature charter compliance), the main journals and
+quartiles, open access and journal access, article processing charges (APC) and the signature
+charter.
+
+Sections without data for the structure (journal access, charter) are not created.
+
+## Empty report
+
+A report without blocks, on the chosen structure, period and scope: add charts, key figures and
+texts yourself, or fill it from the dashboard with **Add to a report**.
+
+## Instance templates
+
+Under **Templates of the institution**, **New report** also offers the reports published as
+templates by the super administrators of your instance (see
+[Share a report](/en/guides/rapports/partager-un-rapport/#publish-an-instance-template)).
+
+## Known limitations
+
+- **A template is not a live link**: changing the template, or Druid, does not change the
+  reports already created.
+- **AI summaries are empty at creation**: generate them in the editor (see
+  [Write the texts with AI](/en/guides/rapports/textes-ia/)).
+- **Without the structure's data** (dashboard not generated), the report lists every chart of
+  the template, including those that will be unavailable.
+
+## See also
+
+- [Create a report](/en/guides/rapports/creer-un-rapport/)
+- [Indicators](/en/donnees/indicateurs/)
+- [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/)

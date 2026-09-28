@@ -1,0 +1,118 @@
+---
+title: "Modèles de rapport"
+description: "Ce que contient chaque modèle de rapport, ses paramètres et ses choix de méthode."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils, sur les structures qu'ils voient"
+	menu="Mes rapports › Nouveau rapport › Modèle"
+/>
+
+Un modèle crée en deux clics un rapport complet : vous choisissez la structure, la période, le
+périmètre et, selon le modèle, un ou deux paramètres. Le rapport obtenu est ensuite **un
+rapport comme un autre** : ajoutez, retirez ou déplacez des blocs à votre guise.
+
+Tous les modèles **écartent les graphiques sans objet** pour la structure (pas d'équipes, pas
+d'axes stratégiques, pas de scores de charte…) et les sections restées vides.
+
+## Bilan de structure
+
+**Pour** : un bilan complet d'un laboratoire, d'une composante ou de l'établissement, par exemple
+pour un rapport d'évaluation.
+
+**Contenu** : une section par onglet visible du tableau de bord (vue d'ensemble, collaborations,
+impact et citations, ouvrages, revues, APC, financements, axes stratégiques, charte de
+signature, équipes, doctorants, chercheurs, réseau, sources), avec ses graphiques, et des
+chiffres clés en tête des sections vue d'ensemble et impact.
+
+C'est le modèle proposé par le bouton **Rapport PDF** du tableau de bord. Le rapport est long :
+masquez ou supprimez les sections inutiles.
+
+## Collaborations internationales
+
+**Paramètre** : un **Pays** partenaire, ou **Tous les pays partenaires**.
+
+**Contenu** :
+- vue d'ensemble : part et évolution des co-publications internationales, types de
+  collaboration ;
+- pays partenaires : carte, principaux pays, évolution, part de l'Union européenne ;
+- institutions partenaires : principaux partenaires, flux, réseau ;
+- thématiques et impact des **co-publications internationales** seulement (filtre propre à ces
+  blocs).
+
+## Collaboration avec une université ou un groupe
+
+**Paramètre** : un ou plusieurs **établissements partenaires**, ou un groupe prédéfini (EUniWell
+par exemple). Druid propose d'ajouter les **établissements affiliés** (hôpitaux, instituts)
+qui ont aussi cosigné (**Les ajouter**).
+
+**Contenu** : un paragraphe de présentation, une synthèse IA, les chiffres clés de la
+collaboration et de son impact, la vue d'ensemble, les revues, les personnes et labos
+impliqués, une ventilation par université (à partir de deux partenaires), une analyse IA par
+grand thème, les autres partenaires de ces co-publications et, en annexe, la liste des
+co-publications.
+
+**Choix de méthode**, rappelés dans le rapport :
+- les publications de **plus de 50 auteurs** (grands consortiums) comptent dans les volumes mais
+  sont **écartées des indicateurs d'impact** ;
+- l'impact est comparé à une **référence comparable** : les co-publications internationales de
+  la structure dans les mêmes sous-disciplines, pondérées comme la collaboration ;
+- le pied de page porte « Document de travail interne ».
+
+## Analyse des financements
+
+**Paramètre** : une catégorie de **Financeurs** (ANR, Europe…), ou **Tous les financeurs**.
+
+**Contenu** : une note sur les données de financement, une synthèse IA, les chiffres clés
+(publications financées et part du corpus, financeurs distincts, ANR, Europe, impact des
+articles financés), les principaux financeurs, les catégories, l'évolution, les financements
+par labo, puis les thématiques, l'impact et les partenaires des **publications financées**.
+
+**À savoir** :
+- un financement est ce que **déclare** la publication (financeurs OpenAlex, projets ANR et
+  européens de HAL) ; seule une partie des publications en déclare un ;
+- l'impact des articles financés est comparé à celui des **articles** de la structure sans
+  financeur (les chapitres et communications, souvent sans FWCI, fausseraient la comparaison) ;
+- les catégories sont déduites des noms des financeurs, au mieux.
+
+## Revues et politique de publication
+
+**Paramètre** : un **Éditeur**, ou **Tous les éditeurs**.
+
+**Contenu** : une synthèse IA, les chiffres clés (revues distinctes, part en Q1, accès ouvert,
+accès à NU et licences nationales, APC, conformité à la charte de signature), les principales
+revues et quartiles, l'accès ouvert et l'accès aux revues, les frais de publication (APC) et
+la charte de signature.
+
+Les sections sans données pour la structure (accès aux revues, charte) ne sont pas créées.
+
+## Rapport vide
+
+Un rapport sans bloc, sur la structure, la période et le périmètre choisis : ajoutez vous-même
+graphiques, chiffres clés et textes, ou remplissez-le depuis le tableau de bord avec **Ajouter à
+un rapport**.
+
+## Modèles de l'établissement
+
+Sous **Modèles de l'établissement**, **Nouveau rapport** propose aussi les rapports publiés
+comme modèles par les super-administrateurs de votre instance (voir
+[Partager un rapport](/guides/rapports/partager-un-rapport/#publier-un-modèle-de-létablissement)).
+
+## Limites connues
+
+- **Un modèle n'est pas un lien vivant** : modifier le modèle, ou Druid, ne change pas les
+  rapports déjà créés.
+- **Les synthèses IA sont vides à la création** : générez-les dans l'éditeur (voir
+  [Rédiger les textes par IA](/guides/rapports/textes-ia/)).
+- **Sans les données de la structure** (tableau de bord non généré), le rapport reprend tous
+  les graphiques du modèle, y compris ceux qui seront indisponibles.
+
+## Voir aussi
+
+- [Créer un rapport](/guides/rapports/creer-un-rapport/)
+- [Indicateurs](/donnees/indicateurs/)
+- [Analyser les collaborations](/guides/tableau-de-bord/collaborations/)

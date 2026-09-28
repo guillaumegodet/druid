@@ -27,6 +27,9 @@ dispose pas de la fonction, ou que votre profil ne la permet pas.
 | **Alignement IdRef enrichi** | Choix entre homonymes IdRef affiné grâce au graphe CRISalid. | Recherche IdRef simple, par nom et dates. |
 | **Console ETL** | Régénération des tableaux de bord depuis Druid, configuration des structures, contrôle des affiliations. | Tableaux de bord régénérés hors de Druid. |
 | **Gestion des droits** | Vue des groupes de droits et de leurs membres dans **Administration** (l'attribution se fait dans la console Keycloak). | Accès gérés par l'équipe technique. |
+| **Enregistrement des rapports** | **Mes rapports** enregistrés sur l'instance : partage, historique, modèles de l'établissement. | Sur une démonstration en lecture seule, rapports conservés dans le navigateur seulement. |
+| **Archivage des PDF de rapport** | Les PDF générés sont conservés dans l'historique du rapport et peuvent être partagés figés. | L'historique garde la date, l'auteur et le périmètre, sans le fichier. |
+| **Textes par IA (ILAAS)** | Synthèse et analyse par thème des rapports ; analyse thématique des collaborations. | Blocs **Texte IA** impossibles à générer. |
 | **Assistant conversationnel** | Bouton flottant pour interroger les données CRISalid en langage naturel. | — |
 | **Export vers CRISalid** | Envoi des chercheurs, identifiants et structures à CRISalid (bouton **Synchroniser avec SoVisu+**). | Pas de moissonnage automatique des publications par personne. |
 

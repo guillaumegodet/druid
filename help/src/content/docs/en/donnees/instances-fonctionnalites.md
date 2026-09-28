@@ -25,6 +25,9 @@ help, your instance probably does not have the feature, or your profile does not
 | **Enhanced IdRef alignment** | Choice between IdRef namesakes refined with the CRISalid graph. | Simple IdRef search, by name and dates. |
 | **ETL console** | Regenerating the dashboards from Druid, configuring structures, checking affiliations. | Dashboards regenerated outside Druid. |
 | **Access rights** | View of the rights groups and their members in **Administration** (rights are granted in the Keycloak console). | Access managed by the technical team. |
+| **Report saving** | **My reports** saved on the instance: sharing, history, instance templates. | On a read-only demo, reports are kept in the browser only. |
+| **Report PDF archiving** | Generated PDFs are kept in the report history and can be shared frozen. | The history keeps the date, author and scope, without the file. |
+| **AI texts (ILAAS)** | Summary and analysis by theme of reports; thematic analysis of collaborations. | **AI text** blocks cannot be generated. |
 | **Chat assistant** | Floating button to query the CRISalid data in natural language. | — |
 | **Export to CRISalid** | Sending researchers, identifiers and structures to CRISalid (**Synchronise with SoVisu+** button). | No automatic harvesting of publications per person. |
 

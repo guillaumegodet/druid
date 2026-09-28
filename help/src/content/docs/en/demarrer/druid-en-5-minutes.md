@@ -23,8 +23,9 @@ are the ones used to harvest each researcher's publications.
   (RNSR, ROR, UAI…) and their supervising bodies.
 - **Analyse the scientific output** of a laboratory or a group of researchers: volume, open
   access, impact, collaborations, journals, APCs.
-- **Export**: lists as CSV, Excel or PDF, a file for ABES, a PDF report of the dashboard,
-  charts you can embed in a website.
+- **Build reports**: bibliometric reports from the dashboard charts or from templates (review,
+  collaborations, funding, journals), shared and exported as PDF.
+- **Export**: lists as CSV, Excel or PDF, a file for ABES, charts you can embed in a website.
 
 ## The sections of the menu
 
@@ -34,6 +35,7 @@ are the ones used to harvest each researcher's publications.
 | **Structures** | Laboratories, teams and faculties, their hierarchy and their description. | Central services and administrators |
 | **Groups** | Cross-cutting selections of researchers (a council, a project, a cohort) with their own dashboard. | Administrators |
 | **Dashboard** | The bibliometric indicators of a structure or a group, in about fifteen tabs. | Everyone (limited to their lab for a lab profile) |
+| **My reports** | Your bibliometric reports, those shared with you and those visible to everyone; creation from a template, PDF export. | Everyone (on the structures they see) |
 | **Alignment tools** | Researcher identifier alignment and, if your instance is connected to an LDAP directory, LDAP alignment. | Central services and administrators |
 | **Administration** | ETL console, rights management, media sources for the news watch, depending on your profile. | Administrators and communication officers |
 

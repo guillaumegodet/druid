@@ -23,8 +23,10 @@ Druid sont celles qui permettent de moissonner les publications de chaque cherch
   identifiants (RNSR, ROR, UAI…) et leurs tutelles.
 - **Analyser la production scientifique** d'un laboratoire ou d'un groupe de chercheurs :
   volume, accès ouvert, impact, collaborations, revues, APC.
-- **Exporter** : listes en CSV, Excel ou PDF, fichier pour l'ABES, rapport PDF du tableau de
-  bord, graphiques intégrables sur un site web.
+- **Composer des rapports** bibliométriques à partir des graphiques du tableau de bord ou de
+  modèles (bilan, collaborations, financements, revues), les partager et les exporter en PDF.
+- **Exporter** : listes en CSV, Excel ou PDF, fichier pour l'ABES, graphiques intégrables sur
+  un site web.
 
 ## Les rubriques du menu
 
@@ -34,6 +36,7 @@ Druid sont celles qui permettent de moissonner les publications de chaque cherch
 | **Structures** | Les laboratoires, équipes et composantes, leur hiérarchie et leur fiche descriptive. | Services centraux et administrateurs |
 | **Groupes** | Des sélections transverses de chercheurs (un conseil, un projet, une cohorte) avec leur propre tableau de bord. | Administrateurs |
 | **Tableau de bord** | Les indicateurs bibliométriques d'une structure ou d'un groupe, en une quinzaine d'onglets. | Tout le monde (limité à son labo pour un profil labo) |
+| **Mes rapports** | Vos rapports bibliométriques, ceux partagés avec vous et ceux visibles par tous ; création à partir d'un modèle, export PDF. | Tout le monde (sur les structures qu'il voit) |
 | **Outils d'alignement** | L'alignement des identifiants chercheurs et, si votre instance est reliée à un annuaire LDAP, l'alignement LDAP. | Services centraux et administrateurs |
 | **Administration** | Console ETL, gestion des droits, sources médias de la veille, selon votre profil. | Administrateurs et chargé·es de communication |
 

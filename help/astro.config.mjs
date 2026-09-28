@@ -41,6 +41,7 @@ export default defineConfig({
 						{ label: 'Identifiants', translations: { en: 'Identifiers' }, items: [{ autogenerate: { directory: 'guides/identifiants' } }] },
 						{ label: 'Structures et groupes', translations: { en: 'Structures and groups' }, items: [{ autogenerate: { directory: 'guides/structures-groupes' } }] },
 						{ label: 'Tableau de bord', translations: { en: 'Dashboard' }, items: [{ autogenerate: { directory: 'guides/tableau-de-bord' } }] },
+						{ label: 'Rapports', translations: { en: 'Reports' }, items: [{ autogenerate: { directory: 'guides/rapports' } }] },
 						{ label: 'Veille et communication', translations: { en: 'Monitoring and communication' }, items: [{ autogenerate: { directory: 'guides/veille' } }] },
 						{ label: 'Administration', translations: { en: 'Administration' }, items: [{ autogenerate: { directory: 'guides/administration' } }] },
 						{ label: 'Corriger une donnée', translations: { en: 'Fix a data error' }, items: [{ autogenerate: { directory: 'guides/corriger' } }] },
