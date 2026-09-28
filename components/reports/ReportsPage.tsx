@@ -193,9 +193,11 @@ export const ReportsPage: React.FC<{
                       type="button"
                       onClick={() => setConfirmDelete(r.id)}
                       title={t`Delete`}
-                      className="btn-pill h-8 w-8 justify-center"
+                      // Labelled, like « Duplicate »: a fixed w-8 left no room for the icon inside the
+                      // px-5 padding of btn-pill (invisible button, 2026-09-28).
+                      className="btn-pill h-8 px-3 text-[12px] text-[#b23b3b] dark:text-[#f08c8c]"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-3.5 h-3.5" /> <Trans>Delete</Trans>
                     </button>
                   ))}
                 </div>

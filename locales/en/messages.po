@@ -7610,6 +7610,7 @@ msgstr "Hide from the PDF"
 
 #: components/reports/ReportEditor.tsx:443
 #: components/reports/ReportsPage.tsx:195
+#: components/reports/ReportsPage.tsx:200
 msgid "Delete"
 msgstr "Delete"
 
