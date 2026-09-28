@@ -8,13 +8,20 @@ import type { ReportPeriod } from '../dashboard/report/definition';
 
 export const selectCls = 'input-soft !w-auto py-1.5 pr-7 text-sm font-semibold cursor-pointer disabled:cursor-default';
 
+interface StructureList {
+  slugs: string[];
+  groups: string[];
+  /** Tabs hidden per structure (druid_tabs_hidden). */
+  tabsHidden: Record<string, string[]>;
+}
+
 /** Dashboards the user can open (same list as the dashboard selector). */
-export function useStructureSlugs(): { slugs: string[]; groups: string[] } {
-  const [state, setState] = useState<{ slugs: string[]; groups: string[] }>({ slugs: [], groups: [] });
+export function useStructureSlugs(): StructureList {
+  const [state, setState] = useState<StructureList>({ slugs: [], groups: [], tabsHidden: {} });
   useEffect(() => {
     fetchDashboardStructures()
-      .then(({ slugs, groups }) => setState({ slugs, groups }))
-      .catch(() => setState({ slugs: [], groups: [] }));
+      .then(({ slugs, groups, tabsHidden }) => setState({ slugs, groups, tabsHidden }))
+      .catch(() => setState({ slugs: [], groups: [], tabsHidden: {} }));
   }, []);
   return state;
 }

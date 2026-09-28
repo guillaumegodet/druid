@@ -25,7 +25,8 @@ import { PubFilters } from './dashboard/publicationFilters';
 import { AddToReportContext, ShareScopeContext, type AddToReport, type ChartState } from './dashboard/EChartCard';
 import { AddToReportDialog } from './reports/AddToReportDialog';
 import { sanitizeChartParams } from './dashboard/chartMeta';
-import { ReportWizard } from './dashboard/report/ReportWizard';
+import { NewReportDialog } from './reports/NewReportDialog';
+import { reportsBackend } from './dashboard/report/reportsApi';
 import { getRoles } from '../lib/auth';
 import { Researcher, ViewState } from '../types';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -277,9 +278,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     });
   };
 
-  // ── PDF report (3-step wizard: criteria / content / preview) ──────────────
-  // Prefilled with the current period and scope; works on the unfiltered
-  // `data` to leave the scope choice to the wizard.
+  // ── PDF report: « Structure report » template of « Mes rapports », pre-filled with the
+  // current structure, years and scope (decision R7 of docs/plan-mes-rapports.md, replaces the
+  // former 3-step wizard); the report opens in the editor, where the PDF is generated.
   const [reportOpen, setReportOpen] = useState(false);
   // « Ajouter à un rapport » on a chart (docs/plan-mes-rapports.md, lot 4).
   const [addTarget, setAddTarget] = useState<{ chartId: string; title: string; state: ChartState | null } | null>(null);
@@ -390,7 +391,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <button
               type="button"
               onClick={() => setReportOpen(true)}
-              title={t`Compose a PDF report (choice of period, scope and charts)`}
+              title={t`Create a report from this dashboard (editable, then exported as PDF)`}
               className="btn-pill px-3 py-1.5 text-[13px]"
             >
               <FileText className="w-4 h-4" />
@@ -509,16 +510,20 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         />
       )}
 
-      {reportOpen && data && slug && (
-        <ReportWizard
-          dataset={data}
-          slug={slug}
-          memberAuthorIds={memberAuthorIds}
-          canScopeHeadcount={canScopeHeadcount}
-          visibleTabKeys={visibleTabs.map((t) => t.key)}
-          initialRange={range}
-          initialScope={scope}
+      {reportOpen && slug && (
+        <NewReportDialog
+          backend={reportsBackend()}
+          initial={{
+            templateId: 'structure',
+            slug,
+            period: { kind: 'fixed', start: range.start, end: range.end },
+            perimetre: scope,
+          }}
           onClose={() => setReportOpen(false)}
+          onCreated={(id) => {
+            setReportOpen(false);
+            onOpenReport?.(id);
+          }}
         />
       )}
 

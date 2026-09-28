@@ -363,148 +363,149 @@ msgstr "Stop the answer"
 msgid "Send"
 msgstr "Send"
 
-#: components/DashboardPage.tsx:77
+#: components/DashboardPage.tsx:78
 #: components/dashboard/InternationalTab.tsx:128
 #: components/dashboard/report/reportCatalog.ts:25
+#: components/dashboard/report/templates.ts:134
 msgid "Overview"
 msgstr "Overview"
 
-#: components/DashboardPage.tsx:78
+#: components/DashboardPage.tsx:79
 #: components/dashboard/report/reportCatalog.ts:33
 msgid "Collaborations"
 msgstr "Collaborations"
 
-#: components/DashboardPage.tsx:79
+#: components/DashboardPage.tsx:80
 #: components/dashboard/report/reportCatalog.ts:50
 msgid "Impact and citations"
 msgstr "Impact and citations"
 
-#: components/DashboardPage.tsx:80
+#: components/DashboardPage.tsx:81
 #: components/dashboard/report/reportCatalog.ts:60
 msgid "Books"
 msgstr "Books"
 
-#: components/DashboardPage.tsx:81
+#: components/DashboardPage.tsx:82
 #: components/dashboard/report/reportCatalog.ts:65
 msgid "Journals"
 msgstr "Journals"
 
-#: components/DashboardPage.tsx:82
+#: components/DashboardPage.tsx:83
 #: components/dashboard/report/reportCatalog.ts:70
 msgid "APC monitoring"
 msgstr "APC monitoring"
 
-#: components/DashboardPage.tsx:83
+#: components/DashboardPage.tsx:84
 #: components/dashboard/report/reportCatalog.ts:77
 msgid "Funding"
 msgstr "Funding"
 
-#: components/DashboardPage.tsx:84
+#: components/DashboardPage.tsx:85
 #: components/dashboard/report/reportCatalog.ts:82
 msgid "Strategic axes"
 msgstr "Strategic axes"
 
-#: components/DashboardPage.tsx:85
+#: components/DashboardPage.tsx:86
 msgid "Benchmark"
 msgstr "Benchmark"
 
-#: components/DashboardPage.tsx:86
+#: components/DashboardPage.tsx:87
 #: components/dashboard/report/reportCatalog.ts:87
 msgid "Signature charter"
 msgstr "Signature charter"
 
-#: components/DashboardPage.tsx:87
+#: components/DashboardPage.tsx:88
 #: components/dashboard/report/reportCatalog.ts:92
 msgid "Teams"
 msgstr "Teams"
 
-#: components/DashboardPage.tsx:88
+#: components/DashboardPage.tsx:89
 #: components/dashboard/report/reportCatalog.ts:100
 msgid "PhD students"
 msgstr "PhD students"
 
-#: components/DashboardPage.tsx:89
+#: components/DashboardPage.tsx:90
 #: components/dashboard/report/reportCatalog.ts:105
 msgid "Researchers"
 msgstr "Researchers"
 
-#: components/DashboardPage.tsx:90
+#: components/DashboardPage.tsx:91
 #: components/dashboard/report/reportCatalog.ts:110
 msgid "Network"
 msgstr "Network"
 
-#: components/DashboardPage.tsx:91
+#: components/DashboardPage.tsx:92
 #: components/dashboard/PublicationsListTab.tsx:209
 msgid "Publication list"
 msgstr "Publication list"
 
-#: components/DashboardPage.tsx:92
+#: components/DashboardPage.tsx:93
 msgid "Watch"
 msgstr "Watch"
 
-#: components/DashboardPage.tsx:93
+#: components/DashboardPage.tsx:94
 #: components/dashboard/report/reportCatalog.ts:116
 msgid "Sources"
 msgstr "Sources"
 
-#: components/DashboardPage.tsx:304
+#: components/DashboardPage.tsx:305
 #: components/Sidebar.tsx:163
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Dashboard"
 
 #. placeholder {0}: data.lab
-#: components/DashboardPage.tsx:304
+#: components/DashboardPage.tsx:305
 msgid "Dashboard — {0}"
 msgstr "Dashboard — {0}"
 
-#: components/DashboardPage.tsx:318
-#: components/reports/ReportControls.tsx:37
+#: components/DashboardPage.tsx:319
+#: components/reports/ReportControls.tsx:44
 msgid "Structure or group"
 msgstr "Structure or group"
 
-#: components/DashboardPage.tsx:320
+#: components/DashboardPage.tsx:321
 #: components/Sidebar.tsx:158
-#: components/reports/ReportControls.tsx:40
+#: components/reports/ReportControls.tsx:47
 msgid "Structures"
 msgstr "Structures"
 
-#: components/DashboardPage.tsx:328
+#: components/DashboardPage.tsx:329
 #: components/Sidebar.tsx:161
-#: components/reports/ReportControls.tsx:44
+#: components/reports/ReportControls.tsx:51
 msgid "Groups"
 msgstr "Groups"
 
-#: components/DashboardPage.tsx:339
+#: components/DashboardPage.tsx:340
 msgid "Open the ETL console on this structure"
 msgstr "Open the ETL console on this structure"
 
-#: components/DashboardPage.tsx:340
+#: components/DashboardPage.tsx:341
 msgid "Configure"
 msgstr "Configure"
 
 #. placeholder {0}: excluded.toLocaleString(numberLocale())
-#: components/DashboardPage.tsx:350
+#: components/DashboardPage.tsx:351
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 
-#: components/DashboardPage.tsx:351
+#: components/DashboardPage.tsx:352
 #: components/dashboard/report/ReportWizard.tsx:311
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 
-#: components/DashboardPage.tsx:356
+#: components/DashboardPage.tsx:357
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:287
 #: components/dashboard/report/ReportWizard.tsx:477
 #: components/dashboard/report/composeReportPdf.ts:26
 #: components/reports/AddToReportDialog.tsx:80
 #: components/reports/AddToReportDialog.tsx:85
-#: components/reports/ReportControls.tsx:146
+#: components/reports/ReportControls.tsx:153
 msgid "Affiliation"
 msgstr "Affiliation"
 
-#: components/DashboardPage.tsx:357
+#: components/DashboardPage.tsx:358
 #: components/ResearcherDashboard.tsx:193
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:288
@@ -512,41 +513,41 @@ msgstr "Affiliation"
 #: components/dashboard/report/composeReportPdf.ts:26
 #: components/reports/AddToReportDialog.tsx:80
 #: components/reports/AddToReportDialog.tsx:85
-#: components/reports/ReportControls.tsx:147
+#: components/reports/ReportControls.tsx:154
 msgid "Headcount"
 msgstr "Headcount"
 
-#: components/DashboardPage.tsx:382
+#: components/DashboardPage.tsx:383
 msgid "Copy the link to this view (structure, tab, period, scope)"
 msgstr "Copy the link to this view (structure, tab, period, scope)"
 
-#: components/DashboardPage.tsx:386
+#: components/DashboardPage.tsx:387
 #: components/dashboard/NewsTab.tsx:836
 msgid "Copied!"
 msgstr "Copied!"
 
-#: components/DashboardPage.tsx:386
+#: components/DashboardPage.tsx:387
 #: components/dashboard/EChartCard.tsx:362
 msgid "Copy link"
 msgstr "Copy link"
 
-#: components/DashboardPage.tsx:393
-msgid "Compose a PDF report (choice of period, scope and charts)"
-msgstr "Compose a PDF report (choice of period, scope and charts)"
+#: components/DashboardPage.tsx:394
+msgid "Create a report from this dashboard (editable, then exported as PDF)"
+msgstr "Create a report from this dashboard (editable, then exported as PDF)"
 
-#: components/DashboardPage.tsx:397
+#: components/DashboardPage.tsx:398
 msgid "PDF report"
 msgstr "PDF report"
 
-#: components/DashboardPage.tsx:417
+#: components/DashboardPage.tsx:418
 msgid "Loading data…"
 msgstr "Loading data…"
 
-#: components/DashboardPage.tsx:426
+#: components/DashboardPage.tsx:427
 msgid "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 msgstr "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 
-#: components/DashboardPage.tsx:430
+#: components/DashboardPage.tsx:431
 #: components/dashboard/EmbedPage.tsx:95
 msgid "Error loading data: {error}"
 msgstr "Error loading data: {error}"
@@ -577,7 +578,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/ResearcherDetail.tsx:446
 #: components/ResearcherDetail.tsx:549
 #: components/reports/AddToReportDialog.tsx:195
-#: components/reports/NewReportDialog.tsx:99
+#: components/reports/NewReportDialog.tsx:183
 #: components/reports/ReportsPage.tsx:176
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/MergeResearchersModal.tsx:291
@@ -589,7 +590,7 @@ msgstr "Cancel"
 
 #: components/GroupList.tsx:169
 #: components/StructureDetail.tsx:139
-#: components/reports/NewReportDialog.tsx:106
+#: components/reports/NewReportDialog.tsx:191
 msgid "Create"
 msgstr "Create"
 
@@ -1067,7 +1068,7 @@ msgstr "Acronym"
 #: components/StructureList.tsx:201
 #: components/dashboard/MediaSourcesAdmin.tsx:215
 #: components/dashboard/MediaSourcesAdmin.tsx:288
-#: components/reports/NewReportDialog.tsx:70
+#: components/reports/NewReportDialog.tsx:160
 #: components/researchers/ListHeader.tsx:46
 msgid "Name"
 msgstr "Name"
@@ -1185,7 +1186,7 @@ msgstr "Structure deletion: not available"
 #: components/StructureList.tsx:436
 #: components/dashboard/report/ReportWizard.tsx:271
 #: components/dashboard/report/composeReportPdf.ts:59
-#: components/reports/NewReportDialog.tsx:82
+#: components/reports/NewReportDialog.tsx:139
 msgid "Structure"
 msgstr "Structure"
 
@@ -2569,6 +2570,7 @@ msgstr "National"
 
 #: components/dashboard/CollaborationsTab.tsx:285
 #: components/dashboard/PartnerInstitutionPicker.tsx:39
+#: components/dashboard/report/templates.ts:138
 msgid "Partner institutions"
 msgstr "Partner institutions"
 
@@ -2629,7 +2631,7 @@ msgstr "About “{title}”"
 #: components/dashboard/report/ReportWizard.tsx:261
 #: components/reports/AddToReportDialog.tsx:122
 #: components/reports/ChartPicker.tsx:58
-#: components/reports/NewReportDialog.tsx:65
+#: components/reports/NewReportDialog.tsx:111
 #: components/researchers/UnifiedAlignPage.tsx:603
 msgid "Close"
 msgstr "Close"
@@ -3160,6 +3162,7 @@ msgid "Top 25 keywords"
 msgstr "Top 25 keywords"
 
 #: components/dashboard/MarketShareSection.tsx:23
+#: components/reports/NewReportDialog.tsx:152
 msgid "Country"
 msgstr "Country"
 
@@ -3346,8 +3349,8 @@ msgstr "Last collection: {0}."
 #: components/dashboard/report/composeReportPdf.ts:60
 #: components/dashboard/report/pdfDoc.ts:126
 #: components/groups/GroupDashboardSection.tsx:145
-#: components/reports/NewReportDialog.tsx:86
-#: components/reports/ReportControls.tsx:76
+#: components/reports/NewReportDialog.tsx:143
+#: components/reports/ReportControls.tsx:83
 msgid "Period"
 msgstr "Period"
 
@@ -5575,8 +5578,8 @@ msgstr "PDF report — {0}"
 #: components/dashboard/report/ReportWizard.tsx:282
 #: components/dashboard/report/composeReportPdf.ts:61
 #: components/dashboard/report/pdfDoc.ts:127
-#: components/reports/NewReportDialog.tsx:90
-#: components/reports/ReportControls.tsx:144
+#: components/reports/NewReportDialog.tsx:147
+#: components/reports/ReportControls.tsx:151
 msgctxt "perimeter"
 msgid "Scope"
 msgstr "Scope"
@@ -6476,6 +6479,42 @@ msgstr "Browser storage unavailable: reports cannot be saved here."
 msgid "Sharing and history are not available on this read-only instance."
 msgstr "Sharing and history are not available on this read-only instance."
 
+#: components/dashboard/report/templates.ts:73
+msgid "Empty report"
+msgstr "Empty report"
+
+#: components/dashboard/report/templates.ts:74
+msgid "Start from scratch and add charts, key figures and text yourself."
+msgstr "Start from scratch and add charts, key figures and text yourself."
+
+#: components/dashboard/report/templates.ts:89
+msgid "Structure report"
+msgstr "Structure report"
+
+#: components/dashboard/report/templates.ts:90
+msgid "Every tab of the dashboard of a structure: output, collaborations, impact, journals, funding, teams…"
+msgstr "Every tab of the dashboard of a structure: output, collaborations, impact, journals, funding, teams…"
+
+#: components/dashboard/report/templates.ts:120
+msgid "International collaborations"
+msgstr "International collaborations"
+
+#: components/dashboard/report/templates.ts:121
+msgid "Share and evolution of international co-publications, partner countries and institutions, themes and impact — optionally for one country."
+msgstr "Share and evolution of international co-publications, partner countries and institutions, themes and impact — optionally for one country."
+
+#: components/dashboard/report/templates.ts:136
+msgid "Partner countries"
+msgstr "Partner countries"
+
+#: components/dashboard/report/templates.ts:140
+msgid "Themes of international co-publications"
+msgstr "Themes of international co-publications"
+
+#: components/dashboard/report/templates.ts:142
+msgid "Impact of international co-publications"
+msgstr "Impact of international co-publications"
+
 #: components/etl/EtlConsolePage.tsx:191
 msgid "ETL API unreachable"
 msgstr "ETL API unreachable"
@@ -7027,7 +7066,7 @@ msgid "by {0}"
 msgstr "by {0}"
 
 #: components/reports/AddToReportDialog.tsx:158
-#: components/reports/NewReportDialog.tsx:64
+#: components/reports/NewReportDialog.tsx:110
 #: components/reports/ReportsPage.tsx:99
 msgid "New report"
 msgstr "New report"
@@ -7102,27 +7141,39 @@ msgstr "Search a chart…"
 msgid "No chart matches."
 msgstr "No chart matches."
 
-#: components/reports/NewReportDialog.tsx:77
+#: components/reports/NewReportDialog.tsx:116
+msgid "Template"
+msgstr "Template"
+
+#: components/reports/NewReportDialog.tsx:154
+msgid "All partner countries"
+msgstr "All partner countries"
+
+#: components/reports/NewReportDialog.tsx:166
 msgid "e.g. Collaborations with the University of Ottawa"
 msgstr "e.g. Collaborations with the University of Ottawa"
 
-#: components/reports/NewReportDialog.tsx:95
-msgid "The report starts empty: add charts, key figures and text in the editor. Everything stays editable."
-msgstr "The report starts empty: add charts, key figures and text in the editor. Everything stays editable."
+#: components/reports/NewReportDialog.tsx:173
+msgid "Loading the structure's data to choose the charts…"
+msgstr "Loading the structure's data to choose the charts…"
 
-#: components/reports/ReportControls.tsx:78
+#: components/reports/NewReportDialog.tsx:178
+msgid "No data for this structure: the report will list every chart of the template."
+msgstr "No data for this structure: the report will list every chart of the template."
+
+#: components/reports/ReportControls.tsx:85
 msgid "Last years"
 msgstr "Last years"
 
-#: components/reports/ReportControls.tsx:79
+#: components/reports/ReportControls.tsx:86
 msgid "Fixed years"
 msgstr "Fixed years"
 
-#: components/reports/ReportControls.tsx:89
+#: components/reports/ReportControls.tsx:96
 msgid "{n} years"
 msgstr "{n} years"
 
-#: components/reports/ReportControls.tsx:98
+#: components/reports/ReportControls.tsx:105
 msgid "incl. current year"
 msgstr "incl. current year"
 
