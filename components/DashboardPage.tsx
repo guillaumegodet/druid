@@ -19,6 +19,7 @@ import { AxesTab } from './dashboard/AxesTab';
 import { BenchmarkTab } from './dashboard/BenchmarkTab';
 import { CharteTab } from './dashboard/CharteTab';
 import { PublicationsListTab } from './dashboard/PublicationsListTab';
+import { PublicationsListModal } from './dashboard/PublicationsListModal';
 import { NewsTab } from './dashboard/NewsTab';
 import { SourcesTab } from './dashboard/SourcesTab';
 import { PubFilters } from './dashboard/publicationFilters';
@@ -146,15 +147,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // Publication list filters — controllable from the other tabs.
   const [listFilters, setListFilters] = useState<PubFilters>({});
 
-  // Cross-tab link: opens « Liste des publications » pre-filtered.
-  const openList = (filters: PubFilters) => {
+  // Drill-down from a chart: the pre-filtered list opens in a modal over the current tab;
+  // the modal can hand its filters over to the « Liste des publications » tab.
+  const [drillFilters, setDrillFilters] = useState<PubFilters | null>(null);
+  const openList = (filters: PubFilters) => setDrillFilters(filters);
+  const closeDrill = useCallback(() => setDrillFilters(null), []);
+  const openDrillInTab = useCallback((filters: PubFilters) => {
     setListFilters(filters);
     setTab('list');
-  };
+    setDrillFilters(null);
+  }, []);
 
   // Structure change = different corpus, the filters no longer make sense.
   useEffect(() => {
     setListFilters({});
+    setDrillFilters(null);
   }, [slug]);
 
   // Reloadable: the ETL console creates structures and changes the hidden tabs.
@@ -487,6 +494,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   range={range}
                   filters={listFilters}
                   onFiltersChange={setListFilters}
+                />
+              )}
+              {drillFilters && (
+                <PublicationsListModal
+                  dataset={scopedData}
+                  range={range}
+                  initialFilters={drillFilters}
+                  onClose={closeDrill}
+                  onOpenInTab={openDrillInTab}
                 />
               )}
             </ShareScopeContext.Provider>

@@ -72,13 +72,16 @@ const FilterCheckbox: React.FC<{
  * « Liste des publications » tab: search, multi-criteria filters
  * (drivable from the other tabs via onOpenList → PubFilters),
  * sort by year, pagination, CSV export of the filtered results.
+ * Also rendered inside PublicationsListModal (`embedded`: no card, extra header buttons).
  */
 export const PublicationsListTab: React.FC<{
   dataset: DashboardDataset;
   range: YearRange;
   filters: PubFilters;
   onFiltersChange: (filters: PubFilters) => void;
-}> = ({ dataset, range, filters, onFiltersChange }) => {
+  embedded?: boolean;
+  headerActions?: React.ReactNode;
+}> = ({ dataset, range, filters, onFiltersChange, embedded = false, headerActions }) => {
   const { t, i18n } = useLingui();
   const [page, setPage] = useState(0);
   const [panelOpen, setPanelOpen] = useState(false);
@@ -202,7 +205,7 @@ export const PublicationsListTab: React.FC<{
   };
 
   return (
-    <div className="glass-card flex flex-col">
+    <div className={embedded ? 'flex flex-col' : 'glass-card flex flex-col'}>
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 pt-4 pb-3">
         <div>
           <h3 className="font-disp font-semibold text-[15px] text-ink dark:text-[#f5f2ea]">
@@ -213,7 +216,7 @@ export const PublicationsListTab: React.FC<{
             {activeCount > 0 && <> (<Plural value={activeCount} one="# filter" other="# filters" />)</>}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-lighter" />
             <input
@@ -244,6 +247,7 @@ export const PublicationsListTab: React.FC<{
           >
             <Download className="w-4 h-4" /> CSV
           </button>
+          {headerActions}
         </div>
       </div>
 

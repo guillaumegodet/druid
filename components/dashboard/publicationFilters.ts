@@ -2,7 +2,9 @@
 //
 // Any tab can open the pre-filtered list via the `onOpenList(filters)` callback
 // provided by DashboardPage (e.g. the « Publis » column of the
-// « Toutes les revues » table opens the list filtered on the journal).
+// « Toutes les revues » table opens the list filtered on the journal). The list
+// opens in a modal over the current tab (PublicationsListModal), which can hand
+// its filters over to the « Liste des publications » tab.
 // To add a link from a new tab: pass `onOpenList` as a prop
 // and call `onOpenList({ country: 'DE' })`, `onOpenList({ team: 'ComBi' })`, etc.
 // Each field of PubFilters maps to one dimension of DashboardPublication;
