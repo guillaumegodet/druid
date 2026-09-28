@@ -2097,6 +2097,30 @@ const parseTaskId = (req, res) => {
   return id;
 };
 
+// ── « Mes rapports » (docs/plan-mes-rapports.md, lot 2) ──────────────────────
+// Reports, shares and generation history in the Rapports* tables of the Grist doc. Routing,
+// access control and validation live in scripts/lib/reports_store.cjs, shared with the
+// Cloudflare Pages Function functions/api/reports/[[path]].js. Every authenticated user may
+// create reports (decision R9); the rights on the data themselves stay those of each reader.
+const reportsStore = require('./scripts/lib/reports_store.cjs');
+app.all(['/api/reports', '/api/reports/*'], async (req, res) => {
+  const doc = process.env.VITE_GRIST_DOC_ID;
+  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+  if (!GRIST_API_KEY) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
+  const sessionUser = req.session.user;
+  if (!sessionUser?.preferred_username) return res.status(401).json({ error: 'Unauthorized' });
+  const store = reportsStore.createReportsStore(
+    reportsStore.gristClient({ apiBase: GRIST_API_BASE, doc, apiKey: GRIST_API_KEY }),
+  );
+  const user = { id: sessionUser.preferred_username, isSuperAdmin: !!sessionUser.access?.isSuperAdmin };
+  const out = await reportsStore.routeReports(store, user, {
+    method: req.method,
+    segments: req.path.replace(/^\/api\/reports\/?/, '').split('/'),
+    body: req.body,
+  });
+  res.status(out.status).json(out.body);
+});
+
 // Detection rules (docs/plan-chantiers-taches.md, lot 5): scripts/sync_tasks.cjs reads the
 // alignment caches + the Annuaire and creates / verifies / auto-resolves the rule-generated
 // tasks. Same background-run contract as the alignments (progress file, 409 while running).

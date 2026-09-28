@@ -2454,7 +2454,7 @@ msgid "Compliance by team unavailable: no team with at least 3 analysable public
 msgstr "Compliance by team unavailable: no team with at least 3 analysable publications (staff not matched?)."
 
 #: components/dashboard/CollaborationsTab.tsx:46
-#: components/dashboard/CollaborationsTab.tsx:285
+#: components/dashboard/CollaborationsTab.tsx:284
 #: components/dashboard/charts/IntlVsNationalChart.tsx:35
 #: components/dashboard/kpiItems.ts:35
 msgctxt "feminine plural"
@@ -2514,74 +2514,74 @@ msgid "Most co-signing {labWord}"
 msgstr "Most co-signing {labWord}"
 
 #: components/dashboard/CollaborationsTab.tsx:212
-#: components/dashboard/CollaborationsTab.tsx:377
+#: components/dashboard/CollaborationsTab.tsx:376
 #: components/dashboard/PartnerBilanSection.tsx:423
 msgid "Yearly evolution"
 msgstr "Yearly evolution"
 
-#: components/dashboard/CollaborationsTab.tsx:281
+#: components/dashboard/CollaborationsTab.tsx:280
 msgid "Typology"
 msgstr "Typology"
 
-#: components/dashboard/CollaborationsTab.tsx:282
+#: components/dashboard/CollaborationsTab.tsx:281
 msgid "Within the structure"
 msgstr "Within the structure"
 
-#: components/dashboard/CollaborationsTab.tsx:283
+#: components/dashboard/CollaborationsTab.tsx:282
 msgid "Nantes Université"
 msgstr "Nantes Université"
 
-#: components/dashboard/CollaborationsTab.tsx:284
+#: components/dashboard/CollaborationsTab.tsx:283
 #: components/dashboard/charts/IntlVsNationalChart.tsx:28
 msgid "National"
 msgstr "National"
 
-#: components/dashboard/CollaborationsTab.tsx:286
+#: components/dashboard/CollaborationsTab.tsx:285
 #: components/dashboard/PartnerInstitutionPicker.tsx:39
 msgid "Partner institutions"
 msgstr "Partner institutions"
 
-#: components/dashboard/CollaborationsTab.tsx:310
+#: components/dashboard/CollaborationsTab.tsx:309
 msgid "The collaboration typology is not filled in for this corpus (run <0>scripts/backfill_collaborations.py</0>)."
 msgstr "The collaboration typology is not filled in for this corpus (run <0>scripts/backfill_collaborations.py</0>)."
 
 #. placeholder {0}: typology.typed.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:317
+#: components/dashboard/CollaborationsTab.tsx:316
 msgid "Broadest category per publication · {0} typed publications"
 msgstr "Broadest category per publication · {0} typed publications"
 
 #. placeholder {0}: dataset.lab
-#: components/dashboard/CollaborationsTab.tsx:331
+#: components/dashboard/CollaborationsTab.tsx:330
 msgid "Co-publications between {0} labs (≥ 2 internal sub-structures signing)"
 msgstr "Co-publications between {0} labs (≥ 2 internal sub-structures signing)"
 
-#: components/dashboard/CollaborationsTab.tsx:332
+#: components/dashboard/CollaborationsTab.tsx:331
 msgid "internal co-publications"
 msgstr "internal co-publications"
 
-#: components/dashboard/CollaborationsTab.tsx:334
-#: components/dashboard/CollaborationsTab.tsx:346
+#: components/dashboard/CollaborationsTab.tsx:333
+#: components/dashboard/CollaborationsTab.tsx:345
 msgid "Labs"
 msgstr "Labs"
 
-#: components/dashboard/CollaborationsTab.tsx:343
+#: components/dashboard/CollaborationsTab.tsx:342
 msgid "Co-publications with other Nantes Université labs (outside the current structure)"
 msgstr "Co-publications with other Nantes Université labs (outside the current structure)"
 
-#: components/dashboard/CollaborationsTab.tsx:344
+#: components/dashboard/CollaborationsTab.tsx:343
 msgid "publications with ≥ 1 other NU lab"
 msgstr "publications with ≥ 1 other NU lab"
 
-#: components/dashboard/CollaborationsTab.tsx:356
+#: components/dashboard/CollaborationsTab.tsx:355
 msgid "No national partners identified (run <0>scripts/backfill_collaborations.py</0>)."
 msgstr "No national partners identified (run <0>scripts/backfill_collaborations.py</0>)."
 
 #. placeholder {0}: national.total.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:361
+#: components/dashboard/CollaborationsTab.tsx:360
 msgid "Co-signing French institutions (outside Nantes Université) — <0>{0}</0> publications with ≥ 1 national partner."
 msgstr "Co-signing French institutions (outside Nantes Université) — <0>{0}</0> publications with ≥ 1 national partner."
 
-#: components/dashboard/CollaborationsTab.tsx:368
+#: components/dashboard/CollaborationsTab.tsx:367
 #: components/dashboard/embedRegistry.tsx:856
 msgid "Most co-signing institutions"
 msgstr "Most co-signing institutions"
@@ -6414,6 +6414,14 @@ msgstr "Interactive version"
 msgid "Page {0} / {1}"
 msgstr "Page {0} / {1}"
 
+#: components/dashboard/report/reportsApi.ts:165
+msgid "Browser storage unavailable: reports cannot be saved here."
+msgstr "Browser storage unavailable: reports cannot be saved here."
+
+#: components/dashboard/report/reportsApi.ts:166
+msgid "Sharing and history are not available on this read-only instance."
+msgstr "Sharing and history are not available on this read-only instance."
+
 #: components/etl/EtlConsolePage.tsx:191
 msgid "ETL API unreachable"
 msgstr "ETL API unreachable"
@@ -9643,210 +9651,238 @@ msgid "OpenAlex unreachable"
 msgstr "OpenAlex unreachable"
 
 #: lib/apiErrors.ts:57
+msgid "Report not found"
+msgstr "Report not found"
+
+#: lib/apiErrors.ts:58
+msgid "Not allowed on this report"
+msgstr "Not allowed on this report"
+
+#: lib/apiErrors.ts:59
+msgid "Invalid report definition"
+msgstr "Invalid report definition"
+
+#: lib/apiErrors.ts:60
+msgid "Report changed since it was loaded"
+msgstr "Report changed since it was loaded"
+
+#: lib/apiErrors.ts:61
+msgid "Invalid report share"
+msgstr "Invalid report share"
+
+#: lib/apiErrors.ts:62
+msgid "Invalid report generation"
+msgstr "Invalid report generation"
+
+#: lib/apiErrors.ts:63
+msgid "Read-only instance: reports are kept in the browser"
+msgstr "Read-only instance: reports are kept in the browser"
+
+#: lib/apiErrors.ts:65
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:66
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:67
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:68
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:69
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:70
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:71
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:72
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:74
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:75
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:76
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:77
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:78
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:79
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:80
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:81
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:83
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:84
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:85
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:86
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:87
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:88
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:89
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:90
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:91
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:92
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:93
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:94
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:95
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:96
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:97
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:98
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:99
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:100
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:102
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:103
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:104
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:105
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:106
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:107
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:108
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:110
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:111
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:112
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:113
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:115
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:116
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:117
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:118
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:120
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:121
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:122
 msgid "Load failed"
 msgstr "Load failed"
 

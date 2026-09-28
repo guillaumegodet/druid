@@ -12,8 +12,8 @@
  * looks it up in the active catalog. Unknown texts are returned unchanged. Messages carrying
  * a variable part use the shape `Fixed head: detail` — only the head is translated.
  *
- * `lib/__tests__/apiErrors.test.ts` checks that every `error: '…'` literal of `server.cjs`
- * and `functions/` is declared here.
+ * `lib/__tests__/apiErrors.test.ts` checks that every `error: '…'` literal of `server.cjs`,
+ * `functions/` and the shared server modules of `scripts/lib/` is declared here.
  */
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
@@ -53,6 +53,14 @@ export const API_ERRORS = [
   msg`Missing theme`,
   msg`No publication to analyze`,
   msg`OpenAlex unreachable`,
+  // reports (« Mes rapports », docs/plan-mes-rapports.md — scripts/lib/reports_store.cjs)
+  msg`Report not found`,
+  msg`Not allowed on this report`,
+  msg`Invalid report definition`,
+  msg`Report changed since it was loaded`,
+  msg`Invalid report share`,
+  msg`Invalid report generation`,
+  msg`Read-only instance: reports are kept in the browser`,
   // tasks (« À traiter › Tâches », docs/plan-chantiers-taches.md)
   msg`Task not found`,
   msg`Unknown event action`,
