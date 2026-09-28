@@ -11,12 +11,11 @@
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { numberLocale } from '../../lib/i18n';
-import { buildPartnerCatalog } from './collabAggregates';
+import { buildPartnerCatalog, unitsOfDataset } from './collabAggregates';
 import type { KpiItem } from './kpiItems';
 import { countryLabel } from './labels';
 import type { YearRange } from './overviewAggregates';
 import type { PubFilters } from './publicationFilters';
-import { TEAM_UNKNOWN } from './structureAggregates';
 import type { DashboardDataset, DashboardPublication } from './types';
 
 /** Threshold of « large collaborations » (decision D2, same as PartnerBreakdownSection). */
@@ -49,15 +48,20 @@ export function halfTrend(pubs: DashboardPublication[], r: YearRange) {
   return { first, second, a, b, change: a > 0 ? Math.round(((b - a) / a) * 100) : null };
 }
 
-/** Rank of a partner among all the partners of the structure, globally and in its country. */
+/**
+ * Rank of a partner among the partners of the structure of the same kind (foreign or French —
+ * a foreign university ranked among French labs and hospitals would read oddly), and in its country.
+ */
 export function partnerRank(source: DashboardPublication[], key: string) {
-  const catalog = buildPartnerCatalog(source);
+  const all = buildPartnerCatalog(source);
+  const entry = all.find((c) => c.key === key);
+  if (!entry) return null;
+  const catalog = all.filter((c) => c.scope === entry.scope);
   const i = catalog.findIndex((c) => c.key === key);
-  if (i < 0) return null;
-  const entry = catalog[i];
   const sameCountry = entry.countryCode ? catalog.filter((c) => c.countryCode === entry.countryCode) : [];
   return {
     name: entry.name,
+    scope: entry.scope,
     rank: i + 1,
     of: catalog.length,
     countryCode: entry.countryCode ?? null,
@@ -147,7 +151,9 @@ export function partnerKpiItems(dataset: DashboardDataset, range: YearRange, ctx
   const rank = key && ctx.source ? partnerRank(inRange(ctx.source.publications, range), key) : null;
   if (rank) {
     const country = rank.countryCode ? countryLabel(rank.countryCode, ctx.source!.countryNames) : null;
-    const rankHint = i18n._(msg`of ${fmt(rank.of)} partners`);
+    const rankHint = rank.scope === 'international'
+      ? i18n._(msg`of ${fmt(rank.of)} foreign partners`)
+      : i18n._(msg`of ${fmt(rank.of)} French partners`);
     items.push({
       key: 'rank',
       label: (ctx.filters.partnerKeys?.length ?? 0) > 1 ? i18n._(msg`Rank of ${rank.name}`) : i18n._(msg`Partner rank`),
@@ -159,17 +165,17 @@ export function partnerKpiItems(dataset: DashboardDataset, range: YearRange, ctx
   const researchers = new Set(pubs.flatMap((p) => p.authorIds));
   items.push({ key: 'researchers', label: i18n._(msg`Researchers involved`), value: fmt(researchers.size) });
 
-  const composite = dataset.publications.some((p) => p.sousStructures.length > 0);
-  const labsOf = (p: DashboardPublication) =>
-    composite ? p.sousStructures.filter(Boolean) : p.teams.filter((t) => t && t !== TEAM_UNKNOWN);
-  const labs = new Set(pubs.flatMap(labsOf));
-  const withoutLab = pubs.filter((p) => labsOf(p).length === 0).length;
-  items.push({
-    key: 'labs',
-    label: composite ? i18n._(msg`Labs involved`) : i18n._(msg`Teams involved`),
-    value: fmt(labs.size),
-    hint: withoutLab ? i18n._(msg`${fmt(withoutLab)} publications without identified lab`) : undefined,
-  });
+  const units = unitsOfDataset(dataset);
+  if (units.kind) {
+    const labs = new Set(pubs.flatMap(units.of));
+    const withoutLab = pubs.filter((p) => units.of(p).length === 0).length;
+    items.push({
+      key: 'labs',
+      label: units.kind === 'labs' ? i18n._(msg`Labs involved`) : i18n._(msg`Teams involved`),
+      value: fmt(labs.size),
+      hint: withoutLab ? i18n._(msg`${fmt(withoutLab)} publications without identified lab`) : undefined,
+    });
+  }
 
   const open = pubs.filter((p) => OPEN.has(p.oaStatus ?? '')).length;
   const openPct = pct(open, n);

@@ -57,6 +57,7 @@ import {
   aggregatePartnerBreakdown,
   buildPartnerCatalog,
   internalLabsOf,
+  unitsOfDataset,
 } from './collabAggregates';
 import { TEAM_UNKNOWN } from './structureAggregates';
 import { FranceMapChart } from './charts/FranceMapChart';
@@ -221,13 +222,17 @@ const usePartnerBreakdown = ({ dataset, range, filters }: EmbedChartProps) =>
       dataset.publications, range, keys, dataset.authors, buildPartnerCatalog(dataset.publications),
     );
   }, [dataset, range, filters?.partnerKeys]);
-/** Publications per member lab of a composite structure, plus those with no identified lab. */
+/**
+ * Publications per lab — member labs of a composite structure, or the labs of the authors in an
+ * institution export (unitsOfDataset) — plus those with no identified lab.
+ */
 const useLabRanking = ({ dataset, range }: EmbedChartProps) =>
   useMemo(() => {
+    const units = unitsOfDataset(dataset);
     const counts = new Map<string, number>();
     for (const p of dataset.publications) {
       if (typeof p.year !== 'number' || p.year < range.start || p.year > range.end) continue;
-      const labs = Array.from(new Set(p.sousStructures.filter(Boolean)));
+      const labs = units.of(p);
       for (const lab of labs.length ? labs : [TEAM_UNKNOWN]) counts.set(lab, (counts.get(lab) ?? 0) + 1);
     }
     return Array.from(counts.entries())

@@ -417,7 +417,7 @@ msgstr "Signature charter"
 
 #: components/DashboardPage.tsx:88
 #: components/dashboard/report/reportCatalog.ts:92
-#: components/dashboard/report/reportTables.ts:50
+#: components/dashboard/report/reportTables.ts:49
 msgid "Teams"
 msgstr "Teams"
 
@@ -1282,7 +1282,7 @@ msgid "{0}: ≈ €{1} — {2} publication(s)"
 msgstr "{0}: ≈ €{1} — {2} publication(s)"
 
 #: components/dashboard/ApcTab.tsx:175
-#: components/dashboard/embedRegistry.tsx:689
+#: components/dashboard/embedRegistry.tsx:694
 msgid "Total APC cost per year"
 msgstr "Total APC cost per year"
 
@@ -1302,7 +1302,7 @@ msgid "{0} publication(s) — total ≈ €{1}"
 msgstr "{0} publication(s) — total ≈ €{1}"
 
 #: components/dashboard/ApcTab.tsx:225
-#: components/dashboard/embedRegistry.tsx:703
+#: components/dashboard/embedRegistry.tsx:708
 msgid "Mean APC cost per journal"
 msgstr "Mean APC cost per journal"
 
@@ -1421,7 +1421,7 @@ msgstr "Export (CSV)"
 #: components/dashboard/ImpactTab.tsx:209
 #: components/dashboard/PublicationsListTab.tsx:278
 #: components/dashboard/PublicationsListTab.tsx:431
-#: components/dashboard/report/reportTables.ts:47
+#: components/dashboard/report/reportTables.ts:46
 msgid "Year"
 msgstr "Year"
 
@@ -1565,7 +1565,7 @@ msgstr "Export the APC list (CSV)"
 #: components/dashboard/ImpactTab.tsx:212
 #: components/dashboard/JournalsTab.tsx:201
 #: components/dashboard/PublicationsListTab.tsx:433
-#: components/dashboard/report/reportTables.ts:49
+#: components/dashboard/report/reportTables.ts:48
 msgid "Journal"
 msgstr "Journal"
 
@@ -1645,7 +1645,7 @@ msgstr "Title, DOI or journal…"
 #: components/dashboard/MediaSourcesAdmin.tsx:384
 #: components/dashboard/NewsTab.tsx:690
 #: components/dashboard/PublicationsListTab.tsx:432
-#: components/dashboard/report/reportTables.ts:48
+#: components/dashboard/report/reportTables.ts:47
 msgid "Title"
 msgstr "Title"
 
@@ -1674,26 +1674,26 @@ msgid "Axis assigned from OpenAlex topics and the keywords defined in the config
 msgstr "Axis assigned from OpenAlex topics and the keywords defined in the configuration (≥ 2 matches with a clear lead). Corrections entered below are saved in the Grist curation table and take precedence over the classification."
 
 #: components/dashboard/AxesTab.tsx:337
-#: components/dashboard/embedRegistry.tsx:562
 #: components/dashboard/embedRegistry.tsx:567
+#: components/dashboard/embedRegistry.tsx:572
 msgid "Breakdown by strategic axis"
 msgstr "Breakdown by strategic axis"
 
 #: components/dashboard/AxesTab.tsx:345
-#: components/dashboard/embedRegistry.tsx:575
 #: components/dashboard/embedRegistry.tsx:580
+#: components/dashboard/embedRegistry.tsx:585
 msgid "Publications by axis"
 msgstr "Publications by axis"
 
 #: components/dashboard/AxesTab.tsx:356
-#: components/dashboard/embedRegistry.tsx:590
 #: components/dashboard/embedRegistry.tsx:595
+#: components/dashboard/embedRegistry.tsx:600
 msgid "Yearly evolution by strategic axis"
 msgstr "Yearly evolution by strategic axis"
 
 #: components/dashboard/AxesTab.tsx:363
-#: components/dashboard/embedRegistry.tsx:604
 #: components/dashboard/embedRegistry.tsx:609
+#: components/dashboard/embedRegistry.tsx:614
 msgid "Publication types by strategic axis"
 msgstr "Publication types by strategic axis"
 
@@ -2310,8 +2310,8 @@ msgid "No chapter, monograph or edited book over the period."
 msgstr "No chapter, monograph or edited book over the period."
 
 #: components/dashboard/BooksTab.tsx:31
-#: components/dashboard/embedRegistry.tsx:351
-#: components/dashboard/embedRegistry.tsx:353
+#: components/dashboard/embedRegistry.tsx:356
+#: components/dashboard/embedRegistry.tsx:358
 msgid "Book types"
 msgstr "Book types"
 
@@ -2324,7 +2324,7 @@ msgid "threshold"
 msgstr "threshold"
 
 #: components/dashboard/CharteTab.tsx:71
-#: components/dashboard/embedRegistry.tsx:631
+#: components/dashboard/embedRegistry.tsx:636
 msgid "Distribution of compliance scores"
 msgstr "Distribution of compliance scores"
 
@@ -2346,7 +2346,7 @@ msgid "“Nantes Université” mention"
 msgstr "“Nantes Université” mention"
 
 #: components/dashboard/CharteTab.tsx:136
-#: components/dashboard/embedRegistry.tsx:642
+#: components/dashboard/embedRegistry.tsx:647
 msgid "Compliance rate per year"
 msgstr "Compliance rate per year"
 
@@ -2355,7 +2355,7 @@ msgid "Full compliance vs simple “Nantes Université” mention"
 msgstr "Full compliance vs simple “Nantes Université” mention"
 
 #: components/dashboard/CharteTab.tsx:187
-#: components/dashboard/embedRegistry.tsx:653
+#: components/dashboard/embedRegistry.tsx:658
 msgid "Presence rate by criterion"
 msgstr "Presence rate by criterion"
 
@@ -2371,7 +2371,7 @@ msgid "{0}: {1}% compliant ({2} analysable publications)"
 msgstr "{0}: {1}% compliant ({2} analysable publications)"
 
 #: components/dashboard/CharteTab.tsx:249
-#: components/dashboard/embedRegistry.tsx:664
+#: components/dashboard/embedRegistry.tsx:669
 msgid "Compliance rate by team"
 msgstr "Compliance rate by team"
 
@@ -2390,14 +2390,14 @@ msgstr "All"
 #: components/dashboard/CharteTab.tsx:341
 #: components/dashboard/CharteTab.tsx:569
 #: components/dashboard/CharteTab.tsx:573
-#: components/dashboard/embedRegistry.tsx:139
+#: components/dashboard/embedRegistry.tsx:140
 msgctxt "plural"
 msgid "Compliant"
 msgstr "Compliant"
 
 #: components/dashboard/CharteTab.tsx:342
 #: components/dashboard/CharteTab.tsx:570
-#: components/dashboard/embedRegistry.tsx:140
+#: components/dashboard/embedRegistry.tsx:141
 msgctxt "plural"
 msgid "Non-compliant"
 msgstr "Non-compliant"
@@ -2488,7 +2488,7 @@ msgid "⚠️ {0} publication(s) out of {1} without raw OpenAlex affiliation are
 msgstr "⚠️ {0} publication(s) out of {1} without raw OpenAlex affiliation are not analysed (BSO-only corpus)."
 
 #: components/dashboard/CharteTab.tsx:566
-#: components/dashboard/embedRegistry.tsx:136
+#: components/dashboard/embedRegistry.tsx:137
 msgid "Corpus compliance"
 msgstr "Corpus compliance"
 
@@ -2521,12 +2521,12 @@ msgid "No collaboration"
 msgstr "No collaboration"
 
 #: components/dashboard/CollaborationsTab.tsx:91
-#: components/dashboard/embedRegistry.tsx:780
+#: components/dashboard/embedRegistry.tsx:785
 msgid "Evolution of collaboration types"
 msgstr "Evolution of collaboration types"
 
 #: components/dashboard/CollaborationsTab.tsx:108
-#: components/dashboard/embedRegistry.tsx:770
+#: components/dashboard/embedRegistry.tsx:775
 msgid "Collaboration types"
 msgstr "Collaboration types"
 
@@ -2605,7 +2605,7 @@ msgstr "internal co-publications"
 
 #: components/dashboard/CollaborationsTab.tsx:333
 #: components/dashboard/CollaborationsTab.tsx:345
-#: components/dashboard/report/reportTables.ts:50
+#: components/dashboard/report/reportTables.ts:49
 msgid "Labs"
 msgstr "Labs"
 
@@ -2627,7 +2627,7 @@ msgid "Co-signing French institutions (outside Nantes Université) — <0>{0}</0
 msgstr "Co-signing French institutions (outside Nantes Université) — <0>{0}</0> publications with ≥ 1 national partner."
 
 #: components/dashboard/CollaborationsTab.tsx:367
-#: components/dashboard/embedRegistry.tsx:889
+#: components/dashboard/embedRegistry.tsx:894
 msgid "Most co-signing institutions"
 msgstr "Most co-signing institutions"
 
@@ -2642,7 +2642,7 @@ msgstr "About “{title}”"
 #: components/dashboard/NewsletterPanel.tsx:484
 #: components/dashboard/report/ReportWizard.tsx:261
 #: components/reports/AddToReportDialog.tsx:122
-#: components/reports/ChartPicker.tsx:59
+#: components/reports/ChartPicker.tsx:60
 #: components/reports/NewReportDialog.tsx:162
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/UnifiedAlignPage.tsx:603
@@ -2785,7 +2785,7 @@ msgid "publications"
 msgstr "publications"
 
 #: components/dashboard/FundersTab.tsx:81
-#: components/dashboard/embedRegistry.tsx:711
+#: components/dashboard/embedRegistry.tsx:716
 msgid "Main funders"
 msgstr "Main funders"
 
@@ -2794,7 +2794,7 @@ msgid "Number of publications acknowledging each funder · colour = category · 
 msgstr "Number of publications acknowledging each funder · colour = category · top 15"
 
 #: components/dashboard/FundersTab.tsx:131
-#: components/dashboard/embedRegistry.tsx:715
+#: components/dashboard/embedRegistry.tsx:720
 msgid "Breakdown by funder category"
 msgstr "Breakdown by funder category"
 
@@ -2814,7 +2814,7 @@ msgid "funded publications"
 msgstr "funded publications"
 
 #: components/dashboard/FundersTab.tsx:186
-#: components/dashboard/embedRegistry.tsx:719
+#: components/dashboard/embedRegistry.tsx:724
 msgid "Funded publications per year"
 msgstr "Funded publications per year"
 
@@ -2823,7 +2823,7 @@ msgid "Bars = publications acknowledging ≥ 1 funder · label = share of the ye
 msgstr "Bars = publications acknowledging ≥ 1 funder · label = share of the year's corpus"
 
 #: components/dashboard/FundersTab.tsx:227
-#: components/dashboard/embedRegistry.tsx:723
+#: components/dashboard/embedRegistry.tsx:728
 msgid "Breakdown of funders by lab"
 msgstr "Breakdown of funders by lab"
 
@@ -3001,7 +3001,7 @@ msgid "Explore further"
 msgstr "Explore further"
 
 #: components/dashboard/JournalsTab.tsx:60
-#: components/dashboard/embedRegistry.tsx:675
+#: components/dashboard/embedRegistry.tsx:680
 msgid "Publications by access category"
 msgstr "Publications by access category"
 
@@ -3013,7 +3013,7 @@ msgid "{0}: {1}% accessible ({2} journal publications)"
 msgstr "{0}: {1}% accessible ({2} journal publications)"
 
 #: components/dashboard/JournalsTab.tsx:111
-#: components/dashboard/embedRegistry.tsx:682
+#: components/dashboard/embedRegistry.tsx:687
 msgid "Share of publications accessible at NU per year"
 msgstr "Share of publications accessible at NU per year"
 
@@ -3117,8 +3117,8 @@ msgid "Unranked (FNEGE)"
 msgstr "Unranked (FNEGE)"
 
 #: components/dashboard/JournalsTab.tsx:402
-#: components/dashboard/embedRegistry.tsx:498
 #: components/dashboard/embedRegistry.tsx:503
+#: components/dashboard/embedRegistry.tsx:508
 msgid "Journal access at Nantes Université"
 msgstr "Journal access at Nantes Université"
 
@@ -3811,8 +3811,8 @@ msgstr "1 active filter"
 #: components/dashboard/PublicationsListTab.tsx:290
 #: components/dashboard/benchmarkAggregates.ts:280
 #: components/dashboard/charts/OpenAccessDonutChart.tsx:55
-#: components/dashboard/embedRegistry.tsx:254
-#: components/dashboard/partnerKpis.ts:176
+#: components/dashboard/embedRegistry.tsx:259
+#: components/dashboard/partnerKpis.ts:182
 msgid "Open access"
 msgstr "Open access"
 
@@ -4265,8 +4265,8 @@ msgid "{0, plural, one {# publication excluded} other {# publications excluded}}
 msgstr "{0, plural, one {# publication excluded} other {# publications excluded}}"
 
 #: components/dashboard/PartnerBreakdownSection.tsx:119
-#: components/dashboard/embedRegistry.tsx:900
 #: components/dashboard/embedRegistry.tsx:905
+#: components/dashboard/embedRegistry.tsx:910
 msgid "Co-publications by university"
 msgstr "Co-publications by university"
 
@@ -4275,8 +4275,8 @@ msgid "Click a bar for details"
 msgstr "Click a bar for details"
 
 #: components/dashboard/PartnerBreakdownSection.tsx:133
-#: components/dashboard/embedRegistry.tsx:916
-#: components/dashboard/embedRegistry.tsx:919
+#: components/dashboard/embedRegistry.tsx:921
+#: components/dashboard/embedRegistry.tsx:924
 msgid "Yearly trend by university"
 msgstr "Yearly trend by university"
 
@@ -4341,8 +4341,8 @@ msgid "No PhD student publication identified: this tab requires a staff file (wi
 msgstr "No PhD student publication identified: this tab requires a staff file (with the “doctorant” type) matched to authors in druid-biblio."
 
 #: components/dashboard/PhdTab.tsx:39
-#: components/dashboard/embedRegistry.tsx:410
-#: components/dashboard/embedRegistry.tsx:418
+#: components/dashboard/embedRegistry.tsx:415
+#: components/dashboard/embedRegistry.tsx:423
 msgid "PhD students by team"
 msgstr "PhD students by team"
 
@@ -4351,14 +4351,14 @@ msgid "Publications involving at least one PhD student"
 msgstr "Publications involving at least one PhD student"
 
 #: components/dashboard/PhdTab.tsx:48
-#: components/dashboard/embedRegistry.tsx:426
-#: components/dashboard/embedRegistry.tsx:434
+#: components/dashboard/embedRegistry.tsx:431
+#: components/dashboard/embedRegistry.tsx:439
 msgid "Evolution of PhD student publications"
 msgstr "Evolution of PhD student publications"
 
 #: components/dashboard/PhdTab.tsx:56
-#: components/dashboard/embedRegistry.tsx:442
-#: components/dashboard/embedRegistry.tsx:450
+#: components/dashboard/embedRegistry.tsx:447
+#: components/dashboard/embedRegistry.tsx:455
 msgid "Publications per PhD student"
 msgstr "Publications per PhD student"
 
@@ -4483,8 +4483,8 @@ msgstr "Team(s): {teams}"
 
 #: components/dashboard/ResearchersTab.tsx:92
 #: components/dashboard/ResearchersTab.tsx:188
-#: components/dashboard/embedRegistry.tsx:460
-#: components/dashboard/embedRegistry.tsx:468
+#: components/dashboard/embedRegistry.tsx:465
+#: components/dashboard/embedRegistry.tsx:473
 msgid "Most prolific researchers"
 msgstr "Most prolific researchers"
 
@@ -4566,8 +4566,8 @@ msgid "still to be harvested on the CRISalid side"
 msgstr "still to be harvested on the CRISalid side"
 
 #: components/dashboard/SourcesTab.tsx:71
-#: components/dashboard/embedRegistry.tsx:943
-#: components/dashboard/embedRegistry.tsx:946
+#: components/dashboard/embedRegistry.tsx:948
+#: components/dashboard/embedRegistry.tsx:951
 msgid "Main source of records"
 msgstr "Main source of records"
 
@@ -4576,8 +4576,8 @@ msgid "“winning” source of the merge (priority CRISalid > BSO > OpenAlex > H
 msgstr "“winning” source of the merge (priority CRISalid > BSO > OpenAlex > HAL)"
 
 #: components/dashboard/SourcesTab.tsx:77
-#: components/dashboard/embedRegistry.tsx:953
-#: components/dashboard/embedRegistry.tsx:956
+#: components/dashboard/embedRegistry.tsx:958
+#: components/dashboard/embedRegistry.tsx:961
 msgid "Overlaps between sources"
 msgstr "Overlaps between sources"
 
@@ -4590,13 +4590,13 @@ msgid "source combinations in which each publication was seen"
 msgstr "source combinations in which each publication was seen"
 
 #: components/dashboard/SourcesTab.tsx:90
-#: components/dashboard/embedRegistry.tsx:968
+#: components/dashboard/embedRegistry.tsx:973
 msgid "Coverage by year"
 msgstr "Coverage by year"
 
 #: components/dashboard/SourcesTab.tsx:95
-#: components/dashboard/embedRegistry.tsx:975
-#: components/dashboard/embedRegistry.tsx:978
+#: components/dashboard/embedRegistry.tsx:980
+#: components/dashboard/embedRegistry.tsx:983
 msgid "Sub-sources of the CRISalid harvester"
 msgstr "Sub-sources of the CRISalid harvester"
 
@@ -4605,8 +4605,8 @@ msgid "a publication may count in several harvested sources"
 msgstr "a publication may count in several harvested sources"
 
 #: components/dashboard/SourcesTab.tsx:101
-#: components/dashboard/embedRegistry.tsx:985
-#: components/dashboard/embedRegistry.tsx:988
+#: components/dashboard/embedRegistry.tsx:990
+#: components/dashboard/embedRegistry.tsx:993
 msgid "OpenAlex diagnosis of harvester records"
 msgstr "OpenAlex diagnosis of harvester records"
 
@@ -4731,8 +4731,8 @@ msgid "The publications of this structure are not yet matched to teams — only 
 msgstr "The publications of this structure are not yet matched to teams — only the member list is available."
 
 #: components/dashboard/TeamsTab.tsx:485
-#: components/dashboard/embedRegistry.tsx:365
-#: components/dashboard/embedRegistry.tsx:368
+#: components/dashboard/embedRegistry.tsx:370
+#: components/dashboard/embedRegistry.tsx:373
 msgid "Breakdown by team"
 msgstr "Breakdown by team"
 
@@ -4741,14 +4741,14 @@ msgid "A publication counts in each of its teams"
 msgstr "A publication counts in each of its teams"
 
 #: components/dashboard/TeamsTab.tsx:494
-#: components/dashboard/embedRegistry.tsx:375
-#: components/dashboard/embedRegistry.tsx:377
+#: components/dashboard/embedRegistry.tsx:380
+#: components/dashboard/embedRegistry.tsx:382
 msgid "Evolution by team"
 msgstr "Evolution by team"
 
 #: components/dashboard/TeamsTab.tsx:502
-#: components/dashboard/embedRegistry.tsx:381
-#: components/dashboard/embedRegistry.tsx:383
+#: components/dashboard/embedRegistry.tsx:386
+#: components/dashboard/embedRegistry.tsx:388
 msgid "Types by team"
 msgstr "Types by team"
 
@@ -4822,7 +4822,7 @@ msgid "Multidisciplinary universities with health"
 msgstr "Multidisciplinary universities with health"
 
 #: components/dashboard/charts/BooksByYearChart.tsx:55
-#: components/dashboard/embedRegistry.tsx:357
+#: components/dashboard/embedRegistry.tsx:362
 msgid "Books per year"
 msgstr "Books per year"
 
@@ -4831,7 +4831,7 @@ msgid "Countries:"
 msgstr "Countries:"
 
 #: components/dashboard/charts/CountryEvolutionChart.tsx:88
-#: components/dashboard/embedRegistry.tsx:860
+#: components/dashboard/embedRegistry.tsx:865
 msgid "Evolution of the main partner countries"
 msgstr "Evolution of the main partner countries"
 
@@ -4840,7 +4840,7 @@ msgid "Shared publications per year, for the main countries (excluding France)"
 msgstr "Shared publications per year, for the main countries (excluding France)"
 
 #: components/dashboard/charts/CountryHeatmapChart.tsx:64
-#: components/dashboard/embedRegistry.tsx:285
+#: components/dashboard/embedRegistry.tsx:290
 msgid "Partner countries by year"
 msgstr "Partner countries by year"
 
@@ -4855,12 +4855,12 @@ msgid "Outside EU"
 msgstr "Outside EU"
 
 #: components/dashboard/charts/EuByYearChart.tsx:59
-#: components/dashboard/embedRegistry.tsx:300
+#: components/dashboard/embedRegistry.tsx:305
 msgid "EU / outside EU by year"
 msgstr "EU / outside EU by year"
 
 #: components/dashboard/charts/EuZoneChart.tsx:34
-#: components/dashboard/embedRegistry.tsx:296
+#: components/dashboard/embedRegistry.tsx:301
 msgid "European Union / outside EU"
 msgstr "European Union / outside EU"
 
@@ -4881,7 +4881,7 @@ msgid "origin"
 msgstr "origin"
 
 #: components/dashboard/charts/FlowMapChart.tsx:98
-#: components/dashboard/embedRegistry.tsx:271
+#: components/dashboard/embedRegistry.tsx:276
 msgid "Partnership flow map"
 msgstr "Partnership flow map"
 
@@ -4894,7 +4894,7 @@ msgid "Loading the map…"
 msgstr "Loading the map…"
 
 #: components/dashboard/charts/FranceMapChart.tsx:78
-#: components/dashboard/embedRegistry.tsx:850
+#: components/dashboard/embedRegistry.tsx:855
 msgid "Map of French partner institutions"
 msgstr "Map of French partner institutions"
 
@@ -4907,7 +4907,7 @@ msgid "World average (1.0)"
 msgstr "World average (1.0)"
 
 #: components/dashboard/charts/FwciHistogramChart.tsx:61
-#: components/dashboard/embedRegistry.tsx:337
+#: components/dashboard/embedRegistry.tsx:342
 msgid "FWCI distribution"
 msgstr "FWCI distribution"
 
@@ -4946,12 +4946,12 @@ msgid "International share"
 msgstr "International share"
 
 #: components/dashboard/charts/IntlPercentChart.tsx:52
-#: components/dashboard/embedRegistry.tsx:263
+#: components/dashboard/embedRegistry.tsx:268
 msgid "Share of international publications"
 msgstr "Share of international publications"
 
 #: components/dashboard/charts/IntlVsNationalChart.tsx:48
-#: components/dashboard/embedRegistry.tsx:259
+#: components/dashboard/embedRegistry.tsx:264
 msgid "International vs national"
 msgstr "International vs national"
 
@@ -4965,7 +4965,7 @@ msgid "Other"
 msgstr "Other"
 
 #: components/dashboard/charts/LanguageDonutChart.tsx:52
-#: components/dashboard/embedRegistry.tsx:246
+#: components/dashboard/embedRegistry.tsx:251
 msgid "Publication languages"
 msgstr "Publication languages"
 
@@ -4982,7 +4982,7 @@ msgid "{name} ({labs}): {count} publications"
 msgstr "{name} ({labs}): {count} publications"
 
 #: components/dashboard/charts/NetworkChart.tsx:137
-#: components/dashboard/embedRegistry.tsx:478
+#: components/dashboard/embedRegistry.tsx:483
 msgid "Co-authorship network"
 msgstr "Co-authorship network"
 
@@ -5004,12 +5004,12 @@ msgid "Undetermined"
 msgstr "Undetermined"
 
 #: components/dashboard/charts/PublicationTypesChart.tsx:52
-#: components/dashboard/embedRegistry.tsx:250
+#: components/dashboard/embedRegistry.tsx:255
 msgid "Publication types"
 msgstr "Publication types"
 
 #: components/dashboard/charts/QuartileChart.tsx:53
-#: components/dashboard/embedRegistry.tsx:329
+#: components/dashboard/embedRegistry.tsx:334
 msgid "Scimago quartiles (SJR)"
 msgstr "Scimago quartiles (SJR)"
 
@@ -5018,7 +5018,7 @@ msgid "Publications in ranked journals (known quartile)"
 msgstr "Publications in ranked journals (known quartile)"
 
 #: components/dashboard/charts/SankeyChart.tsx:49
-#: components/dashboard/embedRegistry.tsx:308
+#: components/dashboard/embedRegistry.tsx:313
 msgid "Flows team → country → organisation"
 msgstr "Flows team → country → organisation"
 
@@ -5027,7 +5027,7 @@ msgid "Main foreign partner organisations"
 msgstr "Main foreign partner organisations"
 
 #: components/dashboard/charts/SunburstChart.tsx:46
-#: components/dashboard/embedRegistry.tsx:318
+#: components/dashboard/embedRegistry.tsx:323
 msgid "Breakdown of partnerships"
 msgstr "Breakdown of partnerships"
 
@@ -5037,7 +5037,7 @@ msgstr "Team / country / organisation (main foreign organisations)"
 
 #: components/dashboard/charts/TeamCharts.tsx:229
 #: components/dashboard/charts/TeamCharts.tsx:329
-#: components/dashboard/embedRegistry.tsx:387
+#: components/dashboard/embedRegistry.tsx:392
 msgid "Disciplinary profile of teams"
 msgstr "Disciplinary profile of teams"
 
@@ -5046,7 +5046,7 @@ msgid "Share of publications by OpenAlex subfield"
 msgstr "Share of publications by OpenAlex subfield"
 
 #: components/dashboard/charts/TeamOrgNetworkChart.tsx:59
-#: components/dashboard/embedRegistry.tsx:871
+#: components/dashboard/embedRegistry.tsx:876
 msgid "Network teams ↔ foreign organisations"
 msgstr "Network teams ↔ foreign organisations"
 
@@ -5055,7 +5055,7 @@ msgid "Main partner organisations; square = organisation, circle = team"
 msgstr "Main partner organisations; square = organisation, circle = team"
 
 #: components/dashboard/charts/TopByYearChart.tsx:52
-#: components/dashboard/embedRegistry.tsx:333
+#: components/dashboard/embedRegistry.tsx:338
 msgid "Top 1% / 10% publications"
 msgstr "Top 1% / 10% publications"
 
@@ -5064,7 +5064,7 @@ msgid "Most cited publications in their field (OpenAlex)"
 msgstr "Most cited publications in their field (OpenAlex)"
 
 #: components/dashboard/charts/TopCountriesChart.tsx:50
-#: components/dashboard/embedRegistry.tsx:281
+#: components/dashboard/embedRegistry.tsx:286
 msgid "Top partner countries"
 msgstr "Top partner countries"
 
@@ -5087,7 +5087,7 @@ msgid "100% open access"
 msgstr "100% open access"
 
 #: components/dashboard/charts/TopJournalsChart.tsx:102
-#: components/dashboard/embedRegistry.tsx:491
+#: components/dashboard/embedRegistry.tsx:496
 msgid "Most frequent journals"
 msgstr "Most frequent journals"
 
@@ -5096,7 +5096,7 @@ msgid "Colour ∝ share of the journal's publications in open access"
 msgstr "Colour ∝ share of the journal's publications in open access"
 
 #: components/dashboard/charts/TopPartnersChart.tsx:52
-#: components/dashboard/embedRegistry.tsx:304
+#: components/dashboard/embedRegistry.tsx:309
 msgid "Top partner organisations"
 msgstr "Top partner organisations"
 
@@ -5105,7 +5105,7 @@ msgid "Co-signing foreign organisations (number of publications)"
 msgstr "Co-signing foreign organisations (number of publications)"
 
 #: components/dashboard/charts/WorldChoroplethChart.tsx:63
-#: components/dashboard/embedRegistry.tsx:267
+#: components/dashboard/embedRegistry.tsx:272
 msgid "Map of partner countries"
 msgstr "Map of partner countries"
 
@@ -5114,144 +5114,144 @@ msgid "Number of co-signed publications by country (France excluded)"
 msgstr "Number of co-signed publications by country (France excluded)"
 
 #: components/dashboard/charts/YearlyEvolutionChart.tsx:54
-#: components/dashboard/embedRegistry.tsx:242
+#: components/dashboard/embedRegistry.tsx:247
 msgid "Publications per year"
 msgstr "Publications per year"
 
-#: components/dashboard/embedRegistry.tsx:234
+#: components/dashboard/embedRegistry.tsx:239
 msgid "No lab identified"
 msgstr "No lab identified"
 
-#: components/dashboard/embedRegistry.tsx:341
+#: components/dashboard/embedRegistry.tsx:346
 msgid "Mean FWCI by sub-structure"
 msgstr "Mean FWCI by sub-structure"
 
-#: components/dashboard/embedRegistry.tsx:342
+#: components/dashboard/embedRegistry.tsx:347
 msgid "Top 1% / 10% by sub-structure"
 msgstr "Top 1% / 10% by sub-structure"
 
-#: components/dashboard/embedRegistry.tsx:344
+#: components/dashboard/embedRegistry.tsx:349
 msgid "Mean FWCI by team"
 msgstr "Mean FWCI by team"
 
-#: components/dashboard/embedRegistry.tsx:344
+#: components/dashboard/embedRegistry.tsx:349
 msgid "Top 1% / 10% by team"
 msgstr "Top 1% / 10% by team"
 
-#: components/dashboard/embedRegistry.tsx:346
+#: components/dashboard/embedRegistry.tsx:351
 msgid "Mean FWCI by researcher"
 msgstr "Mean FWCI by researcher"
 
-#: components/dashboard/embedRegistry.tsx:347
+#: components/dashboard/embedRegistry.tsx:352
 msgid "Top 1% / 10% by researcher"
 msgstr "Top 1% / 10% by researcher"
 
-#: components/dashboard/embedRegistry.tsx:398
+#: components/dashboard/embedRegistry.tsx:403
 msgid "Disciplinary heatmap of teams"
 msgstr "Disciplinary heatmap of teams"
 
-#: components/dashboard/embedRegistry.tsx:516
 #: components/dashboard/embedRegistry.tsx:521
+#: components/dashboard/embedRegistry.tsx:526
 msgid "Main keywords"
 msgstr "Main keywords"
 
-#: components/dashboard/embedRegistry.tsx:531
 #: components/dashboard/embedRegistry.tsx:536
+#: components/dashboard/embedRegistry.tsx:541
 msgid "Main subfields"
 msgstr "Main subfields"
 
-#: components/dashboard/embedRegistry.tsx:546
 #: components/dashboard/embedRegistry.tsx:551
+#: components/dashboard/embedRegistry.tsx:556
 msgid "OpenAlex domains"
 msgstr "OpenAlex domains"
 
-#: components/dashboard/embedRegistry.tsx:552
+#: components/dashboard/embedRegistry.tsx:557
 msgid "A publication may belong to several domains"
 msgstr "A publication may belong to several domains"
 
-#: components/dashboard/embedRegistry.tsx:618
+#: components/dashboard/embedRegistry.tsx:623
 msgid "Corpus compliance (signature charter)"
 msgstr "Corpus compliance (signature charter)"
 
-#: components/dashboard/embedRegistry.tsx:696
+#: components/dashboard/embedRegistry.tsx:701
 msgid "Elsevier APCs by lab"
 msgstr "Elsevier APCs by lab"
 
-#: components/dashboard/embedRegistry.tsx:733
-#: components/dashboard/embedRegistry.tsx:740
+#: components/dashboard/embedRegistry.tsx:738
+#: components/dashboard/embedRegistry.tsx:745
 msgid "Internal co-publications per year"
 msgstr "Internal co-publications per year"
 
-#: components/dashboard/embedRegistry.tsx:745
-#: components/dashboard/embedRegistry.tsx:752
+#: components/dashboard/embedRegistry.tsx:750
+#: components/dashboard/embedRegistry.tsx:757
 msgid "Co-publications with NU labs per year"
 msgstr "Co-publications with NU labs per year"
 
-#: components/dashboard/embedRegistry.tsx:757
-#: components/dashboard/embedRegistry.tsx:764
+#: components/dashboard/embedRegistry.tsx:762
+#: components/dashboard/embedRegistry.tsx:769
 msgid "National co-publications per year"
 msgstr "National co-publications per year"
 
-#: components/dashboard/embedRegistry.tsx:776
+#: components/dashboard/embedRegistry.tsx:781
 msgid "Broadest category per publication"
 msgstr "Broadest category per publication"
 
-#: components/dashboard/embedRegistry.tsx:790
+#: components/dashboard/embedRegistry.tsx:795
 msgid "Domains of internal co-publications"
 msgstr "Domains of internal co-publications"
 
-#: components/dashboard/embedRegistry.tsx:794
+#: components/dashboard/embedRegistry.tsx:799
 msgid "Subfields of internal co-publications"
 msgstr "Subfields of internal co-publications"
 
-#: components/dashboard/embedRegistry.tsx:798
+#: components/dashboard/embedRegistry.tsx:803
 msgid "Internal collaboration topics by lab"
 msgstr "Internal collaboration topics by lab"
 
-#: components/dashboard/embedRegistry.tsx:802
+#: components/dashboard/embedRegistry.tsx:807
 msgid "Domains of co-publications with NU labs"
 msgstr "Domains of co-publications with NU labs"
 
-#: components/dashboard/embedRegistry.tsx:806
+#: components/dashboard/embedRegistry.tsx:811
 msgid "Subfields of co-publications with NU labs"
 msgstr "Subfields of co-publications with NU labs"
 
-#: components/dashboard/embedRegistry.tsx:810
+#: components/dashboard/embedRegistry.tsx:815
 msgid "Collaboration topics with NU labs"
 msgstr "Collaboration topics with NU labs"
 
-#: components/dashboard/embedRegistry.tsx:814
+#: components/dashboard/embedRegistry.tsx:819
 msgid "Most co-signing labs of the structure"
 msgstr "Most co-signing labs of the structure"
 
-#: components/dashboard/embedRegistry.tsx:822
+#: components/dashboard/embedRegistry.tsx:827
 msgid "Most co-signing labs (within the structure)"
 msgstr "Most co-signing labs (within the structure)"
 
-#: components/dashboard/embedRegistry.tsx:832
-#: components/dashboard/embedRegistry.tsx:840
+#: components/dashboard/embedRegistry.tsx:837
+#: components/dashboard/embedRegistry.tsx:845
 msgid "Most co-signing Nantes Université labs"
 msgstr "Most co-signing Nantes Université labs"
 
-#: components/dashboard/embedRegistry.tsx:881
+#: components/dashboard/embedRegistry.tsx:886
 msgid "Most co-signing French institutions"
 msgstr "Most co-signing French institutions"
 
-#: components/dashboard/embedRegistry.tsx:906
+#: components/dashboard/embedRegistry.tsx:911
 msgid "A publication co-signed by several of them counts for each"
 msgstr "A publication co-signed by several of them counts for each"
 
-#: components/dashboard/embedRegistry.tsx:926
 #: components/dashboard/embedRegistry.tsx:931
-#: components/dashboard/partnerKpis.ts:169
+#: components/dashboard/embedRegistry.tsx:936
+#: components/dashboard/partnerKpis.ts:174
 msgid "Labs involved"
 msgstr "Labs involved"
 
-#: components/dashboard/embedRegistry.tsx:932
+#: components/dashboard/embedRegistry.tsx:937
 msgid "Publications per member lab (a co-signed publication counts for each lab)"
 msgstr "Publications per member lab (a co-signed publication counts for each lab)"
 
-#: components/dashboard/embedRegistry.tsx:965
+#: components/dashboard/embedRegistry.tsx:970
 msgid "Source coverage by year"
 msgstr "Source coverage by year"
 
@@ -5294,7 +5294,7 @@ msgid "staff not matched"
 msgstr "staff not matched"
 
 #: components/dashboard/kpiItems.ts:90
-#: components/dashboard/partnerKpis.ts:212
+#: components/dashboard/partnerKpis.ts:218
 msgid "Known FWCI"
 msgstr "Known FWCI"
 
@@ -5433,73 +5433,78 @@ msgstr "Outreach"
 msgid "Institutional"
 msgstr "Institutional"
 
-#: components/dashboard/partnerKpis.ts:132
+#: components/dashboard/partnerKpis.ts:136
 msgid "Co-publications"
 msgstr "Co-publications"
 
-#: components/dashboard/partnerKpis.ts:140
+#: components/dashboard/partnerKpis.ts:144
 msgid "Trend"
 msgstr "Trend"
 
 #. placeholder {0}: fmt(rank.of)
-#: components/dashboard/partnerKpis.ts:150
-msgid "of {0} partners"
-msgstr "of {0} partners"
+#: components/dashboard/partnerKpis.ts:155
+msgid "of {0} foreign partners"
+msgstr "of {0} foreign partners"
+
+#. placeholder {0}: fmt(rank.of)
+#: components/dashboard/partnerKpis.ts:156
+msgid "of {0} French partners"
+msgstr "of {0} French partners"
 
 #. placeholder {0}: rank.name
-#: components/dashboard/partnerKpis.ts:153
+#: components/dashboard/partnerKpis.ts:159
 msgid "Rank of {0}"
 msgstr "Rank of {0}"
 
-#: components/dashboard/partnerKpis.ts:153
+#: components/dashboard/partnerKpis.ts:159
 msgid "Partner rank"
 msgstr "Partner rank"
 
 #. placeholder {0}: rank.countryRank
-#: components/dashboard/partnerKpis.ts:155
+#: components/dashboard/partnerKpis.ts:161
 msgid "{0} in {country}"
 msgstr "{0} in {country}"
 
-#: components/dashboard/partnerKpis.ts:160
+#: components/dashboard/partnerKpis.ts:166
 msgid "Researchers involved"
 msgstr "Researchers involved"
 
-#: components/dashboard/partnerKpis.ts:169
+#: components/dashboard/partnerKpis.ts:174
 msgid "Teams involved"
 msgstr "Teams involved"
 
 #. placeholder {0}: fmt(withoutLab)
-#: components/dashboard/partnerKpis.ts:171
+#: components/dashboard/partnerKpis.ts:176
 msgid "{0} publications without identified lab"
 msgstr "{0} publications without identified lab"
 
-#: components/dashboard/partnerKpis.ts:183
+#: components/dashboard/partnerKpis.ts:189
 msgid "Large collaborations"
 msgstr "Large collaborations"
 
 #. placeholder {0}: fmt(large)
-#: components/dashboard/partnerKpis.ts:185
+#: components/dashboard/partnerKpis.ts:191
 msgid "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
 msgstr "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
 
-#: components/dashboard/partnerKpis.ts:196
+#: components/dashboard/partnerKpis.ts:202
 msgid "reference: {text}"
 msgstr "reference: {text}"
 
-#: components/dashboard/partnerKpis.ts:200
+#: components/dashboard/partnerKpis.ts:206
 msgid "Median FWCI"
 msgstr "Median FWCI"
 
-#: components/dashboard/partnerKpis.ts:206
+#: components/dashboard/partnerKpis.ts:212
 msgid "Top 10% share"
 msgstr "Top 10% share"
 
 #. placeholder {0}: Math.round(c.coverage * 100)
-#: components/dashboard/partnerKpis.ts:215
+#: components/dashboard/partnerKpis.ts:221
 msgid "{0}% compared with the reference"
 msgstr "{0}% compared with the reference"
 
-#: components/dashboard/partnerKpis.ts:216
+#: components/dashboard/partnerKpis.ts:222
 msgid "reference too thin"
 msgstr "reference too thin"
 
@@ -7313,15 +7318,19 @@ msgstr "needs signature charter scores"
 msgid "needs at least 2 partner institutions in the report filters"
 msgstr "needs at least 2 partner institutions in the report filters"
 
-#: components/reports/ChartPicker.tsx:58
+#: components/reports/ChartPicker.tsx:22
+msgid "needs the labs of the publications"
+msgstr "needs the labs of the publications"
+
+#: components/reports/ChartPicker.tsx:59
 msgid "Add a chart"
 msgstr "Add a chart"
 
-#: components/reports/ChartPicker.tsx:70
+#: components/reports/ChartPicker.tsx:71
 msgid "Search a chart…"
 msgstr "Search a chart…"
 
-#: components/reports/ChartPicker.tsx:99
+#: components/reports/ChartPicker.tsx:100
 msgid "No chart matches."
 msgstr "No chart matches."
 

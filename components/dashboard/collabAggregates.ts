@@ -182,6 +182,27 @@ export function hasSubStructures(pubs: DashboardPublication[]): boolean {
   return pubs.some((p) => p.sousStructures.length > 0);
 }
 
+/**
+ * Internal units of a publication, whatever the kind of dashboard (plan-mes-rapports lot 7):
+ * - composite structure: its member labs (sousStructures);
+ * - lab: its teams;
+ * - institution (univ-nantes): neither is filled on the publications — the labs come from the
+ *   authors (AuthorMeta.teams = labs of the author in an institution export, lot 0 of
+ *   docs/archive/plan-collab-consortium.md).
+ * `kind` says how to call them ('labs' or 'teams'); null when nothing is known.
+ */
+export function unitsOfDataset(dataset: { publications: DashboardPublication[]; authors: AuthorMeta[] }): {
+  kind: 'labs' | 'teams' | null;
+  of: (p: DashboardPublication) => string[];
+} {
+  const known = (xs: string[]) => Array.from(new Set(xs.filter((x) => x && x !== TEAM_UNKNOWN)));
+  if (hasSubStructures(dataset.publications)) return { kind: 'labs', of: (p) => known(p.sousStructures) };
+  if (dataset.publications.some((p) => known(p.teams).length > 0)) return { kind: 'teams', of: (p) => known(p.teams) };
+  const teamsById = new Map(dataset.authors.map((a) => [a.id, a.teams]));
+  if (!dataset.authors.some((a) => known(a.teams).length > 0)) return { kind: null, of: () => [] };
+  return { kind: 'labs', of: (p) => known(p.authorIds.flatMap((id) => teamsById.get(id) ?? [])) };
+}
+
 // ── National collaborations (French institutions outside NU) ──────────────────
 
 export interface NationalCollabAggregates {

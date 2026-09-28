@@ -7,7 +7,7 @@
 // ⚠️ Keep the keys in sync with EMBEDDABLE_IDS (embedIds.ts) — checked by
 // lib/__tests__/reportScope.test.ts.
 
-import { hasSubStructures } from './collabAggregates';
+import { hasSubStructures, unitsOfDataset } from './collabAggregates';
 import type { PubFilters } from './publicationFilters';
 import { TEAM_UNKNOWN } from './structureAggregates';
 import type { DashboardDataset } from './types';
@@ -29,6 +29,11 @@ export type DatasetFeature =
   | 'journalAccess'
   /** Signature charter scores. */
   | 'charte'
+  /**
+   * Labs known for the publications: member labs of a composite structure, or the labs of the
+   * authors in an institution export (unitsOfDataset).
+   */
+  | 'labs'
   /**
    * Not a dataset property: the block filters name a group of at least 2 partner institutions
    * (partnerKeys) — the per-university breakdown needs it (scopeFeatures).
@@ -171,7 +176,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   'equipes-repartition': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
   'equipes-evolution': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
   'equipes-types': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
-  'labos-classement': { tab: 'teams', requires: ['composite'], trivialUnder: ['sousStructure'] },
+  'labos-classement': { tab: 'teams', requires: ['labs'], trivialUnder: ['sousStructure'] },
   'radar-disciplinaire': { tab: 'teams', requires: ['teams'], params: [LEVEL_PARAM] },
   'heatmap-disciplinaire': { tab: 'teams', requires: ['teams'], params: [LEVEL_PARAM] },
   'doctorants-repartition': { tab: 'phd', requires: ['phd'] },
@@ -201,6 +206,7 @@ export function datasetFeatures(dataset: DashboardDataset): Set<DatasetFeature> 
   if (pubs.some((p) => p.hasPhd)) out.add('phd');
   if (pubs.some((p) => p.journalAccess != null)) out.add('journalAccess');
   if (pubs.some((p) => p.charte?.score != null)) out.add('charte');
+  if (unitsOfDataset(dataset).kind === 'labs') out.add('labs');
   return out;
 }
 

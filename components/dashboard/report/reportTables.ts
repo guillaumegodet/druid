@@ -5,7 +5,7 @@
 import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { YearRange } from '../overviewAggregates';
-import { TEAM_UNKNOWN } from '../structureAggregates';
+import { unitsOfDataset } from '../collabAggregates';
 import type { DashboardDataset } from '../types';
 
 export interface TableColumn {
@@ -35,19 +35,18 @@ export const REPORT_TABLES: Record<string, ReportTable> = {
   publications: {
     label: msg`List of publications`,
     build: (dataset, range, limit) => {
-      const composite = dataset.publications.some((p) => p.sousStructures.length > 0);
+      const units = unitsOfDataset(dataset);
       const pubs = dataset.publications
         .filter((p) => typeof p.year === 'number' && p.year >= range.start && p.year <= range.end)
         .sort((a, b) => (b.year ?? 0) - (a.year ?? 0) || (a.title ?? '').localeCompare(b.title ?? ''));
       const shown = pubs.slice(0, limit);
-      const labsOf = (p: (typeof pubs)[number]) =>
-        (composite ? p.sousStructures : p.teams).filter((t) => t && t !== TEAM_UNKNOWN).join(', ');
+      const labsOf = (p: (typeof pubs)[number]) => units.of(p).join(', ');
       return {
         columns: [
           { label: msg`Year`, width: 8 },
           { label: msg`Title`, width: 50 },
           { label: msg`Journal`, width: 24 },
-          { label: composite ? msg`Labs` : msg`Teams`, width: 18 },
+          { label: units.kind === 'teams' ? msg`Teams` : msg`Labs`, width: 18 },
         ],
         rows: shown.map((p) => [String(p.year ?? ''), p.title ?? '—', p.journal ?? '', labsOf(p)]),
         links: shown.map((p) => (p.doi ? `https://doi.org/${p.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, '')}` : null)),

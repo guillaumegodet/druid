@@ -19,6 +19,7 @@ export const FEATURE_LABELS: Record<DatasetFeature, MessageDescriptor> = {
   journalAccess: msg`needs the journal access categories`,
   charte: msg`needs signature charter scores`,
   partnerGroup: msg`needs at least 2 partner institutions in the report filters`,
+  labs: msg`needs the labs of the publications`,
 };
 
 export const ChartPicker: React.FC<{

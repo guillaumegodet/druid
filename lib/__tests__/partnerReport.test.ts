@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildPartnerCatalog, aggregatePartnerBreakdown } from '../../components/dashboard/collabAggregates';
+import { buildPartnerCatalog, aggregatePartnerBreakdown, unitsOfDataset } from '../../components/dashboard/collabAggregates';
 import { KPI_SETS } from '../../components/dashboard/kpiItems';
 import { compareImpact, halfTrend, median, partnerRank } from '../../components/dashboard/partnerKpis';
 import { buildFilterContext, matchesFilters } from '../../components/dashboard/publicationFilters';
@@ -89,6 +89,22 @@ describe('partner key figures', () => {
       copubs: '4', rank: '2', researchers: '2', labs: '2', open: '100 %', large: '25 %',
     });
     expect(items.find((i) => i.key === 'labs')?.hint).toMatch(/1/);
+  });
+});
+
+describe('internal units of an institution export', () => {
+  it('reads the labs of the authors when publications carry none', () => {
+    const inst = {
+      ...DS,
+      publications: copubs.map((p) => ({ ...p, sousStructures: [], teams: ['Non identifié'] })),
+      authors: [{ id: 1, label: 'A1', teams: ['LAB-X'] }, { id: 2, label: 'A2', teams: ['LAB-Y', 'Non identifié'] }],
+    } as unknown as DashboardDataset;
+    const units = unitsOfDataset(inst);
+    expect(units.kind).toBe('labs');
+    expect(units.of(copubs[0])).toEqual(['LAB-X', 'LAB-Y']);
+    const items = KPI_SETS.partner.items(inst, RANGE, { source: inst, filters: { partnerKeys: ['03c4mmv16'] } });
+    expect(items.find((i) => i.key === 'labs')?.value).toBe('2');
+    expect(REPORT_TABLES.publications.build(inst, RANGE, 10).rows.find((r) => r[1] === 'A')?.[3]).toBe('LAB-X, LAB-Y');
   });
 });
 
