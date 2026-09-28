@@ -96,7 +96,7 @@ export const EmbedPage: React.FC = () => {
     );
   } else if (data) {
     const { Chart } = def;
-    body = <Chart dataset={data} range={range} params={chartParams} />;
+    body = <Chart dataset={data} range={range} params={chartParams} filters={filterState.filters} />;
   }
 
   return (

@@ -91,8 +91,8 @@ export const REPORT_SECTIONS: ReportSection[] = [
     tab: 'teams',
     title: msg`Teams`,
     ids: [
-      'equipes-repartition', 'equipes-evolution', 'equipes-types', 'radar-disciplinaire',
-      'heatmap-disciplinaire',
+      'equipes-repartition', 'equipes-evolution', 'equipes-types', 'labos-classement',
+      'radar-disciplinaire', 'heatmap-disciplinaire',
     ],
   },
   {

@@ -6,11 +6,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, BarChart3, ChevronDown, ChevronUp, Copy, Eye, EyeOff, FileDown, Gauge, Heading, Plus,
-  RefreshCw, Share2, Trash2, Type, X,
+  RefreshCw, Share2, Table2, Trash2, Type, X,
 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
-import { datasetFeatures } from '../dashboard/chartMeta';
+import { datasetFeatures, scopeFeatures } from '../dashboard/chartMeta';
+import { REPORT_TABLES, tableLabel } from '../dashboard/report/reportTables';
 import { EMBED_CHARTS } from '../dashboard/embedRegistry';
 import { KPI_SETS } from '../dashboard/kpiItems';
 import { buildFilterContext, describeFilters, type PubFilters } from '../dashboard/publicationFilters';
@@ -141,7 +142,10 @@ export const ReportEditor: React.FC<{
   const datasets = useReportDatasets(slugs);
   const resolved = useMemo(() => (draft ? resolveReport(draft, datasets) : null), [draft, datasets]);
   const mainDataset = draft ? datasets[draft.context.slug] : undefined;
-  const features = useMemo(() => (mainDataset ? datasetFeatures(mainDataset) : null), [mainDataset]);
+  const features = useMemo(
+    () => (mainDataset && draft ? scopeFeatures(datasetFeatures(mainDataset), draft.context.filters) : null),
+    [mainDataset, draft],
+  );
   const filterChips = useMemo(() => {
     if (!draft || !mainDataset) return [];
     const chips = describeFilters(draft.context.filters, buildFilterContext(mainDataset));
@@ -169,6 +173,7 @@ export const ReportEditor: React.FC<{
         dataset: rb.dataset!,
         range: rb.scope!.range,
         params: rb.params,
+        filters: rb.scope!.filters,
       }));
     const batches: RenderItem[][] = [];
     for (let i = 0; i < items.length; i += PDF_BATCH) batches.push(items.slice(i, i + PDF_BATCH));
@@ -301,6 +306,15 @@ export const ReportEditor: React.FC<{
           placeholder={canEdit ? t`Description (printed on the cover page)` : ''}
           onChange={(e) => edit((d) => ({ ...d, description: e.target.value }))}
         />
+        <input
+          className="input-soft text-xs"
+          value={draft.footerNote ?? ''}
+          maxLength={200}
+          disabled={!canEdit}
+          placeholder={canEdit ? t`Footer note on every PDF page (e.g. Internal working document)` : ''}
+          onChange={(e) => edit((d) => ({ ...d, footerNote: e.target.value || undefined }))}
+          aria-label={t`Footer note`}
+        />
         <div className="flex flex-wrap items-center gap-2 text-sm">
           <StructureSelect
             value={draft.context.slug}
@@ -372,6 +386,13 @@ export const ReportEditor: React.FC<{
                 onClick={() => addBlock({ id: newBlockId(), kind: 'text', markdown: '' })}
               >
                 <Type className="w-3.5 h-3.5" /> <Trans>Text</Trans>
+              </button>
+              <button
+                type="button"
+                className="btn-pill h-8 text-[12px] justify-center col-span-2"
+                onClick={() => addBlock({ id: newBlockId(), kind: 'table', tableId: 'publications' })}
+              >
+                <Table2 className="w-3.5 h-3.5" /> <Trans>Publication list</Trans>
               </button>
             </div>
           )}
@@ -462,6 +483,7 @@ const BlockIcon: React.FC<{ block: ReportBlock }> = ({ block }) => {
   if (block.kind === 'chart') return <BarChart3 className={cls} />;
   if (block.kind === 'kpis') return <Gauge className={cls} />;
   if (block.kind === 'section') return <Heading className={cls} />;
+  if (block.kind === 'table') return <Table2 className={cls} />;
   return <Type className={cls} />;
 };
 
@@ -475,6 +497,7 @@ function blockLabel(b: ReportBlock, t: Translate): string {
     const entry = EMBED_CHARTS[b.chartId];
     return b.title?.trim() || (entry ? t(entry.label) : b.chartId);
   }
+  if (b.kind === 'table') return tableLabel(b.tableId);
   return b.kind;
 }
 
@@ -502,6 +525,21 @@ const BlockSettings: React.FC<{
         <p className="text-[11px] text-muted-light dark:text-[#8f897c]">
           <Trans># heading · - bullet · **bold** · *italic* · [label](https://…) · blank line = new paragraph</Trans>
         </p>
+      </div>
+    );
+  }
+  if (block.kind === 'table') {
+    return (
+      <div className={box}>
+        <select className={selectCls} value={block.tableId} disabled={!canEdit} onChange={(e) => onPatch({ tableId: e.target.value })}>
+          {Object.keys(REPORT_TABLES).map((id) => <option key={id} value={id}>{tableLabel(id)}</option>)}
+        </select>
+        <label className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-muted dark:text-[#c3beb0] w-28"><Trans>Max. rows in the PDF</Trans></span>
+          <input type="number" className="input-soft !w-24" min={1} max={5000} disabled={!canEdit}
+            value={block.limit ?? ''} placeholder="500"
+            onChange={(e) => onPatch({ limit: e.target.value === '' ? undefined : Math.max(1, Math.min(5000, Number(e.target.value))) })} />
+        </label>
       </div>
     );
   }

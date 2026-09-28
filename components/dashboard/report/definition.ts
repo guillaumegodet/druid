@@ -6,7 +6,7 @@
 // the /embed `f` parameter (embedState.ts) and the editor all go through them.
 
 import { z } from 'zod';
-import { EMBEDDABLE_IDS, KPI_SET_IDS } from '../embedIds';
+import { EMBEDDABLE_IDS, KPI_SET_IDS, TABLE_IDS } from '../embedIds';
 import type { PubFilters } from '../publicationFilters';
 
 /** Bounds of a definition (a Grist Text cell holds it, see plan § 3.1). */
@@ -126,7 +126,7 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     id: blockId,
     hidden: z.boolean().optional(),
     kind: z.literal('table'),
-    tableId: z.string().max(40),
+    tableId: z.string().refine((id) => TABLE_IDS.has(id), { message: 'unknown table' }),
     limit: z.number().int().min(1).max(5_000).optional(),
     override: contextOverride.optional(),
     ownFilters,
@@ -151,6 +151,8 @@ export const reportDefinitionSchema = z.strictObject({
   templateId: z.string().max(60).optional(),
   templateParams: z.record(z.string().max(40), z.unknown()).optional(),
   context: reportContextSchema,
+  /** Printed in the footer of every PDF page (e.g. « Document de travail interne », decision D7). */
+  footerNote: z.string().max(200).optional(),
   blocks: z.array(reportBlockSchema).max(REPORT_LIMITS.maxBlocks)
     .refine((bs) => new Set(bs.map((b) => b.id)).size === bs.length, { message: 'duplicate block id' }),
   lang: z.enum(['fr', 'en']),

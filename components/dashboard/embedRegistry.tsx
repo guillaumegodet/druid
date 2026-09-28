@@ -9,7 +9,7 @@ import { msg } from '@lingui/core/macro';
 import { useVizTheme } from './EChartCard';
 import { DashboardDataset } from './types';
 import { YearRange, aggregateOverview } from './overviewAggregates';
-import { axeOfPub } from './publicationFilters';
+import { axeOfPub, type PubFilters } from './publicationFilters';
 import {
   aggregateInternational,
   aggregateFlows,
@@ -54,8 +54,11 @@ import {
   aggregateCollabTypology,
   aggregateInternalCollab,
   aggregateNationalCollab,
+  aggregatePartnerBreakdown,
+  buildPartnerCatalog,
   internalLabsOf,
 } from './collabAggregates';
+import { TEAM_UNKNOWN } from './structureAggregates';
 import { FranceMapChart } from './charts/FranceMapChart';
 import { aggregateTeamOrgNetwork } from './internationalAggregates';
 import { CountryEvolutionChart } from './charts/CountryEvolutionChart';
@@ -112,6 +115,11 @@ export interface EmbedChartProps {
    * a missing key means the chart's usual default.
    */
   params?: ChartParams;
+  /**
+   * Filters the dataset was restricted with (already applied): only read by the charts that
+   * need the partner group itself (partner-breakdown-*).
+   */
+  filters?: PubFilters;
 }
 
 /** Charter threshold as a fraction (tab default: 75 %). */
@@ -202,6 +210,31 @@ const impactGroupEntries = (
     },
   },
 });
+/**
+ * Per-university breakdown of the partner group named by the block filters (partnerKeys). The
+ * dataset is already restricted (hyper-authored papers included or not by the block filters).
+ */
+const usePartnerBreakdown = ({ dataset, range, filters }: EmbedChartProps) =>
+  useMemo(() => {
+    const keys = filters?.partnerKeys ?? [];
+    return aggregatePartnerBreakdown(
+      dataset.publications, range, keys, dataset.authors, buildPartnerCatalog(dataset.publications),
+    );
+  }, [dataset, range, filters?.partnerKeys]);
+/** Publications per member lab of a composite structure, plus those with no identified lab. */
+const useLabRanking = ({ dataset, range }: EmbedChartProps) =>
+  useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const p of dataset.publications) {
+      if (typeof p.year !== 'number' || p.year < range.start || p.year > range.end) continue;
+      const labs = Array.from(new Set(p.sousStructures.filter(Boolean)));
+      for (const lab of labs.length ? labs : [TEAM_UNKNOWN]) counts.set(lab, (counts.get(lab) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .map(([lab, count]) => ({ label: lab === TEAM_UNKNOWN ? i18n._(msg`No lab identified`) : lab, count, teams: [] }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 25);
+  }, [dataset, range]);
 
 export const EMBED_CHARTS: Record<string, Entry> = {
   // ── Overview
@@ -858,6 +891,49 @@ export const EMBED_CHARTS: Record<string, Entry> = {
           data={d.topInstitutions.map((i) => ({ label: i.key, count: i.count, teams: [] }))}
           colorSlot={3}
           height={Math.max(280, d.topInstitutions.length * 26 + 60)}
+        />
+      );
+    },
+  },
+  // ── Partner group / labs involved (« Collaboration avec une université » template) ──
+  'partner-breakdown-top': {
+    label: msg`Co-publications by university`,
+    Chart: (p) => {
+      const d = usePartnerBreakdown(p);
+      return (
+        <RankBarChart
+          title={i18n._(msg`Co-publications by university`)}
+          subtitle={i18n._(msg`A publication co-signed by several of them counts for each`)}
+          exportName="partner-breakdown-top"
+          data={d.entries.map((e) => ({ label: e.name, count: e.total, teams: [] }))}
+          colorSlot={4}
+          height={Math.max(240, d.entries.length * 28 + 60)}
+        />
+      );
+    },
+  },
+  'partner-breakdown-evolution': {
+    label: msg`Yearly trend by university`,
+    Chart: (p) => (
+      <StackedAreaChart
+        title={i18n._(msg`Yearly trend by university`)}
+        exportName="partner-breakdown-evolution"
+        data={usePartnerBreakdown(p).byYearStacked}
+      />
+    ),
+  },
+  'labos-classement': {
+    label: msg`Labs involved`,
+    Chart: (p) => {
+      const d = useLabRanking(p);
+      return (
+        <RankBarChart
+          title={i18n._(msg`Labs involved`)}
+          subtitle={i18n._(msg`Publications per member lab (a co-signed publication counts for each lab)`)}
+          exportName="labos-classement"
+          data={d}
+          colorSlot={2}
+          height={Math.max(260, d.length * 26 + 60)}
         />
       );
     },

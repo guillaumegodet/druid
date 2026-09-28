@@ -9,6 +9,7 @@ import {
   sanitizeChartParams,
   trivialFiltersOf,
   datasetFeatures,
+  scopeFeatures,
   type ChartParams,
   type DatasetFeature,
 } from '../chartMeta';
@@ -47,6 +48,11 @@ export interface ResolvedBlock {
   scope: BlockScope | null;
   /** Restricted dataset (chart and kpis blocks with data). */
   dataset: DashboardDataset | null;
+  /**
+   * Whole corpus of the block structure in its scope, without the filters (key figures that
+   * compare the restricted corpus with it: partner rank, comparable impact reference).
+   */
+  source: DashboardDataset | null;
   status: BlockStatus;
   missing: DatasetFeature[];
   /** Active filters under which the chart degenerates (warning only). */
@@ -124,19 +130,22 @@ export function resolveReport(def: ReportDefinition, datasets: DatasetsBySlug, n
   };
 
   const blocks = def.blocks.map((block): ResolvedBlock => {
-    const base = { block, scope: null, dataset: null, missing: [], trivial: [], params: {} };
+    const base = { block, scope: null, dataset: null, source: null, missing: [], trivial: [], params: {} };
     if (!hasScope(block)) return { ...base, status: 'ok' };
     const scope = scopeOf(def.context, block.override, now, !!block.ownFilters);
     const source = datasets[scope.slug];
     if (block.kind === 'chart' && !EMBEDDABLE_IDS.has(block.chartId)) return { ...base, scope, status: 'unknown-chart' };
     if (source === undefined) return { ...base, scope, status: 'loading' };
     if (source === null) return { ...base, scope, status: 'no-data' };
-    if (block.kind !== 'chart') return { ...base, scope, dataset: restrict(scope, source), status: 'ok' };
-    // Features are read on the whole structure: a filter emptying a chart is not a missing feature.
-    const missing = missingFeatures(block.chartId, featuresOf(scope.slug, source));
+    const whole = restrict({ ...scope, filters: {} }, source);
+    if (block.kind !== 'chart') return { ...base, scope, dataset: restrict(scope, source), source: whole, status: 'ok' };
+    // Features are read on the whole structure (a filter emptying a chart is not a missing
+    // feature), plus the partner group named by the block filters.
+    const missing = missingFeatures(block.chartId, scopeFeatures(featuresOf(scope.slug, source), scope.filters));
     return {
       block,
       scope,
+      source: whole,
       dataset: missing.length ? null : restrict(scope, source),
       status: missing.length ? 'missing-feature' : 'ok',
       missing,

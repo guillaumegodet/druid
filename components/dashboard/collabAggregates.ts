@@ -241,7 +241,7 @@ export function aggregateNationalCollab(
 // year filter.
 
 export interface PartnerCatalogEntry {
-  /** ROR if known (see phase 0), else the displayed name — key expected by buildPartnerMatcher. */
+  /** ROR if known (see phase 0), else `<scope>:<name>` (partnerKey) — key expected by buildPartnerMatcher. */
   key: string;
   name: string;
   /** Number of publications where this institution appears as a partner. */
@@ -257,7 +257,7 @@ export interface PartnerCatalogEntry {
  * as a national AND international partner under the same name (e.g. hospital, ministry) would merge
  * its two counts under a single `scope` depending on encounter order — review lot 8.
  */
-const partnerKey = (o: { name: string; ror?: string | null }, scope: 'international' | 'national'): string =>
+export const partnerKey = (o: { name: string; ror?: string | null }, scope: 'international' | 'national'): string =>
   o.ror || `${scope}:${o.name}`;
 
 export function buildPartnerCatalog(pubs: DashboardPublication[]): PartnerCatalogEntry[] {
@@ -492,9 +492,14 @@ export function aggregatePartnerBreakdown(
   /** Selected keys present among the publication's partners (deduplicated). */
   const keysOf = (p: DashboardPublication): string[] => {
     const found = new Set<string>();
-    for (const o of [...(p.partnerInstitutions || []), ...(p.nationalPartners || [])]) {
-      const k = o.ror && keySet.has(o.ror) ? o.ror : keySet.has(o.name) ? o.name : null;
-      if (k) found.add(k);
+    // Catalog keys (partnerKey): ROR, else `<scope>:<name>` — the bare name never matched.
+    for (const o of p.partnerInstitutions || []) {
+      const k = partnerKey(o, 'international');
+      if (keySet.has(k)) found.add(k);
+    }
+    for (const o of p.nationalPartners || []) {
+      const k = partnerKey(o, 'national');
+      if (keySet.has(k)) found.add(k);
     }
     return Array.from(found);
   };

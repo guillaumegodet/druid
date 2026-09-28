@@ -19,6 +19,7 @@ import { EMBED_CHARTS } from '../embedRegistry';
 import { DashboardDataset } from '../types';
 import { YearRange } from '../overviewAggregates';
 import type { ChartParams } from '../chartMeta';
+import type { PubFilters } from '../publicationFilters';
 
 /** One chart to capture: registry id + the data, period and parameters it is drawn with. */
 export interface RenderItem {
@@ -28,6 +29,8 @@ export interface RenderItem {
   dataset: DashboardDataset;
   range: YearRange;
   params?: ChartParams;
+  /** Filters the dataset was restricted with (charts reading the partner group). */
+  filters?: PubFilters;
 }
 
 export interface CapturedChart {
@@ -181,7 +184,7 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({ items, onDone })
               return (
                 <div key={it.key} style={{ width: CHART_WIDTH, marginBottom: 16 }}>
                   <ItemCapture itemKey={it.key} parent={capture}>
-                    <Chart dataset={it.dataset} range={it.range} params={it.params} />
+                    <Chart dataset={it.dataset} range={it.range} params={it.params} filters={it.filters} />
                   </ItemCapture>
                 </div>
               );

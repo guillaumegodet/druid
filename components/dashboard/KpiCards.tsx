@@ -12,6 +12,13 @@ import {
   Award,
   Trophy,
   Gauge,
+  Handshake,
+  TrendingUp,
+  Medal,
+  Users,
+  Building2,
+  Unlock,
+  Network,
 } from 'lucide-react';
 import { OverviewKpis, YearRange } from './overviewAggregates';
 import { ImpactKpis } from './impactAggregates';
@@ -86,6 +93,16 @@ const KPI_STYLES: Record<string, { Icon: React.FC<{ className?: string }>; slot:
   top10: { Icon: Award, slot: 5 },
   top1: { Icon: Trophy, slot: 4 },
   'fwci-mean': { Icon: Gauge, slot: 6 },
+  // Collaboration with a partner (partnerKpis.ts)
+  copubs: { Icon: Handshake, slot: 0 },
+  trend: { Icon: TrendingUp, slot: 2 },
+  rank: { Icon: Medal, slot: 4 },
+  researchers: { Icon: Users, slot: 3 },
+  labs: { Icon: Building2, slot: 1 },
+  open: { Icon: Unlock, slot: 2 },
+  large: { Icon: Network, slot: 7 },
+  'fwci-median': { Icon: Gauge, slot: 6 },
+  'top10-share': { Icon: Award, slot: 5 },
 };
 
 /** Grid of key-figure cards (tabs and report `kpis` blocks). */
@@ -139,17 +156,20 @@ export const ImpactKpiCards: React.FC<{ kpis: ImpactKpis }> = ({ kpis }) => {
 };
 
 /** Key-figure row of a report `kpis` block (KPI_SETS, kpiItems.ts). */
-export const KpiSetCards: React.FC<{ setId: string; dataset: DashboardDataset; range: YearRange }> = ({
-  setId,
-  dataset,
-  range,
-}) => {
+export const KpiSetCards: React.FC<{
+  setId: string;
+  dataset: DashboardDataset;
+  range: YearRange;
+  /** Whole corpus of the structure (sets comparing with it: partner rank, impact reference). */
+  source?: DashboardDataset | null;
+  filters?: PubFilters;
+}> = ({ setId, dataset, range, source = null, filters }) => {
   const { i18n } = useLingui();
   const set = KPI_SETS[setId];
   const items = React.useMemo(
-    () => (set ? set.items(dataset, range) : []),
+    () => (set ? set.items(dataset, range, { source, filters: filters ?? {} }) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [set, dataset, range, i18n.locale],
+    [set, dataset, range, source, filters, i18n.locale],
   );
   return <KpiGrid items={items} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" />;
 };

@@ -19,6 +19,8 @@ export const EMBEDDABLE_IDS = new Set<string>([
   'collab-nu-top', 'collab-nu-evolution', 'collab-nu-domaines', 'collab-nu-sous-disciplines',
   'collab-nu-sankey', 'carte-france',
   'collab-national-top', 'collab-national-evolution',
+  // Collaborations — per-university breakdown of a partner group (report blocks)
+  'partner-breakdown-top', 'partner-breakdown-evolution',
   // Impact
   'quartiles-scimago', 'top-par-annee', 'distribution-fwci',
   'impact-fwci-sous-structure', 'impact-top-sous-structure', 'impact-fwci-equipe',
@@ -38,8 +40,8 @@ export const EMBEDDABLE_IDS = new Set<string>([
   'charte-conformite', 'charte-scores', 'charte-evolution', 'charte-criteres',
   'charte-equipes',
   // Teams / PhD students / Researchers / Network
-  'equipes-repartition', 'equipes-evolution', 'equipes-types', 'radar-disciplinaire',
-  'heatmap-disciplinaire',
+  'equipes-repartition', 'equipes-evolution', 'equipes-types', 'labos-classement',
+  'radar-disciplinaire', 'heatmap-disciplinaire',
   'doctorants-repartition', 'doctorants-evolution', 'doctorants-classement',
   'chercheurs-classement', 'reseau-cosignatures',
   // Sources / coverage (CRISalid harvester vs BSO/OpenAlex/HAL)
@@ -51,4 +53,10 @@ export const EMBEDDABLE_IDS = new Set<string>([
  * Key-figure rows a report `kpis` block can show (kpiItems.ts, KPI_SETS).
  * ⚠️ Keep in sync with the keys of KPI_SETS.
  */
-export const KPI_SET_IDS = new Set<string>(['overview', 'impact']);
+export const KPI_SET_IDS = new Set<string>(['overview', 'impact', 'partner', 'partner-impact']);
+
+/**
+ * Tables a report `table` block can show (reportTables.ts, REPORT_TABLES).
+ * ⚠️ Keep in sync with the keys of REPORT_TABLES.
+ */
+export const TABLE_IDS = new Set<string>(['publications']);

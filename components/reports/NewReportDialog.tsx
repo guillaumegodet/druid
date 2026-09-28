@@ -19,6 +19,10 @@ import {
 } from '../dashboard/report/templates';
 import type { ReportSummary } from '../dashboard/report/reportsApi';
 import type { DashboardDataset } from '../dashboard/types';
+import { buildPartnerCatalog, type PartnerCatalogEntry } from '../dashboard/collabAggregates';
+import { consortiumPartnerGroups } from '../dashboard/consortia';
+import { PartnerInstitutionPicker } from '../dashboard/PartnerInstitutionPicker';
+import { affiliatedPartners } from '../dashboard/report/rorAffiliates';
 import { loadDashboardDataset } from '../dashboard/useDashboardData';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect, useStructureSlugs } from './ReportControls';
 
@@ -37,7 +41,7 @@ export const NewReportDialog: React.FC<{
 }> = ({ backend, onClose, onCreated, initial }) => {
   const { t, i18n } = useLingui();
   const { slugs, tabsHidden } = useStructureSlugs();
-  const [templateId, setTemplateId] = useState(initial?.templateId ?? REPORT_TEMPLATES[0].id);
+  const [templateId, setTemplateId] = useState(initial?.templateId ?? 'structure');
   // Instance templates: reports published by a super admin (templateId `report:<id>`).
   const [instanceTemplates, setInstanceTemplates] = useState<ReportSummary[]>([]);
   useEffect(() => {
@@ -76,10 +80,28 @@ export const NewReportDialog: React.FC<{
       .catch(() => { if (!cancelled) setDataset(null); });
     return () => { cancelled = true; };
   }, [slug]);
-  useEffect(() => setCountry(''), [slug]);
+  useEffect(() => { setCountry(''); setPartners([]); }, [slug]);
 
   const countries = useMemo(() => partnerCountries(dataset ?? null), [dataset]);
   const countryName = (cc: string) => (dataset ? countryLabel(cc, dataset.countryNames) : cc);
+
+  // Partner institutions (collaboration template): the structure's partner catalog, consortium
+  // chips, and the institutions affiliated with the chosen ones (ROR registry, decision D1).
+  const [partners, setPartners] = useState<string[]>([]);
+  const catalog = useMemo(() => (dataset ? buildPartnerCatalog(dataset.publications) : []), [dataset]);
+  const partnerGroups = useMemo(
+    () => consortiumPartnerGroups(catalog, dataset?.benchmark?.openalex.ror ?? null),
+    [catalog, dataset],
+  );
+  const [affiliates, setAffiliates] = useState<PartnerCatalogEntry[]>([]);
+  useEffect(() => {
+    let cancelled = false;
+    setAffiliates([]);
+    if (!partners.length || !template.params.includes('partners')) return;
+    affiliatedPartners(partners, catalog).then((a) => { if (!cancelled) setAffiliates(a); });
+    return () => { cancelled = true; };
+  }, [partners, catalog, template]);
+  const partnerName = (key: string) => catalog.find((c) => c.key === key)?.name ?? key;
 
   // Suggested name, until the user types their own.
   const suggestedName = useMemo(() => {
@@ -87,9 +109,14 @@ export const NewReportDialog: React.FC<{
     const label = t(template.label);
     const where = dataset ? dataset.lab : slug;
     const withCountry = template.params.includes('country') && country ? ` — ${countryName(country)}` : '';
+    if (template.params.includes('partners')) {
+      const first = partners[0] ? partnerName(partners[0]) : '';
+      const more = partners.length > 1 ? ` (+${partners.length - 1})` : '';
+      return first ? `${where} × ${first}${more}` : '';
+    }
     return template.id === 'blank' ? '' : `${label} — ${where}${withCountry}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [template, instanceTemplate, dataset, slug, country, t]);
+  }, [template, instanceTemplate, dataset, slug, country, partners, catalog, t]);
   useEffect(() => {
     if (!nameTouched) setName(suggestedName);
   }, [suggestedName, nameTouched]);
@@ -98,7 +125,10 @@ export const NewReportDialog: React.FC<{
     setSaving(true);
     setError(null);
     try {
-      const input = { name, slug, period, perimetre, country: country || undefined, lang: i18n.locale === 'en' ? 'en' as const : 'fr' as const };
+      const input = {
+        name, slug, period, perimetre, country: country || undefined, partners,
+        lang: i18n.locale === 'en' ? 'en' as const : 'fr' as const,
+      };
       let definition;
       if (instanceTemplate) {
         const source = await backend.get(instanceTemplate.id);
@@ -134,7 +164,7 @@ export const NewReportDialog: React.FC<{
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label={t`Template`}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2" role="radiogroup" aria-label={t`Template`}>
           {REPORT_TEMPLATES.map((tpl) => {
             const active = tpl.id === templateId;
             return (
@@ -203,6 +233,31 @@ export const NewReportDialog: React.FC<{
               </select>
             </div>
           )}
+          {template.params.includes('partners') && dataset && (
+            <div className="flex flex-col gap-2">
+              <PartnerInstitutionPicker
+                catalog={catalog}
+                selected={partners}
+                onChange={setPartners}
+                predefinedGroups={partnerGroups}
+              />
+              {affiliates.length > 0 && (
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  <span className="text-muted dark:text-[#c3beb0]">
+                    <Trans>Affiliated institutions (ROR) that also co-signed:</Trans>{' '}
+                    {affiliates.map((a) => a.name).join(', ')}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn-pill h-7 px-2.5 text-[11px]"
+                    onClick={() => setPartners((cur) => [...cur, ...affiliates.map((a) => a.key)])}
+                  >
+                    <Trans>Add them</Trans>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
           <label className={row}>
             <span className={label}><Trans>Name</Trans></span>
             <input
@@ -231,7 +286,7 @@ export const NewReportDialog: React.FC<{
           <button
             type="button"
             onClick={() => void create()}
-            disabled={saving || waitingData || !name.trim() || !slug}
+            disabled={saving || waitingData || !name.trim() || !slug || (template.params.includes('partners') && partners.length === 0)}
             className="btn-pill-dark h-9 px-4 text-[13px] disabled:opacity-40"
           >
             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}

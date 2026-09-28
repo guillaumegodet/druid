@@ -419,8 +419,71 @@ export class ReportPdf {
     this.y += 6;
   }
 
-  /** Footers (content pages only) — to be called before save(). */
-  finalize(footerLeft: string) {
+  /**
+   * Table paginated over as many pages as needed, header repeated on each page. `widths` are
+   * relative; cells wrap on at most 3 lines. `links[i]` makes the `linkColumn` cell of row i a link.
+   */
+  simpleTable(
+    title: string,
+    columns: string[],
+    widths: number[],
+    rows: string[][],
+    opts: { links?: (string | null)[]; linkColumn?: number; note?: string } = {},
+  ) {
+    const d = this.doc;
+    const total = widths.reduce((a, b) => a + b, 0) || 1;
+    const colW = widths.map((w) => (w / total) * CONTENT_W);
+    const size = 7.5;
+    const lineH = lh(size, 1.25);
+    const header = () => {
+      this.text('semi', size, INK_SECONDARY);
+      let x = MARGIN;
+      columns.forEach((c, i) => { d.text(c, x + 1, this.y); x += colW[i]; });
+      this.y += 1.8;
+      d.setDrawColor(...RULE);
+      d.setLineWidth(0.25);
+      d.line(MARGIN, this.y, MARGIN + CONTENT_W, this.y);
+      this.y += lineH;
+    };
+    this.ensureSpace(lh(12, 1.25) + 4 + lineH * 4);
+    this.text('semi', 12, INK);
+    d.text(title, MARGIN, this.y);
+    this.y += lh(12, 1.25) + 1;
+    header();
+    rows.forEach((row, r) => {
+      this.text('body', size, INK);
+      const cells = row.map((cell, i) => (d.splitTextToSize(cell || '', colW[i] - 2) as string[]).slice(0, 3));
+      const h = Math.max(...cells.map((c) => c.length)) * lineH + 1;
+      if (this.y + h > BOTTOM) {
+        d.addPage();
+        this.y = MARGIN + 4;
+        header();
+        this.text('body', size, INK);
+      }
+      let x = MARGIN;
+      cells.forEach((lines, i) => {
+        const link = i === (opts.linkColumn ?? 0) ? opts.links?.[r] : null;
+        if (link) {
+          d.setTextColor(...INK);
+          lines.forEach((ln, k) => d.textWithLink(ln, x + 1, this.y + k * lineH, { url: link }));
+        } else {
+          d.text(lines, x + 1, this.y);
+        }
+        x += colW[i];
+      });
+      this.y += h;
+    });
+    if (opts.note) {
+      this.y += 1;
+      this.text('body', 8, INK_MUTED);
+      d.text(opts.note, MARGIN, this.y);
+      this.y += lh(8);
+    }
+    this.y += 5;
+  }
+
+  /** Footers (content pages only) — to be called before save(). `note`: e.g. « Document de travail interne ». */
+  finalize(footerLeft: string, note?: string) {
     const d = this.doc;
     const total = d.getNumberOfPages();
     for (let i = 2; i <= total; i++) {
@@ -429,8 +492,12 @@ export class ReportPdf {
       d.setLineWidth(0.25);
       d.line(MARGIN, PAGE_H - 13, PAGE_W - MARGIN, PAGE_H - 13);
       this.text('body', 8, INK_MUTED);
-      d.text(footerLeft, MARGIN, PAGE_H - 8.5);
+      d.text((d.splitTextToSize(footerLeft, note ? CONTENT_W * 0.45 : CONTENT_W * 0.8) as string[])[0], MARGIN, PAGE_H - 8.5);
       d.text(i18n._(msg`Page ${i - 1} / ${total - 1}`), PAGE_W - MARGIN, PAGE_H - 8.5, { align: 'right' });
+      if (note) {
+        this.text('semi', 8, INK_SECONDARY);
+        d.text(note, PAGE_W / 2 + 12, PAGE_H - 8.5, { align: 'center' });
+      }
     }
   }
 

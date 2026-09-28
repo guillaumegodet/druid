@@ -14,7 +14,7 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { accessLabel, AXE_OTHER, charterCompliant } from './phase4Aggregates';
 import { comboLabelOf } from './sourcesAggregates';
-import { buildPartnerCatalog } from './collabAggregates';
+import { buildPartnerCatalog, partnerKey } from './collabAggregates';
 
 /** Effective strategic axis of a publication (1st axis if multiple, « Autre » otherwise). */
 export function axeOfPub(p: DashboardPublication): string {
@@ -188,9 +188,13 @@ export function matchesFilters(
   if (f.partnerInstitution && !p.partnerInstitutions.some((i) => i.name === f.partnerInstitution))
     return false;
   if (f.partnerKeys && f.partnerKeys.length > 0) {
-    const inGroup = (o: { name: string; ror?: string | null }) =>
-      f.partnerKeys!.includes(o.ror || o.name);
-    if (!p.partnerInstitutions.some(inGroup) && !p.nationalPartners.some(inGroup)) return false;
+    // Same keys as the partner catalog (partnerKey): ROR, else `<scope>:<name>` — comparing with the
+    // bare name never matched the institutions without a ROR (plan-mes-rapports lot 7).
+    const keys = f.partnerKeys;
+    if (
+      !p.partnerInstitutions.some((o) => keys.includes(partnerKey(o, 'international'))) &&
+      !p.nationalPartners.some((o) => keys.includes(partnerKey(o, 'national')))
+    ) return false;
   }
   if (f.international && p.isInternational !== true) return false;
   if (f.domain && !p.domains.includes(f.domain)) return false;

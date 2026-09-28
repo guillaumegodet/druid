@@ -8,6 +8,7 @@ import { msg } from '@lingui/core/macro';
 import { numberLocale } from '../../lib/i18n';
 import { aggregateImpact, type ImpactKpis } from './impactAggregates';
 import { aggregateOverview, CONFERENCE_LABEL, type OverviewKpis, type YearRange } from './overviewAggregates';
+import { partnerImpactItems, partnerKpiItems, type PartnerKpiContext } from './partnerKpis';
 import type { PubFilters } from './publicationFilters';
 import type { DashboardDataset } from './types';
 
@@ -113,8 +114,14 @@ export function impactKpiItems(kpis: ImpactKpis): KpiItem[] {
 
 export interface KpiSet {
   label: MessageDescriptor;
-  items: (dataset: DashboardDataset, range: YearRange) => KpiItem[];
+  /**
+   * `dataset` = restricted corpus of the block; `ctx` = the whole corpus of its structure and the
+   * block filters, for the sets comparing both (partner rank, impact reference).
+   */
+  items: (dataset: DashboardDataset, range: YearRange, ctx?: PartnerKpiContext) => KpiItem[];
 }
+
+const noContext: PartnerKpiContext = { source: null, filters: {} };
 
 /** Key-figure rows available to report `kpis` blocks. ⚠️ Keys = KPI_SET_IDS (embedIds.ts). */
 export const KPI_SETS: Record<string, KpiSet> = {
@@ -125,5 +132,13 @@ export const KPI_SETS: Record<string, KpiSet> = {
   impact: {
     label: msg`Key figures — impact`,
     items: (dataset, range) => impactKpiItems(aggregateImpact(dataset.publications, range).kpis),
+  },
+  partner: {
+    label: msg`Key figures — collaboration`,
+    items: (dataset, range, ctx) => partnerKpiItems(dataset, range, ctx ?? noContext),
+  },
+  'partner-impact': {
+    label: msg`Key figures — impact of the collaboration`,
+    items: (dataset, range, ctx) => partnerImpactItems(dataset, range, ctx ?? noContext),
   },
 };

@@ -5,7 +5,9 @@
 
 import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { datasetFeatures, missingFeatures, trivialFiltersOf } from '../chartMeta';
+import { datasetFeatures, missingFeatures, scopeFeatures, trivialFiltersOf } from '../chartMeta';
+import { buildPartnerCatalog } from '../collabAggregates';
+import { LARGE_COLLAB_AUTHORS } from '../partnerKpis';
 import type { PubFilters } from '../publicationFilters';
 import { visibleTabKeys } from '../tabAvailability';
 import type { DashboardDataset } from '../types';
@@ -13,7 +15,7 @@ import { newBlockId, type ReportBlock, type ReportDefinition, type ReportPeriod 
 import { REPORT_SECTIONS } from './reportCatalog';
 
 /** Parameters a template asks for, in form order. */
-export type TemplateParam = 'structure' | 'period' | 'perimetre' | 'country';
+export type TemplateParam = 'structure' | 'period' | 'perimetre' | 'country' | 'partners';
 
 export interface TemplateInput {
   name: string;
@@ -22,6 +24,8 @@ export interface TemplateInput {
   perimetre: 'affiliation' | 'effectifs';
   /** ISO-2 partner country (international collaborations), empty = all countries. */
   country?: string;
+  /** Partner institutions (catalog keys: ROR, else `<scope>:<name>`) — collaboration template. */
+  partners?: string[];
   lang: 'fr' | 'en';
 }
 
@@ -52,7 +56,7 @@ const kpis = (setId: string): ReportBlock => ({ id: newBlockId(), kind: 'kpis', 
 
 /** Keeps the charts the structure can show and that stay meaningful under the report filters. */
 function usable(ids: string[], env: TemplateEnv, filters: PubFilters): string[] {
-  const features = env.dataset ? datasetFeatures(env.dataset) : null;
+  const features = env.dataset ? scopeFeatures(datasetFeatures(env.dataset), filters) : null;
   return ids.filter((id) =>
     (!features || missingFeatures(id, features).length === 0) && trivialFiltersOf(id, filters).length === 0);
 }
@@ -149,7 +153,74 @@ const internationalReport: ReportTemplate = {
   },
 };
 
-export const REPORT_TEMPLATES: ReportTemplate[] = [structureReport, internationalReport, blank];
+/**
+ * « Collaboration avec une université ou un groupe » (plan § 5.2, former Ottawa plan): the report
+ * scope is the co-publications with the chosen institutions (partnerKeys filter). Large
+ * collaborations count in the volumes but are left out of the impact blocks (D2); the footer says
+ * « internal working document » (D7); the annex lists the co-publications (D6).
+ */
+const partnerReport: ReportTemplate = {
+  id: 'partner',
+  label: msg`Collaboration with a university or group`,
+  description: msg`Co-publications with one or several institutions: key figures, impact against a comparable reference, themes, people and labs involved, per-university breakdown, list of publications.`,
+  params: ['structure', 'period', 'perimetre', 'partners'],
+  needsDataset: true,
+  build(input, env) {
+    const keys = [...new Set(input.partners ?? [])];
+    const filters: PubFilters = { partnerKeys: keys };
+    const catalog = env.dataset ? buildPartnerCatalog(env.dataset.publications) : [];
+    const nameOf = new Map(catalog.map((c) => [c.key, c.name]));
+    const names = keys.map((k) => nameOf.get(k) ?? k.replace(/^(international|national):/, ''));
+    const scopeList = keys
+      .map((k, i) => (/^0[a-z0-9]{8}$/.test(k) ? `${names[i]} (ROR ${k})` : names[i]))
+      .join(', ');
+    const lab = env.dataset?.lab ?? input.slug;
+    const partnersLabel = names.join(', ');
+    // Impact blocks: large collaborations left out (their filters add to the partner filter).
+    const noLarge = (b: ReportBlock): ReportBlock =>
+      b.kind === 'chart' || b.kind === 'kpis' ? { ...b, override: { filters: { maxAuthors: LARGE_COLLAB_AUTHORS } } } : b;
+    const pick = (ids: string[]) => usable(ids, env, filters).map(chart);
+    const about: ReportBlock = {
+      id: newBlockId(),
+      kind: 'text',
+      markdown: [
+        i18n._(msg`Co-publications of ${lab} with ${partnersLabel}.`),
+        '',
+        `- ${i18n._(msg`Partner scope: ${scopeList}.`)}`,
+        `- ${i18n._(msg`Publications with more than ${LARGE_COLLAB_AUTHORS} authors (large consortia) are counted in the volumes but left out of the impact indicators and charts.`)}`,
+        `- ${i18n._(msg`The impact reference is the international co-publications of ${lab} in the same subfields, weighted like the collaboration.`)}`,
+      ].join('\n'),
+    };
+    const blocks: ReportBlock[] = [
+      about,
+      section(msg`Key figures`),
+      kpis('partner'),
+      noLarge(kpis('partner-impact')),
+      section(msg`Overview`),
+      ...pick(['publications-par-annee', 'types-publications', 'acces-ouvert', 'domaines', 'top-sous-domaines', 'top-mots-cles']),
+      section(msg`Journals and impact`),
+      ...pick(['top-revues']),
+      ...pick(['quartiles-scimago', 'distribution-fwci', 'top-par-annee']).map(noLarge),
+      section(msg`People and labs involved`),
+      ...pick(['labos-classement', 'equipes-repartition', 'chercheurs-classement']),
+      ...(keys.length >= 2
+        ? [section(msg`Breakdown by university`), ...pick(['partner-breakdown-top', 'partner-breakdown-evolution'])]
+        : []),
+      section(msg`Other partners in these co-publications`),
+      ...pick(['top-pays', 'top-partenaires', 'carte-monde']),
+      section(msg`Annex`),
+      { id: newBlockId(), kind: 'table', tableId: 'publications' },
+    ];
+    const kept = blocks.filter((b, i) => b.kind !== 'section' || (blocks[i + 1] && blocks[i + 1].kind !== 'section'));
+    return {
+      ...base(partnerReport, input, filters, kept, { partners: keys }),
+      description: i18n._(msg`Co-publications of ${lab} with ${partnersLabel}.`),
+      footerNote: i18n._(msg`Internal working document`),
+    };
+  },
+};
+
+export const REPORT_TEMPLATES: ReportTemplate[] = [partnerReport, structureReport, internationalReport, blank];
 
 export const templateById = (id: string): ReportTemplate | undefined => REPORT_TEMPLATES.find((t) => t.id === id);
 

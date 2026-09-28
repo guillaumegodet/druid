@@ -16,6 +16,7 @@ import { chartDoc, methodologyNote } from './chartDocs';
 import type { ReportDefinition } from './definition';
 import { loadReportFonts } from './fonts';
 import { ReportPdf } from './pdfDoc';
+import { DEFAULT_TABLE_LIMIT, REPORT_TABLES, tableLabel } from './reportTables';
 import type { CapturedChart } from './ReportRenderer';
 import type { BlockScope, ResolvedReport } from './resolveReport';
 
@@ -83,7 +84,24 @@ export async function composeReportPdf({ definition, resolved, datasets, capture
     else if (b.kind === 'text') pdf.markdown(b.markdown);
     else if (b.kind === 'kpis' && rb.dataset && rb.scope) {
       const set = KPI_SETS[b.setId];
-      if (set) pdf.kpiGrid(i18n._(set.label), set.items(rb.dataset, rb.scope.range));
+      if (set) {
+        pdf.kpiGrid(i18n._(set.label), set.items(rb.dataset, rb.scope.range, { source: rb.source, filters: rb.scope.filters }));
+      }
+    } else if (b.kind === 'table' && rb.dataset && rb.scope) {
+      const table = REPORT_TABLES[b.tableId];
+      if (!table) continue;
+      const tr = table.build(rb.dataset, rb.scope.range, b.limit ?? DEFAULT_TABLE_LIMIT);
+      pdf.simpleTable(
+        tableLabel(b.tableId),
+        tr.columns.map((c) => i18n._(c.label)),
+        tr.columns.map((c) => c.width),
+        tr.rows,
+        {
+          links: tr.links,
+          linkColumn: 1,
+          note: tr.omitted ? i18n._(msg`${tr.omitted} more rows not printed (limit of the block).`) : undefined,
+        },
+      );
     } else if (b.kind === 'chart' && rb.scope) {
       const cap = captures.get(b.id);
       if (!cap) continue;
@@ -113,7 +131,7 @@ export async function composeReportPdf({ definition, resolved, datasets, capture
     }
   }
 
-  pdf.finalize(`${definition.name} · ${periodLabel(scope)}`);
+  pdf.finalize(`${definition.name} · ${periodLabel(scope)}`, definition.footerNote?.trim() || undefined);
   const filename = `rapport_${slugify(definition.name)}_${scope.range.start}-${scope.range.end}.pdf`;
   pdf.save(filename);
   return filename;

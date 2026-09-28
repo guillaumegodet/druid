@@ -28,7 +28,12 @@ export type DatasetFeature =
   /** NU journal access categories (journalAccess). */
   | 'journalAccess'
   /** Signature charter scores. */
-  | 'charte';
+  | 'charte'
+  /**
+   * Not a dataset property: the block filters name a group of at least 2 partner institutions
+   * (partnerKeys) — the per-university breakdown needs it (scopeFeatures).
+   */
+  | 'partnerGroup';
 
 /**
  * Parameter of a chart: an integer between `min` and `max`, or one of `values`.
@@ -113,6 +118,10 @@ export const CHART_META: Record<string, ChartMeta> = {
   'collab-nu-domaines': { tab: 'collaborations' },
   'collab-nu-sous-disciplines': { tab: 'collaborations' },
   'collab-nu-sankey': { tab: 'collaborations' },
+  // Per-university breakdown of a partner group (plan-mes-rapports lot 7, « Collaboration avec une
+  // université » template): the institutions are read from the block filters (partnerKeys).
+  'partner-breakdown-top': { tab: 'collaborations', requires: ['partnerGroup'] },
+  'partner-breakdown-evolution': { tab: 'collaborations', requires: ['partnerGroup'] },
   'collab-national-top': { tab: 'collaborations' },
   'collab-national-evolution': { tab: 'collaborations' },
   'carte-france': { tab: 'collaborations' },
@@ -162,6 +171,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   'equipes-repartition': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
   'equipes-evolution': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
   'equipes-types': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
+  'labos-classement': { tab: 'teams', requires: ['composite'], trivialUnder: ['sousStructure'] },
   'radar-disciplinaire': { tab: 'teams', requires: ['teams'], params: [LEVEL_PARAM] },
   'heatmap-disciplinaire': { tab: 'teams', requires: ['teams'], params: [LEVEL_PARAM] },
   'doctorants-repartition': { tab: 'phd', requires: ['phd'] },
@@ -192,6 +202,12 @@ export function datasetFeatures(dataset: DashboardDataset): Set<DatasetFeature> 
   if (pubs.some((p) => p.journalAccess != null)) out.add('journalAccess');
   if (pubs.some((p) => p.charte?.score != null)) out.add('charte');
   return out;
+}
+
+/** Dataset features plus those given by the block filters (partnerGroup). */
+export function scopeFeatures(features: Set<DatasetFeature>, filters: PubFilters): Set<DatasetFeature> {
+  if ((filters.partnerKeys?.length ?? 0) < 2) return features;
+  return new Set([...features, 'partnerGroup' as const]);
 }
 
 /** Features a chart needs and the dataset lacks (empty = available). */
