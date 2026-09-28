@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { copyToClipboard } from '../../lib/clipboard';
 import { embedStateParams } from './embedState';
 import type { PubFilters } from './publicationFilters';
+import type { ChartParams } from './chartMeta';
 import * as echarts from 'echarts/core';
 import type { EChartsCoreOption } from 'echarts/core';
 import {
@@ -118,7 +119,7 @@ export const ShareScopeContext = React.createContext<ShareScope | null>(null);
 export function buildEmbedUrl(
   scope: ShareScope,
   chartId: string,
-  state?: { filters?: PubFilters; params?: Record<string, number> },
+  state?: { filters?: PubFilters; params?: ChartParams },
 ): string {
   const u = new URL('/embed', window.location.origin);
   u.searchParams.set('struct', scope.slug);

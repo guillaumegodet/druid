@@ -50,8 +50,8 @@ const TYPOLOGY_LABELS: Record<string, MessageDescriptor> = {
   'Pas de collaboration': msg`No collaboration`,
 };
 
-/** Stacked yearly evolution per collaboration category. */
-const TypologyEvolutionChart: React.FC<{
+/** Stacked yearly evolution per collaboration category (also in the chart registry). */
+export const TypologyEvolutionChart: React.FC<{
   data: { keys: string[]; years: number[]; series: { name: string; data: number[] }[] };
 }> = ({ data }) => {
   const t = useVizTheme();
@@ -91,6 +91,82 @@ const TypologyEvolutionChart: React.FC<{
       title={tr`Evolution of collaboration types`}
       option={option}
       exportName="collab-typologie-evolution"
+    />
+  );
+};
+
+/** Collaboration types donut, translated labels and stable colors (tab and registry). */
+export const TypologyDonutChart: React.FC<{
+  data: { key: string; count: number }[];
+  subtitle?: string;
+}> = ({ data, subtitle }) => {
+  const t = useVizTheme();
+  const { t: tr } = useLingui();
+  const colors = typologyColors(t);
+  return (
+    <TeamDonutChart
+      title={tr`Collaboration types`}
+      subtitle={subtitle}
+      exportName="collab-typologie"
+      data={data.map((c) => ({
+        name: TYPOLOGY_LABELS[c.key] ? tr(TYPOLOGY_LABELS[c.key]) : c.key,
+        value: c.count,
+        color: colors[c.key],
+      }))}
+    />
+  );
+};
+
+/** Domains of internal co-publications (`idPrefix` = collab-structure | collab-nu). */
+export const InternalCollabDomainsChart: React.FC<{
+  agg: InternalCollabAggregates;
+  idPrefix: string;
+  onSelect?: (domain: string) => void;
+}> = ({ agg, idPrefix, onSelect }) => {
+  const { t } = useLingui();
+  return (
+    <TeamDonutChart
+      title={t`Domains of co-publications`}
+      exportName={`${idPrefix}-domaines`}
+      data={agg.domains.map((d) => ({ name: d.key, value: d.count }))}
+      onSelect={onSelect}
+    />
+  );
+};
+
+/** Subfields of internal co-publications. */
+export const InternalCollabSubfieldsChart: React.FC<{
+  agg: InternalCollabAggregates;
+  idPrefix: string;
+  onItemClick?: (subfield: string) => void;
+}> = ({ agg, idPrefix, onItemClick }) => {
+  const { t } = useLingui();
+  return (
+    <RankBarChart
+      title={t`Subfields of co-publications`}
+      exportName={`${idPrefix}-sous-disciplines`}
+      data={agg.topSubfields.map((s) => ({ label: s.key, count: s.count, teams: [] }))}
+      colorSlot={3}
+      height={Math.max(280, agg.topSubfields.length * 26 + 60)}
+      onItemClick={onItemClick}
+    />
+  );
+};
+
+/** Collaboration topics by lab (Sankey). */
+export const InternalCollabSankeyChart: React.FC<{
+  agg: InternalCollabAggregates;
+  idPrefix: string;
+}> = ({ agg, idPrefix }) => {
+  const { t } = useLingui();
+  return (
+    <SankeyChart
+      nodes={agg.sankey.nodes}
+      links={agg.sankey.links}
+      title={t`Collaboration topics by lab`}
+      subtitle={t`Width ∝ shared co-publications (top OpenAlex subfields)`}
+      exportName={`${idPrefix}-sankey`}
+      height={Math.max(360, agg.sankey.nodes.length * 22 + 80)}
     />
   );
 };
@@ -140,34 +216,21 @@ const InternalCollabSection: React.FC<{
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
         <div className="lg:col-span-2">
-          <TeamDonutChart
-            title={t`Domains of co-publications`}
-            exportName={`${idPrefix}-domaines`}
-            data={agg.domains.map((d) => ({ name: d.key, value: d.count }))}
+          <InternalCollabDomainsChart
+            agg={agg}
+            idPrefix={idPrefix}
             onSelect={onOpenList ? (domain) => onOpenList({ domain }) : undefined}
           />
         </div>
         <div className="lg:col-span-3">
-          <RankBarChart
-            title={t`Subfields of co-publications`}
-            exportName={`${idPrefix}-sous-disciplines`}
-            data={agg.topSubfields.map((s) => ({ label: s.key, count: s.count, teams: [] }))}
-            colorSlot={3}
-            height={Math.max(280, agg.topSubfields.length * 26 + 60)}
+          <InternalCollabSubfieldsChart
+            agg={agg}
+            idPrefix={idPrefix}
             onItemClick={onOpenList ? (subfield) => onOpenList({ subfield }) : undefined}
           />
         </div>
       </div>
-      {agg.sankey.links.length > 0 && (
-        <SankeyChart
-          nodes={agg.sankey.nodes}
-          links={agg.sankey.links}
-          title={t`Collaboration topics by lab`}
-          subtitle={t`Width ∝ shared co-publications (top OpenAlex subfields)`}
-          exportName={`${idPrefix}-sankey`}
-          height={Math.max(360, agg.sankey.nodes.length * 22 + 80)}
-        />
-      )}
+      {agg.sankey.links.length > 0 && <InternalCollabSankeyChart agg={agg} idPrefix={idPrefix} />}
     </div>
   );
 };
@@ -185,7 +248,6 @@ export const CollaborationsTab: React.FC<{
   range: YearRange;
   onOpenList?: (filters: PubFilters) => void;
 }> = ({ dataset, range, onOpenList }) => {
-  const t = useVizTheme();
   const { t: tr } = useLingui();
   const { publications } = dataset;
   const composite = useMemo(() => hasSubStructures(publications), [publications]);
@@ -249,15 +311,9 @@ export const CollaborationsTab: React.FC<{
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               <div className="lg:col-span-2">
-                <TeamDonutChart
-                  title={tr`Collaboration types`}
+                <TypologyDonutChart
+                  data={typology.byCategory}
                   subtitle={tr`Broadest category per publication · ${typology.typed.toLocaleString(numberLocale())} typed publications`}
-                  exportName="collab-typologie"
-                  data={typology.byCategory.map((c) => ({
-                    name: TYPOLOGY_LABELS[c.key] ? tr(TYPOLOGY_LABELS[c.key]) : c.key,
-                    value: c.count,
-                    color: typologyColors(t)[c.key],
-                  }))}
                 />
               </div>
               <div className="lg:col-span-3">

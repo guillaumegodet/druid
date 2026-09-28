@@ -25,16 +25,18 @@ export const REPORT_SECTIONS: ReportSection[] = [
     title: msg`Overview`,
     ids: [
       'publications-par-annee', 'langues', 'types-publications', 'acces-ouvert',
-      'top-mots-cles', 'top-sous-domaines',
+      'top-mots-cles', 'top-sous-domaines', 'domaines',
     ],
   },
   {
     tab: 'collaborations',
     title: msg`Collaborations`,
     ids: [
-      'collab-typologie',
-      'collab-structure-top', 'collab-structure-evolution',
-      'collab-nu-top', 'collab-nu-evolution',
+      'collab-typologie', 'collab-typologie-evolution',
+      'collab-structure-top', 'collab-structure-evolution', 'collab-structure-domaines',
+      'collab-structure-sous-disciplines', 'collab-structure-sankey',
+      'collab-nu-top', 'collab-nu-evolution', 'collab-nu-domaines', 'collab-nu-sous-disciplines',
+      'collab-nu-sankey',
       'collab-national-top', 'collab-national-evolution', 'carte-france',
       'international-vs-national', 'pourcentage-international',
       'carte-monde', 'carte-flux', 'top-pays', 'pays-annees', 'evolution-pays',
@@ -46,7 +48,12 @@ export const REPORT_SECTIONS: ReportSection[] = [
   {
     tab: 'impact',
     title: msg`Impact and citations`,
-    ids: ['quartiles-scimago', 'top-par-annee', 'distribution-fwci'],
+    ids: [
+      'quartiles-scimago', 'top-par-annee', 'distribution-fwci',
+      'impact-fwci-sous-structure', 'impact-top-sous-structure',
+      'impact-fwci-equipe', 'impact-top-equipe',
+      'impact-fwci-chercheur', 'impact-top-chercheur',
+    ],
   },
   {
     tab: 'books',
@@ -61,7 +68,7 @@ export const REPORT_SECTIONS: ReportSection[] = [
   {
     tab: 'apc',
     title: msg`APC monitoring`,
-    ids: ['apc-evolution', 'apc-par-revue'],
+    ids: ['apc-evolution', 'apc-par-revue', 'apc-elsevier-par-labo'],
   },
   {
     // Visible tab with charts already in EMBEDDABLE_IDS/EMBED_CHARTS — was missing from here
@@ -73,7 +80,7 @@ export const REPORT_SECTIONS: ReportSection[] = [
   {
     tab: 'themes',
     title: msg`Strategic axes`,
-    ids: ['axes-repartition', 'axes-evolution', 'axes-types'],
+    ids: ['axes-repartition', 'axes-barres', 'axes-evolution', 'axes-types'],
   },
   {
     tab: 'charte',
@@ -83,7 +90,10 @@ export const REPORT_SECTIONS: ReportSection[] = [
   {
     tab: 'teams',
     title: msg`Teams`,
-    ids: ['equipes-repartition', 'equipes-evolution', 'equipes-types', 'radar-disciplinaire'],
+    ids: [
+      'equipes-repartition', 'equipes-evolution', 'equipes-types', 'radar-disciplinaire',
+      'heatmap-disciplinaire',
+    ],
   },
   {
     tab: 'phd',

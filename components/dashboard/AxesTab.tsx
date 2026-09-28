@@ -6,6 +6,7 @@ import { AXE_OTHER, aggregateAxes } from './phase4Aggregates';
 import { PubFilters } from './publicationFilters';
 import { TeamDonutChart, StackedAreaChart, StackedBarHChart, RankBarChart } from './charts/TeamCharts';
 import { useVizTheme } from './EChartCard';
+import type { VizTheme } from './palette';
 import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -21,6 +22,18 @@ import {
 } from './axesCorrections';
 
 const PAGE_SIZE = 25;
+
+/**
+ * Stable color per axis (config order), gray for « Autre / Non classé » and for an axis that
+ * no longer matches the config (stale Grist correction, renamed axis) — without this fallback,
+ * indexOf returned -1 and t.series[-1] (undefined) rendered the segment without color (review lot 9c).
+ * Shared with the chart registry.
+ */
+export const axisColorOf = (t: VizTheme, axes: string[]) => (axe: string): string => {
+  if (axe === AXE_OTHER) return '#8c8677';
+  const idx = axes.indexOf(axe);
+  return idx >= 0 ? t.series[idx % t.series.length] : '#8c8677';
+};
 
 interface CorrectionsState extends AxisCorrectionIndex {
   loaded: boolean;
@@ -307,14 +320,7 @@ export const AxesTab: React.FC<{
     );
   }
 
-  // Stable color per axis (config order), gray for « Autre / Non classé » and for an axis that
-  // no longer matches the config (stale Grist correction, renamed axis) — without this fallback,
-  // indexOf returned -1 and t.series[-1] (undefined) rendered the segment without color (review lot 9c).
-  const colorOf = (axe: string) => {
-    if (axe === AXE_OTHER) return '#8c8677';
-    const idx = axes.indexOf(axe);
-    return idx >= 0 ? t.series[idx % t.series.length] : '#8c8677';
-  };
+  const colorOf = axisColorOf(t, axes);
   const seriesColors = agg.axeNames.map(colorOf);
 
   return (

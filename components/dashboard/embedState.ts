@@ -6,7 +6,7 @@
 // public page refuses the filters that target a person or need the private
 // corpus.
 
-import { sanitizeChartParams } from './chartMeta';
+import { sanitizeChartParams, type ChartParams } from './chartMeta';
 import type { PubFilters } from './publicationFilters';
 import { pubFiltersSchema } from './report/definition';
 import { hasActiveFilter } from './report/restrictDataset';
@@ -59,7 +59,7 @@ export function parseEmbedFilters(raw: string | null, opts: { isPublic: boolean 
 }
 
 /** `p` parameter of /embed → chart parameters (unknown keys dropped, values clamped). */
-export function parseEmbedParams(raw: string | null, chartId: string): Record<string, number> {
+export function parseEmbedParams(raw: string | null, chartId: string): ChartParams {
   if (raw == null || raw === '') return {};
   const value = decodeEmbedParam(raw);
   if (value == null || typeof value !== 'object' || Array.isArray(value)) return {};
@@ -69,7 +69,7 @@ export function parseEmbedParams(raw: string | null, chartId: string): Record<st
 /** Query parameters to append to an /embed URL (only the non-empty ones). */
 export function embedStateParams(
   filters: PubFilters | undefined,
-  params: Record<string, number> | undefined,
+  params: ChartParams | undefined,
 ): [string, string][] {
   const out: [string, string][] = [];
   if (filters && hasActiveFilter(filters)) out.push(['f', encodeEmbedParam(filters)]);

@@ -4,6 +4,7 @@
 
 import { AuthorMeta, DashboardPublication } from './types';
 import { YearRange } from './overviewAggregates';
+import { TEAM_UNKNOWN } from './structureAggregates';
 
 export const QUARTILES = ['Q1', 'Q2', 'Q3', 'Q4'];
 
@@ -156,6 +157,26 @@ export function aggregateImpactByGroup(
     rows = rows.sort((a, b) => b.fwciMean - a.fwciMean).slice(0, top);
   }
   return rows;
+}
+
+/** Grouping of the « Impact par équipe ou chercheur » section. */
+export type ImpactGrouping = 'sousStructure' | 'team' | 'researcher';
+
+/** Number of researchers kept by the « par chercheur » grouping (best mean FWCI). */
+export const IMPACT_RESEARCHER_TOP = 30;
+
+/** Rows of the « Impact par équipe ou chercheur » charts for one grouping (tab and registry). */
+export function impactRowsByGrouping(
+  pubs: DashboardPublication[],
+  authors: AuthorMeta[],
+  range: YearRange,
+  grouping: ImpactGrouping,
+): ImpactGroupRow[] {
+  if (grouping === 'sousStructure') return aggregateImpactByGroup(pubs, range, (p) => p.sousStructures);
+  if (grouping === 'team') {
+    return aggregateImpactByGroup(pubs, range, (p) => p.teams.filter((tm) => tm && tm !== TEAM_UNKNOWN));
+  }
+  return aggregateImpactByGroup(pubs, range, researcherGroupsOf(authors), IMPACT_RESEARCHER_TOP);
 }
 
 /** « chercheur » (researcher) groups: labels of the internal authors of a publication. */

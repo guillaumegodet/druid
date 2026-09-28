@@ -85,9 +85,24 @@ import {
   StackedAreaChart,
   StackedBarHChart,
   TeamRadarChart,
+  TeamHeatmapChart,
   RankBarChart,
 } from './charts/TeamCharts';
 import { NetworkChart } from './charts/NetworkChart';
+import { FwciMeanByGroupChart, TopByGroupChart } from './charts/ImpactGroupCharts';
+import { impactRowsByGrouping, type ImpactGrouping } from './impactAggregates';
+import { aggregateDomains } from './phase4Aggregates';
+import {
+  InternalCollabDomainsChart,
+  InternalCollabSankeyChart,
+  InternalCollabSubfieldsChart,
+  TypologyDonutChart,
+  TypologyEvolutionChart,
+} from './CollaborationsTab';
+import { axisColorOf } from './AxesTab';
+import { ApcByLaboChart, aggregateDealByLabo } from './ApcTab';
+import { enumParam, intParam, type ChartParams } from './chartMeta';
+import type { TeamRadarLevel } from './structureAggregates';
 
 export interface EmbedChartProps {
   dataset: DashboardDataset;
@@ -96,11 +111,11 @@ export interface EmbedChartProps {
    * Chart parameters declared in CHART_META (chartMeta.ts), already sanitized;
    * a missing key means the chart's usual default.
    */
-  params?: Record<string, number>;
+  params?: ChartParams;
 }
 
 /** Charter threshold as a fraction (tab default: 75 %). */
-const charteSeuilOf = (p: EmbedChartProps) => (p.params?.thresholdPct ?? 75) / 100;
+const charteSeuilOf = (p: EmbedChartProps) => (intParam(p.params, 'thresholdPct') ?? 75) / 100;
 
 /** Compliant / non-compliant donut in the current theme colors. */
 const CharteConformiteDonut: React.FC<{ conformes: number; analysable: number }> = ({
@@ -139,6 +154,54 @@ const useSources = ({ dataset, range }: EmbedChartProps) =>
   useMemo(() => aggregateSources(dataset.publications, range), [dataset, range]);
 const useFunders = ({ dataset, range }: EmbedChartProps) =>
   useMemo(() => aggregateFunders(dataset.publications, range), [dataset, range]);
+
+/** Axis aggregates + the tab's axis colors (config order, gray for « Autre »). */
+const useAxes = ({ dataset, range }: EmbedChartProps) => {
+  const t = useVizTheme();
+  const axes = useMemo(() => dataset.strategicAxes.map((a) => a.name), [dataset.strategicAxes]);
+  const d = useMemo(
+    () => aggregateAxes(dataset.publications, range, axes, axeOfPub),
+    [dataset.publications, range, axes],
+  );
+  const colorOf = useMemo(() => axisColorOf(t, axes), [t, axes]);
+  return { d, colorOf, seriesColors: d.axeNames.map(colorOf) };
+};
+const useInternalCollab = ({ dataset, range }: EmbedChartProps, scope: 'structure' | 'nu') =>
+  useMemo(
+    () => aggregateInternalCollab(
+      dataset.publications,
+      range,
+      scope === 'structure' ? internalLabsOf : (x) => x.nantesPartners,
+    ),
+    [dataset, range, scope],
+  );
+/** « Impact par équipe ou chercheur » charts, one registry entry per grouping (= the tab's exportNames). */
+const impactGroupEntries = (
+  grouping: ImpactGrouping,
+  suffix: string,
+  labels: { fwci: MessageDescriptor; top: MessageDescriptor },
+): Record<string, Entry> => ({
+  [`impact-fwci-${suffix}`]: {
+    label: labels.fwci,
+    Chart: (p) => {
+      const rows = useMemo(
+        () => impactRowsByGrouping(p.dataset.publications, p.dataset.authors, p.range, grouping),
+        [p.dataset, p.range],
+      );
+      return <FwciMeanByGroupChart rows={rows} exportName={`impact-fwci-${suffix}`} />;
+    },
+  },
+  [`impact-top-${suffix}`]: {
+    label: labels.top,
+    Chart: (p) => {
+      const rows = useMemo(
+        () => impactRowsByGrouping(p.dataset.publications, p.dataset.authors, p.range, grouping),
+        [p.dataset, p.range],
+      );
+      return <TopByGroupChart rows={rows} exportName={`impact-top-${suffix}`} />;
+    },
+  },
+});
 
 export const EMBED_CHARTS: Record<string, Entry> = {
   // ── Overview
@@ -241,6 +304,15 @@ export const EMBED_CHARTS: Record<string, Entry> = {
     label: msg`FWCI distribution`,
     Chart: (p) => <FwciHistogramChart data={useImpact(p).fwciHistogram} />,
   },
+  ...impactGroupEntries('sousStructure', 'sous-structure', {
+    fwci: msg`Mean FWCI by sub-structure`,
+    top: msg`Top 1% / 10% by sub-structure`,
+  }),
+  ...impactGroupEntries('team', 'equipe', { fwci: msg`Mean FWCI by team`, top: msg`Top 1% / 10% by team` }),
+  ...impactGroupEntries('researcher', 'chercheur', {
+    fwci: msg`Mean FWCI by researcher`,
+    top: msg`Top 1% / 10% by researcher`,
+  }),
   // ── Books
   'ouvrages-types': {
     label: msg`Book types`,
@@ -281,8 +353,24 @@ export const EMBED_CHARTS: Record<string, Entry> = {
   'radar-disciplinaire': {
     label: msg`Disciplinary profile of teams`,
     Chart: (p) => {
-      const d = useMemo(() => aggregateTeamRadar(p.dataset.publications, p.range), [p.dataset, p.range]);
+      const level = enumParam<TeamRadarLevel>(p.params, 'level') ?? 'subfield';
+      const d = useMemo(
+        () => aggregateTeamRadar(p.dataset.publications, p.range, { level }),
+        [p.dataset, p.range, level],
+      );
       return <TeamRadarChart data={d} />;
+    },
+  },
+  'heatmap-disciplinaire': {
+    label: msg`Disciplinary heatmap of teams`,
+    Chart: (p) => {
+      const level = enumParam<TeamRadarLevel>(p.params, 'level') ?? 'subfield';
+      // Same series cap as the heatmap view of the Teams tab (more readable than the radar).
+      const d = useMemo(
+        () => aggregateTeamRadar(p.dataset.publications, p.range, { level, maxSeries: 12 }),
+        [p.dataset, p.range, level],
+      );
+      return <TeamHeatmapChart data={d} />;
     },
   },
   'doctorants-repartition': {
@@ -357,7 +445,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
     label: msg`Co-authorship network`,
     Chart: (p) => {
       // Same initial threshold as the Network tab, computed on the (possibly restricted) corpus.
-      const minPubs = p.params?.minPubs ?? (p.dataset.publications.length > 10000 ? 8 : 2);
+      const minPubs = intParam(p.params, 'minPubs') ?? (p.dataset.publications.length > 10000 ? 8 : 2);
       const d = useMemo(
         () => aggregateNetwork(p.dataset.publications, p.dataset.authors, p.range, minPubs),
         [p.dataset, p.range, minPubs],
@@ -370,7 +458,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
     label: msg`Most frequent journals`,
     Chart: (p) => {
       const d = useMemo(() => aggregateJournals(p.dataset.publications, p.range), [p.dataset, p.range]);
-      return <TopJournalsChart rows={d.rows} defaultN={p.params?.n} />;
+      return <TopJournalsChart rows={d.rows} defaultN={intParam(p.params, 'n')} />;
     },
   },
   'acces-revues': {
@@ -421,21 +509,46 @@ export const EMBED_CHARTS: Record<string, Entry> = {
       );
     },
   },
+  domaines: {
+    label: msg`OpenAlex domains`,
+    Chart: (p) => {
+      const d = useMemo(() => aggregateDomains(p.dataset.publications, p.range), [p.dataset, p.range]);
+      return (
+        <TeamDonutChart
+          title={i18n._(msg`OpenAlex domains`)}
+          subtitle={i18n._(msg`A publication may belong to several domains`)}
+          exportName="domaines"
+          data={d.map((x) => ({ name: x.key, value: x.count }))}
+        />
+      );
+    },
+  },
   // Strategic axes: ETL classification only (Grist corrections are applied
   // in the authenticated tab, not in public embeds).
   'axes-repartition': {
     label: msg`Breakdown by strategic axis`,
     Chart: (p) => {
-      const axes = p.dataset.strategicAxes.map((a) => a.name);
-      const d = useMemo(
-        () => aggregateAxes(p.dataset.publications, p.range, axes, axeOfPub),
-        [p.dataset, p.range],
-      );
+      const { d, colorOf } = useAxes(p);
       return (
         <TeamDonutChart
           title={i18n._(msg`Breakdown by strategic axis`)}
           exportName="axes-repartition"
-          data={d.byAxe.map((t) => ({ name: t.key, value: t.count }))}
+          data={d.byAxe.map((a) => ({ name: a.key, value: a.count, color: colorOf(a.key) }))}
+        />
+      );
+    },
+  },
+  'axes-barres': {
+    label: msg`Publications by axis`,
+    Chart: (p) => {
+      const { d } = useAxes(p);
+      return (
+        <RankBarChart
+          title={i18n._(msg`Publications by axis`)}
+          exportName="axes-barres"
+          data={d.byAxe.map((a) => ({ label: a.key, count: a.count, teams: [] }))}
+          colorSlot={0}
+          height={Math.max(260, d.byAxe.length * 34 + 80)}
         />
       );
     },
@@ -443,26 +556,28 @@ export const EMBED_CHARTS: Record<string, Entry> = {
   'axes-evolution': {
     label: msg`Yearly evolution by strategic axis`,
     Chart: (p) => {
-      const axes = p.dataset.strategicAxes.map((a) => a.name);
-      const d = useMemo(
-        () => aggregateAxes(p.dataset.publications, p.range, axes, axeOfPub),
-        [p.dataset, p.range],
-      );
+      const { d, seriesColors } = useAxes(p);
       return (
-        <StackedAreaChart title={i18n._(msg`Yearly evolution by strategic axis`)} exportName="axes-evolution" data={d.byYear} />
+        <StackedAreaChart
+          title={i18n._(msg`Yearly evolution by strategic axis`)}
+          exportName="axes-evolution"
+          data={d.byYear}
+          colors={seriesColors}
+        />
       );
     },
   },
   'axes-types': {
     label: msg`Publication types by strategic axis`,
     Chart: (p) => {
-      const axes = p.dataset.strategicAxes.map((a) => a.name);
-      const d = useMemo(
-        () => aggregateAxes(p.dataset.publications, p.range, axes, axeOfPub),
-        [p.dataset, p.range],
-      );
+      const { d, seriesColors } = useAxes(p);
       return (
-        <StackedBarHChart title={i18n._(msg`Publication types by strategic axis`)} exportName="axes-types" data={d.byType} />
+        <StackedBarHChart
+          title={i18n._(msg`Publication types by strategic axis`)}
+          exportName="axes-types"
+          data={d.byType}
+          colors={seriesColors}
+        />
       );
     },
   },
@@ -487,7 +602,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
         () => aggregateCharte(p.dataset.publications, p.range, seuil),
         [p.dataset, p.range, seuil],
       );
-      return <CharteScoresChart data={d.scoreHistogram} thresholdPct={p.params?.thresholdPct ?? 75} />;
+      return <CharteScoresChart data={d.scoreHistogram} thresholdPct={intParam(p.params, 'thresholdPct') ?? 75} />;
     },
   },
   'charte-evolution': {
@@ -542,6 +657,13 @@ export const EMBED_CHARTS: Record<string, Entry> = {
     Chart: (p) => {
       const d = useMemo(() => aggregateApc(p.dataset.publications, p.range), [p.dataset, p.range]);
       return <ApcYearlyChart data={d.byYear} />;
+    },
+  },
+  'apc-elsevier-par-labo': {
+    label: msg`Elsevier APCs by lab`,
+    Chart: (p) => {
+      const d = useMemo(() => aggregateDealByLabo(p.dataset.publications, p.range), [p.dataset, p.range]);
+      return <ApcByLaboChart data={d} />;
     },
   },
   'apc-par-revue': {
@@ -618,15 +740,42 @@ export const EMBED_CHARTS: Record<string, Entry> = {
         () => aggregateCollabTypology(p.dataset.publications, p.range),
         [p.dataset, p.range],
       );
-      return (
-        <TeamDonutChart
-          title={i18n._(msg`Collaboration types`)}
-          subtitle={i18n._(msg`Broadest category per publication`)}
-          exportName="collab-typologie"
-          data={d.byCategory.map((c) => ({ name: c.key, value: c.count }))}
-        />
-      );
+      return <TypologyDonutChart data={d.byCategory} subtitle={i18n._(msg`Broadest category per publication`)} />;
     },
+  },
+  'collab-typologie-evolution': {
+    label: msg`Evolution of collaboration types`,
+    Chart: (p) => {
+      const d = useMemo(
+        () => aggregateCollabTypology(p.dataset.publications, p.range),
+        [p.dataset, p.range],
+      );
+      return <TypologyEvolutionChart data={d.byYear} />;
+    },
+  },
+  'collab-structure-domaines': {
+    label: msg`Domains of internal co-publications`,
+    Chart: (p) => <InternalCollabDomainsChart agg={useInternalCollab(p, 'structure')} idPrefix="collab-structure" />,
+  },
+  'collab-structure-sous-disciplines': {
+    label: msg`Subfields of internal co-publications`,
+    Chart: (p) => <InternalCollabSubfieldsChart agg={useInternalCollab(p, 'structure')} idPrefix="collab-structure" />,
+  },
+  'collab-structure-sankey': {
+    label: msg`Internal collaboration topics by lab`,
+    Chart: (p) => <InternalCollabSankeyChart agg={useInternalCollab(p, 'structure')} idPrefix="collab-structure" />,
+  },
+  'collab-nu-domaines': {
+    label: msg`Domains of co-publications with NU labs`,
+    Chart: (p) => <InternalCollabDomainsChart agg={useInternalCollab(p, 'nu')} idPrefix="collab-nu" />,
+  },
+  'collab-nu-sous-disciplines': {
+    label: msg`Subfields of co-publications with NU labs`,
+    Chart: (p) => <InternalCollabSubfieldsChart agg={useInternalCollab(p, 'nu')} idPrefix="collab-nu" />,
+  },
+  'collab-nu-sankey': {
+    label: msg`Collaboration topics with NU labs`,
+    Chart: (p) => <InternalCollabSankeyChart agg={useInternalCollab(p, 'nu')} idPrefix="collab-nu" />,
   },
   'collab-structure-top': {
     label: msg`Most co-signing labs of the structure`,
@@ -681,7 +830,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
         publications={p.dataset.publications}
         range={p.range}
         countryNames={p.dataset.countryNames}
-        defaultN={p.params?.n}
+        defaultN={intParam(p.params, 'n')}
       />
     ),
   },

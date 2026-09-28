@@ -240,6 +240,21 @@ export interface KeywordsAggregates {
   topSubfields: CountItem[];
 }
 
+/**
+ * The 4 OpenAlex domains of the publications of the period (a publication may
+ * have several) — the « domaines » donut of the registry, same count as the
+ * domains of the partner breakdown (aggregatePartnerBilan).
+ */
+export function aggregateDomains(pubs: DashboardPublication[], range: YearRange): CountItem[] {
+  const counts = new Map<string, number>();
+  for (const p of inRangePubs(pubs, range)) {
+    for (const d of new Set(p.domains)) counts.set(d, (counts.get(d) ?? 0) + 1);
+  }
+  return Array.from(counts.entries())
+    .map(([key, count]) => ({ key, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
 export function aggregateKeywords(
   pubs: DashboardPublication[],
   range: YearRange,

@@ -24,6 +24,7 @@ import { DashboardDataset } from '../types';
 import { getYearBounds, YearRange } from '../overviewAggregates';
 import { YearRangeSelector } from '../YearRangeSelector';
 import { EMBED_CHARTS } from '../embedRegistry';
+import { datasetFeatures, missingFeatures } from '../chartMeta';
 import { REPORT_SECTIONS, ReportSection } from './reportCatalog';
 import { CapturedChart, ReportRenderer } from './ReportRenderer';
 import { generateReportPdf } from './generateReport';
@@ -94,9 +95,15 @@ export const ReportWizard: React.FC<ReportWizardProps> = ({
   );
 
   // ── Step 2: available sections/charts and selection ───────────────────────
+  // Charts whose data the structure lacks (no teams, not composite…) are left out:
+  // they would print as empty frames.
+  const features = useMemo(() => datasetFeatures(dataset), [dataset]);
   const availableSections = useMemo(
-    () => REPORT_SECTIONS.filter((s) => visibleTabKeys.includes(s.tab)),
-    [visibleTabKeys],
+    () =>
+      REPORT_SECTIONS.filter((s) => visibleTabKeys.includes(s.tab))
+        .map((s) => ({ ...s, ids: s.ids.filter((id) => missingFeatures(id, features).length === 0) }))
+        .filter((s) => s.ids.length > 0),
+    [visibleTabKeys, features],
   );
   // tab → selected ids (catalog order preserved at render time).
   const [selection, setSelection] = useState<Record<string, Set<string>>>(() =>

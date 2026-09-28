@@ -11,7 +11,9 @@ import {
   sanitizeChartParams,
   trivialFiltersOf,
 } from '../../components/dashboard/chartMeta';
-import { EMBEDDABLE_IDS } from '../../components/dashboard/embedIds';
+import { EMBEDDABLE_IDS, KPI_SET_IDS } from '../../components/dashboard/embedIds';
+import { KPI_SETS } from '../../components/dashboard/kpiItems';
+import { aggregateDomains } from '../../components/dashboard/phase4Aggregates';
 import {
   decodeEmbedParam,
   embedStateParams,
@@ -73,10 +75,16 @@ describe('chart metadata (CHART_META)', () => {
   it('declares parameters with consistent bounds', () => {
     for (const [id, meta] of Object.entries(CHART_META)) {
       for (const p of meta.params ?? []) {
-        expect(p.min, id).toBeLessThanOrEqual(p.max);
+        if (p.values) {
+          expect(p.values.length, id).toBeGreaterThan(0);
+          if (p.default != null) expect(p.values, id).toContain(p.default);
+          continue;
+        }
+        expect(typeof p.min === 'number' && typeof p.max === 'number', id).toBe(true);
+        expect(p.min!, id).toBeLessThanOrEqual(p.max!);
         if (p.default != null) {
-          expect(p.default, id).toBeGreaterThanOrEqual(p.min);
-          expect(p.default, id).toBeLessThanOrEqual(p.max);
+          expect(p.default as number, id).toBeGreaterThanOrEqual(p.min!);
+          expect(p.default as number, id).toBeLessThanOrEqual(p.max!);
         }
       }
     }
@@ -87,6 +95,30 @@ describe('chart metadata (CHART_META)', () => {
     expect(sanitizeChartParams('top-revues', { n: 12.4 })).toEqual({ n: 12 });
     expect(sanitizeChartParams('top-revues', { n: 'ten' })).toEqual({});
     expect(sanitizeChartParams('langues', { n: 5 })).toEqual({});
+    // Enumerated parameter: only the allowed values.
+    expect(sanitizeChartParams('heatmap-disciplinaire', { level: 'topic' })).toEqual({ level: 'topic' });
+    expect(sanitizeChartParams('heatmap-disciplinaire', { level: 'field', n: 3 })).toEqual({});
+  });
+
+  it('offers exactly the key-figure sets declared in KPI_SET_IDS', () => {
+    expect(new Set(Object.keys(KPI_SETS))).toEqual(KPI_SET_IDS);
+    const items = KPI_SETS.overview.items(DS, { start: 2020, end: 2025 });
+    expect(items.find((i) => i.key === 'publications')?.value).toBe('4');
+    expect(items.find((i) => i.key === 'international')?.value).toBe('3');
+    expect(KPI_SETS.impact.items(DS, { start: 2020, end: 2025 }).map((i) => i.key))
+      .toEqual(['fwci-known', 'top10', 'top1', 'fwci-mean']);
+  });
+
+  it('counts each OpenAlex domain once per publication', () => {
+    const ds = dataset([
+      pub({ domains: ['Health Sciences', 'Life Sciences', 'Health Sciences'] }),
+      pub({ domains: ['Health Sciences'] }),
+      pub({ domains: ['Physical Sciences'], year: 2010 }),
+    ]);
+    expect(aggregateDomains(ds.publications, { start: 2020, end: 2025 })).toEqual([
+      { key: 'Health Sciences', count: 2 },
+      { key: 'Life Sciences', count: 1 },
+    ]);
   });
 
   it('flags degenerate charts under a filter', () => {
@@ -180,6 +212,9 @@ describe('report definition schema', () => {
     expect(bad({ blocks: [valid.blocks[0], valid.blocks[0]] }).ok).toBe(false);
     expect(bad({ context: { ...valid.context, period: { kind: 'fixed', start: 2025, end: 2020 } } }).ok).toBe(false);
     expect(bad({ context: { ...valid.context, slug: '../etc' } }).ok).toBe(false);
+    expect(bad({ blocks: [{ id: 'k1', kind: 'kpis', setId: 'unknown' }] }).ok).toBe(false);
+    expect(bad({ blocks: [{ id: 'k1', kind: 'kpis', setId: 'impact' }] }).ok).toBe(true);
+    expect(bad({ blocks: [{ id: 'h1', kind: 'chart', chartId: 'heatmap-disciplinaire', params: { level: 'topic' } }] }).ok).toBe(true);
   });
 
   it('bounds the size of a definition', () => {

@@ -232,14 +232,14 @@ export const ApcByJournalChart: React.FC<{
 };
 
 // ── Breakdown of the Elsevier agreement per lab (composite institution) ──────
-interface LaboAmount {
+export interface LaboAmount {
   labo: string;
   total: number; // cumulative list value in € (OA articles under the agreement)
   n: number;
 }
 
 /** Elsevier APCs (OA under the agreement) per lab. A co-signed publication counts in each lab. */
-function aggregateDealByLabo(pubs: DashboardPublication[], range: YearRange): LaboAmount[] {
+export function aggregateDealByLabo(pubs: DashboardPublication[], range: YearRange): LaboAmount[] {
   const m = new Map<string, { total: number; n: number }>();
   for (const p of pubs) {
     const dl = p.publisherDeal;
@@ -261,7 +261,7 @@ function aggregateDealByLabo(pubs: DashboardPublication[], range: YearRange): La
 }
 
 /** Horizontal bars: Elsevier list value (€) per lab. */
-const ApcByLaboChart: React.FC<{ data: LaboAmount[] }> = ({ data }) => {
+export const ApcByLaboChart: React.FC<{ data: LaboAmount[] }> = ({ data }) => {
   const t = useVizTheme();
   const { t: tr } = useLingui();
   const option = useMemo(() => {

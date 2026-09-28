@@ -30,14 +30,22 @@ export type DatasetFeature =
   /** Signature charter scores. */
   | 'charte';
 
-/** Integer parameter of a chart; missing value = the chart's current default. */
+/**
+ * Parameter of a chart: an integer between `min` and `max`, or one of `values`.
+ * A missing value means the chart's usual default. (Flat shape rather than a
+ * tagged union: the non-strict tsconfig narrows it poorly.)
+ */
 export interface ChartParamDef {
   key: string;
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
+  /** Allowed values of an enumerated parameter (min/max ignored). */
+  values?: string[];
   /** Omitted when the chart computes its default from the data (e.g. network threshold). */
-  default?: number;
+  default?: number | string;
 }
+
+export type ChartParams = Record<string, number | string>;
 
 export interface ChartMeta {
   /** DashboardPage tab (same keys as REPORT_SECTIONS). */
@@ -60,6 +68,7 @@ const FOREIGN_SUBSET: (keyof PubFilters)[] = [
   'international', 'country', 'partnerInstitution', 'partnerKeys',
 ];
 const CHARTE_PARAMS: ChartParamDef[] = [{ key: 'thresholdPct', min: 0, max: 100, default: 75 }];
+const LEVEL_PARAM: ChartParamDef = { key: 'level', values: ['subfield', 'topic'], default: 'subfield' };
 const charte = (extra: Partial<ChartMeta> = {}): ChartMeta => ({
   tab: 'charte', requires: ['charte'], params: CHARTE_PARAMS, ...extra,
 });
@@ -72,6 +81,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   'acces-ouvert': { tab: 'overview' },
   'top-mots-cles': { tab: 'overview' },
   'top-sous-domaines': { tab: 'overview' },
+  domaines: { tab: 'overview', trivialUnder: ['domain'] },
   // ── Collaborations — international
   'international-vs-national': { tab: 'collaborations', trivialUnder: FOREIGN_SUBSET },
   'pourcentage-international': { tab: 'collaborations', trivialUnder: FOREIGN_SUBSET },
@@ -92,10 +102,17 @@ export const CHART_META: Record<string, ChartMeta> = {
   'reseau-equipes-organismes': { tab: 'collaborations' },
   // ── Collaborations — typology / structure / NU / national
   'collab-typologie': { tab: 'collaborations', trivialUnder: FOREIGN_SUBSET },
+  'collab-typologie-evolution': { tab: 'collaborations', trivialUnder: FOREIGN_SUBSET },
   'collab-structure-top': { tab: 'collaborations', requires: ['composite'] },
   'collab-structure-evolution': { tab: 'collaborations', requires: ['composite'] },
+  'collab-structure-domaines': { tab: 'collaborations', requires: ['composite'] },
+  'collab-structure-sous-disciplines': { tab: 'collaborations', requires: ['composite'] },
+  'collab-structure-sankey': { tab: 'collaborations', requires: ['composite'] },
   'collab-nu-top': { tab: 'collaborations' },
   'collab-nu-evolution': { tab: 'collaborations' },
+  'collab-nu-domaines': { tab: 'collaborations' },
+  'collab-nu-sous-disciplines': { tab: 'collaborations' },
+  'collab-nu-sankey': { tab: 'collaborations' },
   'collab-national-top': { tab: 'collaborations' },
   'collab-national-evolution': { tab: 'collaborations' },
   'carte-france': { tab: 'collaborations' },
@@ -103,6 +120,12 @@ export const CHART_META: Record<string, ChartMeta> = {
   'quartiles-scimago': { tab: 'impact' },
   'top-par-annee': { tab: 'impact' },
   'distribution-fwci': { tab: 'impact' },
+  'impact-fwci-sous-structure': { tab: 'impact', requires: ['composite'] },
+  'impact-top-sous-structure': { tab: 'impact', requires: ['composite'] },
+  'impact-fwci-equipe': { tab: 'impact', requires: ['teams'] },
+  'impact-top-equipe': { tab: 'impact', requires: ['teams'] },
+  'impact-fwci-chercheur': { tab: 'impact', nominative: true },
+  'impact-top-chercheur': { tab: 'impact', nominative: true },
   // ── Books
   'ouvrages-types': { tab: 'books', trivialUnder: ['pubType'] },
   'ouvrages-par-annee': { tab: 'books', trivialUnder: ['pubType'] },
@@ -118,6 +141,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   // ── APC tracking
   'apc-evolution': { tab: 'apc' },
   'apc-par-revue': { tab: 'apc' },
+  'apc-elsevier-par-labo': { tab: 'apc', requires: ['composite'] },
   // ── Funding
   'funders-top': { tab: 'funders' },
   'funders-categories': { tab: 'funders' },
@@ -125,6 +149,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   'funders-par-labo': { tab: 'funders', requires: ['composite'] },
   // ── Strategic axes
   'axes-repartition': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
+  'axes-barres': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
   'axes-evolution': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
   'axes-types': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
   // ── Signature charter
@@ -137,7 +162,8 @@ export const CHART_META: Record<string, ChartMeta> = {
   'equipes-repartition': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
   'equipes-evolution': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
   'equipes-types': { tab: 'teams', requires: ['teams'], trivialUnder: ['team'] },
-  'radar-disciplinaire': { tab: 'teams', requires: ['teams'] },
+  'radar-disciplinaire': { tab: 'teams', requires: ['teams'], params: [LEVEL_PARAM] },
+  'heatmap-disciplinaire': { tab: 'teams', requires: ['teams'], params: [LEVEL_PARAM] },
   'doctorants-repartition': { tab: 'phd', requires: ['phd'] },
   'doctorants-evolution': { tab: 'phd', requires: ['phd'] },
   'doctorants-classement': { tab: 'phd', requires: ['phd'], nominative: true },
@@ -181,17 +207,35 @@ export function trivialFiltersOf(chartId: string, filters: PubFilters): (keyof P
   });
 }
 
-/** Chart parameters for rendering: known keys only, integers clamped to their bounds. */
+/**
+ * Chart parameters for rendering: known keys only, integers rounded and
+ * clamped to their bounds, enumerated values kept only when allowed.
+ */
 export function sanitizeChartParams(
   chartId: string,
   raw: Record<string, unknown> | null | undefined,
-): Record<string, number> {
-  const out: Record<string, number> = {};
+): ChartParams {
+  const out: ChartParams = {};
   if (!raw) return out;
   for (const def of CHART_META[chartId]?.params ?? []) {
     const v = raw[def.key];
-    if (typeof v !== 'number' || !Number.isFinite(v)) continue;
-    out[def.key] = Math.min(def.max, Math.max(def.min, Math.round(v)));
+    if (def.values) {
+      if (typeof v === 'string' && def.values.includes(v)) out[def.key] = v;
+    } else if (typeof v === 'number' && Number.isFinite(v)) {
+      out[def.key] = Math.min(def.max ?? Infinity, Math.max(def.min ?? -Infinity, Math.round(v)));
+    }
   }
   return out;
+}
+
+/** Integer parameter of a sanitized set (undefined when absent). */
+export function intParam(params: ChartParams | undefined, key: string): number | undefined {
+  const v = params?.[key];
+  return typeof v === 'number' ? v : undefined;
+}
+
+/** Enumerated parameter of a sanitized set (undefined when absent). */
+export function enumParam<T extends string>(params: ChartParams | undefined, key: string): T | undefined {
+  const v = params?.[key];
+  return typeof v === 'string' ? (v as T) : undefined;
 }

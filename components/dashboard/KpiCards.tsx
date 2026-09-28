@@ -8,12 +8,19 @@ import {
   Quote,
   Presentation,
   GraduationCap,
+  Activity,
+  Award,
+  Trophy,
+  Gauge,
 } from 'lucide-react';
-import { CONFERENCE_LABEL, OverviewKpis } from './overviewAggregates';
+import { OverviewKpis, YearRange } from './overviewAggregates';
+import { ImpactKpis } from './impactAggregates';
 import { PubFilters } from './publicationFilters';
 import { useVizTheme } from './EChartCard';
-import { useLingui } from '@lingui/react/macro';
-import { numberLocale } from '../../lib/i18n';
+// Runtime hook (not the macro): only subscribes the cards to locale changes, labels come from i18n._.
+import { useLingui } from '@lingui/react';
+import { KPI_SETS, KpiItem, impactKpiItems, overviewKpiItems } from './kpiItems';
+import { DashboardDataset } from './types';
 
 export interface KpiCardData {
   label: string;
@@ -65,94 +72,84 @@ export const KpiCard: React.FC<KpiCardData & { onClick?: () => void }> = ({
   );
 };
 
+/** Icon and color slot of each key figure (KpiItem.key, kpiItems.ts). */
+const KPI_STYLES: Record<string, { Icon: React.FC<{ className?: string }>; slot: number }> = {
+  publications: { Icon: FileText, slot: 0 },
+  international: { Icon: Globe2, slot: 5 },
+  foreign: { Icon: Languages, slot: 6 },
+  apc: { Icon: Euro, slot: 4 },
+  french: { Icon: BookOpen, slot: 2 },
+  citations: { Icon: Quote, slot: 3 },
+  conferences: { Icon: Presentation, slot: 1 },
+  phd: { Icon: GraduationCap, slot: 7 },
+  'fwci-known': { Icon: Activity, slot: 0 },
+  top10: { Icon: Award, slot: 5 },
+  top1: { Icon: Trophy, slot: 4 },
+  'fwci-mean': { Icon: Gauge, slot: 6 },
+};
+
+/** Grid of key-figure cards (tabs and report `kpis` blocks). */
+export const KpiGrid: React.FC<{
+  items: KpiItem[];
+  className: string;
+  /** Opens the pre-filtered publication list (clickable cards). */
+  onOpenList?: (filters: PubFilters) => void;
+}> = ({ items, className, onOpenList }) => {
+  const t = useVizTheme();
+  return (
+    <div className={className}>
+      {items.map((it) => {
+        const style = KPI_STYLES[it.key] ?? { Icon: FileText, slot: 0 };
+        return (
+          <KpiCard
+            key={it.key}
+            label={it.label}
+            value={it.value}
+            hint={it.hint}
+            icon={<style.Icon className="w-5 h-5" />}
+            color={t.series[style.slot]}
+            onClick={onOpenList && it.filter ? () => onOpenList(it.filter!) : undefined}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
 /** KPI row of the Overview (ported from the mockups, Druid 2026 style). */
 export const OverviewKpiCards: React.FC<{
   kpis: OverviewKpis;
   /** Opens the pre-filtered publication list (clickable cards). */
   onOpenList?: (filters: PubFilters) => void;
 }> = ({ kpis, onOpenList }) => {
-  const t = useVizTheme();
-  const { t: tr } = useLingui();
-  const intlHint =
-    kpis.intlPct != null
-      ? (kpis.intlUnknown > 0 ? tr`${kpis.intlPct}% (excluding undetermined)` : `${kpis.intlPct} %`)
-      : undefined;
-
-  const cards: KpiCardData[] = [
-    {
-      label: tr`Publications`,
-      value: kpis.total.toLocaleString(numberLocale()),
-      icon: <FileText className="w-5 h-5" />,
-      color: t.series[0],
-    },
-    {
-      label: tr({ message: `International`, context: "feminine plural" }),
-      value: kpis.intl.toLocaleString(numberLocale()),
-      hint: intlHint,
-      icon: <Globe2 className="w-5 h-5" />,
-      color: t.series[5],
-      filter: { international: true },
-    },
-    {
-      label: tr`In a foreign language`,
-      value: kpis.foreign.toLocaleString(numberLocale()),
-      hint: kpis.foreignPct != null ? `${kpis.foreignPct} %` : undefined,
-      icon: <Languages className="w-5 h-5" />,
-      color: t.series[6],
-    },
-    {
-      label: tr`Publications with APC`,
-      value: kpis.apcCount.toLocaleString(numberLocale()),
-      hint:
-        kpis.apcTotalEur > 0
-          ? `${Math.round(kpis.apcTotalEur).toLocaleString(numberLocale())} EUR`
-          : undefined,
-      icon: <Euro className="w-5 h-5" />,
-      color: t.series[4],
-      filter: { hasApc: true },
-    },
-    {
-      label: tr`In French`,
-      value: kpis.french.toLocaleString(numberLocale()),
-      hint: kpis.frenchPct != null ? `${kpis.frenchPct} %` : undefined,
-      icon: <BookOpen className="w-5 h-5" />,
-      color: t.series[2],
-      filter: { language: 'fr' },
-    },
-    {
-      label: tr`Total citations`,
-      value: kpis.citations.toLocaleString(numberLocale()),
-      hint: kpis.citationsPerPub != null ? tr`${kpis.citationsPerPub.toLocaleString(numberLocale())} / publication` : undefined,
-      icon: <Quote className="w-5 h-5" />,
-      color: t.series[3],
-    },
-    {
-      label: tr`Conference papers`,
-      value: kpis.conf.toLocaleString(numberLocale()),
-      hint: kpis.confPct != null ? `${kpis.confPct} %` : undefined,
-      icon: <Presentation className="w-5 h-5" />,
-      color: t.series[1],
-      filter: { pubType: CONFERENCE_LABEL },
-    },
-    {
-      label: tr`Involving PhD students`,
-      value: kpis.phdKnown ? kpis.phd.toLocaleString(numberLocale()) : '—',
-      hint: kpis.phdKnown ? undefined : tr`staff not matched`,
-      icon: <GraduationCap className="w-5 h-5" />,
-      color: t.series[7],
-      filter: kpis.phdKnown ? { hasPhd: true } : undefined,
-    },
-  ];
-
+  useLingui();
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-      {cards.map((c) => (
-        <KpiCard
-          key={c.label}
-          {...c}
-          onClick={onOpenList && c.filter ? () => onOpenList(c.filter!) : undefined}
-        />
-      ))}
-    </div>
+    <KpiGrid
+      items={overviewKpiItems(kpis)}
+      className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
+      onOpenList={onOpenList}
+    />
   );
+};
+
+/** KPI row of the Impact tab (ported from the mockups, Druid 2026 style). */
+export const ImpactKpiCards: React.FC<{ kpis: ImpactKpis }> = ({ kpis }) => {
+  useLingui();
+  return <KpiGrid items={impactKpiItems(kpis)} className="grid grid-cols-2 lg:grid-cols-4 gap-3" />;
+};
+
+/** Key-figure row of a report `kpis` block (KPI_SETS, kpiItems.ts). */
+export const KpiSetCards: React.FC<{ setId: string; dataset: DashboardDataset; range: YearRange }> = ({
+  setId,
+  dataset,
+  range,
+}) => {
+  const { i18n } = useLingui();
+  const set = KPI_SETS[setId];
+  const items = React.useMemo(
+    () => (set ? set.items(dataset, range) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [set, dataset, range, i18n.locale],
+  );
+  return <KpiGrid items={items} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" />;
 };

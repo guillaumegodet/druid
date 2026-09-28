@@ -4,8 +4,9 @@ import { DashboardDataset } from './types';
 import { YearRange } from './overviewAggregates';
 import {
   aggregateImpact,
-  aggregateImpactByGroup,
-  researcherGroupsOf,
+  IMPACT_RESEARCHER_TOP,
+  impactRowsByGrouping,
+  type ImpactGrouping,
   topPublicationRows,
   TopTableKind,
 } from './impactAggregates';
@@ -20,10 +21,11 @@ import { doiUrl } from '../../lib/doi';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 
 const TEAM_UNKNOWN = 'Non identifié';
-const RESEARCHER_TOP = 30;
+// Local name kept: it is the placeholder of a translated message.
+const RESEARCHER_TOP = IMPACT_RESEARCHER_TOP;
 const PAGE_SIZE = 25;
 
-type Grouping = 'sousStructure' | 'team' | 'researcher';
+type Grouping = ImpactGrouping;
 
 const subBtn = (active: boolean) =>
   `pill px-3 py-1 text-xs transition-colors cursor-pointer ${
@@ -62,22 +64,10 @@ const ImpactGroupingSection: React.FC<{
     if (groupings.length && !groupings.some((g) => g.key === grouping)) setGrouping(groupings[0].key);
   }, [groupings, grouping]);
 
-  const rows = useMemo(() => {
-    if (grouping === 'sousStructure') {
-      return aggregateImpactByGroup(publications, range, (p) => p.sousStructures);
-    }
-    if (grouping === 'team') {
-      return aggregateImpactByGroup(publications, range, (p) =>
-        p.teams.filter((tm) => tm && tm !== TEAM_UNKNOWN),
-      );
-    }
-    return aggregateImpactByGroup(
-      publications,
-      range,
-      researcherGroupsOf(authors),
-      RESEARCHER_TOP,
-    );
-  }, [publications, range, grouping, authors]);
+  const rows = useMemo(
+    () => impactRowsByGrouping(publications, authors, range, grouping),
+    [publications, range, grouping, authors],
+  );
 
   const suffix = grouping === 'sousStructure' ? 'sous-structure' : grouping === 'team' ? 'equipe' : 'chercheur';
 

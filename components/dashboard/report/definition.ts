@@ -6,7 +6,7 @@
 // the /embed `f` parameter (embedState.ts) and the editor all go through them.
 
 import { z } from 'zod';
-import { EMBEDDABLE_IDS } from '../embedIds';
+import { EMBEDDABLE_IDS, KPI_SET_IDS } from '../embedIds';
 import type { PubFilters } from '../publicationFilters';
 
 /** Bounds of a definition (a Grist Text cell holds it, see plan § 3.1). */
@@ -106,13 +106,13 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     title: shortText.optional(),
     note: text.optional(),
     override: contextOverride.optional(),
-    params: z.record(z.string().max(40), z.number()).optional(),
+    params: z.record(z.string().max(40), z.union([z.number(), z.string().max(40)])).optional(),
   }),
   z.strictObject({
     id: blockId,
     hidden: z.boolean().optional(),
     kind: z.literal('kpis'),
-    setId: z.string().max(40),
+    setId: z.string().refine((id) => KPI_SET_IDS.has(id), { message: 'unknown key-figure set' }),
     override: contextOverride.optional(),
   }),
   z.strictObject({
