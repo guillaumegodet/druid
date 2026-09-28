@@ -3,6 +3,7 @@ import { parseReportDefinition, type ReportBlock } from '../../components/dashbo
 import { resolveReport } from '../../components/dashboard/report/resolveReport';
 import {
   DEFAULT_PERIOD,
+  instantiateReportTemplate,
   partnerCountries,
   REPORT_TEMPLATES,
   templateById,
@@ -79,5 +80,15 @@ describe('report templates', () => {
   it('lists partner countries by frequency', () => {
     expect(partnerCountries(LAB)).toEqual(['CA', 'DE']);
     expect(partnerCountries(null)).toEqual([]);
+  });
+
+  it('instantiates an instance template on another structure and period', () => {
+    const source = templateById('international')!.build({ ...input, country: 'CA' }, { dataset: LAB, hiddenTabs: [] });
+    const def = instantiateReportTemplate(source, 12, { ...input, name: 'Copy', slug: 'other', period: { kind: 'fixed', start: 2020, end: 2022 } });
+    expect(parseReportDefinition(def).ok).toBe(true);
+    expect(def).toMatchObject({ name: 'Copy', templateId: 'report:12', context: { slug: 'other', filters: { country: 'CA' } } });
+    expect(def.blocks).toHaveLength(source.blocks.length);
+    expect(def.blocks.every((b, i) => b.id !== source.blocks[i].id)).toBe(true);
+    expect(new Set(def.blocks.map((b) => b.id)).size).toBe(def.blocks.length);
   });
 });

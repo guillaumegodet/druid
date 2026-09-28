@@ -15,8 +15,10 @@ type Row = { id: number; fields: Record<string, unknown> };
 let docSeq = 0;
 
 /** In-memory Grist with the methods of gristClient(). */
-function fakeGrist() {
+function fakeGrist(existing: Record<string, string[]> = {}) {
   const tables = new Map<string, Row[]>();
+  const columns = new Map<string, string[]>();
+  for (const [t, cols] of Object.entries(existing)) { tables.set(t, []); columns.set(t, cols); }
   const seq = new Map<string, number>();
   const calls: string[] = [];
   let failNext = false;
@@ -29,7 +31,15 @@ function fakeGrist() {
     failOnce: () => { failNext = true; },
     rows: (t: string) => tables.get(t) ?? [],
     tables: async () => { guard(); calls.push('tables'); return [...tables.keys()].map((id) => ({ id })); },
-    createTables: async (ts: { id: string }[]) => { calls.push(`create ${ts.map((t) => t.id).join(',')}`); ts.forEach((t) => tables.set(t.id, [])); },
+    createTables: async (ts: { id: string; columns: { id: string }[] }[]) => {
+      calls.push(`create ${ts.map((t) => t.id).join(',')}`);
+      ts.forEach((t) => { tables.set(t.id, []); columns.set(t.id, t.columns.map((c) => c.id)); });
+    },
+    columns: async (t: string) => (columns.get(t) ?? []).map((id) => ({ id })),
+    addColumns: async (t: string, cols: { id: string }[]) => {
+      calls.push(`add columns ${t}: ${cols.map((c) => c.id).join(',')}`);
+      columns.set(t, [...(columns.get(t) ?? []), ...cols.map((c) => c.id)]);
+    },
     records: async (t: string, filter?: Record<string, unknown[]>) => {
       guard();
       return (tables.get(t) ?? [])
@@ -88,7 +98,7 @@ describe('reports store — access control', () => {
     expect((await route(ALICE, 'GET', '')).body.mine.map((r: { id: number }) => r.id)).toEqual([1]);
     // Another user: answered as absent (ids of private reports do not leak), and not listed.
     expect(await route(BOB, 'GET', '1')).toEqual({ status: 404, body: { error: 'Report not found' } });
-    expect((await route(BOB, 'GET', '')).body).toEqual({ mine: [], shared: [], instance: [] });
+    expect((await route(BOB, 'GET', '')).body).toEqual({ mine: [], shared: [], instance: [], templates: [] });
     // Super admin: may read it, not edit its content.
     expect((await route(ADMIN, 'GET', '1')).body.report.role).toBe('admin');
     expect((await route(ADMIN, 'PATCH', '1', { definition: definition('Renamed') })).status).toBe(403);
@@ -178,6 +188,35 @@ describe('reports store — access control', () => {
     expect((await route(ALICE, 'GET', '1/unknown')).status).toBe(404);
     grist.failOnce();
     expect(await route(ALICE, 'GET', '')).toEqual({ status: 502, body: { error: 'Grist HTTP 500 (GET tables)' } });
+  });
+});
+
+describe('reports store — schema evolution and instance templates', () => {
+  it('adds the columns introduced since the tables were created', async () => {
+    const old = store.REPORTS_COLUMNS.filter((c: { id: string }) => c.id !== 'published_template').map((c: { id: string }) => c.id);
+    const grist = fakeGrist({
+      Rapports: old,
+      Rapports_partages: store.SHARES_COLUMNS.map((c: { id: string }) => c.id),
+      Rapports_generations: store.GENERATIONS_COLUMNS.map((c: { id: string }) => c.id),
+    });
+    const s = store.createReportsStore(grist);
+    await store.routeReports(s, ALICE, { method: 'GET', segments: [''], body: undefined });
+    expect(grist.calls.filter((c) => c.startsWith('create') || c.startsWith('add'))).toEqual(['add columns Rapports: published_template']);
+  });
+
+  it('lets super admins only publish instance templates, readable by everyone', async () => {
+    const { route } = setup();
+    await route(ALICE, 'POST', '', { definition: definition('Lab template') });
+    expect((await route(ALICE, 'PATCH', '1', { publishedTemplate: true })).status).toBe(403);
+    // A super admin who is not the owner may publish it (no content change).
+    const published = await route(ADMIN, 'PATCH', '1', { publishedTemplate: true });
+    expect(published.body.report.publishedTemplate).toBe(true);
+    const bob = (await route(BOB, 'GET', '')).body;
+    expect(bob.templates.map((r: { name: string; role: string }) => `${r.name}:${r.role}`)).toEqual(['Lab template:viewer']);
+    expect(bob.instance).toEqual([]);
+    expect((await route(BOB, 'GET', '1')).body.report.role).toBe('viewer');
+    // A copy is an ordinary private report.
+    expect((await route(BOB, 'POST', '1/duplicate')).body.report.publishedTemplate).toBe(false);
   });
 });
 

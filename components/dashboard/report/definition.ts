@@ -180,5 +180,11 @@ export function parseReportDefinition(input: unknown): ParseResult<ReportDefinit
   return { ok: true, value: r.data };
 }
 
-/** New block id (block ids only need to be unique within a report). */
-export const newBlockId = (): string => `b${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
+let blockSeq = 0;
+/**
+ * New block id (unique within a report). The counter keeps ids built in one burst (a template of
+ * 60 blocks) distinct — the time and random parts alone could collide, and the schema refuses
+ * duplicate ids.
+ */
+export const newBlockId = (): string =>
+  `b${Date.now().toString(36)}${(blockSeq++).toString(36)}${Math.random().toString(36).slice(2, 5)}`;

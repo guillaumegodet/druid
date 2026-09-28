@@ -214,6 +214,14 @@ function App() {
       if (newState.page) setCurrentView(newState.page as ViewState);
     }
   );
+  // People a report can be shared with: login ids are the Annuaire uid on Keycloak instances,
+  // the e-mail behind Cloudflare Access (then the logged-in id itself is an e-mail).
+  const shareCandidates = useMemo(() => {
+    const byEmail = getUserInfo().preferred_username.includes('@');
+    return researchers
+      .map((r) => ({ id: (byEmail ? r.email : r.uid) ?? '', label: r.displayName }))
+      .filter((c) => c.id);
+  }, [researchers]);
   const openReport = (id: number | null) => {
     setReportId(id);
     setCurrentView(ViewState.REPORTS);
@@ -915,7 +923,7 @@ function App() {
               </div>
             }
           >
-            <ReportsPage reportId={reportId} onOpenReport={openReport} />
+            <ReportsPage reportId={reportId} onOpenReport={openReport} shareCandidates={shareCandidates} />
           </React.Suspense>
         );
       case ViewState.ADMIN:

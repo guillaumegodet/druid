@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, BarChart3, ChevronDown, ChevronUp, Copy, Eye, EyeOff, FileDown, Gauge, Heading, Plus,
-  RefreshCw, Trash2, Type, X,
+  RefreshCw, Share2, Trash2, Type, X,
 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
@@ -23,6 +23,7 @@ import { useReportDatasets } from '../dashboard/report/useReportDatasets';
 import { ChartPicker } from './ChartPicker';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect } from './ReportControls';
 import { ReportPreview } from './ReportPreview';
+import { ShareDialog, type ShareCandidate } from './ShareDialog';
 
 type SaveState = 'saved' | 'pending' | 'saving' | 'error' | 'conflict';
 
@@ -43,7 +44,9 @@ export const ReportEditor: React.FC<{
   backend: ReportsBackend;
   onBack: () => void;
   onOpenReport: (id: number | null) => void;
-}> = ({ reportId, backend, onBack, onOpenReport }) => {
+  /** People the report can be shared with (suggestions). */
+  shareCandidates?: ShareCandidate[];
+}> = ({ reportId, backend, onBack, onOpenReport, shareCandidates = [] }) => {
   const { t } = useLingui();
   const [stored, setStored] = useState<StoredReport | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -54,6 +57,7 @@ export const ReportEditor: React.FC<{
   const [picker, setPicker] = useState(false);
   const [pdfRun, setPdfRun] = useState<PdfRun | null>(null);
   const [pdfMessage, setPdfMessage] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
   const savingRef = useRef(false);
 
   const load = useCallback(() => {
@@ -233,6 +237,13 @@ export const ReportEditor: React.FC<{
   }
 
   const selected = draft.blocks.find((b) => b.id === selectedId) ?? null;
+  // Sharing: the owner and super admins, on a server backend (not in the browser of a read-only instance).
+  const canShare = backend.kind === 'server' && (stored.role === 'owner' || stored.role === 'admin');
+  const shareSummary = [
+    stored.shares?.length ? t`${stored.shares.length} people` : null,
+    stored.visibility === 'instance' ? t`everyone` : null,
+    stored.publishedTemplate ? t`template` : null,
+  ].filter(Boolean).join(', ');
   const pdfBusy = pdfRun != null;
   const saveLabel: Record<SaveState, string> = {
     saved: t`Saved`,
@@ -260,6 +271,12 @@ export const ReportEditor: React.FC<{
           <span className={`text-xs ${saveState === 'error' || saveState === 'conflict' ? 'text-[#b23b3b] dark:text-[#f08c8c]' : 'text-muted-light dark:text-[#8f897c]'}`}>
             {canEdit ? saveLabel[saveState] : t`Read only`}
           </span>
+          {canShare && (
+            <button type="button" onClick={() => setSharing(true)} className="btn-pill h-9 px-3 text-[13px]" title={t`Share the report`}>
+              <Share2 className="w-4 h-4" /> <Trans>Share</Trans>
+              {shareSummary && <span className="text-xs text-muted-light dark:text-[#8f897c]">· {shareSummary}</span>}
+            </button>
+          )}
           <button type="button" onClick={() => void duplicate()} className="btn-pill h-9 px-3 text-[13px]" title={t`Make your own copy`}>
             <Copy className="w-4 h-4" /> <Trans>Duplicate</Trans>
           </button>
@@ -397,6 +414,17 @@ export const ReportEditor: React.FC<{
         </main>
       </div>
 
+      {sharing && (
+        <ShareDialog
+          report={stored}
+          definition={draft}
+          backend={backend}
+          candidates={shareCandidates}
+          onClose={() => setSharing(false)}
+          // Only the report metadata changed: the draft (possibly with pending edits) is kept.
+          onSaved={(r) => setStored(r)}
+        />
+      )}
       {picker && (
         <ChartPicker
           features={features}

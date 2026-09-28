@@ -25,22 +25,22 @@ msgstr "Error searching for duplicates"
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:281
+#: App.tsx:289
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:318
+#: App.tsx:326
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:332
+#: App.tsx:340
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:346
+#: App.tsx:354
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -48,114 +48,114 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:348
+#: App.tsx:356
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 
-#: App.tsx:350
+#: App.tsx:358
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:357
+#: App.tsx:365
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:428
-#: App.tsx:444
+#: App.tsx:436
+#: App.tsx:452
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: data.count
 #. placeholder {1}: data.skipped ? t`, ${data.skipped} skipped (no uid)` : ''
-#: App.tsx:430
+#: App.tsx:438
 msgid "people.csv updated: {0} people exported{1}."
 msgstr "people.csv updated: {0} people exported{1}."
 
 #. placeholder {0}: data.skipped
-#: App.tsx:430
+#: App.tsx:438
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:432
+#: App.tsx:440
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
 #. placeholder {0}: data.count
-#: App.tsx:445
+#: App.tsx:453
 msgid "structures.csv updated: {0} structures exported to cdb."
 msgstr "structures.csv updated: {0} structures exported to cdb."
 
-#: App.tsx:447
+#: App.tsx:455
 msgid "Error generating structures.csv"
 msgstr "Error generating structures.csv"
 
-#: App.tsx:457
+#: App.tsx:465
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:467
+#: App.tsx:475
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:481
+#: App.tsx:489
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:493
+#: App.tsx:501
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "LDAP update applied: {updated} record(s) written to Grist."
 
-#: App.tsx:495
+#: App.tsx:503
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:502
+#: App.tsx:510
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:536
+#: App.tsx:544
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation applied: {0} record(s) written to Grist."
 
-#: App.tsx:538
+#: App.tsx:546
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:551
+#: App.tsx:559
 msgid "This record has no Grist row: validation impossible."
 msgstr "This record has no Grist row: validation impossible."
 
-#: App.tsx:563
+#: App.tsx:571
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:580
+#: App.tsx:588
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:611
+#: App.tsx:619
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:625
+#: App.tsx:633
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "LDAP structures: {updated} updated, {created} created in Grist."
 
-#: App.tsx:627
+#: App.tsx:635
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:649
+#: App.tsx:657
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:658
+#: App.tsx:666
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -163,69 +163,69 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:667
+#: App.tsx:675
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:675
+#: App.tsx:683
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:689
+#: App.tsx:697
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:706
+#: App.tsx:714
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:740
+#: App.tsx:748
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:868
+#: App.tsx:876
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:872
+#: App.tsx:880
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:878
+#: App.tsx:886
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:896
+#: App.tsx:904
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:914
-#: App.tsx:926
+#: App.tsx:922
+#: App.tsx:934
 #: components/dashboard/EmbedPage.tsx:88
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
 #: components/etl/EtlConsolePage.tsx:457
-#: components/reports/ReportEditor.tsx:220
-#: components/reports/ReportsPage.tsx:123
+#: components/reports/ReportEditor.tsx:224
+#: components/reports/ReportsPage.tsx:134
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:334
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:935
+#: App.tsx:943
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:959
+#: App.tsx:967
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:963
+#: App.tsx:971
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1004
+#: App.tsx:1012
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -523,11 +523,13 @@ msgstr "Copy the link to this view (structure, tab, period, scope)"
 
 #: components/DashboardPage.tsx:387
 #: components/dashboard/NewsTab.tsx:836
+#: components/reports/ShareDialog.tsx:188
 msgid "Copied!"
 msgstr "Copied!"
 
 #: components/DashboardPage.tsx:387
 #: components/dashboard/EChartCard.tsx:362
+#: components/reports/ShareDialog.tsx:188
 msgid "Copy link"
 msgstr "Copy link"
 
@@ -578,8 +580,9 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/ResearcherDetail.tsx:446
 #: components/ResearcherDetail.tsx:549
 #: components/reports/AddToReportDialog.tsx:195
-#: components/reports/NewReportDialog.tsx:183
-#: components/reports/ReportsPage.tsx:176
+#: components/reports/NewReportDialog.tsx:230
+#: components/reports/ReportsPage.tsx:188
+#: components/reports/ShareDialog.tsx:194
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/MergeResearchersModal.tsx:291
 #: components/researchers/TaskForm.tsx:163
@@ -590,7 +593,7 @@ msgstr "Cancel"
 
 #: components/GroupList.tsx:169
 #: components/StructureDetail.tsx:139
-#: components/reports/NewReportDialog.tsx:191
+#: components/reports/NewReportDialog.tsx:238
 msgid "Create"
 msgstr "Create"
 
@@ -599,7 +602,7 @@ msgid "Functional groups"
 msgstr "Functional groups"
 
 #: components/GroupList.tsx:187
-#: components/reports/ReportEditor.tsx:240
+#: components/reports/ReportEditor.tsx:251
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -791,6 +794,7 @@ msgstr "Back to the list"
 
 #: components/ResearcherDetail.tsx:240
 #: components/Sidebar.tsx:155
+#: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "People"
 
@@ -835,6 +839,7 @@ msgstr "Export PDF"
 #: components/ResearcherDetail.tsx:299
 #: components/StructureDetail.tsx:139
 #: components/dashboard/NewsletterPanel.tsx:400
+#: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Save"
 
@@ -986,11 +991,11 @@ msgid "Change language"
 msgstr "Change language"
 
 #: components/Sidebar.tsx:164
-#: components/reports/ReportEditor.tsx:212
-#: components/reports/ReportEditor.tsx:227
-#: components/reports/ReportEditor.tsx:250
-#: components/reports/ReportsPage.tsx:89
-#: components/reports/ReportsPage.tsx:105
+#: components/reports/ReportEditor.tsx:216
+#: components/reports/ReportEditor.tsx:231
+#: components/reports/ReportEditor.tsx:261
+#: components/reports/ReportsPage.tsx:100
+#: components/reports/ReportsPage.tsx:116
 msgid "My reports"
 msgstr "My reports"
 
@@ -1068,7 +1073,7 @@ msgstr "Acronym"
 #: components/StructureList.tsx:201
 #: components/dashboard/MediaSourcesAdmin.tsx:215
 #: components/dashboard/MediaSourcesAdmin.tsx:288
-#: components/reports/NewReportDialog.tsx:160
+#: components/reports/NewReportDialog.tsx:207
 #: components/researchers/ListHeader.tsx:46
 msgid "Name"
 msgstr "Name"
@@ -1186,7 +1191,7 @@ msgstr "Structure deletion: not available"
 #: components/StructureList.tsx:436
 #: components/dashboard/report/ReportWizard.tsx:271
 #: components/dashboard/report/composeReportPdf.ts:59
-#: components/reports/NewReportDialog.tsx:139
+#: components/reports/NewReportDialog.tsx:186
 msgid "Structure"
 msgstr "Structure"
 
@@ -2631,7 +2636,8 @@ msgstr "About “{title}”"
 #: components/dashboard/report/ReportWizard.tsx:261
 #: components/reports/AddToReportDialog.tsx:122
 #: components/reports/ChartPicker.tsx:58
-#: components/reports/NewReportDialog.tsx:111
+#: components/reports/NewReportDialog.tsx:132
+#: components/reports/ShareDialog.tsx:94
 #: components/researchers/UnifiedAlignPage.tsx:603
 msgid "Close"
 msgstr "Close"
@@ -3162,7 +3168,7 @@ msgid "Top 25 keywords"
 msgstr "Top 25 keywords"
 
 #: components/dashboard/MarketShareSection.tsx:23
-#: components/reports/NewReportDialog.tsx:152
+#: components/reports/NewReportDialog.tsx:199
 msgid "Country"
 msgstr "Country"
 
@@ -3200,6 +3206,7 @@ msgstr "Add to the selection…"
 
 #: components/dashboard/MarketShareSection.tsx:232
 #: components/etl/EtlConsolePage.tsx:487
+#: components/reports/ShareDialog.tsx:131
 msgid "Remove"
 msgstr "Remove"
 
@@ -3274,7 +3281,7 @@ msgstr "reject."
 
 #: components/dashboard/MediaMentionsPanel.tsx:258
 #: components/dashboard/MediaMentionsPanel.tsx:555
-#: components/reports/ReportEditor.tsx:520
+#: components/reports/ReportEditor.tsx:548
 #: components/researchers/TasksPage.tsx:185
 msgid "auto"
 msgstr "auto"
@@ -3349,7 +3356,7 @@ msgstr "Last collection: {0}."
 #: components/dashboard/report/composeReportPdf.ts:60
 #: components/dashboard/report/pdfDoc.ts:126
 #: components/groups/GroupDashboardSection.tsx:145
-#: components/reports/NewReportDialog.tsx:143
+#: components/reports/NewReportDialog.tsx:190
 #: components/reports/ReportControls.tsx:83
 msgid "Period"
 msgstr "Period"
@@ -4366,7 +4373,7 @@ msgid "Filters"
 msgstr "Filters"
 
 #: components/dashboard/PublicationsListTab.tsx:257
-#: components/reports/ReportEditor.tsx:307
+#: components/reports/ReportEditor.tsx:324
 #: components/researchers/UnifiedAlignPage.tsx:549
 msgid "Remove this filter"
 msgstr "Remove this filter"
@@ -5566,7 +5573,7 @@ msgid "Content"
 msgstr "Content"
 
 #: components/dashboard/report/ReportWizard.tsx:203
-#: components/reports/ReportEditor.tsx:203
+#: components/reports/ReportEditor.tsx:207
 msgid "PDF report generation failed — see the browser console."
 msgstr "PDF report generation failed — see the browser console."
 
@@ -5578,7 +5585,7 @@ msgstr "PDF report — {0}"
 #: components/dashboard/report/ReportWizard.tsx:282
 #: components/dashboard/report/composeReportPdf.ts:61
 #: components/dashboard/report/pdfDoc.ts:127
-#: components/reports/NewReportDialog.tsx:147
+#: components/reports/NewReportDialog.tsx:194
 #: components/reports/ReportControls.tsx:151
 msgctxt "perimeter"
 msgid "Scope"
@@ -6471,11 +6478,11 @@ msgstr "Interactive version"
 msgid "Page {0} / {1}"
 msgstr "Page {0} / {1}"
 
-#: components/dashboard/report/reportsApi.ts:174
+#: components/dashboard/report/reportsApi.ts:180
 msgid "Browser storage unavailable: reports cannot be saved here."
 msgstr "Browser storage unavailable: reports cannot be saved here."
 
-#: components/dashboard/report/reportsApi.ts:175
+#: components/dashboard/report/reportsApi.ts:181
 msgid "Sharing and history are not available on this read-only instance."
 msgstr "Sharing and history are not available on this read-only instance."
 
@@ -7061,18 +7068,18 @@ msgstr "Loading your reports…"
 
 #. placeholder {0}: r.owner
 #: components/reports/AddToReportDialog.tsx:153
-#: components/reports/ReportsPage.tsx:149
+#: components/reports/ReportsPage.tsx:160
 msgid "by {0}"
 msgstr "by {0}"
 
 #: components/reports/AddToReportDialog.tsx:158
-#: components/reports/NewReportDialog.tsx:110
-#: components/reports/ReportsPage.tsx:99
+#: components/reports/NewReportDialog.tsx:131
+#: components/reports/ReportsPage.tsx:110
 msgid "New report"
 msgstr "New report"
 
 #: components/reports/AddToReportDialog.tsx:169
-#: components/reports/ReportEditor.tsx:258
+#: components/reports/ReportEditor.tsx:269
 msgid "Report name"
 msgstr "Report name"
 
@@ -7101,6 +7108,7 @@ msgid "This report already holds the maximum number of blocks."
 msgstr "This report already holds the maximum number of blocks."
 
 #: components/reports/AddToReportDialog.tsx:198
+#: components/reports/ShareDialog.tsx:157
 #: components/researchers/AffiliationsTable.tsx:113
 msgid "Add"
 msgstr "Add"
@@ -7141,23 +7149,27 @@ msgstr "Search a chart…"
 msgid "No chart matches."
 msgstr "No chart matches."
 
-#: components/reports/NewReportDialog.tsx:116
+#: components/reports/NewReportDialog.tsx:137
 msgid "Template"
 msgstr "Template"
 
-#: components/reports/NewReportDialog.tsx:154
+#: components/reports/NewReportDialog.tsx:160
+msgid "Templates of the institution"
+msgstr "Templates of the institution"
+
+#: components/reports/NewReportDialog.tsx:201
 msgid "All partner countries"
 msgstr "All partner countries"
 
-#: components/reports/NewReportDialog.tsx:166
+#: components/reports/NewReportDialog.tsx:213
 msgid "e.g. Collaborations with the University of Ottawa"
 msgstr "e.g. Collaborations with the University of Ottawa"
 
-#: components/reports/NewReportDialog.tsx:173
+#: components/reports/NewReportDialog.tsx:220
 msgid "Loading the structure's data to choose the charts…"
 msgstr "Loading the structure's data to choose the charts…"
 
-#: components/reports/NewReportDialog.tsx:178
+#: components/reports/NewReportDialog.tsx:225
 msgid "No data for this structure: the report will list every chart of the template."
 msgstr "No data for this structure: the report will list every chart of the template."
 
@@ -7179,153 +7191,175 @@ msgstr "incl. current year"
 
 #. placeholder {0}: r.name
 #. placeholder {0}: stored?.name ?? ''
-#: components/reports/ReportEditor.tsx:128
-#: components/reports/ReportsPage.tsx:51
+#: components/reports/ReportEditor.tsx:132
+#: components/reports/ReportsPage.tsx:54
 msgid "{0} (copy)"
 msgstr "{0} (copy)"
 
 #. placeholder {0}: run.missing.length
-#: components/reports/ReportEditor.tsx:199
+#: components/reports/ReportEditor.tsx:203
 msgid "PDF downloaded — {0} chart(s) could not be captured and were left out."
 msgstr "PDF downloaded — {0} chart(s) could not be captured and were left out."
 
-#: components/reports/ReportEditor.tsx:200
+#: components/reports/ReportEditor.tsx:204
 msgid "PDF downloaded."
 msgstr "PDF downloaded."
 
 #. placeholder {0}: stored.definitionError
-#: components/reports/ReportEditor.tsx:229
+#: components/reports/ReportEditor.tsx:233
 msgid "This report can no longer be opened: its definition does not match the current format ({0})."
 msgstr "This report can no longer be opened: its definition does not match the current format ({0})."
 
-#: components/reports/ReportEditor.tsx:238
+#. placeholder {0}: stored.shares.length
+#: components/reports/ReportEditor.tsx:243
+msgid "{0} people"
+msgstr "{0} people"
+
+#: components/reports/ReportEditor.tsx:244
+msgid "everyone"
+msgstr "everyone"
+
+#: components/reports/ReportEditor.tsx:245
+msgid "template"
+msgstr "template"
+
+#: components/reports/ReportEditor.tsx:249
 msgid "Saved"
 msgstr "Saved"
 
-#: components/reports/ReportEditor.tsx:239
+#: components/reports/ReportEditor.tsx:250
 msgid "Unsaved changes…"
 msgstr "Unsaved changes…"
 
-#: components/reports/ReportEditor.tsx:241
+#: components/reports/ReportEditor.tsx:252
 msgid "Not saved"
 msgstr "Not saved"
 
-#: components/reports/ReportEditor.tsx:242
+#: components/reports/ReportEditor.tsx:253
 msgid "Changed elsewhere"
 msgstr "Changed elsewhere"
 
-#: components/reports/ReportEditor.tsx:261
+#: components/reports/ReportEditor.tsx:272
 msgid "Read only"
 msgstr "Read only"
 
-#: components/reports/ReportEditor.tsx:263
+#: components/reports/ReportEditor.tsx:275
+#: components/reports/ShareDialog.tsx:91
+msgid "Share the report"
+msgstr "Share the report"
+
+#: components/reports/ReportEditor.tsx:276
+msgid "Share"
+msgstr "Share"
+
+#: components/reports/ReportEditor.tsx:280
 msgid "Make your own copy"
 msgstr "Make your own copy"
 
-#: components/reports/ReportEditor.tsx:264
-#: components/reports/ReportsPage.tsx:160
-#: components/reports/ReportsPage.tsx:163
+#: components/reports/ReportEditor.tsx:281
+#: components/reports/ReportsPage.tsx:172
+#: components/reports/ReportsPage.tsx:175
 msgid "Duplicate"
 msgstr "Duplicate"
 
 #. placeholder {0}: Math.min(pdfRun!.index + 1, pdfRun!.batches.length)
 #. placeholder {1}: Math.max(1, pdfRun!.batches.length)
-#: components/reports/ReportEditor.tsx:274
+#: components/reports/ReportEditor.tsx:291
 msgid "Rendering charts {0}/{1}…"
 msgstr "Rendering charts {0}/{1}…"
 
-#: components/reports/ReportEditor.tsx:275
+#: components/reports/ReportEditor.tsx:292
 msgid "Generate the PDF"
 msgstr "Generate the PDF"
 
-#: components/reports/ReportEditor.tsx:284
+#: components/reports/ReportEditor.tsx:301
 msgid "Description (printed on the cover page)"
 msgstr "Description (printed on the cover page)"
 
 #. placeholder {0}: resolved.publicationCount
-#: components/reports/ReportEditor.tsx:315
+#: components/reports/ReportEditor.tsx:332
 msgid "{0} publications"
 msgstr "{0} publications"
 
-#: components/reports/ReportEditor.tsx:321
+#: components/reports/ReportEditor.tsx:338
 msgid "This report was changed elsewhere since you opened it; your latest changes are not saved."
 msgstr "This report was changed elsewhere since you opened it; your latest changes are not saved."
 
-#: components/reports/ReportEditor.tsx:322
+#: components/reports/ReportEditor.tsx:339
 msgid "Reload the saved version"
 msgstr "Reload the saved version"
 
-#: components/reports/ReportEditor.tsx:336
+#: components/reports/ReportEditor.tsx:353
 msgid "Chart"
 msgstr "Chart"
 
-#: components/reports/ReportEditor.tsx:343
+#: components/reports/ReportEditor.tsx:360
 msgid "Key figures"
 msgstr "Key figures"
 
-#: components/reports/ReportEditor.tsx:348
+#: components/reports/ReportEditor.tsx:365
 msgid "New section"
 msgstr "New section"
 
-#: components/reports/ReportEditor.tsx:350
+#: components/reports/ReportEditor.tsx:367
 msgid "Section"
 msgstr "Section"
 
-#: components/reports/ReportEditor.tsx:357
-#: components/reports/ReportEditor.tsx:473
+#: components/reports/ReportEditor.tsx:374
+#: components/reports/ReportEditor.tsx:501
 msgid "Text"
 msgstr "Text"
 
-#: components/reports/ReportEditor.tsx:372
+#: components/reports/ReportEditor.tsx:389
 msgid "Move up"
 msgstr "Move up"
 
-#: components/reports/ReportEditor.tsx:373
+#: components/reports/ReportEditor.tsx:390
 msgid "Move down"
 msgstr "Move down"
 
-#: components/reports/ReportEditor.tsx:374
+#: components/reports/ReportEditor.tsx:391
 msgid "Show in the PDF"
 msgstr "Show in the PDF"
 
-#: components/reports/ReportEditor.tsx:374
+#: components/reports/ReportEditor.tsx:391
 msgid "Hide from the PDF"
 msgstr "Hide from the PDF"
 
-#: components/reports/ReportEditor.tsx:377
-#: components/reports/ReportsPage.tsx:183
+#: components/reports/ReportEditor.tsx:394
+#: components/reports/ReportsPage.tsx:195
 msgid "Delete"
 msgstr "Delete"
 
-#: components/reports/ReportEditor.tsx:391
+#: components/reports/ReportEditor.tsx:408
 msgid "Add a first block with the buttons above."
 msgstr "Add a first block with the buttons above."
 
-#: components/reports/ReportEditor.tsx:391
+#: components/reports/ReportEditor.tsx:408
 msgid "This report is empty."
 msgstr "This report is empty."
 
-#: components/reports/ReportEditor.tsx:465
+#: components/reports/ReportEditor.tsx:493
 msgid "Section title"
 msgstr "Section title"
 
-#: components/reports/ReportEditor.tsx:475
+#: components/reports/ReportEditor.tsx:503
 msgid "# heading · - bullet · **bold** · *italic* · [label](https://…) · blank line = new paragraph"
 msgstr "# heading · - bullet · **bold** · *italic* · [label](https://…) · blank line = new paragraph"
 
-#: components/reports/ReportEditor.tsx:500
+#: components/reports/ReportEditor.tsx:528
 msgid "Title (optional)"
 msgstr "Title (optional)"
 
-#: components/reports/ReportEditor.tsx:506
+#: components/reports/ReportEditor.tsx:534
 msgid "Note printed under the chart"
 msgstr "Note printed under the chart"
 
-#: components/reports/ReportEditor.tsx:527
+#: components/reports/ReportEditor.tsx:555
 msgid "This chart has its own scope (structure, period or filters)."
 msgstr "This chart has its own scope (structure, period or filters)."
 
-#: components/reports/ReportEditor.tsx:530
+#: components/reports/ReportEditor.tsx:558
 msgid "Use the report scope"
 msgstr "Use the report scope"
 
@@ -7365,64 +7399,118 @@ msgstr "This report is empty. Add a section, a chart, key figures or text from t
 msgid "Hidden from the PDF"
 msgstr "Hidden from the PDF"
 
-#: components/reports/ReportsPage.tsx:93
+#: components/reports/ReportsPage.tsx:104
 msgid "Reports built from the dashboard charts — kept in this browser on this read-only instance"
 msgstr "Reports built from the dashboard charts — kept in this browser on this read-only instance"
 
-#: components/reports/ReportsPage.tsx:94
+#: components/reports/ReportsPage.tsx:105
 msgid "Reports built from the dashboard charts, saved, shareable and exportable as PDF"
 msgstr "Reports built from the dashboard charts, saved, shareable and exportable as PDF"
 
-#: components/reports/ReportsPage.tsx:108
+#: components/reports/ReportsPage.tsx:119
 msgid "Shared with me"
 msgstr "Shared with me"
 
-#: components/reports/ReportsPage.tsx:111
+#: components/reports/ReportsPage.tsx:122
 msgid "Visible to everyone"
 msgstr "Visible to everyone"
 
-#: components/reports/ReportsPage.tsx:129
+#: components/reports/ReportsPage.tsx:140
 msgid "No report yet. Create one, then add charts, key figures and text; its PDF is generated in one click."
 msgstr "No report yet. Create one, then add charts, key figures and text; its PDF is generated in one click."
 
-#: components/reports/ReportsPage.tsx:131
+#: components/reports/ReportsPage.tsx:142
 msgid "No report has been shared with you."
 msgstr "No report has been shared with you."
 
-#: components/reports/ReportsPage.tsx:133
+#: components/reports/ReportsPage.tsx:144
 msgid "No report is visible to everyone on this instance."
 msgstr "No report is visible to everyone on this instance."
 
 #. placeholder {0}: formatDate(r.updatedAt)
-#: components/reports/ReportsPage.tsx:147
+#: components/reports/ReportsPage.tsx:158
 msgid "Updated {0}"
 msgstr "Updated {0}"
 
 #. placeholder {0}: formatDate(r.lastGeneratedAt)
-#: components/reports/ReportsPage.tsx:148
+#: components/reports/ReportsPage.tsx:159
 msgid "Last PDF {0}"
 msgstr "Last PDF {0}"
 
-#: components/reports/ReportsPage.tsx:150
+#: components/reports/ReportsPage.tsx:161
 msgid "can edit"
 msgstr "can edit"
 
-#: components/reports/ReportsPage.tsx:150
+#: components/reports/ReportsPage.tsx:161
 msgid "read only"
 msgstr "read only"
 
-#: components/reports/ReportsPage.tsx:151
+#: components/reports/ReportsPage.tsx:162
 msgid "visible to everyone"
 msgstr "visible to everyone"
 
 #. placeholder {0}: r.shareCount
-#: components/reports/ReportsPage.tsx:152
+#: components/reports/ReportsPage.tsx:163
 msgid "shared with {0}"
 msgstr "shared with {0}"
 
-#: components/reports/ReportsPage.tsx:173
+#: components/reports/ReportsPage.tsx:164
+msgid "instance template"
+msgstr "instance template"
+
+#: components/reports/ReportsPage.tsx:185
 msgid "Confirm deletion"
 msgstr "Confirm deletion"
+
+#: components/reports/ShareDialog.tsx:100
+msgid "Each reader sees the report computed with their own access to the data: a chart on a structure they cannot open shows as unavailable."
+msgstr "Each reader sees the report computed with their own access to the data: a chart on a structure they cannot open shows as unavailable."
+
+#: components/reports/ShareDialog.tsx:104
+msgid "This report names people (researcher rankings, co-authorship network…): share it with care."
+msgstr "This report names people (researcher rankings, co-authorship network…): share it with care."
+
+#: components/reports/ShareDialog.tsx:111
+msgid "Not shared with anyone yet."
+msgstr "Not shared with anyone yet."
+
+#: components/reports/ShareDialog.tsx:125
+#: components/reports/ShareDialog.tsx:153
+msgid "Can view"
+msgstr "Can view"
+
+#: components/reports/ShareDialog.tsx:126
+#: components/reports/ShareDialog.tsx:154
+msgid "Can edit"
+msgstr "Can edit"
+
+#: components/reports/ShareDialog.tsx:146
+msgid "E-mail address"
+msgstr "E-mail address"
+
+#: components/reports/ShareDialog.tsx:146
+msgid "Login (uid)"
+msgstr "Login (uid)"
+
+#: components/reports/ShareDialog.tsx:147
+msgid "Person to add"
+msgstr "Person to add"
+
+#: components/reports/ShareDialog.tsx:166
+msgid "Visible to every user of this instance"
+msgstr "Visible to every user of this instance"
+
+#: components/reports/ShareDialog.tsx:167
+msgid "Read only; anyone can duplicate it to make their own version."
+msgstr "Read only; anyone can duplicate it to make their own version."
+
+#: components/reports/ShareDialog.tsx:174
+msgid "Publish as a template of the instance"
+msgstr "Publish as a template of the instance"
+
+#: components/reports/ShareDialog.tsx:175
+msgid "Offered to everyone in « New report », on the structure and period they choose."
+msgstr "Offered to everyone in « New report », on the structure and period they choose."
 
 #. placeholder {0}: apiErrorText(e)
 #: components/researchers/AbesExportModal.tsx:141

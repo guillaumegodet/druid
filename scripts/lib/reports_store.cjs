@@ -33,6 +33,9 @@ const REPORTS_COLUMNS = [
   text('created_at', 'Created at'),
   text('updated_at', 'Updated at'),
   text('deleted_at', 'Deleted at'),
+  // Published by a super admin as a template of the instance (lot 6): readable by everyone,
+  // offered in « New report ».
+  { id: 'published_template', fields: { label: 'Instance template', type: 'Bool' } },
 ];
 const SHARES_COLUMNS = [
   { id: 'report', fields: { label: 'Report (row id)', type: 'Int' } },
@@ -135,6 +138,8 @@ function gristClient({ apiBase, doc, apiKey, fetchImpl = fetch, userAgent }) {
     add: async (table, rows) =>
       ((await call('POST', `tables/${table}/records`, { records: rows.map((fields) => ({ fields })) })).records || [])
         .map((r) => r.id),
+    columns: async (table) => (await call('GET', `tables/${table}/columns`)).columns || [],
+    addColumns: (table, columns) => call('POST', `tables/${table}/columns`, { columns }),
     update: (table, rows) => call('PATCH', `tables/${table}/records`, { records: rows }),
     remove: (table, ids) => call('POST', `tables/${table}/data/delete`, ids),
   };
@@ -146,12 +151,19 @@ function ensureTables(client) {
   if (!readyDocs.has(client.key)) {
     const p = (async () => {
       const have = new Set((await client.tables()).map((t) => t.id));
-      const missing = [
+      const all = [
         [REPORTS_TABLE, REPORTS_COLUMNS],
         [SHARES_TABLE, SHARES_COLUMNS],
         [GENERATIONS_TABLE, GENERATIONS_COLUMNS],
-      ].filter(([id]) => !have.has(id));
+      ];
+      const missing = all.filter(([id]) => !have.has(id));
       if (missing.length) await client.createTables(missing.map(([id, columns]) => ({ id, columns })));
+      // Tables created by an earlier version: add the columns introduced since.
+      for (const [id, columns] of all.filter(([tid]) => have.has(tid))) {
+        const present = new Set((await client.columns(id)).map((c) => c.id));
+        const absent = columns.filter((c) => !present.has(c.id));
+        if (absent.length) await client.addColumns(id, absent);
+      }
     })();
     readyDocs.set(client.key, p);
     p.catch(() => readyDocs.delete(client.key));
@@ -178,6 +190,7 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
     createdAt: row.fields.created_at || null,
     updatedAt: row.fields.updated_at || null,
     role,
+    publishedTemplate: !!row.fields.published_template,
     ...extra,
   });
 
@@ -196,7 +209,7 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
     else {
       const share = (await sharesOf([id])).find((s) => normId(s.fields.grantee) === uid);
       if (share) role = SHARE_ROLES.includes(share.fields.role) ? share.fields.role : 'viewer';
-      else if (row.fields.visibility === 'instance') role = 'viewer';
+      else if (row.fields.visibility === 'instance' || row.fields.published_template) role = 'viewer';
       else if (user.isSuperAdmin) role = 'admin';
     }
     // Not readable: answered as absent, so that ids of private reports do not leak.
@@ -248,7 +261,9 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
       const grantRole = new Map(grants.map((s) => [s.fields.report, s.fields.role === 'editor' ? 'editor' : 'viewer']));
       const sharedRows = all.filter((r) => grantRole.has(r.id) && normId(r.fields.owner) !== uid);
       const instanceRows = all.filter((r) =>
-        r.fields.visibility === 'instance' && normId(r.fields.owner) !== uid && !grantRole.has(r.id));
+        r.fields.visibility === 'instance' && normId(r.fields.owner) !== uid && !grantRole.has(r.id) &&
+        !r.fields.published_template);
+      const templateRows = all.filter((r) => r.fields.published_template);
       const ids = [...mineRows, ...sharedRows, ...instanceRows].map((r) => r.id);
       const last = await lastGenerations(ids);
       const shareCount = new Map();
@@ -261,6 +276,10 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
         mine: mineRows.map((r) => summaryOf(r, 'owner', { ...extra(r), shareCount: shareCount.get(r.id) || 0 })).sort(byUpdate),
         shared: sharedRows.map((r) => summaryOf(r, grantRole.get(r.id), extra(r))).sort(byUpdate),
         instance: instanceRows.map((r) => summaryOf(r, 'viewer', extra(r))).sort(byUpdate),
+        // Instance templates, whoever owns them (the owner also sees them in `mine`).
+        templates: templateRows
+          .map((r) => summaryOf(r, normId(r.fields.owner) === uid ? 'owner' : 'viewer'))
+          .sort((a, b) => a.name.localeCompare(b.name)),
       };
     },
 
@@ -276,7 +295,7 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
       const visibility = VISIBILITIES.includes(input.visibility) ? input.visibility : 'private';
       const at = stamp();
       const [id] = await client.add(REPORTS_TABLE, [{
-        ...fields, owner: user.id, visibility, created_at: at, updated_at: at, deleted_at: '',
+        ...fields, owner: user.id, visibility, created_at: at, updated_at: at, deleted_at: '', published_template: false,
       }]);
       return this.get(user, id);
     },
@@ -286,7 +305,7 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
       await ensureTables(client);
       const { row, role } = await load(user, id);
       // Editors change the content; a super admin who is neither owner nor editor may only
-      // change the visibility (e.g. withdraw a report from the instance).
+      // change the visibility or the template flag (e.g. withdraw a report from the instance).
       if (!canEdit(role) && !(role === 'admin' && input.definition === undefined)) {
         throw new ReportsError('forbidden');
       }
@@ -299,6 +318,11 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
         if (!canManage(role)) throw new ReportsError('forbidden');
         if (!VISIBILITIES.includes(input.visibility)) throw new ReportsError('invalid', 'visibility');
         fields.visibility = input.visibility;
+      }
+      // Publishing as an instance template: super admins only.
+      if (input.publishedTemplate !== undefined) {
+        if (!user.isSuperAdmin || !canManage(role)) throw new ReportsError('forbidden');
+        fields.published_template = !!input.publishedTemplate;
       }
       fields.updated_at = stamp();
       await client.update(REPORTS_TABLE, [{ id, fields }]);

@@ -15,6 +15,7 @@ import {
 } from '../dashboard/report/reportsApi';
 import { ReportEditor } from './ReportEditor';
 import { NewReportDialog } from './NewReportDialog';
+import type { ShareCandidate } from './ShareDialog';
 
 type ListTab = 'mine' | 'shared' | 'instance';
 
@@ -24,7 +25,9 @@ const formatDate = (iso: string | null | undefined) =>
 export const ReportsPage: React.FC<{
   reportId: number | null;
   onOpenReport: (id: number | null) => void;
-}> = ({ reportId, onOpenReport }) => {
+  /** People reports can be shared with (suggestions of the sharing dialog). */
+  shareCandidates?: ShareCandidate[];
+}> = ({ reportId, onOpenReport, shareCandidates }) => {
   const { t } = useLingui();
   const backend = reportsBackend();
   const { compact, onScrollCapture } = useCompactHeader();
@@ -70,7 +73,15 @@ export const ReportsPage: React.FC<{
   };
 
   if (reportId != null) {
-    return <ReportEditor reportId={reportId} backend={backend} onBack={() => onOpenReport(null)} onOpenReport={onOpenReport} />;
+    return (
+      <ReportEditor
+        reportId={reportId}
+        backend={backend}
+        onBack={() => onOpenReport(null)}
+        onOpenReport={onOpenReport}
+        shareCandidates={shareCandidates}
+      />
+    );
   }
 
   const tabCls = (active: boolean) =>
@@ -150,6 +161,7 @@ export const ReportsPage: React.FC<{
                     {tab === 'shared' && <span>{r.role === 'editor' ? t`can edit` : t`read only`}</span>}
                     {tab === 'mine' && r.visibility === 'instance' && <span><Trans>visible to everyone</Trans></span>}
                     {tab === 'mine' && !!r.shareCount && <span><Trans>shared with {r.shareCount}</Trans></span>}
+                    {tab === 'mine' && r.publishedTemplate && <span><Trans>instance template</Trans></span>}
                   </div>
                 </button>
                 <div className="flex items-center gap-1.5">

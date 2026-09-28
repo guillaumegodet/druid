@@ -10,7 +10,14 @@ import { apiErrorText } from '../../lib/apiErrors';
 import { countryLabel } from '../dashboard/labels';
 import type { ReportPeriod } from '../dashboard/report/definition';
 import type { ReportsBackend } from '../dashboard/report/reportsApi';
-import { DEFAULT_PERIOD, partnerCountries, REPORT_TEMPLATES, templateById } from '../dashboard/report/templates';
+import {
+  DEFAULT_PERIOD,
+  instantiateReportTemplate,
+  partnerCountries,
+  REPORT_TEMPLATES,
+  templateById,
+} from '../dashboard/report/templates';
+import type { ReportSummary } from '../dashboard/report/reportsApi';
 import type { DashboardDataset } from '../dashboard/types';
 import { loadDashboardDataset } from '../dashboard/useDashboardData';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect, useStructureSlugs } from './ReportControls';
@@ -31,7 +38,15 @@ export const NewReportDialog: React.FC<{
   const { t, i18n } = useLingui();
   const { slugs, tabsHidden } = useStructureSlugs();
   const [templateId, setTemplateId] = useState(initial?.templateId ?? REPORT_TEMPLATES[0].id);
-  const template = templateById(templateId) ?? REPORT_TEMPLATES[0];
+  // Instance templates: reports published by a super admin (templateId `report:<id>`).
+  const [instanceTemplates, setInstanceTemplates] = useState<ReportSummary[]>([]);
+  useEffect(() => {
+    backend.list().then((l) => setInstanceTemplates(l.templates)).catch(() => setInstanceTemplates([]));
+  }, [backend]);
+  const instanceTemplate = templateId.startsWith('report:')
+    ? instanceTemplates.find((r) => `report:${r.id}` === templateId) ?? null
+    : null;
+  const template = instanceTemplate ? templateById('blank')! : templateById(templateId) ?? REPORT_TEMPLATES[0];
   const [slug, setSlug] = useState(initial?.slug ?? '');
   const [period, setPeriod] = useState<ReportPeriod>(initial?.period ?? DEFAULT_PERIOD);
   const [perimetre, setPerimetre] = useState<'affiliation' | 'effectifs'>(initial?.perimetre ?? 'affiliation');
@@ -68,12 +83,13 @@ export const NewReportDialog: React.FC<{
 
   // Suggested name, until the user types their own.
   const suggestedName = useMemo(() => {
+    if (instanceTemplate) return `${instanceTemplate.name} — ${dataset ? dataset.lab : slug}`;
     const label = t(template.label);
     const where = dataset ? dataset.lab : slug;
     const withCountry = template.params.includes('country') && country ? ` — ${countryName(country)}` : '';
     return template.id === 'blank' ? '' : `${label} — ${where}${withCountry}`;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [template, dataset, slug, country, t]);
+  }, [template, instanceTemplate, dataset, slug, country, t]);
   useEffect(() => {
     if (!nameTouched) setName(suggestedName);
   }, [suggestedName, nameTouched]);
@@ -82,10 +98,15 @@ export const NewReportDialog: React.FC<{
     setSaving(true);
     setError(null);
     try {
-      const definition = template.build(
-        { name, slug, period, perimetre, country: country || undefined, lang: i18n.locale === 'en' ? 'en' : 'fr' },
-        { dataset: dataset ?? null, hiddenTabs: tabsHidden[slug] ?? [] },
-      );
+      const input = { name, slug, period, perimetre, country: country || undefined, lang: i18n.locale === 'en' ? 'en' as const : 'fr' as const };
+      let definition;
+      if (instanceTemplate) {
+        const source = await backend.get(instanceTemplate.id);
+        if (!source.definition) throw new Error(source.definitionError ?? '');
+        definition = instantiateReportTemplate(source.definition, instanceTemplate.id, input);
+      } else {
+        definition = template.build(input, { dataset: dataset ?? null, hiddenTabs: tabsHidden[slug] ?? [] });
+      }
       const r = await backend.create(definition);
       onCreated(r.id);
     } catch (e) {
@@ -115,7 +136,7 @@ export const NewReportDialog: React.FC<{
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2" role="radiogroup" aria-label={t`Template`}>
           {REPORT_TEMPLATES.map((tpl) => {
-            const active = tpl.id === template.id;
+            const active = tpl.id === templateId;
             return (
               <button
                 key={tpl.id}
@@ -133,6 +154,32 @@ export const NewReportDialog: React.FC<{
             );
           })}
         </div>
+
+        {instanceTemplates.length > 0 && (
+          <div className="flex flex-col gap-1.5">
+            <h3 className="section-label"><Trans>Templates of the institution</Trans></h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              {instanceTemplates.map((r) => {
+                const active = `report:${r.id}` === templateId;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    role="radio"
+                    aria-checked={active}
+                    onClick={() => setTemplateId(`report:${r.id}`)}
+                    className={`text-left rounded-xl p-3 border transition-colors ${active ? 'border-accent-strong bg-accent/25' : 'border-ink/10 dark:border-white/15 hover:bg-ink/5 dark:hover:bg-white/5'}`}
+                  >
+                    <div className="flex items-center gap-1.5 font-disp font-semibold text-[14px] text-ink dark:text-[#f5f2ea]">
+                      {active && <Check className="w-4 h-4" />} {r.name}
+                    </div>
+                    {r.description && <div className="text-xs text-muted dark:text-[#c3beb0] mt-1 line-clamp-2">{r.description}</div>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-col gap-2 text-sm">
           <div className={row}>

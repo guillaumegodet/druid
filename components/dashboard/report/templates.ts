@@ -160,3 +160,20 @@ export function partnerCountries(dataset: DashboardDataset | null): string[] {
   for (const p of dataset.publications) for (const cc of new Set(p.countries)) counts.set(cc, (counts.get(cc) ?? 0) + 1);
   return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([cc]) => cc);
 }
+
+/**
+ * New report from an instance template (a report published by a super admin, lot 6): same
+ * blocks, filters and texts, on the chosen structure, period and scope. Blocks pinned to another
+ * structure (override) keep it. Block ids are renewed; the source is recorded as templateId.
+ */
+export function instantiateReportTemplate(source: ReportDefinition, sourceId: number, input: TemplateInput): ReportDefinition {
+  return {
+    ...source,
+    name: input.name.trim(),
+    templateId: `report:${sourceId}`,
+    templateParams: {},
+    context: { ...source.context, slug: input.slug, period: input.period, perimetre: input.perimetre },
+    blocks: source.blocks.map((b) => ({ ...b, id: newBlockId() })),
+    lang: input.lang,
+  };
+}

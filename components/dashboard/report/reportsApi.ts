@@ -29,6 +29,8 @@ export interface ReportSummary {
   lastGeneratedAt?: string | null;
   /** Number of grantees (own reports only). */
   shareCount?: number;
+  /** Published by a super admin as a template of the instance. */
+  publishedTemplate?: boolean;
 }
 
 export interface ReportShare {
@@ -50,6 +52,8 @@ export interface ReportLists {
   mine: ReportSummary[];
   shared: ReportSummary[];
   instance: ReportSummary[];
+  /** Instance templates (offered in « New report »). */
+  templates: ReportSummary[];
 }
 
 export interface ReportGeneration {
@@ -74,6 +78,8 @@ export interface GenerationInput {
 export interface ReportUpdate {
   definition?: ReportDefinition;
   visibility?: ReportVisibility;
+  /** Super admins: publish (or withdraw) the report as an instance template. */
+  publishedTemplate?: boolean;
   /** updatedAt of the version being edited: the save is refused if the report moved on. */
   expectedUpdatedAt?: string | null;
 }
@@ -133,7 +139,7 @@ type RawReport = { report: Omit<StoredReport, 'definitionError'> & { definition:
 
 export const serverReportsBackend: ReportsBackend = {
   kind: 'server',
-  list: () => request<ReportLists>('/api/reports'),
+  list: () => request<ReportLists>('/api/reports').then((l) => ({ ...l, templates: l.templates ?? [] })),
   get: (id) => request<RawReport>(`/api/reports/${id}`).then((d) => withValidatedDefinition(d.report)),
   // async: a schema refusal comes back as a rejected promise, like a server refusal.
   create: async (definition, visibility = 'private') =>
@@ -226,6 +232,7 @@ export function browserReportsBackend(storage: () => Storage | null, now: () => 
         .sort((a, b) => String(b.updatedAt).localeCompare(String(a.updatedAt))),
       shared: [],
       instance: [],
+      templates: [],
     }),
     get: async (id) => toStored(find(read(), id)),
     create: async (definition) => {
