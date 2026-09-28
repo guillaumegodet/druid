@@ -19,6 +19,7 @@ import { halfTrend, median } from '../partnerKpis';
 import type { DashboardDataset, DashboardPublication } from '../types';
 import type { ReportDefinition } from './definition';
 import type { ResolvedBlock } from './resolveReport';
+import { restrictDataset } from './restrictDataset';
 
 export type AiTask = 'executive' | 'domains';
 
@@ -37,6 +38,10 @@ const MAX_TOPICS = 60;
 const MAX_PUBLICATIONS = 80;
 /** A theme with fewer publications gets its figures but no written synthesis. */
 const MIN_THEME_PUBLICATIONS = 3;
+/** Publications a theme needs for its trend to be printed. */
+const MIN_TREND_PUBLICATIONS = 10;
+/** FWCI values a theme needs for its median to be printed. */
+const MIN_MEDIAN_VALUES = 5;
 
 async function callAi<T>(body: object): Promise<T & { model: string }> {
   const resp = await fetch('/api/report-ai', {
@@ -69,7 +74,9 @@ function labels(rb: ResolvedBlock) {
 /** Code-computed figures of a theme (the only figures of the text). */
 function themeFigures(members: DashboardPublication[], total: number, ds: DashboardDataset, range: { start: number; end: number }) {
   const parts = [i18n._(msg`${fmt(members.length)} publications (${Math.round((members.length / Math.max(1, total)) * 100)}% of the corpus)`)];
-  const trend = halfTrend(members, range);
+  // Small themes: a trend or a median would be noise (« −100 % » on 3 publications), and the model
+  // comments on whatever figure it is given.
+  const trend = members.length >= MIN_TREND_PUBLICATIONS ? halfTrend(members, range) : null;
   if (trend && trend.change != null) parts.push(i18n._(msg`trend ${trend.change > 0 ? '+' : ''}${trend.change}%`));
   const units = unitsOfDataset(ds);
   if (units.kind) {
@@ -80,7 +87,8 @@ function themeFigures(members: DashboardPublication[], total: number, ds: Dashbo
   }
   const researchers = new Set(members.flatMap((p) => p.authorIds)).size;
   parts.push(i18n._(msg`${fmt(researchers)} researchers involved`));
-  const fwci = median(members.flatMap((p) => (typeof p.fwci === 'number' ? [p.fwci] : [])));
+  const fwcis = members.flatMap((p) => (typeof p.fwci === 'number' ? [p.fwci] : []));
+  const fwci = fwcis.length >= MIN_MEDIAN_VALUES ? median(fwcis) : null;
   if (fwci != null) parts.push(i18n._(msg`median FWCI ${fwci.toLocaleString(numberLocale(), { maximumFractionDigits: 2 })}`));
   return parts.join(' · ');
 }
@@ -155,9 +163,27 @@ export async function generateDomainsText(
 function keyFigures(rb: ResolvedBlock): KpiItem[] {
   const ds = rb.dataset!;
   const range = rb.scope!.range;
-  const ctx = { source: rb.source, filters: rb.scope!.filters };
-  const sets = rb.scope!.filters.partnerKeys?.length ? ['partner', 'partner-impact'] : ['overview', 'impact'];
-  return sets.flatMap((id) => KPI_SETS[id].items(ds, range, ctx));
+  const filters = rb.scope!.filters;
+  const ctx = { source: rb.source, filters };
+  // Volume figures on the whole scope: the block may leave the large collaborations out (D2), and the
+  // model would otherwise read « 0 % of large collaborations » (seen on Ottawa, 2026-09-28).
+  const { maxAuthors, ...volumeFilters } = filters;
+  const volume = maxAuthors != null && rb.source
+    ? restrictDataset(rb.source, { filters: volumeFilters })
+    : ds;
+  const [volumeSet, impactSet] = filters.partnerKeys?.length ? ['partner', 'partner-impact'] : ['overview', 'impact'];
+  const items = [
+    ...KPI_SETS[volumeSet].items(volume, range, { ...ctx, filters: volumeFilters }),
+    ...KPI_SETS[impactSet].items(ds, range, ctx),
+  ];
+  if (maxAuthors != null) {
+    items.push({
+      key: 'impact-scope',
+      label: i18n._(msg`Impact indicators`),
+      value: i18n._(msg`without the publications of more than ${maxAuthors} authors`),
+    });
+  }
+  return items;
 }
 
 /** Executive summary, key points and cooperation leads (Markdown). */
