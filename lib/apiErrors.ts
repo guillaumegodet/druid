@@ -61,6 +61,7 @@ export const API_ERRORS = [
   msg`Invalid report share`,
   msg`Invalid report generation`,
   msg`Read-only instance: reports are kept in the browser`,
+  msg`Invalid AI task`,
   // tasks (« À traiter › Tâches », docs/plan-chantiers-taches.md)
   msg`Task not found`,
   msg`Unknown event action`,

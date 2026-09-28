@@ -2121,6 +2121,17 @@ app.all(['/api/reports', '/api/reports/*'], async (req, res) => {
   res.status(out.status).json(out.body);
 });
 
+// AI texts of the reports (plan-mes-rapports lot 8): ILAAS writes, the client computes the figures.
+// Same module on Cloudflare (functions/api/report-ai.js).
+const reportsAi = require('./scripts/lib/reports_ai.cjs');
+app.post('/api/report-ai', async (req, res) => {
+  if (!ILAAS_API_KEY) return res.status(500).json({ error: 'ILAAS_API_KEY not configured (druid service env)' });
+  const ai = reportsAi.createReportAi({ apiBase: ILAAS_API_BASE, apiKey: ILAAS_API_KEY, model: ILAAS_MODEL });
+  const out = await ai.run(req.body || {});
+  if (out.status >= 500) console.error('[Report AI]', out.body.error);
+  res.status(out.status).json(out.body);
+});
+
 // Detection rules (docs/plan-chantiers-taches.md, lot 5): scripts/sync_tasks.cjs reads the
 // alignment caches + the Annuaire and creates / verifies / auto-resolves the rule-generated
 // tasks. Same background-run contract as the alignments (progress file, 409 while running).

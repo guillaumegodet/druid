@@ -21,7 +21,7 @@ function declared(): Set<string> {
 /** Server error literals: fixed strings, and the head of `Head: ${detail}` templates. */
 function serverLiterals(): { file: string; text: string; raw: string }[] {
   // server.cjs, functions/, and the shared modules they serve responses from.
-  const files = [join(ROOT, 'server.cjs'), join(ROOT, 'scripts/lib/reports_store.cjs')];
+  const files = [join(ROOT, 'server.cjs'), join(ROOT, 'scripts/lib/reports_store.cjs'), join(ROOT, 'scripts/lib/reports_ai.cjs')];
   const walk = (dir: string) => {
     for (const name of readdirSync(dir)) {
       const p = join(dir, name);

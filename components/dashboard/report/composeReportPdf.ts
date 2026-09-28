@@ -17,6 +17,7 @@ import type { ReportDefinition } from './definition';
 import { loadReportFonts } from './fonts';
 import { ReportPdf } from './pdfDoc';
 import { DEFAULT_TABLE_LIMIT, REPORT_TABLES, tableLabel } from './reportTables';
+import { aiFrameLabel } from './reportAi';
 import type { CapturedChart } from './ReportRenderer';
 import type { BlockScope, ResolvedReport } from './resolveReport';
 
@@ -82,6 +83,8 @@ export async function composeReportPdf({ definition, resolved, datasets, capture
     if (b.hidden) continue;
     if (b.kind === 'section') pdf.sectionTitle(b.title);
     else if (b.kind === 'text') pdf.markdown(b.markdown);
+    // AI blocks never generated are left out of the PDF.
+    else if (b.kind === 'ai') { if (b.text?.trim()) pdf.aiBlock(aiFrameLabel(b), b.text); }
     else if (b.kind === 'kpis' && rb.dataset && rb.scope) {
       const set = KPI_SETS[b.setId];
       if (set) {

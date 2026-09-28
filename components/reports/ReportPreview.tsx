@@ -2,7 +2,8 @@
 // with the registry components — the same data, periods and parameters as the PDF.
 
 import React, { useMemo } from 'react';
-import { AlertTriangle, EyeOff, RefreshCw } from 'lucide-react';
+import { AlertTriangle, EyeOff, RefreshCw, Sparkles } from 'lucide-react';
+import { AI_TASK_LABELS, aiFrameLabel } from '../dashboard/report/reportAi';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { EMBED_CHARTS } from '../dashboard/embedRegistry';
 import { KpiSetCards } from '../dashboard/KpiCards';
@@ -104,7 +105,21 @@ const BlockBody: React.FC<{ rb: ResolvedBlock }> = ({ rb }) => {
       : <Placeholder><Trans>Empty text block</Trans></Placeholder>;
   }
   if (b.kind === 'ai') {
-    return <Placeholder><Trans>This kind of block is not available yet.</Trans></Placeholder>;
+    if (!b.text?.trim()) {
+      return (
+        <Placeholder>
+          <Sparkles className="w-4 h-4" /> {t(AI_TASK_LABELS[b.task])} — <Trans>not generated yet: use « Generate » in the block settings (left column).</Trans>
+        </Placeholder>
+      );
+    }
+    return (
+      <div className="glass-card p-5 border-l-4 border-accent flex flex-col gap-2">
+        <p className={`text-xs font-semibold flex items-center gap-1.5 ${b.reviewedBy ? 'text-muted-light dark:text-[#8f897c]' : 'text-[#9a6b00] dark:text-[#f4d24a]'}`}>
+          <Sparkles className="w-3.5 h-3.5" /> {aiFrameLabel(b)}
+        </p>
+        <MarkdownView md={b.text} />
+      </div>
+    );
   }
   const slug = rb.scope?.slug ?? '';
   if (rb.status === 'loading') return <Placeholder spin><Trans>Loading the data of {slug}…</Trans></Placeholder>;

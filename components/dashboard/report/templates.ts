@@ -178,7 +178,11 @@ const partnerReport: ReportTemplate = {
     const partnersLabel = names.join(', ');
     // Impact blocks: large collaborations left out (their filters add to the partner filter).
     const noLarge = (b: ReportBlock): ReportBlock =>
-      b.kind === 'chart' || b.kind === 'kpis' ? { ...b, override: { filters: { maxAuthors: LARGE_COLLAB_AUTHORS } } } : b;
+      b.kind === 'chart' || b.kind === 'kpis' || b.kind === 'ai'
+        ? { ...b, override: { filters: { maxAuthors: LARGE_COLLAB_AUTHORS } } }
+        : b;
+    // AI texts (lot 8), empty until generated in the editor — left out of the PDF until then.
+    const ai = (task: 'executive' | 'domains'): ReportBlock => noLarge({ id: newBlockId(), kind: 'ai', task });
     const pick = (ids: string[]) => usable(ids, env, filters).map(chart);
     const about: ReportBlock = {
       id: newBlockId(),
@@ -193,6 +197,8 @@ const partnerReport: ReportTemplate = {
     };
     const blocks: ReportBlock[] = [
       about,
+      section(msg`Summary`),
+      ai('executive'),
       section(msg`Key figures`),
       kpis('partner'),
       noLarge(kpis('partner-impact')),
@@ -206,6 +212,8 @@ const partnerReport: ReportTemplate = {
       ...(keys.length >= 2
         ? [section(msg`Breakdown by university`), ...pick(['partner-breakdown-top', 'partner-breakdown-evolution'])]
         : []),
+      section(msg`Analysis by major theme`),
+      ai('domains'),
       section(msg`Other partners in these co-publications`),
       ...pick(['top-pays', 'top-partenaires', 'carte-monde']),
       section(msg`Annex`),

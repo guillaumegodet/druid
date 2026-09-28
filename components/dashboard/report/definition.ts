@@ -136,7 +136,11 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     id: blockId,
     hidden: z.boolean().optional(),
     kind: z.literal('ai'),
-    task: z.string().max(40),
+    /** executive = summary, key points and leads; domains = analysis by major theme (reportAi.ts). */
+    task: z.enum(['executive', 'domains']),
+    /** Scope of the corpus the text is written from (e.g. large collaborations left out, D2). */
+    override: contextOverride.optional(),
+    ownFilters,
     text: text.optional(),
     reviewedBy: shortText.optional(),
     reviewedAt: shortText.optional(),

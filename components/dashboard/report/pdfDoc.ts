@@ -267,6 +267,29 @@ export class ReportPdf {
     }
   }
 
+  /**
+   * AI-written text: a label line saying so (model, review), the Markdown text, and an accent bar
+   * along it — a reader must be able to tell AI text from the author's own.
+   */
+  aiBlock(label: string, md: string) {
+    const d = this.doc;
+    this.ensureSpace(lh(8) + 20);
+    const startPage = d.getNumberOfPages();
+    const top = this.y - 3.5;
+    this.text('semi', 8, INK_MUTED);
+    d.text(label, MARGIN, this.y);
+    this.y += lh(8) + 1.5;
+    this.markdown(md);
+    // Accent bar in the left margin, on the first page of the block (a bar spanning page breaks is
+    // not worth it).
+    const end = d.getNumberOfPages() === startPage ? this.y - 3 : BOTTOM;
+    d.setPage(startPage);
+    d.setFillColor(...ACCENT);
+    d.rect(MARGIN - 4, top, 1.2, Math.max(6, end - top), 'F');
+    d.setPage(d.getNumberOfPages());
+    this.y += 2;
+  }
+
   /** Section title (= tab). Keeps ~55 mm together with the following content. */
   sectionTitle(title: string) {
     this.ensureSpace(14 + 55);

@@ -205,7 +205,7 @@ msgstr "Loading dashboard…"
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
 #: components/etl/EtlConsolePage.tsx:457
-#: components/reports/ReportEditor.tsx:229
+#: components/reports/ReportEditor.tsx:250
 #: components/reports/ReportsPage.tsx:134
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:334
@@ -367,7 +367,7 @@ msgstr "Send"
 #: components/dashboard/InternationalTab.tsx:128
 #: components/dashboard/report/reportCatalog.ts:25
 #: components/dashboard/report/templates.ts:138
-#: components/dashboard/report/templates.ts:199
+#: components/dashboard/report/templates.ts:205
 msgid "Overview"
 msgstr "Overview"
 
@@ -438,7 +438,7 @@ msgstr "Network"
 
 #: components/DashboardPage.tsx:92
 #: components/dashboard/PublicationsListTab.tsx:209
-#: components/reports/ReportEditor.tsx:395
+#: components/reports/ReportEditor.tsx:416
 msgid "Publication list"
 msgstr "Publication list"
 
@@ -501,7 +501,7 @@ msgstr "Affiliation: all publications signed by the structure. Staff: only those
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:287
 #: components/dashboard/report/ReportWizard.tsx:477
-#: components/dashboard/report/composeReportPdf.ts:27
+#: components/dashboard/report/composeReportPdf.ts:28
 #: components/reports/AddToReportDialog.tsx:80
 #: components/reports/AddToReportDialog.tsx:85
 #: components/reports/ReportControls.tsx:153
@@ -513,7 +513,7 @@ msgstr "Affiliation"
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:288
 #: components/dashboard/report/ReportWizard.tsx:477
-#: components/dashboard/report/composeReportPdf.ts:27
+#: components/dashboard/report/composeReportPdf.ts:28
 #: components/reports/AddToReportDialog.tsx:80
 #: components/reports/AddToReportDialog.tsx:85
 #: components/reports/ReportControls.tsx:154
@@ -605,7 +605,7 @@ msgid "Functional groups"
 msgstr "Functional groups"
 
 #: components/GroupList.tsx:187
-#: components/reports/ReportEditor.tsx:256
+#: components/reports/ReportEditor.tsx:277
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -994,9 +994,9 @@ msgid "Change language"
 msgstr "Change language"
 
 #: components/Sidebar.tsx:164
-#: components/reports/ReportEditor.tsx:221
-#: components/reports/ReportEditor.tsx:236
-#: components/reports/ReportEditor.tsx:266
+#: components/reports/ReportEditor.tsx:242
+#: components/reports/ReportEditor.tsx:257
+#: components/reports/ReportEditor.tsx:287
 #: components/reports/ReportsPage.tsx:100
 #: components/reports/ReportsPage.tsx:116
 msgid "My reports"
@@ -1193,7 +1193,7 @@ msgstr "Structure deletion: not available"
 
 #: components/StructureList.tsx:436
 #: components/dashboard/report/ReportWizard.tsx:271
-#: components/dashboard/report/composeReportPdf.ts:60
+#: components/dashboard/report/composeReportPdf.ts:61
 #: components/reports/NewReportDialog.tsx:216
 msgid "Structure"
 msgstr "Structure"
@@ -2656,12 +2656,12 @@ msgid "Description"
 msgstr "Description"
 
 #: components/dashboard/EChartCard.tsx:299
-#: components/dashboard/report/pdfDoc.ts:336
+#: components/dashboard/report/pdfDoc.ts:359
 msgid "Method"
 msgstr "Method"
 
 #: components/dashboard/EChartCard.tsx:304
-#: components/dashboard/report/pdfDoc.ts:337
+#: components/dashboard/report/pdfDoc.ts:360
 msgid "Limitations"
 msgstr "Limitations"
 
@@ -3288,7 +3288,7 @@ msgstr "reject."
 
 #: components/dashboard/MediaMentionsPanel.tsx:258
 #: components/dashboard/MediaMentionsPanel.tsx:555
-#: components/reports/ReportEditor.tsx:586
+#: components/reports/ReportEditor.tsx:683
 #: components/researchers/TasksPage.tsx:185
 msgid "auto"
 msgstr "auto"
@@ -3360,7 +3360,7 @@ msgstr "Last collection: {0}."
 
 #: components/dashboard/MediaMentionsPanel.tsx:490
 #: components/dashboard/report/ReportWizard.tsx:278
-#: components/dashboard/report/composeReportPdf.ts:61
+#: components/dashboard/report/composeReportPdf.ts:62
 #: components/dashboard/report/pdfDoc.ts:126
 #: components/groups/GroupDashboardSection.tsx:145
 #: components/reports/NewReportDialog.tsx:220
@@ -3654,7 +3654,7 @@ msgstr "(untitled)"
 #: components/dashboard/NewsTab.tsx:585
 #: components/dashboard/charts/YearlyEvolutionChart.tsx:41
 #: components/dashboard/kpiItems.ts:33
-#: components/dashboard/report/composeReportPdf.ts:67
+#: components/dashboard/report/composeReportPdf.ts:68
 #: components/dashboard/report/pdfDoc.ts:128
 msgid "Publications"
 msgstr "Publications"
@@ -3934,6 +3934,7 @@ msgstr "Generate another proposal"
 
 #: components/dashboard/NewsTab.tsx:845
 #: components/groups/GroupDashboardSection.tsx:177
+#: components/reports/ReportEditor.tsx:584
 msgid "Regenerate"
 msgstr "Regenerate"
 
@@ -4380,12 +4381,12 @@ msgid "Show filters"
 msgstr "Show filters"
 
 #: components/dashboard/PublicationsListTab.tsx:232
-#: components/dashboard/report/composeReportPdf.ts:65
+#: components/dashboard/report/composeReportPdf.ts:66
 msgid "Filters"
 msgstr "Filters"
 
 #: components/dashboard/PublicationsListTab.tsx:257
-#: components/reports/ReportEditor.tsx:338
+#: components/reports/ReportEditor.tsx:359
 #: components/researchers/UnifiedAlignPage.tsx:549
 msgid "Remove this filter"
 msgstr "Remove this filter"
@@ -5687,7 +5688,7 @@ msgid "Content"
 msgstr "Content"
 
 #: components/dashboard/report/ReportWizard.tsx:203
-#: components/reports/ReportEditor.tsx:212
+#: components/reports/ReportEditor.tsx:233
 msgid "PDF report generation failed — see the browser console."
 msgstr "PDF report generation failed — see the browser console."
 
@@ -5697,7 +5698,7 @@ msgid "PDF report — {0}"
 msgstr "PDF report — {0}"
 
 #: components/dashboard/report/ReportWizard.tsx:282
-#: components/dashboard/report/composeReportPdf.ts:62
+#: components/dashboard/report/composeReportPdf.ts:63
 #: components/dashboard/report/pdfDoc.ts:127
 #: components/reports/NewReportDialog.tsx:224
 #: components/reports/ReportControls.tsx:151
@@ -6558,18 +6559,18 @@ msgstr "For each subfield with at least 10 publications over the period, ratio =
 msgid "The world reference is not filtered by year or language: a subfield may appear over-represented simply because it is poorly covered by OpenAlex worldwide (a known bias in the humanities and social sciences). The 10-publication threshold limits statistical noise but remains arbitrary."
 msgstr "The world reference is not filtered by year or language: a subfield may appear over-represented simply because it is poorly covered by OpenAlex worldwide (a known bias in the humanities and social sciences). The 10-publication threshold limits statistical noise but remains arbitrary."
 
-#: components/dashboard/report/composeReportPdf.ts:74
+#: components/dashboard/report/composeReportPdf.ts:75
 #: components/dashboard/report/generateReport.ts:49
 msgid "Source: Druid / druid-biblio (OpenAlex, French Open Science Monitor). Document generated automatically from the bibliometric dashboard — the “interactive version” links open each chart with the same filters."
 msgstr "Source: Druid / druid-biblio (OpenAlex, French Open Science Monitor). Document generated automatically from the bibliometric dashboard — the “interactive version” links open each chart with the same filters."
 
-#: components/dashboard/report/composeReportPdf.ts:77
+#: components/dashboard/report/composeReportPdf.ts:78
 #: components/dashboard/report/generateReport.ts:52
 msgid "Methodological note"
 msgstr "Methodological note"
 
 #. placeholder {0}: tr.omitted
-#: components/dashboard/report/composeReportPdf.ts:102
+#: components/dashboard/report/composeReportPdf.ts:105
 msgid "{0} more rows not printed (limit of the block)."
 msgstr "{0} more rows not printed (limit of the block)."
 
@@ -6587,15 +6588,78 @@ msgstr "BIBLIOMETRIC REPORT"
 msgid "Generated on"
 msgstr "Generated on"
 
-#: components/dashboard/report/pdfDoc.ts:416
+#: components/dashboard/report/pdfDoc.ts:439
 msgid "Interactive version"
 msgstr "Interactive version"
 
 #. placeholder {0}: i - 1
 #. placeholder {1}: total - 1
-#: components/dashboard/report/pdfDoc.ts:496
+#: components/dashboard/report/pdfDoc.ts:519
 msgid "Page {0} / {1}"
 msgstr "Page {0} / {1}"
+
+#. placeholder {0}: fmt(members.length)
+#. placeholder {1}: Math.round((members.length / Math.max(1, total)) * 100)
+#: components/dashboard/report/reportAi.ts:71
+msgid "{0} publications ({1}% of the corpus)"
+msgstr "{0} publications ({1}% of the corpus)"
+
+#. placeholder {0}: trend.change > 0 ? '+' : ''
+#. placeholder {1}: trend.change
+#: components/dashboard/report/reportAi.ts:73
+msgid "trend {0}{1}%"
+msgstr "trend {0}{1}%"
+
+#. placeholder {0}: top.join(', ')
+#: components/dashboard/report/reportAi.ts:79
+msgid "labs: {0}"
+msgstr "labs: {0}"
+
+#. placeholder {0}: top.join(', ')
+#: components/dashboard/report/reportAi.ts:79
+msgid "teams: {0}"
+msgstr "teams: {0}"
+
+#. placeholder {0}: fmt(researchers)
+#: components/dashboard/report/reportAi.ts:82
+msgid "{0} researchers involved"
+msgstr "{0} researchers involved"
+
+#. placeholder {0}: fwci.toLocaleString(numberLocale(), { maximumFractionDigits: 2 })
+#: components/dashboard/report/reportAi.ts:84
+msgid "median FWCI {0}"
+msgstr "median FWCI {0}"
+
+#. placeholder {0}: fmt(unthemed)
+#: components/dashboard/report/reportAi.ts:150
+msgid "*{0} publications do not fall into any of these themes.*"
+msgstr "*{0} publications do not fall into any of these themes.*"
+
+#: components/dashboard/report/reportAi.ts:182
+msgid "Key points"
+msgstr "Key points"
+
+#: components/dashboard/report/reportAi.ts:183
+msgid "Cooperation leads"
+msgstr "Cooperation leads"
+
+#. placeholder {0}: b.reviewedBy
+#. placeholder {1}: b.reviewedAt ?? ''
+#: components/dashboard/report/reportAi.ts:203
+msgid "Text generated by AI ({who}) — reviewed by {0} on {1}"
+msgstr "Text generated by AI ({who}) — reviewed by {0} on {1}"
+
+#: components/dashboard/report/reportAi.ts:204
+msgid "Text generated by AI ({who}) — not reviewed yet"
+msgstr "Text generated by AI ({who}) — not reviewed yet"
+
+#: components/dashboard/report/reportAi.ts:208
+msgid "AI summary"
+msgstr "AI summary"
+
+#: components/dashboard/report/reportAi.ts:209
+msgid "AI analysis by major theme"
+msgstr "AI analysis by major theme"
 
 #: components/dashboard/report/reportTables.ts:36
 msgid "List of publications"
@@ -6653,49 +6717,57 @@ msgstr "Collaboration with a university or group"
 msgid "Co-publications with one or several institutions: key figures, impact against a comparable reference, themes, people and labs involved, per-university breakdown, list of publications."
 msgstr "Co-publications with one or several institutions: key figures, impact against a comparable reference, themes, people and labs involved, per-university breakdown, list of publications."
 
-#: components/dashboard/report/templates.ts:187
-#: components/dashboard/report/templates.ts:217
+#: components/dashboard/report/templates.ts:191
+#: components/dashboard/report/templates.ts:225
 msgid "Co-publications of {lab} with {partnersLabel}."
 msgstr "Co-publications of {lab} with {partnersLabel}."
 
-#: components/dashboard/report/templates.ts:189
+#: components/dashboard/report/templates.ts:193
 msgid "Partner scope: {scopeList}."
 msgstr "Partner scope: {scopeList}."
 
-#: components/dashboard/report/templates.ts:190
+#: components/dashboard/report/templates.ts:194
 msgid "Publications with more than {LARGE_COLLAB_AUTHORS} authors (large consortia) are counted in the volumes but left out of the impact indicators and charts."
 msgstr "Publications with more than {LARGE_COLLAB_AUTHORS} authors (large consortia) are counted in the volumes but left out of the impact indicators and charts."
 
-#: components/dashboard/report/templates.ts:191
+#: components/dashboard/report/templates.ts:195
 msgid "The impact reference is the international co-publications of {lab} in the same subfields, weighted like the collaboration."
 msgstr "The impact reference is the international co-publications of {lab} in the same subfields, weighted like the collaboration."
 
-#: components/dashboard/report/templates.ts:196
-#: components/reports/ReportEditor.tsx:374
+#: components/dashboard/report/templates.ts:200
+msgid "Summary"
+msgstr "Summary"
+
+#: components/dashboard/report/templates.ts:202
+#: components/reports/ReportEditor.tsx:395
 msgid "Key figures"
 msgstr "Key figures"
 
-#: components/dashboard/report/templates.ts:201
+#: components/dashboard/report/templates.ts:207
 msgid "Journals and impact"
 msgstr "Journals and impact"
 
-#: components/dashboard/report/templates.ts:204
+#: components/dashboard/report/templates.ts:210
 msgid "People and labs involved"
 msgstr "People and labs involved"
 
-#: components/dashboard/report/templates.ts:207
+#: components/dashboard/report/templates.ts:213
 msgid "Breakdown by university"
 msgstr "Breakdown by university"
 
-#: components/dashboard/report/templates.ts:209
+#: components/dashboard/report/templates.ts:215
+msgid "Analysis by major theme"
+msgstr "Analysis by major theme"
+
+#: components/dashboard/report/templates.ts:217
 msgid "Other partners in these co-publications"
 msgstr "Other partners in these co-publications"
 
-#: components/dashboard/report/templates.ts:211
+#: components/dashboard/report/templates.ts:219
 msgid "Annex"
 msgstr "Annex"
 
-#: components/dashboard/report/templates.ts:218
+#: components/dashboard/report/templates.ts:226
 msgid "Internal working document"
 msgstr "Internal working document"
 
@@ -7256,7 +7328,7 @@ msgid "New report"
 msgstr "New report"
 
 #: components/reports/AddToReportDialog.tsx:169
-#: components/reports/ReportEditor.tsx:274
+#: components/reports/ReportEditor.tsx:295
 msgid "Report name"
 msgstr "Report name"
 
@@ -7384,72 +7456,72 @@ msgstr "incl. current year"
 
 #. placeholder {0}: r.name
 #. placeholder {0}: stored?.name ?? ''
-#: components/reports/ReportEditor.tsx:133
+#: components/reports/ReportEditor.tsx:138
 #: components/reports/ReportsPage.tsx:54
 msgid "{0} (copy)"
 msgstr "{0} (copy)"
 
 #. placeholder {0}: run.missing.length
-#: components/reports/ReportEditor.tsx:208
+#: components/reports/ReportEditor.tsx:229
 msgid "PDF downloaded — {0} chart(s) could not be captured and were left out."
 msgstr "PDF downloaded — {0} chart(s) could not be captured and were left out."
 
-#: components/reports/ReportEditor.tsx:209
+#: components/reports/ReportEditor.tsx:230
 msgid "PDF downloaded."
 msgstr "PDF downloaded."
 
 #. placeholder {0}: stored.definitionError
-#: components/reports/ReportEditor.tsx:238
+#: components/reports/ReportEditor.tsx:259
 msgid "This report can no longer be opened: its definition does not match the current format ({0})."
 msgstr "This report can no longer be opened: its definition does not match the current format ({0})."
 
 #. placeholder {0}: stored.shares.length
-#: components/reports/ReportEditor.tsx:248
+#: components/reports/ReportEditor.tsx:269
 msgid "{0} people"
 msgstr "{0} people"
 
-#: components/reports/ReportEditor.tsx:249
+#: components/reports/ReportEditor.tsx:270
 msgid "everyone"
 msgstr "everyone"
 
-#: components/reports/ReportEditor.tsx:250
+#: components/reports/ReportEditor.tsx:271
 msgid "template"
 msgstr "template"
 
-#: components/reports/ReportEditor.tsx:254
+#: components/reports/ReportEditor.tsx:275
 msgid "Saved"
 msgstr "Saved"
 
-#: components/reports/ReportEditor.tsx:255
+#: components/reports/ReportEditor.tsx:276
 msgid "Unsaved changes…"
 msgstr "Unsaved changes…"
 
-#: components/reports/ReportEditor.tsx:257
+#: components/reports/ReportEditor.tsx:278
 msgid "Not saved"
 msgstr "Not saved"
 
-#: components/reports/ReportEditor.tsx:258
+#: components/reports/ReportEditor.tsx:279
 msgid "Changed elsewhere"
 msgstr "Changed elsewhere"
 
-#: components/reports/ReportEditor.tsx:277
+#: components/reports/ReportEditor.tsx:298
 msgid "Read only"
 msgstr "Read only"
 
-#: components/reports/ReportEditor.tsx:280
+#: components/reports/ReportEditor.tsx:301
 #: components/reports/ShareDialog.tsx:91
 msgid "Share the report"
 msgstr "Share the report"
 
-#: components/reports/ReportEditor.tsx:281
+#: components/reports/ReportEditor.tsx:302
 msgid "Share"
 msgstr "Share"
 
-#: components/reports/ReportEditor.tsx:285
+#: components/reports/ReportEditor.tsx:306
 msgid "Make your own copy"
 msgstr "Make your own copy"
 
-#: components/reports/ReportEditor.tsx:286
+#: components/reports/ReportEditor.tsx:307
 #: components/reports/ReportsPage.tsx:172
 #: components/reports/ReportsPage.tsx:175
 msgid "Duplicate"
@@ -7457,152 +7529,179 @@ msgstr "Duplicate"
 
 #. placeholder {0}: Math.min(pdfRun!.index + 1, pdfRun!.batches.length)
 #. placeholder {1}: Math.max(1, pdfRun!.batches.length)
-#: components/reports/ReportEditor.tsx:296
+#: components/reports/ReportEditor.tsx:317
 msgid "Rendering charts {0}/{1}…"
 msgstr "Rendering charts {0}/{1}…"
 
-#: components/reports/ReportEditor.tsx:297
+#: components/reports/ReportEditor.tsx:318
 msgid "Generate the PDF"
 msgstr "Generate the PDF"
 
-#: components/reports/ReportEditor.tsx:306
+#: components/reports/ReportEditor.tsx:327
 msgid "Description (printed on the cover page)"
 msgstr "Description (printed on the cover page)"
 
-#: components/reports/ReportEditor.tsx:314
+#: components/reports/ReportEditor.tsx:335
 msgid "Footer note on every PDF page (e.g. Internal working document)"
 msgstr "Footer note on every PDF page (e.g. Internal working document)"
 
-#: components/reports/ReportEditor.tsx:316
+#: components/reports/ReportEditor.tsx:337
 msgid "Footer note"
 msgstr "Footer note"
 
 #. placeholder {0}: resolved.publicationCount
-#: components/reports/ReportEditor.tsx:346
+#: components/reports/ReportEditor.tsx:367
 msgid "{0} publications"
 msgstr "{0} publications"
 
-#: components/reports/ReportEditor.tsx:352
+#: components/reports/ReportEditor.tsx:373
 msgid "This report was changed elsewhere since you opened it; your latest changes are not saved."
 msgstr "This report was changed elsewhere since you opened it; your latest changes are not saved."
 
-#: components/reports/ReportEditor.tsx:353
+#: components/reports/ReportEditor.tsx:374
 msgid "Reload the saved version"
 msgstr "Reload the saved version"
 
-#: components/reports/ReportEditor.tsx:367
+#: components/reports/ReportEditor.tsx:388
 msgid "Chart"
 msgstr "Chart"
 
-#: components/reports/ReportEditor.tsx:379
+#: components/reports/ReportEditor.tsx:400
 msgid "New section"
 msgstr "New section"
 
-#: components/reports/ReportEditor.tsx:381
+#: components/reports/ReportEditor.tsx:402
 msgid "Section"
 msgstr "Section"
 
-#: components/reports/ReportEditor.tsx:388
-#: components/reports/ReportEditor.tsx:524
+#: components/reports/ReportEditor.tsx:409
+#: components/reports/ReportEditor.tsx:591
+#: components/reports/ReportEditor.tsx:621
 msgid "Text"
 msgstr "Text"
 
-#: components/reports/ReportEditor.tsx:410
+#: components/reports/ReportEditor.tsx:423
+msgid "AI text"
+msgstr "AI text"
+
+#: components/reports/ReportEditor.tsx:438
 msgid "Move up"
 msgstr "Move up"
 
-#: components/reports/ReportEditor.tsx:411
+#: components/reports/ReportEditor.tsx:439
 msgid "Move down"
 msgstr "Move down"
 
-#: components/reports/ReportEditor.tsx:412
+#: components/reports/ReportEditor.tsx:440
 msgid "Show in the PDF"
 msgstr "Show in the PDF"
 
-#: components/reports/ReportEditor.tsx:412
+#: components/reports/ReportEditor.tsx:440
 msgid "Hide from the PDF"
 msgstr "Hide from the PDF"
 
-#: components/reports/ReportEditor.tsx:415
+#: components/reports/ReportEditor.tsx:443
 #: components/reports/ReportsPage.tsx:195
 msgid "Delete"
 msgstr "Delete"
 
-#: components/reports/ReportEditor.tsx:429
+#: components/reports/ReportEditor.tsx:468
 msgid "Add a first block with the buttons above."
 msgstr "Add a first block with the buttons above."
 
-#: components/reports/ReportEditor.tsx:429
+#: components/reports/ReportEditor.tsx:468
 msgid "This report is empty."
 msgstr "This report is empty."
 
-#: components/reports/ReportEditor.tsx:516
+#: components/reports/ReportEditor.tsx:575
+msgid "Groups the topics of the corpus into major themes, then writes a synthesis per theme; the figures are computed by Druid."
+msgstr "Groups the topics of the corpus into major themes, then writes a synthesis per theme; the figures are computed by Druid."
+
+#: components/reports/ReportEditor.tsx:576
+msgid "Summary, key points and cooperation leads written from the key figures and the analysis by theme of this report (generate it first)."
+msgstr "Summary, key points and cooperation leads written from the key figures and the analysis by theme of this report (generate it first)."
+
+#. placeholder {0}: ai.running.done
+#. placeholder {1}: ai.running.total
+#: components/reports/ReportEditor.tsx:583
+msgid "Writing… {0}/{1}"
+msgstr "Writing… {0}/{1}"
+
+#: components/reports/ReportEditor.tsx:584
+msgid "Generate"
+msgstr "Generate"
+
+#: components/reports/ReportEditor.tsx:602
+msgid "I have reviewed this text (printed in the PDF)"
+msgstr "I have reviewed this text (printed in the PDF)"
+
+#: components/reports/ReportEditor.tsx:613
 msgid "Section title"
 msgstr "Section title"
 
-#: components/reports/ReportEditor.tsx:526
+#: components/reports/ReportEditor.tsx:623
 msgid "# heading · - bullet · **bold** · *italic* · [label](https://…) · blank line = new paragraph"
 msgstr "# heading · - bullet · **bold** · *italic* · [label](https://…) · blank line = new paragraph"
 
-#: components/reports/ReportEditor.tsx:538
+#: components/reports/ReportEditor.tsx:635
 msgid "Max. rows in the PDF"
 msgstr "Max. rows in the PDF"
 
-#: components/reports/ReportEditor.tsx:566
+#: components/reports/ReportEditor.tsx:663
 msgid "Title (optional)"
 msgstr "Title (optional)"
 
-#: components/reports/ReportEditor.tsx:572
+#: components/reports/ReportEditor.tsx:669
 msgid "Note printed under the chart"
 msgstr "Note printed under the chart"
 
-#: components/reports/ReportEditor.tsx:593
+#: components/reports/ReportEditor.tsx:690
 msgid "This chart has its own scope (structure, period or filters)."
 msgstr "This chart has its own scope (structure, period or filters)."
 
-#: components/reports/ReportEditor.tsx:596
+#: components/reports/ReportEditor.tsx:693
 msgid "Use the report scope"
 msgstr "Use the report scope"
 
 #. placeholder {0}: data.rows.length
 #. placeholder {1}: data.rows.length + data.omitted
-#: components/reports/ReportPreview.tsx:88
+#: components/reports/ReportPreview.tsx:89
 msgid "Preview limited to {PREVIEW_ROWS} rows; the PDF prints {0} of {1}."
 msgstr "Preview limited to {PREVIEW_ROWS} rows; the PDF prints {0} of {1}."
 
-#: components/reports/ReportPreview.tsx:104
+#: components/reports/ReportPreview.tsx:105
 msgid "Empty text block"
 msgstr "Empty text block"
 
-#: components/reports/ReportPreview.tsx:107
-msgid "This kind of block is not available yet."
-msgstr "This kind of block is not available yet."
+#: components/reports/ReportPreview.tsx:111
+msgid "not generated yet: use « Generate » in the block settings (left column)."
+msgstr "not generated yet: use « Generate » in the block settings (left column)."
 
-#: components/reports/ReportPreview.tsx:110
+#: components/reports/ReportPreview.tsx:125
 msgid "Loading the data of {slug}…"
 msgstr "Loading the data of {slug}…"
 
-#: components/reports/ReportPreview.tsx:111
+#: components/reports/ReportPreview.tsx:126
 msgid "No data available for {slug}, or no access to it."
 msgstr "No data available for {slug}, or no access to it."
 
-#: components/reports/ReportPreview.tsx:112
+#: components/reports/ReportPreview.tsx:127
 msgid "This chart no longer exists."
 msgstr "This chart no longer exists."
 
-#: components/reports/ReportPreview.tsx:115
+#: components/reports/ReportPreview.tsx:130
 msgid "Not available for {slug}: {reasons}."
 msgstr "Not available for {slug}: {reasons}."
 
-#: components/reports/ReportPreview.tsx:134
+#: components/reports/ReportPreview.tsx:149
 msgid "This chart says little under the current filters."
 msgstr "This chart says little under the current filters."
 
-#: components/reports/ReportPreview.tsx:151
+#: components/reports/ReportPreview.tsx:166
 msgid "This report is empty. Add a section, a chart, key figures or text from the left-hand column."
 msgstr "This report is empty. Add a section, a chart, key figures or text from the left-hand column."
 
-#: components/reports/ReportPreview.tsx:165
+#: components/reports/ReportPreview.tsx:180
 msgid "Hidden from the PDF"
 msgstr "Hidden from the PDF"
 
@@ -10449,211 +10548,215 @@ msgstr "Invalid report generation"
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Read-only instance: reports are kept in the browser"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:64
+msgid "Invalid AI task"
+msgstr "Invalid AI task"
+
+#: lib/apiErrors.ts:66
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:67
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:68
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:69
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:70
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:71
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:72
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:73
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:75
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:76
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:77
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:78
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:79
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:80
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:81
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:82
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:84
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:85
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:86
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:87
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:88
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:89
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:90
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:91
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:92
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:93
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:94
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:95
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:96
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:97
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:98
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:99
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:100
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:101
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:103
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:104
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:105
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:106
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:107
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:108
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:109
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:111
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:112
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:113
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:114
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:116
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:117
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:118
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:119
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:121
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:122
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:123
 msgid "Load failed"
 msgstr "Load failed"
 

@@ -6,12 +6,14 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, BarChart3, ChevronDown, ChevronUp, Copy, Eye, EyeOff, FileDown, Gauge, Heading, Plus,
-  RefreshCw, Share2, Table2, Trash2, Type, X,
+  RefreshCw, Share2, Sparkles, Table2, Trash2, Type, X,
 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
 import { datasetFeatures, scopeFeatures } from '../dashboard/chartMeta';
 import { REPORT_TABLES, tableLabel } from '../dashboard/report/reportTables';
+import { AI_TASK_LABELS, generateAiText } from '../dashboard/report/reportAi';
+import { getUserInfo } from '../../lib/auth';
 import { EMBED_CHARTS } from '../dashboard/embedRegistry';
 import { KPI_SETS } from '../dashboard/kpiItems';
 import { buildFilterContext, describeFilters, type PubFilters } from '../dashboard/publicationFilters';
@@ -59,6 +61,9 @@ export const ReportEditor: React.FC<{
   const [pdfRun, setPdfRun] = useState<PdfRun | null>(null);
   const [pdfMessage, setPdfMessage] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
+  // AI text being generated (one block at a time).
+  const [aiRun, setAiRun] = useState<{ blockId: string; done: number; total: number } | null>(null);
+  const [aiError, setAiError] = useState<{ blockId: string; message: string } | null>(null);
   const savingRef = useRef(false);
 
   const load = useCallback(() => {
@@ -160,6 +165,22 @@ export const ReportEditor: React.FC<{
       if (key === 'charterCompliant') delete filters.charteSeuil;
       return { ...d, context: { ...d.context, filters } };
     });
+
+  // ── AI texts (reportAi.ts): the code computes, ILAAS writes; a new text is « not reviewed » ──
+  const generateAi = async (blockId: string) => {
+    const rb = resolved?.blocks.find((x) => x.block.id === blockId);
+    if (!draft || !rb || rb.block.kind !== 'ai' || rb.status !== 'ok' || !rb.dataset) return;
+    setAiError(null);
+    setAiRun({ blockId, done: 0, total: 1 });
+    try {
+      const r = await generateAiText(rb.block.task, rb, draft, (p) => setAiRun({ blockId, ...p }));
+      patchBlock(blockId, { text: r.text, model: r.model, reviewedBy: undefined, reviewedAt: undefined });
+    } catch (e) {
+      setAiError({ blockId, message: apiErrorText(e) });
+    } finally {
+      setAiRun(null);
+    }
+  };
 
   // ── PDF ──
   const loadingData = resolved?.blocks.some((rb) => rb.status === 'loading') ?? true;
@@ -389,10 +410,17 @@ export const ReportEditor: React.FC<{
               </button>
               <button
                 type="button"
-                className="btn-pill h-8 text-[12px] justify-center col-span-2"
+                className="btn-pill h-8 text-[12px] justify-center"
                 onClick={() => addBlock({ id: newBlockId(), kind: 'table', tableId: 'publications' })}
               >
                 <Table2 className="w-3.5 h-3.5" /> <Trans>Publication list</Trans>
+              </button>
+              <button
+                type="button"
+                className="btn-pill h-8 text-[12px] justify-center"
+                onClick={() => addBlock({ id: newBlockId(), kind: 'ai', task: 'executive' })}
+              >
+                <Sparkles className="w-3.5 h-3.5" /> <Trans>AI text</Trans>
               </button>
             </div>
           )}
@@ -419,7 +447,18 @@ export const ReportEditor: React.FC<{
                   )}
                 </div>
                 {selectedId === b.id && selected && (
-                  <BlockSettings block={selected} canEdit={canEdit} onPatch={(p) => patchBlock(b.id, p)} />
+                  <BlockSettings
+                    block={selected}
+                    canEdit={canEdit}
+                    onPatch={(p) => patchBlock(b.id, p)}
+                    ai={{
+                      available: resolved?.blocks.find((x) => x.block.id === b.id)?.status === 'ok',
+                      running: aiRun?.blockId === b.id ? aiRun : null,
+                      busy: aiRun != null,
+                      error: aiError?.blockId === b.id ? aiError.message : null,
+                      onGenerate: () => void generateAi(b.id),
+                    }}
+                  />
                 )}
               </li>
             ))}
@@ -484,6 +523,7 @@ const BlockIcon: React.FC<{ block: ReportBlock }> = ({ block }) => {
   if (block.kind === 'kpis') return <Gauge className={cls} />;
   if (block.kind === 'section') return <Heading className={cls} />;
   if (block.kind === 'table') return <Table2 className={cls} />;
+  if (block.kind === 'ai') return <Sparkles className={cls} />;
   return <Type className={cls} />;
 };
 
@@ -498,7 +538,18 @@ function blockLabel(b: ReportBlock, t: Translate): string {
     return b.title?.trim() || (entry ? t(entry.label) : b.chartId);
   }
   if (b.kind === 'table') return tableLabel(b.tableId);
-  return b.kind;
+  return t(AI_TASK_LABELS[b.task]);
+}
+
+/** Generation state of an AI block, handed down by the editor. */
+interface AiControls {
+  /** The block data is loaded (its scope resolved). */
+  available: boolean;
+  running: { done: number; total: number } | null;
+  /** Another AI text is being generated. */
+  busy: boolean;
+  error: string | null;
+  onGenerate: () => void;
 }
 
 /** Settings of the selected block, under its line in the block list. */
@@ -506,9 +557,55 @@ const BlockSettings: React.FC<{
   block: ReportBlock;
   canEdit: boolean;
   onPatch: (patch: Partial<ReportBlock>) => void;
-}> = ({ block, canEdit, onPatch }) => {
+  ai: AiControls;
+}> = ({ block, canEdit, onPatch, ai }) => {
   const { t } = useLingui();
   const box = 'mt-1 mb-2 ml-6 p-3 rounded-lg bg-white/60 dark:bg-white/5 flex flex-col gap-2 text-sm';
+  if (block.kind === 'ai') {
+    const reviewed = !!block.reviewedBy;
+    return (
+      <div className={box}>
+        <select className={selectCls} value={block.task} disabled={!canEdit || ai.busy}
+          onChange={(e) => onPatch({ task: e.target.value as 'executive' | 'domains' })}>
+          <option value="executive">{t(AI_TASK_LABELS.executive)}</option>
+          <option value="domains">{t(AI_TASK_LABELS.domains)}</option>
+        </select>
+        <p className="text-[11px] text-muted-light dark:text-[#8f897c]">
+          {block.task === 'domains'
+            ? <Trans>Groups the topics of the corpus into major themes, then writes a synthesis per theme; the figures are computed by Druid.</Trans>
+            : <Trans>Summary, key points and cooperation leads written from the key figures and the analysis by theme of this report (generate it first).</Trans>}
+        </p>
+        {canEdit && (
+          <button type="button" onClick={ai.onGenerate} disabled={!ai.available || ai.busy}
+            className="btn-pill h-8 px-3 text-[12px] self-start disabled:opacity-40">
+            {ai.running ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+            {ai.running
+              ? t`Writing… ${ai.running.done}/${ai.running.total}`
+              : block.text ? t`Regenerate` : t`Generate`}
+          </button>
+        )}
+        {ai.error && <p className="text-xs text-[#b23b3b] dark:text-[#f08c8c]">{ai.error}</p>}
+        {block.text !== undefined && (
+          <>
+            <textarea className="input-soft text-[13px]" rows={10} value={block.text} maxLength={20000} disabled={!canEdit}
+              onChange={(e) => onPatch({ text: e.target.value })} aria-label={t`Text`} />
+            <label className="flex items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={reviewed}
+                disabled={!canEdit}
+                onChange={(e) =>
+                  onPatch(e.target.checked
+                    ? { reviewedBy: getUserInfo().name || getUserInfo().preferred_username, reviewedAt: new Date().toISOString().slice(0, 10) }
+                    : { reviewedBy: undefined, reviewedAt: undefined })}
+              />
+              <Trans>I have reviewed this text (printed in the PDF)</Trans>
+            </label>
+          </>
+        )}
+      </div>
+    );
+  }
   if (block.kind === 'section') {
     return (
       <div className={box}>

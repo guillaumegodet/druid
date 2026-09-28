@@ -74,7 +74,7 @@ export interface ResolvedReport {
 export type DatasetsBySlug = Record<string, DashboardDataset | null | undefined>;
 
 const hasScope = (b: ReportBlock): b is Extract<ReportBlock, { override?: unknown }> =>
-  b.kind === 'chart' || b.kind === 'kpis' || b.kind === 'table';
+  b.kind === 'chart' || b.kind === 'kpis' || b.kind === 'table' || b.kind === 'ai';
 
 export function scopeOf(
   context: ReportContext,
