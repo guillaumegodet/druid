@@ -32,6 +32,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { numberLocale } from '../lib/i18n';
 import { fetchDashboardStructures } from '../lib/dashboardSource';
 import { HelpButton } from './HelpButton';
+import { visibleTabKeys } from './dashboard/tabAvailability';
 import { DASHBOARD_TAB_HELP } from '../lib/helpLinks';
 
 interface DashboardPageProps {
@@ -218,10 +219,11 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const hasAxes = (data?.strategicAxes?.length ?? 0) > 0;
   const hasBenchmark = data?.benchmark != null;
   const visibleTabs = useMemo(() => {
-    const hidden = new Set(slug ? tabsHiddenBySlug[slug] ?? [] : []);
-    return NATIVE_TABS.filter(({ key }) =>
-      key === 'overview' ||
-      (!hidden.has(key) && (key !== 'themes' || hasAxes) && (key !== 'benchmark' || hasBenchmark)));
+    const keys = new Set(visibleTabKeys(
+      NATIVE_TABS.map(({ key }) => key),
+      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark },
+    ));
+    return NATIVE_TABS.filter(({ key }) => keys.has(key));
   }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark]);
   useEffect(() => {
     if (data && !visibleTabs.some((t) => t.key === tab)) setTab('overview');

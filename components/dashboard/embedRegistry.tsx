@@ -92,7 +92,15 @@ import { NetworkChart } from './charts/NetworkChart';
 export interface EmbedChartProps {
   dataset: DashboardDataset;
   range: YearRange;
+  /**
+   * Chart parameters declared in CHART_META (chartMeta.ts), already sanitized;
+   * a missing key means the chart's usual default.
+   */
+  params?: Record<string, number>;
 }
+
+/** Charter threshold as a fraction (tab default: 75 %). */
+const charteSeuilOf = (p: EmbedChartProps) => (p.params?.thresholdPct ?? 75) / 100;
 
 /** Compliant / non-compliant donut in the current theme colors. */
 const CharteConformiteDonut: React.FC<{ conformes: number; analysable: number }> = ({
@@ -348,7 +356,8 @@ export const EMBED_CHARTS: Record<string, Entry> = {
   'reseau-cosignatures': {
     label: msg`Co-authorship network`,
     Chart: (p) => {
-      const minPubs = p.dataset.publications.length > 10000 ? 8 : 2;
+      // Same initial threshold as the Network tab, computed on the (possibly restricted) corpus.
+      const minPubs = p.params?.minPubs ?? (p.dataset.publications.length > 10000 ? 8 : 2);
       const d = useMemo(
         () => aggregateNetwork(p.dataset.publications, p.dataset.authors, p.range, minPubs),
         [p.dataset, p.range, minPubs],
@@ -361,7 +370,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
     label: msg`Most frequent journals`,
     Chart: (p) => {
       const d = useMemo(() => aggregateJournals(p.dataset.publications, p.range), [p.dataset, p.range]);
-      return <TopJournalsChart rows={d.rows} />;
+      return <TopJournalsChart rows={d.rows} defaultN={p.params?.n} />;
     },
   },
   'acces-revues': {
@@ -460,7 +469,11 @@ export const EMBED_CHARTS: Record<string, Entry> = {
   'charte-conformite': {
     label: msg`Corpus compliance (signature charter)`,
     Chart: (p) => {
-      const d = useMemo(() => aggregateCharte(p.dataset.publications, p.range), [p.dataset, p.range]);
+      const seuil = charteSeuilOf(p);
+      const d = useMemo(
+        () => aggregateCharte(p.dataset.publications, p.range, seuil),
+        [p.dataset, p.range, seuil],
+      );
       return (
         <CharteConformiteDonut conformes={d.conformes} analysable={d.analysable} />
       );
@@ -469,28 +482,44 @@ export const EMBED_CHARTS: Record<string, Entry> = {
   'charte-scores': {
     label: msg`Distribution of compliance scores`,
     Chart: (p) => {
-      const d = useMemo(() => aggregateCharte(p.dataset.publications, p.range), [p.dataset, p.range]);
-      return <CharteScoresChart data={d.scoreHistogram} />;
+      const seuil = charteSeuilOf(p);
+      const d = useMemo(
+        () => aggregateCharte(p.dataset.publications, p.range, seuil),
+        [p.dataset, p.range, seuil],
+      );
+      return <CharteScoresChart data={d.scoreHistogram} thresholdPct={p.params?.thresholdPct ?? 75} />;
     },
   },
   'charte-evolution': {
     label: msg`Compliance rate per year`,
     Chart: (p) => {
-      const d = useMemo(() => aggregateCharte(p.dataset.publications, p.range), [p.dataset, p.range]);
+      const seuil = charteSeuilOf(p);
+      const d = useMemo(
+        () => aggregateCharte(p.dataset.publications, p.range, seuil),
+        [p.dataset, p.range, seuil],
+      );
       return <CharteRateChart data={d.rateByYear} />;
     },
   },
   'charte-criteres': {
     label: msg`Presence rate by criterion`,
     Chart: (p) => {
-      const d = useMemo(() => aggregateCharte(p.dataset.publications, p.range), [p.dataset, p.range]);
+      const seuil = charteSeuilOf(p);
+      const d = useMemo(
+        () => aggregateCharte(p.dataset.publications, p.range, seuil),
+        [p.dataset, p.range, seuil],
+      );
       return <CharteCriteresChart data={d.byCritere} />;
     },
   },
   'charte-equipes': {
     label: msg`Compliance rate by team`,
     Chart: (p) => {
-      const d = useMemo(() => aggregateCharte(p.dataset.publications, p.range), [p.dataset, p.range]);
+      const seuil = charteSeuilOf(p);
+      const d = useMemo(
+        () => aggregateCharte(p.dataset.publications, p.range, seuil),
+        [p.dataset, p.range, seuil],
+      );
       return <CharteTeamsChart data={d.byTeam} />;
     },
   },
@@ -652,6 +681,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
         publications={p.dataset.publications}
         range={p.range}
         countryNames={p.dataset.countryNames}
+        defaultN={p.params?.n}
       />
     ),
   },

@@ -10,80 +10,45 @@ import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
+import {
+  AXES_GRIST,
+  EMPTY_AXIS_INDEX,
+  effectiveAxe,
+  fetchAxisCorrections,
+  findAxisCorrection,
+  type AxisCorrection,
+  type AxisCorrectionIndex,
+} from './axesCorrections';
 
 const PAGE_SIZE = 25;
 
-/**
- * Collaborative curation of the axes via Grist (cf. the study
- * guillaumegodet/Dataviz — studies/202604-centrale-axes): the Grist table
- * holds the corrected classification (Axe_Retenu field), editable here via
- * the authenticated Grist proxy of server.cjs.
- */
-const AXES_GRIST: Record<string, { docId: string; table: string; field: string }> = {
-  'ec-nantes': {
-    docId: '5aREUrB1kuFAcVY4GTUDfA',
-    table: 'Publications_centrale_axes_strategiques2',
-    field: 'Axe_Retenu',
-  },
-};
-
-/** Title normalization for matching (same rule as the study). */
-function normTitle(s: string | null): string {
-  return (s ?? '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]/g, '');
-}
-
-interface Correction {
-  gristId: number;
-  axe: string; // raw Grist value (may be multiple « a|b »)
-}
-
-interface CorrectionsState {
-  /** Index doi (lowercase) and normalized title → Grist record. */
-  byDoi: Map<string, Correction>;
-  byTitle: Map<string, Correction>;
+interface CorrectionsState extends AxisCorrectionIndex {
   loaded: boolean;
   error: string | null;
 }
 
+/** Grist corrections of the axes (axesCorrections.ts), loaded when the structure has a correction table. */
 function useAxesCorrections(slug: string, enabled: boolean) {
   const cfg = AXES_GRIST[slug];
   const [state, setState] = useState<CorrectionsState>({
-    byDoi: new Map(),
-    byTitle: new Map(),
+    ...EMPTY_AXIS_INDEX,
     loaded: false,
     error: null,
   });
 
   useEffect(() => {
     if (!cfg || !enabled) {
-      setState({ byDoi: new Map(), byTitle: new Map(), loaded: !cfg, error: null });
+      setState({ ...EMPTY_AXIS_INDEX, loaded: !cfg, error: null });
       return;
     }
     let cancelled = false;
-    fetch(`/api/grist/docs/${cfg.docId}/tables/${cfg.table}/records`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`))))
-      .then((j: { records: { id: number; fields: Record<string, unknown> }[] }) => {
-        if (cancelled) return;
-        const byDoi = new Map<string, Correction>();
-        const byTitle = new Map<string, Correction>();
-        for (const rec of j.records ?? []) {
-          const axe = String(rec.fields[cfg.field] ?? '').trim();
-          if (!axe) continue;
-          const c = { gristId: rec.id, axe };
-          const doi = String(rec.fields.doi ?? '').trim().toLowerCase();
-          if (doi) byDoi.set(doi, c);
-          const nt = normTitle(String(rec.fields.Titre ?? ''));
-          if (nt) byTitle.set(nt, c);
-        }
-        setState({ byDoi, byTitle, loaded: true, error: null });
+    fetchAxisCorrections(slug)
+      .then((index) => {
+        if (!cancelled) setState({ ...(index ?? EMPTY_AXIS_INDEX), loaded: true, error: null });
       })
       .catch((e: Error) => {
         if (!cancelled) {
-          setState({ byDoi: new Map(), byTitle: new Map(), loaded: true, error: apiErrorText(e) });
+          setState({ ...EMPTY_AXIS_INDEX, loaded: true, error: apiErrorText(e) });
         }
       });
     return () => {
@@ -91,14 +56,12 @@ function useAxesCorrections(slug: string, enabled: boolean) {
     };
   }, [slug, enabled, cfg]);
 
-  const findCorrection = (p: DashboardPublication): Correction | undefined => {
-    const doi = (p.doi ?? '').toLowerCase();
-    return (doi && state.byDoi.get(doi)) || state.byTitle.get(normTitle(p.title)) || undefined;
-  };
+  const findCorrection = (p: DashboardPublication): AxisCorrection | undefined =>
+    findAxisCorrection(state, p);
 
   const applyLocal = (gristId: number, axe: string) => {
     setState((s) => {
-      const upd = (m: Map<string, Correction>) => {
+      const upd = (m: Map<string, AxisCorrection>) => {
         const next = new Map(m);
         for (const [k, v] of next) if (v.gristId === gristId) next.set(k, { gristId, axe });
         return next;
@@ -323,14 +286,10 @@ export const AxesTab: React.FC<{
   const hasAxes = axes.length > 0 && dataset.publications.some((p) => p.chosenAxe);
   const corrections = useAxesCorrections(dataset.slug, hasAxes);
 
-  // Effective axis: Grist correction (first axis if multiple) otherwise ETL classification.
+  // Effective axis: Grist correction otherwise ETL classification (1st axis if multiple, like axeOfPub).
   const axeOf = useMemo(() => {
-    return (p: DashboardPublication): string => {
-      const c = corrections.findCorrection(p);
-      const raw = c ? c.axe.split('|')[0].trim() : p.chosenAxe;
-      return raw && raw.trim() ? raw.trim() : AXE_OTHER;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const index = { byDoi: corrections.byDoi, byTitle: corrections.byTitle };
+    return (p: DashboardPublication): string => effectiveAxe(index, p);
   }, [corrections.byDoi, corrections.byTitle]);
 
   const agg = useMemo(
