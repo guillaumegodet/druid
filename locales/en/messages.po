@@ -199,33 +199,33 @@ msgstr "Grist row {gristRowId} not found in the loaded scope"
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:913
-#: App.tsx:925
+#: App.tsx:914
+#: App.tsx:926
 #: components/dashboard/EmbedPage.tsx:88
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
 #: components/etl/EtlConsolePage.tsx:457
-#: components/reports/ReportEditor.tsx:222
+#: components/reports/ReportEditor.tsx:220
 #: components/reports/ReportsPage.tsx:123
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:334
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:934
+#: App.tsx:935
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:958
+#: App.tsx:959
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:962
+#: App.tsx:963
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1003
+#: App.tsx:1004
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -363,186 +363,190 @@ msgstr "Stop the answer"
 msgid "Send"
 msgstr "Send"
 
-#: components/DashboardPage.tsx:73
+#: components/DashboardPage.tsx:77
 #: components/dashboard/InternationalTab.tsx:128
 #: components/dashboard/report/reportCatalog.ts:25
 msgid "Overview"
 msgstr "Overview"
 
-#: components/DashboardPage.tsx:74
+#: components/DashboardPage.tsx:78
 #: components/dashboard/report/reportCatalog.ts:33
 msgid "Collaborations"
 msgstr "Collaborations"
 
-#: components/DashboardPage.tsx:75
+#: components/DashboardPage.tsx:79
 #: components/dashboard/report/reportCatalog.ts:50
 msgid "Impact and citations"
 msgstr "Impact and citations"
 
-#: components/DashboardPage.tsx:76
+#: components/DashboardPage.tsx:80
 #: components/dashboard/report/reportCatalog.ts:60
 msgid "Books"
 msgstr "Books"
 
-#: components/DashboardPage.tsx:77
+#: components/DashboardPage.tsx:81
 #: components/dashboard/report/reportCatalog.ts:65
 msgid "Journals"
 msgstr "Journals"
 
-#: components/DashboardPage.tsx:78
+#: components/DashboardPage.tsx:82
 #: components/dashboard/report/reportCatalog.ts:70
 msgid "APC monitoring"
 msgstr "APC monitoring"
 
-#: components/DashboardPage.tsx:79
+#: components/DashboardPage.tsx:83
 #: components/dashboard/report/reportCatalog.ts:77
 msgid "Funding"
 msgstr "Funding"
 
-#: components/DashboardPage.tsx:80
+#: components/DashboardPage.tsx:84
 #: components/dashboard/report/reportCatalog.ts:82
 msgid "Strategic axes"
 msgstr "Strategic axes"
 
-#: components/DashboardPage.tsx:81
+#: components/DashboardPage.tsx:85
 msgid "Benchmark"
 msgstr "Benchmark"
 
-#: components/DashboardPage.tsx:82
+#: components/DashboardPage.tsx:86
 #: components/dashboard/report/reportCatalog.ts:87
 msgid "Signature charter"
 msgstr "Signature charter"
 
-#: components/DashboardPage.tsx:83
+#: components/DashboardPage.tsx:87
 #: components/dashboard/report/reportCatalog.ts:92
 msgid "Teams"
 msgstr "Teams"
 
-#: components/DashboardPage.tsx:84
+#: components/DashboardPage.tsx:88
 #: components/dashboard/report/reportCatalog.ts:100
 msgid "PhD students"
 msgstr "PhD students"
 
-#: components/DashboardPage.tsx:85
+#: components/DashboardPage.tsx:89
 #: components/dashboard/report/reportCatalog.ts:105
 msgid "Researchers"
 msgstr "Researchers"
 
-#: components/DashboardPage.tsx:86
+#: components/DashboardPage.tsx:90
 #: components/dashboard/report/reportCatalog.ts:110
 msgid "Network"
 msgstr "Network"
 
-#: components/DashboardPage.tsx:87
+#: components/DashboardPage.tsx:91
 #: components/dashboard/PublicationsListTab.tsx:209
 msgid "Publication list"
 msgstr "Publication list"
 
-#: components/DashboardPage.tsx:88
+#: components/DashboardPage.tsx:92
 msgid "Watch"
 msgstr "Watch"
 
-#: components/DashboardPage.tsx:89
+#: components/DashboardPage.tsx:93
 #: components/dashboard/report/reportCatalog.ts:116
 msgid "Sources"
 msgstr "Sources"
 
-#: components/DashboardPage.tsx:296
+#: components/DashboardPage.tsx:304
 #: components/Sidebar.tsx:163
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Dashboard"
 
 #. placeholder {0}: data.lab
-#: components/DashboardPage.tsx:296
+#: components/DashboardPage.tsx:304
 msgid "Dashboard — {0}"
 msgstr "Dashboard — {0}"
 
-#: components/DashboardPage.tsx:310
+#: components/DashboardPage.tsx:318
 #: components/reports/ReportControls.tsx:37
 msgid "Structure or group"
 msgstr "Structure or group"
 
-#: components/DashboardPage.tsx:312
+#: components/DashboardPage.tsx:320
 #: components/Sidebar.tsx:158
 #: components/reports/ReportControls.tsx:40
 msgid "Structures"
 msgstr "Structures"
 
-#: components/DashboardPage.tsx:320
+#: components/DashboardPage.tsx:328
 #: components/Sidebar.tsx:161
 #: components/reports/ReportControls.tsx:44
 msgid "Groups"
 msgstr "Groups"
 
-#: components/DashboardPage.tsx:331
+#: components/DashboardPage.tsx:339
 msgid "Open the ETL console on this structure"
 msgstr "Open the ETL console on this structure"
 
-#: components/DashboardPage.tsx:332
+#: components/DashboardPage.tsx:340
 msgid "Configure"
 msgstr "Configure"
 
 #. placeholder {0}: excluded.toLocaleString(numberLocale())
-#: components/DashboardPage.tsx:342
+#: components/DashboardPage.tsx:350
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 
-#: components/DashboardPage.tsx:343
+#: components/DashboardPage.tsx:351
 #: components/dashboard/report/ReportWizard.tsx:311
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 
-#: components/DashboardPage.tsx:348
+#: components/DashboardPage.tsx:356
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:287
 #: components/dashboard/report/ReportWizard.tsx:477
 #: components/dashboard/report/composeReportPdf.ts:26
+#: components/reports/AddToReportDialog.tsx:80
+#: components/reports/AddToReportDialog.tsx:85
 #: components/reports/ReportControls.tsx:146
 msgid "Affiliation"
 msgstr "Affiliation"
 
-#: components/DashboardPage.tsx:349
+#: components/DashboardPage.tsx:357
 #: components/ResearcherDashboard.tsx:193
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:288
 #: components/dashboard/report/ReportWizard.tsx:477
 #: components/dashboard/report/composeReportPdf.ts:26
+#: components/reports/AddToReportDialog.tsx:80
+#: components/reports/AddToReportDialog.tsx:85
 #: components/reports/ReportControls.tsx:147
 msgid "Headcount"
 msgstr "Headcount"
 
-#: components/DashboardPage.tsx:374
+#: components/DashboardPage.tsx:382
 msgid "Copy the link to this view (structure, tab, period, scope)"
 msgstr "Copy the link to this view (structure, tab, period, scope)"
 
-#: components/DashboardPage.tsx:378
+#: components/DashboardPage.tsx:386
 #: components/dashboard/NewsTab.tsx:836
 msgid "Copied!"
 msgstr "Copied!"
 
-#: components/DashboardPage.tsx:378
-#: components/dashboard/EChartCard.tsx:344
+#: components/DashboardPage.tsx:386
+#: components/dashboard/EChartCard.tsx:362
 msgid "Copy link"
 msgstr "Copy link"
 
-#: components/DashboardPage.tsx:385
+#: components/DashboardPage.tsx:393
 msgid "Compose a PDF report (choice of period, scope and charts)"
 msgstr "Compose a PDF report (choice of period, scope and charts)"
 
-#: components/DashboardPage.tsx:389
+#: components/DashboardPage.tsx:397
 msgid "PDF report"
 msgstr "PDF report"
 
-#: components/DashboardPage.tsx:409
+#: components/DashboardPage.tsx:417
 msgid "Loading data…"
 msgstr "Loading data…"
 
-#: components/DashboardPage.tsx:418
+#: components/DashboardPage.tsx:426
 msgid "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 msgstr "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 
-#: components/DashboardPage.tsx:422
+#: components/DashboardPage.tsx:430
 #: components/dashboard/EmbedPage.tsx:95
 msgid "Error loading data: {error}"
 msgstr "Error loading data: {error}"
@@ -572,6 +576,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/ResearcherDetail.tsx:294
 #: components/ResearcherDetail.tsx:446
 #: components/ResearcherDetail.tsx:549
+#: components/reports/AddToReportDialog.tsx:195
 #: components/reports/NewReportDialog.tsx:99
 #: components/reports/ReportsPage.tsx:176
 #: components/researchers/GroupModal.tsx:64
@@ -593,7 +598,7 @@ msgid "Functional groups"
 msgstr "Functional groups"
 
 #: components/GroupList.tsx:187
-#: components/reports/ReportEditor.tsx:242
+#: components/reports/ReportEditor.tsx:240
 msgid "Saving…"
 msgstr "Saving…"
 
@@ -627,7 +632,7 @@ msgstr "Draft"
 #. placeholder {0}: node.members.length
 #. placeholder {0}: rows.length
 #: components/GroupList.tsx:251
-#: components/dashboard/TeamsTab.tsx:122
+#: components/dashboard/TeamsTab.tsx:123
 #: components/rights/RightsPage.tsx:196
 msgid "{0, plural, one {# member} other {# members}}"
 msgstr "{0, plural, one {# member} other {# members}}"
@@ -980,9 +985,9 @@ msgid "Change language"
 msgstr "Change language"
 
 #: components/Sidebar.tsx:164
-#: components/reports/ReportEditor.tsx:214
-#: components/reports/ReportEditor.tsx:229
-#: components/reports/ReportEditor.tsx:252
+#: components/reports/ReportEditor.tsx:212
+#: components/reports/ReportEditor.tsx:227
+#: components/reports/ReportEditor.tsx:250
 #: components/reports/ReportsPage.tsx:89
 #: components/reports/ReportsPage.tsx:105
 msgid "My reports"
@@ -1135,7 +1140,7 @@ msgid "Open full screen / regenerate from the current structures.csv"
 msgstr "Open full screen / regenerate from the current structures.csv"
 
 #: components/StructureList.tsx:348
-#: components/dashboard/EChartCard.tsx:528
+#: components/dashboard/EChartCard.tsx:558
 msgid "Full screen"
 msgstr "Full screen"
 
@@ -1216,7 +1221,7 @@ msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 #: components/dashboard/ApcTab.tsx:506
 #: components/dashboard/ApcTab.tsx:839
 #: components/dashboard/AxesTab.tsx:276
-#: components/dashboard/CharteTab.tsx:441
+#: components/dashboard/CharteTab.tsx:442
 #: components/dashboard/FundersTab.tsx:404
 #: components/dashboard/ImpactTab.tsx:248
 #: components/dashboard/JournalsTab.tsx:283
@@ -1230,7 +1235,7 @@ msgstr "Previous"
 #: components/dashboard/ApcTab.tsx:508
 #: components/dashboard/ApcTab.tsx:845
 #: components/dashboard/AxesTab.tsx:282
-#: components/dashboard/CharteTab.tsx:447
+#: components/dashboard/CharteTab.tsx:448
 #: components/dashboard/FundersTab.tsx:415
 #: components/dashboard/ImpactTab.tsx:254
 #: components/dashboard/JournalsTab.tsx:289
@@ -1403,7 +1408,7 @@ msgstr "Export (CSV)"
 #: components/dashboard/ApcTab.tsx:480
 #: components/dashboard/ApcTab.tsx:744
 #: components/dashboard/AxesTab.tsx:207
-#: components/dashboard/CharteTab.tsx:390
+#: components/dashboard/CharteTab.tsx:391
 #: components/dashboard/ImpactTab.tsx:209
 #: components/dashboard/PublicationsListTab.tsx:278
 #: components/dashboard/PublicationsListTab.tsx:431
@@ -1419,7 +1424,7 @@ msgstr "Paid"
 #: components/dashboard/NewsTab.tsx:650
 #: components/dashboard/PublicationsListTab.tsx:434
 #: components/dashboard/ResearchersTab.tsx:133
-#: components/dashboard/TeamsTab.tsx:147
+#: components/dashboard/TeamsTab.tsx:148
 #: components/researchers/TaskForm.tsx:95
 #: components/structures/IdentificationTab.tsx:113
 #: components/structures/LifecycleTab.tsx:118
@@ -1443,7 +1448,7 @@ msgstr "hybrid"
 #: components/dashboard/ApcTab.tsx:507
 #: components/dashboard/ApcTab.tsx:842
 #: components/dashboard/AxesTab.tsx:279
-#: components/dashboard/CharteTab.tsx:444
+#: components/dashboard/CharteTab.tsx:445
 #: components/dashboard/FundersTab.tsx:407
 #: components/dashboard/ImpactTab.tsx:251
 #: components/dashboard/JournalsTab.tsx:286
@@ -1571,7 +1576,7 @@ msgstr "Corresponding author's affiliation"
 
 #. placeholder {0}: dataset.lab
 #: components/dashboard/ApcTab.tsx:750
-#: components/dashboard/CharteTab.tsx:394
+#: components/dashboard/CharteTab.tsx:395
 #: components/dashboard/ImpactTab.tsx:211
 msgid "{0} authors"
 msgstr "{0} authors"
@@ -1624,7 +1629,7 @@ msgid "Title, DOI or journal…"
 msgstr "Title, DOI or journal…"
 
 #: components/dashboard/AxesTab.tsx:208
-#: components/dashboard/CharteTab.tsx:395
+#: components/dashboard/CharteTab.tsx:396
 #: components/dashboard/ImpactTab.tsx:210
 #: components/dashboard/MediaSourcesAdmin.tsx:384
 #: components/dashboard/NewsTab.tsx:690
@@ -2298,20 +2303,20 @@ msgstr "No chapter, monograph or edited book over the period."
 msgid "Book types"
 msgstr "Book types"
 
-#: components/dashboard/CharteTab.tsx:45
+#: components/dashboard/CharteTab.tsx:46
 msgid "Score (%)"
 msgstr "Score (%)"
 
-#: components/dashboard/CharteTab.tsx:60
+#: components/dashboard/CharteTab.tsx:61
 msgid "threshold"
 msgstr "threshold"
 
-#: components/dashboard/CharteTab.tsx:70
+#: components/dashboard/CharteTab.tsx:71
 #: components/dashboard/embedRegistry.tsx:598
 msgid "Distribution of compliance scores"
 msgstr "Distribution of compliance scores"
 
-#: components/dashboard/CharteTab.tsx:86
+#: components/dashboard/CharteTab.tsx:87
 msgid "Compliance rate"
 msgstr "Compliance rate"
 
@@ -2319,50 +2324,50 @@ msgstr "Compliance rate"
 #. placeholder {1}: d.pctConf
 #. placeholder {2}: d.pctNu
 #. placeholder {3}: d.n
-#: components/dashboard/CharteTab.tsx:94
+#: components/dashboard/CharteTab.tsx:95
 msgid "{0} — compliant: {1}% · “NU” mention: {2}% ({3} analysed)"
 msgstr "{0} — compliant: {1}% · “NU” mention: {2}% ({3} analysed)"
 
-#: components/dashboard/CharteTab.tsx:120
-#: components/dashboard/CharteTab.tsx:538
+#: components/dashboard/CharteTab.tsx:121
+#: components/dashboard/CharteTab.tsx:542
 msgid "“Nantes Université” mention"
 msgstr "“Nantes Université” mention"
 
-#: components/dashboard/CharteTab.tsx:135
+#: components/dashboard/CharteTab.tsx:136
 #: components/dashboard/embedRegistry.tsx:609
 msgid "Compliance rate per year"
 msgstr "Compliance rate per year"
 
-#: components/dashboard/CharteTab.tsx:136
+#: components/dashboard/CharteTab.tsx:137
 msgid "Full compliance vs simple “Nantes Université” mention"
 msgstr "Full compliance vs simple “Nantes Université” mention"
 
-#: components/dashboard/CharteTab.tsx:186
+#: components/dashboard/CharteTab.tsx:187
 #: components/dashboard/embedRegistry.tsx:620
 msgid "Presence rate by criterion"
 msgstr "Presence rate by criterion"
 
-#: components/dashboard/CharteTab.tsx:187
+#: components/dashboard/CharteTab.tsx:188
 msgid "Share of analysed publications satisfying each element of the signature"
 msgstr "Share of analysed publications satisfying each element of the signature"
 
 #. placeholder {0}: d.team
 #. placeholder {1}: d.pct
 #. placeholder {2}: d.n
-#: components/dashboard/CharteTab.tsx:211
+#: components/dashboard/CharteTab.tsx:212
 msgid "{0}: {1}% compliant ({2} analysable publications)"
 msgstr "{0}: {1}% compliant ({2} analysable publications)"
 
-#: components/dashboard/CharteTab.tsx:248
+#: components/dashboard/CharteTab.tsx:249
 #: components/dashboard/embedRegistry.tsx:631
 msgid "Compliance rate by team"
 msgstr "Compliance rate by team"
 
-#: components/dashboard/CharteTab.tsx:249
+#: components/dashboard/CharteTab.tsx:250
 msgid "Teams with at least 3 analysable publications"
 msgstr "Teams with at least 3 analysable publications"
 
-#: components/dashboard/CharteTab.tsx:339
+#: components/dashboard/CharteTab.tsx:340
 #: components/dashboard/NewsTab.tsx:620
 #: components/dashboard/PublicationsListTab.tsx:44
 #: components/dashboard/PublicationsListTab.tsx:307
@@ -2370,112 +2375,112 @@ msgctxt "feminine"
 msgid "All"
 msgstr "All"
 
-#: components/dashboard/CharteTab.tsx:340
-#: components/dashboard/CharteTab.tsx:565
+#: components/dashboard/CharteTab.tsx:341
 #: components/dashboard/CharteTab.tsx:569
+#: components/dashboard/CharteTab.tsx:573
 #: components/dashboard/embedRegistry.tsx:131
 msgctxt "plural"
 msgid "Compliant"
 msgstr "Compliant"
 
-#: components/dashboard/CharteTab.tsx:341
-#: components/dashboard/CharteTab.tsx:566
+#: components/dashboard/CharteTab.tsx:342
+#: components/dashboard/CharteTab.tsx:570
 #: components/dashboard/embedRegistry.tsx:132
 msgctxt "plural"
 msgid "Non-compliant"
 msgstr "Non-compliant"
 
-#: components/dashboard/CharteTab.tsx:349
+#: components/dashboard/CharteTab.tsx:350
 msgid "Detected signatures"
 msgstr "Detected signatures"
 
 #. placeholder {0}: rows.length
-#: components/dashboard/CharteTab.tsx:352
+#: components/dashboard/CharteTab.tsx:353
 msgid "{0, plural, one {# signature, sorted from least to most compliant} other {# signatures, sorted from least to most compliant}}"
 msgstr "{0, plural, one {# signature, sorted from least to most compliant} other {# signatures, sorted from least to most compliant}}"
 
-#: components/dashboard/CharteTab.tsx:373
+#: components/dashboard/CharteTab.tsx:374
 msgid "Search in the signature…"
 msgstr "Search in the signature…"
 
-#: components/dashboard/CharteTab.tsx:380
+#: components/dashboard/CharteTab.tsx:381
 msgid "Download the list (CSV)"
 msgstr "Download the list (CSV)"
 
-#: components/dashboard/CharteTab.tsx:391
+#: components/dashboard/CharteTab.tsx:392
 msgid "Score"
 msgstr "Score"
 
-#: components/dashboard/CharteTab.tsx:392
-#: components/dashboard/CharteTab.tsx:415
+#: components/dashboard/CharteTab.tsx:393
+#: components/dashboard/CharteTab.tsx:416
 msgid "Compliant"
 msgstr "Compliant"
 
-#: components/dashboard/CharteTab.tsx:393
+#: components/dashboard/CharteTab.tsx:394
 msgid "Signature (raw affiliation)"
 msgstr "Signature (raw affiliation)"
 
-#: components/dashboard/CharteTab.tsx:415
+#: components/dashboard/CharteTab.tsx:416
 msgid "Non-compliant"
 msgstr "Non-compliant"
 
-#: components/dashboard/CharteTab.tsx:473
+#: components/dashboard/CharteTab.tsx:475
 msgid "Compliance not computed for this structure: it requires the raw OpenAlex affiliations (column missing from old ETLs — rerun the ETL) and a signature model in the Nantes Université charter (appendix 2)."
 msgstr "Compliance not computed for this structure: it requires the raw OpenAlex affiliations (column missing from old ETLs — rerun the ETL) and a signature model in the Nantes Université charter (appendix 2)."
 
-#: components/dashboard/CharteTab.tsx:487
+#: components/dashboard/CharteTab.tsx:491
 msgid "Compares the raw OpenAlex affiliation of the structure's authors with the signature model of the common charter (June 2022). The score is the share of charter criteria satisfied."
 msgstr "Compares the raw OpenAlex affiliation of the structure's authors with the signature model of the common charter (June 2022). The score is the share of charter criteria satisfied."
 
-#: components/dashboard/CharteTab.tsx:493
+#: components/dashboard/CharteTab.tsx:497
 msgid "Reference model"
 msgstr "Reference model"
 
-#: components/dashboard/CharteTab.tsx:499
+#: components/dashboard/CharteTab.tsx:503
 msgid "Aggregated monitoring"
 msgstr "Aggregated monitoring"
 
-#: components/dashboard/CharteTab.tsx:500
+#: components/dashboard/CharteTab.tsx:504
 msgid "This structure has no official signature of its own: each publication is assessed against the charter model of <0>its lab</0>, and the indicators below are the sum of the member labs' monitoring."
 msgstr "This structure has no official signature of its own: each publication is assessed against the charter model of <0>its lab</0>, and the indicators below are the sum of the member labs' monitoring."
 
-#: components/dashboard/CharteTab.tsx:508
+#: components/dashboard/CharteTab.tsx:512
 msgid "Compliance threshold (share of criteria to satisfy):"
 msgstr "Compliance threshold (share of criteria to satisfy):"
 
-#: components/dashboard/CharteTab.tsx:524
+#: components/dashboard/CharteTab.tsx:528
 msgid "Analysable publications"
 msgstr "Analysable publications"
 
 #. placeholder {0}: nonAnalysees.toLocaleString(numberLocale())
-#: components/dashboard/CharteTab.tsx:526
+#: components/dashboard/CharteTab.tsx:530
 msgid "{0} without raw affiliation"
 msgstr "{0} without raw affiliation"
 
-#: components/dashboard/CharteTab.tsx:531
+#: components/dashboard/CharteTab.tsx:535
 msgid "Compliant signatures"
 msgstr "Compliant signatures"
 
-#: components/dashboard/CharteTab.tsx:540
+#: components/dashboard/CharteTab.tsx:544
 msgid "{pctNu}% — historical minimum criterion"
 msgstr "{pctNu}% — historical minimum criterion"
 
-#: components/dashboard/CharteTab.tsx:545
+#: components/dashboard/CharteTab.tsx:549
 msgid "Mean score"
 msgstr "Mean score"
 
 #. placeholder {0}: nonAnalysees.toLocaleString(numberLocale())
 #. placeholder {1}: agg.total.toLocaleString(numberLocale())
-#: components/dashboard/CharteTab.tsx:553
+#: components/dashboard/CharteTab.tsx:557
 msgid "⚠️ {0} publication(s) out of {1} without raw OpenAlex affiliation are not analysed (BSO-only corpus)."
 msgstr "⚠️ {0} publication(s) out of {1} without raw OpenAlex affiliation are not analysed (BSO-only corpus)."
 
-#: components/dashboard/CharteTab.tsx:562
+#: components/dashboard/CharteTab.tsx:566
 #: components/dashboard/embedRegistry.tsx:128
 msgid "Corpus compliance"
 msgstr "Corpus compliance"
 
-#: components/dashboard/CharteTab.tsx:595
+#: components/dashboard/CharteTab.tsx:599
 msgid "Compliance by team unavailable: no team with at least 3 analysable publications (staff not matched?)."
 msgstr "Compliance by team unavailable: no team with at least 3 analysable publications (staff not matched?)."
 
@@ -2612,75 +2617,81 @@ msgstr "Co-signing French institutions (outside Nantes Université) — <0>{0}</
 msgid "Most co-signing institutions"
 msgstr "Most co-signing institutions"
 
-#: components/dashboard/EChartCard.tsx:264
+#: components/dashboard/EChartCard.tsx:282
 msgid "About “{title}”"
 msgstr "About “{title}”"
 
-#: components/dashboard/EChartCard.tsx:270
-#: components/dashboard/EChartCard.tsx:335
+#: components/dashboard/EChartCard.tsx:288
+#: components/dashboard/EChartCard.tsx:353
 #: components/dashboard/NetworkTab.tsx:356
 #: components/dashboard/NewsTab.tsx:815
 #: components/dashboard/NewsletterPanel.tsx:484
 #: components/dashboard/report/ReportWizard.tsx:261
+#: components/reports/AddToReportDialog.tsx:122
 #: components/reports/ChartPicker.tsx:58
 #: components/reports/NewReportDialog.tsx:65
 #: components/researchers/UnifiedAlignPage.tsx:603
 msgid "Close"
 msgstr "Close"
 
-#: components/dashboard/EChartCard.tsx:277
+#: components/dashboard/EChartCard.tsx:295
 #: components/researchers/TaskForm.tsx:147
 #: components/structures/IdentificationTab.tsx:57
 msgid "Description"
 msgstr "Description"
 
-#: components/dashboard/EChartCard.tsx:281
+#: components/dashboard/EChartCard.tsx:299
 #: components/dashboard/report/pdfDoc.ts:336
 msgid "Method"
 msgstr "Method"
 
-#: components/dashboard/EChartCard.tsx:286
+#: components/dashboard/EChartCard.tsx:304
 #: components/dashboard/report/pdfDoc.ts:337
 msgid "Limitations"
 msgstr "Limitations"
 
-#: components/dashboard/EChartCard.tsx:329
+#: components/dashboard/EChartCard.tsx:347
 msgid "Share “{title}”"
 msgstr "Share “{title}”"
 
-#: components/dashboard/EChartCard.tsx:332
+#: components/dashboard/EChartCard.tsx:350
 msgid "Public link: accessible without authentication, with the current filters (structure and year range)."
 msgstr "Public link: accessible without authentication, with the current filters (structure and year range)."
 
-#: components/dashboard/EChartCard.tsx:341
+#: components/dashboard/EChartCard.tsx:359
 msgid "Direct link"
 msgstr "Direct link"
 
-#: components/dashboard/EChartCard.tsx:347
+#: components/dashboard/EChartCard.tsx:365
 msgid "Open in a new tab"
 msgstr "Open in a new tab"
 
-#: components/dashboard/EChartCard.tsx:354
+#: components/dashboard/EChartCard.tsx:372
 msgid "Iframe embed"
 msgstr "Iframe embed"
 
-#: components/dashboard/EChartCard.tsx:365
+#: components/dashboard/EChartCard.tsx:383
 msgid "Copy the embed code"
 msgstr "Copy the embed code"
 
-#: components/dashboard/EChartCard.tsx:511
+#: components/dashboard/EChartCard.tsx:531
 msgid "Methodology (description, method, limitations)"
 msgstr "Methodology (description, method, limitations)"
 
-#: components/dashboard/EChartCard.tsx:518
+#: components/dashboard/EChartCard.tsx:541
+#: components/reports/AddToReportDialog.tsx:119
+msgid "Add to a report"
+msgstr "Add to a report"
+
+#: components/dashboard/EChartCard.tsx:548
 msgid "Share (public link / iframe)"
 msgstr "Share (public link / iframe)"
 
-#: components/dashboard/EChartCard.tsx:522
+#: components/dashboard/EChartCard.tsx:552
 msgid "Download as PNG"
 msgstr "Download as PNG"
 
-#: components/dashboard/EChartCard.tsx:528
+#: components/dashboard/EChartCard.tsx:558
 msgid "Exit full screen"
 msgstr "Exit full screen"
 
@@ -3260,7 +3271,7 @@ msgstr "reject."
 
 #: components/dashboard/MediaMentionsPanel.tsx:258
 #: components/dashboard/MediaMentionsPanel.tsx:555
-#: components/reports/ReportEditor.tsx:522
+#: components/reports/ReportEditor.tsx:520
 #: components/researchers/TasksPage.tsx:185
 msgid "auto"
 msgstr "auto"
@@ -4110,12 +4121,12 @@ msgid "Describe the topic you are interested in for {institutionLabel} — the A
 msgstr "Describe the topic you are interested in for {institutionLabel} — the AI suggests subjects among those actually present in these publications, to be corrected before running the analysis."
 
 #: components/dashboard/PartnerBilanSection.tsx:164
-#: components/dashboard/TeamsTab.tsx:342
+#: components/dashboard/TeamsTab.tsx:344
 msgid "e.g. maritime decarbonisation, AI and health…"
 msgstr "e.g. maritime decarbonisation, AI and health…"
 
 #: components/dashboard/PartnerBilanSection.tsx:175
-#: components/dashboard/TeamsTab.tsx:353
+#: components/dashboard/TeamsTab.tsx:355
 msgid "Analysing…"
 msgstr "Analysing…"
 
@@ -4352,7 +4363,7 @@ msgid "Filters"
 msgstr "Filters"
 
 #: components/dashboard/PublicationsListTab.tsx:257
-#: components/reports/ReportEditor.tsx:309
+#: components/reports/ReportEditor.tsx:307
 #: components/researchers/UnifiedAlignPage.tsx:549
 msgid "Remove this filter"
 msgstr "Remove this filter"
@@ -4400,7 +4411,7 @@ msgid "Domain"
 msgstr "Domain"
 
 #: components/dashboard/PublicationsListTab.tsx:367
-#: components/dashboard/TeamsTab.tsx:329
+#: components/dashboard/TeamsTab.tsx:331
 msgid "Subfield"
 msgstr "Subfield"
 
@@ -4581,139 +4592,139 @@ msgstr "OpenAlex diagnosis of harvester records"
 msgid "records whose main source is the harvester — “structure not credited” = affiliation corrections to request"
 msgstr "records whose main source is the harvester — “structure not credited” = affiliation corrections to request"
 
-#: components/dashboard/TeamsTab.tsx:77
+#: components/dashboard/TeamsTab.tsx:78
 msgid "Unassigned"
 msgstr "Unassigned"
 
-#: components/dashboard/TeamsTab.tsx:119
+#: components/dashboard/TeamsTab.tsx:120
 msgid "Members by {teamLabel}"
 msgstr "Members by {teamLabel}"
 
-#: components/dashboard/TeamsTab.tsx:123
+#: components/dashboard/TeamsTab.tsx:124
 msgid "{matched} with a record in People (click to open)"
 msgstr "{matched} with a record in People (click to open)"
 
-#: components/dashboard/TeamsTab.tsx:132
+#: components/dashboard/TeamsTab.tsx:133
 msgid "All {teamLabel}s"
 msgstr "All {teamLabel}s"
 
-#: components/dashboard/TeamsTab.tsx:146
+#: components/dashboard/TeamsTab.tsx:147
 msgid "Member"
 msgstr "Member"
 
 #. placeholder {0}: range.start
 #. placeholder {1}: range.end
-#: components/dashboard/TeamsTab.tsx:149
+#: components/dashboard/TeamsTab.tsx:150
 msgid "Publications ({0}–{1})"
 msgstr "Publications ({0}–{1})"
 
-#: components/dashboard/TeamsTab.tsx:160
+#: components/dashboard/TeamsTab.tsx:161
 msgid "Open the record in People"
 msgstr "Open the record in People"
 
-#: components/dashboard/TeamsTab.tsx:278
+#: components/dashboard/TeamsTab.tsx:280
 msgid "subfield"
 msgstr "subfield"
 
-#: components/dashboard/TeamsTab.tsx:278
+#: components/dashboard/TeamsTab.tsx:280
 msgid "topic"
 msgstr "topic"
 
-#: components/dashboard/TeamsTab.tsx:282
+#: components/dashboard/TeamsTab.tsx:284
 msgid "Share of each team's publications across the {axisCount} most frequent OpenAlex {levelName}s"
 msgstr "Share of each team's publications across the {axisCount} most frequent OpenAlex {levelName}s"
 
-#: components/dashboard/TeamsTab.tsx:284
+#: components/dashboard/TeamsTab.tsx:286
 msgid "Share of each team's publications across the {levelName}s selected for “{analyzedFor}”"
 msgstr "Share of each team's publications across the {levelName}s selected for “{analyzedFor}”"
 
-#: components/dashboard/TeamsTab.tsx:285
+#: components/dashboard/TeamsTab.tsx:287
 msgid "The topics selected by the AI become the axes of the radar"
 msgstr "The topics selected by the AI become the axes of the radar"
 
-#: components/dashboard/TeamsTab.tsx:289
+#: components/dashboard/TeamsTab.tsx:291
 msgid "Describe a theme above: the AI selects the matching OpenAlex {levelName}s among those found in the unit's publications."
 msgstr "Describe a theme above: the AI selects the matching OpenAlex {levelName}s among those found in the unit's publications."
 
-#: components/dashboard/TeamsTab.tsx:291
+#: components/dashboard/TeamsTab.tsx:293
 msgid "No {levelName} seems to match “{analyzedFor}” in these publications — rephrase, or add one manually."
 msgstr "No {levelName} seems to match “{analyzedFor}” in these publications — rephrase, or add one manually."
 
-#: components/dashboard/TeamsTab.tsx:293
+#: components/dashboard/TeamsTab.tsx:295
 msgid "Not enough OpenAlex {levelName}s to draw the disciplinary profile."
 msgstr "Not enough OpenAlex {levelName}s to draw the disciplinary profile."
 
-#: components/dashboard/TeamsTab.tsx:306
-#: components/dashboard/TeamsTab.tsx:307
+#: components/dashboard/TeamsTab.tsx:308
+#: components/dashboard/TeamsTab.tsx:309
 msgid "Radar"
 msgstr "Radar"
 
-#: components/dashboard/TeamsTab.tsx:309
+#: components/dashboard/TeamsTab.tsx:311
 msgid "Teams × topics heatmap"
 msgstr "Teams × topics heatmap"
 
-#: components/dashboard/TeamsTab.tsx:310
+#: components/dashboard/TeamsTab.tsx:312
 msgid "Heatmap"
 msgstr "Heatmap"
 
-#: components/dashboard/TeamsTab.tsx:316
+#: components/dashboard/TeamsTab.tsx:318
 msgid "Automatic"
 msgstr "Automatic"
 
-#: components/dashboard/TeamsTab.tsx:319
+#: components/dashboard/TeamsTab.tsx:321
 msgid "By theme (AI)"
 msgstr "By theme (AI)"
 
-#: components/dashboard/TeamsTab.tsx:323
+#: components/dashboard/TeamsTab.tsx:325
 msgid "Level:"
 msgstr "Level:"
 
-#: components/dashboard/TeamsTab.tsx:330
+#: components/dashboard/TeamsTab.tsx:332
 msgctxt "OpenAlex"
 msgid "Topic"
 msgstr "Topic"
 
-#: components/dashboard/TeamsTab.tsx:353
+#: components/dashboard/TeamsTab.tsx:355
 msgid "Suggest axes"
 msgstr "Suggest axes"
 
-#: components/dashboard/TeamsTab.tsx:360
+#: components/dashboard/TeamsTab.tsx:362
 msgid "Radar axes (click to remove):"
 msgstr "Radar axes (click to remove):"
 
-#: components/dashboard/TeamsTab.tsx:367
+#: components/dashboard/TeamsTab.tsx:369
 msgid "Remove this axis"
 msgstr "Remove this axis"
 
-#: components/dashboard/TeamsTab.tsx:381
+#: components/dashboard/TeamsTab.tsx:383
 msgid "+ add an axis ({levelName})…"
 msgstr "+ add an axis ({levelName})…"
 
-#: components/dashboard/TeamsTab.tsx:448
+#: components/dashboard/TeamsTab.tsx:455
 msgid "The teams of this structure are not filled in (no staff matched to authors). Add a staff file with teams in druid-biblio to enable this tab."
 msgstr "The teams of this structure are not filled in (no staff matched to authors). Add a staff file with teams in druid-biblio to enable this tab."
 
-#: components/dashboard/TeamsTab.tsx:459
+#: components/dashboard/TeamsTab.tsx:466
 msgid "The publications of this structure are not yet matched to teams — only the member list is available."
 msgstr "The publications of this structure are not yet matched to teams — only the member list is available."
 
-#: components/dashboard/TeamsTab.tsx:478
+#: components/dashboard/TeamsTab.tsx:485
 #: components/dashboard/embedRegistry.tsx:332
 #: components/dashboard/embedRegistry.tsx:335
 msgid "Breakdown by team"
 msgstr "Breakdown by team"
 
-#: components/dashboard/TeamsTab.tsx:479
+#: components/dashboard/TeamsTab.tsx:486
 msgid "A publication counts in each of its teams"
 msgstr "A publication counts in each of its teams"
 
-#: components/dashboard/TeamsTab.tsx:487
+#: components/dashboard/TeamsTab.tsx:494
 #: components/dashboard/embedRegistry.tsx:342
 #: components/dashboard/embedRegistry.tsx:344
 msgid "Evolution by team"
 msgstr "Evolution by team"
 
-#: components/dashboard/TeamsTab.tsx:495
+#: components/dashboard/TeamsTab.tsx:502
 #: components/dashboard/embedRegistry.tsx:348
 #: components/dashboard/embedRegistry.tsx:350
 msgid "Types by team"
@@ -5552,7 +5563,7 @@ msgid "Content"
 msgstr "Content"
 
 #: components/dashboard/report/ReportWizard.tsx:203
-#: components/reports/ReportEditor.tsx:205
+#: components/reports/ReportEditor.tsx:203
 msgid "PDF report generation failed — see the browser console."
 msgstr "PDF report generation failed — see the browser console."
 
@@ -6987,6 +6998,74 @@ msgstr "Last generation: {0}"
 msgid "Demonstration instance — fictitious data, read-only: changes are not saved."
 msgstr "Demonstration instance — fictitious data, read-only: changes are not saved."
 
+#. placeholder {0}: capture.slug
+#: components/reports/AddToReportDialog.tsx:34
+msgid "Report — {0}"
+msgstr "Report — {0}"
+
+#. placeholder {0}: done.name
+#: components/reports/AddToReportDialog.tsx:130
+msgid "Added to « {0} »."
+msgstr "Added to « {0} »."
+
+#: components/reports/AddToReportDialog.tsx:133
+msgid "Back to the dashboard"
+msgstr "Back to the dashboard"
+
+#: components/reports/AddToReportDialog.tsx:136
+msgid "Open the report"
+msgstr "Open the report"
+
+#: components/reports/AddToReportDialog.tsx:145
+msgid "Loading your reports…"
+msgstr "Loading your reports…"
+
+#. placeholder {0}: r.owner
+#: components/reports/AddToReportDialog.tsx:153
+#: components/reports/ReportsPage.tsx:149
+msgid "by {0}"
+msgstr "by {0}"
+
+#: components/reports/AddToReportDialog.tsx:158
+#: components/reports/NewReportDialog.tsx:64
+#: components/reports/ReportsPage.tsx:99
+msgid "New report"
+msgstr "New report"
+
+#: components/reports/AddToReportDialog.tsx:169
+#: components/reports/ReportEditor.tsx:258
+msgid "Report name"
+msgstr "Report name"
+
+#: components/reports/AddToReportDialog.tsx:177
+msgid "The report covers {reportLabel}, with filters."
+msgstr "The report covers {reportLabel}, with filters."
+
+#: components/reports/AddToReportDialog.tsx:178
+msgid "The report covers {reportLabel}."
+msgstr "The report covers {reportLabel}."
+
+#: components/reports/AddToReportDialog.tsx:182
+msgid "Follow the report scope"
+msgstr "Follow the report scope"
+
+#: components/reports/AddToReportDialog.tsx:182
+msgid "the chart is recomputed on the report structure, years and filters"
+msgstr "the chart is recomputed on the report structure, years and filters"
+
+#: components/reports/AddToReportDialog.tsx:186
+msgid "Keep what the dashboard shows"
+msgstr "Keep what the dashboard shows"
+
+#: components/reports/AddToReportDialog.tsx:191
+msgid "This report already holds the maximum number of blocks."
+msgstr "This report already holds the maximum number of blocks."
+
+#: components/reports/AddToReportDialog.tsx:198
+#: components/researchers/AffiliationsTable.tsx:113
+msgid "Add"
+msgstr "Add"
+
 #: components/reports/ChartPicker.tsx:15
 msgid "needs a structure with member labs"
 msgstr "needs a structure with member labs"
@@ -7023,11 +7102,6 @@ msgstr "Search a chart…"
 msgid "No chart matches."
 msgstr "No chart matches."
 
-#: components/reports/NewReportDialog.tsx:64
-#: components/reports/ReportsPage.tsx:99
-msgid "New report"
-msgstr "New report"
-
 #: components/reports/NewReportDialog.tsx:77
 msgid "e.g. Collaborations with the University of Ottawa"
 msgstr "e.g. Collaborations with the University of Ottawa"
@@ -7054,54 +7128,50 @@ msgstr "incl. current year"
 
 #. placeholder {0}: r.name
 #. placeholder {0}: stored?.name ?? ''
-#: components/reports/ReportEditor.tsx:130
+#: components/reports/ReportEditor.tsx:128
 #: components/reports/ReportsPage.tsx:51
 msgid "{0} (copy)"
 msgstr "{0} (copy)"
 
 #. placeholder {0}: run.missing.length
-#: components/reports/ReportEditor.tsx:201
+#: components/reports/ReportEditor.tsx:199
 msgid "PDF downloaded — {0} chart(s) could not be captured and were left out."
 msgstr "PDF downloaded — {0} chart(s) could not be captured and were left out."
 
-#: components/reports/ReportEditor.tsx:202
+#: components/reports/ReportEditor.tsx:200
 msgid "PDF downloaded."
 msgstr "PDF downloaded."
 
 #. placeholder {0}: stored.definitionError
-#: components/reports/ReportEditor.tsx:231
+#: components/reports/ReportEditor.tsx:229
 msgid "This report can no longer be opened: its definition does not match the current format ({0})."
 msgstr "This report can no longer be opened: its definition does not match the current format ({0})."
 
-#: components/reports/ReportEditor.tsx:240
+#: components/reports/ReportEditor.tsx:238
 msgid "Saved"
 msgstr "Saved"
 
-#: components/reports/ReportEditor.tsx:241
+#: components/reports/ReportEditor.tsx:239
 msgid "Unsaved changes…"
 msgstr "Unsaved changes…"
 
-#: components/reports/ReportEditor.tsx:243
+#: components/reports/ReportEditor.tsx:241
 msgid "Not saved"
 msgstr "Not saved"
 
-#: components/reports/ReportEditor.tsx:244
+#: components/reports/ReportEditor.tsx:242
 msgid "Changed elsewhere"
 msgstr "Changed elsewhere"
 
-#: components/reports/ReportEditor.tsx:260
-msgid "Report name"
-msgstr "Report name"
-
-#: components/reports/ReportEditor.tsx:263
+#: components/reports/ReportEditor.tsx:261
 msgid "Read only"
 msgstr "Read only"
 
-#: components/reports/ReportEditor.tsx:265
+#: components/reports/ReportEditor.tsx:263
 msgid "Make your own copy"
 msgstr "Make your own copy"
 
-#: components/reports/ReportEditor.tsx:266
+#: components/reports/ReportEditor.tsx:264
 #: components/reports/ReportsPage.tsx:160
 #: components/reports/ReportsPage.tsx:163
 msgid "Duplicate"
@@ -7109,102 +7179,102 @@ msgstr "Duplicate"
 
 #. placeholder {0}: Math.min(pdfRun!.index + 1, pdfRun!.batches.length)
 #. placeholder {1}: Math.max(1, pdfRun!.batches.length)
-#: components/reports/ReportEditor.tsx:276
+#: components/reports/ReportEditor.tsx:274
 msgid "Rendering charts {0}/{1}…"
 msgstr "Rendering charts {0}/{1}…"
 
-#: components/reports/ReportEditor.tsx:277
+#: components/reports/ReportEditor.tsx:275
 msgid "Generate the PDF"
 msgstr "Generate the PDF"
 
-#: components/reports/ReportEditor.tsx:286
+#: components/reports/ReportEditor.tsx:284
 msgid "Description (printed on the cover page)"
 msgstr "Description (printed on the cover page)"
 
 #. placeholder {0}: resolved.publicationCount
-#: components/reports/ReportEditor.tsx:317
+#: components/reports/ReportEditor.tsx:315
 msgid "{0} publications"
 msgstr "{0} publications"
 
-#: components/reports/ReportEditor.tsx:323
+#: components/reports/ReportEditor.tsx:321
 msgid "This report was changed elsewhere since you opened it; your latest changes are not saved."
 msgstr "This report was changed elsewhere since you opened it; your latest changes are not saved."
 
-#: components/reports/ReportEditor.tsx:324
+#: components/reports/ReportEditor.tsx:322
 msgid "Reload the saved version"
 msgstr "Reload the saved version"
 
-#: components/reports/ReportEditor.tsx:338
+#: components/reports/ReportEditor.tsx:336
 msgid "Chart"
 msgstr "Chart"
 
-#: components/reports/ReportEditor.tsx:345
+#: components/reports/ReportEditor.tsx:343
 msgid "Key figures"
 msgstr "Key figures"
 
-#: components/reports/ReportEditor.tsx:350
+#: components/reports/ReportEditor.tsx:348
 msgid "New section"
 msgstr "New section"
 
-#: components/reports/ReportEditor.tsx:352
+#: components/reports/ReportEditor.tsx:350
 msgid "Section"
 msgstr "Section"
 
-#: components/reports/ReportEditor.tsx:359
-#: components/reports/ReportEditor.tsx:475
+#: components/reports/ReportEditor.tsx:357
+#: components/reports/ReportEditor.tsx:473
 msgid "Text"
 msgstr "Text"
 
-#: components/reports/ReportEditor.tsx:374
+#: components/reports/ReportEditor.tsx:372
 msgid "Move up"
 msgstr "Move up"
 
-#: components/reports/ReportEditor.tsx:375
+#: components/reports/ReportEditor.tsx:373
 msgid "Move down"
 msgstr "Move down"
 
-#: components/reports/ReportEditor.tsx:376
+#: components/reports/ReportEditor.tsx:374
 msgid "Show in the PDF"
 msgstr "Show in the PDF"
 
-#: components/reports/ReportEditor.tsx:376
+#: components/reports/ReportEditor.tsx:374
 msgid "Hide from the PDF"
 msgstr "Hide from the PDF"
 
-#: components/reports/ReportEditor.tsx:379
+#: components/reports/ReportEditor.tsx:377
 #: components/reports/ReportsPage.tsx:183
 msgid "Delete"
 msgstr "Delete"
 
-#: components/reports/ReportEditor.tsx:393
+#: components/reports/ReportEditor.tsx:391
 msgid "Add a first block with the buttons above."
 msgstr "Add a first block with the buttons above."
 
-#: components/reports/ReportEditor.tsx:393
+#: components/reports/ReportEditor.tsx:391
 msgid "This report is empty."
 msgstr "This report is empty."
 
-#: components/reports/ReportEditor.tsx:467
+#: components/reports/ReportEditor.tsx:465
 msgid "Section title"
 msgstr "Section title"
 
-#: components/reports/ReportEditor.tsx:477
+#: components/reports/ReportEditor.tsx:475
 msgid "# heading · - bullet · **bold** · *italic* · [label](https://…) · blank line = new paragraph"
 msgstr "# heading · - bullet · **bold** · *italic* · [label](https://…) · blank line = new paragraph"
 
-#: components/reports/ReportEditor.tsx:502
+#: components/reports/ReportEditor.tsx:500
 msgid "Title (optional)"
 msgstr "Title (optional)"
 
-#: components/reports/ReportEditor.tsx:508
+#: components/reports/ReportEditor.tsx:506
 msgid "Note printed under the chart"
 msgstr "Note printed under the chart"
 
-#: components/reports/ReportEditor.tsx:529
+#: components/reports/ReportEditor.tsx:527
 msgid "This chart has its own scope (structure, period or filters)."
 msgstr "This chart has its own scope (structure, period or filters)."
 
-#: components/reports/ReportEditor.tsx:532
+#: components/reports/ReportEditor.tsx:530
 msgid "Use the report scope"
 msgstr "Use the report scope"
 
@@ -7281,11 +7351,6 @@ msgstr "Updated {0}"
 #: components/reports/ReportsPage.tsx:148
 msgid "Last PDF {0}"
 msgstr "Last PDF {0}"
-
-#. placeholder {0}: r.owner
-#: components/reports/ReportsPage.tsx:149
-msgid "by {0}"
-msgstr "by {0}"
 
 #: components/reports/ReportsPage.tsx:150
 msgid "can edit"
@@ -7451,10 +7516,6 @@ msgstr "Visiting member"
 #: components/researchers/AffiliationsTable.tsx:108
 msgid "Affiliations & history"
 msgstr "Affiliations & history"
-
-#: components/researchers/AffiliationsTable.tsx:113
-msgid "Add"
-msgstr "Add"
 
 #: components/researchers/AffiliationsTable.tsx:129
 msgid "Primary affiliation"

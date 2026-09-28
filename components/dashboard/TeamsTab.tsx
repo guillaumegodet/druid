@@ -11,6 +11,7 @@ import {
   TeamRadarLevel,
 } from './structureAggregates';
 import { buildThemeCandidates } from './collabAggregates';
+import { ChartStateContext } from './EChartCard';
 import { PubFilters } from './publicationFilters';
 import {
   TeamDonutChart,
@@ -203,6 +204,7 @@ const TeamRadarSection: React.FC<{ dataset: DashboardDataset; range: YearRange }
   const [mode, setMode] = useState<RadarMode>('auto');
   const [view, setView] = useState<RadarView>('radar');
   const [level, setLevel] = useState<TeamRadarLevel>('subfield');
+  const chartState = useMemo(() => ({ params: { level } }), [level]);
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -404,18 +406,22 @@ const TeamRadarSection: React.FC<{ dataset: DashboardDataset; range: YearRange }
       </div>
     ) : undefined;
 
+  // The OpenAlex level goes with a chart added to a report (the AI selection does not: automatic mode).
   if (view === 'heatmap') {
     return (
-      <TeamHeatmapChart
-        data={radar}
-        subtitle={subtitle}
-        headerExtra={headerExtra}
-        toolbar={toolbar}
-        emptyMessage={emptyMessage}
-      />
+      <ChartStateContext.Provider value={chartState}>
+        <TeamHeatmapChart
+          data={radar}
+          subtitle={subtitle}
+          headerExtra={headerExtra}
+          toolbar={toolbar}
+          emptyMessage={emptyMessage}
+        />
+      </ChartStateContext.Provider>
     );
   }
   return (
+    <ChartStateContext.Provider value={chartState}>
     <TeamRadarChart
       data={radar}
       subtitle={subtitle}
@@ -424,6 +430,7 @@ const TeamRadarSection: React.FC<{ dataset: DashboardDataset; range: YearRange }
       emptyMessage={emptyMessage}
       height={520}
     />
+    </ChartStateContext.Provider>
   );
 };
 

@@ -70,17 +70,23 @@ export type DatasetsBySlug = Record<string, DashboardDataset | null | undefined>
 const hasScope = (b: ReportBlock): b is Extract<ReportBlock, { override?: unknown }> =>
   b.kind === 'chart' || b.kind === 'kpis' || b.kind === 'table';
 
-export function scopeOf(context: ReportContext, override: Partial<ReportContext> | undefined, now: Date): BlockScope {
+export function scopeOf(
+  context: ReportContext,
+  override: Partial<ReportContext> | undefined,
+  now: Date,
+  ownFilters = false,
+): BlockScope {
   const o = override ?? {};
   const period = o.period ?? context.period;
-  const filters = { ...context.filters, ...(o.filters ?? {}) };
+  // Block filters add to the report filters, or replace them (ownFilters).
+  const filters = ownFilters ? { ...(o.filters ?? {}) } : { ...context.filters, ...(o.filters ?? {}) };
   return {
     slug: o.slug ?? context.slug,
     perimetre: o.perimetre ?? context.perimetre,
     period,
     range: resolvePeriod(period, now),
     filters,
-    overridden: Object.keys(o).length > 0,
+    overridden: Object.keys(o).length > 0 || ownFilters,
   };
 }
 
@@ -120,7 +126,7 @@ export function resolveReport(def: ReportDefinition, datasets: DatasetsBySlug, n
   const blocks = def.blocks.map((block): ResolvedBlock => {
     const base = { block, scope: null, dataset: null, missing: [], trivial: [], params: {} };
     if (!hasScope(block)) return { ...base, status: 'ok' };
-    const scope = scopeOf(def.context, block.override, now);
+    const scope = scopeOf(def.context, block.override, now, !!block.ownFilters);
     const source = datasets[scope.slug];
     if (block.kind === 'chart' && !EMBEDDABLE_IDS.has(block.chartId)) return { ...base, scope, status: 'unknown-chart' };
     if (source === undefined) return { ...base, scope, status: 'loading' };

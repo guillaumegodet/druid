@@ -30,7 +30,7 @@ import {
 } from 'echarts/components';
 import { RadarComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { Download, Maximize2, Minimize2, Share2, Copy, Check, ExternalLink, X, Info } from 'lucide-react';
+import { Download, Maximize2, Minimize2, Share2, Copy, Check, ExternalLink, X, Info, FilePlus2 } from 'lucide-react';
 import { chartDoc } from './report/chartDocs';
 import { VIZ_DARK, VIZ_LIGHT, VizTheme } from './palette';
 import { EMBEDDABLE_IDS } from './embedIds';
@@ -111,6 +111,24 @@ export interface ShareScope {
   perimetre?: 'affiliation' | 'effectifs';
 }
 export const ShareScopeContext = React.createContext<ShareScope | null>(null);
+
+/**
+ * State of the visible charts that a tab hands to « Ajouter à un rapport » (docs/plan-mes-rapports.md,
+ * lot 4): chart parameters (charter threshold, level of the disciplinary charts…) and publication
+ * filters the tab applies. Charts outside such a provider are added with their defaults.
+ */
+export interface ChartState {
+  params?: ChartParams;
+  filters?: PubFilters;
+}
+export const ChartStateContext = React.createContext<ChartState | null>(null);
+
+/**
+ * Opens the « Ajouter à un rapport » dialog — provided by DashboardPage only, so that /embed and
+ * the PDF rendering never load the reports code.
+ */
+export type AddToReport = (chartId: string, title: string, state: ChartState | null) => void;
+export const AddToReportContext = React.createContext<AddToReport | null>(null);
 
 /**
  * Public /embed URL of a chart. `state` carries the publication filters and
@@ -408,6 +426,8 @@ export const EChartCard: React.FC<EChartCardProps> = ({
   // Button visible only for dataviz that can really be embedded: an
   // exportName missing from the registry would produce a « not found » /embed link.
   const canShare = shareable && !embedMode && shareScope != null && EMBEDDABLE_IDS.has(exportName);
+  const addToReport = useContext(AddToReportContext);
+  const chartState = useContext(ChartStateContext);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -512,6 +532,16 @@ export const EChartCard: React.FC<EChartCardProps> = ({
               className={toolbarBtn}
             >
               <Info className="w-4 h-4" />
+            </button>
+          )}
+          {canShare && addToReport && (
+            <button
+              type="button"
+              onClick={() => addToReport(exportName, title, chartState)}
+              title={t`Add to a report`}
+              className={toolbarBtn}
+            >
+              <FilePlus2 className="w-4 h-4" />
             </button>
           )}
           {canShare && (

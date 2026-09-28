@@ -91,6 +91,11 @@ export const reportContextSchema = z.strictObject({
 });
 
 const contextOverride = reportContextSchema.partial();
+/**
+ * true: the block's own filters (override.filters) replace the report filters instead of adding
+ * to them — a chart added from the dashboard keeps exactly what was shown there.
+ */
+const ownFilters = z.boolean().optional();
 const chartId = z.string().refine((id) => EMBEDDABLE_IDS.has(id), { message: 'unknown chart' });
 const blockId = z.string().regex(/^[A-Za-z0-9_-]{1,40}$/);
 const text = z.string().max(REPORT_LIMITS.maxText);
@@ -106,6 +111,7 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     title: shortText.optional(),
     note: text.optional(),
     override: contextOverride.optional(),
+    ownFilters,
     params: z.record(z.string().max(40), z.union([z.number(), z.string().max(40)])).optional(),
   }),
   z.strictObject({
@@ -114,6 +120,7 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     kind: z.literal('kpis'),
     setId: z.string().refine((id) => KPI_SET_IDS.has(id), { message: 'unknown key-figure set' }),
     override: contextOverride.optional(),
+    ownFilters,
   }),
   z.strictObject({
     id: blockId,
@@ -122,6 +129,7 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     tableId: z.string().max(40),
     limit: z.number().int().min(1).max(5_000).optional(),
     override: contextOverride.optional(),
+    ownFilters,
   }),
   z.strictObject({ id: blockId, hidden: z.boolean().optional(), kind: z.literal('text'), markdown: text }),
   z.strictObject({
@@ -171,3 +179,6 @@ export function parseReportDefinition(input: unknown): ParseResult<ReportDefinit
   }
   return { ok: true, value: r.data };
 }
+
+/** New block id (block ids only need to be unique within a report). */
+export const newBlockId = (): string => `b${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;

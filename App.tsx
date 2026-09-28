@@ -902,6 +902,7 @@ function App() {
               researchers={researchers}
               onOpenResearcher={handleResearcherSelect}
               onOpenAdmin={(slug) => openAdmin('console', slug)}
+              onOpenReport={(id) => openReport(id)}
             />
           </React.Suspense>
         );

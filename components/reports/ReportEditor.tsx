@@ -14,7 +14,7 @@ import { datasetFeatures } from '../dashboard/chartMeta';
 import { EMBED_CHARTS } from '../dashboard/embedRegistry';
 import { KPI_SETS } from '../dashboard/kpiItems';
 import { buildFilterContext, describeFilters, type PubFilters } from '../dashboard/publicationFilters';
-import type { ReportBlock, ReportDefinition } from '../dashboard/report/definition';
+import { newBlockId, type ReportBlock, type ReportDefinition } from '../dashboard/report/definition';
 import { composeReportPdf } from '../dashboard/report/composeReportPdf';
 import { ReportRenderer, type CapturedChart, type RenderItem } from '../dashboard/report/ReportRenderer';
 import { errorStatus, type ReportsBackend, type StoredReport } from '../dashboard/report/reportsApi';
@@ -28,8 +28,6 @@ type SaveState = 'saved' | 'pending' | 'saving' | 'error' | 'conflict';
 
 /** Charts captured per batch: bounds the number of ECharts instances mounted at once. */
 const PDF_BATCH = 6;
-
-const newBlockId = () => `b${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`;
 
 interface PdfRun {
   definition: ReportDefinition;
@@ -524,11 +522,11 @@ const BlockSettings: React.FC<{
           )}
         </label>
       ))}
-      {block.override && Object.keys(block.override).length > 0 && (
+      {((block.override && Object.keys(block.override).length > 0) || block.ownFilters) && (
         <div className="flex items-center justify-between gap-2 text-xs text-muted dark:text-[#c3beb0]">
           <Trans>This chart has its own scope (structure, period or filters).</Trans>
           {canEdit && (
-            <button type="button" className="btn-pill h-7 px-2 text-[11px]" onClick={() => onPatch({ override: undefined })}>
+            <button type="button" className="btn-pill h-7 px-2 text-[11px]" onClick={() => onPatch({ override: undefined, ownFilters: undefined })}>
               <Plus className="w-3 h-3 rotate-45" /> <Trans>Use the report scope</Trans>
             </button>
           )}

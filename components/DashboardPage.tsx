@@ -22,7 +22,9 @@ import { PublicationsListTab } from './dashboard/PublicationsListTab';
 import { NewsTab } from './dashboard/NewsTab';
 import { SourcesTab } from './dashboard/SourcesTab';
 import { PubFilters } from './dashboard/publicationFilters';
-import { ShareScopeContext } from './dashboard/EChartCard';
+import { AddToReportContext, ShareScopeContext, type AddToReport, type ChartState } from './dashboard/EChartCard';
+import { AddToReportDialog } from './reports/AddToReportDialog';
+import { sanitizeChartParams } from './dashboard/chartMeta';
 import { ReportWizard } from './dashboard/report/ReportWizard';
 import { getRoles } from '../lib/auth';
 import { Researcher, ViewState } from '../types';
@@ -43,6 +45,8 @@ interface DashboardPageProps {
   onOpenResearcher?: (r: Researcher) => void;
   /** Admins: opens the ETL console (Administration section) on the current structure. */
   onOpenAdmin?: (slug: string) => void;
+  /** « Ajouter à un rapport »: opens the report the chart was added to. */
+  onOpenReport?: (id: number) => void;
 }
 
 const DEFAULT_STRUCT = 'univ-nantes';
@@ -105,6 +109,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   researchers,
   onOpenResearcher,
   onOpenAdmin,
+  onOpenReport,
 }) => {
   const { t } = useLingui();
   const [slugs, setSlugs] = useState<string[]>([]);
@@ -276,6 +281,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // Prefilled with the current period and scope; works on the unfiltered
   // `data` to leave the scope choice to the wizard.
   const [reportOpen, setReportOpen] = useState(false);
+  // « Ajouter à un rapport » on a chart (docs/plan-mes-rapports.md, lot 4).
+  const [addTarget, setAddTarget] = useState<{ chartId: string; title: string; state: ChartState | null } | null>(null);
+  const addToReport = useCallback<AddToReport>((chartId, title, state) => setAddTarget({ chartId, title, state }), []);
 
   const tabBtn = (active: boolean) =>
     `pill px-4 py-1.5 text-[13px] transition-colors cursor-pointer ${
@@ -425,6 +433,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             </div>
           )}
           {!loading && scopedData && slug && (
+            <AddToReportContext.Provider value={addToReport}>
             <ShareScopeContext.Provider value={{ slug, range, perimetre: scope }}>
               {tab === 'overview' && (
                 <OverviewTab
@@ -480,8 +489,25 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 />
               )}
             </ShareScopeContext.Provider>
+            </AddToReportContext.Provider>
           )}
       </>
+
+      {addTarget && slug && (
+        <AddToReportDialog
+          capture={{
+            chartId: addTarget.chartId,
+            slug,
+            range,
+            perimetre: scope,
+            filters: addTarget.state?.filters ?? {},
+            params: sanitizeChartParams(addTarget.chartId, addTarget.state?.params),
+          }}
+          chartTitle={addTarget.title}
+          onClose={() => setAddTarget(null)}
+          onOpenReport={onOpenReport}
+        />
+      )}
 
       {reportOpen && data && slug && (
         <ReportWizard

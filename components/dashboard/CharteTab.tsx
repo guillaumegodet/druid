@@ -13,6 +13,7 @@ import {
   baseValueAxis,
   baseCategoryAxis,
   useVizTheme,
+  ChartStateContext,
 } from './EChartCard';
 import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
@@ -462,6 +463,7 @@ export const CharteTab: React.FC<{
   const { t: tr } = useLingui();
   const [thresholdPct, setSeuilPct] = useState(75);
   const seuil = thresholdPct / 100;
+  const chartState = useMemo(() => ({ params: { thresholdPct } }), [thresholdPct]);
   const agg = useMemo(
     () => aggregateCharte(dataset.publications, range, seuil),
     [dataset.publications, range, seuil],
@@ -482,6 +484,8 @@ export const CharteTab: React.FC<{
   const nonAnalysees = agg.total - agg.analysable;
 
   return (
+    // The adjusted threshold goes with a chart added to a report (thresholdPct parameter).
+    <ChartStateContext.Provider value={chartState}>
     <div className="flex flex-col gap-4">
       <p className="text-sm text-muted dark:text-[#c3beb0] px-1">
         <Trans>
@@ -601,5 +605,6 @@ export const CharteTab: React.FC<{
 
       <SignaturesTable dataset={dataset} range={range} seuil={seuil} />
     </div>
+    </ChartStateContext.Provider>
   );
 };
