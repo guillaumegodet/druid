@@ -34,22 +34,54 @@ function parseJson(content) {
   try { return JSON.parse(m[0]); } catch { return {}; }
 }
 
-function createReportAi({ apiBase, apiKey, model, fetchImpl = fetch }) {
+/**
+ * Retry policy of the ILAAS calls: long generations are sometimes cut (« terminated », « fetch
+ * failed », 502/503/504 — seen during the 2026-09-28 model benchmark). A cut or overloaded call is
+ * retried after a short pause; a refused one (4xx other than 429) is not.
+ */
+const ATTEMPTS = 3;
+const ATTEMPT_TIMEOUT_MS = 90000;
+const RETRY_DELAYS_MS = [1500, 4000];
+const retryable = (status) => status === 429 || status >= 500;
+
+function createReportAi({ apiBase, apiKey, model, fetchImpl = fetch, sleep = (ms) => new Promise((r) => setTimeout(r, ms)) }) {
   const base = String(apiBase || 'https://llm.ilaas.fr/v1').replace(/\/$/, '');
   const chat = async (system, user, maxTokens, temperature) => {
-    const r = await fetchImpl(`${base}/chat/completions`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
-        max_tokens: maxTokens,
-        temperature,
-      }),
+    const body = JSON.stringify({
+      model,
+      messages: [{ role: 'system', content: system }, { role: 'user', content: user }],
+      max_tokens: maxTokens,
+      temperature,
     });
-    if (!r.ok) throw new Error(`ILAAS HTTP ${r.status}`);
-    const data = await r.json();
-    return data.choices?.[0]?.message?.content || '';
+    let lastError = null;
+    for (let attempt = 0; attempt < ATTEMPTS; attempt++) {
+      if (attempt > 0) await sleep(RETRY_DELAYS_MS[attempt - 1] ?? RETRY_DELAYS_MS[RETRY_DELAYS_MS.length - 1]);
+      let r;
+      try {
+        r = await fetchImpl(`${base}/chat/completions`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+          body,
+          // A generation stuck longer than this is abandoned and retried.
+          signal: typeof AbortSignal !== 'undefined' && AbortSignal.timeout ? AbortSignal.timeout(ATTEMPT_TIMEOUT_MS) : undefined,
+        });
+      } catch (e) {
+        lastError = e; // network cut or timeout: retried
+        continue;
+      }
+      if (!r.ok) {
+        lastError = new Error(`ILAAS HTTP ${r.status}`);
+        if (retryable(r.status)) continue;
+        throw lastError;
+      }
+      try {
+        const data = await r.json();
+        return data.choices?.[0]?.message?.content || '';
+      } catch (e) {
+        lastError = e; // body cut while reading: retried
+      }
+    }
+    throw lastError || new Error('ILAAS unreachable');
   };
 
   /** Topics → 3-7 themes. Each topic in at most one theme; unknown topics dropped. */

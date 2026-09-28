@@ -19,7 +19,10 @@ function fakeIlaas(...contents: string[]) {
     if (content === undefined) return new Response('down', { status: 503 });
     return new Response(JSON.stringify({ choices: [{ message: { content } }] }));
   };
-  return { ai: createReportAi({ apiBase: 'https://llm.example.org/v1', apiKey: 'k', model: 'test-model', fetchImpl }), calls };
+  return {
+    ai: createReportAi({ apiBase: 'https://llm.example.org/v1', apiKey: 'k', model: 'test-model', fetchImpl, sleep: async () => {} }),
+    calls,
+  };
 }
 
 describe('reports_ai (server)', () => {
@@ -69,6 +72,31 @@ describe('reports_ai (server)', () => {
     expect(await ai.run({ task: 'clusters', items: [] })).toEqual({ status: 400, body: { error: 'No publication to analyze' } });
     expect(await ai.run({ task: 'executive', keyFigures: [{ label: 'Co-publications', value: '145' }] }))
       .toEqual({ status: 502, body: { error: 'Analysis failed: ILAAS HTTP 503' } });
+  });
+
+  it('retries a cut or overloaded call, not a refused one', async () => {
+    const answers: (() => Response)[] = [
+      () => { throw new TypeError('fetch failed'); },
+      () => new Response('busy', { status: 503 }),
+      () => new Response(JSON.stringify({ choices: [{ message: { content: '{"summary":"S","keyPoints":[],"leads":[]}' } }] })),
+    ];
+    let calls = 0;
+    const retrying = createReportAi({
+      apiBase: 'https://llm.example.org/v1', apiKey: 'k', model: 'm', sleep: async () => {},
+      fetchImpl: async () => { calls += 1; return answers.shift()!(); },
+    });
+    const ok = await retrying.run({ task: 'executive', keyFigures: [{ label: 'x', value: '1' }] });
+    expect(ok).toMatchObject({ status: 200, body: { summary: 'S' } });
+    expect(calls).toBe(3);
+
+    let refusedCalls = 0;
+    const refused = createReportAi({
+      apiBase: 'https://llm.example.org/v1', apiKey: 'k', model: 'm', sleep: async () => {},
+      fetchImpl: async () => { refusedCalls += 1; return new Response('bad', { status: 400 }); },
+    });
+    expect((await refused.run({ task: 'executive', keyFigures: [{ label: 'x', value: '1' }] })).body)
+      .toEqual({ error: 'Analysis failed: ILAAS HTTP 400' });
+    expect(refusedCalls).toBe(1);
   });
 });
 
