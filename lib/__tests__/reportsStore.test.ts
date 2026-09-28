@@ -78,14 +78,28 @@ const BOB = { id: 'Bob', isSuperAdmin: false };
 const CAROL = { id: 'carol', isSuperAdmin: false };
 const ADMIN = { id: 'admin', isSuperAdmin: true };
 
-function setup() {
+/** In-memory PDF archive (the `blobs` of the store). */
+function fakeBlobs() {
+  const files = new Map<string, Uint8Array>();
+  return {
+    files,
+    put: async (k: string, b: Uint8Array) => { files.set(k, b); },
+    get: async (k: string) => files.get(k) ?? null,
+    remove: async (k: string) => { files.delete(k); },
+  };
+}
+
+function setup({ blobs = null as ReturnType<typeof fakeBlobs> | null, start = '2026-09-28T10:00:00Z' } = {}) {
   const grist = fakeGrist();
-  let t = Date.parse('2026-09-28T10:00:00Z');
-  const s = store.createReportsStore(grist, { now: () => new Date((t += 1000)) });
+  let t = Date.parse(start);
+  const clock = { advance: (ms: number) => { t += ms; } };
+  const s = store.createReportsStore(grist, { now: () => new Date((t += 1000)), blobs });
   const route = (user: object, method: string, path: string, body?: unknown) =>
     store.routeReports(s, user, { method, segments: path.split('/'), body });
-  return { grist, s, route };
+  return { grist, s, route, clock };
 }
+
+const PDF = new TextEncoder().encode('%PDF-1.7 fake');
 
 describe('reports store — access control', () => {
   it('creates the three tables once, then a private report visible to its owner only', async () => {
@@ -179,6 +193,56 @@ describe('reports store — access control', () => {
     expect((await route(ALICE, 'GET', '')).body.mine[0].lastGeneratedAt).toBe(gen.body.generation.generatedAt);
     expect((await route(BOB, 'POST', '1/generations', { publicationCount: -1 })).status).toBe(400);
     expect((await route(CAROL, 'GET', '1/generations')).status).toBe(404);
+    // History: the owner sees the generation; a plain reader only shared ones; no archive here.
+    expect((await route(ALICE, 'GET', '1/generations')).body).toMatchObject({ archive: false, generations: [{ generatedBy: 'Bob', hasPdf: false }] });
+    expect((await route(BOB, 'GET', '1/generations')).body.generations).toEqual([]);
+    expect(await route(ALICE, 'PUT', `1/generations/${gen.body.generation.id}/pdf`, PDF))
+      .toEqual({ status: 501, body: { error: 'PDF archiving is not configured on this instance' } });
+  });
+
+  it('archives PDFs, shares a frozen version with readers, and applies the retention', async () => {
+    const blobs = fakeBlobs();
+    const { route, clock } = setup({ blobs });
+    await route(ALICE, 'POST', '', { definition: definition('Report') });
+    await route(ALICE, 'POST', '1/shares', { shares: [{ grantee: 'bob', role: 'viewer' }] });
+    const gen = (await route(ALICE, 'POST', '1/generations', { publicationCount: 3 })).body.generation;
+    expect((await route(ALICE, 'PUT', `1/generations/${gen.id}/pdf`, new TextEncoder().encode('not a pdf'))).status).toBe(400);
+    expect((await route(BOB, 'PUT', `1/generations/${gen.id}/pdf`, PDF)).status).toBe(403);
+    const put = await route(ALICE, 'PUT', `1/generations/${gen.id}/pdf`, PDF);
+    expect(put.body.generation).toMatchObject({ hasPdf: true });
+    expect([...blobs.files.keys()]).toEqual([`reports/1/${gen.id}.pdf`]);
+
+    const own = await route(ALICE, 'GET', `1/generations/${gen.id}/pdf`);
+    expect(own).toMatchObject({ status: 200, filename: 'report_2026-09-28.pdf' });
+    expect(own.binary).toEqual(PDF);
+    // Bob (viewer) sees and downloads it only once the owner shares it.
+    expect((await route(BOB, 'GET', `1/generations/${gen.id}/pdf`)).status).toBe(404);
+    expect((await route(BOB, 'PATCH', `1/generations/${gen.id}`, { sharedFrozen: true })).status).toBe(403);
+    await route(ALICE, 'PATCH', `1/generations/${gen.id}`, { sharedFrozen: true });
+    expect((await route(BOB, 'GET', '1/generations')).body.generations.map((g: { id: number }) => g.id)).toEqual([gen.id]);
+    expect((await route(BOB, 'GET', `1/generations/${gen.id}/pdf`)).binary).toEqual(PDF);
+
+    // Retention: 20 PDFs per report, 2 years at most.
+    for (let i = 0; i < 21; i++) {
+      const g = (await route(ALICE, 'POST', '1/generations', {})).body.generation;
+      await route(ALICE, 'PUT', `1/generations/${g.id}/pdf`, PDF);
+    }
+    expect(blobs.files.size).toBe(20);
+    expect(blobs.files.has(`reports/1/${gen.id}.pdf`)).toBe(false);
+    expect((await route(ALICE, 'GET', `1/generations/${gen.id}/pdf`)).body).toEqual({ error: 'PDF not archived' });
+    clock.advance(731 * 86400000);
+    const late = (await route(ALICE, 'POST', '1/generations', {})).body.generation;
+    await route(ALICE, 'PUT', `1/generations/${late.id}/pdf`, PDF);
+    expect([...blobs.files.keys()]).toEqual([`reports/1/${late.id}.pdf`]);
+  });
+
+  it('routes generation sub-paths strictly', async () => {
+    const { route } = setup({ blobs: fakeBlobs() });
+    await route(ALICE, 'POST', '', { definition: definition() });
+    expect((await route(ALICE, 'GET', '1/generations/x/pdf')).body).toEqual({ error: 'Invalid id' });
+    expect((await route(ALICE, 'GET', '1/generations/9/pdf')).body).toEqual({ error: 'Generation not found' });
+    expect((await route(ALICE, 'DELETE', '1/generations/9')).status).toBe(404);
+    expect((await route(ALICE, 'GET', '1/generations/9/pdf/more')).status).toBe(404);
   });
 
   it('answers unknown routes, bad ids and Grist failures', async () => {
@@ -217,6 +281,23 @@ describe('reports store — schema evolution and instance templates', () => {
     expect((await route(BOB, 'GET', '1')).body.report.role).toBe('viewer');
     // A copy is an ordinary private report.
     expect((await route(BOB, 'POST', '1/duplicate')).body.report.publishedTemplate).toBe(false);
+  });
+});
+
+describe('fsBlobs (Nantes PDF archive)', () => {
+  it('writes, reads and removes PDFs under the directory, and refuses foreign keys', async () => {
+    const { fsBlobs } = createRequire(import.meta.url)('../../scripts/lib/reports_blobs_fs.cjs');
+    const { mkdtempSync, readdirSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const dir = mkdtempSync(join(tmpdir(), 'report-pdfs-'));
+    const blobs = fsBlobs(dir);
+    await blobs.put('reports/1/2.pdf', PDF);
+    expect(await blobs.get('reports/1/2.pdf')).toEqual(PDF);
+    expect(readdirSync(join(dir, 'reports/1'))).toEqual(['2.pdf']); // no leftover .part
+    await blobs.remove('reports/1/2.pdf');
+    expect(await blobs.get('reports/1/2.pdf')).toBeNull();
+    await expect(blobs.put('../../etc/passwd', PDF)).rejects.toThrow(/Invalid archive key/);
   });
 });
 

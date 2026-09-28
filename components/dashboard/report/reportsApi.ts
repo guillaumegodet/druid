@@ -64,8 +64,16 @@ export interface ReportGeneration {
   publicationCount: number | null;
   dataDate: string | null;
   aiTexts: unknown;
-  pdfRef: string | null;
+  /** A PDF of this generation is archived (lot 9). */
+  hasPdf: boolean;
+  /** Shared as frozen PDF with every reader of the report (decision R1). */
   sharedFrozen: boolean;
+}
+
+export interface GenerationHistory {
+  generations: ReportGeneration[];
+  /** The instance keeps the PDFs (disk volume on Nantes, R2 bucket on Cloudflare). */
+  archive: boolean;
 }
 
 export interface GenerationInput {
@@ -95,8 +103,14 @@ export interface ReportsBackend {
   duplicate(id: number, name?: string): Promise<StoredReport>;
   listShares(id: number): Promise<ReportShare[]>;
   setShares(id: number, shares: { grantee: string; role: ShareRole }[]): Promise<ReportShare[]>;
-  listGenerations(id: number): Promise<ReportGeneration[]>;
+  listGenerations(id: number): Promise<GenerationHistory>;
   addGeneration(id: number, input: GenerationInput): Promise<ReportGeneration>;
+  /** Archives the PDF of a generation. */
+  uploadPdf(id: number, generationId: number, pdf: Blob): Promise<ReportGeneration>;
+  /** Owner: share (or not) an archived generation with every reader. */
+  setGenerationShared(id: number, generationId: number, sharedFrozen: boolean): Promise<ReportGeneration>;
+  /** Download URL of an archived PDF. */
+  pdfUrl(id: number, generationId: number): string;
 }
 
 /** Same head as the server refusal, so that both read the same once translated. */
@@ -157,9 +171,21 @@ export const serverReportsBackend: ReportsBackend = {
   setShares: (id, shares) =>
     request<{ shares: ReportShare[] }>(`/api/reports/${id}/shares`, post({ shares })).then((d) => d.shares),
   listGenerations: (id) =>
-    request<{ generations: ReportGeneration[] }>(`/api/reports/${id}/generations`).then((d) => d.generations),
+    request<GenerationHistory>(`/api/reports/${id}/generations`).then((d) => ({ generations: d.generations ?? [], archive: !!d.archive })),
   addGeneration: (id, input) =>
     request<{ generation: ReportGeneration }>(`/api/reports/${id}/generations`, post(input)).then((d) => d.generation),
+  uploadPdf: (id, generationId, pdf) =>
+    request<{ generation: ReportGeneration }>(`/api/reports/${id}/generations/${generationId}/pdf`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/pdf' },
+      body: pdf,
+    }).then((d) => d.generation),
+  setGenerationShared: (id, generationId, sharedFrozen) =>
+    request<{ generation: ReportGeneration }>(`/api/reports/${id}/generations/${generationId}`, {
+      method: 'PATCH',
+      body: JSON.stringify({ sharedFrozen }),
+    }).then((d) => d.generation),
+  pdfUrl: (id, generationId) => `/api/reports/${id}/generations/${generationId}/pdf`,
 };
 
 // ── Browser backend (read-only instance) ─────────────────────────────────────
@@ -271,8 +297,11 @@ export function browserReportsBackend(storage: () => Storage | null, now: () => 
     },
     listShares: async () => [],
     setShares: async () => { throw notInBrowser(); },
-    listGenerations: async () => [],
+    listGenerations: async () => ({ generations: [], archive: false }),
     addGeneration: async () => { throw notInBrowser(); },
+    uploadPdf: async () => { throw notInBrowser(); },
+    setGenerationShared: async () => { throw notInBrowser(); },
+    pdfUrl: () => '',
   };
   return backend;
 }

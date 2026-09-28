@@ -6,7 +6,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowLeft, BarChart3, ChevronDown, ChevronUp, Copy, Eye, EyeOff, FileDown, Gauge, Heading, Plus,
-  RefreshCw, Share2, Sparkles, Table2, Trash2, Type, X,
+  History, RefreshCw, Share2, Sparkles, Table2, Trash2, Type, X,
 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
@@ -27,6 +27,7 @@ import { ChartPicker } from './ChartPicker';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect } from './ReportControls';
 import { ReportPreview } from './ReportPreview';
 import { ShareDialog, type ShareCandidate } from './ShareDialog';
+import { HistoryDialog } from './HistoryDialog';
 
 type SaveState = 'saved' | 'pending' | 'saving' | 'error' | 'conflict';
 
@@ -61,6 +62,7 @@ export const ReportEditor: React.FC<{
   const [pdfRun, setPdfRun] = useState<PdfRun | null>(null);
   const [pdfMessage, setPdfMessage] = useState<string | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
   // AI text being generated (one block at a time).
   const [aiRun, setAiRun] = useState<{ blockId: string; done: number; total: number } | null>(null);
   const [aiError, setAiError] = useState<{ blockId: string; message: string } | null>(null);
@@ -209,25 +211,37 @@ export const ReportEditor: React.FC<{
     setPdfRun(null);
     (async () => {
       try {
-        await composeReportPdf({
+        const { blob } = await composeReportPdf({
           definition: run.definition,
           resolved: run.resolved,
           datasets,
           captures: new Map(run.captures.map((c) => [c.id, c])),
         });
+        // History (lot 9): the resolved definition (fixed period), then the PDF itself when the
+        // instance archives them. Neither failure spoils the download already done.
+        let archived = false;
         if (backend.kind === 'server') {
           const s = run.resolved.scope;
-          await backend.addGeneration(reportId, {
-            definitionSnapshot: {
-              ...run.definition,
-              context: { ...run.definition.context, period: { kind: 'fixed', start: s.range.start, end: s.range.end } },
-            },
-            publicationCount: run.resolved.publicationCount ?? undefined,
-          }).catch((e) => console.warn('Report: generation not recorded in the history', e));
+          try {
+            const gen = await backend.addGeneration(reportId, {
+              definitionSnapshot: {
+                ...run.definition,
+                context: { ...run.definition.context, period: { kind: 'fixed', start: s.range.start, end: s.range.end } },
+              },
+              publicationCount: run.resolved.publicationCount ?? undefined,
+            });
+            archived = await backend.uploadPdf(reportId, gen.id, blob).then(() => true, (e) => {
+              if (errorStatus(e) !== 501) console.warn('Report: PDF not archived', e);
+              return false;
+            });
+          } catch (e) {
+            console.warn('Report: generation not recorded in the history', e);
+          }
         }
+        const done = archived ? t`PDF downloaded and archived in the history.` : t`PDF downloaded.`;
         setPdfMessage(run.missing.length
-          ? t`PDF downloaded — ${run.missing.length} chart(s) could not be captured and were left out.`
-          : t`PDF downloaded.`);
+          ? `${done} ${t`${run.missing.length} chart(s) could not be captured and were left out.`}`
+          : done);
       } catch (e) {
         console.error('Report PDF generation failed', e);
         setPdfMessage(t`PDF report generation failed — see the browser console.`);
@@ -301,6 +315,11 @@ export const ReportEditor: React.FC<{
             <button type="button" onClick={() => setSharing(true)} className="btn-pill h-9 px-3 text-[13px]" title={t`Share the report`}>
               <Share2 className="w-4 h-4" /> <Trans>Share</Trans>
               {shareSummary && <span className="text-xs text-muted-light dark:text-[#8f897c]">· {shareSummary}</span>}
+            </button>
+          )}
+          {backend.kind === 'server' && (
+            <button type="button" onClick={() => setHistoryOpen(true)} className="btn-pill h-9 px-3 text-[13px]" title={t`PDFs generated from this report`}>
+              <History className="w-4 h-4" /> <Trans>History</Trans>
             </button>
           )}
           <button type="button" onClick={() => void duplicate()} className="btn-pill h-9 px-3 text-[13px]" title={t`Make your own copy`}>
@@ -474,6 +493,17 @@ export const ReportEditor: React.FC<{
         </main>
       </div>
 
+      {historyOpen && (
+        <HistoryDialog
+          reportId={reportId}
+          backend={backend}
+          canEdit={canEdit}
+          canManage={stored.role === 'owner' || stored.role === 'admin'}
+          // The restored version replaces the draft, saved like any edit (conflicts detected).
+          onRestore={(def) => edit(() => def)}
+          onClose={() => setHistoryOpen(false)}
+        />
+      )}
       {sharing && (
         <ShareDialog
           report={stored}

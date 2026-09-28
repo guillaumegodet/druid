@@ -46,8 +46,10 @@ export interface ComposeInput {
   captures: Map<string, CapturedChart>;
 }
 
-/** Composes and downloads the PDF; returns the file name. */
-export async function composeReportPdf({ definition, resolved, datasets, captures }: ComposeInput): Promise<string> {
+/** Composes and downloads the PDF; returns its file name and bytes (for the archive). */
+export async function composeReportPdf(
+  { definition, resolved, datasets, captures }: ComposeInput,
+): Promise<{ filename: string; blob: Blob }> {
   const fonts = await loadReportFonts();
   const pdf = new ReportPdf(fonts);
   const scope = resolved.scope;
@@ -137,5 +139,6 @@ export async function composeReportPdf({ definition, resolved, datasets, capture
   pdf.finalize(`${definition.name} · ${periodLabel(scope)}`, definition.footerNote?.trim() || undefined);
   const filename = `rapport_${slugify(definition.name)}_${scope.range.start}-${scope.range.end}.pdf`;
   pdf.save(filename);
-  return filename;
+  // Same bytes for the archive of the generation (lot 9).
+  return { filename, blob: pdf.doc.output('blob') };
 }

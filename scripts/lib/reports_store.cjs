@@ -64,6 +64,11 @@ const LIMITS = {
   maxBlocks: 150,
   maxShares: 100,
   maxGrantee: 200,
+  /** Archived PDF (lot 9); the gateway accepts up to 40 MB on the upload route. */
+  maxPdfBytes: 40 * 1024 * 1024,
+  /** Retention of the archived PDFs (decision R4): the last 20 of a report, 2 years at most. */
+  keepPdfs: 20,
+  keepPdfDays: 730,
 };
 const SLUG_RE = /^[a-z0-9_-]{1,64}$/;
 const VISIBILITIES = ['private', 'instance'];
@@ -79,6 +84,10 @@ const ERRORS = {
   invalidGeneration: { status: 400, error: 'Invalid report generation' },
   invalidId: { status: 400, error: 'Invalid id' },
   unknownRoute: { status: 404, error: 'Not found' },
+  noArchive: { status: 501, error: 'PDF archiving is not configured on this instance' },
+  invalidPdf: { status: 400, error: 'Invalid PDF' },
+  generationNotFound: { status: 404, error: 'Generation not found' },
+  pdfNotArchived: { status: 404, error: 'PDF not archived' },
 };
 
 class ReportsError extends Error {
@@ -175,9 +184,12 @@ function ensureTables(client) {
 
 /**
  * @param client gristClient(...) (or a fake with the same methods, in tests)
- * @param now clock, injectable for tests
+ * @param opts.now clock, injectable for tests
+ * @param opts.blobs storage of the archived PDFs — { put(key, bytes), get(key) → bytes | null,
+ *   remove(key) } — provided by each runtime (Nantes: a directory of the container volume;
+ *   Cloudflare: an R2 bucket); absent = no archiving (the history keeps the metadata only).
  */
-function createReportsStore(client, { now = () => new Date() } = {}) {
+function createReportsStore(client, { now = () => new Date(), blobs = null } = {}) {
   const stamp = () => now().toISOString();
 
   const summaryOf = (row, role, extra = {}) => ({
@@ -388,22 +400,62 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
       return this.listShares(user, id);
     },
 
+    /**
+     * History of a report, most recent first. Editors (and the owner, super admins) see every
+     * generation; plain readers only those the owner shared as frozen PDF (decision R1).
+     * `archive` says whether this instance keeps the PDFs.
+     */
     async listGenerations(user, id) {
       await ensureTables(client);
-      await load(user, id);
-      return (await client.records(GENERATIONS_TABLE, { report: [id] }))
-        .map((g) => ({
-          id: g.id,
-          generatedAt: g.fields.generated_at,
-          generatedBy: g.fields.generated_by,
-          definitionSnapshot: parseJson(g.fields.definition_snapshot, null),
-          publicationCount: g.fields.publication_count ?? null,
-          dataDate: g.fields.data_date || null,
-          aiTexts: parseJson(g.fields.ai_texts, null),
-          pdfRef: g.fields.pdf_ref || null,
-          sharedFrozen: !!g.fields.shared_frozen,
-        }))
-        .sort((a, b) => String(b.generatedAt).localeCompare(String(a.generatedAt)));
+      const { role } = await load(user, id);
+      const all = await generationsOf(id);
+      return {
+        generations: (canEdit(role) || canManage(role) ? all : all.filter((g) => g.sharedFrozen)).map(publicGeneration),
+        archive: !!blobs,
+      };
+    },
+
+    /** Owner and super admins: share (or not) an archived generation with every reader. */
+    async updateGeneration(user, id, genId, input = {}) {
+      await ensureTables(client);
+      const { role } = await load(user, id);
+      if (!canManage(role)) throw new ReportsError('forbidden');
+      const gen = (await generationsOf(id)).find((g) => g.id === genId);
+      if (!gen) throw new ReportsError('generationNotFound');
+      if (typeof input.sharedFrozen !== 'boolean') throw new ReportsError('invalidGeneration', 'sharedFrozen');
+      await client.update(GENERATIONS_TABLE, [{ id: genId, fields: { shared_frozen: input.sharedFrozen } }]);
+      return publicGeneration({ ...gen, sharedFrozen: input.sharedFrozen });
+    },
+
+    /** Archives the PDF of a generation (its author, or an editor), then applies the retention. */
+    async putPdf(user, id, genId, bytes) {
+      await ensureTables(client);
+      if (!blobs) throw new ReportsError('noArchive');
+      const { role } = await load(user, id);
+      const gen = (await generationsOf(id)).find((g) => g.id === genId);
+      if (!gen) throw new ReportsError('generationNotFound');
+      if (!canEdit(role) && !canManage(role) && normId(gen.generatedBy) !== normId(user.id)) throw new ReportsError('forbidden');
+      const data = bytes instanceof Uint8Array ? bytes : null;
+      if (!data || !data.length || data.length > LIMITS.maxPdfBytes || !isPdf(data)) throw new ReportsError('invalidPdf');
+      const key = `reports/${id}/${genId}.pdf`;
+      await blobs.put(key, data);
+      await client.update(GENERATIONS_TABLE, [{ id: genId, fields: { pdf_ref: key } }]);
+      await prunePdfs(id);
+      return publicGeneration({ ...gen, pdfRef: key });
+    },
+
+    /** Archived PDF of a generation: editors, or any reader when shared as frozen PDF. */
+    async getPdf(user, id, genId) {
+      await ensureTables(client);
+      if (!blobs) throw new ReportsError('noArchive');
+      const { row, role } = await load(user, id);
+      const gen = (await generationsOf(id)).find((g) => g.id === genId);
+      if (!gen) throw new ReportsError('generationNotFound');
+      if (!canEdit(role) && !canManage(role) && !gen.sharedFrozen) throw new ReportsError('generationNotFound');
+      const bytes = gen.pdfRef ? await blobs.get(gen.pdfRef) : null;
+      if (!bytes) throw new ReportsError('pdfNotArchived');
+      const day = String(gen.generatedAt || '').slice(0, 10);
+      return { bytes, filename: `${slugifyName(row.fields.name)}_${day || genId}.pdf` };
     },
 
     /** Records a PDF generation — any reader may generate, the history names who did. */
@@ -427,17 +479,57 @@ function createReportsStore(client, { now = () => new Date() } = {}) {
         pdf_ref: '',
         shared_frozen: false,
       }]);
-      return (await this.listGenerations(user, id)).find((g) => g.id === genId);
+      return publicGeneration((await generationsOf(id)).find((g) => g.id === genId));
     },
   };
+
+  /** Every generation of a report, most recent first (no access check). */
+  async function generationsOf(id) {
+    return (await client.records(GENERATIONS_TABLE, { report: [id] }))
+      .map((g) => ({
+        id: g.id,
+        generatedAt: g.fields.generated_at,
+        generatedBy: g.fields.generated_by,
+        definitionSnapshot: parseJson(g.fields.definition_snapshot, null),
+        publicationCount: g.fields.publication_count ?? null,
+        dataDate: g.fields.data_date || null,
+        aiTexts: parseJson(g.fields.ai_texts, null),
+        pdfRef: g.fields.pdf_ref || null,
+        sharedFrozen: !!g.fields.shared_frozen,
+      }))
+      .sort((a, b) => String(b.generatedAt).localeCompare(String(a.generatedAt)));
+  }
+
+  /** Retention (R4): PDFs beyond the last `keepPdfs` of the report, or older than `keepPdfDays`, are removed. */
+  async function prunePdfs(id) {
+    const archived = (await generationsOf(id)).filter((g) => g.pdfRef);
+    const limit = now().getTime() - LIMITS.keepPdfDays * 86400000;
+    const drop = archived.filter((g, i) => i >= LIMITS.keepPdfs || Date.parse(g.generatedAt) < limit);
+    for (const g of drop) await blobs.remove(g.pdfRef);
+    if (drop.length) await client.update(GENERATIONS_TABLE, drop.map((g) => ({ id: g.id, fields: { pdf_ref: '' } })));
+  }
 }
+
+/** What the client sees of a generation: whether a PDF is archived, not where. */
+const publicGeneration = (g) => {
+  const { pdfRef, ...rest } = g;
+  return { ...rest, hasPdf: !!pdfRef };
+};
+
+/** `%PDF-` signature. */
+const isPdf = (b) => b.length > 5 && b[0] === 0x25 && b[1] === 0x50 && b[2] === 0x44 && b[3] === 0x46 && b[4] === 0x2d;
+
+const slugifyName = (s) =>
+  String(s || 'rapport').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'rapport';
 
 // ── Routing (shared by server.cjs and the Pages Function) ────────────────────
 
 /**
  * Serves /api/reports/… for an authenticated user.
- * @param req { method, segments (path after /api/reports, split), body (parsed JSON or undefined) }
- * @returns { status, body }
+ * @param req { method, segments (path after /api/reports, split), body (parsed JSON, the raw
+ *   bytes (Uint8Array) of an uploaded PDF, or undefined) }
+ * @returns { status, body } — or { status, binary, filename } for a PDF download
  */
 async function routeReports(store, user, { method, segments, body }) {
   try {
@@ -448,9 +540,22 @@ async function routeReports(store, user, { method, segments, body }) {
       if (method === 'POST') return ok({ report: await store.create(user, body || {}) }, 201);
       throw new ReportsError('unknownRoute');
     }
-    if (rest.length) throw new ReportsError('unknownRoute');
     if (!/^\d+$/.test(first)) throw new ReportsError('invalidId');
     const id = Number(first);
+    // /:id/generations/:gid[/pdf]
+    if (sub === 'generations' && rest.length) {
+      const [gid, leaf, ...more] = rest;
+      if (more.length || !/^\d+$/.test(gid)) throw new ReportsError(/^\d+$/.test(gid) ? 'unknownRoute' : 'invalidId');
+      const genId = Number(gid);
+      if (!leaf && method === 'PATCH') return ok({ generation: await store.updateGeneration(user, id, genId, body || {}) });
+      if (leaf === 'pdf' && method === 'PUT') return ok({ generation: await store.putPdf(user, id, genId, body) });
+      if (leaf === 'pdf' && method === 'GET') {
+        const { bytes, filename } = await store.getPdf(user, id, genId);
+        return { status: 200, binary: bytes, filename };
+      }
+      throw new ReportsError('unknownRoute');
+    }
+    if (rest.length) throw new ReportsError('unknownRoute');
     if (!sub) {
       if (method === 'GET') return ok({ report: await store.get(user, id) });
       if (method === 'PATCH') return ok({ report: await store.update(user, id, body || {}) });
@@ -462,7 +567,7 @@ async function routeReports(store, user, { method, segments, body }) {
       if (method === 'GET') return ok({ shares: await store.listShares(user, id) });
       if (method === 'POST') return ok({ shares: await store.setShares(user, id, body && body.shares) });
     } else if (sub === 'generations') {
-      if (method === 'GET') return ok({ generations: await store.listGenerations(user, id) });
+      if (method === 'GET') return ok(await store.listGenerations(user, id));
       if (method === 'POST') return ok({ generation: await store.addGeneration(user, id, body || {}) }, 201);
     }
     throw new ReportsError('unknownRoute');

@@ -2103,23 +2103,40 @@ const parseTaskId = (req, res) => {
 // Cloudflare Pages Function functions/api/reports/[[path]].js. Every authenticated user may
 // create reports (decision R9); the rights on the data themselves stay those of each reader.
 const reportsStore = require('./scripts/lib/reports_store.cjs');
-app.all(['/api/reports', '/api/reports/*'], async (req, res) => {
-  const doc = process.env.VITE_GRIST_DOC_ID;
-  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
-  if (!GRIST_API_KEY) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
-  const sessionUser = req.session.user;
-  if (!sessionUser?.preferred_username) return res.status(401).json({ error: 'Unauthorized' });
-  const store = reportsStore.createReportsStore(
-    reportsStore.gristClient({ apiBase: GRIST_API_BASE, doc, apiKey: GRIST_API_KEY }),
-  );
-  const user = { id: sessionUser.preferred_username, isSuperAdmin: !!sessionUser.access?.isSuperAdmin };
-  const out = await reportsStore.routeReports(store, user, {
-    method: req.method,
-    segments: req.path.replace(/^\/api\/reports\/?/, '').split('/'),
-    body: req.body,
-  });
-  res.status(out.status).json(out.body);
-});
+// Archived PDFs (lot 9): a directory of the container volume (druid.yaml mounts it on the host).
+const { fsBlobs } = require('./scripts/lib/reports_blobs_fs.cjs');
+const REPORT_PDF_DIR = process.env.REPORT_PDF_DIR || path.join(__dirname, 'report-pdfs');
+const reportBlobs = fsBlobs(REPORT_PDF_DIR);
+app.all(
+  ['/api/reports', '/api/reports/*'],
+  // PDF upload of a generation: raw bytes (the JSON parser leaves them aside).
+  express.raw({ type: 'application/pdf', limit: reportsStore.LIMITS.maxPdfBytes }),
+  async (req, res) => {
+    const doc = process.env.VITE_GRIST_DOC_ID;
+    if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+    if (!GRIST_API_KEY) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
+    const sessionUser = req.session.user;
+    if (!sessionUser?.preferred_username) return res.status(401).json({ error: 'Unauthorized' });
+    const store = reportsStore.createReportsStore(
+      reportsStore.gristClient({ apiBase: GRIST_API_BASE, doc, apiKey: GRIST_API_KEY }),
+      { blobs: reportBlobs },
+    );
+    const user = { id: sessionUser.preferred_username, isSuperAdmin: !!sessionUser.access?.isSuperAdmin };
+    const out = await reportsStore.routeReports(store, user, {
+      method: req.method,
+      segments: req.path.replace(/^\/api\/reports\/?/, '').split('/'),
+      body: Buffer.isBuffer(req.body) ? new Uint8Array(req.body) : req.body,
+    });
+    if (out.binary) {
+      return res.status(out.status)
+        .type('application/pdf')
+        .set('Content-Disposition', `attachment; filename="${out.filename}"`)
+        .set('Cache-Control', 'private, no-store')
+        .send(Buffer.from(out.binary));
+    }
+    res.status(out.status).json(out.body);
+  },
+);
 
 // AI texts of the reports (plan-mes-rapports lot 8): ILAAS writes, the client computes the figures.
 // Same module on Cloudflare (functions/api/report-ai.js).
