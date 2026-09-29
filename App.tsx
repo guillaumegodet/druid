@@ -424,35 +424,27 @@ function App() {
     setCurrentView(ViewState.RESEARCHER_DETAIL);
   };
 
+  /** Outbound flow to SoVisu+ (Administration): regenerates the two cdb files — structures.csv
+   *  first (from Grist), then people.csv, whose main_research_structure points at the structures'
+   *  local_id. Stops at the first failure so people.csv never references a structure missing from
+   *  structures.csv. */
   const handleSyncToSovisu = async () => {
     try {
       setLoading(true);
-      const res = await fetch('/api/sync-sovisuplus', {
+      setError('');
+      const sRes = await fetch('/api/sync-structures-csv', { method: 'POST' });
+      const sData = await sRes.json();
+      if (!sRes.ok) throw new Error(sData.error || t`Server error`);
+      const pRes = await fetch('/api/sync-sovisuplus', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ researchers, structures }),
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t`Server error`);
-      setError('');
-      alert(t`people.csv updated: ${data.count} people exported${data.skipped ? t`, ${data.skipped} skipped (no uid)` : ''}.`);
+      const pData = await pRes.json();
+      if (!pRes.ok) throw new Error(pData.error || t`Server error`);
+      alert(t`SoVisu+ files updated: ${sData.count} structures (structures.csv), ${pData.count} people (people.csv)${pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''}.`);
     } catch (err: any) {
       setError(apiErrorText(err) || t`Error synchronizing with SoVisu+`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGenerateStructuresCsv = async () => {
-    try {
-      setLoading(true);
-      setError('');
-      const res = await fetch('/api/sync-structures-csv', { method: 'POST' });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t`Server error`);
-      alert(t`structures.csv updated: ${data.count} structures exported to cdb.`);
-    } catch (err: any) {
-      setError(apiErrorText(err) || t`Error generating structures.csv`);
     } finally {
       setLoading(false);
     }
@@ -797,7 +789,7 @@ function App() {
           />
         );
       case ViewState.STRUCTURES_LIST:
-        return <StructureList structures={structures} onSelectStructure={handleStructureSelect} loading={loading} onManualSync={() => refreshData()} onLdapImport={hasCapability('HAS_LDAP') ? handleStructuresLdapImport : undefined} onGenerateCsv={hasCapability('HAS_SERVER_JOBS') ? handleGenerateStructuresCsv : undefined} onCreate={writable ? () => handleCreateStructure() : undefined} />;
+        return <StructureList structures={structures} onSelectStructure={handleStructureSelect} loading={loading} onManualSync={() => refreshData()} onLdapImport={hasCapability('HAS_LDAP') ? handleStructuresLdapImport : undefined} onCreate={writable ? () => handleCreateStructure() : undefined} />;
       case ViewState.STRUCTURE_DETAIL:
         if (!selectedStructure) return null;
         return (
@@ -936,7 +928,7 @@ function App() {
             }
           >
             <AdminPage initialTab={adminTab} struct={adminStruct} onOpenDashboard={openDashboardFor}
-              onSyncToSovisu={hasCapability('HAS_SERVER_JOBS') ? handleSyncToSovisu : undefined} syncingSovisu={loading} />
+              onSyncToSovisu={hasCapability('HAS_SOVISU_EXPORT') ? handleSyncToSovisu : undefined} syncingSovisu={loading} />
           </React.Suspense>
         );
       default:

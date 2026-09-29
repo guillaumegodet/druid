@@ -62,100 +62,92 @@ msgstr "Error attaching LDAP records"
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:436
-#: App.tsx:452
+#: App.tsx:437
+#: App.tsx:444
 msgid "Server error"
 msgstr "Server error"
 
-#. placeholder {0}: data.count
-#. placeholder {1}: data.skipped ? t`, ${data.skipped} skipped (no uid)` : ''
-#: App.tsx:438
-msgid "people.csv updated: {0} people exported{1}."
-msgstr "people.csv updated: {0} people exported{1}."
+#. placeholder {0}: sData.count
+#. placeholder {1}: pData.count
+#. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
+#: App.tsx:445
+msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
+msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
-#. placeholder {0}: data.skipped
-#: App.tsx:438
+#. placeholder {0}: pData.skipped
+#: App.tsx:445
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:440
+#: App.tsx:447
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#. placeholder {0}: data.count
-#: App.tsx:453
-msgid "structures.csv updated: {0} structures exported to cdb."
-msgstr "structures.csv updated: {0} structures exported to cdb."
-
-#: App.tsx:455
-msgid "Error generating structures.csv"
-msgstr "Error generating structures.csv"
-
-#: App.tsx:465
+#: App.tsx:457
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:475
+#: App.tsx:467
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:489
+#: App.tsx:481
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:501
+#: App.tsx:493
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "LDAP update applied: {updated} record(s) written to Grist."
 
-#: App.tsx:503
+#: App.tsx:495
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:510
+#: App.tsx:502
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:544
+#: App.tsx:536
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation applied: {0} record(s) written to Grist."
 
-#: App.tsx:546
+#: App.tsx:538
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:559
+#: App.tsx:551
 msgid "This record has no Grist row: validation impossible."
 msgstr "This record has no Grist row: validation impossible."
 
-#: App.tsx:571
+#: App.tsx:563
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:588
+#: App.tsx:580
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:619
+#: App.tsx:611
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:633
+#: App.tsx:625
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "LDAP structures: {updated} updated, {created} created in Grist."
 
-#: App.tsx:635
+#: App.tsx:627
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:657
+#: App.tsx:649
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:666
+#: App.tsx:658
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -163,44 +155,44 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:675
+#: App.tsx:667
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:683
+#: App.tsx:675
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:697
+#: App.tsx:689
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:714
+#: App.tsx:706
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:748
+#: App.tsx:740
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:876
+#: App.tsx:868
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:880
+#: App.tsx:872
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:886
+#: App.tsx:878
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:904
+#: App.tsx:896
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:922
-#: App.tsx:934
+#: App.tsx:914
+#: App.tsx:926
 #: components/dashboard/EmbedPage.tsx:88
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
@@ -213,20 +205,20 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:943
+#: App.tsx:935
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:967
+#: App.tsx:959
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:971
+#: App.tsx:963
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1012
+#: App.tsx:1004
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -954,17 +946,17 @@ msgid "Validate"
 msgstr "Validate"
 
 #: components/ResearcherList.tsx:174
-#: components/StructureList.tsx:313
+#: components/StructureList.tsx:301
 msgid "List"
 msgstr "List"
 
 #: components/ResearcherList.tsx:175
-#: components/StructureList.tsx:314
+#: components/StructureList.tsx:302
 msgid "Charts"
 msgstr "Charts"
 
 #: components/ResearcherList.tsx:183
-#: components/StructureList.tsx:322
+#: components/StructureList.tsx:310
 msgid "List view (table)"
 msgstr "List view (table)"
 
@@ -1008,7 +1000,7 @@ msgid "My reports"
 msgstr "My reports"
 
 #: components/Sidebar.tsx:167
-#: components/admin/AdminPage.tsx:78
+#: components/admin/AdminPage.tsx:99
 msgid "Administration"
 msgstr "Administration"
 
@@ -1054,7 +1046,7 @@ msgid "Lifecycle and lineage"
 msgstr "Lifecycle and lineage"
 
 #: components/StructureDetail.tsx:100
-#: components/StructureList.tsx:247
+#: components/StructureList.tsx:245
 msgid "New structure"
 msgstr "New structure"
 
@@ -1073,12 +1065,12 @@ msgctxt "in progress"
 msgid "Saving…"
 msgstr "Saving…"
 
-#: components/StructureList.tsx:200
+#: components/StructureList.tsx:198
 #: components/etl/EtlConsolePage.tsx:355
 msgid "Acronym"
 msgstr "Acronym"
 
-#: components/StructureList.tsx:201
+#: components/StructureList.tsx:199
 #: components/dashboard/MediaSourcesAdmin.tsx:215
 #: components/dashboard/MediaSourcesAdmin.tsx:288
 #: components/reports/NewReportDialog.tsx:288
@@ -1086,13 +1078,13 @@ msgstr "Acronym"
 msgid "Name"
 msgstr "Name"
 
-#: components/StructureList.tsx:202
-#: components/StructureList.tsx:438
+#: components/StructureList.tsx:200
+#: components/StructureList.tsx:426
 msgid "Supervising bodies"
 msgstr "Supervising bodies"
 
-#: components/StructureList.tsx:203
-#: components/StructureList.tsx:440
+#: components/StructureList.tsx:201
+#: components/StructureList.tsx:428
 #: components/etl/EtlMaintenancePanels.tsx:268
 #: components/researchers/ListHeader.tsx:48
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
@@ -1101,137 +1093,128 @@ msgstr "Supervising bodies"
 msgid "Status"
 msgstr "Status"
 
-#: components/StructureList.tsx:232
+#: components/StructureList.tsx:230
 msgid "Research structures"
 msgstr "Research structures"
 
-#: components/StructureList.tsx:240
+#: components/StructureList.tsx:238
 msgid "Directory of labs and teams"
 msgstr "Directory of labs and teams"
 
-#: components/StructureList.tsx:246
+#: components/StructureList.tsx:244
 msgid "Create a structure (team, unit, faculty, institution) in Grist"
 msgstr "Create a structure (team, unit, faculty, institution) in Grist"
 
-#: components/StructureList.tsx:252
+#: components/StructureList.tsx:250
 #: components/researchers/ListHeader.tsx:70
 msgid "Export"
 msgstr "Export"
 
-#: components/StructureList.tsx:271
+#: components/StructureList.tsx:269
 #: components/researchers/ListHeader.tsx:98
 msgid "Synchronise"
 msgstr "Synchronise"
 
-#: components/StructureList.tsx:280
+#: components/StructureList.tsx:278
 #: components/researchers/ListHeader.tsx:104
 msgid "Force Grist refresh"
 msgstr "Force Grist refresh"
 
-#: components/StructureList.tsx:290
+#: components/StructureList.tsx:288
 msgid "Import from LDAP"
 msgstr "Import from LDAP"
 
-#: components/StructureList.tsx:296
-msgid "Regenerates docker/cdb/data/structures.csv from Grist"
-msgstr "Regenerates docker/cdb/data/structures.csv from Grist"
-
-#: components/StructureList.tsx:300
-#: components/admin/AdminPage.tsx:93
-msgid "Synchronise with SoVisu+"
-msgstr "Synchronise with SoVisu+"
-
-#: components/StructureList.tsx:322
+#: components/StructureList.tsx:310
 msgid "Chart view (structure hierarchy)"
 msgstr "Chart view (structure hierarchy)"
 
-#: components/StructureList.tsx:339
+#: components/StructureList.tsx:327
 msgid "Structure hierarchy (inclusions / participations)"
 msgstr "Structure hierarchy (inclusions / participations)"
 
-#: components/StructureList.tsx:346
+#: components/StructureList.tsx:334
 msgid "Open full screen / regenerate from the current structures.csv"
 msgstr "Open full screen / regenerate from the current structures.csv"
 
-#: components/StructureList.tsx:348
+#: components/StructureList.tsx:336
 #: components/dashboard/EChartCard.tsx:558
 msgid "Full screen"
 msgstr "Full screen"
 
-#: components/StructureList.tsx:353
+#: components/StructureList.tsx:341
 msgid "Structure hierarchy"
 msgstr "Structure hierarchy"
 
-#: components/StructureList.tsx:367
+#: components/StructureList.tsx:355
 msgid "Search for a structure, an acronym, an RNSR…"
 msgstr "Search for a structure, an acronym, an RNSR…"
 
-#: components/StructureList.tsx:379
+#: components/StructureList.tsx:367
 msgid "All levels"
 msgstr "All levels"
 
-#: components/StructureList.tsx:389
+#: components/StructureList.tsx:377
 #: components/researchers/TasksPage.tsx:109
 msgid "All statuses"
 msgstr "All statuses"
 
-#: components/StructureList.tsx:399
+#: components/StructureList.tsx:387
 msgid "All supervising bodies"
 msgstr "All supervising bodies"
 
-#: components/StructureList.tsx:407
+#: components/StructureList.tsx:395
 msgid "All clusters"
 msgstr "All clusters"
 
-#: components/StructureList.tsx:414
+#: components/StructureList.tsx:402
 msgid "Organisation merge: not available"
 msgstr "Organisation merge: not available"
 
 #. placeholder {0}: selectedIds.size
-#: components/StructureList.tsx:415
+#: components/StructureList.tsx:403
 msgid "Merge ({0})"
 msgstr "Merge ({0})"
 
-#: components/StructureList.tsx:420
+#: components/StructureList.tsx:408
 msgid "Structure deletion: not available"
 msgstr "Structure deletion: not available"
 
-#: components/StructureList.tsx:436
+#: components/StructureList.tsx:424
 #: components/dashboard/report/ReportWizard.tsx:271
 #: components/dashboard/report/composeReportPdf.ts:63
 #: components/reports/NewReportDialog.tsx:224
 msgid "Structure"
 msgstr "Structure"
 
-#: components/StructureList.tsx:437
+#: components/StructureList.tsx:425
 msgid "IDs"
 msgstr "IDs"
 
-#: components/StructureList.tsx:439
+#: components/StructureList.tsx:427
 #: components/structures/IdentificationTab.tsx:89
 msgid "Level"
 msgstr "Level"
 
 #. placeholder {0}: lab.acronym
-#: components/StructureList.tsx:463
+#: components/StructureList.tsx:451
 msgid "Team of lab {0} — open its record"
 msgstr "Team of lab {0} — open its record"
 
 #. placeholder {0}: s.parentStructure
-#: components/StructureList.tsx:463
+#: components/StructureList.tsx:451
 msgid "Parent lab “{0}” not found in the list"
 msgstr "Parent lab “{0}” not found in the list"
 
-#: components/StructureList.tsx:510
+#: components/StructureList.tsx:498
 msgid "No structure found."
 msgstr "No structure found."
 
-#: components/StructureList.tsx:517
+#: components/StructureList.tsx:505
 #: components/researchers/ResearcherTable.tsx:158
 msgid "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 
-#: components/StructureList.tsx:525
+#: components/StructureList.tsx:513
 #: components/dashboard/ApcTab.tsx:506
 #: components/dashboard/ApcTab.tsx:839
 #: components/dashboard/AxesTab.tsx:276
@@ -1245,7 +1228,7 @@ msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 msgid "Previous"
 msgstr "Previous"
 
-#: components/StructureList.tsx:532
+#: components/StructureList.tsx:520
 #: components/dashboard/ApcTab.tsx:508
 #: components/dashboard/ApcTab.tsx:845
 #: components/dashboard/AxesTab.tsx:282
@@ -1259,25 +1242,53 @@ msgstr "Previous"
 msgid "Next"
 msgstr "Next"
 
-#: components/admin/AdminPage.tsx:54
+#: components/admin/AdminPage.tsx:75
 msgid "ETL console"
 msgstr "ETL console"
 
-#: components/admin/AdminPage.tsx:55
+#: components/admin/AdminPage.tsx:76
 msgid "Access rights"
 msgstr "Access rights"
 
-#: components/admin/AdminPage.tsx:56
+#: components/admin/AdminPage.tsx:77
 msgid "Media sources"
 msgstr "Media sources"
 
-#: components/admin/AdminPage.tsx:68
+#: components/admin/AdminPage.tsx:89
 msgid "Section reserved for administrators."
 msgstr "Section reserved for administrators."
 
-#: components/admin/AdminPage.tsx:90
-msgid "Regenerates people.csv (staff + structures) for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
-msgstr "Regenerates people.csv (staff + structures) for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
+#: components/admin/AdminPage.tsx:111
+msgid "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
+msgstr "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
+
+#: components/admin/AdminPage.tsx:114
+msgid "Synchronise with SoVisu+"
+msgstr "Synchronise with SoVisu+"
+
+#: components/admin/AdminPage.tsx:121
+msgid "Last export to SoVisu+:"
+msgstr "Last export to SoVisu+:"
+
+#. placeholder {0}: exportStatus.structures.count
+#. placeholder {1}: formatStatusDate(exportStatus.structures.updatedAt)
+#: components/admin/AdminPage.tsx:123
+msgid "structures.csv — {0} structures, {1}"
+msgstr "structures.csv — {0} structures, {1}"
+
+#: components/admin/AdminPage.tsx:124
+msgid "structures.csv — never generated"
+msgstr "structures.csv — never generated"
+
+#. placeholder {0}: exportStatus.people.count
+#. placeholder {1}: formatStatusDate(exportStatus.people.updatedAt)
+#: components/admin/AdminPage.tsx:127
+msgid "people.csv — {0} people, {1}"
+msgstr "people.csv — {0} people, {1}"
+
+#: components/admin/AdminPage.tsx:128
+msgid "people.csv — never generated"
+msgstr "people.csv — never generated"
 
 #. placeholder {0}: d.year
 #. placeholder {1}: d.total.toLocaleString(numberLocale())

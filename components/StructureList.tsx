@@ -22,8 +22,6 @@ interface StructureListProps {
   onManualSync?: () => void;
   /** Callback importing structures from LDAP (opens the review page) */
   onLdapImport?: () => void;
-  /** Callback generating structures.csv for cdb (from Grist) */
-  onGenerateCsv?: () => void;
   /** Opens the « Nouvelle structure » page */
   onCreate?: () => void;
 }
@@ -38,7 +36,7 @@ const filterSelectCls = 'h-10 px-4 rounded-full bg-white/75 dark:bg-white/10 bor
  * @component StructureList
  * @description Main view of research structures (labs, units, teams).
  */
-export const StructureList: React.FC<StructureListProps> = ({ structures, onSelectStructure, loading = false, onManualSync, onLdapImport, onGenerateCsv, onCreate }) => {
+export const StructureList: React.FC<StructureListProps> = ({ structures, onSelectStructure, loading = false, onManualSync, onLdapImport, onCreate }) => {
   const { t } = useLingui();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -279,25 +277,15 @@ export const StructureList: React.FC<StructureListProps> = ({ structures, onSele
                   <RefreshCw className={`w-4 h-4 text-[#3b5bdb] ${loading ? 'animate-spin' : ''}`} />
                   <Trans>Force Grist refresh</Trans>
                 </button>
-                {/* LDAP import / SoVisu+ export: only on instances with the matching capability
-                    (HAS_LDAP / HAS_SERVER_JOBS, decided in App.tsx) — absent on Cloudflare. */}
+                {/* LDAP import: only on instances with the HAS_LDAP capability (decided in App.tsx) —
+                    absent on Cloudflare. The export to SoVisu+ (structures.csv) lives in Administration. */}
                 {onLdapImport && (
                 <button
                   onClick={() => { setShowSyncMenu(false); onLdapImport(); }}
-                  className="w-full text-left px-4 py-3 text-[13px] font-semibold text-ink dark:text-[#f5f2ea] hover:bg-accent/15 border-b border-ink/5 dark:border-white/5 flex items-center gap-2.5 transition-colors"
+                  className="w-full text-left px-4 py-3 text-[13px] font-semibold text-ink dark:text-[#f5f2ea] hover:bg-accent/15 flex items-center gap-2.5 transition-colors"
                 >
                   <Building className="w-4 h-4 text-[#1f7a4d]" />
                   <Trans>Import from LDAP</Trans>
-                </button>
-                )}
-                {onGenerateCsv && (
-                <button
-                  onClick={() => { setShowSyncMenu(false); onGenerateCsv(); }}
-                  title={t`Regenerates docker/cdb/data/structures.csv from Grist`}
-                  className="w-full text-left px-4 py-3 text-[13px] font-semibold text-ink dark:text-[#f5f2ea] hover:bg-accent/15 flex items-center gap-2.5 transition-colors"
-                >
-                  <RefreshCw className="w-4 h-4 text-[#e09e2a]" />
-                  <Trans>Synchronise with SoVisu+</Trans>
                 </button>
                 )}
               </div>

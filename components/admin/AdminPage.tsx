@@ -8,8 +8,16 @@ import { RightsPage } from '../rights/RightsPage';
 import { MediaSourcesAdmin } from '../dashboard/MediaSourcesAdmin';
 import { HelpButton } from '../HelpButton';
 import { ADMIN_TAB_HELP } from '../../lib/helpLinks';
+import { numberLocale } from '../../lib/i18n';
 
 export type { AdminTab };
+
+/** Last generation of a cdb file (GET /api/sovisu-export-status); null = file absent. */
+type CdbFileStatus = { updatedAt: string; count: number } | null;
+type SovisuExportStatus = { structures: CdbFileStatus; people: CdbFileStatus };
+
+const formatStatusDate = (iso: string) =>
+  new Date(iso).toLocaleString(numberLocale(), { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 
 /**
  * @component AdminPage
@@ -27,8 +35,9 @@ export const AdminPage: React.FC<{
   struct?: string | null;
   /** Opens a structure's dashboard (from the console). */
   onOpenDashboard?: (slug: string) => void;
-  /** Outgoing flow to SoVisu+: regenerates people.csv for cdb (former entry of the Synchroniser menu of
-   *  Personnel — docs/archive/plan-reorganisation-sync-ldap.md, lot 4). Absent on an instance without server jobs. */
+  /** Outgoing flow to SoVisu+: regenerates structures.csv then people.csv for cdb (former entries of the
+   *  Synchroniser menus of Personnel and Structures — docs/archive/plan-reorganisation-sync-ldap.md, lot 4).
+   *  Absent on an instance without the HAS_SOVISU_EXPORT capability. */
   onSyncToSovisu?: () => void;
   syncingSovisu?: boolean;
 }> = ({ initialTab, struct, onOpenDashboard, onSyncToSovisu, syncingSovisu = false }) => {
@@ -39,6 +48,18 @@ export const AdminPage: React.FC<{
   useEffect(() => {
     if (initialTab && tabs.includes(initialTab)) setTab(initialTab);
   }, [initialTab, tabs]);
+
+  // Freshness of the two cdb files, re-read after each synchronisation (syncingSovisu back to false).
+  const [exportStatus, setExportStatus] = useState<SovisuExportStatus | null>(null);
+  useEffect(() => {
+    if (!onSyncToSovisu || syncingSovisu) return;
+    let cancelled = false;
+    fetch('/api/sovisu-export-status')
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (!cancelled) setExportStatus(data); })
+      .catch(() => { if (!cancelled) setExportStatus(null); });
+    return () => { cancelled = true; };
+  }, [onSyncToSovisu, syncingSovisu]);
 
   // Shareable URL: ?page=ADMIN&tab=… (+ ?struct= set by the console itself).
   useEffect(() => {
@@ -87,7 +108,7 @@ export const AdminPage: React.FC<{
           ))}
           {onSyncToSovisu && (
             <button type="button" onClick={onSyncToSovisu} disabled={syncingSovisu}
-              title={t`Regenerates people.csv (staff + structures) for cdb / SoVisu+ — outbound flow, nothing written to the Directory`}
+              title={t`Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory`}
               className="ml-2 pill px-4 py-1.5 text-[13px] inline-flex items-center gap-2 bg-white/60 dark:bg-white/10 text-ink dark:text-[#f5f2ea] hover:bg-white dark:hover:bg-white/15 border border-[rgba(224,158,42,.45)] transition-colors disabled:opacity-50">
               <RefreshCw className={`w-4 h-4 text-[#e09e2a] ${syncingSovisu ? 'animate-spin' : ''}`} />
               <Trans>Synchronise with SoVisu+</Trans>
@@ -95,6 +116,18 @@ export const AdminPage: React.FC<{
           )}
         </div>
       </div>
+      {onSyncToSovisu && exportStatus && (
+        <p className="-mt-2 text-right text-[11px] text-muted-light dark:text-[#8f897c]">
+          <Trans>Last export to SoVisu+:</Trans>{' '}
+          {exportStatus.structures
+            ? t`structures.csv — ${exportStatus.structures.count} structures, ${formatStatusDate(exportStatus.structures.updatedAt)}`
+            : t`structures.csv — never generated`}
+          {' · '}
+          {exportStatus.people
+            ? t`people.csv — ${exportStatus.people.count} people, ${formatStatusDate(exportStatus.people.updatedAt)}`
+            : t`people.csv — never generated`}
+        </p>
+      )}
 
       {tab === 'console' && (
         <EtlConsolePage struct={struct ?? null} onOpenDashboard={onOpenDashboard} />

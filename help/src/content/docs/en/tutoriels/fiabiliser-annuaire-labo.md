@@ -92,9 +92,9 @@ only found by name.
 *If your instance allows the export to CRISalid.*
 
 1. Open **Administration** and click **Synchronise with SoVisu+**: Druid regenerates the list
-   of researchers (identifiers, primary structure, dates) sent to CRISalid.
-2. If structures have changed, do the same from **Structures › Synchronise › Synchronise
-   with SoVisu+**.
+   of structures, then the list of researchers (identifiers, primary structure, dates), both
+   sent to CRISalid.
+2. Check the date of the last export shown under the button.
 
 CRISalid takes the new list into account at its next run (usually the following day), then
 harvests the publications over the following days.

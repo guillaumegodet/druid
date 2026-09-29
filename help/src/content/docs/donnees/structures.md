@@ -97,7 +97,7 @@ filiation** garde la trace de ces liens (succession, intégration, fusion, sciss
   être importées et mises à jour depuis cet annuaire (bouton **Importer LDAP** de la liste
   Structures).
 - Sinon, elles sont créées et complétées à la main dans Druid.
-- Elles peuvent être transmises à CRISalid (bouton **Synchroniser avec SoVisu+**), si votre
+- Elles peuvent être transmises à CRISalid (**Administration › Synchroniser avec SoVisu+**), si votre
   instance le permet.
 
 ## Exemple

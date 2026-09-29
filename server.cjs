@@ -2480,6 +2480,46 @@ app.post('/api/sync-structures-csv', requireEstablishmentScope, async (req, res)
   }
 });
 
+// ── SoVisu+ export status (Administration) ─────────────────────────────────
+// Last generation date and record count of the two cdb files, shown under the
+// « Synchronise with SoVisu+ » button so a stale file is visible at a glance
+// (structures.csv had not been regenerated since June as of 2026-09-29).
+
+/** Counts the CSV records (header excluded), honouring quoted cells that span
+ * several lines (descriptions) — pure. */
+function countCsvRecords(text) {
+  let records = 0, inQuotes = false, rowHasContent = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') inQuotes = !inQuotes;
+    if (c === '\n' && !inQuotes) {
+      if (rowHasContent) records++;
+      rowHasContent = false;
+    } else if (c !== '\r') {
+      rowHasContent = true;
+    }
+  }
+  if (rowHasContent) records++;
+  return Math.max(0, records - 1);
+}
+
+function cdbFileStatus(file) {
+  if (!fs.existsSync(file)) return null;
+  return {
+    updatedAt: fs.statSync(file).mtime.toISOString(),
+    count: countCsvRecords(fs.readFileSync(file, 'utf8')),
+  };
+}
+
+app.get('/api/sovisu-export-status', requireEstablishmentScope, (req, res) => {
+  try {
+    res.json({ structures: cdbFileStatus(STRUCT_CSV_PATH), people: cdbFileStatus(CSV_PATH) });
+  } catch (err) {
+    console.error('[cdb] status error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── Structures hierarchy dataviz (vendored crisalid-directory-bridge tool) ───
 // Runs scripts/structures-viz/visualize_structures.py on the current structures.csv
 // (/cdb-data/structures.csv) and returns the standalone HTML (Cytoscape.js). Shown in
@@ -2490,7 +2530,7 @@ app.get('/api/structures-hierarchy.html', (req, res) => {
   try {
     if (!fs.existsSync(STRUCT_CSV_PATH)) {
       return res.status(404).type('text/plain').send(
-        "structures.csv introuvable — génère-le d'abord via « Générer structures.csv »."
+        "structures.csv introuvable — génère-le d'abord via Administration → « Synchroniser avec SoVisu+ »."
       );
     }
     // Regenerate only if the CSV is newer than the HTML already produced.
@@ -3017,5 +3057,5 @@ if (require.main === module) {
 
 module.exports = {
   app, gristProxyGuard, gristProxyDecision, rejectCrossSite, csvEscape, runningProgress, settleProgress, startBackgroundRun,
-  buildPeopleCsv, buildStructuresCsv, gristCell, normalizeFuzzyDate, fuzzyDateBound, isFuzzyDatePast,
+  buildPeopleCsv, buildStructuresCsv, gristCell, countCsvRecords, normalizeFuzzyDate, fuzzyDateBound, isFuzzyDatePast,
 };

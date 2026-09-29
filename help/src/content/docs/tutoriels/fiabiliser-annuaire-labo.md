@@ -94,9 +94,9 @@ personne n'est retrouvée que par son nom.
 *Si votre instance permet l'export vers CRISalid.*
 
 1. Ouvrez **Administration** et cliquez sur **Synchroniser avec SoVisu+** : Druid régénère
-   la liste des chercheurs (identifiants, structure principale, dates) envoyée à CRISalid.
-2. Si des structures ont changé, faites de même depuis **Structures › Synchroniser ›
-   Synchroniser avec SoVisu+**.
+   la liste des structures, puis celle des chercheurs (identifiants, structure principale,
+   dates), envoyées à CRISalid.
+2. Vérifiez la date du dernier export affichée sous le bouton.
 
 CRISalid prend en compte la nouvelle liste à son prochain passage (en général le lendemain),
 puis moissonne les publications au fil des jours.

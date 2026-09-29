@@ -94,7 +94,7 @@ track of these links (succession, integration, merger, split).
   imported and updated from that directory (**Import from LDAP** button of the Structures
   list).
 - Otherwise, they are created and completed by hand in Druid.
-- They can be sent to CRISalid (**Synchronise with SoVisu+** button), if your instance allows
+- They can be sent to CRISalid (**Administration › Synchronise with SoVisu+**), if your instance allows
   it.
 
 ## Example

@@ -4,7 +4,7 @@
 // extracted from the Express handlers /api/sync-sovisuplus and /api/sync-structures-csv (lot 2,
 // docs/plan-architecture-multi-instances.md). No test existed on these exports until now
 // (see docs/druid-audit-qualite-crisalid in the project memory: « 0 test/lint/CI »).
-const { buildPeopleCsv, buildStructuresCsv, gristCell } = require(require('path').join(__dirname, '../../server.cjs'));
+const { buildPeopleCsv, buildStructuresCsv, gristCell, countCsvRecords } = require(require('path').join(__dirname, '../../server.cjs'));
 
 let ko = 0;
 const check = (label, got, want) => {
@@ -140,6 +140,15 @@ function STRUCT_INDEX(header) {
   const { csv, count } = buildStructuresCsv([]);
   check('structures.csv: no record → 0 data row', { lines: csv.trim().split('\n').length, count }, { lines: 1, count: 0 });
 }
+
+// ── countCsvRecords (export status shown in Administration) ──────────────────
+check('count: header only → 0', countCsvRecords('a,b\n'), 0);
+check('count: 2 rows, no trailing newline', countCsvRecords('a,b\n1,2\n3,4'), 2);
+check('count: quoted cell on 2 lines = 1 record', countCsvRecords('a,b\n"x\ny",2\n'), 1);
+check('count: CRLF + blank line ignored', countCsvRecords('a,b\r\n1,2\r\n\r\n'), 1);
+check('count: output of buildStructuresCsv', countCsvRecords(buildStructuresCsv([
+  { fields: { local_id: 'L1', descriptions: 'line 1\nline 2' } }, { fields: { local_id: 'L2' } },
+]).csv), 2);
 
 console.log(ko ? `${ko} failure(s)` : 'all cases OK');
 process.exit(ko ? 1 : 0);
