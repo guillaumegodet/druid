@@ -156,6 +156,7 @@ export const PublicationsListTab: React.FC<{
       ['is_international', (p) => bool(p.isInternational)],
       ['collab_types', (p) => list(p.collabTypes)],
       ['nantes_partners', (p) => list(p.nantesPartners)],
+      ['nantes_partners_source', (p) => list(p.nantesPartnersSource ?? [])],
       [
         'national_partners',
         (p) => list((p.nationalPartners ?? []).map((x) => (x.city ? `${x.name} (${x.city})` : x.name))),

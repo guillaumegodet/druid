@@ -74,6 +74,12 @@ export interface DashboardPublication {
   collabTypes: string[];
   sousStructures: string[];
   nantesPartners: string[];
+  /**
+   * Provenance of each nantesPartners entry (same order): OpenAlex affiliations, the
+   * co-authors' lab memberships in the CRISalid graph, or both. Missing when the graph
+   * was not used (structures other than the university labs, exports predating 2026-09-29).
+   */
+  nantesPartnersSource?: ('openalex' | 'crisalid' | 'both')[];
   nationalPartners: {
     name: string;
     city: string | null;

@@ -96,6 +96,26 @@ export interface InternalCollabAggregates {
  * Aggregates shared by the internal sub-tabs. `labsOf` extracts the co-signing
  * labs of a publication (internal sub-structures, or NU labs).
  */
+/**
+ * Publications with ≥ 1 other Nantes Université lab over the period, and among them those
+ * found ONLY through the co-authors' lab memberships in the CRISalid graph (every partner lab
+ * has provenance « crisalid »): without the graph, they would not be counted.
+ */
+export function partnerLabProvenance(
+  pubs: DashboardPublication[],
+  range: YearRange,
+): { total: number; graphOnly: number } {
+  let total = 0;
+  let graphOnly = 0;
+  for (const p of inRangePubs(pubs, range)) {
+    if (!p.nantesPartners?.length) continue;
+    total += 1;
+    const src = p.nantesPartnersSource ?? [];
+    if (src.length === p.nantesPartners.length && src.every((s) => s === 'crisalid')) graphOnly += 1;
+  }
+  return { total, graphOnly };
+}
+
 export function aggregateInternalCollab(
   pubs: DashboardPublication[],
   range: YearRange,

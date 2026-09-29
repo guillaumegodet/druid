@@ -89,6 +89,12 @@ institutions:
 A publication can combine several types. The co-affiliations of the same author with their
 supervising bodies do not count as a collaboration.
 
+On instances connected to the CRISalid graph, **another laboratory of the institution** is
+also recognized when a co-author is a **member** of it according to the directory, even if
+their signature does not mention it (for instance a clinician who signs « CHU Nantes »). The
+current membership counts: a co-author who moved to another laboratory is attached to the new
+one. The institution sub-tab shows how many publications are found only this way.
+
 ## Signature charter
 
 The **Signature charter** tab compares the affiliation written by the authors with the form

@@ -64,6 +64,9 @@ n'existent que sur les instances qui en disposent (voir
   chercheurs impliqués, analyse thématique. Voir
   [Analyser les collaborations](/guides/tableau-de-bord/collaborations/).
 - **Profil disciplinaire des équipes** par thématique, en carte de chaleur.
+- **Collaborations avec les autres laboratoires de l'établissement** : elles tiennent compte
+  des appartenances des co-auteurs dans le graphe CRISalid, en plus de leurs signatures. Voir
+  [Publications et attribution](/donnees/publications-attribution/#collaborations).
 - **Console ETL** intégrée à Druid (administrateurs techniques), avec le contrôle des
   affiliations OpenAlex.
 

@@ -4,6 +4,7 @@ import { YearRange } from './overviewAggregates';
 import {
   aggregateCollabTypology,
   aggregateInternalCollab,
+  partnerLabProvenance,
   aggregateNationalCollab,
   internalLabsOf,
   hasSubStructures,
@@ -271,6 +272,10 @@ export const CollaborationsTab: React.FC<{
         : null,
     [publications, range, sub],
   );
+  const nantesProvenance = useMemo(
+    () => (sub === 'nantes' ? partnerLabProvenance(publications, range) : null),
+    [publications, range, sub],
+  );
   const national = useMemo(
     () => (sub === 'national' ? aggregateNationalCollab(publications, range) : null),
     [publications, range, sub],
@@ -346,6 +351,13 @@ export const CollaborationsTab: React.FC<{
           onOpenList={onOpenList}
           labFilter={(lab) => ({ nantesPartner: lab })}
         />
+      )}
+      {sub === 'nantes' && nantes && nantes.total > 0 && nantesProvenance && nantesProvenance.graphOnly > 0 && (
+        <p className="text-xs text-muted-light dark:text-[#8f897c] px-1">
+          <Trans>
+            Including {nantesProvenance.graphOnly.toLocaleString(numberLocale())} publications found only through the co-authors' lab memberships in the CRISalid graph (for instance clinicians who sign « CHU Nantes » without their lab).
+          </Trans>
+        </p>
       )}
 
       {sub === 'national' && national && (

@@ -64,6 +64,9 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
   involved, thematic analysis. See
   [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/).
 - **Disciplinary profile of teams** by topic, as a heat map.
+- **Collaborations with the other laboratories of the institution** also take into account the
+  co-authors' memberships in the CRISalid graph, not only their signatures. See
+  [Publications and attribution](/en/donnees/publications-attribution/#collaborations).
 - **ETL console** built into Druid (technical administrators), with OpenAlex affiliation
   checks.
 
