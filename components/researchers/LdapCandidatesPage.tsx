@@ -30,6 +30,8 @@ interface Props {
   /** Embedded in LdapAlignPage (« Rechercher manquants » tab): the title is carried by the page,
    * only the action buttons remain here (the selection lives in this component). */
   embedded?: boolean;
+  /** Content rendered at the end of the scrolling area (scrolls with the lists, not pinned). */
+  footer?: React.ReactNode;
 }
 
 /** Empty Grist fields that the attachment will fill (civility, grade, birth). */
@@ -54,7 +56,7 @@ const stateLabel = (etat?: string): string =>
  * (several candidates) are arbitrated by hand. « Rattacher » writes `uid_dyna`
  * (+ civility / grade / birth if empty) to Grist.
  */
-export const LdapCandidatesPage: React.FC<Props> = ({ diff, progress, applying, onRerun, onApply, onMerge, embedded = false }) => {
+export const LdapCandidatesPage: React.FC<Props> = ({ diff, progress, applying, onRerun, onApply, onMerge, embedded = false, footer }) => {
   const { t } = useLingui();
   const proposals = diff?.proposals ?? [];
   const ambiguous = diff?.ambiguous ?? [];
@@ -285,6 +287,7 @@ export const LdapCandidatesPage: React.FC<Props> = ({ diff, progress, applying, 
             )}
           </>
         )}
+        {footer}
       </div>
     </div>
   );

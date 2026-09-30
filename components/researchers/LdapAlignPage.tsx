@@ -47,6 +47,27 @@ export const LdapAlignPage: React.FC<Props> = ({ mode, onModeChange, candDiff, c
   const running = mode === 'search' ? !!candProgress?.running : !!ldapProgress?.running;
   const ldapWithoutRecord = ldapDiff?.ldapWithoutRecord ?? [];
 
+  const ldapWithoutRecordSection = (
+    <section>
+      <div className="flex items-center gap-2 pb-2 mb-2 border-b border-ink/5 dark:border-white/5 text-muted-lighter dark:text-[#8f897c]">
+        <UserPlus className="w-4 h-4" />
+        <h3 className="font-disp text-base font-bold tracking-tight text-ink dark:text-[#f5f2ea]"><Trans>LDAP uid without Directory record ({ldapWithoutRecord.length})</Trans></h3>
+      </div>
+      <p className="text-[12.5px] text-muted-light dark:text-[#8f897c] mb-2">
+        {ldapDiff
+          ? <Trans>LDAP people without a Directory record — automatic creation planned for Phase 2 (requires extending the LDAP extraction to name/first name/email). List from the last LDAP sync (“Check existing ones” tab).</Trans>
+          : <Trans>List available after an LDAP sync (“Check existing ones” tab).</Trans>}
+      </p>
+      {ldapWithoutRecord.length > 0 && (
+        <div className="flex flex-wrap gap-1.5 max-h-32 overflow-auto">
+          {ldapWithoutRecord.map((uid) => (
+            <span key={uid} className="px-2.5 py-0.5 rounded-full bg-white/40 dark:bg-white/5 border border-ink/5 dark:border-white/10 font-mono text-[11px] text-muted-light dark:text-[#8f897c]">{uid}</span>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+
   const { compact, onScrollCapture } = useCompactHeader();
   return (
     <div className="flex flex-col h-full" onScrollCapture={onScrollCapture}>
@@ -84,28 +105,8 @@ export const LdapAlignPage: React.FC<Props> = ({ mode, onModeChange, candDiff, c
       </header>
 
       {mode === 'search' ? (
-        <div className="flex-1 min-h-0 flex flex-col">
-          <div className="flex-1 min-h-0">
-            <LdapCandidatesPage embedded diff={candDiff} progress={candProgress} applying={candApplying} onRerun={onRerunCandidates} onApply={onApplyCandidates} onMerge={onMerge} />
-          </div>
-          <section className="px-4 md:px-7 pb-6">
-            <div className="flex items-center gap-2 pb-2 mb-2 border-b border-ink/5 dark:border-white/5 text-muted-lighter dark:text-[#8f897c]">
-              <UserPlus className="w-4 h-4" />
-              <h3 className="font-disp text-base font-bold tracking-tight text-ink dark:text-[#f5f2ea]"><Trans>LDAP uid without Directory record ({ldapWithoutRecord.length})</Trans></h3>
-            </div>
-            <p className="text-[12.5px] text-muted-light dark:text-[#8f897c] mb-2">
-              {ldapDiff
-                ? <Trans>LDAP people without a Directory record — automatic creation planned for Phase 2 (requires extending the LDAP extraction to name/first name/email). List from the last LDAP sync (“Check existing ones” tab).</Trans>
-                : <Trans>List available after an LDAP sync (“Check existing ones” tab).</Trans>}
-            </p>
-            {ldapWithoutRecord.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 max-h-32 overflow-auto">
-                {ldapWithoutRecord.map((uid) => (
-                  <span key={uid} className="px-2.5 py-0.5 rounded-full bg-white/40 dark:bg-white/5 border border-ink/5 dark:border-white/10 font-mono text-[11px] text-muted-light dark:text-[#8f897c]">{uid}</span>
-                ))}
-              </div>
-            )}
-          </section>
+        <div className="flex-1 min-h-0">
+          <LdapCandidatesPage embedded diff={candDiff} progress={candProgress} applying={candApplying} onRerun={onRerunCandidates} onApply={onApplyCandidates} onMerge={onMerge} footer={ldapWithoutRecordSection} />
         </div>
       ) : (
         <div className="flex-1 min-h-0">
