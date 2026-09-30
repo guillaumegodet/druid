@@ -526,7 +526,7 @@ async function main() {
   const labNames = await loadLabNames();
   const affils = MODE === 'push' ? new Map() : await loadAffiliations();
   const markedAbsent = MODE === 'push' ? 0 : all.filter((p) => (p.first || p.last) && scopusMarkedAbsent(p)).length;
-  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('scopus', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('scopus', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT, record: OPTS.record });
   let targets = sel.targets;
   const eligible = sel.eligible.length;
 

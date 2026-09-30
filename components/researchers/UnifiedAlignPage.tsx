@@ -184,9 +184,14 @@ interface DrawerProps {
   onUpdatePpn?: (r: Redirection) => void;
   onReject?: (c: Candidate, nb: number) => void;
   onMixed?: (c: Candidate, nb: number) => void;
+  mode: AlignMode;
+  /** « Search this record »: runs this source on this record only (lot 3); absent = not offered. */
+  onSearchRecord?: () => void;
+  /** A run of this source is in progress (the server would refuse a second one). */
+  sourceBusy?: boolean;
 }
 
-const SourceDrawer: React.FC<DrawerProps> = ({ src, row, cell, selected, onToggleSelect, chosen, onChoose, onClearChoice, decision, onDecide, applying, onUpdatePpn, onReject, onMixed }) => {
+const SourceDrawer: React.FC<DrawerProps> = ({ src, row, cell, selected, onToggleSelect, chosen, onChoose, onClearChoice, decision, onDecide, applying, onUpdatePpn, onReject, onMixed, mode, onSearchRecord, sourceBusy = false }) => {
   const { t } = useLingui();
   const isMulti = !!(src !== 'idref' && ALIGN_SOURCE_META[src].multi);
   const fill = cell.fill || [];
@@ -284,7 +289,17 @@ const SourceDrawer: React.FC<DrawerProps> = ({ src, row, cell, selected, onToggl
       )}
 
       {cell.status === 'not_found' && <p className="text-[12.5px] text-muted-faint">{t`No candidate found during the last ${SOURCE_LABEL[src]} run.`}</p>}
-      {cell.status === 'none' && <p className="text-[12.5px] text-muted-faint"><Trans>Never searched on this source for this record — use “Search everywhere” or the dedicated {SOURCE_LABEL[src]} page.</Trans></p>}
+      {cell.status === 'none' && <p className="text-[12.5px] text-muted-faint"><Trans>Never searched on this source for this record.</Trans></p>}
+      {onSearchRecord && (
+        <div className="flex items-center gap-2">
+          <button type="button" onClick={onSearchRecord} disabled={sourceBusy}
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-ink/15 dark:border-white/15 text-[12px] font-semibold hover:bg-white/70 dark:hover:bg-white/10 disabled:opacity-50"
+            title={sourceBusy ? t`A ${SOURCE_LABEL[src]} search is already running — wait for it to finish` : t`Runs ${SOURCE_LABEL[src]} on this record only, even if it was already searched (after a name correction, for instance)`}>
+            <RotateCw className="w-3.5 h-3.5" />
+            {mode === 'verify' ? t`Check this record again on ${SOURCE_LABEL[src]}` : cell.status === 'none' ? t`Search this record on ${SOURCE_LABEL[src]}` : t`Search this record again on ${SOURCE_LABEL[src]}`}
+          </button>
+        </div>
+      )}
     </div>
   );
 };
@@ -459,6 +474,13 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
   const launch = (choice: AlignLaunchChoice) => {
     setLaunchOpen(false);
     onRerunAll(mode, labo || undefined, group, choice);
+  };
+  // « Search this record » (lot 3): one source, one record (Grist row of `G-<n>`), even if already searched.
+  const searchRecord = (row: PersonAlignRow, src: UnifiedAlignSource) => {
+    const rec = parseInt(row.id.replace(/^G-/, ''), 10);
+    if (!rec) return;
+    if (hasUnsaved && !window.confirm(t`Some selections or decisions are not applied yet — rerunning will clear them. Continue?`)) return;
+    onRerunAll(mode, undefined, undefined, { sources: [src], force: false, limits: {}, record: rec });
   };
   // After a rejection / a mixed identity: the selection of the discarded candidate no longer makes sense.
   const forgetCandidate = (row: PersonAlignRow, src: UnifiedAlignSource, cand: Candidate) => {
@@ -676,7 +698,9 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
                               onDecide={(dec) => setDecisions((p) => ({ ...p, [rowSourceKey(row.id, rowOpenSrc)]: dec }))}
                               applying={applying} onUpdatePpn={onApply ? (r) => updatePpn(row, r) : undefined}
                               onReject={onRejectCandidate ? (c, nb) => rejectCand(row, rowOpenSrc, c, nb) : undefined}
-                              onMixed={onMixedCandidate ? (c, nb) => mixedCand(row, rowOpenSrc, c, nb) : undefined} />
+                              onMixed={onMixedCandidate ? (c, nb) => mixedCand(row, rowOpenSrc, c, nb) : undefined}
+                              mode={mode} sourceBusy={!!progress?.[rowOpenSrc]?.running}
+                              onSearchRecord={rowOpenSrc === 'idref' && mode === 'verify' ? undefined : () => searchRecord(row, rowOpenSrc)} />
                           </div>
                         )}
                       </div>

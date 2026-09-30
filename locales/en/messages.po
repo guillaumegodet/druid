@@ -12502,3 +12502,32 @@ msgstr "Search everywhere…"
 #: lib/unifiedAlignRuns.ts:146
 msgid "Estimate failed: {0}"
 msgstr "Estimate failed: {0}"
+
+#: components/researchers/UnifiedAlignPage.tsx:292
+msgid "Never searched on this source for this record."
+msgstr "Never searched on this source for this record."
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:297
+msgid "A {0} search is already running — wait for it to finish"
+msgstr "A {0} search is already running — wait for it to finish"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:297
+msgid "Runs {0} on this record only, even if it was already searched (after a name correction, for instance)"
+msgstr "Runs {0} on this record only, even if it was already searched (after a name correction, for instance)"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:299
+msgid "Check this record again on {0}"
+msgstr "Check this record again on {0}"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:299
+msgid "Search this record on {0}"
+msgstr "Search this record on {0}"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:299
+msgid "Search this record again on {0}"
+msgstr "Search this record again on {0}"

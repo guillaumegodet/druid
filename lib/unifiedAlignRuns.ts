@@ -33,13 +33,16 @@ export interface UnifiedRunProgress {
 
 const label = (src: UnifiedAlignSource): string => (src === 'idref' ? 'IdRef' : ALIGN_SOURCE_META[src].label);
 
-const triggerUrl = (src: UnifiedAlignSource, mode: AlignMode, labo?: string, group?: AlignGroup, force = false, limit = 0): string => {
+interface TriggerScope { labo?: string; group?: AlignGroup; force?: boolean; limit?: number; record?: number }
+const triggerUrl = (src: UnifiedAlignSource, mode: AlignMode, { labo, group, force = false, limit = 0, record = 0 }: TriggerScope): string => {
   const q = new URLSearchParams();
   if (labo) q.set('labo', labo);
   if (group) q.set('group', group);
   // Incremental by default (never processed or in error); force = reprocess the scope in full.
   if (force) q.set('force', '1');
   if (limit > 0) q.set('limit', String(limit));
+  // One record (Grist row), searched again from its drawer.
+  if (record > 0) q.set('record', String(record));
   if (src === 'idref') {
     // Only mode covered by the unified view: plain Qualinka (see plan §5) — the caller must
     // never request idref outside 'search' mode (guard below), but we set it explicitly.
@@ -87,9 +90,11 @@ export async function runUnifiedAlign(
     force?: boolean;
     /** Maximum number of records per source (launch window; Scopus capped by default). */
     limits?: Partial<Record<UnifiedAlignSource, number>>;
+    /** Grist row of one record: that record only, even if already searched (drawer button). */
+    record?: number;
   } = {},
 ): Promise<Partial<Record<UnifiedAlignSource, UnifiedRunProgress>>> {
-  const { labo, group, onProgress, pollIntervalMs = 2000, force = false, limits = {} } = opts;
+  const { labo, group, onProgress, pollIntervalMs = 2000, force = false, limits = {}, record = 0 } = opts;
   const results: Partial<Record<UnifiedAlignSource, UnifiedRunProgress>> = {};
 
   await Promise.all(sources.map(async (src) => {
@@ -98,7 +103,7 @@ export async function runUnifiedAlign(
     const report = (p: UnifiedRunProgress) => { results[src] = p; onProgress?.(src, p); };
     report({ running: true, total: 0, done: 0 });
     try {
-      const trig = await fetch(triggerUrl(src, mode, labo, group, force, limits[src] || 0));
+      const trig = await fetch(triggerUrl(src, mode, { labo, group, force, limit: limits[src] || 0, record }));
       // 409 = a run is already in progress for this source: simply switch to tracking
       // (same convention as runAlign/rerunIdref in App.tsx).
       if (!trig.ok && trig.status !== 409) {

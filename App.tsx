@@ -694,7 +694,7 @@ function App() {
       setError('');
       setUnifiedProgress({});
       await runUnifiedAlign(choice?.sources ?? UNIFIED_ALIGN_SOURCES, mode, {
-        labo, group, force: choice?.force, limits: choice?.limits,
+        labo, group, force: choice?.force, limits: choice?.limits, record: choice?.record,
         onProgress: (src, p) => setUnifiedProgress((prev) => ({ ...prev, [src]: p })),
       });
       setUnifiedProgress(null);

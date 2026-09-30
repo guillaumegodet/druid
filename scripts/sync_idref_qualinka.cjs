@@ -68,6 +68,7 @@ const LABO_FILTER = (getArg('labo', '') || '').trim().toUpperCase(); // `--labo=
 // « Personnel [non] titulaire n'ayant pas d'obligation statutaire de recherche »; « personnel » = the rest.
 // Applied by selectTargets (scripts/lib/align_targets.cjs) with alignGroupOf of scripts/lib/align_common.cjs.
 const GROUP_FILTER = (getArg('group', '') || '').trim().toLowerCase();
+const RECORD = parseInt(getArg('record', '0'), 10) || 0;   // --record=<Grist row>: that record only, even if already processed
 const CONCURRENCY = parseInt(getArg('concurrency', '4'), 10) || 4;
 const USE_REFS = hasFlag('refs');           // enables the references call (expensive)
 const USE_NEO4J = hasFlag('neo4j');         // context = publication titles (Neo4j)
@@ -571,11 +572,12 @@ async function main() {
   const cache = store.loadCache();                            // resume: merge with the existing cache
   // Records without IdRef of the scope; without --force, the already processed ones are skipped
   // (scripts/lib/align_targets.cjs, shared with the run estimate of the launch window).
-  const sel = selectTargets('idref', all, cache, { labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE });
+  const sel = selectTargets('idref', all, cache, { labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, record: RECORD });
+  const taken = FORCE || RECORD ? sel.eligible : sel.pending;
   const sansIdref = sel.eligible.length;
-  const remaining = FORCE ? sansIdref : sel.pending.length;
-  const nbExternes = (FORCE ? sel.eligible : sel.pending).filter((p) => !p.uid).length;
-  let targets = LIMIT > 0 ? (FORCE ? sel.eligible : sel.pending).slice(0, LIMIT) : (FORCE ? sel.eligible : sel.pending);
+  const remaining = taken.length;
+  const nbExternes = taken.filter((p) => !p.uid).length;
+  let targets = LIMIT > 0 ? taken.slice(0, LIMIT) : taken;
 
   // Context sources (optional)
   let laboDesc = {};

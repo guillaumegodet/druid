@@ -49,6 +49,9 @@ function commonOptions({ modes = ['search', 'verify'], concurrency = 6 } = {}) {
     // --push-grist=false: computes without writing to the review table (dry-run/debug).
     pushGrist: (getArg('push-grist', 'true') || 'true').toLowerCase() !== 'false',
     force: hasFlag('force'),
+    // `--record=<Grist row>`: one record only, searched again even if already processed (« Search this
+    // record » in the drawer of the unified page, docs/plan-recherche-alignement-maitrisee.md, lot 3).
+    record: parseInt(getArg('record', '0'), 10) || 0,
   };
 }
 

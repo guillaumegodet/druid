@@ -486,7 +486,7 @@ async function main() {
   console.log(`[hal] mode=${MODE} concurrency=${CONCURRENCY}${PUSH_GRIST ? '' : ' (dry run: no Grist write)'}`);
 
   const all = await common.fetchAnnuaire();
-  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('hal', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('hal', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT, record: OPTS.record });
   let targets = sel.targets;
   const eligible = sel.eligible.length;
 

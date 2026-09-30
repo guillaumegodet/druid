@@ -80,13 +80,15 @@ const TARGET_SOURCES = {
  * Records a run of `source` processes. `eligible` = records of the scope lacking (search) or
  * carrying (verify) the identifier; `pending` = those never processed in this mode, or in error;
  * `targets` = what the run takes (all eligible with `force`, else pending), capped by `limit`.
+ * `record` (Grist row id) = that record only, taken even if already processed (drawer button).
  */
-function selectTargets(source, all, cache, { mode = 'search', labo = '', group = '', force = false, limit = 0 } = {}) {
+function selectTargets(source, all, cache, { mode = 'search', labo = '', group = '', force = false, limit = 0, record = 0 } = {}) {
   const spec = TARGET_SOURCES[source];
   if (!spec) throw new Error(`Unknown alignment source: ${source}`);
-  const scoped = applyTargetFilters(all.filter((p) => (p.first || p.last) && spec.eligible(p, mode)), { labo, group });
+  const pool = record > 0 ? all.filter((p) => p.recId === record) : all;
+  const scoped = applyTargetFilters(pool.filter((p) => (p.first || p.last) && spec.eligible(p, mode)), { labo, group });
   const pending = scoped.filter((p) => !spec.done((cache || {})[p.key], mode));
-  let targets = force ? scoped : pending;
+  let targets = force || record > 0 ? scoped : pending;
   if (limit > 0) targets = targets.slice(0, limit);
   return { eligible: scoped, pending, targets };
 }

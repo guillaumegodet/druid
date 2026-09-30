@@ -30,6 +30,14 @@ describe('scripts/lib/align_targets.cjs — records an alignment run processes',
     expect(keys(selectTargets('orcid', all, {}, { mode: 'verify' }).targets)).toEqual(['b']);
   });
 
+  it('record: one Grist row, taken even if already searched; nothing when it already has the identifier', () => {
+    const rows = all.map((p, i) => ({ ...p, recId: i + 1 }));   // a → 1, b → 2…
+    const cache = { a: { mode: 'search', status: 'not_found' } };
+    expect(keys(selectTargets('orcid', rows, cache, { mode: 'search', record: 1 }).targets)).toEqual(['a']);
+    expect(keys(selectTargets('orcid', rows, cache, { mode: 'search', record: 2 }).targets)).toEqual([]);   // b has an ORCID
+    expect(keys(selectTargets('idref', rows, { a: { status: 'ambiguous' } }, { record: 1 }).targets)).toEqual(['a']);
+  });
+
   it('per-source rules: OpenAlex skips departures, Scopus skips « absent », IdRef cache has no mode', () => {
     expect(keys(selectTargets('openalex', all, {}, {}).targets)).toEqual(['a', 'b', 'c', 'd']);
     expect(keys(selectTargets('scopus', all, {}, {}).targets)).toEqual(['a', 'b', 'c', 'd']);

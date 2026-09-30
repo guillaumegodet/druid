@@ -505,7 +505,7 @@ async function main() {
 
   const all = await common.fetchAnnuaire();
   const labNames = await loadLabNames();
-  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('orcid', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('orcid', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT, record: OPTS.record });
   let targets = sel.targets;
   const eligible = sel.eligible.length;
 

@@ -3266,6 +3266,9 @@ app.get('/api/sync-idref-trigger', requireEstablishmentScope, (req, res) => {
     const alignLimit = Math.max(0, parseInt(req.query.limit, 10) || 0);
     if (alignLimit > 0) alignArgs.push(`--limit=${alignLimit}`);
     if (req.query.force === '1' || req.query.force === 'true') alignArgs.push('--force');
+    // ?record=<Grist row>: one record, searched again from its drawer (lot 3 of the controlled search plan).
+    const alignRecord = parseInt(req.query.record, 10) || 0;
+    if (alignRecord > 0) alignArgs.push(`--record=${alignRecord}`);
     if (labo) alignArgs.push(`--labo=${labo}`);
     if (group) alignArgs.push(`--group=${group}`);
     const searchArgs = ['scripts/sync_idref.cjs', `--mode=${mode}`];
@@ -3315,6 +3318,8 @@ app.get('/api/align/:source/trigger', requireEstablishmentScope, (req, res) => {
   const limit = Math.max(0, parseInt(req.query.limit, 10) || 0);
   // Incremental by default, lab and secondary groups included (decision D2 of 2026-09-30).
   const force = req.query.force === '1' || req.query.force === 'true';
+  // ?record=<Grist row>: one record, searched again from its drawer (lot 3 of the controlled search plan).
+  const record = parseInt(req.query.record, 10) || 0;
   const running = runningProgress(src.progress);
   if (running) return res.status(409).json({ error: `Alignment already running: ${src.label}`, progress: running });
   try {
@@ -3324,7 +3329,8 @@ app.get('/api/align/:source/trigger', requireEstablishmentScope, (req, res) => {
     if (group) args.push(`--group=${group}`);
     if (limit > 0) args.push(`--limit=${limit}`);
     if (force) args.push('--force');
-    startBackgroundRun(src.label, src.progress, { mode, labo: labo || undefined, group: group || undefined }, args);
+    if (record > 0) args.push(`--record=${record}`);
+    startBackgroundRun(src.label, src.progress, { mode, labo: labo || undefined, group: group || undefined, record: record || undefined }, args);
     res.json({ started: true, source: req.params.source, mode, labo: labo || undefined, group: group || undefined });
   } catch (err) {
     console.error(`[Sync ${src.label} Error]`, err);

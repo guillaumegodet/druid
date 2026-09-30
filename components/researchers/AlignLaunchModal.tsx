@@ -15,6 +15,8 @@ export interface AlignLaunchChoice {
   sources: UnifiedAlignSource[];
   force: boolean;
   limits: Partial<Record<UnifiedAlignSource, number>>;
+  /** Grist row of one record (« Search this record » in a drawer, not from this window). */
+  record?: number;
 }
 
 interface Props {

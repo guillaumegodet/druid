@@ -761,7 +761,7 @@ async function main() {
   const labs = MODE === 'push' ? new Map() : await loadLabs();
   const decisions = await loadReviewDecisions(REVIEW_TABLE, 'OpenAlex_candidat', extractAId);
   for (const [k, d] of decisions) if (d.decision === DECISION_MIXED) MIXED_KEYS.add(k);
-  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('openalex', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('openalex', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT, record: OPTS.record });
   let targets = sel.targets;
   const eligible = sel.eligible.length;
 
