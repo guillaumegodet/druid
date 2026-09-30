@@ -190,7 +190,10 @@ async function references(ppn) {
 
 // ── Enriched context: publication titles (Neo4j) + lab description (Grist) ──
 const NEO4J_URL = process.env.NEO4J_HTTP_URL || 'http://localhost:7474';
-const NEO4J_AUTH = 'Basic ' + Buffer.from(`${process.env.NEO4J_USER || 'neo4j'}:${process.env.NEO4J_PASSWORD || 'nantes_crisalid_2024'}`).toString('base64');
+// No default password: NEO4J_PASSWORD comes from the environment (druid.yaml). Without it the graph
+// answers 401 and the graph signals are skipped.
+if (!process.env.NEO4J_PASSWORD) console.warn('[neo4j] NEO4J_PASSWORD is not set: the CRISalid graph will refuse the queries');
+const NEO4J_AUTH = 'Basic ' + Buffer.from(`${process.env.NEO4J_USER || 'neo4j'}:${process.env.NEO4J_PASSWORD || ''}`).toString('base64');
 const PUB_TITLES_K = parseInt(getArg('pubk', '8'), 10) || 8;   // max number of titles injected as context
 
 // Preloads in ONE query the publication titles by uid_dyna (Person.uid = 'local-'+uid).
