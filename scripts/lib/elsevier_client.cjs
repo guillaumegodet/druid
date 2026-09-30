@@ -52,14 +52,15 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
    * GET JSON on an Elsevier API. `pool` = quota pool name. Returns the body, `{ notFound: true }` on 404,
    * null on network/HTTP error or once the run is aborted (quota, authorization).
    * `opts.badRequestAsValue`: a 400 returns `{ badRequest: true }` instead of null (a multi-id request
-   * holding one invalid id answers 400: the caller splits the batch).
+   * holding one invalid id answers 400: the caller splits the batch). `opts.timeout` / `opts.tries`
+   * override the defaults (25 s, 5 tries) for heavy pages.
    */
   async function get(pool, path, params, opts = {}) {
     if (aborted || !apiKey) return null;
     await throttle(pool);
     const url = `${ELS}${path}${params ? `?${new URLSearchParams(params)}` : ''}`;
     try {
-      const r = await getUrl(url, { json: true, withHeaders: true, headers, timeout: 25000, noRetry: [400, 401, 403, 404], rateLimitWaitMs });
+      const r = await getUrl(url, { json: true, withHeaders: true, headers, timeout: opts.timeout || 25000, tries: opts.tries || 5, noRetry: [400, 401, 403, 404], rateLimitWaitMs });
       trackQuota(pool, r.headers);
       return r.body;
     } catch (e) {

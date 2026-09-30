@@ -133,14 +133,27 @@ async function openalexPublications(aids, { apiKey = process.env.OPENALEX_API_KE
 const arr = (x) => (Array.isArray(x) ? x : x ? [x] : []);
 const scopusOrg = (afid, a = {}) => makeOrg({ ids: { scopus: afid }, names: [a.name || a.affilname || ''], city: a.city || a['affiliation-city'] || '', country: a.country || a['affiliation-country'] || '' });
 
+const SMALL_PAGE = 25;
 /** Scopus Search by author id: papers with the affiliation ids of THAT author. Returns null when the run is aborted. */
-async function scopusPublications(client, scopusIds, { hierarchy, maxDocs = 2000 } = {}) {
+// Most recent first, at most 500: the recent years carry the departures, and a profile merging
+// homonyms (thousands of documents) would otherwise cost dozens of requests (measured on 2026-09-30:
+// 1 985 documents = 80 requests, 7 minutes, for 29 affiliated ones).
+async function scopusPublications(client, scopusIds, { hierarchy, maxDocs = 500 } = {}) {
   const ids = scopusIds.filter((i) => /^\d+$/.test(i));
   if (!ids.length) return [];
   const query = ids.map((i) => `AU-ID(${i})`).join(' OR ');
   const out = [];
-  for (let start = 0, total = 1; start < total && start < maxDocs; start += 200) {
-    const d = await client.get('scopus_search', '/search/scopus', { query, view: 'STANDARD', count: '200', start: String(start), field: 'dc:identifier,dc:title,prism:coverDate,prism:doi,affiliation,author' });
+  // Pages of 200, with the full author list of every document: for authors of large collaborations
+  // (thousands of co-authors per paper) such a page takes longer than the timeout. On a failure the
+  // same page is asked again by 25, with a longer timeout, then the run goes on by 25.
+  let pageSize = 200;
+  for (let start = 0, total = 1; start < total && start < maxDocs; start += pageSize) {
+    const fields = { query, view: 'STANDARD', sort: '-coverDate', count: String(pageSize), start: String(start), field: 'dc:identifier,dc:title,prism:coverDate,prism:doi,affiliation,author' };
+    let d = await client.get('scopus_search', '/search/scopus', fields, pageSize === 200 ? { tries: 1 } : { timeout: 60000, tries: 3 });
+    if (!d && !client.aborted() && pageSize === 200) {
+      pageSize = SMALL_PAGE;
+      d = await client.get('scopus_search', '/search/scopus', { ...fields, count: String(pageSize) }, { timeout: 60000, tries: 3 });
+    }
     if (!d) { if (client.aborted()) return null; throw new Error('Scopus Search failed'); }
     const sr = d['search-results'] || {};
     total = parseInt(sr['opensearch:totalResults'] || '0', 10) || 0;
