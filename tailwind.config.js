@@ -1,9 +1,14 @@
 
 /** @type {import('tailwindcss').Config} */
 export default {
+  // Front sources only: the former "./**/*.{js,ts,jsx,tsx}" also scanned node_modules, dist and help/
+  // (Tailwind warning), a memory peak of the Docker build that endangered Neo4j (2026-09-30).
   content: [
     "./index.html",
-    "./**/*.{js,ts,jsx,tsx}",
+    "./*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./hooks/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
   ],
   darkMode: 'class',
   theme: {
