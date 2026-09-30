@@ -13,34 +13,38 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:127
+#: App.tsx:128
 msgid "Error computing the LDAP diff"
 msgstr "Error computing the LDAP diff"
 
-#: App.tsx:137
+#: App.tsx:138
 msgid "Error searching for duplicates"
 msgstr "Error searching for duplicates"
 
-#: App.tsx:161
+#: App.tsx:162
+msgid "Researcher not found in the loaded scope"
+msgstr "Researcher not found in the loaded scope"
+
+#: App.tsx:175
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:289
+#: App.tsx:303
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:326
+#: App.tsx:340
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:340
+#: App.tsx:354
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:354
+#: App.tsx:368
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -48,106 +52,106 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:356
+#: App.tsx:370
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 
-#: App.tsx:358
+#: App.tsx:372
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:365
+#: App.tsx:379
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:437
-#: App.tsx:444
+#: App.tsx:451
+#: App.tsx:458
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:445
+#: App.tsx:459
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:445
+#: App.tsx:459
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:447
+#: App.tsx:461
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#: App.tsx:457
+#: App.tsx:471
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:467
+#: App.tsx:481
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:481
+#: App.tsx:495
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:493
+#: App.tsx:507
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "LDAP update applied: {updated} record(s) written to Grist."
 
-#: App.tsx:495
+#: App.tsx:509
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:502
+#: App.tsx:516
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:536
+#: App.tsx:550
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation applied: {0} record(s) written to Grist."
 
-#: App.tsx:538
+#: App.tsx:552
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:551
+#: App.tsx:565
 msgid "This record has no Grist row: validation impossible."
 msgstr "This record has no Grist row: validation impossible."
 
-#: App.tsx:563
+#: App.tsx:577
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:580
+#: App.tsx:594
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:611
+#: App.tsx:625
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:625
+#: App.tsx:639
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "LDAP structures: {updated} updated, {created} created in Grist."
 
-#: App.tsx:627
+#: App.tsx:641
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:649
+#: App.tsx:663
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:658
+#: App.tsx:672
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -155,44 +159,44 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:667
+#: App.tsx:681
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:675
+#: App.tsx:689
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:689
+#: App.tsx:703
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:706
+#: App.tsx:720
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:740
+#: App.tsx:754
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:868
+#: App.tsx:885
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:872
+#: App.tsx:889
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:878
+#: App.tsx:895
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:896
+#: App.tsx:914
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:914
-#: App.tsx:926
+#: App.tsx:932
+#: App.tsx:944
 #: components/dashboard/EmbedPage.tsx:88
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
@@ -201,24 +205,24 @@ msgstr "Loading dashboard…"
 #: components/reports/ReportEditor.tsx:264
 #: components/reports/ReportsPage.tsx:134
 #: components/researchers/MergeLogPanel.tsx:64
-#: components/researchers/TasksPage.tsx:334
+#: components/researchers/TasksPage.tsx:347
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:935
+#: App.tsx:953
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:959
+#: App.tsx:977
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:963
+#: App.tsx:981
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1004
+#: App.tsx:1022
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -352,7 +356,7 @@ msgid "Stop the answer"
 msgstr "Stop the answer"
 
 #: components/ChatWidget.tsx:497
-#: components/researchers/TasksPage.tsx:348
+#: components/researchers/TasksPage.tsx:361
 msgid "Send"
 msgstr "Send"
 
@@ -584,9 +588,11 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:194
 #: components/researchers/GroupModal.tsx:64
+#: components/researchers/ImportConflictsPage.tsx:151
+#: components/researchers/ImportConflictsPage.tsx:217
 #: components/researchers/MergeResearchersModal.tsx:291
 #: components/researchers/TaskForm.tsx:163
-#: components/researchers/TasksPage.tsx:309
+#: components/researchers/TasksPage.tsx:322
 #: components/structures/StructuresLdapReview.tsx:131
 msgid "Cancel"
 msgstr "Cancel"
@@ -658,6 +664,7 @@ msgid "No result."
 msgstr "No result."
 
 #: components/GroupList.tsx:318
+#: lib/importConflicts.ts:86
 msgid "OpenAlex author"
 msgstr "OpenAlex author"
 
@@ -1089,7 +1096,7 @@ msgstr "Supervising bodies"
 #: components/researchers/ListHeader.tsx:48
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
 #: components/researchers/ResearcherTable.tsx:89
-#: components/researchers/TasksPage.tsx:170
+#: components/researchers/TasksPage.tsx:173
 msgid "Status"
 msgstr "Status"
 
@@ -1154,7 +1161,7 @@ msgid "All levels"
 msgstr "All levels"
 
 #: components/StructureList.tsx:377
-#: components/researchers/TasksPage.tsx:109
+#: components/researchers/TasksPage.tsx:112
 msgid "All statuses"
 msgstr "All statuses"
 
@@ -1663,6 +1670,7 @@ msgstr "Title, DOI or journal…"
 #: components/dashboard/NewsTab.tsx:690
 #: components/dashboard/PublicationsListTab.tsx:437
 #: components/dashboard/report/reportTables.ts:47
+#: lib/importConflicts.ts:62
 msgid "Title"
 msgstr "Title"
 
@@ -2973,6 +2981,7 @@ msgstr "Citations"
 #: components/dashboard/PublicationsListTab.tsx:336
 #: components/researchers/AffiliationsTable.tsx:237
 #: components/researchers/AffiliationsTable.tsx:277
+#: lib/importConflicts.ts:74
 #: lib/structureLabels.ts:17
 msgid "Team"
 msgstr "Team"
@@ -3247,7 +3256,7 @@ msgstr "Hearing"
 #: components/dashboard/NewsTab.tsx:116
 #: components/dashboard/NewsTab.tsx:126
 #: components/dashboard/fundersAggregates.ts:42
-#: lib/tasks.ts:55
+#: lib/tasks.ts:58
 msgid "Other"
 msgstr "Other"
 
@@ -3291,7 +3300,7 @@ msgstr "reject."
 #: components/dashboard/MediaMentionsPanel.tsx:258
 #: components/dashboard/MediaMentionsPanel.tsx:555
 #: components/reports/ReportEditor.tsx:713
-#: components/researchers/TasksPage.tsx:185
+#: components/researchers/TasksPage.tsx:188
 msgid "auto"
 msgstr "auto"
 
@@ -3460,8 +3469,9 @@ msgstr "Harvested sources ({0})"
 #: components/dashboard/MediaSourcesAdmin.tsx:197
 #: components/researchers/DuplicatesPage.tsx:115
 #: components/researchers/DuplicatesPage.tsx:128
+#: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/OpenAlexAffiliationsPage.tsx:80
-#: components/researchers/TasksPage.tsx:126
+#: components/researchers/TasksPage.tsx:129
 msgid "Refresh"
 msgstr "Refresh"
 
@@ -3478,6 +3488,7 @@ msgid "built-in"
 msgstr "built-in"
 
 #: components/dashboard/MediaSourcesAdmin.tsx:251
+#: components/researchers/ImportConflictsPage.tsx:149
 #: components/researchers/alignAtoms.tsx:178
 msgid "Confirm"
 msgstr "Confirm"
@@ -3836,6 +3847,7 @@ msgstr "Citations (already received)"
 #: components/researchers/LdapCandidatesPage.tsx:185
 #: components/researchers/ListHeader.tsx:49
 #: components/researchers/OpenAlexAffiliationsPage.tsx:107
+#: lib/importConflicts.ts:75
 msgid "Lab"
 msgstr "Lab"
 
@@ -3887,12 +3899,12 @@ msgid "Link"
 msgstr "Link"
 
 #: components/dashboard/NewsTab.tsx:735
-#: components/researchers/TasksPage.tsx:108
+#: components/researchers/TasksPage.tsx:111
 msgid "Open"
 msgstr "Open"
 
 #: components/dashboard/NewsTab.tsx:735
-#: components/researchers/TasksPage.tsx:155
+#: components/researchers/TasksPage.tsx:158
 msgid "Closed"
 msgstr "Closed"
 
@@ -4076,7 +4088,7 @@ msgid "Discard"
 msgstr "Discard"
 
 #: components/dashboard/NewsletterPanel.tsx:454
-#: components/researchers/TasksPage.tsx:262
+#: components/researchers/TasksPage.tsx:269
 msgid "Reopen"
 msgstr "Reopen"
 
@@ -4432,6 +4444,7 @@ msgstr "Lab"
 
 #: components/dashboard/PublicationsListTab.tsx:348
 #: components/researchers/GeneralTab.tsx:263
+#: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Employment type"
 
@@ -4520,6 +4533,7 @@ msgstr "None"
 #: components/dashboard/ResearchersTab.tsx:134
 #: components/researchers/AbesExportModal.tsx:228
 #: components/researchers/ResearcherTable.tsx:85
+#: lib/importConflicts.ts:73
 msgid "Employer"
 msgstr "Employer"
 
@@ -7268,13 +7282,13 @@ msgid "Suspicious"
 msgstr "Suspicious"
 
 #: components/etl/EtlMaintenancePanels.tsx:152
-#: lib/tasks.ts:74
+#: lib/tasks.ts:77
 msgid "In progress"
 msgstr "In progress"
 
 #: components/etl/EtlMaintenancePanels.tsx:153
 #: components/reports/ReportEditor.tsx:322
-#: components/researchers/TasksPage.tsx:332
+#: components/researchers/TasksPage.tsx:345
 msgid "History"
 msgstr "History"
 
@@ -8152,7 +8166,7 @@ msgid "Person"
 msgstr "Person"
 
 #: components/researchers/AbesExportModal.tsx:231
-#: lib/tasks.ts:97
+#: lib/tasks.ts:100
 msgid "Comment"
 msgstr "Comment"
 
@@ -8382,12 +8396,12 @@ msgid "Recomputes the groups from the Directory (no LDAP run)"
 msgstr "Recomputes the groups from the Directory (no LDAP run)"
 
 #: components/researchers/DuplicatesPage.tsx:123
-#: components/researchers/TodoPage.tsx:64
+#: components/researchers/TodoPage.tsx:77
 msgid "Duplicates"
 msgstr "Duplicates"
 
 #: components/researchers/DuplicatesPage.tsx:124
-#: components/researchers/TodoPage.tsx:53
+#: components/researchers/TodoPage.tsx:64
 msgid "Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation"
 msgstr "Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation"
 
@@ -8398,7 +8412,7 @@ msgstr "Looking for duplicates…"
 #: components/researchers/DuplicatesPage.tsx:143
 #: components/researchers/ListHeader.tsx:121
 #: components/researchers/OpenAlexAffiliationsPage.tsx:93
-#: components/researchers/TodoPage.tsx:50
+#: components/researchers/TodoPage.tsx:61
 msgid "To process"
 msgstr "To process"
 
@@ -8446,6 +8460,11 @@ msgstr "Declare a multiple affiliation (concurrent or successive) or mark “to 
 msgid "Qualify"
 msgstr "Qualify"
 
+#: components/researchers/DuplicatesPage.tsx:209
+#: components/researchers/TasksPage.tsx:302
+msgid "Open the merge assistant"
+msgstr "Open the merge assistant"
+
 #. placeholder {0}: a.name
 #. placeholder {1}: a.labo || '∅'
 #. placeholder {2}: b.name
@@ -8453,10 +8472,6 @@ msgstr "Qualify"
 #: components/researchers/DuplicatesPage.tsx:209
 msgid "Merge {0} ({1}) and {2} ({3})"
 msgstr "Merge {0} ({1}) and {2} ({3})"
-
-#: components/researchers/DuplicatesPage.tsx:209
-msgid "Open the merge assistant"
-msgstr "Open the merge assistant"
 
 #: components/researchers/DuplicatesPage.tsx:213
 #: components/researchers/LdapCandidatesPage.tsx:221
@@ -8587,10 +8602,12 @@ msgid "First name"
 msgstr "First name"
 
 #: components/researchers/GeneralTab.tsx:205
+#: lib/importConflicts.ts:66
 msgid "Nationality"
 msgstr "Nationality"
 
 #: components/researchers/GeneralTab.tsx:209
+#: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date of birth"
 
@@ -8626,26 +8643,29 @@ msgid "— Undefined —"
 msgstr "— Undefined —"
 
 #: components/researchers/GeneralTab.tsx:295
+#: lib/importConflicts.ts:71
+msgid "Employment start"
+msgstr "Employment start"
+
+#: components/researchers/GeneralTab.tsx:295
 msgid "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 
-#: components/researchers/GeneralTab.tsx:295
-msgid "Employment start"
-msgstr "Employment start"
+#: components/researchers/GeneralTab.tsx:299
+#: lib/importConflicts.ts:72
+msgid "Employment end"
+msgstr "Employment end"
 
 #: components/researchers/GeneralTab.tsx:299
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
-
-#: components/researchers/GeneralTab.tsx:299
-msgid "Employment end"
-msgstr "Employment end"
 
 #: components/researchers/GeneralTab.tsx:312
 msgid "Accredited to supervise research (HDR)"
 msgstr "Accredited to supervise research (HDR)"
 
 #: components/researchers/GeneralTab.tsx:317
+#: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "HDR year"
 
@@ -8658,6 +8678,7 @@ msgid "Faculty"
 msgstr "Faculty"
 
 #: components/researchers/GeneralTab.tsx:341
+#: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "Doctoral school"
 
@@ -8684,6 +8705,126 @@ msgstr "Select or create…"
 #: components/researchers/GroupModal.tsx:60
 msgid "{selectedCount, plural, one {# researcher selected} other {# researchers selected}}"
 msgstr "{selectedCount, plural, one {# researcher selected} other {# researchers selected}}"
+
+#: components/researchers/ImportConflictsPage.tsx:107
+msgid "All kinds"
+msgstr "All kinds"
+
+#: components/researchers/ImportConflictsPage.tsx:111
+msgid "All fields"
+msgstr "All fields"
+
+#: components/researchers/ImportConflictsPage.tsx:114
+msgid "Search (name, lab, value…)"
+msgstr "Search (name, lab, value…)"
+
+#: components/researchers/ImportConflictsPage.tsx:116
+msgid "Re-reads the arbitration table and the directory"
+msgstr "Re-reads the arbitration table and the directory"
+
+#: components/researchers/ImportConflictsPage.tsx:130
+msgid "Conflicts to settle"
+msgstr "Conflicts to settle"
+
+#: components/researchers/ImportConflictsPage.tsx:131
+msgid "Records concerned"
+msgstr "Records concerned"
+
+#: components/researchers/ImportConflictsPage.tsx:132
+msgid "Edited since the import"
+msgstr "Edited since the import"
+
+#: components/researchers/ImportConflictsPage.tsx:135
+msgid "Values of the {source} directory that differ from Druid. The empty cells have already been filled by the import; here, choose for each line which value to keep. The choice is written to the record at once, with a line in its comments."
+msgstr "Values of the {source} directory that differ from Druid. The empty cells have already been filled by the import; here, choose for each line which value to keep. The choice is written to the record at once, with a line in its comments."
+
+#. placeholder {0}: rows.length
+#: components/researchers/ImportConflictsPage.tsx:145
+msgid "Take the {source} value for the {0} displayed conflicts?"
+msgstr "Take the {source} value for the {0} displayed conflicts?"
+
+#. placeholder {0}: rows.length
+#: components/researchers/ImportConflictsPage.tsx:146
+msgid "Keep the current value for the {0} displayed conflicts?"
+msgstr "Keep the current value for the {0} displayed conflicts?"
+
+#. placeholder {0}: rows.length
+#: components/researchers/ImportConflictsPage.tsx:155
+msgid "For the {0} displayed conflicts:"
+msgstr "For the {0} displayed conflicts:"
+
+#: components/researchers/ImportConflictsPage.tsx:156
+#: components/researchers/ImportConflictsPage.tsx:222
+msgid "Take {source}"
+msgstr "Take {source}"
+
+#: components/researchers/ImportConflictsPage.tsx:157
+msgid "Keep current"
+msgstr "Keep current"
+
+#: components/researchers/ImportConflictsPage.tsx:165
+#: components/researchers/OpenAlexAffiliationsPage.tsx:101
+msgid "Nothing to show with these filters."
+msgstr "Nothing to show with these filters."
+
+#: components/researchers/ImportConflictsPage.tsx:165
+msgid "No conflict left to settle."
+msgstr "No conflict left to settle."
+
+#: components/researchers/ImportConflictsPage.tsx:173
+#: components/researchers/TasksPage.tsx:297
+msgid "Open the record"
+msgstr "Open the record"
+
+#: components/researchers/ImportConflictsPage.tsx:180
+msgid "Take {source} for this record"
+msgstr "Take {source} for this record"
+
+#: components/researchers/ImportConflictsPage.tsx:187
+#: components/researchers/MergeResearchersModal.tsx:218
+msgid "Field"
+msgstr "Field"
+
+#: components/researchers/ImportConflictsPage.tsx:188
+msgid "Current value"
+msgstr "Current value"
+
+#: components/researchers/ImportConflictsPage.tsx:189
+msgid "{source} value"
+msgstr "{source} value"
+
+#: components/researchers/ImportConflictsPage.tsx:190
+msgid "Decision"
+msgstr "Decision"
+
+#: components/researchers/ImportConflictsPage.tsx:199
+msgid "edited since the import"
+msgstr "edited since the import"
+
+#: components/researchers/ImportConflictsPage.tsx:213
+msgid "dd/mm/yyyy"
+msgstr "dd/mm/yyyy"
+
+#: components/researchers/ImportConflictsPage.tsx:221
+msgid "Keep the current value"
+msgstr "Keep the current value"
+
+#: components/researchers/ImportConflictsPage.tsx:221
+msgid "Keep"
+msgstr "Keep"
+
+#: components/researchers/ImportConflictsPage.tsx:222
+msgid "Write the {source} value in the record"
+msgstr "Write the {source} value in the record"
+
+#: components/researchers/ImportConflictsPage.tsx:223
+msgid "Type another value"
+msgstr "Type another value"
+
+#. placeholder {0}: people.length
+#: components/researchers/ImportConflictsPage.tsx:236
+msgid "First {MAX_PEOPLE} records out of {0} — narrow with the filters."
+msgstr "First {MAX_PEOPLE} records out of {0} — narrow with the filters."
 
 #: components/researchers/LdapAlignPage.tsx:27
 #: components/researchers/UnifiedAlignPage.tsx:44
@@ -8966,6 +9107,7 @@ msgid "Apply ({0})"
 msgstr "Apply ({0})"
 
 #: components/researchers/ListHeader.tsx:47
+#: lib/importConflicts.ts:69
 msgid "Email"
 msgstr "Email"
 
@@ -9032,6 +9174,7 @@ msgid "https://…"
 msgstr "https://…"
 
 #: components/researchers/MediaPresenceSection.tsx:37
+#: lib/importConflicts.ts:91
 msgid "LinkedIn"
 msgstr "LinkedIn"
 
@@ -9080,6 +9223,7 @@ msgid "https://…academia.edu/…"
 msgstr "https://…academia.edu/…"
 
 #: components/researchers/MediaPresenceSection.tsx:46
+#: lib/importConflicts.ts:92
 msgid "ResearchGate"
 msgstr "ResearchGate"
 
@@ -9088,6 +9232,7 @@ msgid "https://researchgate.net/profile/…"
 msgstr "https://researchgate.net/profile/…"
 
 #: components/researchers/MediaPresenceSection.tsx:47
+#: lib/importConflicts.ts:90
 msgid "Google Scholar"
 msgstr "Google Scholar"
 
@@ -9247,10 +9392,6 @@ msgstr "Suggested value pre-selected — change it if needed."
 msgid "No difference: the absorbed row adds nothing and will simply be deleted."
 msgstr "No difference: the absorbed row adds nothing and will simply be deleted."
 
-#: components/researchers/MergeResearchersModal.tsx:218
-msgid "Field"
-msgstr "Field"
-
 #. placeholder {0}: fmt('validation_source', (side === 'keep' ? effective.keep : effective.drop).fields['validation_source']) || '—'
 #. placeholder {1}: fmt('validation_date', (side === 'keep' ? effective.keep : effective.drop).fields['validation_date']) || '—'
 #: components/researchers/MergeResearchersModal.tsx:230
@@ -9323,7 +9464,7 @@ msgid "Process in the ETL console"
 msgstr "Process in the ETL console"
 
 #: components/researchers/OpenAlexAffiliationsPage.tsx:79
-#: components/researchers/TasksPage.tsx:125
+#: components/researchers/TasksPage.tsx:128
 msgid "Re-reads the Grist table"
 msgstr "Re-reads the Grist table"
 
@@ -9338,10 +9479,6 @@ msgstr "Detected in total"
 #: components/researchers/OpenAlexAffiliationsPage.tsx:98
 msgid "Publications whose raw OpenAlex affiliation does not match the lab. Read-only here: to submit a correction to OpenAlex or mark it processed, open the lab in the ETL console."
 msgstr "Publications whose raw OpenAlex affiliation does not match the lab. Read-only here: to submit a correction to OpenAlex or mark it processed, open the lab in the ETL console."
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:101
-msgid "Nothing to show with these filters."
-msgstr "Nothing to show with these filters."
 
 #. placeholder {0}: rows.length
 #: components/researchers/OpenAlexAffiliationsPage.tsx:133
@@ -9358,6 +9495,7 @@ msgid "Affiliation"
 msgstr "Affiliation"
 
 #: components/researchers/ResearcherTable.tsx:86
+#: lib/importConflicts.ts:97
 msgid "Identifiers"
 msgstr "Identifiers"
 
@@ -9415,7 +9553,7 @@ msgid "Error creating the task"
 msgstr "Error creating the task"
 
 #: components/researchers/TaskForm.tsx:85
-#: components/researchers/TasksPage.tsx:133
+#: components/researchers/TasksPage.tsx:136
 msgid "New task"
 msgstr "New task"
 
@@ -9424,7 +9562,7 @@ msgid "Something to do outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR)"
 msgstr "Something to do outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR)"
 
 #: components/researchers/TaskForm.tsx:101
-#: components/researchers/TasksPage.tsx:167
+#: components/researchers/TasksPage.tsx:170
 msgid "Researcher"
 msgstr "Researcher"
 
@@ -9437,7 +9575,7 @@ msgid "No record selected — the task will be created without a researcher link
 msgstr "No record selected — the task will be created without a researcher link (badge « to complete »)."
 
 #: components/researchers/TaskForm.tsx:131
-#: components/researchers/TasksPage.tsx:169
+#: components/researchers/TasksPage.tsx:172
 msgid "Channel"
 msgstr "Channel"
 
@@ -9466,39 +9604,39 @@ msgid "Create the task"
 msgstr "Create the task"
 
 #. placeholder {0}: trig.status
-#: components/researchers/TasksPage.tsx:64
+#: components/researchers/TasksPage.tsx:66
 msgid "Detection trigger failed: {0}"
 msgstr "Detection trigger failed: {0}"
 
-#: components/researchers/TasksPage.tsx:77
+#: components/researchers/TasksPage.tsx:79
 msgid "Error during the detection"
 msgstr "Error during the detection"
 
-#: components/researchers/TasksPage.tsx:113
+#: components/researchers/TasksPage.tsx:116
 msgid "All bases"
 msgstr "All bases"
 
-#: components/researchers/TasksPage.tsx:117
+#: components/researchers/TasksPage.tsx:120
 msgid "All channels"
 msgstr "All channels"
 
-#: components/researchers/TasksPage.tsx:121
+#: components/researchers/TasksPage.tsx:124
 msgid "Mine"
 msgstr "Mine"
 
-#: components/researchers/TasksPage.tsx:123
+#: components/researchers/TasksPage.tsx:126
 msgid "Search (title, name, lab…)"
 msgstr "Search (title, name, lab…)"
 
-#: components/researchers/TasksPage.tsx:128
+#: components/researchers/TasksPage.tsx:131
 msgid "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
 msgstr "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
 
-#: components/researchers/TasksPage.tsx:130
+#: components/researchers/TasksPage.tsx:133
 msgid "Detecting…"
 msgstr "Detecting…"
 
-#: components/researchers/TasksPage.tsx:130
+#: components/researchers/TasksPage.tsx:133
 msgid "Run detection"
 msgstr "Run detection"
 
@@ -9506,196 +9644,218 @@ msgstr "Run detection"
 #. placeholder {1}: detect?.verified ?? 0
 #. placeholder {2}: detect?.resolved ?? 0
 #. placeholder {3}: detect?.reopened ?? 0
-#: components/researchers/TasksPage.tsx:138
+#: components/researchers/TasksPage.tsx:141
 msgid "Detection done: {0} created, {1} verified, {2} resolved automatically, {3} reopened"
 msgstr "Detection done: {0} created, {1} verified, {2} resolved automatically, {3} reopened"
 
-#: components/researchers/TasksPage.tsx:147
+#: components/researchers/TasksPage.tsx:150
 msgid "Loading the tasks…"
 msgstr "Loading the tasks…"
 
-#: components/researchers/TasksPage.tsx:159
+#: components/researchers/TasksPage.tsx:162
 msgid "No task matches these filters."
 msgstr "No task matches these filters."
 
-#: components/researchers/TasksPage.tsx:166
+#: components/researchers/TasksPage.tsx:169
 msgid "Task"
 msgstr "Task"
 
-#: components/researchers/TasksPage.tsx:168
+#: components/researchers/TasksPage.tsx:171
 msgid "Base"
 msgstr "Base"
 
-#: components/researchers/TasksPage.tsx:171
+#: components/researchers/TasksPage.tsx:174
 msgid "Assigned"
 msgstr "Assigned"
 
-#: components/researchers/TasksPage.tsx:172
-#: lib/tasks.ts:88
+#: components/researchers/TasksPage.tsx:175
+#: lib/tasks.ts:91
 msgid "Created"
 msgstr "Created"
 
-#: components/researchers/TasksPage.tsx:185
+#: components/researchers/TasksPage.tsx:188
 msgid "Generated by a detection rule — closed automatically when the situation disappears"
 msgstr "Generated by a detection rule — closed automatically when the situation disappears"
 
-#: components/researchers/TasksPage.tsx:194
+#: components/researchers/TasksPage.tsx:197
 msgid "No Directory record linked: link it from the Grist table"
 msgstr "No Directory record linked: link it from the Grist table"
 
-#: components/researchers/TasksPage.tsx:195
+#: components/researchers/TasksPage.tsx:198
 msgid "To complete"
 msgstr "To complete"
 
-#: components/researchers/TasksPage.tsx:219
+#: components/researchers/TasksPage.tsx:223
 msgid "Directory not loaded yet: researcher links open once the list is available."
 msgstr "Directory not loaded yet: researcher links open once the list is available."
 
-#: components/researchers/TasksPage.tsx:254
+#: components/researchers/TasksPage.tsx:261
 msgid "Action failed"
 msgstr "Action failed"
 
-#: components/researchers/TasksPage.tsx:258
+#: components/researchers/TasksPage.tsx:265
 msgid "Take over"
 msgstr "Take over"
 
-#: components/researchers/TasksPage.tsx:258
+#: components/researchers/TasksPage.tsx:265
 msgid "Resume"
 msgstr "Resume"
 
-#: components/researchers/TasksPage.tsx:259
-#: lib/tasks.ts:91
+#: components/researchers/TasksPage.tsx:266
+#: lib/tasks.ts:94
 msgid "Put on hold"
 msgstr "Put on hold"
 
-#: components/researchers/TasksPage.tsx:260
+#: components/researchers/TasksPage.tsx:267
 msgid "Mark as done"
 msgstr "Mark as done"
 
-#: components/researchers/TasksPage.tsx:261
+#: components/researchers/TasksPage.tsx:268
 msgid "Drop"
 msgstr "Drop"
 
-#: components/researchers/TasksPage.tsx:262
+#: components/researchers/TasksPage.tsx:269
 msgid "Back to “to do”"
 msgstr "Back to “to do”"
 
-#: components/researchers/TasksPage.tsx:276
+#: components/researchers/TasksPage.tsx:283
 msgid "Created by"
 msgstr "Created by"
 
-#: components/researchers/TasksPage.tsx:277
+#: components/researchers/TasksPage.tsx:284
 msgid "Taken over by"
 msgstr "Taken over by"
 
-#: components/researchers/TasksPage.tsx:278
+#: components/researchers/TasksPage.tsx:285
 msgid "Closed by"
 msgstr "Closed by"
 
-#: components/researchers/TasksPage.tsx:280
+#: components/researchers/TasksPage.tsx:287
 msgid "Verified"
 msgstr "Verified"
 
-#: components/researchers/TasksPage.tsx:283
+#: components/researchers/TasksPage.tsx:290
 msgid "Waiting for:"
 msgstr "Waiting for:"
 
-#: components/researchers/TasksPage.tsx:284
+#: components/researchers/TasksPage.tsx:291
 msgid "Resolution:"
 msgstr "Resolution:"
 
-#: components/researchers/TasksPage.tsx:287
+#: components/researchers/TasksPage.tsx:294
 msgid "Open the link"
 msgstr "Open the link"
 
-#: components/researchers/TasksPage.tsx:290
-msgid "Open the record"
-msgstr "Open the record"
+#: components/researchers/TasksPage.tsx:301
+msgid "The task closes itself at the next detection, once the records are merged"
+msgstr "The task closes itself at the next detection, once the records are merged"
 
-#: components/researchers/TasksPage.tsx:305
+#. placeholder {0}: p.uids[0]
+#. placeholder {1}: p.uids[1]
+#: components/researchers/TasksPage.tsx:302
+msgid "Merge {0} + {1}"
+msgstr "Merge {0} + {1}"
+
+#: components/researchers/TasksPage.tsx:318
 msgid "Waiting for what? (researcher's answer, ABES batch, external support…)"
 msgstr "Waiting for what? (researcher's answer, ABES batch, external support…)"
 
-#: components/researchers/TasksPage.tsx:305
+#: components/researchers/TasksPage.tsx:318
 msgid "Resolution (optional)"
 msgstr "Resolution (optional)"
 
-#: components/researchers/TasksPage.tsx:315
+#: components/researchers/TasksPage.tsx:328
 msgid "Assign to (username)"
 msgstr "Assign to (username)"
 
-#: components/researchers/TasksPage.tsx:316
+#: components/researchers/TasksPage.tsx:329
 msgid "Reassign"
 msgstr "Reassign"
 
-#: components/researchers/TasksPage.tsx:317
+#: components/researchers/TasksPage.tsx:330
 msgid "Assign to me"
 msgstr "Assign to me"
 
-#: components/researchers/TasksPage.tsx:324
+#: components/researchers/TasksPage.tsx:337
 msgid "Email sent to the researcher"
 msgstr "Email sent to the researcher"
 
-#: components/researchers/TasksPage.tsx:346
+#: components/researchers/TasksPage.tsx:359
 msgid "Add a comment…"
 msgstr "Add a comment…"
 
-#: components/researchers/TasksPage.tsx:381
+#: components/researchers/TasksPage.tsx:394
 msgid "Subject:"
 msgstr "Subject:"
 
-#: components/researchers/TasksPage.tsx:387
-#: lib/tasks.ts:67
+#: components/researchers/TasksPage.tsx:400
+#: lib/tasks.ts:70
 msgid "Email to the researcher"
 msgstr "Email to the researcher"
 
-#: components/researchers/TasksPage.tsx:388
+#: components/researchers/TasksPage.tsx:401
 msgid "no email in the Directory"
 msgstr "no email in the Directory"
 
-#: components/researchers/TasksPage.tsx:394
+#: components/researchers/TasksPage.tsx:407
 msgid "Subject"
 msgstr "Subject"
 
-#: components/researchers/TasksPage.tsx:398
+#: components/researchers/TasksPage.tsx:411
 msgid "Copy the email"
 msgstr "Copy the email"
 
-#: components/researchers/TasksPage.tsx:402
+#: components/researchers/TasksPage.tsx:415
 msgid "Open in the mail client"
 msgstr "Open in the mail client"
 
-#: components/researchers/TasksPage.tsx:407
+#: components/researchers/TasksPage.tsx:420
 msgid "Mark as sent (task on hold)"
 msgstr "Mark as sent (task on hold)"
 
-#: components/researchers/TodoPage.tsx:55
+#: components/researchers/TodoPage.tsx:66
 msgid "Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands"
 msgstr "Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands"
 
-#: components/researchers/TodoPage.tsx:56
+#: components/researchers/TodoPage.tsx:68
+msgid "Values of an imported directory that differ from Druid — choose which one to keep"
+msgstr "Values of an imported directory that differ from Druid — choose which one to keep"
+
+#: components/researchers/TodoPage.tsx:69
 msgid "Publications with a suspicious OpenAlex affiliation, detected by the ETL console"
 msgstr "Publications with a suspicious OpenAlex affiliation, detected by the ETL console"
 
-#: components/researchers/TodoPage.tsx:63
+#: components/researchers/TodoPage.tsx:76
 msgid "Records sharing the same uid_dyna"
 msgstr "Records sharing the same uid_dyna"
 
-#: components/researchers/TodoPage.tsx:68
+#: components/researchers/TodoPage.tsx:81
 msgid "Tasks to carry out outside Druid"
 msgstr "Tasks to carry out outside Druid"
 
-#: components/researchers/TodoPage.tsx:69
+#: components/researchers/TodoPage.tsx:82
 msgid "Tasks"
 msgstr "Tasks"
 
-#: components/researchers/TodoPage.tsx:71
+#: components/researchers/TodoPage.tsx:84
 msgid "Suspicious OpenAlex affiliations (ETL console), read-only"
 msgstr "Suspicious OpenAlex affiliations (ETL console), read-only"
 
-#: components/researchers/TodoPage.tsx:72
+#: components/researchers/TodoPage.tsx:85
 msgid "OpenAlex affiliations"
 msgstr "OpenAlex affiliations"
+
+#: components/researchers/TodoPage.tsx:88
+msgid "Conflicts left by a directory import"
+msgstr "Conflicts left by a directory import"
+
+#: components/researchers/TodoPage.tsx:89
+msgid "Directory conflicts {conflictSource}"
+msgstr "Directory conflicts {conflictSource}"
+
+#: components/researchers/TodoPage.tsx:89
+msgid "Directory conflicts"
+msgstr "Directory conflicts"
 
 #: components/researchers/UnifiedAlignPage.tsx:108
 msgid "{label}: one candidate to check — tick to fill in, click to see it"
@@ -10326,6 +10486,7 @@ msgid "— None —"
 msgstr "— None —"
 
 #: components/structures/ClassificationTab.tsx:54
+#: lib/importConflicts.ts:76
 msgid "Campus"
 msgstr "Campus"
 
@@ -11321,6 +11482,70 @@ msgstr "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} missing: run {1} first (the script creates it)."
 
+#: lib/importConflicts.ts:63
+msgid "Grade"
+msgstr "Grade"
+
+#: lib/importConflicts.ts:67
+msgid "HDR"
+msgstr "HDR"
+
+#: lib/importConflicts.ts:77
+msgid "Membership type"
+msgstr "Membership type"
+
+#: lib/importConflicts.ts:78
+msgid "Affiliation start"
+msgstr "Affiliation start"
+
+#: lib/importConflicts.ts:79
+msgid "Affiliation end"
+msgstr "Affiliation end"
+
+#: lib/importConflicts.ts:80
+msgid "ORCID"
+msgstr "ORCID"
+
+#: lib/importConflicts.ts:81
+msgid "IdRef"
+msgstr "IdRef"
+
+#: lib/importConflicts.ts:82
+msgid "IdHAL"
+msgstr "IdHAL"
+
+#: lib/importConflicts.ts:83
+msgid "IdHAL (numeric)"
+msgstr "IdHAL (numeric)"
+
+#: lib/importConflicts.ts:84
+msgid "Scopus Author ID"
+msgstr "Scopus Author ID"
+
+#: lib/importConflicts.ts:85
+msgid "OpenAlex ids"
+msgstr "OpenAlex ids"
+
+#: lib/importConflicts.ts:87
+msgid "uid_dyna"
+msgstr "uid_dyna"
+
+#: lib/importConflicts.ts:88
+msgid "Directory page"
+msgstr "Directory page"
+
+#: lib/importConflicts.ts:89
+msgid "Photo"
+msgstr "Photo"
+
+#: lib/importConflicts.ts:96
+msgid "HR"
+msgstr "HR"
+
+#: lib/importConflicts.ts:98
+msgid "Links"
+msgstr "Links"
+
 #: lib/researcherLabels.ts:14
 msgid "Internal"
 msgstr "Internal"
@@ -11481,77 +11706,89 @@ msgstr "HR — death to propagate"
 msgid "Directory — employment end to enter"
 msgstr "Directory — employment end to enter"
 
-#: lib/tasks.ts:65
+#: lib/tasks.ts:55
+msgid "Directory — two records for the same person: merge"
+msgstr "Directory — two records for the same person: merge"
+
+#: lib/tasks.ts:56
+msgid "Directory — shared identifiers, different names: same person?"
+msgstr "Directory — shared identifiers, different names: same person?"
+
+#: lib/tasks.ts:57
+msgid "Directory — identifier carried by two people: fix it"
+msgstr "Directory — identifier carried by two people: fix it"
+
+#: lib/tasks.ts:68
 msgid "Authorities correspondent (IdRef)"
 msgstr "Authorities correspondent (IdRef)"
 
-#: lib/tasks.ts:66
+#: lib/tasks.ts:69
 msgid "ABES batch (export)"
 msgstr "ABES batch (export)"
 
-#: lib/tasks.ts:68
+#: lib/tasks.ts:71
 msgid "External support (provider)"
 msgstr "External support (provider)"
 
-#: lib/tasks.ts:69
+#: lib/tasks.ts:72
 msgid "Internal (Druid)"
 msgstr "Internal (Druid)"
 
-#: lib/tasks.ts:73
+#: lib/tasks.ts:76
 msgid "To do"
 msgstr "To do"
 
-#: lib/tasks.ts:75
+#: lib/tasks.ts:78
 msgid "Waiting"
 msgstr "Waiting"
 
-#: lib/tasks.ts:76
-#: lib/tasks.ts:92
+#: lib/tasks.ts:79
+#: lib/tasks.ts:95
 msgid "Done"
 msgstr "Done"
 
-#: lib/tasks.ts:77
-#: lib/tasks.ts:93
+#: lib/tasks.ts:80
+#: lib/tasks.ts:96
 msgid "Dropped"
 msgstr "Dropped"
 
-#: lib/tasks.ts:78
+#: lib/tasks.ts:81
 msgid "Resolved (verified)"
 msgstr "Resolved (verified)"
 
-#: lib/tasks.ts:82
+#: lib/tasks.ts:85
 msgid "Low"
 msgstr "Low"
 
-#: lib/tasks.ts:83
+#: lib/tasks.ts:86
 msgid "Normal"
 msgstr "Normal"
 
-#: lib/tasks.ts:84
+#: lib/tasks.ts:87
 msgid "High"
 msgstr "High"
 
-#: lib/tasks.ts:89
+#: lib/tasks.ts:92
 msgid "Taken over"
 msgstr "Taken over"
 
-#: lib/tasks.ts:90
+#: lib/tasks.ts:93
 msgid "Email prepared"
 msgstr "Email prepared"
 
-#: lib/tasks.ts:94
+#: lib/tasks.ts:97
 msgid "Reopened"
 msgstr "Reopened"
 
-#: lib/tasks.ts:95
+#: lib/tasks.ts:98
 msgid "Reassigned"
 msgstr "Reassigned"
 
-#: lib/tasks.ts:96
+#: lib/tasks.ts:99
 msgid "Edited"
 msgstr "Edited"
 
-#: lib/tasks.ts:98
+#: lib/tasks.ts:101
 msgid "Resolved automatically"
 msgstr "Resolved automatically"
 
@@ -11568,25 +11805,3 @@ msgstr "{lbl} alignment: {0}"
 #: lib/unifiedAlignRuns.ts:87
 msgid "Error during the {lbl} alignment"
 msgstr "Error during the {lbl} alignment"
-
-#: components/researchers/TasksPage.tsx:301
-msgid "The task closes itself at the next detection, once the records are merged"
-msgstr "The task closes itself at the next detection, once the records are merged"
-
-#. placeholder {0}: p.uids[0]
-#. placeholder {1}: p.uids[1]
-#: components/researchers/TasksPage.tsx:302
-msgid "Merge {0} + {1}"
-msgstr "Merge {0} + {1}"
-
-#: lib/tasks.ts:55
-msgid "Directory — two records for the same person: merge"
-msgstr "Directory — two records for the same person: merge"
-
-#: lib/tasks.ts:56
-msgid "Directory — shared identifiers, different names: same person?"
-msgstr "Directory — shared identifiers, different names: same person?"
-
-#: lib/tasks.ts:57
-msgid "Directory — identifier carried by two people: fix it"
-msgstr "Directory — identifier carried by two people: fix it"

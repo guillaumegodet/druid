@@ -29,6 +29,7 @@ import { useUrlState } from './hooks/useUrlState';
 import { MainLayout } from './components/layout/MainLayout';
 import { ChatWidget } from './components/ChatWidget';
 import { TodoPage, type TodoTab } from './components/researchers/TodoPage';
+import { useImportConflicts } from './hooks/useImportConflicts';
 import { TaskForm } from './components/researchers/TaskForm';
 import { useTasks } from './hooks/useTasks';
 import type { Task } from './lib/tasks';
@@ -148,6 +149,19 @@ function App() {
   // The task list is loaded once for admins (the pill counts the open ones); `?tab=` in the URL.
   const tasksEnabled = isSuperAdmin() && hasCapability('HAS_TASKS');
   const tasksState = useTasks(tasksEnabled);
+  const conflictsState = useImportConflicts(tasksEnabled);
+  // Conflicts settled one by one: the researchers are reloaded once the admin pauses.
+  const conflictsRefreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const afterConflictResolved = () => {
+    conflictsState.reload();
+    if (conflictsRefreshTimer.current) clearTimeout(conflictsRefreshTimer.current);
+    conflictsRefreshTimer.current = setTimeout(() => { refreshData(); }, 8000);
+  };
+  const openConflictRecord = (record: number, uid: string) => {
+    const r = researchers.find((res) => res.gristRowId === record) || (uid ? researchers.find((res) => res.uid === uid) : undefined);
+    if (!r) { setError(t`Researcher not found in the loaded scope`); return; }
+    handleResearcherSelect(r);
+  };
   const [todoTab, setTodoTab] = useState<TodoTab>('doublons');
   const [taskForm, setTaskForm] = useState<{ researcher: Researcher | null } | null>(null);
   const openTodo = (tab?: TodoTab) => {
@@ -206,7 +220,7 @@ function App() {
     (newState) => {
       // Legacy « Doublons » page URL → « À traiter » section, Doublons tab.
       if (String(newState.page) === 'DUPLICATES') { setCurrentView(ViewState.TASKS); setTodoTab('doublons'); return; }
-      if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'affiliations')) setTodoTab(newState.tab);
+      if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'affiliations' || newState.tab === 'conflits')) setTodoTab(newState.tab);
       if (newState.page === ViewState.REPORTS) {
         const n = Number(newState.id);
         setReportId(Number.isInteger(n) && n > 0 ? n : null);
@@ -763,7 +777,7 @@ function App() {
             loading={loading}
             onManualSync={() => refreshData()}
             onOpenDuplicates={isSuperAdmin() ? () => openTodo() : undefined}
-            duplicatesCount={duplicatesCount + tasksState.openCount}
+            duplicatesCount={duplicatesCount + tasksState.openCount + conflictsState.openCount}
             onMergeResearchers={writable ? (rowIds) => setMergeRowIds(rowIds) : undefined}
             onImportValidation={writable && hasCapability('HAS_STATUS_VALIDATION') ? () => setValidationImportOpen(true) : undefined}
           />
@@ -852,6 +866,9 @@ function App() {
             duplicatesCount={duplicatesCount}
             tasksOpenCount={tasksState.openCount}
             withTasks={tasksEnabled}
+            conflictTables={conflictsState.tables}
+            onOpenConflictRecord={openConflictRecord}
+            onConflictsResolved={afterConflictResolved}
             onOpenConsole={hasCapability('HAS_ETL_API') ? (slug) => openAdmin('console', slug) : undefined}
             duplicates={{
               diff: dupDiff,

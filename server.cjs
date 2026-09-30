@@ -2065,7 +2065,9 @@ const gristTasksWrite = async (doc, headers, table, method, records) => {
     method, headers, body: JSON.stringify({ records }),
   });
   if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (${table} ${method}): ${await resp.text()}`);
-  return (await resp.json()).records || [];
+  // A records PATCH answers `null` (only POST returns the new ids).
+  const data = await resp.json().catch(() => null);
+  return data?.records || [];
 };
 const taskAuthor = (req) => req.session.user.preferred_username || req.session.user.email || req.session.user.name || 'druid';
 /** Grist row → API shape (statut normalised: an empty status typed in Grist reads as `a_faire`). */
@@ -2209,6 +2211,102 @@ app.get('/api/tasks/openalex-affiliations', requireSuperAdmin, async (req, res) 
     res.status(502).json({ error: e.message });
   }
 });
+
+// « À traiter › Conflits annuaire <source> »: arbitration of the conflicts left by a directory
+// import (Grist tables `Arbitrage_*`, scripts/lib/import_conflicts.cjs). Admin-only, like the
+// other « À traiter » tabs; every choice is written with the author of the Keycloak session.
+const importConflicts = require('./scripts/lib/import_conflicts.cjs');
+/** Annuaire column types + label maps of its Ref columns (id ↔ label). */
+const loadAnnuaireMeta = async (doc, headers) => {
+  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/${importConflicts.ANNUAIRE}/columns`, { headers });
+  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (Annuaire columns)`);
+  const columns = (await resp.json()).columns || [];
+  const colTypes = new Map(columns.map((c) => [c.id, c.fields.type]));
+  const refLabels = new Map();
+  const refIds = new Map();
+  for (const c of columns) {
+    const target = String(c.fields.type).startsWith('Ref:') ? c.fields.type.slice(4) : '';
+    const labelCol = importConflicts.REF_LABEL_COLUMNS[target];
+    if (!labelCol) continue;
+    const rows = await gristTasksGet(doc, headers, target);
+    refLabels.set(c.id, new Map(rows.map((r) => [r.id, String(r.fields[labelCol] ?? '')])));
+    refIds.set(c.id, new Map(rows.map((r) => [String(r.fields[labelCol] ?? '').toUpperCase(), r.id])));
+  }
+  return { colTypes, refLabels, refIds };
+};
+const loadAnnuaireRecords = async (doc, headers, ids) => {
+  if (ids.length === 0) return new Map();
+  const rows = await gristTasksGet(doc, headers, importConflicts.ANNUAIRE, { id: [...new Set(ids)] });
+  return new Map(rows.map((r) => [r.id, r.fields]));
+};
+const listConflictTables = async (doc, headers) => {
+  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables`, { headers });
+  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (tables)`);
+  return ((await resp.json()).tables || []).map((t) => t.id).filter(importConflicts.isConflictTable);
+};
+/** Resolves `:table` against the existing Arbitrage_* tables (never a free table name). */
+const conflictTableOf = async (req, doc, headers) => {
+  const table = String(req.params.table || '');
+  if (!importConflicts.isConflictTable(table) || !(await listConflictTables(doc, headers)).includes(table)) {
+    const err = new Error('Conflict table not found'); err.status = 404; throw err;
+  }
+  return table;
+};
+const withConflicts = (handler) => async (req, res) => {
+  const doc = tasksDocId();
+  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+  try {
+    await handler(req, res, { doc, headers: gristTasksHeaders() });
+  } catch (e) {
+    res.status(e.status || (e instanceof importConflicts.ConflictInputError ? 400 : 502)).json({ error: e.message });
+  }
+};
+
+/** Open rows of a table that still need a decision (same list as the tab shows). */
+const actionableConflicts = async (doc, headers, table, meta) => {
+  const rows = (await gristTasksGet(doc, headers, table)).filter((r) => importConflicts.isOpen(r.fields));
+  const annuaire = await loadAnnuaireRecords(doc, headers, rows.map((r) => r.fields[importConflicts.COL.record]));
+  return importConflicts.openConflicts(rows, { ...meta, annuaire });
+};
+
+// Tables with their number of actionable conflicts (tab + counter; a settled table stays listed with 0).
+app.get('/api/import-conflicts', requireSuperAdmin, withConflicts(async (req, res, { doc, headers }) => {
+  const ids = await listConflictTables(doc, headers);
+  const meta = ids.length ? await loadAnnuaireMeta(doc, headers) : null;
+  const tables = [];
+  for (const id of ids) {
+    tables.push({ id, source: importConflicts.sourceLabel(id), open: (await actionableConflicts(doc, headers, id, meta)).length });
+  }
+  res.json({ tables });
+}));
+
+app.get('/api/import-conflicts/:table', requireSuperAdmin, withConflicts(async (req, res, { doc, headers }) => {
+  const table = await conflictTableOf(req, doc, headers);
+  const conflicts = await actionableConflicts(doc, headers, table, await loadAnnuaireMeta(doc, headers));
+  res.json({ source: importConflicts.sourceLabel(table), conflicts });
+}));
+
+// Body: { decisions: [{ id, choice: 'import'|'current'|'other', value? }] } (≤ 500 per call).
+app.post('/api/import-conflicts/:table/resolve', requireSuperAdmin, withConflicts(async (req, res, { doc, headers }) => {
+  const table = await conflictTableOf(req, doc, headers);
+  const decisions = Array.isArray(req.body?.decisions) ? req.body.decisions : [];
+  if (decisions.length === 0 || decisions.length > 500) throw new importConflicts.ConflictInputError('1 to 500 decisions expected');
+  const rows = (await gristTasksGet(doc, headers, table)).filter((r) => importConflicts.isOpen(r.fields));
+  const targeted = rows.filter((r) => decisions.some((d) => d?.id === r.id));
+  const meta = await loadAnnuaireMeta(doc, headers);
+  const annuaire = await loadAnnuaireRecords(doc, headers, targeted.map((r) => r.fields[importConflicts.COL.record]));
+  const { annuairePatches, rowPatches } = importConflicts.buildWrites(targeted, decisions, {
+    ...meta, annuaire, source: importConflicts.sourceLabel(table), author: taskAuthor(req), nowIso: new Date().toISOString(),
+  });
+  // Annuaire first: a failure leaves the conflicts open, never marked resolved without effect.
+  for (const group of importConflicts.groupBySameFields(annuairePatches)) {
+    await gristTasksWrite(doc, headers, importConflicts.ANNUAIRE, 'PATCH', group);
+  }
+  for (const group of importConflicts.groupBySameFields(rowPatches)) {
+    await gristTasksWrite(doc, headers, table, 'PATCH', group);
+  }
+  res.json({ resolved: rowPatches.length, updatedRecords: annuairePatches.length });
+}));
 
 // List (all statuses: the client filters, the table stays small).
 app.get('/api/tasks', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {

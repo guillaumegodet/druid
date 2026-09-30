@@ -1,14 +1,16 @@
 import React from 'react';
-import { ClipboardList, Copy, Building2 } from 'lucide-react';
+import { ClipboardList, Copy, Building2, GitCompareArrows } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useCompactHeader } from '../../hooks/useCompactHeader';
 import { DuplicatesPage } from './DuplicatesPage';
 import { TasksPage } from './TasksPage';
 import { OpenAlexAffiliationsPage } from './OpenAlexAffiliationsPage';
+import { ImportConflictsPage } from './ImportConflictsPage';
+import type { ConflictTable } from '../../lib/importConflicts';
 import { HelpButton } from '../HelpButton';
 import { TODO_TAB_HELP } from '../../lib/helpLinks';
 
-export type TodoTab = 'doublons' | 'taches' | 'affiliations';
+export type TodoTab = 'doublons' | 'taches' | 'affiliations' | 'conflits';
 
 type DuplicatesProps = React.ComponentProps<typeof DuplicatesPage>;
 type TasksProps = React.ComponentProps<typeof TasksPage>;
@@ -24,17 +26,26 @@ interface Props {
   withTasks: boolean;
   /** Opens the ETL console of a lab (Administration), from the « Affiliations OpenAlex » tab. */
   onOpenConsole?: (slug: string) => void;
+  /** Directory-import arbitration tables (`Arbitrage_*`); the tab shows when there is one. */
+  conflictTables: ConflictTable[];
+  onOpenConflictRecord: (record: number, uid: string) => void;
+  onConflictsResolved: () => void;
 }
 
 /**
  * « À traiter » section of the Personnel tab (docs/plan-chantiers-taches.md, lot 2): what is
  * left to do, in two tabs — the uid_dyna duplicates (DuplicatesPage, unchanged) and the tasks
  * to carry out outside Druid (TasksPage), plus the read-only OpenAlex affiliations (lot 6).
- * URL ?page=TASKS&tab=doublons|taches|affiliations; the pill of the
+ * directory-import conflicts (ImportConflictsPage, when an `Arbitrage_*` table exists).
+ * URL ?page=TASKS&tab=doublons|taches|affiliations|conflits; the pill of the
  * Personnel header carries the sum of both counters. Admin-only (decision of 2026-09-23).
  */
-export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, duplicatesCount, tasksOpenCount, duplicates, tasks, withTasks, onOpenConsole }) => {
-  const tab: TodoTab = withTasks ? requestedTab : 'doublons';
+export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, duplicatesCount, tasksOpenCount, duplicates, tasks, withTasks, onOpenConsole, conflictTables, onOpenConflictRecord, onConflictsResolved }) => {
+  const withConflicts = withTasks && conflictTables.length > 0;
+  const tab: TodoTab = !withTasks || (requestedTab === 'conflits' && !withConflicts) ? 'doublons' : requestedTab;
+  // One import source ⇒ named in the tab (« Directory conflicts Centrale »); several ⇒ chosen in the tab.
+  const conflictSource = conflictTables.length === 1 ? conflictTables[0].source : '';
+  const conflictsOpen = conflictTables.reduce((n, x) => n + x.open, 0);
   const { t } = useLingui();
   const { compact, onScrollCapture } = useCompactHeader();
   const tabCls = (active: boolean) =>
@@ -53,7 +64,9 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
                   ? <Trans>Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation</Trans>
                   : tab === 'taches'
                     ? <Trans>Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands</Trans>
-                    : <Trans>Publications with a suspicious OpenAlex affiliation, detected by the ETL console</Trans>}
+                    : tab === 'conflits'
+                      ? <Trans>Values of an imported directory that differ from Druid — choose which one to keep</Trans>
+                      : <Trans>Publications with a suspicious OpenAlex affiliation, detected by the ETL console</Trans>}
               </p>
             </div>
             <HelpButton path={TODO_TAB_HELP[tab]} />
@@ -71,13 +84,19 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
               <button onClick={() => onTabChange('affiliations')} className={tabCls(tab === 'affiliations')} title={t`Suspicious OpenAlex affiliations (ETL console), read-only`}>
                 <Building2 className="w-4 h-4" /> <Trans>OpenAlex affiliations</Trans>
               </button>
+              {withConflicts && (
+                <button onClick={() => onTabChange('conflits')} className={tabCls(tab === 'conflits')} title={t`Conflicts left by a directory import`}>
+                  <GitCompareArrows className="w-4 h-4" /> {conflictSource ? t`Directory conflicts ${conflictSource}` : t`Directory conflicts`} {counter(conflictsOpen)}
+                </button>
+              )}
             </>
           )}
         </div>
       </header>
       {tab === 'doublons' ? <DuplicatesPage embedded {...duplicates} />
         : tab === 'taches' ? <TasksPage {...tasks} />
-          : <OpenAlexAffiliationsPage onOpenConsole={onOpenConsole} />}
+          : tab === 'conflits' ? <ImportConflictsPage tables={conflictTables} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />
+            : <OpenAlexAffiliationsPage onOpenConsole={onOpenConsole} />}
     </div>
   );
 };
