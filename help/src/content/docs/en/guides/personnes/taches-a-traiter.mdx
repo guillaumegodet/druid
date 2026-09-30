@@ -68,6 +68,16 @@ still shows the affiliation… These tasks are labelled **auto** and **close by 
 (**Resolved (verified)**) when the situation disappears. Detection runs every night; **Run
 detection** reruns it on demand.
 
+A rule also spots **different records carrying the same identifier** (ORCID, IdRef, IdHAL,
+Scopus): SoVisu+ refuses the second record that arrives with an identifier already taken.
+Depending on the names, the task has one of three types:
+
+| Type | What to do |
+|---|---|
+| **Two records for the same person** | Merge: the **Open the merge assistant** button opens the pair; you choose there the uid to keep. |
+| **Shared identifiers, different names** | Check: the same person under another name (usage name, typo) ⇒ merge; relatives or namesakes ⇒ remove the identifier from the wrong record. |
+| **Identifier carried by two people** | Remove the identifier from the record that should not carry it. When the IdHAL names one of the two people, the task is attached to the other record. |
+
 ## What happens next
 
 Tasks are stored in the shared directory (tracking tables): the whole team sees the same

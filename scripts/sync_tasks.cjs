@@ -22,6 +22,11 @@
  *   scopus_deux_ids  two Nantes-affiliated Scopus author profiles
  *   rh_depart        LDAP employment ended since --since (default: 12 months ago)
  *                    on a record whose IdRef record still mentions Nantes
+ *   annuaire_ids_partages  Annuaire records with different uid_dyna sharing an ORCID, IdRef,
+ *                    IdHAL, IdHAL_i or Scopus id (SoVisu+ refuses the second one): one task per
+ *                    group, typed by the names — annuaire_doublon (same person, merge),
+ *                    annuaire_doublon_a_verifier (usage name or relatives?), annuaire_identifiant_partage
+ *                    (two people: fix the identifier); key = the sorted uids joined by « + »
  *   abes_orcid       Annuaire ORCID missing from the IdRef record (lot ABES channel)
  *   abes_idhal       Annuaire IdHAL missing from the IdRef record (lot ABES channel)
  *
@@ -44,7 +49,7 @@ const schema = require('./lib/tasks_schema.cjs');
 const APPLY = common.hasFlag('apply');
 const AUTHOR = 'druid:regles';
 const PROGRESS_PATH = common.getArg('progress', 'tasks_detect_progress.json');
-const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart'];
+const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages'];
 const RULES_ARG = String(common.getArg('rules', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
@@ -79,7 +84,131 @@ const openNantesAffiliations = (notice) => (notice.affiliations || []).filter((a
   return /nantes/i.test(txt) && (/\.\.\.\./.test(dates) || !/\d{4}/.test(dates));
 });
 
-// ── Rules: detect(ctx) → [{ key, rec, description, lien }] ─────────────────
+/** Identifiers exported to SoVisu+ in people.csv (server.cjs buildPeopleCsv) — SoVisu+ refuses
+ * a person whose identifier already belongs to another person (« Conflicting identifiers »).
+ * OpenAlex_ids is left out: cdb / the IKG ignore it. */
+const SHARED_ID_COLUMNS = [
+  { col: 'ORCID', label: 'ORCID', norm: (v) => normOrcid(v), valid: (v) => /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(v), url: (v) => `https://orcid.org/${v}` },
+  { col: 'IdRef', label: 'IdRef', norm: (v) => String(v).trim().toUpperCase(), valid: (v) => /^\d{8}[\dX]$/.test(v), url: (v) => idrefUrl(v) },
+  { col: 'IdHAL', label: 'IdHAL', norm: (v) => normId(v), valid: (v) => /^[a-z0-9][a-z0-9._-]+$/.test(v), url: (v) => `https://cv.hal.science/${v}` },
+  { col: 'IdHAL_i', label: 'IdHAL numérique', norm: (v) => String(v).trim(), valid: (v) => /^[1-9]\d*$/.test(v), url: () => '' },
+  { col: 'ID_SCOPUS', label: 'Scopus', norm: (v) => String(v).trim(), valid: (v) => /^[1-9]\d{5,}$/.test(v), url: (v) => `https://www.scopus.com/authid/detail.uri?authorId=${v}` },
+];
+/** Values of one identifier column (a cell may carry several, pipe- or comma-separated). */
+const idValues = (spec, raw) => (raw == null || raw === 0 ? [] : String(raw).split(/[|,;\s]+/))
+  .map((v) => (v ? spec.norm(v) : '')).filter((v) => v && spec.valid(v));
+
+/** Lower-case ASCII name tokens (accents, hyphens and particles of one letter dropped). */
+const nameTokens = (s) => String(s || '').normalize('NFKD').replace(/[̀-ͯ]/g, '').toLowerCase()
+  .split(/[^a-z]+/).filter((w) => w.length > 1);
+const overlaps = (a, b) => a.some((w) => b.includes(w));
+/**
+ * How two records sharing identifiers compare by name:
+ *  - `same`     same first and last names (or the two swapped) — one person, two records;
+ *  - `partial`  only the first name or only the last name in common — married / usage name,
+ *               or relatives / homonyms: to check;
+ *  - `distinct` nothing in common — the identifier was put on the wrong record.
+ */
+function nameMatch(a, b) {
+  const [fa, la, fb, lb] = [nameTokens(a.Prenom), nameTokens(a.Nom), nameTokens(b.Prenom), nameTokens(b.Nom)];
+  const first = overlaps(fa, fb);
+  const last = overlaps(la, lb);
+  if ((first && last) || (overlaps(fa, lb) && overlaps(la, fb))) return 'same';
+  return first || last ? 'partial' : 'distinct';
+}
+const SHARED_ID_TYPES = { same: 'annuaire_doublon', partial: 'annuaire_doublon_a_verifier', distinct: 'annuaire_identifiant_partage' };
+const MATCH_RANK = { same: 0, partial: 1, distinct: 2 };
+/** Record carrying the task of a group: an internal record before an `ext_` one, a lab before
+ * the parking lab, then the fullest record, then the oldest row — stable from one run to the next. */
+const filled = (f) => Object.values(f).filter((v) => v !== null && v !== '' && v !== 0 && v !== false).length;
+const PARKING = new Set(['', 'ZZZ']);
+const taskRecordOf = (recs) => [...recs].sort((x, y) =>
+  (x.key.startsWith('ext_') - y.key.startsWith('ext_'))
+  || (PARKING.has(String(x.fields.LABO || '').trim().toUpperCase()) - PARKING.has(String(y.fields.LABO || '').trim().toUpperCase()))
+  || (filled(y.fields) - filled(x.fields)) || (x.id - y.id))[0];
+
+/**
+ * Groups of Annuaire records with DIFFERENT uid_dyna that share at least one exported identifier
+ * (rows of one uid_dyna — pending duplicates, qualified multi-affiliations — count as one person:
+ * the « Doublons » tab handles them). Connected groups: A–B by ORCID and B–C by IdRef give A+B+C.
+ * Returns [{ recs, shared: [{ label, value, url, uids }], match }], `match` being the least
+ * similar pair of the group.
+ */
+function sharedIdentifierGroups(annuaire) {
+  const byUid = new Map();
+  for (const rec of annuaire) {
+    if (!rec.fields.uid_dyna) continue;   // not exported to SoVisu+ (people.csv skips rows without uid)
+    if (!byUid.has(rec.key)) byUid.set(rec.key, []);
+    byUid.get(rec.key).push(rec);
+  }
+  const owners = new Map();   // `<col>:<value>` → Set(uid)
+  for (const [uid, recs] of byUid) {
+    for (const spec of SHARED_ID_COLUMNS) {
+      for (const v of new Set(recs.flatMap((r) => idValues(spec, r.fields[spec.col])))) {
+        const k = `${spec.col}:${v}`;
+        if (!owners.has(k)) owners.set(k, new Set());
+        owners.get(k).add(uid);
+      }
+    }
+  }
+  const parent = new Map();
+  const find = (u) => { while (parent.get(u) !== u) { parent.set(u, parent.get(parent.get(u))); u = parent.get(u); } return u; };
+  const shared = [...owners].filter(([, uids]) => uids.size > 1);
+  for (const [, uids] of shared) {
+    const [head, ...rest] = [...uids];
+    for (const u of [head, ...rest]) if (!parent.has(u)) parent.set(u, u);
+    for (const u of rest) parent.set(find(u), find(head));
+  }
+  const groups = new Map();
+  for (const [k, uids] of shared) {
+    const root = find([...uids][0]);
+    if (!groups.has(root)) groups.set(root, { uids: new Set(), shared: [] });
+    const g = groups.get(root);
+    uids.forEach((u) => g.uids.add(u));
+    const [col, value] = [k.slice(0, k.indexOf(':')), k.slice(k.indexOf(':') + 1)];
+    const spec = SHARED_ID_COLUMNS.find((s) => s.col === col);
+    g.shared.push({ label: spec.label, value, url: spec.url(value), uids: [...uids].sort() });
+  }
+  return [...groups.values()].map((g) => {
+    const uids = [...g.uids].sort();
+    const heads = uids.map((u) => byUid.get(u)[0]);
+    let match = 'same';
+    for (let i = 0; i < heads.length; i++) {
+      for (let j = i + 1; j < heads.length; j++) {
+        const m = nameMatch(heads[i].fields, heads[j].fields);
+        if (MATCH_RANK[m] > MATCH_RANK[match]) match = m;
+      }
+    }
+    return { uids, recs: heads, shared: g.shared, match };
+  });
+}
+
+/**
+ * Record a shared IdHAL most likely belongs to: the only record whose first and last names both
+ * appear in the IdHAL (« jean-dupont » ⇒ DUPONT Jean). null when none or several.
+ */
+function idhalOwner(group) {
+  for (const s of group.shared.filter((x) => x.label === 'IdHAL')) {
+    const words = nameTokens(s.value);
+    const owners = group.recs.filter((r) => {
+      const [first, last] = [nameTokens(r.fields.Prenom), nameTokens(r.fields.Nom)];
+      return first.length && last.length && overlaps(first, words) && overlaps(last, words);
+    });
+    if (owners.length === 1) return { rec: owners[0], idhal: s.value };
+  }
+  return null;
+}
+
+const SHARED_ID_ACTIONS = {
+  same: 'À faire : fusionner les fiches (bouton « Ouvrir l’assistant de fusion » ; on y choisit l’uid à garder). '
+    + 'Garder de préférence l’uid que SoVisu+ connaît déjà avec ces identifiants (celui qui a les publications) : '
+    + 'sinon, faire retirer les identifiants de l’ancienne personne dans SoVisu+, qui ne supprime jamais une personne.',
+  partial: 'À vérifier : même personne sous un autre nom (nom d’usage, faute de saisie) ⇒ fusionner comme un doublon ; '
+    + 'deux personnes (parents, homonymes) ⇒ retirer l’identifiant de la fiche qui ne le porte pas à juste titre.',
+  distinct: 'À faire : retirer l’identifiant de la fiche qui ne le porte pas à juste titre (vérifier sur le lien du profil).',
+};
+
+// ── Rules: detect(ctx) → [{ key, rec, description, lien, type? }] ─────────────────
 const RULES = {
   orcid_deux_ids: {
     type: 'orcid_deux_ids',
@@ -173,6 +302,34 @@ const RULES = {
       return out;
     },
   },
+  annuaire_ids_partages: {
+    // One rule, three task types chosen per group by the names (`type` of each detection).
+    type: 'annuaire_doublon',
+    types: Object.values(SHARED_ID_TYPES),
+    sources: ['annuaire'],
+    detect(ctx) {
+      return sharedIdentifierGroups(ctx.annuaire).map((g) => {
+        const lines = g.recs.map((r) => `• ${r.key} — ${nameOf(r.fields)}${r.fields.LABO ? ` (${r.fields.LABO})` : ''}`);
+        const ids = g.shared.map((s) => `${s.label} ${s.value}${g.uids.length > 2 ? ` (${s.uids.join(', ')})` : ''}`);
+        // Two people: the task goes to the record to correct when the IdHAL names its owner.
+        const owner = g.match !== 'same' ? idhalOwner(g) : null;
+        const others = owner ? g.recs.filter((r) => r !== owner.rec) : [];
+        return {
+          key: g.uids.join('+'),
+          rec: others.length === 1 ? others[0] : taskRecordOf(g.recs),
+          type: SHARED_ID_TYPES[g.match],
+          description: [
+            `${g.uids.length} fiches de l’Annuaire portent les mêmes identifiants :`, ...lines,
+            `Identifiants communs : ${ids.join(' ; ')}.`,
+            ...(owner ? [`Indice : l’IdHAL ${owner.idhal} correspond au nom de ${nameOf(owner.rec.fields)} (${owner.rec.key}).`] : []),
+            'SoVisu+ refuse la seconde fiche qui arrive avec ces identifiants (« Conflicting identifiers »).',
+            SHARED_ID_ACTIONS[g.match],
+          ].join('\n'),
+          lien: (g.shared.find((s) => s.url) || {}).url || '',
+        };
+      });
+    },
+  },
   abes_orcid: {
     type: 'idref_ajouter_orcid',
     sources: ['idref'],
@@ -252,11 +409,12 @@ async function main() {
     const seen = new Set();
     for (const d of detected) {
       const f = d.rec.fields;
+      const type = d.type || rule.type;
       const fields = schema.normalizeCreate({
-        type: rule.type, description: d.description, lien: d.lien,
+        type, description: d.description, lien: d.lien,
         chercheurRowId: d.rec.id, uid_dyna: f.uid_dyna || '', nom: nameOf(f), labo: f.LABO || '',
       }, { author: AUTHOR, nowIso, origine: `regle:${name}` });
-      fields.cle = `${rule.type}:${d.key}`;   // records without uid_dyna keep a stable g<row> key
+      fields.cle = `${type}:${d.key}`;   // records without uid_dyna keep a stable g<row> key
       fields.verifie_le = nowIso;
       if (seen.has(fields.cle)) continue;   // two Annuaire rows sharing a uid (pending duplicate)
       seen.add(fields.cle);
@@ -320,7 +478,7 @@ async function main() {
   writeProgress({ running: false, total: rules.length, done, ...stats, startedAt: nowIso, finishedAt: new Date().toISOString() });
 }
 
-module.exports = { RULES, DEFAULT_RULES, plausible, openNantesAffiliations };
+module.exports = { RULES, DEFAULT_RULES, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups };
 
 if (require.main === module) {
   main().catch((e) => {

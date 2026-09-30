@@ -11568,3 +11568,25 @@ msgstr "{lbl} alignment: {0}"
 #: lib/unifiedAlignRuns.ts:87
 msgid "Error during the {lbl} alignment"
 msgstr "Error during the {lbl} alignment"
+
+#: components/researchers/TasksPage.tsx:301
+msgid "The task closes itself at the next detection, once the records are merged"
+msgstr "The task closes itself at the next detection, once the records are merged"
+
+#. placeholder {0}: p.uids[0]
+#. placeholder {1}: p.uids[1]
+#: components/researchers/TasksPage.tsx:302
+msgid "Merge {0} + {1}"
+msgstr "Merge {0} + {1}"
+
+#: lib/tasks.ts:55
+msgid "Directory — two records for the same person: merge"
+msgstr "Directory — two records for the same person: merge"
+
+#: lib/tasks.ts:56
+msgid "Directory — shared identifiers, different names: same person?"
+msgstr "Directory — shared identifiers, different names: same person?"
+
+#: lib/tasks.ts:57
+msgid "Directory — identifier carried by two people: fix it"
+msgstr "Directory — identifier carried by two people: fix it"

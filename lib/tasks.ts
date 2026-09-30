@@ -52,6 +52,9 @@ export const TASK_TYPES = {
   rh_mutation: { base: 'RH', canal: 'natacha', email: false, label: msg`HR — transfer to propagate` },
   rh_deces: { base: 'RH', canal: 'natacha', email: false, label: msg`HR — death to propagate` },
   annuaire_fin_emploi: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — employment end to enter` },
+  annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — two records for the same person: merge` },
+  annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — shared identifiers, different names: same person?` },
+  annuaire_identifiant_partage: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — identifier carried by two people: fix it` },
   autre: { base: 'Autre', canal: 'interne', email: false, label: msg`Other` },
 } as const satisfies Record<string, TaskTypeMeta>;
 
@@ -115,6 +118,35 @@ export const nextStatuses = (from: TaskStatus): TaskStatus[] => TRANSITIONS[from
 
 /** Dedup key of a rule-generated task (lot 5). */
 export const taskKey = (type: TaskType, uid: string): string => `${type}:${uid}`;
+
+/** Task types of the `annuaire_ids_partages` rule whose records may be one person: the detail
+ * offers the merge assistant. */
+export const MERGEABLE_TASK_TYPES: ReadonlySet<string> = new Set(['annuaire_doublon', 'annuaire_doublon_a_verifier']);
+
+/** uid_dyna of the records of a « shared identifiers » task, read from its key
+ * (`<type>:<uid>+<uid>[+<uid>…]`, scripts/sync_tasks.cjs); [] for any other task. */
+export const sharedIdTaskUids = (task: Pick<Task, 'type' | 'cle'>): string[] => {
+  const prefix = `${task.type}:`;
+  if (!MERGEABLE_TASK_TYPES.has(task.type) && task.type !== 'annuaire_identifiant_partage') return [];
+  if (!task.cle.startsWith(prefix)) return [];
+  const uids = task.cle.slice(prefix.length).split('+').filter(Boolean);
+  return uids.length > 1 ? uids : [];
+};
+
+/** Pairs of Annuaire rows (Grist row ids) the merge assistant can open for a task, resolved
+ * through the loaded directory; pairs with a record not found are left out. */
+export const mergePairsOf = (task: Pick<Task, 'type' | 'cle'>, rowIdOfUid: (uid: string) => number | undefined): { uids: [string, string]; rowIds: [number, number] }[] => {
+  if (!MERGEABLE_TASK_TYPES.has(task.type)) return [];
+  const uids = sharedIdTaskUids(task);
+  const pairs: { uids: [string, string]; rowIds: [number, number] }[] = [];
+  for (let i = 0; i < uids.length; i++) {
+    for (let j = i + 1; j < uids.length; j++) {
+      const [a, b] = [rowIdOfUid(uids[i]), rowIdOfUid(uids[j])];
+      if (a && b && a !== b) pairs.push({ uids: [uids[i], uids[j]], rowIds: [a, b] });
+    }
+  }
+  return pairs;
+};
 
 export interface Task {
   id: number;

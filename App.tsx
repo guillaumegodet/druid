@@ -885,6 +885,7 @@ function App() {
               me: getUserInfo().preferred_username,
               onNewTask: () => setTaskForm({ researcher: null }),
               onOpenResearcher: openTaskResearcher,
+              onMerge: (rowIds) => setMergeRowIds(rowIds),
             }}
           />
         );

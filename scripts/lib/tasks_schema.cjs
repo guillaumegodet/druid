@@ -60,6 +60,9 @@ const TASK_TYPES = {
   rh_mutation: { base: 'RH', canal: 'natacha', email: false },
   rh_deces: { base: 'RH', canal: 'natacha', email: false },
   annuaire_fin_emploi: { base: 'Annuaire', canal: 'interne', email: false },
+  annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false },
+  annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false },
+  annuaire_identifiant_partage: { base: 'Annuaire', canal: 'interne', email: false },
   autre: { base: 'Autre', canal: 'interne', email: false },
 };
 
@@ -94,6 +97,9 @@ const TITLES_FR = {
   rh_mutation: 'Mutation à répercuter (IdRef, HAL, Annuaire)',
   rh_deces: 'Décès à répercuter (IdRef, HAL, Annuaire)',
   annuaire_fin_emploi: 'Fin d’emploi à saisir dans l’Annuaire',
+  annuaire_doublon: 'Deux fiches pour la même personne : fusionner',
+  annuaire_doublon_a_verifier: 'Identifiants communs, noms différents : même personne ?',
+  annuaire_identifiant_partage: 'Identifiant porté par deux personnes : le corriger',
   autre: 'Autre',
 };
 
@@ -259,8 +265,29 @@ const EVENTS_COLUMNS = [
 ];
 
 /**
- * Creates the two tables when missing (idempotent). `fetchImpl` lets the caller
- * inject a fetch (proxy agent in scripts). Returns the list of created tables.
+ * Choices to append to the Choice columns of an existing table: the values this Druid knows
+ * (a task type added after the table was created…) that the Grist column does not list yet.
+ * Grist keeps a value outside the list but shows it as invalid. Existing choices (order,
+ * colours, values typed by hand) are kept. Pure: `current` = the /columns response.
+ */
+function missingChoicePatches(columns, current) {
+  const byId = new Map((current || []).map((c) => [c.id, c.fields || {}]));
+  const patches = [];
+  for (const col of columns) {
+    if (col.fields.type !== 'Choice' || !byId.has(col.id)) continue;
+    let opts = {};
+    try { opts = JSON.parse(byId.get(col.id).widgetOptions || '{}') || {}; } catch { /* unreadable ⇒ rebuilt */ }
+    const have = Array.isArray(opts.choices) ? opts.choices : [];
+    const missing = JSON.parse(col.fields.widgetOptions).choices.filter((v) => !have.includes(v));
+    if (missing.length) patches.push({ id: col.id, fields: { widgetOptions: JSON.stringify({ ...opts, choices: [...have, ...missing] }) } });
+  }
+  return patches;
+}
+
+/**
+ * Creates the two tables when missing and completes the choices of their Choice columns
+ * (idempotent). `fetchImpl` lets the caller inject a fetch (proxy agent in scripts).
+ * Returns the list of created tables.
  */
 async function ensureTasksTables({ apiBase, doc, headers, fetchImpl = fetch, log = () => {} }) {
   const resp = await fetchImpl(`${apiBase}/docs/${doc}/tables`, { headers });
@@ -268,7 +295,18 @@ async function ensureTasksTables({ apiBase, doc, headers, fetchImpl = fetch, log
   const have = new Set(((await resp.json()).tables || []).map((t) => t.id));
   const created = [];
   for (const [id, columns] of [[TASKS_TABLE, TASKS_COLUMNS], [EVENTS_TABLE, EVENTS_COLUMNS]]) {
-    if (have.has(id)) continue;
+    if (have.has(id)) {
+      const cols = await fetchImpl(`${apiBase}/docs/${doc}/tables/${id}/columns`, { headers });
+      if (!cols.ok) throw new Error(`Grist HTTP ${cols.status} (columns of ${id})`);
+      const patches = missingChoicePatches(columns, (await cols.json()).columns);
+      if (!patches.length) continue;
+      const patch = await fetchImpl(`${apiBase}/docs/${doc}/tables/${id}/columns`, {
+        method: 'PATCH', headers, body: JSON.stringify({ columns: patches }),
+      });
+      if (!patch.ok) throw new Error(`Grist HTTP ${patch.status} (choices of ${id}): ${await patch.text()}`);
+      log(`✓ ${id}: choices completed (${patches.map((p) => p.id).join(', ')})`);
+      continue;
+    }
     const create = await fetchImpl(`${apiBase}/docs/${doc}/tables`, {
       method: 'POST', headers, body: JSON.stringify({ tables: [{ id, columns }] }),
     });
@@ -282,5 +320,5 @@ async function ensureTasksTables({ apiBase, doc, headers, fetchImpl = fetch, log
 module.exports = {
   TASKS_TABLE, EVENTS_TABLE, BASES, CANALS, STATUSES, TRANSITIONS, PRIORITIES, TASK_TYPES,
   EVENT_ACTIONS, TASKS_COLUMNS, EVENTS_COLUMNS, TITLES_FR, TaskInputError, normalizeCreate,
-  normalizePatch, statusOf, applyTransition, abesSentPatches, ensureTasksTables,
+  normalizePatch, statusOf, applyTransition, abesSentPatches, missingChoicePatches, ensureTasksTables,
 };

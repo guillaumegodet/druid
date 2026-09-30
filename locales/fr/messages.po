@@ -11568,3 +11568,25 @@ msgstr "Alignement {lbl} : {0}"
 #: lib/unifiedAlignRuns.ts:87
 msgid "Error during the {lbl} alignment"
 msgstr "Erreur lors de l'alignement {lbl}"
+
+#: components/researchers/TasksPage.tsx:301
+msgid "The task closes itself at the next detection, once the records are merged"
+msgstr "La tâche se ferme d’elle-même à la prochaine détection, une fois les fiches fusionnées"
+
+#. placeholder {0}: p.uids[0]
+#. placeholder {1}: p.uids[1]
+#: components/researchers/TasksPage.tsx:302
+msgid "Merge {0} + {1}"
+msgstr "Fusionner {0} + {1}"
+
+#: lib/tasks.ts:55
+msgid "Directory — two records for the same person: merge"
+msgstr "Annuaire — deux fiches pour la même personne : fusionner"
+
+#: lib/tasks.ts:56
+msgid "Directory — shared identifiers, different names: same person?"
+msgstr "Annuaire — identifiants communs, noms différents : même personne ?"
+
+#: lib/tasks.ts:57
+msgid "Directory — identifier carried by two people: fix it"
+msgstr "Annuaire — identifiant porté par deux personnes : le corriger"

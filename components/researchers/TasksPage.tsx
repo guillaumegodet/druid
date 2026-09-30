@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, RotateCw, Plus, ExternalLink, User, ChevronDown, ChevronRight, MessageSquare, AlertTriangle, Mail, Copy, Check, Radar } from 'lucide-react';
+import { RefreshCw, RotateCw, Plus, ExternalLink, User, ChevronDown, ChevronRight, MessageSquare, AlertTriangle, Mail, Copy, Check, Radar, GitMerge } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { Researcher } from '../../types';
 import {
   TASK_TYPES, TASK_BASES, CANAL_LABELS, STATUS_LABELS, PRIORITY_LABELS, EVENT_ACTION_LABELS, TASK_STATUSES,
-  isTaskType, isOpenStatus, nextStatuses, TasksApi,
+  isTaskType, isOpenStatus, nextStatuses, mergePairsOf, TasksApi,
   type Task, type TaskEvent, type TaskStatus, type TaskCanal, type TaskBase, type TaskEventAction,
 } from '../../lib/tasks';
 import type { TasksState } from '../../hooks/useTasks';
@@ -24,6 +24,8 @@ interface Props {
   onNewTask: () => void;
   /** Opens the Druid record of the task's researcher (Grist row id, then uid fallback). */
   onOpenResearcher: (task: Task) => void;
+  /** Opens the merge assistant on two Annuaire rows (« shared identifiers » tasks). */
+  onMerge?: (rowIds: [number, number]) => void;
 }
 
 type StatusFilter = 'open' | 'all' | TaskStatus;
@@ -42,7 +44,7 @@ const fmtDate = (iso: string): string => (iso ? new Date(iso).toLocaleString(num
 /** « À traiter › Tâches » tab (docs/plan-chantiers-taches.md, lot 2): filters, table, inline detail
  * with the event log and the workflow actions. Statuses come from lib/tasks (same table as the
  * server: a forbidden transition is refused there too). */
-export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher }) => {
+export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge }) => {
   const { t, i18n } = useLingui();
   const { tasks, loading, error, reload, transition, patch } = state;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
@@ -93,6 +95,7 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
   const resolveResearcher = (x: Task): Researcher | undefined =>
     (x.chercheur ? researchers.find((r) => r.gristRowId === x.chercheur) : undefined)
     || (x.uid_dyna ? researchers.find((r) => r.uid === x.uid_dyna) : undefined);
+  const rowIdOfUid = (uid: string): number | undefined => researchers.find((r) => r.uid === uid)?.gristRowId;
 
   const counts = useMemo(() => {
     const c: Record<TaskStatus, number> = { a_faire: 0, en_cours: 0, en_attente: 0, fait: 0, abandonnee: 0, resolue_auto: 0 };
@@ -206,7 +209,8 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
                         {openId === x.id && (
                           <tr className="border-t border-ink/5 dark:border-white/5 bg-white/50 dark:bg-white/[.03]">
                             <td colSpan={8} className="px-4 py-4">
-                              <TaskDetail task={x} me={me} researcher={resolveResearcher(x)} onTransition={transition} onPatch={patch} onOpenResearcher={onOpenResearcher} />
+                              <TaskDetail task={x} me={me} researcher={resolveResearcher(x)} onTransition={transition} onPatch={patch} onOpenResearcher={onOpenResearcher}
+                                mergePairs={onMerge ? mergePairsOf(x, rowIdOfUid) : []} onMerge={onMerge} />
                             </td>
                           </tr>
                         )}
@@ -234,7 +238,10 @@ const TaskDetail: React.FC<{
   onTransition: TasksState['transition'];
   onPatch: TasksState['patch'];
   onOpenResearcher: (task: Task) => void;
-}> = ({ task, me, researcher, onTransition, onPatch, onOpenResearcher }) => {
+  /** Record pairs of a « shared identifiers » task the merge assistant can open. */
+  mergePairs: { uids: [string, string]; rowIds: [number, number] }[];
+  onMerge?: (rowIds: [number, number]) => void;
+}> = ({ task, me, researcher, onTransition, onPatch, onOpenResearcher, mergePairs, onMerge }) => {
   const { t, i18n } = useLingui();
   const [events, setEvents] = useState<TaskEvent[] | null>(null);
   const [pending, setPending] = useState<PendingAction>(null);
@@ -289,6 +296,12 @@ const TaskDetail: React.FC<{
           {(task.chercheur || task.uid_dyna) && (
             <button type="button" onClick={() => onOpenResearcher(task)} className="btn-pill h-8 text-[12px]"><User className="w-3.5 h-3.5" /> <Trans>Open the record</Trans></button>
           )}
+          {onMerge && mergePairs.map((p) => (
+            <button key={p.uids.join('+')} type="button" onClick={() => onMerge(p.rowIds)} className="btn-pill h-8 text-[12px]"
+              title={t`The task closes itself at the next detection, once the records are merged`}>
+              <GitMerge className="w-3.5 h-3.5" /> {mergePairs.length > 1 ? t`Merge ${p.uids[0]} + ${p.uids[1]}` : t`Open the merge assistant`}
+            </button>
+          ))}
         </div>
 
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-ink/5 dark:border-white/5">
