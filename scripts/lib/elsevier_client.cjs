@@ -59,10 +59,11 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
   }
   const resetDate = (h) => { const t = parseInt(h['x-ratelimit-reset'] || '0', 10); return t ? new Date(t * 1000).toISOString().slice(0, 10) : '?'; };
   const reserveOf = (k) => (Array.isArray(reserve) ? Number(reserve[k]) || 0 : reserve);
-  /** Pool exhausted (or at its reserve) on its current key: switches to the next key (true), or
-   * stops the run (false). */
-  function exhausted(pool, reason, last = `all ${keys.length} keys exhausted`) {
-    const k = keyOf[pool] || 0;
+  /** Pool exhausted (or at its reserve) on key `k`, the key the request used: switches to the next
+   * key (true), or stops the run (false). Concurrent requests answered on key k after the switch
+   * find the pool already moved on: they just retry (no second switch, no false stop). */
+  function exhausted(pool, k, reason, last = `all ${keys.length} keys exhausted`) {
+    if ((keyOf[pool] || 0) > k) return true;
     if (k + 1 < keys.length) {
       keyOf[pool] = k + 1;
       console.warn(`[${tag}] ${reason}${keyLabel(k)} — switching to key ${k + 2}`);
@@ -73,12 +74,13 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
   }
   function trackQuota(pool, h, k) {
     if (!h || h['x-ratelimit-remaining'] === undefined) return;
+    if (k < (keyOf[pool] || 0)) return;   // late answer of a key the pool already left
     const remaining = parseInt(h['x-ratelimit-remaining'], 10);
     const limit = parseInt(h['x-ratelimit-limit'] || '0', 10) || 0;
     quota[pool] = { remaining, limit, reset: resetDate(h), ...(keys.length > 1 ? { key: k + 1 } : {}) };
     const share = reserveOf(k);
-    if (remaining <= 0) exhausted(pool, `weekly Elsevier quota exhausted (${pool} API, reset ${quota[pool].reset})`);
-    else if (share > 0 && limit && remaining <= Math.floor(limit * share)) exhausted(pool, `weekly Elsevier quota share reached (${pool} API: ${remaining}/${limit} left for the other jobs, reset ${quota[pool].reset})`, `last key (${keys.length}/${keys.length})`);
+    if (remaining <= 0) exhausted(pool, k, `weekly Elsevier quota exhausted (${pool} API, reset ${quota[pool].reset})`);
+    else if (share > 0 && limit && remaining <= Math.floor(limit * share)) exhausted(pool, k, `weekly Elsevier quota share reached (${pool} API: ${remaining}/${limit} left for the other jobs, reset ${quota[pool].reset})`, `last key (${keys.length}/${keys.length})`);
   }
   /**
    * GET JSON on an Elsevier API. `pool` = quota pool name. Returns the body, `{ notFound: true }` on 404,
@@ -104,7 +106,7 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
         if (e.status === 404) return { notFound: true };
         if (e.status === 401 || e.status === 403) abort(`HTTP ${e.status} ${els || ''}${keyLabel(k)} — API key refused or IP not entitled (the API must go through the university proxy)`.replace(/\s+/g, ' ').trim());
         else if (/QUOTA_EXCEEDED/i.test(els) || (e.status === 429 && h['x-ratelimit-remaining'] !== undefined && parseInt(h['x-ratelimit-remaining'], 10) <= 0)) {
-          if (exhausted(pool, `weekly Elsevier quota exhausted (${pool} API${h['x-ratelimit-reset'] ? `, reset ${resetDate(h)}` : ''})`)) continue;
+          if (exhausted(pool, k, `weekly Elsevier quota exhausted (${pool} API${h['x-ratelimit-reset'] ? `, reset ${resetDate(h)}` : ''})`)) continue;
         } else if (e.status === 429) console.warn(`[${tag}] ${path}: rate limit (429) still hit after retries — record marked in error, quota untouched`);
         else if (e.status === 400 && opts.badRequestAsValue) return { badRequest: true };
         else console.warn(`[${tag}] ${path}: ${e.message}`);

@@ -62,6 +62,26 @@ describe('scripts/lib/elsevier_client.cjs — backup API key', () => {
     warn.mockRestore(); err.mockRestore();
   });
 
+  it('concurrent requests refused on key 1 switch once and all retry on key 2 (no false « all keys exhausted »)', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const err = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const calls: string[] = [];
+    const getUrlImpl = async (_url: string, o: { headers: Record<string, string> }) => {
+      const key = o.headers['X-ELS-APIKey'];
+      calls.push(key);
+      await new Promise((r) => { setTimeout(r, 5); });   // the three requests are in flight together
+      if (key === 'k1') throw refused();
+      return { status: 200, headers: quotaHeaders(4990), body: { ok: key } };
+    };
+    const c = client(['k1', 'k2'], getUrlImpl);
+    const out = await Promise.all([1, 2, 3].map((i) => c.get('search', '/search/author', { q: String(i) })));
+    expect(out).toEqual([{ ok: 'k2' }, { ok: 'k2' }, { ok: 'k2' }]);
+    expect(c.aborted()).toBeNull();
+    expect(calls.filter((k) => k === 'k2')).toHaveLength(3);
+    expect(c.quota.search).toMatchObject({ remaining: 4990, key: 2 });
+    warn.mockRestore(); err.mockRestore();
+  });
+
   it('reserve: reaching the share of a key moves the pool to the next key; on the last key it stops the run', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
