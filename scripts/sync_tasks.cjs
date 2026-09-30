@@ -265,7 +265,9 @@ function departDescription(sig) {
     case 'depart_confirme': return `Départ confirmé par ${sourcesFr(sig.sources)} : parti vers ${sig.date}${dest}. Fin d’emploi proposée : ${sig.date}.`;
     case 'depart_declare': return `ORCID : le dernier poste à l’établissement s’est terminé en ${sig.date}${sig.destination ? ` ; nouveau poste à ${sig.destination}${sig.destinationStart ? ` depuis ${sig.destinationStart}` : ''}` : ''}.`;
     case 'nouveau_poste_declare': return `ORCID : nouveau poste à ${sig.destination} depuis ${sig.date}.`;
-    default: return `Publications : aucune affiliée à l’établissement après ${sig.date} ; ${sig.count} affiliées ailleurs${sig.destination ? `, surtout ${sig.destination}` : ''}.`;
+    default: return sig.rule === 'dominant'
+      ? `Publications : surtout affiliées ailleurs depuis ${sig.since} (${sig.count} contre ${sig.local} à l’établissement)${sig.destination ? `, surtout ${sig.destination}` : ''} ; dernière affiliée à l’établissement en ${sig.date}.`
+      : `Publications : aucune affiliée à l’établissement après ${sig.date} ; ${sig.count} affiliées ailleurs${sig.destination ? `, surtout ${sig.destination}` : ''}.`;
   }
 }
 

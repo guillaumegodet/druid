@@ -42,6 +42,9 @@ export interface AhSignal {
   establishment?: string;
   count?: number;
   rule?: 'last_local' | 'dominant';
+  /** rule « dominant »: first year mostly elsewhere, local publications of the window. */
+  since?: number;
+  local?: number;
   sources?: string[];
   source?: 'orcid' | 'publications';
   lastPub?: number | null;

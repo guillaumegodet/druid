@@ -37,6 +37,8 @@
  *          --max-age-days=(6) incremental: skips entries computed since, complete and with unchanged ids
  *          --force (recompute everything) --dry-run (computes, prints a summary, writes nothing)
  *          --concurrency=(3) --chunk=(20) --min-mem-mb=(2500) --scopus-reserve=(0.4) --no-key (OpenAlex polite pool)
+ *          --resignal: no fetch at all — recomputes the signals of the stored entries (after a change of the
+ *          rules), from their publication list (deduplicated by DOI / title), ORCID periods and Scopus profile
  */
 const fs = require('fs');
 const common = require('./lib/align_common.cjs');
@@ -58,6 +60,7 @@ const SOURCES = new Set(String(getArg('sources', 'graph,openalex,scopus,orcid'))
 const MAX_AGE_DAYS = parseFloat(getArg('max-age-days', '6'));
 const FORCE = hasFlag('force');
 const DRY_RUN = hasFlag('dry-run');
+const RESIGNAL = hasFlag('resignal');
 const CONCURRENCY = parseInt(getArg('concurrency', '3'), 10) || 3;
 const CHUNK = parseInt(getArg('chunk', '20'), 10) || 20;
 const MIN_MEM_MB = parseInt(getArg('min-mem-mb', '2500'), 10) || 2500;
@@ -153,6 +156,50 @@ function buildEntry(person, fetched, matcher, H, incomplete) {
   };
 }
 
+// ── Resignal: signals recomputed from the stored entries, without any API call ───
+/** Rebuilds the inputs of computeSignals from a stored entry (publication list capped at MAX_PUBS_STORED,
+ * most recent first: the signals only look at the recent years). */
+function signalsFromEntry(person, e) {
+  const groups = new Map();
+  for (const p of e.pubs || []) {
+    const k = (p.doi && `doi:${p.doi}`) || AH.titleKey({ title: p.t, year: p.y }) || `row:${groups.size}`;
+    const g = groups.get(k) || { year: p.y, classes: new Set(), est: new Set() };
+    for (const c of p.c || []) g.classes.add(c);
+    for (const i of p.e || []) if (e.establishments[i]) g.est.add(e.establishments[i].key);
+    groups.set(k, g);
+  }
+  const pubs = [...groups.values()].map((g) => {
+    if (g.classes.has('local')) g.classes.delete('other');
+    return { year: g.year, classes: [...g.classes], est: [...g.est] };
+  });
+  const agg = { pubs, establishments: e.establishments };
+  const periods = (e.orcid || []).map((o) => ({ ...o, establishment: { name: o.name, country: o.country }, org: AH.makeOrg({ names: [o.name], country: o.country }), inArea: false }));
+  const cls = (list) => (list || []).map((c) => ({ cls: c.cls, establishment: { name: c.name } }));
+  const profile = e.scopusProfile ? { current: cls(e.scopusProfile.current), history: cls(e.scopusProfile.history), range: e.scopusProfile.range } : null;
+  const record = { employmentStart: person.employmentStart, employmentEnd: person.employmentEnd, membershipEnd: person.membershipEnd, isDoctorant: person.isDoctorant };
+  return AH.computeSignals({ agg, periods, profile, record, today: TODAY, thresholds: CONFIG.thresholds });
+}
+async function resignal(people) {
+  const index = STORE.readJson(INDEX_PATH, {});
+  const updated = {};
+  const counts = { resignaled: 0, changed: 0, signals: {} };
+  for (const p of people) {
+    if (ONLY_UID && p.uid !== ONLY_UID && p.key !== ONLY_UID) continue;
+    const e = STORE.readEntry(ENTRIES_DIR, p.key);
+    if (!e) continue;
+    const { signals, firstLocal, lastLocal } = signalsFromEntry(p, e);
+    const before = JSON.stringify(e.signals);
+    Object.assign(e, { signals, firstLocal, lastLocal, resignaledAt: new Date().toISOString() });
+    counts.resignaled++;
+    if (JSON.stringify(signals) !== before) counts.changed++;
+    for (const s of signals) counts.signals[s.type] = (counts.signals[s.type] || 0) + 1;
+    if (!DRY_RUN) STORE.writeJsonAtomic(STORE.entryFile(ENTRIES_DIR, p.key), e);
+    updated[p.key] = { ...(index[p.key] || {}), ...indexLine(e) };
+  }
+  if (!DRY_RUN) STORE.mergeIndex(ENTRIES_DIR, updated);
+  console.log(`[parcours] resignal: ${JSON.stringify(counts)}${DRY_RUN ? ' (dry-run, nothing written)' : ''}`);
+}
+
 // ── Run ──────────────────────────────────────────────────────────────────────
 let CONFIG;
 async function main() {
@@ -161,6 +208,7 @@ async function main() {
   const structures = await loadStructures();
   const matcher = AH.createMatcher(CONFIG, structures);
   const people = await loadPeople();
+  if (RESIGNAL) { await resignal(people); return; }
   const cache = (() => { try { return JSON.parse(fs.readFileSync(INDEX_PATH, 'utf8')); } catch (e) { return {}; } })();
   const dryEntries = {};
   let updatedIndex = {};   // index lines of the CURRENT chunk only (merged then cleared, see below)

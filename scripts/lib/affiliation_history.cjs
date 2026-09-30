@@ -191,6 +191,9 @@ function classifyOrg(org, matcher, H) {
 
 // ── Publications: merge ──────────────────────────────────────────────────────
 const normDoi = (d) => String(d || '').trim().toLowerCase().replace(/^https?:\/\/(dx\.)?doi\.org\//, '').replace(/^doi:/, '');
+/** Same title (letters and digits, 25 characters at least: « Introduction » never merges) and same year:
+ * the same work seen by two sources without a DOI (common in the humanities). */
+const titleKey = (p) => { const t = norm(String(p.title || '').replace(/<[^>]+>/g, '')).slice(0, 120); return t.length >= 25 && p.year ? `title:${t}:${p.year}` : ''; };
 /**
  * Union of the publication lists of several sources: same DOI ⇒ one publication, else same source
  * identifier (an OpenAlex W-id or a Scopus EID seen by the graph and by the direct API). The year of
@@ -201,7 +204,7 @@ function mergePublications(...lists) {
   const byKey = new Map();
   for (const list of lists) {
     for (const p of list || []) {
-      const keys = uniq([normDoi(p.doi) && `doi:${normDoi(p.doi)}`, ...(p.sourceIds || []).map((s) => `src:${String(s).toLowerCase()}`)]);
+      const keys = uniq([normDoi(p.doi) && `doi:${normDoi(p.doi)}`, ...(p.sourceIds || []).map((s) => `src:${String(s).toLowerCase()}`), titleKey(p)]);
       let target = keys.map((k) => byKey.get(k)).find(Boolean);
       if (!target) {
         target = { doi: normDoi(p.doi), sourceIds: [], year: p.year || null, title: p.title || '', sources: [], orgs: [] };
@@ -213,7 +216,7 @@ function mergePublications(...lists) {
       target.sourceIds = uniq([...target.sourceIds, ...(p.sourceIds || [])]);
       target.sources = uniq([...target.sources, ...(p.sources || [])]);
       target.orgs.push(...(p.orgs || []));
-      for (const k of uniq([target.doi && `doi:${target.doi}`, ...target.sourceIds.map((s) => `src:${String(s).toLowerCase()}`)])) byKey.set(k, target);
+      for (const k of uniq([target.doi && `doi:${target.doi}`, ...target.sourceIds.map((s) => `src:${String(s).toLowerCase()}`), titleKey(target)])) byKey.set(k, target);
     }
   }
   return out;
@@ -318,9 +321,12 @@ function computeSignals({ agg, periods = [], profile = null, record = {}, today,
       const w = dated.filter((p) => p.year >= lo && p.year <= hi);
       const L = w.filter((p) => p.classes.includes('local')).length;
       const O = w.filter((p) => p.classes.includes('other')).length;
-      if (O >= T.dominantMin && O >= T.dominantRatio * Math.max(L, 0.5)) {
-        const firstOther = Math.min(...w.filter((p) => p.classes.includes('other')).map((p) => p.year));
-        observed = { rule: 'dominant', year: Math.max(lastLocal < firstOther ? lastLocal : firstOther - 1, firstLocal), count: O, local: L, destination: destinationAfter(firstOther - 1) };
+      // No local publication in the last `lag` years either (current one included): a researcher with a
+      // double affiliation publishing mostly elsewhere, but still with the institution, has not left
+      // (review of 2026-09-30: 112 of the 121 « dominant » departures still published locally in 2025-2026).
+      if (lastLocal <= N - T.lag && O >= T.dominantMin && O >= T.dominantRatio * Math.max(L, 0.5)) {
+        const since = Math.min(...w.filter((p) => p.classes.includes('other')).map((p) => p.year));
+        observed = { rule: 'dominant', year: lastLocal, since, count: O, local: L, destination: destinationAfter(since - 1) };
       }
     }
   }
@@ -358,7 +364,7 @@ function computeSignals({ agg, periods = [], profile = null, record = {}, today,
   if (!hasEnd) {
     if (declared) out.push({ type: 'depart_declare', strength: 'strong', date: declared.end, establishment: declared.establishment, ...(newPost ? { destination: newPost.establishment, destinationStart: newPost.start } : {}) });
     if (newPost && !declared) out.push({ type: 'nouveau_poste_declare', strength: 'strong', date: newPost.start, destination: newPost.establishment });
-    if (observed && !observed.neutralizedBy) out.push({ type: 'depart_observe', strength: 'medium', date: String(observed.year), rule: observed.rule, count: observed.count, destination: observed.destination });
+    if (observed && !observed.neutralizedBy) out.push({ type: 'depart_observe', strength: 'medium', date: String(observed.year), rule: observed.rule, count: observed.count, ...(observed.rule === 'dominant' ? { since: observed.since, local: observed.local } : {}), destination: observed.destination });
     if (scopusCurrent) out.push({ type: 'scopus_courante_non_locale', strength: 'medium', destination: scopusCurrent.establishment, lastPub: scopusCurrent.lastPub });
     // Confirmed: at least two independent sources agree within confirmGap years.
     const years = [];
@@ -394,6 +400,6 @@ function computeSignals({ agg, periods = [], profile = null, record = {}, today,
 }
 
 module.exports = {
-  norm, normDoi, makeOrg, createMatcher, emptyHierarchy, chainOf, classifyOrg, orgKey,
+  titleKey, norm, normDoi, makeOrg, createMatcher, emptyHierarchy, chainOf, classifyOrg, orgKey,
   mergePublications, aggregate, classifyPeriods, computeSignals, DEFAULT_THRESHOLDS, DEFAULT_NEUTRAL_NAMES,
 };

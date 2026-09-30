@@ -113,6 +113,18 @@ describe('mergePublications', () => {
   });
 });
 
+describe('merge by title', () => {
+  it('the same work without DOI seen by two sources is one publication (tags and punctuation ignored)', () => {
+    const merged = mergePublications(
+      [{ ...pub(2024, [BETA]), title: 'La figure de l’aidant : contributions à l’évolution des pratiques' }],
+      [{ ...pub(2024, [BETA_LAB]), title: 'La figure de l’<i>aidant</i>. Contributions à l’évolution des pratiques', sources: ['openalex'] }],
+      [{ ...pub(2024, [BETA]), title: 'Introduction' }, { ...pub(2024, [BETA]), title: 'Introduction' }],
+    );
+    expect(merged).toHaveLength(3);
+    expect(merged[0].sources).toEqual(['graph', 'openalex']);
+  });
+});
+
 describe('aggregate', () => {
   it('counts publications per establishment and year; a local + other publication is local for the signals', () => {
     const agg = aggregate([pub(2020, [ALPHA_LAB, BETA]), pub(2021, [ALPHA_LAB]), pub(2022, [BETA_LAB]), pub(2022, [])], M, H);
@@ -141,6 +153,15 @@ describe('computeSignals — observed departure', () => {
   it('rule 2: elsewhere dominant over the last three complete years despite a residual local paper', () => {
     const s = signalsOf([pub(2020, [ALPHA_LAB]), pub(2023, [BETA]), pub(2024, [BETA]), pub(2024, [ALPHA_LAB]), pub(2025, [BETA])]);
     expect(s[0]).toMatchObject({ type: 'depart_observe', rule: 'dominant' });
+  });
+  it('rule 2 never fires while the person still publishes locally in the last two years (double affiliation)', () => {
+    // 2023-2025 mostly elsewhere, yet local papers in 2026 (review of 2026-09-30).
+    const pubs = [pub(2019, [ALPHA_LAB]), pub(2023, [BETA]), pub(2023, [BETA_LAB]), pub(2024, [BETA]), pub(2025, [BETA_LAB]), pub(2023, [ALPHA_LAB]), pub(2026, [ALPHA_LAB])];
+    expect(signalsOf(pubs)).toEqual([]);
+  });
+  it('rule 2 reports the first year mostly elsewhere and the last local year', () => {
+    const s = signalsOf([pub(2020, [ALPHA_LAB]), pub(2023, [BETA]), pub(2024, [BETA]), pub(2024, [ALPHA_LAB]), pub(2025, [BETA])]);
+    expect(s[0]).toMatchObject({ type: 'depart_observe', rule: 'dominant', date: '2024', since: 2023, count: 3, local: 1 });
   });
   it('neutral organisms and joint local papers are not a departure', () => {
     expect(signalsOf([pub(2019, [ALPHA_LAB]), pub(2021, [CNRS]), pub(2022, [CNRS]), pub(2023, [CNRS])])).toEqual([]);

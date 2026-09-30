@@ -53,6 +53,13 @@ const SignalLine: React.FC<{ s: AhSignal }> = ({ s }) => {
     case 'depart_observe': {
       const date = s.date || '';
       const count = s.count || 0;
+      if (s.rule === 'dominant') {
+        const since = s.since || '';
+        const local = s.local || 0;
+        return dest
+          ? <Trans>Publications: mostly affiliated elsewhere since {since} ({count} against {local} at the institution), mostly {dest}; last one affiliated to the institution in {date}.</Trans>
+          : <Trans>Publications: mostly affiliated elsewhere since {since} ({count} against {local} at the institution); last one affiliated to the institution in {date}.</Trans>;
+      }
       return dest
         ? <Trans>Publications: none affiliated to the institution after {date}; {count} affiliated elsewhere, mostly {dest}.</Trans>
         : <Trans>Publications: none affiliated to the institution after {date}; {count} affiliated elsewhere.</Trans>;
