@@ -114,6 +114,8 @@ export interface TimelineRow {
   first: number | null;
   last: number | null;
   inScopus: 'current' | 'history' | null;
+  /** Indexes of every establishment merged into this row (same name). */
+  mergedIndexes?: number[];
 }
 
 /**
@@ -123,16 +125,29 @@ export interface TimelineRow {
  * readable (the table shows everything).
  */
 export function timelineRows(entry: AhEntry, max = Infinity): TimelineRow[] {
-  const rows: TimelineRow[] = entry.establishments.map((e, i) => ({
-    name: e.name, cls: e.cls, country: e.country, estIndex: i, periods: [], byYear: e.byYear,
-    count: e.count, first: e.first, last: e.last, inScopus: null,
-  }));
-  const byName = new Map(rows.map((r) => [norm(r.name), r]));
+  // The same establishment may come with two keys (ROR from OpenAlex, name from HAL): one row per name,
+  // the one with most publications keeps its index (publication list of the modal).
+  const rows: TimelineRow[] = [];
+  const byName = new Map<string, TimelineRow>();
+  entry.establishments.map((e, i) => ({ e, i })).sort((a, b) => b.e.count - a.e.count).forEach(({ e, i }) => {
+    const k = norm(e.name);
+    const row = byName.get(k);
+    if (!row) {
+      const r: TimelineRow = { name: e.name, cls: e.cls, country: e.country, estIndex: i, periods: [], byYear: { ...e.byYear }, count: e.count, first: e.first, last: e.last, inScopus: null, mergedIndexes: [i] };
+      rows.push(r); byName.set(k, r); return;
+    }
+    for (const [y, n] of Object.entries(e.byYear)) row.byYear[y] = (row.byYear[y] || 0) + n;
+    row.count += e.count;
+    row.first = row.first && e.first ? Math.min(row.first, e.first) : row.first || e.first;
+    row.last = row.last && e.last ? Math.max(row.last, e.last) : row.last || e.last;
+    if (e.cls === 'local') row.cls = 'local';
+    row.mergedIndexes!.push(i);
+  });
   for (const p of entry.orcid) {
     const k = norm(p.name);
     let row = byName.get(k);
     if (!row) {
-      row = { name: p.name, cls: p.cls, country: p.country, estIndex: null, periods: [], byYear: {}, count: 0, first: null, last: null, inScopus: null };
+      row = { name: p.name, cls: p.cls, country: p.country, estIndex: null, periods: [], byYear: {}, count: 0, first: null, last: null, inScopus: null, mergedIndexes: [] };
       rows.push(row);
       byName.set(k, row);
     }
@@ -183,6 +198,8 @@ export function suggestedEndDate(signals: AhSignal[], currentEnd?: string): stri
 export const suggestedStartDate = (signals: AhSignal[], currentStart?: string): string | null =>
   (currentStart ? null : signals.find((s) => s.type === 'arrivee')?.date || null);
 
-/** Publications of one establishment (index in entry.establishments), most recent first. */
-export const publicationsOf = (entry: AhEntry, estIndex: number): AhPublication[] =>
-  entry.pubs.filter((p) => p.e.includes(estIndex)).sort((a, b) => (b.y || 0) - (a.y || 0));
+/** Publications of one or several establishments (indexes in entry.establishments), most recent first. */
+export const publicationsOf = (entry: AhEntry, estIndexes: number | number[]): AhPublication[] => {
+  const set = new Set(Array.isArray(estIndexes) ? estIndexes : [estIndexes]);
+  return entry.pubs.filter((p) => p.e.some((i) => set.has(i))).sort((a, b) => (b.y || 0) - (a.y || 0));
+};

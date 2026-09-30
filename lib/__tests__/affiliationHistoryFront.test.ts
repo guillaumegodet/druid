@@ -49,6 +49,13 @@ describe('affiliationHistory helpers', () => {
     expect(rows[2].inScopus).toBe('current');
     expect(timelineRows(entry(), 2)).toHaveLength(2);
   });
+  it('rows with the same name are merged (two keys for one establishment)', () => {
+    const e = entry();
+    e.establishments.push({ key: 'name:universitealpha', name: 'Université Alpha', country: 'FR', cls: 'local', byYear: { 2016: 1 }, first: 2016, last: 2016, count: 1, labs: [] });
+    const alpha = timelineRows(e).filter((r) => r.name === 'Université Alpha');
+    expect(alpha).toHaveLength(1);
+    expect(alpha[0]).toMatchObject({ count: 3, first: 2015, last: 2020, byYear: { 2015: 1, 2016: 1, 2020: 1 }, mergedIndexes: [1, 3] });
+  });
   it('year range covers publications, ORCID and Druid employment, at least 5 years, capped at now', () => {
     expect(yearRange(timelineRows(entry()), { start: '2012' }, 2026)).toEqual([2012, 2022]);
     expect(yearRange([], {}, 2026)).toEqual([2022, 2026]);

@@ -155,6 +155,10 @@ const orgKey = (o) => (o.ids.ror[0] ? `ror:${o.ids.ror[0]}` : o.ids.openalex[0] 
 const orgName = (o) => o.names[0] || o.ids.ror[0] || o.ids.openalex[0] || o.ids.hal[0] || o.ids.scopus[0] || '?';
 /** Top-level organization (OpenAlex root, HAL institution, Scopus parent) — candidate establishment. */
 const isEstablishmentType = (o) => !!o.root || HAL_INSTITUTION_TYPES.has(o.type);
+/** Government umbrella at the top of some OpenAlex lineages (a national library → « Gouvernement de la
+ * République française »): never the establishment, the node below it is. */
+const UMBRELLA = /^(gouvernement|government|minist[eè]re|ministry|ministerio|bundesministerium|r[ée]publique fran[cç]aise)\b/i;
+const isUmbrella = (o) => o.names.some((n) => UMBRELLA.test(n));
 
 /**
  * Class of an organization: 'local' | 'neutral' | 'other' | 'unknown', with its establishment
@@ -171,8 +175,10 @@ function classifyOrg(org, matcher, H) {
     const est = locals.find((o) => o.root) || locals[locals.length - 1];
     return { cls: 'local', establishment: { key: orgKey(est), name: orgName(est), country: est.country || self.country || '' }, lab: lab(est) };
   }
-  const roots = chain.filter((o) => isEstablishmentType(o) && !matcher.isNeutral(o));
-  const est = roots.find((o) => !o.self) || roots[0];
+  const roots = chain.filter((o) => isEstablishmentType(o) && !matcher.isNeutral(o) && !isUmbrella(o));
+  let est = roots.find((o) => !o.self) || roots[0];
+  // Only an umbrella above: the organization itself (or the node just below the umbrella) is the establishment.
+  if (!est && chain.some(isUmbrella)) est = chain.find((o) => !isUmbrella(o) && !matcher.isNeutral(o));
   if (est) return { cls: 'other', establishment: { key: orgKey(est), name: orgName(est), country: est.country || self.country || '' }, lab: lab(est) };
   if (chain.some((o) => matcher.isNeutral(o))) {
     const n = chain.find((o) => matcher.isNeutral(o) && o.root) || chain.find((o) => matcher.isNeutral(o));
@@ -222,6 +228,7 @@ function mergePublications(...lists) {
  */
 function aggregate(publications, matcher, H) {
   const ests = new Map();
+  const estsByName = new Map();   // the same establishment met with two keys (ROR from OpenAlex, name from HAL)
   const pubs = [];
   let withAffiliation = 0, undated = 0;
   publications.forEach((p, idx) => {
@@ -232,8 +239,10 @@ function aggregate(publications, matcher, H) {
       const c = classifyOrg(org, matcher, H);
       if (c.cls === 'unknown' || !c.establishment) continue;
       classes.add(c.cls);
-      let e = ests.get(c.establishment.key);
-      if (!e) { e = { key: c.establishment.key, name: c.establishment.name, country: c.establishment.country, cls: c.cls, byYear: {}, count: 0, first: null, last: null, labs: {}, pubs: [] }; ests.set(c.establishment.key, e); }
+      let e = ests.get(c.establishment.key) || estsByName.get(norm(c.establishment.name));
+      if (!e) { e = { key: c.establishment.key, name: c.establishment.name, country: c.establishment.country, cls: c.cls, byYear: {}, count: 0, first: null, last: null, labs: {}, pubs: [] }; estsByName.set(norm(c.establishment.name), e); }
+      ests.set(c.establishment.key, e);
+      if (c.cls === 'local') e.cls = 'local';
       if (!e.country && c.establishment.country) e.country = c.establishment.country;
       if (c.lab && !labsSeen.has(`${e.key}|${c.lab.name}`)) { labsSeen.add(`${e.key}|${c.lab.name}`); e.labs[c.lab.name] = (e.labs[c.lab.name] || 0) + 1; }
       if (e.pubs[e.pubs.length - 1] !== idx) {
@@ -247,7 +256,7 @@ function aggregate(publications, matcher, H) {
     if (classes.has('local')) classes.delete('other');
     pubs.push({ year: p.year || null, doi: p.doi || '', title: p.title || '', sources: p.sources || [], classes: [...classes], est: estKeys });
   });
-  const establishments = [...ests.values()]
+  const establishments = [...new Set(ests.values())]
     .map((e) => ({ ...e, labs: Object.entries(e.labs).sort((a, b) => b[1] - a[1]).map(([name, count]) => ({ name, count })) }))
     .sort((a, b) => (b.last || 0) - (a.last || 0) || b.count - a.count);
   return { pubs, establishments, totals: { pubs: publications.length, withAffiliation, undated } };

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { History, RefreshCw, AlertTriangle, Info, ExternalLink, X, CalendarCheck } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { Researcher } from '../../types';
@@ -75,7 +76,7 @@ const SignalLine: React.FC<{ s: AhSignal }> = ({ s }) => {
 /** Publications of one establishment (click on a table row or a chart dot). */
 const PublicationsModal: React.FC<{ entry: AhEntry; row: TimelineRow; onClose: () => void }> = ({ entry, row, onClose }) => {
   const { t } = useLingui();
-  const pubs = row.estIndex === null ? [] : publicationsOf(entry, row.estIndex);
+  const pubs = row.estIndex === null ? [] : publicationsOf(entry, row.mergedIndexes?.length ? row.mergedIndexes : row.estIndex);
   const truncated = entry.totals.pubs > entry.pubs.length;
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') { e.stopImmediatePropagation(); onClose(); } };
@@ -83,7 +84,8 @@ const PublicationsModal: React.FC<{ entry: AhEntry; row: TimelineRow; onClose: (
     return () => window.removeEventListener('keydown', onKey, true);
   }, [onClose]);
   const name = row.name;
-  return (
+  // Portal: the block's glass card has a backdrop-filter, which would make `fixed` relative to the card.
+  return createPortal(
     <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-ink/40 backdrop-blur-sm" onClick={onClose}>
       <div className="glass-card-strong w-full max-w-3xl p-5 flex flex-col gap-3 bg-white/95 dark:bg-[#33312c] max-h-[80vh]" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start justify-between gap-3">
@@ -107,7 +109,8 @@ const PublicationsModal: React.FC<{ entry: AhEntry; row: TimelineRow; onClose: (
           {!pubs.length && <li className="py-2 text-[13px] text-muted dark:text-[#c3beb0]"><Trans>No publication: this establishment only comes from ORCID.</Trans></li>}
         </ul>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 };
 

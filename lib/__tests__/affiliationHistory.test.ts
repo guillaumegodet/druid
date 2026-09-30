@@ -82,6 +82,22 @@ describe('classifyOrg', () => {
   });
 });
 
+describe('establishment choice', () => {
+  it('a government umbrella at the top of the lineage is never the establishment', () => {
+    const H2 = emptyHierarchy();
+    Object.assign(H2.openalex, {
+      I300: { name: 'Bibliothèque Delta', country: 'FR', type: 'archive', ror: '', lineage: ['I300', 'I301'] },
+      I301: { name: 'Gouvernement de la République française', country: 'FR', type: 'government', ror: '', lineage: ['I301'] },
+    });
+    expect(classifyOrg(makeOrg({ ids: { openalex: 'I300' } }), M, H2).establishment.name).toBe('Bibliothèque Delta');
+  });
+  it('the same establishment met with two keys (ROR, name) is one row', () => {
+    const agg = aggregate([pub(2020, [BETA]), pub(2021, [makeOrg({ names: ['Université Beta'], city: 'Betaville' })])], M, H);
+    expect(agg.establishments.filter((e: { name: string }) => e.name === 'Université Beta')).toHaveLength(1);
+    expect(agg.establishments[0].count).toBe(2);
+  });
+});
+
 describe('mergePublications', () => {
   it('merges by DOI (case, doi.org prefix) then by source id, unions the orgs', () => {
     const merged = mergePublications(

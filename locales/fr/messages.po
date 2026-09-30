@@ -204,7 +204,7 @@ msgstr "Chargement du tableau de bord…"
 #: components/reports/HistoryDialog.tsx:78
 #: components/reports/ReportEditor.tsx:264
 #: components/reports/ReportsPage.tsx:134
-#: components/researchers/AffiliationHistorySection.tsx:198
+#: components/researchers/AffiliationHistorySection.tsx:201
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:347
 msgid "Loading…"
@@ -2271,7 +2271,7 @@ msgid "Group of {0} institutions too large for this on-demand computation (max {
 msgstr "Groupe de {0} établissements trop grand pour ce calcul à la demande (max {MAX_PEER_TOPIC_RORS}) — réduisez la sélection ci-dessus."
 
 #: components/dashboard/BenchmarkTab.tsx:1439
-#: components/researchers/AffiliationHistorySection.tsx:191
+#: components/researchers/AffiliationHistorySection.tsx:194
 msgid "Computing…"
 msgstr "Calcul en cours…"
 
@@ -2679,7 +2679,7 @@ msgstr "À propos de « {title} »"
 #: components/reports/HistoryDialog.tsx:72
 #: components/reports/NewReportDialog.tsx:170
 #: components/reports/ShareDialog.tsx:94
-#: components/researchers/AffiliationHistorySection.tsx:91
+#: components/researchers/AffiliationHistorySection.tsx:93
 #: components/researchers/UnifiedAlignPage.tsx:603
 msgid "Close"
 msgstr "Fermer"
@@ -2784,7 +2784,7 @@ msgstr "{0} publication(s)"
 
 #: components/dashboard/FundersTab.tsx:53
 #: components/dashboard/FundersTab.tsx:202
-#: components/researchers/AffiliationHistorySection.tsx:40
+#: components/researchers/AffiliationHistorySection.tsx:41
 msgid "publications"
 msgstr "publications"
 
@@ -3471,7 +3471,7 @@ msgid "Harvested sources ({0})"
 msgstr "Sources moissonnées ({0})"
 
 #: components/dashboard/MediaSourcesAdmin.tsx:197
-#: components/researchers/AffiliationHistorySection.tsx:191
+#: components/researchers/AffiliationHistorySection.tsx:194
 #: components/researchers/DuplicatesPage.tsx:115
 #: components/researchers/DuplicatesPage.tsx:128
 #: components/researchers/ImportConflictsPage.tsx:117
@@ -3666,7 +3666,7 @@ msgstr "Les publications n'ont pas pu être chargées."
 
 #: components/dashboard/NetworkTab.tsx:374
 #: components/dashboard/NewsTab.tsx:707
-#: components/researchers/AffiliationHistorySection.tsx:98
+#: components/researchers/AffiliationHistorySection.tsx:100
 msgid "(untitled)"
 msgstr "(sans titre)"
 
@@ -3677,7 +3677,7 @@ msgstr "(sans titre)"
 #: components/dashboard/report/composeReportPdf.ts:70
 #: components/dashboard/report/pdfDoc.ts:128
 #: components/reports/HistoryDialog.tsx:106
-#: components/researchers/AffiliationHistorySection.tsx:244
+#: components/researchers/AffiliationHistorySection.tsx:247
 msgid "Publications"
 msgstr "Publications"
 
@@ -8207,144 +8207,144 @@ msgstr "Classeur XLSX"
 msgid "Mark as sent"
 msgstr "Marquer comme envoyé"
 
-#: components/researchers/AffiliationHistorySection.tsx:42
+#: components/researchers/AffiliationHistorySection.tsx:43
 msgid "Departure confirmed by {sources}: left around {date}, towards {dest}."
 msgstr "Départ confirmé par {sources} : parti vers {date}, pour {dest}."
 
-#: components/researchers/AffiliationHistorySection.tsx:42
+#: components/researchers/AffiliationHistorySection.tsx:43
 msgid "Departure confirmed by {sources}: left around {date}."
 msgstr "Départ confirmé par {sources} : parti vers {date}."
 
-#: components/researchers/AffiliationHistorySection.tsx:46
+#: components/researchers/AffiliationHistorySection.tsx:47
 msgid "ORCID: the last position at the institution ended in {date}."
 msgstr "ORCID : le dernier poste dans l’établissement s’est terminé en {date}."
 
-#: components/researchers/AffiliationHistorySection.tsx:50
+#: components/researchers/AffiliationHistorySection.tsx:51
 msgid "ORCID: new position at {dest} since {date}."
 msgstr "ORCID : nouveau poste à {dest} depuis {date}."
 
-#: components/researchers/AffiliationHistorySection.tsx:56
+#: components/researchers/AffiliationHistorySection.tsx:57
 msgid "Publications: none affiliated to the institution after {date}; {count} affiliated elsewhere, mostly {dest}."
 msgstr "Publications : aucune affiliée à l’établissement après {date} ; {count} affiliées ailleurs, surtout {dest}."
 
-#: components/researchers/AffiliationHistorySection.tsx:57
+#: components/researchers/AffiliationHistorySection.tsx:58
 msgid "Publications: none affiliated to the institution after {date}; {count} affiliated elsewhere."
 msgstr "Publications : aucune affiliée à l’établissement après {date} ; {count} affiliées ailleurs."
 
-#: components/researchers/AffiliationHistorySection.tsx:60
+#: components/researchers/AffiliationHistorySection.tsx:61
 msgid "Scopus: current affiliation {dest} (computed by Elsevier from the latest publications)."
 msgstr "Scopus : affiliation courante {dest} (déduite par Elsevier des dernières publications)."
 
-#: components/researchers/AffiliationHistorySection.tsx:65
+#: components/researchers/AffiliationHistorySection.tsx:66
 msgid "The record ended in {endYear}, yet publications are still affiliated to the institution in {lastLocal}."
 msgstr "La fiche est close en {endYear}, mais des publications sont encore affiliées à l’établissement en {lastLocal}."
 
-#: components/researchers/AffiliationHistorySection.tsx:66
+#: components/researchers/AffiliationHistorySection.tsx:67
 msgid "The record ended in {endYear}, yet ORCID shows an ongoing position at the institution."
 msgstr "La fiche est close en {endYear}, mais ORCID indique un poste en cours dans l’établissement."
 
-#: components/researchers/AffiliationHistorySection.tsx:69
+#: components/researchers/AffiliationHistorySection.tsx:70
 msgid "Identifiers to check: their publications or profile never mention the institution (homonym or wrong identifier?)."
 msgstr "Identifiants à vérifier : leurs publications ou leur profil ne mentionnent jamais l’établissement (homonyme ou identifiant erroné ?)."
 
-#: components/researchers/AffiliationHistorySection.tsx:90
+#: components/researchers/AffiliationHistorySection.tsx:92
 msgid "Publications affiliated to {name}"
 msgstr "Publications affiliées à {name}"
 
-#: components/researchers/AffiliationHistorySection.tsx:93
+#: components/researchers/AffiliationHistorySection.tsx:95
 msgid "Only the most recent publications of the record are kept for this list."
 msgstr "Seules les publications les plus récentes de la fiche sont conservées pour cette liste."
 
-#: components/researchers/AffiliationHistorySection.tsx:107
+#: components/researchers/AffiliationHistorySection.tsx:109
 msgid "No publication: this establishment only comes from ORCID."
 msgstr "Aucune publication : cet établissement ne vient que d’ORCID."
 
-#: components/researchers/AffiliationHistorySection.tsx:159
+#: components/researchers/AffiliationHistorySection.tsx:162
 msgid "CRISalid graph ({nGraph})"
 msgstr "graphe CRISalid ({nGraph})"
 
-#: components/researchers/AffiliationHistorySection.tsx:160
+#: components/researchers/AffiliationHistorySection.tsx:163
 msgid "OpenAlex ({nOpenalex})"
 msgstr "OpenAlex ({nOpenalex})"
 
-#: components/researchers/AffiliationHistorySection.tsx:161
+#: components/researchers/AffiliationHistorySection.tsx:164
 msgid "Scopus ({nScopus})"
 msgstr "Scopus ({nScopus})"
 
-#: components/researchers/AffiliationHistorySection.tsx:162
+#: components/researchers/AffiliationHistorySection.tsx:165
 msgid "ORCID ({nOrcid} positions)"
 msgstr "ORCID ({nOrcid} postes)"
 
-#: components/researchers/AffiliationHistorySection.tsx:180
+#: components/researchers/AffiliationHistorySection.tsx:183
 msgid "Career path"
 msgstr "Parcours"
 
-#: components/researchers/AffiliationHistorySection.tsx:184
+#: components/researchers/AffiliationHistorySection.tsx:187
 msgid "Computed on {computedAt} · {sourcesText}"
 msgstr "Calculé le {computedAt} · {sourcesText}"
 
-#: components/researchers/AffiliationHistorySection.tsx:185
+#: components/researchers/AffiliationHistorySection.tsx:188
 msgid "incomplete (source unavailable at that time)"
 msgstr "incomplet (source indisponible au moment du calcul)"
 
-#: components/researchers/AffiliationHistorySection.tsx:190
+#: components/researchers/AffiliationHistorySection.tsx:193
 msgid "Recompute now from the identifiers of the record (about ten seconds)"
 msgstr "Recalculer maintenant à partir des identifiants de la fiche (une dizaine de secondes)"
 
-#: components/researchers/AffiliationHistorySection.tsx:202
+#: components/researchers/AffiliationHistorySection.tsx:205
 msgid "Not computed yet: the weekly computation is in progress ({runDone}/{runTotal} records). Use « Refresh » to compute this record now."
 msgstr "Pas encore calculé : le calcul hebdomadaire est en cours ({runDone}/{runTotal} fiches). Utilisez « Actualiser » pour calculer cette fiche tout de suite."
 
-#: components/researchers/AffiliationHistorySection.tsx:203
+#: components/researchers/AffiliationHistorySection.tsx:206
 msgid "Not computed yet. The path is built from the ORCID, IdHAL, IdRef, OpenAlex and Scopus identifiers of the record (see « Researcher identifiers alignment »): use « Refresh » once they are filled."
 msgstr "Pas encore calculé. Le parcours est construit à partir des identifiants ORCID, IdHAL, IdRef, OpenAlex et Scopus de la fiche (voir « Alignement des identifiants chercheurs ») : utilisez « Actualiser » une fois qu’ils sont renseignés."
 
-#: components/researchers/AffiliationHistorySection.tsx:220
+#: components/researchers/AffiliationHistorySection.tsx:223
 msgid "End of employment set to {endSuggestion} — save the record to keep it."
 msgstr "Fin d’emploi renseignée à {endSuggestion} — enregistrez la fiche pour la conserver."
 
-#: components/researchers/AffiliationHistorySection.tsx:221
+#: components/researchers/AffiliationHistorySection.tsx:224
 msgid "Report {endSuggestion} as end of employment"
 msgstr "Reporter {endSuggestion} en fin d’emploi"
 
-#: components/researchers/AffiliationHistorySection.tsx:223
+#: components/researchers/AffiliationHistorySection.tsx:226
 msgid "Start of employment set to {startSuggestion} — save the record to keep it."
 msgstr "Début d’emploi renseigné à {startSuggestion} — enregistrez la fiche pour le conserver."
 
-#: components/researchers/AffiliationHistorySection.tsx:224
+#: components/researchers/AffiliationHistorySection.tsx:227
 msgid "Report {startSuggestion} as start of employment"
 msgstr "Reporter {startSuggestion} en début d’emploi"
 
-#: components/researchers/AffiliationHistorySection.tsx:233
+#: components/researchers/AffiliationHistorySection.tsx:236
 msgid "No affiliated publication and no ORCID position found for the identifiers of this record."
 msgstr "Aucune publication affiliée ni aucun poste ORCID trouvé pour les identifiants de cette fiche."
 
-#: components/researchers/AffiliationHistorySection.tsx:241
+#: components/researchers/AffiliationHistorySection.tsx:244
 msgid "Establishment"
 msgstr "Établissement"
 
-#: components/researchers/AffiliationHistorySection.tsx:245
+#: components/researchers/AffiliationHistorySection.tsx:248
 msgid "Count"
 msgstr "Nombre"
 
-#: components/researchers/AffiliationHistorySection.tsx:264
+#: components/researchers/AffiliationHistorySection.tsx:267
 #: components/researchers/AffiliationTimelineChart.tsx:81
 msgid "ongoing"
 msgstr "en cours"
 
-#: components/researchers/AffiliationHistorySection.tsx:264
+#: components/researchers/AffiliationHistorySection.tsx:267
 msgid "invited"
 msgstr "invité"
 
-#: components/researchers/AffiliationHistorySection.tsx:266
+#: components/researchers/AffiliationHistorySection.tsx:269
 msgid "current"
 msgstr "courante"
 
-#: components/researchers/AffiliationHistorySection.tsx:266
+#: components/researchers/AffiliationHistorySection.tsx:269
 msgid "history"
 msgstr "historique"
 
-#: components/researchers/AffiliationHistorySection.tsx:275
+#: components/researchers/AffiliationHistorySection.tsx:278
 msgid "{totalPubs} publications, {withAffiliation} with an affiliation. A publication counts for each establishment it declares, so the counts may exceed the total. National organisms (CNRS, Inserm…) are shown but never read as a departure."
 msgstr "{totalPubs} publications, dont {withAffiliation} avec une affiliation. Une publication compte pour chaque établissement qu’elle déclare : la somme peut dépasser le total. Les organismes nationaux (CNRS, Inserm…) sont affichés mais jamais lus comme un départ."
 
@@ -8363,10 +8363,6 @@ msgstr "Organisme national"
 #: components/researchers/AffiliationTimelineChart.tsx:34
 msgid "Unresolved"
 msgstr "Non résolu"
-
-#: components/researchers/AffiliationTimelineChart.tsx:48
-msgid "Employment in Druid"
-msgstr "Emploi dans Druid"
 
 #: components/researchers/AffiliationTimelineChart.tsx:60
 msgid "ORCID position (ongoing)"

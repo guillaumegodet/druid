@@ -45,7 +45,7 @@ export const AffiliationTimelineChart: React.FC<Props> = ({ rows, range, employm
     }));
     const es = yearOf(employment.start);
     const ee = employment.end ? yearOf(employment.end) : now;
-    const band = es ? [[{ xAxis: Math.max(es, lo) - 0.5, name: tr`Employment in Druid` }, { xAxis: Math.min(ee || now, hi) + 0.5 }]] : [];
+    const band = es ? [[{ xAxis: Math.max(es, lo) - 0.5 }, { xAxis: Math.min(ee || now, hi) + 0.5 }]] : [];
     const dotSeries = (['local', 'other', 'neutral'] as const).map((cls, k) => ({
       name: label[cls],
       type: 'scatter',
@@ -54,7 +54,7 @@ export const AffiliationTimelineChart: React.FC<Props> = ({ rows, range, employm
       itemStyle: { color: color[cls], borderColor: t.surface, borderWidth: 2 },
       emphasis: { scale: 1.15 },
       z: 3,
-      ...(k === 0 && band.length ? { markArea: { silent: true, itemStyle: { color: t.grid, opacity: 0.55 }, label: { color: t.inkMuted, fontSize: 10, position: 'insideTop' }, data: band } } : {}),
+      ...(k === 0 && band.length ? { markArea: { silent: true, itemStyle: { color: t.grid, opacity: 0.55 }, label: { show: false }, data: band } } : {}),
     }));
     const periodSeries = [false, true].map((ongoing) => ({
       name: ongoing ? tr`ORCID position (ongoing)` : tr`ORCID position`,
