@@ -170,6 +170,9 @@ export const AffiliationHistorySection: React.FC<Props> = ({ researcher, onUpdat
   const totalPubs = entry?.totals.pubs ?? 0;
   const withAffiliation = entry?.totals.withAffiliation ?? 0;
 
+  const reportedEnd = reported.end || '';
+  const reportedStart = reported.start || '';
+
   const report = (kind: 'end' | 'start', date: string) => {
     onUpdateField?.(kind === 'end' ? 'endDate' : 'startDate', date, 'employment');
     setReported((r) => ({ ...r, [kind]: date }));
@@ -209,7 +212,7 @@ export const AffiliationHistorySection: React.FC<Props> = ({ researcher, onUpdat
 
       {state === 'ready' && entry && (
         <>
-          {(signals.length > 0 || endSuggestion || startSuggestion) && (
+          {(signals.length > 0 || endSuggestion || startSuggestion || reported.end || reported.start) && (
             <div className={`rounded-2xl px-4 py-3 flex flex-col gap-2 text-[13px] ${alert ? 'bg-[rgba(224,158,42,.12)] border border-[rgba(224,158,42,.35)]' : 'bg-ink/[.03] dark:bg-white/5 border border-ink/5 dark:border-white/10'}`}>
               {signals.map((s, i) => (
                 <div key={i} className="flex items-start gap-2 text-ink dark:text-[#f5f2ea]">
@@ -217,14 +220,15 @@ export const AffiliationHistorySection: React.FC<Props> = ({ researcher, onUpdat
                   <span><SignalLine s={s} /></span>
                 </div>
               ))}
-              {onUpdateField && (endSuggestion || startSuggestion) && (
+              {onUpdateField && (endSuggestion || startSuggestion || reported.end || reported.start) && (
                 <div className="flex flex-wrap items-center gap-2 pt-1">
-                  {endSuggestion && (reported.end
-                    ? <span className="text-[12px] text-muted dark:text-[#c3beb0]"><CalendarCheck className="inline w-3.5 h-3.5 mr-1" /><Trans>End of employment set to {endSuggestion} — save the record to keep it.</Trans></span>
-                    : <button type="button" onClick={() => report('end', endSuggestion)} className="btn-pill text-[12px]"><Trans>Report {endSuggestion} as end of employment</Trans></button>)}
-                  {startSuggestion && (reported.start
-                    ? <span className="text-[12px] text-muted dark:text-[#c3beb0]"><CalendarCheck className="inline w-3.5 h-3.5 mr-1" /><Trans>Start of employment set to {startSuggestion} — save the record to keep it.</Trans></span>
-                    : <button type="button" onClick={() => report('start', startSuggestion)} className="btn-pill text-[12px]"><Trans>Report {startSuggestion} as start of employment</Trans></button>)}
+                  {/* Once reported, the field holds the date and the suggestion disappears: keep the notice. */}
+                  {reported.end
+                    ? <span className="text-[12px] text-muted dark:text-[#c3beb0]"><CalendarCheck className="inline w-3.5 h-3.5 mr-1" /><Trans>End of employment set to {reportedEnd} — save the record to keep it.</Trans></span>
+                    : endSuggestion && <button type="button" onClick={() => report('end', endSuggestion)} className="btn-pill text-[12px]"><Trans>Report {endSuggestion} as end of employment</Trans></button>}
+                  {reported.start
+                    ? <span className="text-[12px] text-muted dark:text-[#c3beb0]"><CalendarCheck className="inline w-3.5 h-3.5 mr-1" /><Trans>Start of employment set to {reportedStart} — save the record to keep it.</Trans></span>
+                    : startSuggestion && <button type="button" onClick={() => report('start', startSuggestion)} className="btn-pill text-[12px]"><Trans>Report {startSuggestion} as start of employment</Trans></button>}
                 </div>
               )}
             </div>
