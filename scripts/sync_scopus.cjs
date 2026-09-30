@@ -43,6 +43,7 @@
  */
 const fs = require('fs');
 const common = require('./lib/align_common.cjs');
+const { createElsevierClient } = require('./lib/elsevier_client.cjs');
 const {
   normalize, extractOrcid, nameMatch, heterogeneousFirstNames, getUrl, runPool, applyTargetFilters, makeStore, today,
   gristGet, loadRejected, pushReview, ensureReviewTable, DOC,
@@ -82,54 +83,11 @@ const NU_PATTERNS = ['nantes universite', 'universite de nantes', 'university of
 const store = makeStore({ cachePath: 'scopus_align_cache.json', progressPath: 'scopus_align_progress.json' });
 const { loadCache, writeCache, writeProgress } = store;
 
-// ── Elsevier client (throttle, quotas, abort) ────────────────────────────────
-const HEADERS = { Accept: 'application/json', 'X-ELS-APIKey': API_KEY, ...(INST_TOKEN ? { 'X-ELS-Insttoken': INST_TOKEN } : {}) };
-const nextSlot = {};
-/** One slot chain per pool: requests of a pool are spaced by 1/rate, pools run independently. */
-async function throttle(pool) {
-  const interval = Math.ceil(1000 / (RATE_PER_S[pool] || 2)) + RATE_MARGIN_MS;
-  const now = Date.now();
-  const slot = Math.max(now, nextSlot[pool] || 0);
-  nextSlot[pool] = slot + interval;
-  if (slot > now) await new Promise((res) => setTimeout(res, slot - now));
-}
-/** Remaining weekly quota per API pool (search / author / affiliation), from the x-ratelimit-* headers. */
-const QUOTA = {};
-let ABORT = null;
-function abortRun(reason) {
-  if (!ABORT) { ABORT = reason; console.error(`[scopus] RUN STOPPED: ${reason}`); }
-}
-const resetDate = (h) => { const t = parseInt(h['x-ratelimit-reset'] || '0', 10); return t ? new Date(t * 1000).toISOString().slice(0, 10) : '?'; };
-function trackQuota(pool, headers) {
-  if (!headers || headers['x-ratelimit-remaining'] === undefined) return;
-  const remaining = parseInt(headers['x-ratelimit-remaining'], 10);
-  QUOTA[pool] = { remaining, limit: parseInt(headers['x-ratelimit-limit'] || '0', 10) || 0, reset: resetDate(headers) };
-  if (remaining <= 0) abortRun(`weekly Elsevier quota exhausted (${pool} API, reset ${QUOTA[pool].reset})`);
-}
+// ── Elsevier client (throttle, quotas, abort): scripts/lib/elsevier_client.cjs ─────
+const elsevier = createElsevierClient({ tag: 'scopus', ratePerS: RATE_PER_S, rateLimitWaitMs: RATE_LIMIT_WAIT_MS, marginMs: RATE_MARGIN_MS, apiKey: API_KEY, instToken: INST_TOKEN });
+const QUOTA = elsevier.quota;
+const els = (pool, path, params) => elsevier.get(pool, path, params);
 const digits = (v) => String(v || '').replace(/\D/g, '');
-/**
- * GET JSON on an Elsevier API. `pool` = quota pool name. Returns the body, `{ notFound: true }` on 404,
- * null on network/HTTP error or once the run is aborted (quota, authorization).
- */
-async function els(pool, path, params) {
-  if (ABORT || !API_KEY) return null;
-  await throttle(pool);
-  const url = `${ELS}${path}${params ? `?${new URLSearchParams(params)}` : ''}`;
-  try {
-    const r = await getUrl(url, { json: true, withHeaders: true, headers: HEADERS, timeout: 25000, noRetry: [400, 401, 403, 404], rateLimitWaitMs: RATE_LIMIT_WAIT_MS });
-    trackQuota(pool, r.headers);
-    return r.body;
-  } catch (e) {
-    const h = e.headers || {};
-    const els = String(h['x-els-status'] || '');
-    if (e.status === 404) return { notFound: true };
-    if (e.status === 401 || e.status === 403) abortRun(`HTTP ${e.status} ${els || ''} — API key refused or IP not entitled (the API must go through the university proxy)`.trim());
-    else if (/QUOTA_EXCEEDED/i.test(els) || (e.status === 429 && h['x-ratelimit-remaining'] !== undefined && parseInt(h['x-ratelimit-remaining'], 10) <= 0)) abortRun(`weekly Elsevier quota exhausted (${pool} API${h['x-ratelimit-reset'] ? `, reset ${resetDate(h)}` : ''})`);
-    else if (e.status === 429) console.warn(`[scopus] ${path}: rate limit (429) still hit after retries — record marked in error, quota untouched`);
-    else console.warn(`[scopus] ${path}: ${e.message}`);
-    return null;
-  }
-}
 
 // ── Author search ────────────────────────────────────────────────────────────
 /** Query term: letters, spaces, hyphens and apostrophes only (parentheses/quotes would break the syntax). */
@@ -350,7 +308,7 @@ async function alignPerson(p, labNames, affils) {
     }
   }
   // 2. last name alone, restricted to the site (filtered locally by the name match).
-  if (!byId.size && !ABORT) {
+  if (!byId.size && !elsevier.aborted()) {
     const r4 = await authorSearch(`AUTHLASTNAME(${last}) AND AFFIL(nantes)`);
     if (r4 === null) netError = true; else { add(r4.entries); fallback = true; }
   }
@@ -360,7 +318,7 @@ async function alignPerson(p, labNames, affils) {
   // 2b. Compound last name (« Budinich Abarca », « Ait Oubelli »): Scopus often keeps the first part
   //     only → first token of the last name + first name, candidates flagged partialSurname (≤ partial).
   const lastToks = last.split(' ').filter((t) => t.length >= 3);
-  if (!byId.size && !ABORT && lastToks.length >= 2 && firstTok) {
+  if (!byId.size && !elsevier.aborted() && lastToks.length >= 2 && firstTok) {
     const r6 = await authorSearch(`AUTHLASTNAME(${lastToks[0]}) AND AUTHFIRST(${firstTok})`);
     if (r6 === null) netError = true;
     else {
@@ -372,14 +330,14 @@ async function alignPerson(p, labNames, affils) {
     }
   }
   // 3. Pass 0 by ORCID when the name search did not surface the profile that carries it.
-  if (orcid && !ABORT && ![...byId.values()].some((c) => c.orcid === orcid)) {
+  if (orcid && !elsevier.aborted() && ![...byId.values()].some((c) => c.orcid === orcid)) {
     const r5 = await authorSearch(`ORCID(${orcid})`, 5);
     if (r5 === null) netError = true;
     else if (r5.entries.length) { derivedFrom.push('ORCID'); add(r5.entries); }
   }
   // 4. Enrichment (affiliation history) of the candidates still without NU/lab evidence — one request.
   const cands = [...byId.values()];
-  if (MAX_ENRICH > 0 && cands.length && !ABORT) {
+  if (MAX_ENRICH > 0 && cands.length && !elsevier.aborted()) {
     const needs = cands.filter((c) => { const s = scoreCandidate(p, c, labNames, affils); return s.score !== 'fort' && s.affiliation !== 'nu' && s.affiliation !== 'labo'; }).slice(0, MAX_ENRICH);
     if (needs.length) {
       const got = await retrieve(needs.map((c) => c.id), 'STANDARD');
@@ -393,7 +351,7 @@ async function alignPerson(p, labNames, affils) {
   const strong = scored.filter((c) => c.score === 'fort');
   const medium = scored.filter((c) => c.score === 'moyen');
   let status, best = '';
-  if (!scored.length) status = netError || ABORT ? 'error' : 'not_found';
+  if (!scored.length) status = netError || elsevier.aborted() ? 'error' : 'not_found';
   else if (strong.length === 1) { status = 'found'; best = strong[0].id; }
   else if (!strong.length && medium.length === 1) { status = 'found'; best = medium[0].id; }
   else status = 'ambiguous';
@@ -592,7 +550,7 @@ async function main() {
     done = n;
     if (n % 10 === 0 || n === targets.length) {
       writeProgress(progress({ done: n }));
-      console.log(`[scopus] ${n}/${targets.length}${ABORT ? ' (stopping)' : ''}`);
+      console.log(`[scopus] ${n}/${targets.length}${elsevier.aborted() ? ' (stopping)' : ''}`);
     }
   };
   if (MODE === 'verify') {
@@ -600,17 +558,17 @@ async function main() {
     for (let i = 0; i < targets.length; i += VERIFY_BATCH) batches.push(targets.slice(i, i + VERIFY_BATCH));
     let n = 0;
     await runPool(batches, async (batch) => {
-      if (ABORT) { skipped += batch.length; n += batch.length; tick(n); return; }
+      if (elsevier.aborted()) { skipped += batch.length; n += batch.length; tick(n); return; }
       const res = await verifyBatch(batch, labNames, affils);
-      for (const p of batch) { const e = res.get(p.key); if (e && !(e.status === 'error' && ABORT)) record(p, e); else skipped++; }
+      for (const p of batch) { const e = res.get(p.key); if (e && !(e.status === 'error' && elsevier.aborted())) record(p, e); else skipped++; }
       n += batch.length; tick(n);
     }, CONCURRENCY);
   } else if (MODE === 'search') {
     await runPool(targets, async (p) => {
-      if (ABORT) { skipped++; return; }
+      if (elsevier.aborted()) { skipped++; return; }
       const entry = await alignPerson(p, labNames, affils);
       // Aborted mid-record (quota): nothing cached, the next run picks it up again.
-      if (ABORT && entry.status === 'error') { skipped++; return; }
+      if (elsevier.aborted() && entry.status === 'error') { skipped++; return; }
       record(p, entry);
     }, CONCURRENCY, tick);
   }
@@ -638,7 +596,7 @@ async function main() {
     }
   }
 
-  const warning = ABORT ? `Run Scopus interrompu : ${ABORT}${skipped ? ` — ${skipped} fiche(s) non traitée(s), reprises au prochain run` : ''}` : undefined;
+  const warning = elsevier.aborted() ? `Run Scopus interrompu : ${elsevier.aborted()}${skipped ? ` — ${skipped} fiche(s) non traitée(s), reprises au prochain run` : ''}` : undefined;
   writeProgress({ running: false, mode: MODE, total: targets.length, done, ...counts, skipped, push, quota: QUOTA, ...(warning ? { warning } : {}), finishedAt: new Date().toISOString() });
   console.log(`[scopus] Done. ${JSON.stringify(counts)}${skipped ? `, skipped=${skipped}` : ''}. Quota: ${JSON.stringify(QUOTA)}. Cache: ${store.cachePath}`);
 }

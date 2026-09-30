@@ -29,6 +29,22 @@ const DEFAULT_GRIST_API_BASE = 'https://grist.numerique.gouv.fr/api';
 
 const capabilitiesSchema = z.strictObject(Object.fromEntries(ALL_CAPABILITIES.map((k) => [k, z.boolean().optional()])));
 
+// Career path (docs/plan-parcours-affiliations.md, decision D2): which organizations count as the
+// instance itself. Identifiers by type (openalex I…, ror, hal docid, scopus afid, ringgold, rnsr, grid)
+// and names; the Structures table of the instance is always added by the job.
+const ORG_ID_TYPES = ['openalex', 'ror', 'hal', 'scopus', 'ringgold', 'rnsr', 'grid'];
+const orgSetSchema = z.strictObject({
+  ids: z.partialRecord(z.enum(ORG_ID_TYPES), z.array(z.string().trim().min(1))).default({}),
+  names: z.array(z.string().trim().min(1)).default([]),
+}).default({ ids: {}, names: [] });
+const affiliationHistorySchema = z.strictObject({
+  local: orgSetSchema,      // the establishment and its former names
+  site: orgSetSchema,       // other establishments counted as local (hospital, schools of the site…)
+  neutral: orgSetSchema,    // added to the national organisms of the job (CNRS, Inserm…)
+  area: z.strictObject({ cities: z.array(z.string().trim().min(1)).default([]) }).default({ cities: [] }),
+  thresholds: z.partialRecord(z.enum(['lag', 'minAfter', 'minYears', 'dominantWindow', 'dominantMin', 'dominantRatio', 'confirmGap', 'suspectMinPubs', 'stillLocalGap']), z.number()).default({}),
+});
+
 const instanceSchema = z.strictObject({
   slug: z.string().regex(SLUG_RE, 'expected [a-z0-9-]+'),
   label: z.string().trim().min(1),
@@ -58,6 +74,8 @@ const instanceSchema = z.strictObject({
   // DRUID_DEPLOYMENT has this value takes every instance that declares it. null = none. A dedicated
   // project (DRUID_INSTANCE) ignores the field, so one instance can be on both.
   deployment: z.string().regex(DEPLOYMENT_RE, 'expected a Pages project name').nullable().default(null),
+  // Career-path job (scripts/sync_affiliation_history.cjs); null = not configured.
+  affiliationHistory: affiliationHistorySchema.nullable().default(null),
 });
 
 /** Rules spanning several fields. Returns a list of messages (empty = consistent). */
@@ -214,6 +232,7 @@ const selectDeploymentInstances = (candidates, deployment) => {
 };
 
 module.exports = {
+  affiliationHistorySchema,
   ALL_CAPABILITIES,
   DEFAULT_GRIST_API_BASE,
   TUNABLE_CAPABILITIES,

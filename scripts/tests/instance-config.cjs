@@ -154,5 +154,15 @@ check('public repo: non-object refused', publicRepoErrors(null), ['not a JSON ob
   check('deployment: non-object instance.json ignored', selectDeploymentInstances([saas('demo'), { folder: 'y', source: 'instances/', raw: null }], 'druid-saas').slugs, ['demo']);
 }
 
+// ── career path (affiliationHistory, docs/plan-parcours-affiliations.md D2) ──────
+{
+  check('affiliationHistory: null by default', parseInstanceConfig(docker()).config.affiliationHistory, null);
+  const ah = { local: { ids: { openalex: ['I100'], ror: ['0abcdef00'] }, names: ['University'] }, site: { names: ['University Hospital'] }, area: { cities: ['Univtown'] } };
+  const r = parseInstanceConfig({ ...docker(), affiliationHistory: ah });
+  check('affiliationHistory: valid, defaults filled', r.ok && [r.config.affiliationHistory.neutral, r.config.affiliationHistory.thresholds, r.config.affiliationHistory.local.ids.ror], [{ ids: {}, names: [] }, {}, ['0abcdef00']]);
+  check('affiliationHistory: unknown identifier type rejected', rejects({ ...docker(), affiliationHistory: { local: { ids: { orcid: ['x'] } } } }, 'affiliationHistory.local.ids'), true);
+  check('affiliationHistory: unknown threshold rejected', rejects({ ...docker(), affiliationHistory: { thresholds: { lagg: 2 } } }, 'affiliationHistory.thresholds'), true);
+}
+
 console.log(ko ? `\n${ko} failure(s)` : '\nAll good.');
 process.exit(ko ? 1 : 0);

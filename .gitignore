@@ -84,3 +84,6 @@ public/instance-assets/
 functions/dashboard-data/
 functions/instance-assets/
 functions/*_align_cache.json.js
+
+# Career path job (scripts/sync_affiliation_history.cjs): runtime directory, bind-mounted in Docker
+/affiliation_history/
