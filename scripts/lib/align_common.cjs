@@ -263,12 +263,37 @@ async function getUrl(url, { json = false, tries = 5, delay = 200, timeout = 800
   throw lastErr || new Error('request failed');
 }
 
+// ── Stop on request ──────────────────────────────────────────────────────────
+// « Stop » button of the alignment page: the server sends SIGTERM to the script. The first signal
+// stops the main loop from starting new records (runPool `stoppable`); the records in progress
+// finish, then the script ends as usual (cache, progress `stopped: true`, Grist writes of what was
+// processed). A second signal exits at once. Installed by makeStore when a script of scripts/ is the
+// main module — never in server.cjs, nor in a test runner that requires a script.
+let stopRequested = false;
+let stopHandlerInstalled = false;
+const requestStop = () => {
+  if (!stopRequested) console.warn('[align] stop requested: finishing the records in progress, then saving');
+  stopRequested = true;
+};
+function installStopHandler() {
+  const main = (require.main && require.main.filename) || '';
+  if (stopHandlerInstalled || !/[\\/]scripts[\\/][^\\/]+\.cjs$/.test(main)) return;
+  stopHandlerInstalled = true;
+  process.on('SIGTERM', () => {
+    if (stopRequested) process.exit(143);
+    requestStop();
+  });
+}
+const isStopRequested = () => stopRequested;
+
 // ── Simple concurrency pool ──────────────────────────────────────────────────
-async function runPool(items, worker, concurrency, onTick) {
+/** `opts.stoppable`: no new item once a stop was requested (main loop of a script only — the
+ * later phases, Grist writes of the processed records, must still run in full). */
+async function runPool(items, worker, concurrency, onTick, { stoppable = false } = {}) {
   let idx = 0, done = 0;
   const results = new Array(items.length);
   async function next() {
-    while (idx < items.length) {
+    while (idx < items.length && !(stoppable && stopRequested)) {
       const i = idx++;
       try { results[i] = await worker(items[i], i); } catch (e) { results[i] = { error: e.message }; }
       done++;
@@ -548,21 +573,36 @@ async function pushReview({ table, columns, desired, keyOf, targetField }) {
  * root (bind-mounted, see druid.yaml); the copy into dist/ is kept for compatibility with
  * the old deployments (server.cjs now serves the root first).
  */
+/** Minimum spacing of the cache saves made during a run (see writeProgress). */
+const CACHE_SAVE_EVERY_MS = 30000;
+
 function makeStore({ cachePath, progressPath }) {
   const progress = getArg('progress', progressPath);   // overridable (--progress=), see qualinka
+  installStopHandler();
+  // The cache object handed out by loadCache, filled in place by the script: saved along the
+  // way, so that a stop or a crash keeps what was already paid for (API quotas).
+  let live = null;
+  let lastSave = Date.now();
+  const writeCache = (cache) => {
+    const json = JSON.stringify(cache, null, 2);
+    fs.writeFileSync(cachePath, json);
+    try { if (fs.existsSync('dist')) fs.writeFileSync(`dist/${cachePath}`, json); } catch (e) { /* noop */ }
+    lastSave = Date.now();
+  };
   return {
     cachePath,
     progressPath: progress,
     loadCache() {
-      try { return JSON.parse(fs.readFileSync(cachePath, 'utf8')); } catch (e) { return {}; }
+      try { live = JSON.parse(fs.readFileSync(cachePath, 'utf8')); } catch (e) { live = {}; }
+      return live;
     },
-    writeCache(cache) {
-      const json = JSON.stringify(cache, null, 2);
-      fs.writeFileSync(cachePath, json);
-      try { if (fs.existsSync('dist')) fs.writeFileSync(`dist/${cachePath}`, json); } catch (e) { /* noop */ }
-    },
+    writeCache,
     writeProgress(p) {
-      try { fs.writeFileSync(progress, JSON.stringify(p)); } catch (e) { /* noop */ }
+      if (p && p.running && live && Date.now() - lastSave >= CACHE_SAVE_EVERY_MS) {
+        try { writeCache(live); } catch (e) { console.warn(`[align] cache save failed: ${e.message}`); }
+      }
+      const out = p && !p.running && stopRequested ? { ...p, stopped: true } : p;
+      try { fs.writeFileSync(progress, JSON.stringify(out)); } catch (e) { /* noop */ }
     },
   };
 }
@@ -570,7 +610,7 @@ function makeStore({ cachePath, progressPath }) {
 module.exports = {
   getArg, hasFlag, commonOptions,
   stripAccents, normalize, extractPpn, extractOrcid, isValidOrcid, today, nameTokens, nameMatch, heterogeneousFirstNames,
-  getUrl, runPool, proxyFor,
+  getUrl, runPool, proxyFor, isStopRequested, requestStop,
   GRIST_BASE, DOC, KEY, gristGet, gristWrite, gristCreateRecords, gristPatchRecords, gristPatchGrouped, gristDeleteRecords, withTrace,
   fetchAnnuaire, isDoctorantEmployment, isHorsRechercheEmployment, alignGroupOf, ALIGN_GROUPS, applyTargetFilters, loadRejected, loadReviewDecisions, ensureReviewTable, pushReview,
   DECISION_TODO, DECISION_MIXED, DECISIONS, DECISION_CHOICE_OPTIONS, isDecided, reviewDecisionColumns, melerFormula,

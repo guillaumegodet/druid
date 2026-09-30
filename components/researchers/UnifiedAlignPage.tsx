@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { useCompactHeader } from '../../hooks/useCompactHeader';
 import {
   RefreshCw, RotateCw, Check, Link2, Users, GraduationCap, Briefcase, Save, CheckSquare, Square,
-  ChevronDown, ChevronRight, Sparkles, AlertTriangle, Zap, ArrowRight, GitCompare, Shuffle, ExternalLink,
+  ChevronDown, ChevronRight, Sparkles, AlertTriangle, Zap, ArrowRight, GitCompare, Shuffle, ExternalLink, CircleStop,
 } from 'lucide-react';
 import {
   ALIGN_SOURCE_META, buildUnifiedUpdates, unifiedAmbigKey, unifiedCandidateId, unifiedFillKey,
@@ -297,6 +297,8 @@ interface UnifiedAlignPageProps {
   applying?: boolean;
   /** Must stay scoped to the filtered lab/group (decision of 2026-09-21, plan §5) — never a global run. */
   onRerunAll: (mode: AlignMode, labo?: string, group?: AlignGroup) => void;
+  /** « Stop » of one source's run: records in progress finish, what was found is kept. */
+  onStop?: (src: UnifiedAlignSource) => Promise<void>;
   /** Receives the updates already grouped per record (buildUnifiedUpdates) — written by GristService.applyUnifiedUpdates. */
   /** Absent on a read-only instance (READ_ONLY): the Apply and Update buttons are hidden. */
   onApply?: (updates: PersonAlignUpdate[]) => Promise<number | void>;
@@ -306,7 +308,7 @@ interface UnifiedAlignPageProps {
   onMixedCandidate?: (src: UnifiedAlignSource, row: RowRef, candidate: Candidate, candidateCount?: number) => Promise<boolean>;
 }
 
-export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, onModeChange, progress, applying = false, onRerunAll, onApply, onRejectCandidate, onMixedCandidate }) => {
+export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, onModeChange, progress, applying = false, onRerunAll, onStop, onApply, onRejectCandidate, onMixedCandidate }) => {
   const { t } = useLingui();
   const [toast, setToast] = useState<string | null>(null);
   const [labo, setLabo] = useState('');
@@ -317,6 +319,19 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
   const [decisions, setDecisions] = useState<Record<string, UnifiedArbitrateDecision>>({});
   // Filters on what to disambiguate: one source (IdRef, ORCID…) and/or one kind of work.
   const [srcFilter, setSrcFilter] = useState<UnifiedAlignSource | ''>('');
+  // Sources whose « Stop » was clicked, until their run closes its progress.
+  const [stopping, setStopping] = useState<Set<UnifiedAlignSource>>(new Set());
+  useEffect(() => {
+    if (!progress) setStopping(new Set());
+  }, [progress]);
+  const stopSource = async (src: UnifiedAlignSource) => {
+    if (!onStop) return;
+    setStopping((prev) => new Set(prev).add(src));
+    try { await onStop(src); } catch (e) {
+      setStopping((prev) => { const n = new Set(prev); n.delete(src); return n; });
+      setToast(e instanceof Error ? e.message : String(e));
+    }
+  };
   const [kindFilter, setKindFilter] = useState<CellKind | ''>('');
 
   const sources = useMemo(() => SOURCE_ORDER.filter((s) => diff?.sources.includes(s)), [diff]);
@@ -519,9 +534,24 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
             {sources.map((s) => {
               const p = progress[s];
               if (!p) return null;
+              // Scopus: remaining weekly quota of the Author Search API and key in use (key 1 is
+              // shared with the SoVisu+ harvester, which keeps its share).
+              const q = p.quota?.search;
               return (
-                <span key={s} className={p.error ? 'text-[#b3441f] dark:text-[#e08a6a]' : undefined}>
-                  {SOURCE_LABEL[s]} {p.running ? `${p.done ?? 0}/${p.total ?? '?'}` : p.error ? t`error` : t`done`}
+                <span key={s} className={`inline-flex items-center gap-1.5 ${p.error ? 'text-[#b3441f] dark:text-[#e08a6a]' : ''}`}>
+                  {SOURCE_LABEL[s]} {p.running ? `${p.done ?? 0}/${p.total ?? '?'}` : p.error ? t`error` : p.stopped ? t`stopped at ${p.done ?? 0}/${p.total ?? '?'}` : t`done`}
+                  {q && (
+                    <span className="font-normal" title={t`Remaining weekly quota of the Elsevier Author Search API (reset ${q.reset})`}>
+                      · {q.key ? t`key ${q.key}: ${q.remaining.toLocaleString(numberLocale())} searches left` : t`${q.remaining.toLocaleString(numberLocale())} searches left`}
+                    </span>
+                  )}
+                  {p.running && onStop && (
+                    <button type="button" onClick={() => stopSource(s)} disabled={stopping.has(s)}
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-ink/15 dark:border-white/15 hover:bg-white/70 dark:hover:bg-white/10 disabled:opacity-60"
+                      title={t`Stops this source: the records in progress finish, what was found is kept; the next run resumes with the records not searched yet`}>
+                      <CircleStop className="w-3 h-3" /> {stopping.has(s) ? t`Stopping…` : t`Stop`}
+                    </button>
+                  )}
                 </span>
               );
             })}

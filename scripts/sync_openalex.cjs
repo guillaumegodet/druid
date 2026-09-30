@@ -33,9 +33,9 @@
  * diverging name reported; NEW FRAGMENTS (candidates missing from the list) → review.
  * push            : no API call — pushes the cached suggestions again to the review table.
  *
- * Options: `--mode= --limit= --labo= --group=personnel|doctorants|hors_recherche --concurrency=(3) --incremental` (with `--labo`: only reprocesses unseen or failed records)
+ * Options: `--mode= --limit= --labo= --group=personnel|doctorants|hors_recherche --concurrency=(3) --incremental`
  * --push-grist=false (dry run: neither review table nor Annuaire write)
- * --force (reprocesses records already cached; implied by --labo)
+ * --force (reprocesses records already cached, --labo included)
  * --no-key (OPENALEX_MAILTO polite pool instead of the OPENALEX_API_KEY key, the default)
  * Cache: openalex_align_cache.json (key = uid_dyna, or g<rowId>), progress: openalex_align_progress.json.
  */
@@ -49,9 +49,9 @@ const {
 // ── Parameters ───────────────────────────────────────────────────────────────
 const OPTS = common.commonOptions({ modes: ['search', 'verify', 'push'], concurrency: 3 });
 const { mode: MODE, limit: LIMIT, labo: LABO_FILTER, group: GROUP_FILTER, concurrency: CONCURRENCY, pushGrist: PUSH_GRIST } = OPTS;
-// --labo implies a full reprocessing of the lab; --incremental disables it (only reprocesses records
-// never seen or in error — useful after a run interrupted by the OpenAlex rate limit).
-const FORCE = common.hasFlag('incremental') ? false : (OPTS.force || !!LABO_FILTER);
+// Incremental by default, --labo included (decision D2 of 2026-09-30): only records never seen or in
+// error; --force reprocesses the cached ones too. --incremental is kept as an explicit no-op override.
+const FORCE = common.hasFlag('incremental') ? false : OPTS.force;
 // OpenAlex rate limit: 10 requests/s across all keys → at most one request every 130 ms
 // (~7.7/s); without this limiter, concurrency 4 → burst of 429s (LS2N run of 2026-09-11).
 const OA_MIN_INTERVAL_MS = 130;
@@ -807,7 +807,7 @@ async function main() {
       writeProgress({ running: true, mode: MODE, total: targets.length, done: n, ...counts, startedAt: today() });
       console.log(`[openalex] ${n}/${targets.length}`);
     }
-  });
+  }, { stoppable: true });   // « Stop » button: records in progress finish, the rest is left for the next run
   writeCache(cache);
 
   let writes = null;

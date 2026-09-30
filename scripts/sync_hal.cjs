@@ -26,7 +26,7 @@
  *
  * Options: --mode= --limit= --labo= --group=personnel|doctorants|hors_recherche --concurrency=(4)
  *           --push-grist=false (dry-run: neither review table nor Annuaire write)
- *           --force (reprocesses the records already in the cache; implicit with --labo)
+ *           --force (reprocesses the records already in the cache, --labo included)
  * Incremental: a record already processed in the current mode is skipped without --force.
  * Cache: hal_align_cache.json (key = uid_dyna, or g<rowId> for records without uid), served by
  * server.cjs from the app root; progress: hal_align_progress.json.
@@ -40,7 +40,7 @@ const {
 // ── Parameters ───────────────────────────────────────────────────────────────
 const OPTS = common.commonOptions({ modes: ['search', 'verify', 'push'], concurrency: 4 });
 const { mode: MODE, limit: LIMIT, labo: LABO_FILTER, group: GROUP_FILTER, concurrency: CONCURRENCY, pushGrist: PUSH_GRIST } = OPTS;
-const FORCE = OPTS.force || !!LABO_FILTER;
+const FORCE = OPTS.force;   // a lab run is incremental too (decision D2 of 2026-09-30): --force to reprocess
 const HAL = 'https://api.archives-ouvertes.fr';
 const REVIEW_TABLE = 'Alignement_HAL';
 const SOURCE = 'HAL';                 // Data_source label / HAL_* columns
@@ -511,7 +511,7 @@ async function main() {
       writeProgress({ running: true, mode: MODE, total: targets.length, done: n, ...counts, startedAt: today() });
       console.log(`[hal] ${n}/${targets.length}`);
     }
-  });
+  }, { stoppable: true });   // « Stop » button: records in progress finish, the rest is left for the next run
   writeCache(cache);
 
   let push = null;

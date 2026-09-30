@@ -120,6 +120,7 @@ export const API_ERRORS = [
   msg`An IdRef alignment is already running`,
   msg`Alignment already running`,
   msg`Unknown alignment source`,
+  msg`No alignment running`,
   msg`No run yet`,
   // single-person LDAP lookup (researcher creation form)
   msg`LDAP not configured on this instance`,

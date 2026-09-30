@@ -12341,3 +12341,47 @@ msgstr "Alignement {lbl} : {0}"
 #: lib/unifiedAlignRuns.ts:87
 msgid "Error during the {lbl} alignment"
 msgstr "Erreur lors de l'alignement {lbl}"
+
+#. placeholder {0}: p.done ?? 0
+#. placeholder {1}: p.total ?? '?'
+#: components/researchers/UnifiedAlignPage.tsx:542
+msgid "stopped at {0}/{1}"
+msgstr "arrêté à {0}/{1}"
+
+#. placeholder {0}: q.reset
+#: components/researchers/UnifiedAlignPage.tsx:544
+msgid "Remaining weekly quota of the Elsevier Author Search API (reset {0})"
+msgstr "Quota hebdomadaire restant de l’API Elsevier Author Search (remise à zéro le {0})"
+
+#. placeholder {0}: q.key
+#. placeholder {1}: q.remaining.toLocaleString(numberLocale())
+#: components/researchers/UnifiedAlignPage.tsx:545
+msgid "key {0}: {1} searches left"
+msgstr "clé {0} : {1} recherches restantes"
+
+#. placeholder {0}: q.remaining.toLocaleString(numberLocale())
+#: components/researchers/UnifiedAlignPage.tsx:545
+msgid "{0} searches left"
+msgstr "{0} recherches restantes"
+
+#: components/researchers/UnifiedAlignPage.tsx:551
+msgid "Stops this source: the records in progress finish, what was found is kept; the next run resumes with the records not searched yet"
+msgstr "Arrête cette source : les fiches en cours se terminent, ce qui a été trouvé est conservé ; la prochaine recherche reprend avec les fiches pas encore cherchées"
+
+#: components/researchers/UnifiedAlignPage.tsx:552
+msgid "Stopping…"
+msgstr "Arrêt en cours…"
+
+#: components/researchers/UnifiedAlignPage.tsx:552
+msgid "Stop"
+msgstr "Arrêter"
+
+#: lib/apiErrors.ts:123
+msgid "No alignment running"
+msgstr "Aucun alignement en cours"
+
+#. placeholder {0}: label(src)
+#. placeholder {1}: r.status
+#: lib/unifiedAlignRuns.ts:62
+msgid "{0} stop failed: {1}"
+msgstr "Échec de l’arrêt {0} : {1}"

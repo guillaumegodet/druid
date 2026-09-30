@@ -33,7 +33,18 @@ ORCID, HAL, OpenAlex, Scopus) : **une ligne par personne, une colonne par identi
   cherche les identifiants absents, le second revérifie ceux qui sont déjà renseignés
   (notices fusionnées, profils disparus, noms divergents).
 - **Rechercher partout** lance la recherche en parallèle sur toutes les sources, pour la
-  structure choisie. L'avancement s'affiche par source sous le bouton.
+  structure choisie. L'avancement s'affiche par source sous le bouton. Seules les fiches jamais
+  cherchées (ou en erreur) sont traitées : relancer ne refait pas le travail déjà fait.
+- **Arrêter**, à côté de l'avancement d'une source, interrompt sa recherche : les fiches en cours
+  se terminent, ce qui a été trouvé est conservé, et la recherche suivante reprend là où elle
+  s'est arrêtée.
+
+:::caution[Scopus : quota hebdomadaire]
+L'API Elsevier est limitée à 5 000 appels par semaine et par clé, soit environ 2 500 fiches ;
+l'avancement Scopus affiche les recherches restantes. La première clé est partagée avec le
+moissonneur SoVisu+ : Druid lui en laisse 30 % et passe ensuite sur la clé de secours, puis
+s'arrête. Préférez des recherches Scopus structure par structure.
+:::
 
 Selon le nombre de personnes, comptez de quelques minutes à plus d'une heure. Vous pouvez
 fermer la page : la recherche continue.

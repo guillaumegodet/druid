@@ -10,8 +10,8 @@
  * the client reads x-ratelimit-* and aborts the run when a pool is exhausted, or when the remaining
  * share falls under `reserve` (share of the weekly limit left to the other jobs, decision D9).
  * Backup key (2026-09-30): SCOPUS_API_KEY_2 (+ SCOPUS_INST_TOKEN_2) takes over, pool by pool, once
- * the first key has exhausted a pool; the run stops only when the last key is exhausted, and
- * `reserve` only applies to that last key.
+ * the first key has exhausted a pool — or reached its `reserve` share (key 1 is shared with the SoVisu+
+ * harvester, docker/harvester/.env); the run stops only when the last key does.
  */
 const { getUrl } = require('./align_common.cjs');
 
@@ -29,7 +29,9 @@ function envKeys(env = process.env) {
  * @param {object} o
  * @param {string} o.tag           log prefix (« scopus », « parcours »…)
  * @param {object} o.ratePerS      requests per second per pool, e.g. { search: 2, author: 3 }
- * @param {number} [o.reserve=0]   share (0-1) of each weekly limit never consumed by this run
+ * @param {number|number[]} [o.reserve=0] share (0-1) of each weekly limit never consumed by this run:
+ *                                 one number for every key, or one per key (missing ⇒ 0). Reaching it
+ *                                 moves the pool to the next key; on the last key it stops the run
  * @param {number} [o.rateLimitWaitMs=700] wait after a 429 of rate (Elsevier clears within the second)
  * @param {number} [o.marginMs=40] extra spacing between two requests of a pool
  * @param {{ apiKey: string, instToken?: string }[]} [o.keys] keys in order of use (default: envKeys())
@@ -56,15 +58,17 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
     if (!aborted) { aborted = reason; console.error(`[${tag}] RUN STOPPED: ${reason}`); }
   }
   const resetDate = (h) => { const t = parseInt(h['x-ratelimit-reset'] || '0', 10); return t ? new Date(t * 1000).toISOString().slice(0, 10) : '?'; };
-  /** Pool exhausted on its current key: switches to the next key (true), or stops the run (false). */
-  function exhausted(pool, reason) {
+  const reserveOf = (k) => (Array.isArray(reserve) ? Number(reserve[k]) || 0 : reserve);
+  /** Pool exhausted (or at its reserve) on its current key: switches to the next key (true), or
+   * stops the run (false). */
+  function exhausted(pool, reason, last = `all ${keys.length} keys exhausted`) {
     const k = keyOf[pool] || 0;
     if (k + 1 < keys.length) {
       keyOf[pool] = k + 1;
       console.warn(`[${tag}] ${reason}${keyLabel(k)} — switching to key ${k + 2}`);
       return true;
     }
-    abort(`${reason}${keys.length > 1 ? ` — all ${keys.length} keys exhausted` : ''}`);
+    abort(`${reason}${keys.length > 1 ? ` — ${last}` : ''}`);
     return false;
   }
   function trackQuota(pool, h, k) {
@@ -72,8 +76,9 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
     const remaining = parseInt(h['x-ratelimit-remaining'], 10);
     const limit = parseInt(h['x-ratelimit-limit'] || '0', 10) || 0;
     quota[pool] = { remaining, limit, reset: resetDate(h), ...(keys.length > 1 ? { key: k + 1 } : {}) };
+    const share = reserveOf(k);
     if (remaining <= 0) exhausted(pool, `weekly Elsevier quota exhausted (${pool} API, reset ${quota[pool].reset})`);
-    else if (reserve > 0 && limit && k === keys.length - 1 && remaining <= Math.floor(limit * reserve)) abort(`weekly Elsevier quota share reached (${pool} API${keyLabel(k)}: ${remaining}/${limit} left for the other jobs, reset ${quota[pool].reset})`);
+    else if (share > 0 && limit && remaining <= Math.floor(limit * share)) exhausted(pool, `weekly Elsevier quota share reached (${pool} API: ${remaining}/${limit} left for the other jobs, reset ${quota[pool].reset})`, `last key (${keys.length}/${keys.length})`);
   }
   /**
    * GET JSON on an Elsevier API. `pool` = quota pool name. Returns the body, `{ notFound: true }` on 404,

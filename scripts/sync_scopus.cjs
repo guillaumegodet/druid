@@ -37,7 +37,7 @@
  * x-ratelimit-remaining = 0): the records not processed are not cached and are picked up by the next run.
  *
  * Options: --mode= --limit= --labo= --group=personnel|doctorants|hors_recherche --concurrency=(3)
- *           --push-grist=false (dry-run) --force (reprocesses the cached records; implicit with --labo)
+ *           --push-grist=false (dry-run) --force (reprocesses the cached records, --labo included)
  *           --enrich=(3) candidates enriched (affiliation history) per record, 0 = none
  * Cache: scopus_align_cache.json (key = uid_dyna or g<rowId>); progress: scopus_align_progress.json.
  */
@@ -52,7 +52,7 @@ const {
 // ── Parameters ───────────────────────────────────────────────────────────────
 const OPTS = common.commonOptions({ modes: ['search', 'verify', 'push'], concurrency: 3 });
 const { mode: MODE, limit: LIMIT, labo: LABO_FILTER, group: GROUP_FILTER, concurrency: CONCURRENCY, pushGrist: PUSH_GRIST } = OPTS;
-const FORCE = OPTS.force || !!LABO_FILTER;
+const FORCE = OPTS.force;   // a lab run is incremental too (decision D2 of 2026-09-30): --force to reprocess
 const MAX_ENRICH = Math.max(0, parseInt(common.getArg('enrich', '3'), 10) || 0);
 const ELS = 'https://api.elsevier.com/content';
 const API_KEY = process.env.SCOPUS_API_KEY || '';
@@ -83,8 +83,11 @@ const store = makeStore({ cachePath: 'scopus_align_cache.json', progressPath: 's
 const { loadCache, writeCache, writeProgress } = store;
 
 // ── Elsevier client (throttle, quotas, abort): scripts/lib/elsevier_client.cjs ─────
-// Keys read by the client: SCOPUS_API_KEY, then the backup SCOPUS_API_KEY_2 once a pool is exhausted.
-const elsevier = createElsevierClient({ tag: 'scopus', ratePerS: RATE_PER_S, rateLimitWaitMs: RATE_LIMIT_WAIT_MS, marginMs: RATE_MARGIN_MS });
+// Keys read by the client: SCOPUS_API_KEY, then the backup SCOPUS_API_KEY_2. Key 1 is shared with the
+// SoVisu+ harvester: this job leaves it SCOPUS_KEY1_RESERVE of each weekly limit (default 30 %, decision
+// D1 of 2026-09-30) and moves to key 2 — used in full — beyond; with key 1 alone, the run stops there.
+const KEY1_RESERVE = Math.min(0.9, Math.max(0, parseFloat(process.env.SCOPUS_KEY1_RESERVE ?? '0.3') || 0));
+const elsevier = createElsevierClient({ tag: 'scopus', ratePerS: RATE_PER_S, rateLimitWaitMs: RATE_LIMIT_WAIT_MS, marginMs: RATE_MARGIN_MS, reserve: [KEY1_RESERVE, 0] });
 const QUOTA = elsevier.quota;
 const els = (pool, path, params) => elsevier.get(pool, path, params);
 const digits = (v) => String(v || '').replace(/\D/g, '');
@@ -562,7 +565,7 @@ async function main() {
       const res = await verifyBatch(batch, labNames, affils);
       for (const p of batch) { const e = res.get(p.key); if (e && !(e.status === 'error' && elsevier.aborted())) record(p, e); else skipped++; }
       n += batch.length; tick(n);
-    }, CONCURRENCY);
+    }, CONCURRENCY, undefined, { stoppable: true });
   } else if (MODE === 'search') {
     await runPool(targets, async (p) => {
       if (elsevier.aborted()) { skipped++; return; }
@@ -570,7 +573,7 @@ async function main() {
       // Aborted mid-record (quota): nothing cached, the next run picks it up again.
       if (elsevier.aborted() && entry.status === 'error') { skipped++; return; }
       record(p, entry);
-    }, CONCURRENCY, tick);
+    }, CONCURRENCY, tick, { stoppable: true });
   }
   writeCache(cache);
 

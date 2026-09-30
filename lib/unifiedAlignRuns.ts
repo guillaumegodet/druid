@@ -15,6 +15,9 @@ import { t } from '@lingui/core/macro';
 import { apiErrorText, translateApiError } from './apiErrors';
 import { ALIGN_SOURCE_META, type AlignGroup, type AlignMode, type UnifiedAlignSource } from './gristService';
 
+/** Remaining weekly Elsevier quota of one API pool (Scopus progress), `key` = key in use (1, 2). */
+export interface ElsevierPoolQuota { remaining: number; limit: number; reset: string; key?: number }
+
 /** Same shape as the /api/.../progress and /api/sync-idref-progress routes. */
 export interface UnifiedRunProgress {
   running: boolean;
@@ -22,6 +25,10 @@ export interface UnifiedRunProgress {
   done?: number;
   error?: string;
   mode?: string;
+  /** Closed by the « Stop » button (scripts/lib/align_common.cjs): `done` < `total`. */
+  stopped?: boolean;
+  /** Scopus only: remaining quota per API pool (`search`, `author`). */
+  quota?: Record<string, ElsevierPoolQuota>;
 }
 
 const label = (src: UnifiedAlignSource): string => (src === 'idref' ? 'IdRef' : ALIGN_SOURCE_META[src].label);
@@ -41,6 +48,20 @@ const triggerUrl = (src: UnifiedAlignSource, mode: AlignMode, labo?: string, gro
 };
 
 const progressUrl = (src: UnifiedAlignSource): string => (src === 'idref' ? '/api/sync-idref-progress' : `/api/align/${src}/progress`);
+const stopUrl = (src: UnifiedAlignSource): string => (src === 'idref' ? '/api/sync-idref-stop' : `/api/align/${src}/stop`);
+
+/**
+ * Asks the run of a source to stop (« Stop » button): the script finishes the records in progress,
+ * saves what it found and closes its progress with `stopped: true` — the polling of
+ * runUnifiedAlign then ends normally. Rejects with the server message (no run in progress…).
+ */
+export async function stopUnifiedRun(src: UnifiedAlignSource): Promise<void> {
+  const r = await fetch(stopUrl(src), { method: 'POST' });
+  if (!r.ok) {
+    const d = await r.json().catch(() => ({}));
+    throw new Error(translateApiError(String(d.error || '')) || t`${label(src)} stop failed: ${r.status}`);
+  }
+}
 
 /**
  * Starts the run of every requested source in parallel and notifies `onProgress` on each tick

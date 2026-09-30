@@ -3205,19 +3205,36 @@ const settleProgress = (progressPath, error) => {
   fs.writeFileSync(progressPath, JSON.stringify({ ...p, running: false, error, finishedAt: new Date().toISOString() }));
   return true;
 };
+/** Background runs in progress, by progress file — for the « Stop » button (lost on a server
+ * restart: the run then goes on to its end). */
+const runningChildren = new Map();
 const startBackgroundRun = (label, progressPath, initial, args) => {
   fs.writeFileSync(progressPath, JSON.stringify({ running: true, total: 0, done: 0, ...initial, startedAt: new Date().toISOString() }));
   const child = spawn('node', args, { stdio: 'inherit' });
+  runningChildren.set(progressPath, child);
   child.on('error', (err) => {
     console.error(`[Sync ${label}] spawn error`, err);
     settleProgress(progressPath, `Lancement impossible : ${err.message}`);
   });
   child.on('exit', (code, signal) => {
+    if (runningChildren.get(progressPath) === child) runningChildren.delete(progressPath);
     const why = code === 0 ? 'Script terminé sans clore sa progression' : `Script interrompu (code ${code ?? signal})`;
     if (settleProgress(progressPath, why)) console.error(`[Sync ${label}] ${why}`);
   });
   child.unref();
   return child;
+};
+/**
+ * Asks a background run to stop (SIGTERM): the alignment scripts finish the records in progress,
+ * save their cache and close their progress with `stopped: true` (scripts/lib/align_common.cjs).
+ * false when no run of this progress file was started by this server process.
+ */
+const stopBackgroundRun = (label, progressPath) => {
+  const child = runningChildren.get(progressPath);
+  if (!child || child.exitCode !== null) return false;
+  console.log(`[Sync ${label}] stop requested`);
+  child.kill('SIGTERM');
+  return true;
 };
 
 // Groups of the alignment pages (« Personnel » / « Doctorants » / « Sans obligation de recherche » tabs) —
@@ -3228,16 +3245,14 @@ app.get('/api/sync-idref-trigger', requireEstablishmentScope, (req, res) => {
   // 'align' = Qualinka prototype (disambiguation scoring); otherwise search/verify (sync_idref.cjs).
   const mode = ['verify', 'align'].includes(req.query.mode) ? req.query.mode : 'search';
   // `?labo=ACRONYM`: run restricted to one structure (`LABO` column) — lab by lab, much shorter
-  // than a global run. Implies --force: the lab's records already in cache are reprocessed too
-  // (otherwise a lab covered by a previous global run would yield a run with 0 records).
+  // than a global run.
   const labo = String(req.query.labo || '').trim().slice(0, 120);
   // ?group=personnel|doctorants|hors_recherche: scopes the active tab of the IdRef alignment page —
   // « Doctorants » (TYPE_EMPLOI=DOCTORANT) and « Sans obligation de recherche » (LIB_TYPE_EMPLOI
   // « …n'ayant pas d'obligation statutaire de recherche ») are isolated low priorities;
-  // « Personnel » = the rest. These two secondary groups also force reprocessing (deliberately
-  // targeted queue, like labo).
+  // « Personnel » = the rest. Incremental whatever the scope (decision D2 of 2026-09-30,
+  // docs/plan-recherche-alignement-maitrisee.md): ?force=1 to reprocess the cached records.
   const group = ALIGN_GROUPS.includes(req.query.group) ? req.query.group : '';
-  const forceRun = labo || (group && group !== 'personnel');
   // Refuse if a run is already in progress (unreadable progress: start anyway)
   const running = runningProgress(IDREF_PROGRESS_PATH);
   if (running) return res.status(409).json({ error: 'An IdRef alignment is already running', progress: running });
@@ -3250,7 +3265,7 @@ app.get('/api/sync-idref-trigger', requireEstablishmentScope, (req, res) => {
     const alignArgs = ['scripts/sync_idref_qualinka.cjs', '--mode=search', '--neo4j', '--labos', `--progress=${IDREF_PROGRESS_PATH}`];
     const alignLimit = Math.max(0, parseInt(req.query.limit, 10) || 0);
     if (alignLimit > 0) alignArgs.push(`--limit=${alignLimit}`);
-    if (req.query.force === '1' || req.query.force === 'true' || forceRun) alignArgs.push('--force');
+    if (req.query.force === '1' || req.query.force === 'true') alignArgs.push('--force');
     if (labo) alignArgs.push(`--labo=${labo}`);
     if (group) alignArgs.push(`--group=${group}`);
     const searchArgs = ['scripts/sync_idref.cjs', `--mode=${mode}`];
@@ -3263,6 +3278,11 @@ app.get('/api/sync-idref-trigger', requireEstablishmentScope, (req, res) => {
     console.error('[Sync IdRef Error]', err);
     res.status(500).json({ error: err.message });
   }
+});
+
+app.post('/api/sync-idref-stop', requireEstablishmentScope, (req, res) => {
+  if (!stopBackgroundRun('IdRef', IDREF_PROGRESS_PATH)) return res.status(404).json({ error: 'No alignment running' });
+  res.json({ stopping: true });
 });
 
 app.get('/api/sync-idref-progress', requireEstablishmentScope, (req, res) => {
@@ -3293,7 +3313,8 @@ app.get('/api/align/:source/trigger', requireEstablishmentScope, (req, res) => {
   const labo = String(req.query.labo || '').trim().slice(0, 120);
   const group = ALIGN_GROUPS.includes(req.query.group) ? req.query.group : '';
   const limit = Math.max(0, parseInt(req.query.limit, 10) || 0);
-  const force = req.query.force === '1' || req.query.force === 'true' || (group && group !== 'personnel');
+  // Incremental by default, lab and secondary groups included (decision D2 of 2026-09-30).
+  const force = req.query.force === '1' || req.query.force === 'true';
   const running = runningProgress(src.progress);
   if (running) return res.status(409).json({ error: `Alignment already running: ${src.label}`, progress: running });
   try {
@@ -3310,6 +3331,14 @@ app.get('/api/align/:source/trigger', requireEstablishmentScope, (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// « Stop » button of the unified alignment page (docs/plan-recherche-alignement-maitrisee.md, lot 1).
+app.post('/api/align/:source/stop', requireEstablishmentScope, (req, res) => {
+  const src = ALIGN_SOURCES[req.params.source];
+  if (!src) return res.status(404).json({ error: `Unknown alignment source: ${req.params.source}` });
+  if (!stopBackgroundRun(src.label, src.progress)) return res.status(404).json({ error: 'No alignment running' });
+  res.json({ stopping: true });
+});
+
 app.get('/api/align/:source/progress', requireEstablishmentScope, (req, res) => {
   const src = ALIGN_SOURCES[req.params.source];
   if (!src) return res.status(404).json({ error: `Unknown alignment source: ${req.params.source}` });

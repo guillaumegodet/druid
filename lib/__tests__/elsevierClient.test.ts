@@ -62,15 +62,24 @@ describe('scripts/lib/elsevier_client.cjs — backup API key', () => {
     warn.mockRestore(); err.mockRestore();
   });
 
-  it('the reserve share only applies to the last key; one key behaves as before', async () => {
+  it('reserve: reaching the share of a key moves the pool to the next key; on the last key it stops the run', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const err = vi.spyOn(console, 'error').mockImplementation(() => {});
-    const low = fakeHttp(() => quotaHeaders(100, 5000));   // 2 % left, under a 10 % reserve
-    const two = client(['k1', 'k2'], low.getUrlImpl, { reserve: 0.1 });
-    await two.get('search', '/search/author');
-    expect(two.aborted()).toBeNull();   // key 1 may be used up: key 2 is still there
-    await two.get('search', '/search/author');
-    expect(two.aborted()).toBeNull();   // key 1 still answering with 100 left: no switch yet
+    // Key 1 shared with the harvester: 30 % kept; key 2 used in full (sync_scopus.cjs, decision D1).
+    const low = fakeHttp((key) => (key === 'k1' ? quotaHeaders(1400, 5000) : quotaHeaders(100, 5000)));
+    const perKey = client(['k1', 'k2'], low.getUrlImpl, { reserve: [0.3, 0] });
+    await perKey.get('search', '/search/author');   // k1 answers with 28 % left ⇒ under its 30 % share
+    await perKey.get('search', '/search/author');   // k2, 2 % left but no share of its own
+    await perKey.get('search', '/search/author');
+    expect(low.calls.map((x) => x.key)).toEqual(['k1', 'k2', 'k2']);
+    expect(perKey.aborted()).toBeNull();
+    // One share for every key: the last key stops the run once at its share.
+    const both = client(['k1', 'k2'], fakeHttp(() => quotaHeaders(100, 5000)).getUrlImpl, { reserve: 0.1 });
+    await both.get('search', '/search/author');
+    expect(both.aborted()).toBeNull();
+    await both.get('search', '/search/author');
+    expect(both.aborted()).toMatch(/quota share reached .* last key \(2\/2\)/);
+    // One key: stops at its share, as before the backup key.
     const one = client(['k1'], fakeHttp(() => quotaHeaders(100, 5000)).getUrlImpl, { reserve: 0.1 });
     await one.get('search', '/search/author');
     expect(one.aborted()).toMatch(/quota share reached/);

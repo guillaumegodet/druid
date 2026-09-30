@@ -28,7 +28,7 @@
  *                     (/search requests in batches of 50 ORCID), without rerunning the searches.
  *
  * Options: --mode= --limit= --labo= --group=personnel|doctorants|hors_recherche --concurrency=(4)
- *           --push-grist=false (dry-run) --force (reprocesses the cached records; implicit with --labo)
+ *           --push-grist=false (dry-run) --force (reprocesses the cached records, --labo included)
  * Cache: orcid_align_cache.json (key = uid_dyna or g<rowId>); progress: orcid_align_progress.json.
  */
 const common = require('./lib/align_common.cjs');
@@ -41,7 +41,7 @@ const hal = require('./sync_hal.cjs');   // byIdhal (pass 0), extractIdhal
 // ── Parameters ───────────────────────────────────────────────────────────────
 const OPTS = common.commonOptions({ modes: ['search', 'verify', 'push', 'flag-empty'], concurrency: 4 });
 const { mode: MODE, limit: LIMIT, labo: LABO_FILTER, group: GROUP_FILTER, concurrency: CONCURRENCY, pushGrist: PUSH_GRIST } = OPTS;
-const FORCE = OPTS.force || !!LABO_FILTER;
+const FORCE = OPTS.force;   // a lab run is incremental too (decision D2 of 2026-09-30): --force to reprocess
 const ORCID = 'https://pub.orcid.org/v3.0';
 const REVIEW_TABLE = 'Alignement_ORCID';
 const SOURCE = 'ORCID';
@@ -529,7 +529,7 @@ async function main() {
       writeProgress({ running: true, mode: MODE, total: targets.length, done: n, ...counts, startedAt: today() });
       console.log(`[orcid] ${n}/${targets.length}`);
     }
-  });
+  }, { stoppable: true });   // « Stop » button: records in progress finish, the rest is left for the next run
   writeCache(cache);
 
   let push = null;

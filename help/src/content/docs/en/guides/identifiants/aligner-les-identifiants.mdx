@@ -33,7 +33,17 @@ OpenAlex, Scopus): **one row per person, one column per identifier**.
   identifiers, the second rechecks those already filled in (merged authority records,
   profiles that have disappeared, diverging names).
 - **Search everywhere** runs the search in parallel on all sources, for the chosen
-  structure. Progress is shown per source under the button.
+  structure. Progress is shown per source under the button. Only the records never searched
+  (or in error) are processed: running it again does not redo the work already done.
+- **Stop**, next to a source's progress, interrupts its search: the records in progress finish,
+  what was found is kept, and the next search resumes where it stopped.
+
+:::caution[Scopus: weekly quota]
+The Elsevier API is limited to 5,000 calls per week and per key, about 2,500 records; the Scopus
+progress shows the searches left. The first key is shared with the SoVisu+ harvester: Druid
+leaves it 30 %, then moves to the backup key, then stops. Prefer Scopus searches structure by
+structure.
+:::
 
 Depending on the number of people, allow from a few minutes to more than an hour. You can
 close the page: the search goes on.

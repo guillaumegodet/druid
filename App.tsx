@@ -22,7 +22,7 @@ const AdminPage = React.lazy(() =>
 import type { AdminTab } from './lib/auth';
 import { ViewState, Researcher, Structure, ResearcherStatus, StructureLevel } from './types';
 import { GristService, NEW_STRUCTURE_ID, LdapDiff, StructuresLdapDiff, IdrefCandidate, AlignMode, AlignCandidate, DECISION_MIXED, ReviewDecision, AlignGroup, UnifiedAlignDiff, UnifiedAlignSource, UNIFIED_ALIGN_SOURCES, PersonAlignUpdate, unifiedCandidateId, DuplicatesDiff } from './lib/gristService';
-import { runUnifiedAlign, UnifiedRunProgress } from './lib/unifiedAlignRuns';
+import { runUnifiedAlign, stopUnifiedRun, UnifiedRunProgress } from './lib/unifiedAlignRuns';
 import { useDruidData } from './hooks/useDruidData';
 import { isSuperAdmin, hasFullAccess, canUseEstablishmentTools, isLabViewer, hasCapability, canWrite } from './lib/auth';
 import { useUrlState } from './hooks/useUrlState';
@@ -835,6 +835,7 @@ function App() {
             progress={unifiedProgress}
             applying={unifiedApplying}
             onRerunAll={rerunUnifiedAlign}
+            onStop={stopUnifiedRun}
             onApply={writable ? handleApplyUnified : undefined}
             onRejectCandidate={writable ? handleRejectUnifiedCandidate : undefined}
             onMixedCandidate={writable ? handleMixedUnifiedCandidate : undefined}

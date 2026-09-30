@@ -617,7 +617,7 @@ async function main() {
       store.writeProgress({ running: true, total: targets.length, done, accepted, ambiguous });
       console.log(`[qualinka] ${done}/${targets.length}  accepted=${accepted} ambiguous=${ambiguous} low=${low} not_found=${notFound}`);
     }
-  });
+  }, { stoppable: true });   // « Stop » button: records in progress finish, the rest is left for the next run
   store.writeCache(cache);
 
   // Collaborative Grist review: pushes the suggestions directly (accepted → aRenseigner,
