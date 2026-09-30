@@ -1,0 +1,87 @@
+---
+title: "Parcours et suggestions de l’établissement"
+description: "Retracer le parcours d’un chercheur d’après ses publications, ORCID et Scopus, repérer les départs non saisis, et proposer des actions sur ses identifiants."
+sidebar:
+  order: 7
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils (lecture) ; administrateurs Druid (tâches, e-mails)"
+	menu="Fiche d’une personne › Suggestions de l’établissement, Parcours ; Personnel › filtre Parcours"
+	disponibilite="instances Docker (calcul serveur hebdomadaire)"
+/>
+
+Chaque semaine, Druid reconstitue le **parcours** des personnes de l’Annuaire à partir de trois
+sources :
+
+- les **affiliations de leurs publications**, dans le graphe CRISalid, OpenAlex et Scopus ;
+- les **postes déclarés dans leur profil ORCID** ;
+- leur **profil auteur Scopus**.
+
+Il en tire des **signaux** (départ probable, statut incohérent…) et des **suggestions** d’actions
+sur les identifiants.
+
+## Le bloc « Parcours » de la fiche
+
+- **La frise** : une ligne par établissement, les années en abscisse. Les points sont les
+  publications de l’année, plus ou moins gros selon leur nombre. Les barres sont les postes déclarés
+  dans ORCID, en pointillés quand le poste est en cours. La bande grise est la période d’emploi saisie
+  dans Druid.
+- **Les couleurs** : vert pour l’établissement et son site, bleu pour ailleurs, gris pour les
+  organismes nationaux (CNRS, Inserm…). Ces organismes figurent sur les publications de toutes les
+  unités mixtes : ils ne comptent jamais comme un départ.
+- **Le tableau** : chaque établissement avec sa période ORCID, sa présence dans le profil Scopus, sa
+  période observée dans les publications et leur nombre. Un clic ouvre la liste des publications
+  concernées.
+- **« Actualiser »** recalcule la fiche tout de suite, en une dizaine de secondes, par exemple après
+  l’ajout d’un identifiant.
+
+### Les signaux
+
+| Signal | Signification |
+|---|---|
+| Départ confirmé | Au moins deux sources concordent (ORCID, publications, Scopus) |
+| Départ déclaré | Le dernier poste dans l’établissement est terminé dans ORCID |
+| Départ observé | Plus aucune publication affiliée à l’établissement depuis deux ans, plusieurs ailleurs |
+| Affiliation Scopus courante | Elsevier déduit une autre affiliation des dernières publications. Ce signal est peu fiable seul (unités multi-sites) |
+| Statut incohérent | La fiche est close, mais la personne publie encore avec l’établissement |
+| Identifiants à vérifier | Les publications ou le profil Scopus ne mentionnent jamais l’établissement : homonyme ? |
+
+Le bouton **« Reporter … en fin d’emploi »** remplit le champ de la fiche. Rien n’est enregistré
+avant d’avoir cliqué sur **Enregistrer**, et le statut n’est jamais changé automatiquement.
+
+Dans la liste **Personnel**, le filtre **Parcours** retrouve les départs probables ou confirmés, les
+statuts incohérents et les identifiants à vérifier. Une icône signale les départs probables à côté
+du nom. Les mêmes situations deviennent des tâches dans **À traiter**, qui se ferment d’elles-mêmes
+dès que la date de fin est saisie.
+
+## Les suggestions de l’établissement
+
+L’encadré propose **au plus cinq actions** sur les identifiants de la personne, les plus utiles
+d’abord : un identifiant manquant, puis une erreur à corriger, puis un profil à compléter.
+
+| Suggestion | Quand | Où agir |
+|---|---|---|
+| Créer un identifiant ORCID | pas d’ORCID dans la fiche | orcid.org |
+| Rendre public le profil ORCID | profil vide ou privé | paramètres du compte ORCID |
+| Ajouter le poste dans ORCID | profil sans poste, ou sans le poste dans l’établissement | ORCID › Emploi |
+| Clore le poste dans ORCID | départ détecté, poste toujours en cours dans ORCID | ORCID › Emploi |
+| Relier Scopus et ORCID | le profil ORCID ne mentionne pas le Scopus Author ID | assistant Scopus → ORCID d’Elsevier |
+| Créer un IdHAL | pas d’IdHAL (en priorité s’il existe des dépôts HAL) | HAL › Mon espace › Mon IdHAL |
+| Fusionner deux IdHAL | deux IdHAL détectés | support HAL |
+| Corriger le profil Scopus | profil jamais affilié à l’établissement, ou mêlé à des homonymes | Author Feedback Wizard d’Elsevier |
+| Fusionner deux profils Scopus | deux profils détectés | Author Feedback Wizard |
+| Fusionner les profils OpenAlex | plusieurs profils OpenAlex revus | openalex.org : revendiquer le profil (« Claim ») puis y déplacer les travaux |
+
+- **Le chercheur** qui ouvre sa propre fiche lit les mêmes suggestions, formulées pour lui.
+- **Les administrateurs** disposent de trois boutons :
+  - **Préparer l’e-mail** : un modèle à relire, à copier ou à ouvrir dans la messagerie. Druid
+    n’envoie jamais rien lui-même.
+  - **Créer une tâche** : le suivi dans **À traiter**.
+  - **Masquer** : avec un motif (déjà fait, sans objet…). La suggestion ne revient pas, et le motif est
+    gardé dans l’historique des tâches.
+
+Une suggestion disparaît d’elle-même quand la situation est réglée, au recalcul suivant du parcours
+ou des alignements.

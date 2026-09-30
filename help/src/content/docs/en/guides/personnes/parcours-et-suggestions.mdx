@@ -1,0 +1,84 @@
+---
+title: "Career path and suggestions of the institution"
+description: "Trace a researcher’s career path from their publications, ORCID and Scopus, spot departures not entered, and suggest actions on their identifiers."
+sidebar:
+  order: 7
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Every profile (reading); Druid administrators (tasks, emails)"
+	menu="Person record › Suggestions of the institution, Career path; People › Career path filter"
+	disponibilite="Docker instances (weekly server computation)"
+/>
+
+Every week, Druid rebuilds the **career path** of the people of the Directory from three sources:
+
+- the **affiliations of their publications**, in the CRISalid graph, OpenAlex and Scopus;
+- the **positions declared in their ORCID profile**;
+- their **Scopus author profile**.
+
+It derives **signals** from them (probable departure, inconsistent status…) and **suggestions** of
+actions on the identifiers.
+
+## The « Career path » block of the record
+
+- **The timeline**: one row per establishment, years across. Dots are the publications of the year,
+  sized by their number. Bars are the positions declared in ORCID, dashed while ongoing. The grey band
+  is the employment period entered in Druid.
+- **The colours**: green for the institution and its site, blue for elsewhere, grey for national
+  organisms (CNRS, Inserm…). Those organisms appear on the publications of every joint unit: they never
+  count as a departure.
+- **The table**: each establishment with its ORCID period, its presence in the Scopus profile, its
+  period observed in the publications and their number. A click opens the list of those publications.
+- **« Refresh »** recomputes the record right away, in about ten seconds, for instance after adding
+  an identifier.
+
+### Signals
+
+| Signal | Meaning |
+|---|---|
+| Confirmed departure | At least two sources agree (ORCID, publications, Scopus) |
+| Declared departure | The last position at the institution is ended in ORCID |
+| Observed departure | No publication affiliated to the institution for two years, several elsewhere |
+| Current Scopus affiliation | Elsevier infers another affiliation from the latest publications. Weak on its own (multi-site units) |
+| Inconsistent status | The record is ended, yet the person still publishes with the institution |
+| Identifiers to check | The publications or the Scopus profile never mention the institution: namesake? |
+
+The **« Report … as end of employment »** button fills the field of the record. Nothing is saved
+before **Save** is clicked, and the status is never changed automatically.
+
+In the **People** list, the **Career path** filter finds probable or confirmed departures,
+inconsistent statuses and identifiers to check. An icon flags probable departures next to the name.
+The same situations become tasks in **To process**, which close by themselves once the end date is
+entered.
+
+## Suggestions of the institution
+
+The box suggests **at most five actions** on the person’s identifiers, the most useful first: a
+missing identifier, then an error to fix, then a profile to complete.
+
+| Suggestion | When | Where to act |
+|---|---|---|
+| Create an ORCID iD | no ORCID in the record | orcid.org |
+| Make the ORCID profile public | empty or private profile | ORCID account settings |
+| Add the position to ORCID | profile without any position, or without the one at the institution | ORCID › Employment |
+| Close the position in ORCID | departure detected, position still ongoing in ORCID | ORCID › Employment |
+| Link Scopus and ORCID | the ORCID profile does not list the Scopus Author ID | Elsevier’s Scopus-to-ORCID wizard |
+| Create an IdHAL | no IdHAL (priority when HAL deposits exist) | HAL › My space › My IdHAL |
+| Merge two IdHAL | two IdHAL detected | HAL support |
+| Correct the Scopus profile | profile never affiliated to the institution, or mixed with namesakes | Elsevier Author Feedback Wizard |
+| Merge two Scopus profiles | two profiles detected | Author Feedback Wizard |
+| Merge the OpenAlex profiles | several OpenAlex profiles reviewed | openalex.org: « Claim » the profile then move the works to it |
+
+- **The researcher** who opens their own record reads the same suggestions, worded for them.
+- **Administrators** have three buttons:
+  - **Prepare the email**: a template to review, copy or open in the mail client. Druid never sends
+    anything itself.
+  - **Create a task**: the follow-up in **To process**.
+  - **Hide**: with a reason (already done, not relevant…). The suggestion does not come back, and the
+    reason is kept in the task history.
+
+A suggestion disappears by itself once the situation is settled, at the next computation of the
+career path or of the alignments.
