@@ -3010,6 +3010,150 @@ app.post('/api/researchers/:key/affiliation-history/refresh', async (req, res) =
   res.json({ entry, run: ahRunInfo() });
 });
 
+// ── « Suggestions de l'établissement » of a record (docs/plan-parcours-affiliations.md, lot 5) ─────
+// Computed server-side by scripts/lib/suggestions.cjs from the Annuaire rows, the career-path entry, the
+// alignment caches (bind-mounted at the app root), the detection rules of sync_tasks.cjs and the tasks
+// of the person. Read: every right that reads the record (the researcher on their own record included,
+// decision S1); « Create a task » / « Hide »: administrators (the « À traiter » tasks are theirs).
+const SUGG = require('./scripts/lib/suggestions.cjs');
+const alignCacheMemo = {};
+const readAlignCache = (name) => {
+  const file = path.join(__dirname, name);
+  let mtimeMs = 0;
+  try { mtimeMs = fs.statSync(file).mtimeMs; } catch { return {}; }
+  const memo = alignCacheMemo[name];
+  if (memo && memo.mtimeMs === mtimeMs) return memo.data;
+  const data = AH_STORE.readJson(file, {});
+  alignCacheMemo[name] = { mtimeMs, data };
+  return data;
+};
+let suggestionInstitution = null;
+/** Name + ROR of the institution (ROR of the career-path configuration, D2). */
+const institutionForSuggestions = () => {
+  if (suggestionInstitution) return suggestionInstitution;
+  let ror = '';
+  try {
+    const raw = JSON.parse(fs.readFileSync(process.env.AFFILIATION_HISTORY_CONFIG || '', 'utf8'));
+    ror = ((raw.affiliationHistory || raw).local?.ids?.ror || [])[0] || '';
+  } catch { /* no configuration: no ROR in the ORCID suggestion */ }
+  suggestionInstitution = { name: INSTANCE_INFO.label, ror };
+  return suggestionInstitution;
+};
+const gristSqlRows = async (sql, args) => {
+  const r = await fetch(`${GRIST_API_BASE}/docs/${process.env.VITE_GRIST_DOC_ID}/sql`, {
+    method: 'POST', headers: { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sql, args }),
+  });
+  if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
+  return ((await r.json()).records || []).map((x) => x.fields);
+};
+const annuaireRowsForKey = (key) => {
+  const byRow = /^g(\d+)$/.exec(key);
+  return byRow
+    ? gristSqlRows('SELECT * FROM "Annuaire" WHERE id = ?', [Number(byRow[1])])
+    : gristSqlRows('SELECT * FROM "Annuaire" WHERE "uid_dyna" = ?', [key]);
+};
+const splitIdList = (v) => String(v || '').split(/[|,;\s]+/).map((x) => x.trim()).filter(Boolean);
+let institutionRowIds = null;   // Etablissements rows of the institution itself (Employeur reference)
+const institutionEmployerIds = async () => {
+  if (institutionRowIds) return institutionRowIds;
+  const norm = (v) => String(v || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const rows = await gristSqlRows('SELECT id, "Employeur", "Libelle" FROM "Etablissements"', []);
+  institutionRowIds = new Set(rows.filter((r) => [r.Employeur, r.Libelle].some((v) => norm(v) === norm(INSTANCE_INFO.label))).map((r) => r.id));
+  return institutionRowIds;
+};
+/** The record's employment is over (end date passed, or every membership ended in the past). */
+const recordEnded = (rows, todayIso) => rows.some((f) => isFuzzyDatePast(gristDateText(f.employment_end_date), todayIso))
+  || (rows.length > 0 && rows.every((f) => isFuzzyDatePast(gristDateText(f.affiliation_end_date), todayIso)));
+const gristDateText = (v) => (typeof v === 'number' && v ? new Date(v * 1000).toISOString().slice(0, 10) : String(v || '').trim());
+
+app.get('/api/researchers/:key/suggestions', async (req, res) => {
+  const access = req.session.user?.access;
+  if (!hasAnyRight(access)) return res.status(403).json({ error: 'Forbidden' });
+  const key = String(req.params.key || '');
+  if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
+  let rows;
+  try { rows = await annuaireRowsForKey(key); }
+  catch (err) { console.error('[suggestions] Grist', err.message); return res.status(502).json({ error: 'Grist unreachable' }); }
+  if (!rows.length) return res.status(404).json({ error: 'No Annuaire record for this key' });
+  const { RULES } = require('./scripts/sync_tasks.cjs');
+  const { isHorsRechercheEmployment } = require('./scripts/lib/align_common.cjs');
+  const todayIso = new Date().toISOString().slice(0, 10);
+  const f0 = rows[0];
+  const pick = (col) => rows.map((f) => String(f[col] || '').trim()).find(Boolean) || '';
+  const orcid = pick('ORCID').replace(/^https?:\/\/orcid\.org\//i, '').toUpperCase();
+  const record = {
+    key,
+    orcid,
+    idhal: pick('IdHAL') || pick('IdHAL_i'),
+    scopus: [...new Set(rows.flatMap((f) => splitIdList(f.ID_SCOPUS)).filter((x) => /^\d+$/.test(x)))],
+    openalex: [...new Set(rows.flatMap((f) => splitIdList(f.OpenAlex_ids)).filter((x) => /^A\d+$/i.test(x)))],
+    employmentStart: rows.map((f) => gristDateText(f.employment_start_date)).filter(Boolean).sort()[0] || '',
+    ended: recordEnded(rows, todayIso),
+    horsRecherche: rows.every((f) => isHorsRechercheEmployment({ libTypeEmploi: f.LIB_TYPE_EMPLOI })),
+    member: rows.some((f) => String(f.LABO || '').trim()),
+  };
+  // Employed by the institution: its Employeur reference, or no employer and an uid of the LDAP directory.
+  try {
+    const own = await institutionEmployerIds();
+    record.employedHere = rows.some((f) => own.has(f.Employeur) || (!f.Employeur && !!f.uid_dyna && !String(f.uid_dyna).startsWith('ext_')));
+  } catch { record.employedHere = false; }
+  const orcidEntry = readAlignCache('orcid_align_cache.json')[key];
+  const orcidEmpty = !!(orcid && orcidEntry && orcidEntry.mode === 'verify' && orcidEntry.candidate?.emptyRecord
+    && String(orcidEntry.candidate.orcid || orcidEntry.orcid || '').toUpperCase().includes(orcid));
+  // Detection rules of « À traiter » applied to this person only (same code as the 5 a.m. job).
+  const ctx = {
+    annuaire: rows.map((f) => ({ id: f.id, key, fields: f })),
+    hal: readAlignCache('hal_align_cache.json'), idref: readAlignCache('idref_align_cache.json'),
+    scopus: readAlignCache('scopus_align_cache.json'), orcid: readAlignCache('orcid_align_cache.json'),
+  };
+  const ruleHit = (name) => { try { return RULES[name].detect(ctx)[0]?.description || null; } catch { return null; } };
+  let tasks = [];
+  try {
+    tasks = (await gristSqlRows(`SELECT id, cle, type, statut FROM "${tasksSchema.TASKS_TABLE}" WHERE "uid_dyna" = ?`, [key]))
+      .map((t) => ({ ...t, statut: tasksSchema.statusOf(t) }));
+  } catch { /* no task table yet: nothing hidden */ }
+  const { suggestions, hidden } = SUGG.computeSuggestions({
+    record, entry: AH_STORE.readEntry(AFFILIATION_HISTORY_DIR, key), orcidEmpty,
+    ruleHits: { hal_deux_idhal: ruleHit('hal_deux_idhal'), scopus_deux_ids: ruleHit('scopus_deux_ids') },
+    tasks, institution: institutionForSuggestions(),
+  });
+  const canAct = !!access?.isSuperAdmin;
+  res.json({
+    suggestions: suggestions.map((sg) => (canAct ? sg : { ...sg, task: sg.task ? { statut: sg.task.statut } : null })),
+    hidden,
+    viewer: { self: !!f0.uid_dyna && req.session.user?.preferred_username === f0.uid_dyna, canAct },
+  });
+});
+
+// « Create a task » (action: task) or « Hide » (action: dismiss, with a reason) — decision S2: both are
+// tasks keyed `suggestion:<id>:<key>`; a hidden suggestion is an « abandonnee » task with its reason.
+app.post('/api/researchers/:key/suggestions/:id/task', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+  const key = String(req.params.key || '');
+  const id = String(req.params.id || '');
+  if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
+  if (!Object.prototype.hasOwnProperty.call(SUGG.SUGGESTION_TASK_TYPES, id)) return res.status(400).json({ error: 'Unknown suggestion' });
+  const dismiss = req.body?.action === 'dismiss';
+  const rows = await annuaireRowsForKey(key);
+  if (!rows.length) return res.status(404).json({ error: 'No Annuaire record for this key' });
+  const f = rows[0];
+  const author = taskAuthor(req);
+  const nowIso = new Date().toISOString();
+  const fields = tasksSchema.normalizeCreate({
+    type: SUGG.SUGGESTION_TASK_TYPES[id] || 'autre',
+    description: String(req.body?.description || '').slice(0, 4000),
+    lien: `/?page=RESEARCHER_DETAIL&id=${encodeURIComponent(key)}`,
+    chercheurRowId: f.id, uid_dyna: key, nom: `${String(f.Nom || '').toUpperCase()} ${f.Prenom || ''}`.trim(), labo: f.LABO || '',
+  }, { author, nowIso, origine: `suggestion:${id}` });
+  fields.cle = `suggestion:${id}:${key}`;
+  const reason = String(req.body?.reason || '').trim().slice(0, 500);
+  if (dismiss) Object.assign(fields, { statut: 'abandonnee', fait_par: author, fait_le: nowIso, resolution: reason || 'Suggestion masquée' });
+  const [added] = await gristTasksWrite(doc, headers, tasksSchema.TASKS_TABLE, 'POST', [{ fields }]);
+  await appendTaskEvent(doc, headers, added.id, { date: nowIso, auteur: author, action: 'creation', detail: `Suggestion « ${id} » de la fiche` });
+  if (dismiss) await appendTaskEvent(doc, headers, added.id, { date: nowIso, auteur: author, action: 'abandon', detail: reason || 'Suggestion masquée' });
+  res.json({ task: taskOut({ id: added.id, fields }) });
+}));
+
 // ── LDAP Structures sync ────────────────────────────────────────────────────
 app.get('/api/sync-structures-ldap-trigger', requireEstablishmentScope, (req, res) => {
   const running = runningProgress(STRUCT_LDAP_PROGRESS_PATH);

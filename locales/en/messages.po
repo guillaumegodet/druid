@@ -580,9 +580,9 @@ msgid "The group will be kept as soon as it has at least one member."
 msgstr "The group will be kept as soon as it has at least one member."
 
 #: components/GroupList.tsx:168
-#: components/ResearcherDetail.tsx:295
-#: components/ResearcherDetail.tsx:454
-#: components/ResearcherDetail.tsx:557
+#: components/ResearcherDetail.tsx:296
+#: components/ResearcherDetail.tsx:461
+#: components/ResearcherDetail.tsx:564
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
 #: components/reports/NewReportDialog.tsx:311
@@ -592,6 +592,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
 #: components/researchers/MergeResearchersModal.tsx:291
+#: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
 #: components/researchers/TasksPage.tsx:322
 #: components/structures/StructuresLdapReview.tsx:131
@@ -766,187 +767,187 @@ msgstr "Employment types (top 10)"
 msgid "Breakdown by lab (top 8)"
 msgstr "Breakdown by lab (top 8)"
 
-#: components/ResearcherDetail.tsx:113
+#: components/ResearcherDetail.tsx:114
 msgid "Manual validation (Druid)"
 msgstr "Manual validation (Druid)"
 
 #. placeholder {0}: next.displayName
-#: components/ResearcherDetail.tsx:191
+#: components/ResearcherDetail.tsx:192
 msgid "Filled from LDAP: {0}."
 msgstr "Filled from LDAP: {0}."
 
-#: components/ResearcherDetail.tsx:199
+#: components/ResearcherDetail.tsx:200
 msgid "Lab: {lab}."
 msgstr "Lab: {lab}."
 
 #. placeholder {0}: otherLabs.join(', ')
-#: components/ResearcherDetail.tsx:201
+#: components/ResearcherDetail.tsx:202
 msgid "Other labs in LDAP: {0} — add them as memberships if relevant."
 msgstr "Other labs in LDAP: {0} — add them as memberships if relevant."
 
-#: components/ResearcherDetail.tsx:203
+#: components/ResearcherDetail.tsx:204
 msgid "none"
 msgstr "none"
 
-#: components/ResearcherDetail.tsx:204
+#: components/ResearcherDetail.tsx:205
 msgid "No known lab among the LDAP affectations (principal: {affectation}): choose it in Memberships."
 msgstr "No known lab among the LDAP affectations (principal: {affectation}): choose it in Memberships."
 
-#: components/ResearcherDetail.tsx:210
+#: components/ResearcherDetail.tsx:211
 msgid "This uid already has a directory record ({labs}): check it before creating a duplicate."
 msgstr "This uid already has a directory record ({labs}): check it before creating a duplicate."
 
-#: components/ResearcherDetail.tsx:235
+#: components/ResearcherDetail.tsx:236
 msgid "Back to the list"
 msgstr "Back to the list"
 
-#: components/ResearcherDetail.tsx:241
+#: components/ResearcherDetail.tsx:242
 #: components/Sidebar.tsx:155
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "People"
 
-#: components/ResearcherDetail.tsx:253
+#: components/ResearcherDetail.tsx:254
 #: components/researchers/DuplicatesPage.tsx:142
 msgid "Directory"
 msgstr "Directory"
 
-#: components/ResearcherDetail.tsx:263
+#: components/ResearcherDetail.tsx:264
 msgid "Open the Grist document (Annuaire table)"
 msgstr "Open the Grist document (Annuaire table)"
 
-#: components/ResearcherDetail.tsx:272
+#: components/ResearcherDetail.tsx:273
 msgid "Validated record — click to review / unvalidate"
 msgstr "Validated record — click to review / unvalidate"
 
-#: components/ResearcherDetail.tsx:272
+#: components/ResearcherDetail.tsx:273
 msgid "Validate this record"
 msgstr "Validate this record"
 
-#: components/ResearcherDetail.tsx:275
+#: components/ResearcherDetail.tsx:276
 msgid "Validated record"
 msgstr "Validated record"
 
-#: components/ResearcherDetail.tsx:275
-#: components/ResearcherDetail.tsx:473
+#: components/ResearcherDetail.tsx:276
+#: components/ResearcherDetail.tsx:480
 msgid "Validate the record"
 msgstr "Validate the record"
 
-#: components/ResearcherDetail.tsx:281
+#: components/ResearcherDetail.tsx:282
 msgid "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 msgstr "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 
-#: components/ResearcherDetail.tsx:284
+#: components/ResearcherDetail.tsx:285
 msgid "Report a correction"
 msgstr "Report a correction"
 
-#: components/ResearcherDetail.tsx:292
+#: components/ResearcherDetail.tsx:293
 msgid "Export PDF"
 msgstr "Export PDF"
 
-#: components/ResearcherDetail.tsx:300
+#: components/ResearcherDetail.tsx:301
 #: components/StructureDetail.tsx:139
 #: components/dashboard/NewsletterPanel.tsx:400
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Save"
 
-#: components/ResearcherDetail.tsx:300
+#: components/ResearcherDetail.tsx:301
 msgid "Create the record"
 msgstr "Create the record"
 
-#: components/ResearcherDetail.tsx:332
 #: components/ResearcherDetail.tsx:333
+#: components/ResearcherDetail.tsx:334
 msgid "Edit photo (URL)"
 msgstr "Edit photo (URL)"
 
-#: components/ResearcherDetail.tsx:340
+#: components/ResearcherDetail.tsx:341
 msgid "Photo unavailable"
 msgstr "Photo unavailable"
 
 #. placeholder {0}: researcher.uid || t`not provided`
 #. placeholder {1}: researcher.lastSync
-#: components/ResearcherDetail.tsx:358
+#: components/ResearcherDetail.tsx:359
 msgid "UID: {0} · Last sync: {1}"
 msgstr "UID: {0} · Last sync: {1}"
 
-#: components/ResearcherDetail.tsx:358
+#: components/ResearcherDetail.tsx:359
 msgid "not provided"
 msgstr "not provided"
 
-#: components/ResearcherDetail.tsx:405
+#: components/ResearcherDetail.tsx:412
 msgid "Profile photo"
 msgstr "Profile photo"
 
-#: components/ResearcherDetail.tsx:420
+#: components/ResearcherDetail.tsx:427
 msgid "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 msgstr "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 
-#: components/ResearcherDetail.tsx:425
+#: components/ResearcherDetail.tsx:432
 msgid "Photo URL"
 msgstr "Photo URL"
 
-#: components/ResearcherDetail.tsx:436
+#: components/ResearcherDetail.tsx:443
 msgid "The URL must start with http:// or https://."
 msgstr "The URL must start with http:// or https://."
 
-#: components/ResearcherDetail.tsx:440
+#: components/ResearcherDetail.tsx:447
 msgid "The change will be written to Grist (photo_url column) when you click “Save”."
 msgstr "The change will be written to Grist (photo_url column) when you click “Save”."
 
-#: components/ResearcherDetail.tsx:450
+#: components/ResearcherDetail.tsx:457
 msgid "Remove photo"
 msgstr "Remove photo"
 
-#: components/ResearcherDetail.tsx:456
+#: components/ResearcherDetail.tsx:463
 msgid "Apply"
 msgstr "Apply"
 
-#: components/ResearcherDetail.tsx:485
+#: components/ResearcherDetail.tsx:492
 msgid "Validated status"
 msgstr "Validated status"
 
-#: components/ResearcherDetail.tsx:499
+#: components/ResearcherDetail.tsx:506
 #: components/dashboard/MediaSourcesAdmin.tsx:217
 msgid "Scope"
 msgstr "Scope"
 
-#: components/ResearcherDetail.tsx:512
+#: components/ResearcherDetail.tsx:519
 msgid "Source"
 msgstr "Source"
 
-#: components/ResearcherDetail.tsx:517
+#: components/ResearcherDetail.tsx:524
 msgid "E.g. 2026 lab survey, HR list…"
 msgstr "E.g. 2026 lab survey, HR list…"
 
-#: components/ResearcherDetail.tsx:525
+#: components/ResearcherDetail.tsx:532
 msgid "Date (auto)"
 msgstr "Date (auto)"
 
-#: components/ResearcherDetail.tsx:529
+#: components/ResearcherDetail.tsx:536
 msgid "Validated by (auto)"
 msgstr "Validated by (auto)"
 
 #. placeholder {0}: existingValidation.validationDate
 #. placeholder {1}: existingValidation.validatedBy
-#: components/ResearcherDetail.tsx:537
+#: components/ResearcherDetail.tsx:544
 msgid "Already validated on {0} by {1}."
 msgstr "Already validated on {0} by {1}."
 
 #. placeholder {0}: existingValidation.validationDate
-#: components/ResearcherDetail.tsx:538
+#: components/ResearcherDetail.tsx:545
 msgid "Already validated on {0}."
 msgstr "Already validated on {0}."
 
-#: components/ResearcherDetail.tsx:549
+#: components/ResearcherDetail.tsx:556
 msgid "Unvalidate"
 msgstr "Unvalidate"
 
-#: components/ResearcherDetail.tsx:565
+#: components/ResearcherDetail.tsx:572
 msgid "Revalidate"
 msgstr "Revalidate"
 
-#: components/ResearcherDetail.tsx:565
+#: components/ResearcherDetail.tsx:572
 #: components/dashboard/MediaMentionsPanel.tsx:317
 #: components/dashboard/NewsletterPanel.tsx:437
 #: components/researchers/GroupModal.tsx:65
@@ -982,7 +983,7 @@ msgid "Researcher identifier alignment"
 msgstr "Researcher identifier alignment"
 
 #: components/Sidebar.tsx:98
-#: components/researchers/LdapAlignPage.tsx:58
+#: components/researchers/LdapAlignPage.tsx:79
 msgid "LDAP alignment"
 msgstr "LDAP alignment"
 
@@ -3260,7 +3261,7 @@ msgstr "Hearing"
 #: components/dashboard/NewsTab.tsx:116
 #: components/dashboard/NewsTab.tsx:126
 #: components/dashboard/fundersAggregates.ts:42
-#: lib/tasks.ts:63
+#: lib/tasks.ts:66
 msgid "Other"
 msgstr "Other"
 
@@ -3851,7 +3852,7 @@ msgstr "Citations (already received)"
 #: components/dashboard/NewsTab.tsx:610
 #: components/dashboard/NewsTab.tsx:692
 #: components/researchers/AbesExportModal.tsx:229
-#: components/researchers/LdapCandidatesPage.tsx:185
+#: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/ListHeader.tsx:49
 #: components/researchers/OpenAlexAffiliationsPage.tsx:107
 #: lib/importConflicts.ts:75
@@ -7289,7 +7290,7 @@ msgid "Suspicious"
 msgstr "Suspicious"
 
 #: components/etl/EtlMaintenancePanels.tsx:152
-#: lib/tasks.ts:82
+#: lib/tasks.ts:85
 msgid "In progress"
 msgstr "In progress"
 
@@ -8173,7 +8174,7 @@ msgid "Person"
 msgstr "Person"
 
 #: components/researchers/AbesExportModal.tsx:231
-#: lib/tasks.ts:105
+#: lib/tasks.ts:108
 msgid "Comment"
 msgstr "Comment"
 
@@ -8663,7 +8664,7 @@ msgid "Merge {0} ({1}) and {2} ({3})"
 msgstr "Merge {0} ({1}) and {2} ({3})"
 
 #: components/researchers/DuplicatesPage.tsx:213
-#: components/researchers/LdapCandidatesPage.tsx:221
+#: components/researchers/LdapCandidatesPage.tsx:223
 #: components/researchers/MergeResearchersModal.tsx:299
 msgid "Merge"
 msgstr "Merge"
@@ -9045,177 +9046,177 @@ msgstr "Find missing"
 msgid "Check existing ones"
 msgstr "Check existing ones"
 
-#: components/researchers/LdapAlignPage.tsx:61
+#. placeholder {0}: ldapWithoutRecord.length
+#: components/researchers/LdapAlignPage.tsx:54
+msgid "LDAP uid without Directory record ({0})"
+msgstr "LDAP uid without Directory record ({0})"
+
+#: components/researchers/LdapAlignPage.tsx:58
+msgid "LDAP people without a Directory record — automatic creation planned for Phase 2 (requires extending the LDAP extraction to name/first name/email). List from the last LDAP sync (“Check existing ones” tab)."
+msgstr "LDAP people without a Directory record — automatic creation planned for Phase 2 (requires extending the LDAP extraction to name/first name/email). List from the last LDAP sync (“Check existing ones” tab)."
+
+#: components/researchers/LdapAlignPage.tsx:59
+msgid "List available after an LDAP sync (“Check existing ones” tab)."
+msgstr "List available after an LDAP sync (“Check existing ones” tab)."
+
+#: components/researchers/LdapAlignPage.tsx:82
 msgid "Link records without a uid to LDAP staff"
 msgstr "Link records without a uid to LDAP staff"
 
-#: components/researchers/LdapAlignPage.tsx:62
+#: components/researchers/LdapAlignPage.tsx:83
 msgid "Carry over to the Directory the LDAP-authoritative fields that changed (status, employment, name…)"
 msgstr "Carry over to the Directory the LDAP-authoritative fields that changed (status, employment, name…)"
 
-#: components/researchers/LdapAlignPage.tsx:78
+#: components/researchers/LdapAlignPage.tsx:99
 msgid "Re-reads LDAP (~93,000 accounts, in the background) then recomputes the comparison with the Directory"
 msgstr "Re-reads LDAP (~93,000 accounts, in the background) then recomputes the comparison with the Directory"
 
 #. placeholder {0}: ldapProgress?.done ?? 0
 #. placeholder {1}: ldapProgress?.total ?? '?'
-#: components/researchers/LdapAlignPage.tsx:80
+#: components/researchers/LdapAlignPage.tsx:101
 msgid "Syncing… {0}/{1}"
 msgstr "Syncing… {0}/{1}"
 
-#: components/researchers/LdapAlignPage.tsx:80
+#: components/researchers/LdapAlignPage.tsx:101
 msgid "Re-run the LDAP sync"
 msgstr "Re-run the LDAP sync"
 
-#. placeholder {0}: ldapWithoutRecord.length
-#: components/researchers/LdapAlignPage.tsx:94
-msgid "LDAP uid without Directory record ({0})"
-msgstr "LDAP uid without Directory record ({0})"
-
-#: components/researchers/LdapAlignPage.tsx:98
-msgid "LDAP people without a Directory record — automatic creation planned for Phase 2 (requires extending the LDAP extraction to name/first name/email). List from the last LDAP sync (“Check existing ones” tab)."
-msgstr "LDAP people without a Directory record — automatic creation planned for Phase 2 (requires extending the LDAP extraction to name/first name/email). List from the last LDAP sync (“Check existing ones” tab)."
-
-#: components/researchers/LdapAlignPage.tsx:99
-msgid "List available after an LDAP sync (“Check existing ones” tab)."
-msgstr "List available after an LDAP sync (“Check existing ones” tab)."
-
-#: components/researchers/LdapCandidatesPage.tsx:39
+#: components/researchers/LdapCandidatesPage.tsx:41
 msgid "title"
 msgstr "title"
 
-#: components/researchers/LdapCandidatesPage.tsx:40
+#: components/researchers/LdapCandidatesPage.tsx:42
 msgid "grade {grade}"
 msgstr "grade {grade}"
 
-#: components/researchers/LdapCandidatesPage.tsx:41
+#: components/researchers/LdapCandidatesPage.tsx:43
 msgid "birth date"
 msgstr "birth date"
 
-#: components/researchers/LdapCandidatesPage.tsx:47
+#: components/researchers/LdapCandidatesPage.tsx:49
 msgid "active"
 msgstr "active"
 
-#: components/researchers/LdapCandidatesPage.tsx:47
+#: components/researchers/LdapCandidatesPage.tsx:49
 msgid "leaving"
 msgstr "leaving"
 
-#: components/researchers/LdapCandidatesPage.tsx:111
-#: components/researchers/LdapCandidatesPage.tsx:118
+#: components/researchers/LdapCandidatesPage.tsx:113
+#: components/researchers/LdapCandidatesPage.tsx:120
 msgid "Records without identifier → matching to LDAP staff (email, then name)"
 msgstr "Records without identifier → matching to LDAP staff (email, then name)"
 
-#: components/researchers/LdapCandidatesPage.tsx:116
+#: components/researchers/LdapCandidatesPage.tsx:118
 msgid "LDAP linking"
 msgstr "LDAP linking"
 
-#: components/researchers/LdapCandidatesPage.tsx:130
+#: components/researchers/LdapCandidatesPage.tsx:132
 msgid "Searching…"
 msgstr "Searching…"
 
-#: components/researchers/LdapCandidatesPage.tsx:130
+#: components/researchers/LdapCandidatesPage.tsx:132
 msgid "Run LDAP search"
 msgstr "Run LDAP search"
 
-#: components/researchers/LdapCandidatesPage.tsx:138
+#: components/researchers/LdapCandidatesPage.tsx:140
 msgid "Link selection ({entryCount})"
 msgstr "Link selection ({entryCount})"
 
-#: components/researchers/LdapCandidatesPage.tsx:148
+#: components/researchers/LdapCandidatesPage.tsx:150
 msgid "Search in progress… {progressDone}/{progressTotal} records, {progressMatched} matched, {progressAmbiguous, plural, one {# homonym} other {# homonyms}}."
 msgstr "Search in progress… {progressDone}/{progressTotal} records, {progressMatched} matched, {progressAmbiguous, plural, one {# homonym} other {# homonyms}}."
 
 #. placeholder {0}: translateApiError(progress.error)
-#: components/researchers/LdapCandidatesPage.tsx:150
+#: components/researchers/LdapCandidatesPage.tsx:152
 msgid "Error: {0}"
 msgstr "Error: {0}"
 
-#: components/researchers/LdapCandidatesPage.tsx:151
+#: components/researchers/LdapCandidatesPage.tsx:153
 msgid "Last search: {progressMatched, plural, one {# safe match} other {# safe matches}}, {progressAmbiguous, plural, one {# homonym to decide} other {# homonyms to decide}}."
 msgstr "Last search: {progressMatched, plural, one {# safe match} other {# safe matches}}, {progressAmbiguous, plural, one {# homonym to decide} other {# homonyms to decide}}."
 
 #. placeholder {0}: diff.alreadyLinked
-#: components/researchers/LdapCandidatesPage.tsx:156
+#: components/researchers/LdapCandidatesPage.tsx:158
 msgid "{0, plural, one {# cache entry already linked in the meantime — ignored.} other {# cache entries already linked in the meantime — ignored.}}"
 msgstr "{0, plural, one {# cache entry already linked in the meantime — ignored.} other {# cache entries already linked in the meantime — ignored.}}"
 
-#: components/researchers/LdapCandidatesPage.tsx:163
+#: components/researchers/LdapCandidatesPage.tsx:165
 msgid "LDAP search in progress…"
 msgstr "LDAP search in progress…"
 
-#: components/researchers/LdapCandidatesPage.tsx:163
+#: components/researchers/LdapCandidatesPage.tsx:165
 msgid "No suggestion. Run the LDAP search to match records without identifier."
 msgstr "No suggestion. Run the LDAP search to match records without identifier."
 
 #. placeholder {0}: proposals.length
-#: components/researchers/LdapCandidatesPage.tsx:172
+#: components/researchers/LdapCandidatesPage.tsx:174
 msgid "Candidates ({0}) — {selectedCount, plural, one {# selected} other {# selected}}"
 msgstr "Candidates ({0}) — {selectedCount, plural, one {# selected} other {# selected}}"
 
-#: components/researchers/LdapCandidatesPage.tsx:179
+#: components/researchers/LdapCandidatesPage.tsx:181
 msgid "Check / uncheck all"
 msgstr "Check / uncheck all"
 
-#: components/researchers/LdapCandidatesPage.tsx:183
+#: components/researchers/LdapCandidatesPage.tsx:185
 msgid "Record (no uid)"
 msgstr "Record (no uid)"
 
-#: components/researchers/LdapCandidatesPage.tsx:184
+#: components/researchers/LdapCandidatesPage.tsx:186
 msgid "Match"
 msgstr "Match"
 
-#: components/researchers/LdapCandidatesPage.tsx:186
+#: components/researchers/LdapCandidatesPage.tsx:188
 msgid "→ LDAP identity"
 msgstr "→ LDAP identity"
 
-#: components/researchers/LdapCandidatesPage.tsx:188
+#: components/researchers/LdapCandidatesPage.tsx:190
 msgid "Fills in"
 msgstr "Fills in"
 
-#: components/researchers/LdapCandidatesPage.tsx:203
-#: components/researchers/LdapCandidatesPage.tsx:251
+#: components/researchers/LdapCandidatesPage.tsx:205
+#: components/researchers/LdapCandidatesPage.tsx:253
 msgid "(no email)"
 msgstr "(no email)"
 
-#: components/researchers/LdapCandidatesPage.tsx:207
+#: components/researchers/LdapCandidatesPage.tsx:209
 #: components/researchers/ValidationImportReview.tsx:177
 msgid "email"
 msgstr "email"
 
-#: components/researchers/LdapCandidatesPage.tsx:207
+#: components/researchers/LdapCandidatesPage.tsx:209
 #: components/researchers/ValidationImportReview.tsx:177
 msgid "name"
 msgstr "name"
 
-#: components/researchers/LdapCandidatesPage.tsx:216
+#: components/researchers/LdapCandidatesPage.tsx:218
 msgid "This uid is already carried by another row of the same lab: linking would create a duplicate."
 msgstr "This uid is already carried by another row of the same lab: linking would create a duplicate."
 
 #. placeholder {0}: p.duplicateOf.name
-#: components/researchers/LdapCandidatesPage.tsx:217
+#: components/researchers/LdapCandidatesPage.tsx:219
 msgid "duplicate of {0}"
 msgstr "duplicate of {0}"
 
-#: components/researchers/LdapCandidatesPage.tsx:234
+#: components/researchers/LdapCandidatesPage.tsx:236
 msgid "Matches by <0>name</0> are unchecked by default (less reliable than email) — check them after verification."
 msgstr "Matches by <0>name</0> are unchecked by default (less reliable than email) — check them after verification."
 
 #. placeholder {0}: ambiguous.length
-#: components/researchers/LdapCandidatesPage.tsx:243
+#: components/researchers/LdapCandidatesPage.tsx:245
 msgid "Homonyms to decide ({0}) — {arbitratedCount, plural, one {# decided} other {# decided}}"
 msgstr "Homonyms to decide ({0}) — {arbitratedCount, plural, one {# decided} other {# decided}}"
 
 #. placeholder {0}: a.candidateIds.length
 #. placeholder {0}: a.candidates.length
 #. placeholder {0}: cell.ambiguous.candidates.length
-#: components/researchers/LdapCandidatesPage.tsx:253
+#: components/researchers/LdapCandidatesPage.tsx:255
 #: components/researchers/UnifiedAlignPage.tsx:112
 #: components/researchers/UnifiedAlignPage.tsx:238
 #: components/researchers/ValidationImportReview.tsx:197
 msgid "{0, plural, one {# candidate} other {# candidates}}"
 msgstr "{0, plural, one {# candidate} other {# candidates}}"
 
-#: components/researchers/LdapCandidatesPage.tsx:264
+#: components/researchers/LdapCandidatesPage.tsx:266
 msgid "None (do not link)"
 msgstr "None (do not link)"
 
@@ -9762,6 +9763,271 @@ msgstr "⚠ Validation expired — to be rechecked"
 msgid "Expired"
 msgstr "Expired"
 
+#: components/researchers/SuggestionsSection.tsx:34
+msgid "Create an ORCID iD"
+msgstr "Create an ORCID iD"
+
+#: components/researchers/SuggestionsSection.tsx:35
+msgid "You have no ORCID iD: most funders and publishers now ask for one, and it attaches your publications to the institution automatically."
+msgstr "You have no ORCID iD: most funders and publishers now ask for one, and it attaches your publications to the institution automatically."
+
+#: components/researchers/SuggestionsSection.tsx:35
+msgid "No ORCID iD in the record."
+msgstr "No ORCID iD in the record."
+
+#: components/researchers/SuggestionsSection.tsx:36
+msgid "Two minutes on orcid.org, with the professional address, and « {institution} » as employment."
+msgstr "Two minutes on orcid.org, with the professional address, and « {institution} » as employment."
+
+#: components/researchers/SuggestionsSection.tsx:39
+msgid "Make the ORCID profile public"
+msgstr "Make the ORCID profile public"
+
+#: components/researchers/SuggestionsSection.tsx:40
+msgid "Your ORCID profile ({orcid}) shows nothing publicly: it cannot be used to attach your work to the institution."
+msgstr "Your ORCID profile ({orcid}) shows nothing publicly: it cannot be used to attach your work to the institution."
+
+#: components/researchers/SuggestionsSection.tsx:40
+msgid "The ORCID profile ({orcid}) is empty or private."
+msgstr "The ORCID profile ({orcid}) is empty or private."
+
+#: components/researchers/SuggestionsSection.tsx:41
+msgid "In the ORCID account settings, set the default visibility to « Everyone », then make the existing items visible."
+msgstr "In the ORCID account settings, set the default visibility to « Everyone », then make the existing items visible."
+
+#: components/researchers/SuggestionsSection.tsx:44
+msgid "Add the position to ORCID"
+msgstr "Add the position to ORCID"
+
+#: components/researchers/SuggestionsSection.tsx:44
+msgid "Add the position at the institution to ORCID"
+msgstr "Add the position at the institution to ORCID"
+
+#: components/researchers/SuggestionsSection.tsx:46
+msgid "Your ORCID profile lists no position at all."
+msgstr "Your ORCID profile lists no position at all."
+
+#: components/researchers/SuggestionsSection.tsx:46
+msgid "Your ORCID profile lists other positions, but not the one at {institution}."
+msgstr "Your ORCID profile lists other positions, but not the one at {institution}."
+
+#: components/researchers/SuggestionsSection.tsx:47
+msgid "The ORCID profile ({orcid}) lists no position."
+msgstr "The ORCID profile ({orcid}) lists no position."
+
+#: components/researchers/SuggestionsSection.tsx:47
+msgid "The ORCID profile ({orcid}) does not list the position at {institution}."
+msgstr "The ORCID profile ({orcid}) does not list the position at {institution}."
+
+#: components/researchers/SuggestionsSection.tsx:49
+msgid "ORCID › Employment › Add: organisation « {institution} » (ROR {ror}), the lab as department, the start date, visibility « Everyone »."
+msgstr "ORCID › Employment › Add: organisation « {institution} » (ROR {ror}), the lab as department, the start date, visibility « Everyone »."
+
+#: components/researchers/SuggestionsSection.tsx:50
+msgid "ORCID › Employment › Add: organisation « {institution} », the lab as department, the start date, visibility « Everyone »."
+msgstr "ORCID › Employment › Add: organisation « {institution} », the lab as department, the start date, visibility « Everyone »."
+
+#: components/researchers/SuggestionsSection.tsx:53
+msgid "Create an IdHAL"
+msgstr "Create an IdHAL"
+
+#: components/researchers/SuggestionsSection.tsx:55
+msgid "{halDocs} HAL deposits bear your name, but you have no IdHAL to gather them."
+msgstr "{halDocs} HAL deposits bear your name, but you have no IdHAL to gather them."
+
+#: components/researchers/SuggestionsSection.tsx:55
+msgid "{halDocs} HAL deposits, no IdHAL in the record."
+msgstr "{halDocs} HAL deposits, no IdHAL in the record."
+
+#: components/researchers/SuggestionsSection.tsx:56
+msgid "You have no IdHAL: it gathers your HAL deposits and builds your HAL CV."
+msgstr "You have no IdHAL: it gathers your HAL deposits and builds your HAL CV."
+
+#: components/researchers/SuggestionsSection.tsx:56
+msgid "No IdHAL in the record."
+msgstr "No IdHAL in the record."
+
+#: components/researchers/SuggestionsSection.tsx:57
+msgid "HAL › My space › My IdHAL; link the ORCID iD there too."
+msgstr "HAL › My space › My IdHAL; link the ORCID iD there too."
+
+#: components/researchers/SuggestionsSection.tsx:60
+msgid "Merge two IdHAL"
+msgstr "Merge two IdHAL"
+
+#: components/researchers/SuggestionsSection.tsx:61
+msgid "Two IdHAL seem to be yours: your deposits are split between them."
+msgstr "Two IdHAL seem to be yours: your deposits are split between them."
+
+#: components/researchers/SuggestionsSection.tsx:61
+msgid "Two IdHAL for this person (detection rule of « À traiter »)."
+msgstr "Two IdHAL for this person (detection rule of « À traiter »)."
+
+#: components/researchers/SuggestionsSection.tsx:62
+msgid "Keep one IdHAL: ask HAL support to merge them, from the IdHAL page or through the documentation team."
+msgstr "Keep one IdHAL: ask HAL support to merge them, from the IdHAL page or through the documentation team."
+
+#: components/researchers/SuggestionsSection.tsx:65
+msgid "Correct the Scopus author profile"
+msgstr "Correct the Scopus author profile"
+
+#: components/researchers/SuggestionsSection.tsx:67
+msgid "Your Scopus profile ({scopus}) holds {docCount} documents, many of which do not seem to be yours."
+msgstr "Your Scopus profile ({scopus}) holds {docCount} documents, many of which do not seem to be yours."
+
+#: components/researchers/SuggestionsSection.tsx:67
+msgid "Scopus profile {scopus}: {docCount} documents, probably merged with namesakes."
+msgstr "Scopus profile {scopus}: {docCount} documents, probably merged with namesakes."
+
+#: components/researchers/SuggestionsSection.tsx:68
+msgid "Your Scopus profile ({scopus}) never mentions the institution."
+msgstr "Your Scopus profile ({scopus}) never mentions the institution."
+
+#: components/researchers/SuggestionsSection.tsx:68
+msgid "Scopus profile {scopus} never affiliated to the institution: wrong profile or namesake?"
+msgstr "Scopus profile {scopus} never affiliated to the institution: wrong profile or namesake?"
+
+#: components/researchers/SuggestionsSection.tsx:69
+msgid "Elsevier Author Feedback Wizard: select the profile, remove the documents that are not yours, add the missing ones."
+msgstr "Elsevier Author Feedback Wizard: select the profile, remove the documents that are not yours, add the missing ones."
+
+#: components/researchers/SuggestionsSection.tsx:72
+msgid "Merge two Scopus profiles"
+msgstr "Merge two Scopus profiles"
+
+#: components/researchers/SuggestionsSection.tsx:73
+msgid "Scopus splits your publications between two author profiles."
+msgstr "Scopus splits your publications between two author profiles."
+
+#: components/researchers/SuggestionsSection.tsx:73
+msgid "Two Scopus author profiles for this person (detection rule of « À traiter »)."
+msgstr "Two Scopus author profiles for this person (detection rule of « À traiter »)."
+
+#: components/researchers/SuggestionsSection.tsx:74
+msgid "Elsevier Author Feedback Wizard: select both profiles and ask for the merge."
+msgstr "Elsevier Author Feedback Wizard: select both profiles and ask for the merge."
+
+#: components/researchers/SuggestionsSection.tsx:77
+msgid "Merge the OpenAlex profiles"
+msgstr "Merge the OpenAlex profiles"
+
+#: components/researchers/SuggestionsSection.tsx:78
+msgid "OpenAlex splits your publications between {nIds} author profiles."
+msgstr "OpenAlex splits your publications between {nIds} author profiles."
+
+#: components/researchers/SuggestionsSection.tsx:78
+msgid "{nIds} OpenAlex author profiles reviewed for this person."
+msgstr "{nIds} OpenAlex author profiles reviewed for this person."
+
+#: components/researchers/SuggestionsSection.tsx:79
+msgid "OpenAlex is self-service: sign in with the professional address, « Claim » the author page, then move the works of the other profiles to it."
+msgstr "OpenAlex is self-service: sign in with the professional address, « Claim » the author page, then move the works of the other profiles to it."
+
+#: components/researchers/SuggestionsSection.tsx:82
+msgid "Link Scopus and ORCID"
+msgstr "Link Scopus and ORCID"
+
+#: components/researchers/SuggestionsSection.tsx:83
+msgid "Your Scopus profile ({scopus}) is not linked to your ORCID iD: your Scopus publications do not reach it."
+msgstr "Your Scopus profile ({scopus}) is not linked to your ORCID iD: your Scopus publications do not reach it."
+
+#: components/researchers/SuggestionsSection.tsx:83
+msgid "The ORCID profile does not list the Scopus Author ID {scopus}."
+msgstr "The ORCID profile does not list the Scopus Author ID {scopus}."
+
+#: components/researchers/SuggestionsSection.tsx:84
+msgid "Elsevier's Scopus-to-ORCID wizard (sign in with ORCID, check the profile, send the publications)."
+msgstr "Elsevier's Scopus-to-ORCID wizard (sign in with ORCID, check the profile, send the publications)."
+
+#: components/researchers/SuggestionsSection.tsx:87
+msgid "Close the position in ORCID"
+msgstr "Close the position in ORCID"
+
+#: components/researchers/SuggestionsSection.tsx:88
+msgid "Your ORCID profile still shows an ongoing position at the institution, while your recent publications are affiliated elsewhere."
+msgstr "Your ORCID profile still shows an ongoing position at the institution, while your recent publications are affiliated elsewhere."
+
+#: components/researchers/SuggestionsSection.tsx:88
+msgid "Departure detected, yet the ORCID profile keeps an ongoing position at the institution."
+msgstr "Departure detected, yet the ORCID profile keeps an ongoing position at the institution."
+
+#: components/researchers/SuggestionsSection.tsx:89
+msgid "ORCID › Employment: add the end date of the position."
+msgstr "ORCID › Employment: add the end date of the position."
+
+#: components/researchers/SuggestionsSection.tsx:138
+msgid "Suggestions of the institution for you"
+msgstr "Suggestions of the institution for you"
+
+#: components/researchers/SuggestionsSection.tsx:138
+msgid "Suggestions of the institution"
+msgstr "Suggestions of the institution"
+
+#: components/researchers/SuggestionsSection.tsx:142
+msgid "A few actions on your researcher identifiers, so that your publications are attached to you and to your lab."
+msgstr "A few actions on your researcher identifiers, so that your publications are attached to you and to your lab."
+
+#: components/researchers/SuggestionsSection.tsx:143
+msgid "Actions to suggest to the researcher on their identifiers, from the career path and the alignments."
+msgstr "Actions to suggest to the researcher on their identifiers, from the career path and the alignments."
+
+#: components/researchers/SuggestionsSection.tsx:161
+msgid "task in progress"
+msgstr "task in progress"
+
+#: components/researchers/SuggestionsSection.tsx:166
+msgid "Open the page"
+msgstr "Open the page"
+
+#: components/researchers/SuggestionsSection.tsx:171
+msgid "Prepare the email"
+msgstr "Prepare the email"
+
+#: components/researchers/SuggestionsSection.tsx:176
+msgid "Create a task"
+msgstr "Create a task"
+
+#: components/researchers/SuggestionsSection.tsx:181
+msgid "Hide"
+msgstr "Hide"
+
+#: components/researchers/SuggestionsSection.tsx:187
+msgid "Why hide it? (already done, not relevant…)"
+msgstr "Why hide it? (already done, not relevant…)"
+
+#: components/researchers/SuggestionsSection.tsx:188
+msgid "Hide the suggestion"
+msgstr "Hide the suggestion"
+
+#: components/researchers/SuggestionsSection.tsx:197
+msgid "{hidden} more suggestions will show once these are done."
+msgstr "{hidden} more suggestions will show once these are done."
+
+#: components/researchers/SuggestionsSection.tsx:211
+#: components/researchers/TasksPage.tsx:407
+msgid "Subject"
+msgstr "Subject"
+
+#: components/researchers/SuggestionsSection.tsx:214
+#: components/researchers/TasksPage.tsx:394
+msgid "Subject:"
+msgstr "Subject:"
+
+#: components/researchers/SuggestionsSection.tsx:215
+#: components/researchers/TasksPage.tsx:411
+msgid "Copy the email"
+msgstr "Copy the email"
+
+#: components/researchers/SuggestionsSection.tsx:218
+#: components/researchers/TasksPage.tsx:415
+msgid "Open in the mail client"
+msgstr "Open in the mail client"
+
+#: components/researchers/SuggestionsSection.tsx:219
+#: components/researchers/TasksPage.tsx:401
+msgid "no email in the Directory"
+msgstr "no email in the Directory"
+
 #: components/researchers/TaskForm.tsx:71
 msgid "Error creating the task"
 msgstr "Error creating the task"
@@ -9883,7 +10149,7 @@ msgid "Assigned"
 msgstr "Assigned"
 
 #: components/researchers/TasksPage.tsx:175
-#: lib/tasks.ts:96
+#: lib/tasks.ts:99
 msgid "Created"
 msgstr "Created"
 
@@ -9916,7 +10182,7 @@ msgid "Resume"
 msgstr "Resume"
 
 #: components/researchers/TasksPage.tsx:266
-#: lib/tasks.ts:99
+#: lib/tasks.ts:102
 msgid "Put on hold"
 msgstr "Put on hold"
 
@@ -9998,30 +10264,10 @@ msgstr "Email sent to the researcher"
 msgid "Add a comment…"
 msgstr "Add a comment…"
 
-#: components/researchers/TasksPage.tsx:394
-msgid "Subject:"
-msgstr "Subject:"
-
 #: components/researchers/TasksPage.tsx:400
-#: lib/tasks.ts:75
+#: lib/tasks.ts:78
 msgid "Email to the researcher"
 msgstr "Email to the researcher"
-
-#: components/researchers/TasksPage.tsx:401
-msgid "no email in the Directory"
-msgstr "no email in the Directory"
-
-#: components/researchers/TasksPage.tsx:407
-msgid "Subject"
-msgstr "Subject"
-
-#: components/researchers/TasksPage.tsx:411
-msgid "Copy the email"
-msgstr "Copy the email"
-
-#: components/researchers/TasksPage.tsx:415
-msgid "Open in the mail client"
-msgstr "Open in the mail client"
 
 #: components/researchers/TasksPage.tsx:420
 msgid "Mark as sent (task on hold)"
@@ -11219,211 +11465,215 @@ msgstr "Career-path computation failed"
 msgid "No usable identifier for this record"
 msgstr "No usable identifier for this record"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:78
+msgid "Unknown suggestion"
+msgstr "Unknown suggestion"
+
+#: lib/apiErrors.ts:80
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:81
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:82
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:83
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:84
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:85
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:86
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:87
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:89
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:90
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:91
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:92
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:93
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:94
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:95
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:96
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:98
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:99
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:100
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:101
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:102
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:103
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:104
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:105
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:106
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:107
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:108
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:109
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:110
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:111
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:112
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:113
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:114
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:115
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:117
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:118
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:119
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:120
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:121
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:122
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:123
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:125
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:126
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:127
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:128
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:130
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:131
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:132
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:133
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:135
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:136
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:137
 msgid "Load failed"
 msgstr "Load failed"
 
@@ -11921,8 +12171,8 @@ msgid "HAL — outdated affiliation"
 msgstr "HAL — outdated affiliation"
 
 #: lib/tasks.ts:47
-msgid "OpenAlex — two authors"
-msgstr "OpenAlex — two authors"
+msgid "OpenAlex — several author profiles"
+msgstr "OpenAlex — several author profiles"
 
 #: lib/tasks.ts:48
 msgid "OpenAlex — wrong affiliation"
@@ -11933,128 +12183,140 @@ msgid "Scopus — two Author IDs"
 msgstr "Scopus — two Author IDs"
 
 #: lib/tasks.ts:50
+msgid "ORCID — add the position at the institution"
+msgstr "ORCID — add the position at the institution"
+
+#: lib/tasks.ts:51
+msgid "ORCID — link the Scopus profile"
+msgstr "ORCID — link the Scopus profile"
+
+#: lib/tasks.ts:52
+msgid "Scopus — wrong author profile"
+msgstr "Scopus — wrong author profile"
+
+#: lib/tasks.ts:53
 msgid "HR — departure to propagate"
 msgstr "HR — departure to propagate"
 
-#: lib/tasks.ts:51
+#: lib/tasks.ts:54
 msgid "HR — retirement to propagate"
 msgstr "HR — retirement to propagate"
 
-#: lib/tasks.ts:52
+#: lib/tasks.ts:55
 msgid "HR — transfer to propagate"
 msgstr "HR — transfer to propagate"
 
-#: lib/tasks.ts:53
+#: lib/tasks.ts:56
 msgid "HR — death to propagate"
 msgstr "HR — death to propagate"
 
-#: lib/tasks.ts:54
+#: lib/tasks.ts:57
 msgid "Directory — employment end to enter"
 msgstr "Directory — employment end to enter"
 
-#: lib/tasks.ts:55
+#: lib/tasks.ts:58
 msgid "Directory — two records for the same person: merge"
 msgstr "Directory — two records for the same person: merge"
 
-#: lib/tasks.ts:56
+#: lib/tasks.ts:59
 msgid "Directory — shared identifiers: same person or namesakes?"
 msgstr "Directory — shared identifiers: same person or namesakes?"
 
-#: lib/tasks.ts:57
+#: lib/tasks.ts:60
 msgid "Directory — identifier carried by two people: fix it"
 msgstr "Directory — identifier carried by two people: fix it"
 
-#: lib/tasks.ts:58
+#: lib/tasks.ts:61
 msgid "Career path — departure confirmed by several sources"
 msgstr "Career path — departure confirmed by several sources"
 
-#: lib/tasks.ts:59
+#: lib/tasks.ts:62
 msgid "Career path — departure declared in ORCID"
 msgstr "Career path — departure declared in ORCID"
 
-#: lib/tasks.ts:60
+#: lib/tasks.ts:63
 msgid "Career path — probable departure from the publications"
 msgstr "Career path — probable departure from the publications"
 
-#: lib/tasks.ts:61
+#: lib/tasks.ts:64
 msgid "Career path — ended record, recent local activity"
 msgstr "Career path — ended record, recent local activity"
 
-#: lib/tasks.ts:62
+#: lib/tasks.ts:65
 msgid "Career path — identifiers never affiliated to the institution"
 msgstr "Career path — identifiers never affiliated to the institution"
 
-#: lib/tasks.ts:73
+#: lib/tasks.ts:76
 msgid "Authorities correspondent (IdRef)"
 msgstr "Authorities correspondent (IdRef)"
 
-#: lib/tasks.ts:74
+#: lib/tasks.ts:77
 msgid "ABES batch (export)"
 msgstr "ABES batch (export)"
 
-#: lib/tasks.ts:76
+#: lib/tasks.ts:79
 msgid "External support (provider)"
 msgstr "External support (provider)"
 
-#: lib/tasks.ts:77
+#: lib/tasks.ts:80
 msgid "Internal (Druid)"
 msgstr "Internal (Druid)"
 
-#: lib/tasks.ts:81
+#: lib/tasks.ts:84
 msgid "To do"
 msgstr "To do"
 
-#: lib/tasks.ts:83
+#: lib/tasks.ts:86
 msgid "Waiting"
 msgstr "Waiting"
 
-#: lib/tasks.ts:84
-#: lib/tasks.ts:100
+#: lib/tasks.ts:87
+#: lib/tasks.ts:103
 msgid "Done"
 msgstr "Done"
 
-#: lib/tasks.ts:85
-#: lib/tasks.ts:101
+#: lib/tasks.ts:88
+#: lib/tasks.ts:104
 msgid "Dropped"
 msgstr "Dropped"
 
-#: lib/tasks.ts:86
+#: lib/tasks.ts:89
 msgid "Resolved (verified)"
 msgstr "Resolved (verified)"
 
-#: lib/tasks.ts:90
+#: lib/tasks.ts:93
 msgid "Low"
 msgstr "Low"
 
-#: lib/tasks.ts:91
+#: lib/tasks.ts:94
 msgid "Normal"
 msgstr "Normal"
 
-#: lib/tasks.ts:92
+#: lib/tasks.ts:95
 msgid "High"
 msgstr "High"
 
-#: lib/tasks.ts:97
+#: lib/tasks.ts:100
 msgid "Taken over"
 msgstr "Taken over"
 
-#: lib/tasks.ts:98
+#: lib/tasks.ts:101
 msgid "Email prepared"
 msgstr "Email prepared"
 
-#: lib/tasks.ts:102
+#: lib/tasks.ts:105
 msgid "Reopened"
 msgstr "Reopened"
 
-#: lib/tasks.ts:103
+#: lib/tasks.ts:106
 msgid "Reassigned"
 msgstr "Reassigned"
 
-#: lib/tasks.ts:104
+#: lib/tasks.ts:107
 msgid "Edited"
 msgstr "Edited"
 
-#: lib/tasks.ts:106
+#: lib/tasks.ts:109
 msgid "Resolved automatically"
 msgstr "Resolved automatically"
 

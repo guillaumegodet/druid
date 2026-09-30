@@ -75,6 +75,7 @@ export const API_ERRORS = [
   msg`Too many refreshes in progress, retry in a minute`,
   msg`Career-path computation failed`,
   msg`No usable identifier for this record`,
+  msg`Unknown suggestion`,
   // tasks (« À traiter › Tâches », docs/plan-chantiers-taches.md)
   msg`Task not found`,
   msg`Unknown event action`,

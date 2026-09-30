@@ -125,6 +125,48 @@ const TEMPLATES: Partial<Record<TaskType, (c: TaskEmailContext) => TaskEmail>> =
       '', closing(c),
     ].join('\n'),
   }),
+  // « Suggestions de l'établissement » of the record (docs/plan-parcours-affiliations.md, lot 5).
+  orcid_ajouter_poste: (c) => ({
+    subject: 'Votre profil ORCID — ajouter votre poste à Nantes Université',
+    body: [
+      greet(c), '', intro(c),
+      `Votre profil ORCID${c.orcid ? ` (${c.orcid})` : ''} ne mentionne pas votre poste à Nantes Université. C’est cette information qui permet aux éditeurs, aux financeurs et aux bases bibliographiques de rattacher vos travaux à l’établissement.`,
+      detail(c),
+      'L’ajout prend une minute : https://orcid.org/my-orcid → rubrique « Emploi » → « Ajouter ». Choisissez l’organisation « Nantes Université » proposée par la liste (identifiant ROR 03gnr7b55), indiquez votre laboratoire comme département et la date de début, puis rendez l’entrée visible par « Tout le monde ».',
+      '', closing(c),
+    ].join('\n'),
+  }),
+  orcid_relier_scopus: (c) => ({
+    subject: 'Relier votre profil Scopus à votre ORCID',
+    body: [
+      greet(c), '', intro(c),
+      `Votre profil auteur Scopus${c.scopusId ? ` (${c.scopusId})` : ''} n’est pas relié à votre ORCID${c.orcid ? ` (${c.orcid})` : ''}. Une fois reliés, vos publications Scopus alimentent votre ORCID automatiquement et les deux profils restent cohérents.`,
+      detail(c),
+      'Elsevier propose un assistant en quelques étapes : https://orcid.scopusfeedback.com/ (connexion avec votre ORCID, vérification du profil Scopus, envoi des publications). Le lien peut aussi se faire depuis ORCID : https://orcid.org/my-orcid → Travaux → « Ajouter » → « Rechercher et lier » → Scopus.',
+      '', closing(c),
+    ].join('\n'),
+  }),
+  scopus_profil_errone: (c) => ({
+    subject: 'Votre profil auteur Scopus — correction à demander',
+    body: [
+      greet(c), '', intro(c),
+      `Votre profil auteur Scopus${c.scopusId ? ` (${c.scopusId})` : ''} semble erroné : il ne mentionne jamais Nantes Université ou mélange vos publications avec celles d’homonymes. Vos indicateurs (publications, citations, h-index) en sont faussés.`,
+      detail(c),
+      'La correction se demande à Elsevier via l’Author Feedback Wizard : https://www.scopus.com/feedback/author/home.uri (recherchez votre nom, sélectionnez le profil, puis retirez les documents qui ne sont pas les vôtres ou ajoutez ceux qui manquent).',
+      'Nous pouvons aussi faire la demande pour vous : indiquez-nous simplement les documents concernés.',
+      '', closing(c),
+    ].join('\n'),
+  }),
+  openalex_deux_auteurs: (c) => ({
+    subject: 'Vos profils auteur OpenAlex — à regrouper',
+    body: [
+      greet(c), '', intro(c),
+      'OpenAlex, la base ouverte utilisée pour les bilans bibliométriques de l’établissement, répartit vos publications entre plusieurs profils auteur. Ils sont regroupés dans nos outils, mais pas dans OpenAlex ni dans les services qui s’en servent.',
+      detail(c),
+      'OpenAlex permet désormais aux chercheurs de corriger eux-mêmes leur profil : connectez-vous sur https://openalex.org avec votre adresse professionnelle, ouvrez votre page auteur, cliquez sur « Claim », puis déplacez vers ce profil les travaux des autres profils. Mode d’emploi : https://help.openalex.org/how-to/fixing-authors/',
+      '', closing(c),
+    ].join('\n'),
+  }),
 };
 
 /** True when a ready-to-copy email exists for this task type. */

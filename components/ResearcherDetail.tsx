@@ -12,6 +12,7 @@ import { STATUS_LABELS, VALIDATION_SCOPE_LABELS } from '../lib/researcherLabels'
 import { GeneralTab } from './researchers/GeneralTab';
 import { MediaPresenceSection } from './researchers/MediaPresenceSection';
 import { AffiliationHistorySection } from './researchers/AffiliationHistorySection';
+import { SuggestionsSection } from './researchers/SuggestionsSection';
 import { ValidationMark } from './researchers/StatusBadge';
 import { HelpButton } from './HelpButton';
 import { VIEW_HELP } from '../lib/helpLinks';
@@ -376,6 +377,12 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
           />
           {/* Career path (docs/plan-parcours-affiliations.md, lot 3): affiliations of the publications,
               ORCID positions, Scopus profile — full width. Needs the server job (Docker instances). */}
+          {/* « Suggestions de l'établissement » (lot 5): hidden when there is nothing to suggest. */}
+          {hasCapability('HAS_SERVER_JOBS') && !researcher.id.startsWith('NEW-') && (
+            <div className="mt-4 lg:col-span-2 lg:col-start-1 empty:hidden">
+              <SuggestionsSection researcher={localResearcher} />
+            </div>
+          )}
           {hasCapability('HAS_SERVER_JOBS') && !researcher.id.startsWith('NEW-') && (
             <div className="mt-4 lg:col-span-2 lg:col-start-1">
               <AffiliationHistorySection researcher={localResearcher} onUpdateField={onSave ? updateField : undefined} />

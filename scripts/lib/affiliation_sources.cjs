@@ -232,6 +232,15 @@ async function orcidSection(orcid, section, key, kind) {
   }
   return out;
 }
+/** Types of the external identifiers linked to an ORCID (« Scopus Author ID », « ResearcherID »…):
+ * the « link your identifiers » suggestion of the record (docs/plan-parcours-affiliations.md, lot 5). */
+async function orcidExternalTypes(orcid) {
+  if (!orcid) return [];
+  let d;
+  try { d = await getUrl(`https://pub.orcid.org/v3.0/${orcid}/external-identifiers`, { json: true, headers: { Accept: 'application/json' }, timeout: 20000 }); }
+  catch (e) { if (/HTTP (404|409|410)/.test(e.message || '')) return []; throw e; }
+  return [...new Set((d['external-identifier'] || []).map((x) => x['external-id-type']).filter(Boolean))];
+}
 /** Employments + invited positions of an ORCID (two requests). */
 async function orcidPeriods(orcid) {
   if (!orcid) return [];
@@ -310,5 +319,5 @@ function loadHierarchy(path) {
 }
 module.exports = {
   memAvailableMb, createGraphReader, normSourceId, openalexPublications, scopusPublications, scopusProfiles,
-  orcidPeriods, resolveHierarchy, loadHierarchy,
+  orcidPeriods, orcidExternalTypes, resolveHierarchy, loadHierarchy,
 };

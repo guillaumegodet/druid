@@ -142,6 +142,13 @@ function buildEntry(person, fetched, matcher, H, incomplete) {
     orcid: periods.map(shortPeriod),
     scopusProfile: prof ? { current: dedupe(prof.current.map((c) => ({ name: c.establishment?.name || c.org.names[0] || '', cls: c.cls }))), history: dedupe(prof.history.map((c) => ({ name: c.establishment?.name || c.org.names[0] || '', cls: c.cls }))), range: prof.range } : null,
     signals,
+    // Inputs of the « Suggestions de l'établissement » of the record (lot 5).
+    extras: {
+      halDocs: fetched.graph ? fetched.graph.filter((x) => (x.harvesters || []).includes('hal')).length : null,
+      scopusDocCount: fetched.profile ? fetched.profile.docCount || 0 : null,
+      scopusAffiliated: fetched.scopus ? fetched.scopus.filter((x) => x.orgs.length).length : null,
+      orcidExternal: fetched.orcidExternal ?? null,
+    },
     pubs: order.slice(0, MAX_PUBS_STORED).map((i) => { const p = agg.pubs[i]; return { y: p.year, doi: p.doi || undefined, t: String(p.title || '').replace(/<[^>]+>/g, '').slice(0, 180), s: p.sources, c: p.classes, e: p.est.map((k) => estIndex.get(k)) }; }),
   };
 }
@@ -206,11 +213,15 @@ async function main() {
         await run('graph', !!p.uid, () => graph.publications(p.uid)),
         await run('openalex', p.openalex.length > 0, () => SRC.openalexPublications(p.openalex, { apiKey: OPENALEX_KEY, hierarchy })),
         await run('scopus', p.scopus.length > 0, () => SRC.scopusPublications(elsevier, p.scopus, { hierarchy })),
-        await run('orcid', !!p.orcid, () => SRC.orcidPeriods(p.orcid)),
+        await run('orcid', !!p.orcid, async () => {
+          const [periods, ext] = await Promise.all([SRC.orcidPeriods(p.orcid), SRC.orcidExternalTypes(p.orcid)]);
+          fetched.orcidExternal = ext;
+          return periods;
+        }),
       ].every(Boolean);
       if (SOURCES.has('scopus') && p.scopus.length && scopusActive()) {
         const prof = p.scopus.map((id) => profiles.get(id)).filter(Boolean);
-        if (prof.length) fetched.profile = { current: prof.flatMap((x) => x.current), history: prof.flatMap((x) => x.history), range: { start: Math.min(...prof.map((x) => x.range.start || 9999)), end: Math.max(...prof.map((x) => x.range.end || 0)) || null } };
+        if (prof.length) fetched.profile = { current: prof.flatMap((x) => x.current), history: prof.flatMap((x) => x.history), range: { start: Math.min(...prof.map((x) => x.range.start || 9999)), end: Math.max(...prof.map((x) => x.range.end || 0)) || null }, docCount: prof.reduce((n, x) => n + (x.docCount || 0), 0) };
       }
       return { p, ok, fetched, incomplete };
     }, CONCURRENCY);
