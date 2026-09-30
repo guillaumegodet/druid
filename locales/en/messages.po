@@ -11932,8 +11932,8 @@ msgid "Directory — two records for the same person: merge"
 msgstr "Directory — two records for the same person: merge"
 
 #: lib/tasks.ts:56
-msgid "Directory — shared identifiers, different names: same person?"
-msgstr "Directory — shared identifiers, different names: same person?"
+msgid "Directory — shared identifiers: same person or namesakes?"
+msgstr "Directory — shared identifiers: same person or namesakes?"
 
 #: lib/tasks.ts:57
 msgid "Directory — identifier carried by two people: fix it"

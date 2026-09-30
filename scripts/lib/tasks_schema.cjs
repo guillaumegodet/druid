@@ -98,7 +98,7 @@ const TITLES_FR = {
   rh_deces: 'Décès à répercuter (IdRef, HAL, Annuaire)',
   annuaire_fin_emploi: 'Fin d’emploi à saisir dans l’Annuaire',
   annuaire_doublon: 'Deux fiches pour la même personne : fusionner',
-  annuaire_doublon_a_verifier: 'Identifiants communs, noms différents : même personne ?',
+  annuaire_doublon_a_verifier: 'Identifiants communs : même personne ou homonymes ?',
   annuaire_identifiant_partage: 'Identifiant porté par deux personnes : le corriger',
   autre: 'Autre',
 };

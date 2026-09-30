@@ -109,6 +109,21 @@ describe('annuaire_ids_partages — records with different uid sharing an export
     expect(out[1].description).toContain('Indice : l’IdHAL jean-petit correspond au nom de PETIT Jean (petit-j)');
   });
 
+  it('same names but two different IdRef: namesakes as often as duplicates ⇒ to check, with a warning', () => {
+    const out = detect([
+      p(1, 'bernard-l', 'BERNARD', 'Lucie', { IdRef: '111111111', ORCID: '0000-0001-0000-0003' }),
+      p(2, 'ext_bernard-l', 'Bernard', 'Lucie', { IdRef: '222222222', ORCID: '0000-0001-0000-0003' }),
+      p(3, 'blanc-a', 'BLANC', 'Alice', { ORCID: '0000-0001-0000-0004' }),
+      p(4, 'ext_blanc-a', 'Blanc', 'Alice', { ORCID: '0000-0001-0000-0004' }),   // no IdRef on one side: no contradiction
+    ]);
+    expect(out.map((d: { type: string; key: string }) => `${d.type}:${d.key}`)).toEqual([
+      'annuaire_doublon_a_verifier:bernard-l+ext_bernard-l',
+      'annuaire_doublon:blanc-a+ext_blanc-a',
+    ]);
+    expect(out[0].description).toContain('Attention : bernard-l et ext_bernard-l ont des IdRef différents');
+    expect(out[1].description).not.toContain('Attention');
+  });
+
   it('connected groups: A–B by ORCID and B–C by IdRef make one group, typed by its least similar pair', () => {
     const groups = sharedIdentifierGroups([
       p(1, 'roux-m', 'ROUX', 'Marc', { ORCID: '0000-0001-0000-0002', IdRef: '987654321' }),

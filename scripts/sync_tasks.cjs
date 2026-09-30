@@ -25,7 +25,8 @@
  *   annuaire_ids_partages  Annuaire records with different uid_dyna sharing an ORCID, IdRef,
  *                    IdHAL, IdHAL_i or Scopus id (SoVisu+ refuses the second one): one task per
  *                    group, typed by the names — annuaire_doublon (same person, merge),
- *                    annuaire_doublon_a_verifier (usage name or relatives?), annuaire_identifiant_partage
+ *                    annuaire_doublon_a_verifier (usage name, relatives, or same names with two different
+ *                    IdRef / ORCID: namesakes?), annuaire_identifiant_partage
  *                    (two people: fix the identifier); key = the sorted uids joined by « + »
  *   abes_orcid       Annuaire ORCID missing from the IdRef record (lot ABES channel)
  *   abes_idhal       Annuaire IdHAL missing from the IdRef record (lot ABES channel)
@@ -131,8 +132,9 @@ const taskRecordOf = (recs) => [...recs].sort((x, y) =>
  * Groups of Annuaire records with DIFFERENT uid_dyna that share at least one exported identifier
  * (rows of one uid_dyna — pending duplicates, qualified multi-affiliations — count as one person:
  * the « Doublons » tab handles them). Connected groups: A–B by ORCID and B–C by IdRef give A+B+C.
- * Returns [{ recs, shared: [{ label, value, url, uids }], match }], `match` being the least
- * similar pair of the group.
+ * Returns [{ recs, shared: [{ label, value, url, uids }], match, contradictions }], `match` being the least
+ * similar pair of the group — same names but two different values of one identifier type (two
+ * IdRef…) count as `partial`, listed in `contradictions`.
  */
 function sharedIdentifierGroups(annuaire) {
   const byUid = new Map();
@@ -142,15 +144,24 @@ function sharedIdentifierGroups(annuaire) {
     byUid.get(rec.key).push(rec);
   }
   const owners = new Map();   // `<col>:<value>` → Set(uid)
+  const valuesOf = new Map();   // uid → { <col>: Set(value) }
   for (const [uid, recs] of byUid) {
+    valuesOf.set(uid, {});
     for (const spec of SHARED_ID_COLUMNS) {
-      for (const v of new Set(recs.flatMap((r) => idValues(spec, r.fields[spec.col])))) {
+      const values = new Set(recs.flatMap((r) => idValues(spec, r.fields[spec.col])));
+      valuesOf.get(uid)[spec.col] = values;
+      for (const v of values) {
         const k = `${spec.col}:${v}`;
         if (!owners.has(k)) owners.set(k, new Set());
         owners.get(k).add(uid);
       }
     }
   }
+  /** Identifier types for which both records have values and none in common (two IdRef…). */
+  const conflicting = (u, v) => SHARED_ID_COLUMNS.filter((spec) => {
+    const [a, b] = [valuesOf.get(u)[spec.col], valuesOf.get(v)[spec.col]];
+    return a.size && b.size && ![...a].some((x) => b.has(x));
+  }).map((spec) => spec.label);
   const parent = new Map();
   const find = (u) => { while (parent.get(u) !== u) { parent.set(u, parent.get(parent.get(u))); u = parent.get(u); } return u; };
   const shared = [...owners].filter(([, uids]) => uids.size > 1);
@@ -173,13 +184,18 @@ function sharedIdentifierGroups(annuaire) {
     const uids = [...g.uids].sort();
     const heads = uids.map((u) => byUid.get(u)[0]);
     let match = 'same';
+    const contradictions = [];
     for (let i = 0; i < heads.length; i++) {
       for (let j = i + 1; j < heads.length; j++) {
-        const m = nameMatch(heads[i].fields, heads[j].fields);
+        let m = nameMatch(heads[i].fields, heads[j].fields);
+        // Same names but two different IdRef (or ORCID…): namesakes as often as duplicates.
+        const diff = conflicting(uids[i], uids[j]);
+        if (diff.length) contradictions.push({ uids: [uids[i], uids[j]], labels: diff });
+        if (m === 'same' && diff.length) m = 'partial';
         if (MATCH_RANK[m] > MATCH_RANK[match]) match = m;
       }
     }
-    return { uids, recs: heads, shared: g.shared, match };
+    return { uids, recs: heads, shared: g.shared, match, contradictions };
   });
 }
 
@@ -322,6 +338,7 @@ const RULES = {
             `${g.uids.length} fiches de l’Annuaire portent les mêmes identifiants :`, ...lines,
             `Identifiants communs : ${ids.join(' ; ')}.`,
             ...(owner ? [`Indice : l’IdHAL ${owner.idhal} correspond au nom de ${nameOf(owner.rec.fields)} (${owner.rec.key}).`] : []),
+            ...g.contradictions.map((c) => `Attention : ${c.uids.join(' et ')} ont des ${c.labels.join(', ')} différents — souvent deux homonymes.`),
             'SoVisu+ refuse la seconde fiche qui arrive avec ces identifiants (« Conflicting identifiers »).',
             SHARED_ID_ACTIONS[g.match],
           ].join('\n'),
@@ -467,7 +484,9 @@ async function main() {
       await common.gristCreateRecords(schema.EVENTS_TABLE, ids.map((id, i) => ({ tache: id, date: nowIso, auteur: AUTHOR, action: 'creation', detail: `Détectée par la règle ${creates[i].ruleName}` })));
     }
     if (patches.length) {
-      await common.gristPatchRecords(schema.TASKS_TABLE, patches.map(({ id, fields }) => ({ id, fields })));
+      // Grist refuses a PATCH whose records carry different field sets (a verified task only
+      // stamps verifie_le, a resolved one also changes statut…): one request per field set.
+      await common.gristPatchGrouped(schema.TASKS_TABLE, patches.map(({ id, fields }) => ({ id, fields })));
       const events = patches.filter((p) => p.event).map((p) => ({ tache: p.id, ...p.event }));
       if (events.length) await common.gristCreateRecords(schema.EVENTS_TABLE, events);
     }

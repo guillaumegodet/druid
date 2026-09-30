@@ -53,7 +53,7 @@ export const TASK_TYPES = {
   rh_deces: { base: 'RH', canal: 'natacha', email: false, label: msg`HR — death to propagate` },
   annuaire_fin_emploi: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — employment end to enter` },
   annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — two records for the same person: merge` },
-  annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — shared identifiers, different names: same person?` },
+  annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — shared identifiers: same person or namesakes?` },
   annuaire_identifiant_partage: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — identifier carried by two people: fix it` },
   autre: { base: 'Autre', canal: 'interne', email: false, label: msg`Other` },
 } as const satisfies Record<string, TaskTypeMeta>;
