@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { List, LayoutGrid } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { ResearcherDashboard } from './ResearcherDashboard';
@@ -12,6 +12,8 @@ import { useCompactHeader } from '../hooks/useCompactHeader';
 import { ResearcherTable } from './researchers/ResearcherTable';
 import { GroupModal } from './researchers/GroupModal';
 import { apiErrorText } from '../lib/apiErrors';
+import { hasCapability } from '../lib/auth';
+import { fetchAffiliationSignals, isProbableDeparture, type AhSignalsByKey } from '../lib/affiliationHistory';
 
 /**
  * Props of the ResearcherList component
@@ -60,7 +62,20 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
   onImportValidation, onMergeResearchers,
 }) => {
   const { t } = useLingui();
-  const filters = useResearcherFilters(researchers);
+  // Career-path signals (docs/plan-parcours-affiliations.md, lot 4): server job only; a failure just
+  // hides the « Career path » filter.
+  const [parcoursSignals, setParcoursSignals] = useState<AhSignalsByKey | null>(null);
+  useEffect(() => {
+    if (!hasCapability('HAS_SERVER_JOBS')) return;
+    let alive = true;
+    fetchAffiliationSignals().then((s) => { if (alive) setParcoursSignals(s); }).catch(() => { /* filter hidden */ });
+    return () => { alive = false; };
+  }, []);
+  const departureKeys = useMemo(
+    () => (parcoursSignals ? new Set(Object.entries(parcoursSignals).filter(([, types]) => isProbableDeparture(types)).map(([k]) => k)) : null),
+    [parcoursSignals],
+  );
+  const filters = useResearcherFilters(researchers, parcoursSignals);
 
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isGroupModalOpen, setIsGroupModalOpen] = useState(false);
@@ -210,6 +225,9 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
           onContractTypeChange={filters.updateContractTypes}
           filterPoles={filters.filterPoles}
           onPoleChange={filters.updatePoles}
+          filterParcours={filters.filterParcours}
+          onParcoursChange={filters.updateParcours}
+          parcoursCount={filters.parcoursCount}
           filterDateStart={filters.filterDateStart}
           filterDateEnd={filters.filterDateEnd}
           onDateStartChange={filters.setFilterDateStart}
@@ -243,6 +261,7 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
               currentPage={filters.currentPage}
               totalPages={filters.totalPages}
               onPageChange={filters.setCurrentPage}
+              departureKeys={departureKeys}
             />
           ) : (
             <ResearcherDashboard researchers={filters.sortedResearchers} />

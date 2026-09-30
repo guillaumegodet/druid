@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RefreshCw, MoreHorizontal } from 'lucide-react';
+import { RefreshCw, MoreHorizontal, PlaneTakeoff } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Researcher } from '../../types';
 import { ResearcherIcons } from './ResearcherIcons';
@@ -7,6 +7,7 @@ import { StatusBadge } from './StatusBadge';
 import { SortableHeader } from './SortableHeader';
 import { hasCapability } from '../../lib/auth';
 import type { SortKey, SortConfig } from '../../hooks/useResearcherFilters';
+import { affiliationHistoryKey } from '../../lib/affiliationHistory';
 
 /** Avatar gradients (purely decorative, chosen from the initial). */
 const AVATAR_GRADIENTS = [
@@ -56,6 +57,8 @@ interface ResearcherTableProps {
   currentPage: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  /** Keys (uid_dyna / g<rowId>) of the records with a probable departure (career path, lot 4). */
+  departureKeys?: Set<string> | null;
 }
 
 /** Table + pagination of the researcher list — extracted from ResearcherList.tsx (lot 3 of the
@@ -63,7 +66,7 @@ interface ResearcherTableProps {
 export const ResearcherTable: React.FC<ResearcherTableProps> = ({
   researchers, selectedIds, isAllSelected, onToggleSelect, onToggleSelectAll,
   onSelectResearcher, loading, sortedCount, sortConfig, onSort,
-  currentPage, totalPages, onPageChange,
+  currentPage, totalPages, onPageChange, departureKeys = null,
 }) => {
   const { t } = useLingui();
   return (
@@ -104,7 +107,14 @@ export const ResearcherTable: React.FC<ResearcherTableProps> = ({
                 <div className="flex items-center">
                   <ListAvatar person={person} />
                   <div className="ml-3.5">
-                    <div className="font-disp font-semibold text-[15px] text-ink dark:text-[#f5f2ea]">{person.displayName}</div>
+                    <div className="font-disp font-semibold text-[15px] text-ink dark:text-[#f5f2ea] flex items-center gap-1.5">
+                      {person.displayName}
+                      {departureKeys?.has(affiliationHistoryKey(person) || '') && (
+                        <span title={t`Probable departure (career path)`} aria-label={t`Probable departure (career path)`} className="inline-flex">
+                          <PlaneTakeoff className="w-3.5 h-3.5 text-[#ab7f10] dark:text-[#e0b04a]" aria-hidden />
+                        </span>
+                      )}
+                    </div>
                     <div className="text-xs text-muted-light dark:text-[#8f897c]">{person.employment.internalTypology || '—'}</div>
                   </div>
                 </div>

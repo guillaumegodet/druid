@@ -55,6 +55,11 @@ export const TASK_TYPES = {
   annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — two records for the same person: merge` },
   annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — shared identifiers: same person or namesakes?` },
   annuaire_identifiant_partage: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — identifier carried by two people: fix it` },
+  parcours_depart_confirme: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — departure confirmed by several sources` },
+  parcours_depart_declare: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — departure declared in ORCID` },
+  parcours_depart_observe: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — probable departure from the publications` },
+  parcours_statut_incoherent: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — ended record, recent local activity` },
+  parcours_identifiant_suspect: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — identifiers never affiliated to the institution` },
   autre: { base: 'Autre', canal: 'interne', email: false, label: msg`Other` },
 } as const satisfies Record<string, TaskTypeMeta>;
 

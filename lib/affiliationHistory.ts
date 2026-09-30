@@ -203,3 +203,37 @@ export const publicationsOf = (entry: AhEntry, estIndexes: number | number[]): A
   const set = new Set(Array.isArray(estIndexes) ? estIndexes : [estIndexes]);
   return entry.pubs.filter((p) => p.e.some((i) => set.has(i))).sort((a, b) => (b.y || 0) - (a.y || 0));
 };
+
+// ── Researcher list (lot 4) ──────────────────────────────────────────────────
+/** Signal types of each record key (uid_dyna or g<rowId>), served by /api/affiliation-history/signals. */
+export type AhSignalsByKey = Record<string, AhSignalType[]>;
+export const fetchAffiliationSignals = async (): Promise<AhSignalsByKey> => {
+  const resp = await fetch('/api/affiliation-history/signals');
+  if (!resp.ok) throw new AhError(`HTTP ${resp.status}`, resp.status);
+  return ((await resp.json()) as { byKey?: AhSignalsByKey }).byKey || {};
+};
+
+/** Values of the « Career path » filter of the list. */
+export const PARCOURS_FILTERS = ['depart', 'depart_confirme', 'statut_incoherent', 'identifiant_suspect'] as const;
+export type ParcoursFilter = (typeof PARCOURS_FILTERS)[number];
+const DEPARTURE_TYPES: AhSignalType[] = ['depart_confirme', 'depart_declare', 'nouveau_poste_declare', 'depart_observe'];
+
+/** A probable departure: declared (ORCID), observed (publications) or confirmed — the current Scopus
+ * affiliation alone is not one (too noisy, see the lot 0 measures). */
+export const isProbableDeparture = (types: AhSignalType[] | undefined): boolean => !!types?.some((t) => DEPARTURE_TYPES.includes(t));
+
+export function matchesParcoursFilter(types: AhSignalType[] | undefined, selected: string[]): boolean {
+  if (!selected.length) return true;
+  return selected.some((f) => (f === 'depart' ? isProbableDeparture(types) : !!types?.includes(f as AhSignalType)));
+}
+
+/** Number of records per filter value, among the given keys (counter of the filter options). */
+export function parcoursCounts(signals: AhSignalsByKey, keys: (string | null)[]): Record<ParcoursFilter, number> {
+  const out = { depart: 0, depart_confirme: 0, statut_incoherent: 0, identifiant_suspect: 0 } as Record<ParcoursFilter, number>;
+  for (const k of new Set(keys)) {
+    const types = k ? signals[k] : undefined;
+    if (!types) continue;
+    for (const f of PARCOURS_FILTERS) if (matchesParcoursFilter(types, [f])) out[f]++;
+  }
+  return out;
+}

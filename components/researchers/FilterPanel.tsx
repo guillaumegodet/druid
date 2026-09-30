@@ -24,6 +24,10 @@ interface FilterPanelProps {
   onContractTypeChange: (vals: string[]) => void;
   filterPoles: string[];
   onPoleChange: (vals: string[]) => void;
+  /** « Career path » filter (docs/plan-parcours-affiliations.md, lot 4); counts null = hidden. */
+  filterParcours?: string[];
+  onParcoursChange?: (vals: string[]) => void;
+  parcoursCount?: Record<string, number> | null;
   filterDateStart: string;
   filterDateEnd: string;
   onDateStartChange: (val: string) => void;
@@ -60,6 +64,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   filterGrades, onGradeChange,
   filterContractTypes, onContractTypeChange,
   filterPoles, onPoleChange,
+  filterParcours = [], onParcoursChange, parcoursCount = null,
   filterDateStart, filterDateEnd, onDateStartChange, onDateEndChange,
   idFilters, onIdFiltersChange,
   employers, labs, grades, contractTypes, poles,
@@ -67,6 +72,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   mergeRowIds, onMergeResearchers,
 }) => {
   const { t } = useLingui();
+  const { depart: nDepart = 0, depart_confirme: nConfirmed = 0, statut_incoherent: nIncoherent = 0, identifiant_suspect: nSuspect = 0 } = parcoursCount || {};
   return (
   <div className="space-y-3 mb-4">
     {/* Pill search bar + bulk actions */}
@@ -123,6 +129,19 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             onChange={onValidationChange}
           />
         </>
+      )}
+      {parcoursCount && onParcoursChange && (
+        <MultiSelectFilter
+          label={t`CAREER PATH`}
+          options={[
+            { value: 'depart', label: t`PROBABLE DEPARTURE (${nDepart})` },
+            { value: 'depart_confirme', label: t`CONFIRMED DEPARTURE (${nConfirmed})` },
+            { value: 'statut_incoherent', label: t`INCONSISTENT STATUS (${nIncoherent})` },
+            { value: 'identifiant_suspect', label: t`IDENTIFIERS TO CHECK (${nSuspect})` },
+          ]}
+          selected={filterParcours}
+          onChange={onParcoursChange}
+        />
       )}
       <MultiSelectFilter
         label={t`EMPLOYER`}

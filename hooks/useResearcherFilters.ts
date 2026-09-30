@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { affiliationHistoryKey, matchesParcoursFilter, parcoursCounts, type AhSignalsByKey } from '../lib/affiliationHistory';
 import { Researcher } from '../types';
 import { isValidationStale } from '../lib/validation';
 import { POLE_LAB_MAPPING, getPoleFromLab } from '../lib/mappings';
@@ -34,7 +35,9 @@ const PAGE_SIZE = 50;
  *    (« AFFIL. PRINCIPALE ») — the demo matches on any affiliation, a regression fixed on
  *    the Nantes side in review lot 7b (docs/archive/plan-code-review.md).
  */
-export function useResearcherFilters(researchers: Researcher[]) {
+/** `parcoursSignals`: signals of the career-path job per record key (null = not available on this
+ * instance, the « Career path » filter is hidden). */
+export function useResearcherFilters(researchers: Researcher[], parcoursSignals: AhSignalsByKey | null = null) {
   // Pole enrichment (derived from the primary lab when missing in Grist) — done here rather
   // than in the calling component so the PÔLE filter and its sort work on the same data.
   const enrichedResearchers = useMemo(() => researchers.map(r => {
@@ -52,6 +55,7 @@ export function useResearcherFilters(researchers: Researcher[]) {
   const [filterGrades, setFilterGrades] = useState<string[]>([]);
   const [filterContractTypes, setFilterContractTypes] = useState<string[]>([]);
   const [filterPoles, setFilterPoles] = useState<string[]>([]);
+  const [filterParcours, setFilterParcours] = useState<string[]>([]);
   const [filterDateStart, setFilterDateStart] = useState('');
   const [filterDateEnd, setFilterDateEnd] = useState('');
   const [idFilters, setIdFilters] = useState<IdFilters>({ orcid: false, hal: false, idref: false, scopus: false });
@@ -61,7 +65,7 @@ export function useResearcherFilters(researchers: Researcher[]) {
   const splitFilter = (v: string) => (v ? v.split(',').filter(Boolean) : []);
 
   const { setUrlState } = useUrlState(
-    { search: '', status: '', validation: '', employer: '', lab: '', grade: '', contractType: '', pole: '', mode: 'list' },
+    { search: '', status: '', validation: '', employer: '', lab: '', grade: '', contractType: '', pole: '', parcours: '', mode: 'list' },
     (newState) => {
       if (newState.search !== undefined) setSearchTerm(newState.search || '');
       if (newState.status !== undefined) setFilterStatuses(splitFilter(newState.status || ''));
@@ -71,6 +75,7 @@ export function useResearcherFilters(researchers: Researcher[]) {
       if (newState.grade !== undefined) setFilterGrades(splitFilter(newState.grade || ''));
       if (newState.contractType !== undefined) setFilterContractTypes(splitFilter(newState.contractType || ''));
       if (newState.pole !== undefined) setFilterPoles(splitFilter(newState.pole || ''));
+      if (newState.parcours !== undefined) setFilterParcours(splitFilter(newState.parcours || ''));
       if (newState.mode !== undefined) setViewMode((newState.mode as 'list' | 'dashboard') || 'list');
     }
   );
@@ -138,9 +143,17 @@ export function useResearcherFilters(researchers: Researcher[]) {
       (!idFilters.hal || !!r.identifiers.halId) &&
       (!idFilters.idref || !!r.identifiers.idref) &&
       (!idFilters.scopus || !!r.identifiers.scopusId);
+    const key = affiliationHistoryKey(r);
+    const matchesParcours = !parcoursSignals || matchesParcoursFilter(key ? parcoursSignals[key] : undefined, filterParcours);
     return matchesSearch && matchesStatus && matchesValidation && matchesEmployer && matchesLab && matchesGrade &&
-      matchesContractType && matchesPole && matchesPeriod && matchesIds;
-  }), [enrichedResearchers, searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, idFilters, now]);
+      matchesContractType && matchesPole && matchesPeriod && matchesIds && matchesParcours;
+  }), [enrichedResearchers, searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, idFilters, now, parcoursSignals, filterParcours]);
+
+  // Counter of the « Career path » filter options, over every record of the list (not the filtered ones).
+  const parcoursCount = useMemo(
+    () => (parcoursSignals ? parcoursCounts(parcoursSignals, enrichedResearchers.map((r) => affiliationHistoryKey(r))) : null),
+    [parcoursSignals, enrichedResearchers],
+  );
 
   const sortedResearchers = useMemo(() => {
     if (!sortConfig) return filteredResearchers;
@@ -174,7 +187,7 @@ export function useResearcherFilters(researchers: Researcher[]) {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd]);
+  }, [searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, filterParcours]);
 
   const handleSort = (key: SortKey) => {
     setSortConfig(prev => ({
@@ -191,6 +204,7 @@ export function useResearcherFilters(researchers: Researcher[]) {
   const updateGrades = (vals: string[]) => { setFilterGrades(vals); setUrlState({ grade: vals.join(',') }); };
   const updateContractTypes = (vals: string[]) => { setFilterContractTypes(vals); setUrlState({ contractType: vals.join(',') }); };
   const updatePoles = (vals: string[]) => { setFilterPoles(vals); setUrlState({ pole: vals.join(',') }); };
+  const updateParcours = (vals: string[]) => { setFilterParcours(vals); setUrlState({ parcours: vals.join(',') }); };
   const updateViewMode = (val: 'list' | 'dashboard') => { setViewMode(val); setUrlState({ mode: val }); };
 
   return {
@@ -203,6 +217,7 @@ export function useResearcherFilters(researchers: Researcher[]) {
     filterGrades, updateGrades,
     filterContractTypes, updateContractTypes,
     filterPoles, updatePoles,
+    filterParcours, updateParcours, parcoursCount,
     filterDateStart, setFilterDateStart,
     filterDateEnd, setFilterDateEnd,
     idFilters, setIdFilters,

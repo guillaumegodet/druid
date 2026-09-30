@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
   affiliationHistoryKey, timelineRows, yearRange, sortSignals, suggestedEndDate, suggestedStartDate, publicationsOf, yearOf,
-  type AhEntry,
+  isProbableDeparture, matchesParcoursFilter, parcoursCounts,
+  type AhEntry, type AhSignalsByKey,
 } from '../affiliationHistory';
 
 // « Parcours » block helpers (lib/affiliationHistory.ts, docs/plan-parcours-affiliations.md lot 3). Fictitious data.
@@ -71,5 +72,29 @@ describe('affiliationHistory helpers', () => {
     expect(publicationsOf(entry(), 1).map((p) => p.t)).toEqual(['c', 'a']);
     expect(yearOf('2021-08')).toBe(2021);
     expect(yearOf('')).toBeNull();
+  });
+});
+
+describe('list filter « Career path » (lot 4)', () => {
+  const signals = {
+    a: ['depart_confirme', 'depart_observe'],
+    b: ['depart_declare'],
+    c: ['scopus_courante_non_locale'],
+    d: ['statut_incoherent', 'identifiant_suspect'],
+  } as AhSignalsByKey;
+  it('probable departure = declared, observed or confirmed, never the Scopus affiliation alone', () => {
+    expect(isProbableDeparture(signals.a)).toBe(true);
+    expect(isProbableDeparture(signals.b)).toBe(true);
+    expect(isProbableDeparture(signals.c)).toBe(false);
+    expect(isProbableDeparture(undefined)).toBe(false);
+  });
+  it('filter values combine with OR, empty selection keeps everything', () => {
+    expect(matchesParcoursFilter(signals.c, [])).toBe(true);
+    expect(matchesParcoursFilter(signals.d, ['depart', 'statut_incoherent'])).toBe(true);
+    expect(matchesParcoursFilter(signals.b, ['depart_confirme'])).toBe(false);
+    expect(matchesParcoursFilter(undefined, ['depart'])).toBe(false);
+  });
+  it('counts per filter value over the visible records', () => {
+    expect(parcoursCounts(signals, ['a', 'b', 'c', 'd', 'x', null, 'a'])).toEqual({ depart: 2, depart_confirme: 1, statut_incoherent: 1, identifiant_suspect: 1 });
   });
 });

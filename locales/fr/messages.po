@@ -559,7 +559,7 @@ msgid "Error loading data: {error}"
 msgstr "Erreur au chargement des données : {error}"
 
 #: components/GroupList.tsx:84
-#: components/ResearcherList.tsx:125
+#: components/ResearcherList.tsx:140
 msgid "Error saving groups."
 msgstr "Erreur d'enregistrement des groupes."
 
@@ -627,7 +627,7 @@ msgid "Search for a group…"
 msgstr "Rechercher un groupe…"
 
 #: components/GroupList.tsx:221
-#: components/researchers/FilterPanel.tsx:88
+#: components/researchers/FilterPanel.tsx:94
 msgid "Group"
 msgstr "Groupe"
 
@@ -953,22 +953,22 @@ msgstr "Revalider"
 msgid "Validate"
 msgstr "Valider"
 
-#: components/ResearcherList.tsx:174
+#: components/ResearcherList.tsx:189
 #: components/StructureList.tsx:301
 msgid "List"
 msgstr "Liste"
 
-#: components/ResearcherList.tsx:175
+#: components/ResearcherList.tsx:190
 #: components/StructureList.tsx:302
 msgid "Charts"
 msgstr "Dataviz"
 
-#: components/ResearcherList.tsx:183
+#: components/ResearcherList.tsx:198
 #: components/StructureList.tsx:310
 msgid "List view (table)"
 msgstr "Vue liste (tableau)"
 
-#: components/ResearcherList.tsx:183
+#: components/ResearcherList.tsx:198
 msgid "Chart view"
 msgstr "Vue dataviz (graphiques)"
 
@@ -1096,7 +1096,7 @@ msgstr "Tutelles"
 #: components/etl/EtlMaintenancePanels.tsx:268
 #: components/researchers/ListHeader.tsx:48
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
-#: components/researchers/ResearcherTable.tsx:89
+#: components/researchers/ResearcherTable.tsx:92
 #: components/researchers/TasksPage.tsx:173
 msgid "Status"
 msgstr "Statut"
@@ -1218,7 +1218,7 @@ msgid "No structure found."
 msgstr "Aucune structure trouvée."
 
 #: components/StructureList.tsx:505
-#: components/researchers/ResearcherTable.tsx:158
+#: components/researchers/ResearcherTable.tsx:168
 msgid "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 
@@ -3260,7 +3260,7 @@ msgstr "Audition"
 #: components/dashboard/NewsTab.tsx:116
 #: components/dashboard/NewsTab.tsx:126
 #: components/dashboard/fundersAggregates.ts:42
-#: lib/tasks.ts:58
+#: lib/tasks.ts:63
 msgid "Other"
 msgstr "Autre"
 
@@ -4539,7 +4539,7 @@ msgstr "Aucune"
 
 #: components/dashboard/ResearchersTab.tsx:134
 #: components/researchers/AbesExportModal.tsx:228
-#: components/researchers/ResearcherTable.tsx:85
+#: components/researchers/ResearcherTable.tsx:88
 #: lib/importConflicts.ts:73
 msgid "Employer"
 msgstr "Employeur"
@@ -7289,7 +7289,7 @@ msgid "Suspicious"
 msgstr "Suspectes"
 
 #: components/etl/EtlMaintenancePanels.tsx:152
-#: lib/tasks.ts:77
+#: lib/tasks.ts:82
 msgid "In progress"
 msgstr "En cours"
 
@@ -8173,7 +8173,7 @@ msgid "Person"
 msgstr "Personne"
 
 #: components/researchers/AbesExportModal.tsx:231
-#: lib/tasks.ts:100
+#: lib/tasks.ts:105
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -8683,69 +8683,89 @@ msgstr "Requalifier"
 msgid "Generated on {generatedAt}"
 msgstr "Généré le {generatedAt}"
 
-#: components/researchers/FilterPanel.tsx:79
+#: components/researchers/FilterPanel.tsx:85
 msgid "Search for a researcher, a lab, an identifier…"
 msgstr "Rechercher un chercheur, un labo, un identifiant…"
 
-#: components/researchers/FilterPanel.tsx:93
+#: components/researchers/FilterPanel.tsx:99
 msgid "Merge the two selected records"
 msgstr "Fusionner les deux fiches sélectionnées"
 
-#: components/researchers/FilterPanel.tsx:93
+#: components/researchers/FilterPanel.tsx:99
 msgid "Select exactly two Grist records to merge"
 msgstr "Sélectionnez exactement deux fiches Grist à fusionner"
 
-#: components/researchers/FilterPanel.tsx:96
+#: components/researchers/FilterPanel.tsx:102
 #: components/structures/LifecycleTab.tsx:135
 msgctxt "noun"
 msgid "Merge"
 msgstr "Fusion"
 
-#: components/researchers/FilterPanel.tsx:110
+#: components/researchers/FilterPanel.tsx:116
 msgid "STATUS"
 msgstr "STATUT"
 
-#: components/researchers/FilterPanel.tsx:116
+#: components/researchers/FilterPanel.tsx:122
 msgid "VALIDATION"
 msgstr "VALIDATION"
 
-#: components/researchers/FilterPanel.tsx:118
+#: components/researchers/FilterPanel.tsx:124
 msgid "VALIDATED"
 msgstr "VALIDÉ"
 
-#: components/researchers/FilterPanel.tsx:119
+#: components/researchers/FilterPanel.tsx:125
 msgid "VALIDATED (EXPIRED)"
 msgstr "VALIDÉ PÉRIMÉ"
 
-#: components/researchers/FilterPanel.tsx:120
+#: components/researchers/FilterPanel.tsx:126
 msgid "NOT VALIDATED"
 msgstr "NON VALIDÉ"
 
-#: components/researchers/FilterPanel.tsx:128
+#: components/researchers/FilterPanel.tsx:135
+msgid "CAREER PATH"
+msgstr "PARCOURS"
+
+#: components/researchers/FilterPanel.tsx:137
+msgid "PROBABLE DEPARTURE ({nDepart})"
+msgstr "DÉPART PROBABLE ({nDepart})"
+
+#: components/researchers/FilterPanel.tsx:138
+msgid "CONFIRMED DEPARTURE ({nConfirmed})"
+msgstr "DÉPART CONFIRMÉ ({nConfirmed})"
+
+#: components/researchers/FilterPanel.tsx:139
+msgid "INCONSISTENT STATUS ({nIncoherent})"
+msgstr "STATUT INCOHÉRENT ({nIncoherent})"
+
+#: components/researchers/FilterPanel.tsx:140
+msgid "IDENTIFIERS TO CHECK ({nSuspect})"
+msgstr "IDENTIFIANTS À VÉRIFIER ({nSuspect})"
+
+#: components/researchers/FilterPanel.tsx:147
 msgid "EMPLOYER"
 msgstr "EMPLOYEUR"
 
-#: components/researchers/FilterPanel.tsx:134
+#: components/researchers/FilterPanel.tsx:153
 msgid "LAB (PRIMARY AFFIL.)"
 msgstr "LABO (AFFIL. PRINCIPALE)"
 
-#: components/researchers/FilterPanel.tsx:140
+#: components/researchers/FilterPanel.tsx:159
 msgid "GRADE / RANK"
 msgstr "GRADE / CORPS"
 
-#: components/researchers/FilterPanel.tsx:146
+#: components/researchers/FilterPanel.tsx:165
 msgid "EMPLOYMENT TYPE"
 msgstr "TYPE D'EMPLOI"
 
-#: components/researchers/FilterPanel.tsx:152
+#: components/researchers/FilterPanel.tsx:171
 msgid "CLUSTER"
 msgstr "PÔLE"
 
-#: components/researchers/FilterPanel.tsx:162
+#: components/researchers/FilterPanel.tsx:181
 msgid "Identifiers:"
 msgstr "Identifiants :"
 
-#: components/researchers/FilterPanel.tsx:194
+#: components/researchers/FilterPanel.tsx:213
 msgid "Dates:"
 msgstr "Dates :"
 
@@ -9674,33 +9694,38 @@ msgstr "Publications dont l’affiliation brute OpenAlex ne correspond pas au la
 msgid "First {MAX_ROWS} rows out of {0} — narrow with the lab filter."
 msgstr "{MAX_ROWS} premières lignes sur {0} — affinez avec le filtre labo."
 
-#: components/researchers/ResearcherTable.tsx:83
+#: components/researchers/ResearcherTable.tsx:86
 msgid "Identity"
 msgstr "Identité"
 
-#: components/researchers/ResearcherTable.tsx:84
+#: components/researchers/ResearcherTable.tsx:87
 msgctxt "membership"
 msgid "Affiliation"
 msgstr "Appartenance"
 
-#: components/researchers/ResearcherTable.tsx:86
+#: components/researchers/ResearcherTable.tsx:89
 #: lib/importConflicts.ts:97
 msgid "Identifiers"
 msgstr "Identifiants"
 
-#: components/researchers/ResearcherTable.tsx:147
+#: components/researchers/ResearcherTable.tsx:113
+#: components/researchers/ResearcherTable.tsx:113
+msgid "Probable departure (career path)"
+msgstr "Départ probable (parcours)"
+
+#: components/researchers/ResearcherTable.tsx:157
 msgid "Synchronising with Grist…"
 msgstr "Synchronisation avec Grist en cours…"
 
-#: components/researchers/ResearcherTable.tsx:151
+#: components/researchers/ResearcherTable.tsx:161
 msgid "No researcher found."
 msgstr "Aucun chercheur trouvé."
 
-#: components/researchers/ResearcherTable.tsx:166
+#: components/researchers/ResearcherTable.tsx:176
 msgid "Prev."
 msgstr "Préc."
 
-#: components/researchers/ResearcherTable.tsx:192
+#: components/researchers/ResearcherTable.tsx:202
 msgctxt "short"
 msgid "Next"
 msgstr "Suiv."
@@ -9858,7 +9883,7 @@ msgid "Assigned"
 msgstr "Assigné"
 
 #: components/researchers/TasksPage.tsx:175
-#: lib/tasks.ts:91
+#: lib/tasks.ts:96
 msgid "Created"
 msgstr "Créée"
 
@@ -9891,7 +9916,7 @@ msgid "Resume"
 msgstr "Reprendre"
 
 #: components/researchers/TasksPage.tsx:266
-#: lib/tasks.ts:94
+#: lib/tasks.ts:99
 msgid "Put on hold"
 msgstr "Mettre en attente"
 
@@ -9978,7 +10003,7 @@ msgid "Subject:"
 msgstr "Objet :"
 
 #: components/researchers/TasksPage.tsx:400
-#: lib/tasks.ts:70
+#: lib/tasks.ts:75
 msgid "Email to the researcher"
 msgstr "Email au chercheur"
 
@@ -11939,77 +11964,97 @@ msgstr "Annuaire — identifiants communs : même personne ou homonymes ?"
 msgid "Directory — identifier carried by two people: fix it"
 msgstr "Annuaire — identifiant porté par deux personnes : le corriger"
 
-#: lib/tasks.ts:68
+#: lib/tasks.ts:58
+msgid "Career path — departure confirmed by several sources"
+msgstr "Parcours — départ confirmé par plusieurs sources"
+
+#: lib/tasks.ts:59
+msgid "Career path — departure declared in ORCID"
+msgstr "Parcours — départ déclaré dans ORCID"
+
+#: lib/tasks.ts:60
+msgid "Career path — probable departure from the publications"
+msgstr "Parcours — départ probable d’après les publications"
+
+#: lib/tasks.ts:61
+msgid "Career path — ended record, recent local activity"
+msgstr "Parcours — fiche close, activité locale récente"
+
+#: lib/tasks.ts:62
+msgid "Career path — identifiers never affiliated to the institution"
+msgstr "Parcours — identifiants jamais affiliés à l’établissement"
+
+#: lib/tasks.ts:73
 msgid "Authorities correspondent (IdRef)"
 msgstr "Correspondante autorités (IdRef)"
 
-#: lib/tasks.ts:69
+#: lib/tasks.ts:74
 msgid "ABES batch (export)"
 msgstr "Lot ABES (export)"
 
-#: lib/tasks.ts:71
+#: lib/tasks.ts:76
 msgid "External support (provider)"
 msgstr "Support externe (fournisseur)"
 
-#: lib/tasks.ts:72
+#: lib/tasks.ts:77
 msgid "Internal (Druid)"
 msgstr "Interne (Druid)"
 
-#: lib/tasks.ts:76
+#: lib/tasks.ts:81
 msgid "To do"
 msgstr "À faire"
 
-#: lib/tasks.ts:78
+#: lib/tasks.ts:83
 msgid "Waiting"
 msgstr "En attente"
 
-#: lib/tasks.ts:79
-#: lib/tasks.ts:95
+#: lib/tasks.ts:84
+#: lib/tasks.ts:100
 msgid "Done"
 msgstr "Fait"
 
-#: lib/tasks.ts:80
-#: lib/tasks.ts:96
+#: lib/tasks.ts:85
+#: lib/tasks.ts:101
 msgid "Dropped"
 msgstr "Abandonnée"
 
-#: lib/tasks.ts:81
+#: lib/tasks.ts:86
 msgid "Resolved (verified)"
 msgstr "Résolue (vérifiée)"
 
-#: lib/tasks.ts:85
+#: lib/tasks.ts:90
 msgid "Low"
 msgstr "Basse"
 
-#: lib/tasks.ts:86
+#: lib/tasks.ts:91
 msgid "Normal"
 msgstr "Normale"
 
-#: lib/tasks.ts:87
+#: lib/tasks.ts:92
 msgid "High"
 msgstr "Haute"
 
-#: lib/tasks.ts:92
+#: lib/tasks.ts:97
 msgid "Taken over"
 msgstr "Prise en charge"
 
-#: lib/tasks.ts:93
+#: lib/tasks.ts:98
 msgid "Email prepared"
 msgstr "Email préparé"
 
-#: lib/tasks.ts:97
+#: lib/tasks.ts:102
 msgid "Reopened"
 msgstr "Réouverte"
 
-#: lib/tasks.ts:98
+#: lib/tasks.ts:103
 msgid "Reassigned"
 msgstr "Réassignée"
 
-#: lib/tasks.ts:99
+#: lib/tasks.ts:104
 msgid "Edited"
 msgstr "Modifiée"
 
-#: lib/tasks.ts:101
+#: lib/tasks.ts:106
 msgid "Resolved automatically"
 msgstr "Résolue automatiquement"
 

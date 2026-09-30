@@ -3,16 +3,16 @@ import { createRequire } from 'node:module';
 
 // The rules live in the CommonJS script (run by the server and by ofelia); requiring it only
 // defines them (main() runs under require.main === module).
-const { RULES, DEFAULT_RULES, openNantesAffiliations, nameMatch, sharedIdentifierGroups } = createRequire(import.meta.url)('../../scripts/sync_tasks.cjs');
+const { RULES, DEFAULT_RULES, openNantesAffiliations, nameMatch, sharedIdentifierGroups, endsByKey } = createRequire(import.meta.url)('../../scripts/sync_tasks.cjs');
 
 const rec = (id: number, fields: Record<string, unknown>) => ({ id, key: (fields.uid_dyna as string) || `g${id}`, fields });
 const cand = (extra: Record<string, unknown>) => ({ nameMatch: 'exact', score: 'moyen', evidence: ['site (Nantes Université)'], ...extra });
-const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap', unknown>>) =>
-  ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, ...over });
+const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours', unknown>>) =>
+  ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, parcours: {}, ...over });
 
 describe('scripts/sync_tasks.cjs rules (docs/plan-chantiers-taches.md, lot 5)', () => {
   it('default rules exclude the ABES ones (handled by the batch export)', () => {
-    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages']);
+    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'parcours_depart', 'parcours_statut_incoherent']);
     expect(Object.keys(RULES)).toContain('abes_orcid');
   });
 
@@ -67,7 +67,7 @@ describe('rule sources', () => {
   it('every rule declares the caches it reads (empty cache ⇒ rule skipped, no false auto-resolution)', () => {
     for (const [name, rule] of Object.entries(RULES) as [string, { sources: string[] }][]) {
       expect(rule.sources.length, name).toBeGreaterThan(0);
-      for (const s of rule.sources) expect(['orcid', 'hal', 'scopus', 'idref', 'ldap', 'annuaire']).toContain(s);
+      for (const s of rule.sources) expect(['orcid', 'hal', 'scopus', 'idref', 'ldap', 'annuaire', 'parcours']).toContain(s);
     }
   });
 });
@@ -139,5 +139,39 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       p(3, 'faure-a', 'FAURE', 'Alain', { ORCID: '0000-0001-0000-0002' }),
     ]);
     expect(out[0].description).toContain('ORCID 0000-0001-0000-0002 (faure-a, roux-m)');
+  });
+
+  describe('career path rules (docs/plan-parcours-affiliations.md, lot 4)', () => {
+    const line = (signals: unknown[]) => ({ computedAt: '2026-09-30', signals });
+    const confirmed = { type: 'depart_confirme', date: '2021-08', sources: ['orcid', 'publications'], destination: 'Université Beta' };
+    const observed = { type: 'depart_observe', date: '2020', count: 4, destination: 'Université Beta' };
+    it('parcours_depart: one task per record, typed by the strongest signal; ended records skipped', () => {
+      const out = RULES.parcours_depart.detect(ctx({
+        annuaire: [rec(1, { uid_dyna: 'martin-p' }), rec(2, { uid_dyna: 'martin-p' }), rec(3, { uid_dyna: 'leroy-a' }), rec(4, { uid_dyna: 'petit-j', employment_end_date: '2021' })],
+        parcours: { 'martin-p': line([observed, confirmed]), 'leroy-a': line([observed]), 'petit-j': line([confirmed]) },
+      }));
+      expect(out.map((x: { key: string; type: string }) => [x.key, x.type])).toEqual([['martin-p', 'parcours_depart_confirme'], ['leroy-a', 'parcours_depart_observe']]);
+      expect(out[0].description).toContain('Départ confirmé par ORCID + les publications : parti vers 2021-08, pour Université Beta');
+      expect(out[0].description).toContain('aucune affiliée à l’établissement après 2020');
+      expect(out[0].lien).toBe('/?page=RESEARCHER_DETAIL&id=martin-p');
+    });
+    it('a membership ends the record only when every row is ended', () => {
+      const ends = endsByKey([rec(1, { uid_dyna: 'a', affiliation_end_date: '2020' }), rec(2, { uid_dyna: 'a' }), rec(3, { uid_dyna: 'b', affiliation_end_date: '2020' })]);
+      expect([ends.get('a').ended, ends.get('b').ended]).toEqual([false, true]);
+    });
+    it('parcours_statut_incoherent only on records still ended; parcours_identifiant_suspect only on open ones', () => {
+      const parcours = {
+        'a-a': line([{ type: 'statut_incoherent', endYear: 2020, lastLocal: 2024 }]),
+        'b-b': line([{ type: 'statut_incoherent', endYear: 2020, orcidOpenLocal: true }]),
+        'c-c': line([{ type: 'identifiant_suspect', sources: ['publications', 'scopus'] }]),
+      };
+      const annuaire = [rec(1, { uid_dyna: 'a-a', employment_end_date: '2020-12-31' }), rec(2, { uid_dyna: 'b-b' }), rec(3, { uid_dyna: 'c-c' })];
+      const inc = RULES.parcours_statut_incoherent.detect(ctx({ annuaire, parcours }));
+      expect(inc.map((x: { key: string }) => x.key)).toEqual(['a-a']);
+      expect(inc[0].description).toContain('encore affiliées à l’établissement en 2024');
+      const sus = RULES.parcours_identifiant_suspect.detect(ctx({ annuaire, parcours }));
+      expect(sus.map((x: { key: string }) => x.key)).toEqual(['c-c']);
+      expect(sus[0].description).toContain('les publications et le profil Scopus');
+    });
   });
 });

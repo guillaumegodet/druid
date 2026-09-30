@@ -2966,6 +2966,27 @@ app.get('/api/researchers/:key/affiliation-history', (req, res) => {
   res.json({ entry, run: ahRunInfo() });
 });
 
+// Signals of every record for the researcher list (filter « Parcours », lot 4): the index written by the
+// job, reduced to the signal types; re-read only when the file changes (≈ 1 MB, 7 000 records).
+const AH_LIST_SIGNALS = new Set(['depart_confirme', 'depart_declare', 'nouveau_poste_declare', 'depart_observe', 'scopus_courante_non_locale', 'statut_incoherent', 'identifiant_suspect']);
+let ahSignalsCache = { mtimeMs: 0, body: null };
+app.get('/api/affiliation-history/signals', (req, res) => {
+  if (!hasAnyRight(req.session.user?.access)) return res.status(403).json({ error: 'Forbidden' });
+  const file = AH_STORE.indexFile(AFFILIATION_HISTORY_DIR);
+  let mtimeMs = 0;
+  try { mtimeMs = fs.statSync(file).mtimeMs; } catch { return res.json({ byKey: {}, run: ahRunInfo() }); }
+  if (ahSignalsCache.mtimeMs !== mtimeMs) {
+    const index = AH_STORE.readJson(file, {});
+    const byKey = {};
+    for (const [key, line] of Object.entries(index)) {
+      const types = [...new Set((line.signals || []).map((s) => s.type).filter((t) => AH_LIST_SIGNALS.has(t)))];
+      if (types.length) byKey[key] = types;
+    }
+    ahSignalsCache = { mtimeMs, body: { byKey } };
+  }
+  res.json({ ...ahSignalsCache.body, run: ahRunInfo() });
+});
+
 app.post('/api/researchers/:key/affiliation-history/refresh', async (req, res) => {
   const access = req.session.user?.access;
   if (!hasAnyRight(access)) return res.status(403).json({ error: 'Forbidden' });

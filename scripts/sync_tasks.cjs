@@ -28,6 +28,14 @@
  *                    annuaire_doublon_a_verifier (usage name, relatives, or same names with two different
  *                    IdRef / ORCID: namesakes?), annuaire_identifiant_partage
  *                    (two people: fix the identifier); key = the sorted uids joined by « + »
+ *   parcours_depart  probable departure of a record without end date, from the career-path job
+ *                    (affiliation_history/_index.json of scripts/sync_affiliation_history.cjs): one task per
+ *                    record, typed by the strongest signal — parcours_depart_confirme (several sources),
+ *                    parcours_depart_declare (ORCID), parcours_depart_observe (publications); closed as soon
+ *                    as an end date is entered (docs/plan-parcours-affiliations.md, lot 4)
+ *   parcours_statut_incoherent  ended record still publishing locally / with an open ORCID position there
+ *   parcours_identifiant_suspect  identifiers whose publications / Scopus profile never mention the
+ *                    institution (opt-in: --rules=, alignment control)
  *   abes_orcid       Annuaire ORCID missing from the IdRef record (lot ABES channel)
  *   abes_idhal       Annuaire IdHAL missing from the IdRef record (lot ABES channel)
  *
@@ -50,7 +58,7 @@ const schema = require('./lib/tasks_schema.cjs');
 const APPLY = common.hasFlag('apply');
 const AUTHOR = 'druid:regles';
 const PROGRESS_PATH = common.getArg('progress', 'tasks_detect_progress.json');
-const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages'];
+const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'parcours_depart', 'parcours_statut_incoherent'];
 const RULES_ARG = String(common.getArg('rules', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
@@ -225,6 +233,42 @@ const SHARED_ID_ACTIONS = {
 };
 
 // ── Rules: detect(ctx) → [{ key, rec, description, lien, type? }] ─────────────────
+
+// ── Career path (docs/plan-parcours-affiliations.md, lot 4) ────────────────────────
+const PARCOURS_INDEX = common.getArg('parcours-index', 'affiliation_history/_index.json');
+/** Strongest departure signal → task type (a person gets one departure task at a time). */
+const PARCOURS_DEPART = [
+  ['depart_confirme', 'parcours_depart_confirme'],
+  ['depart_declare', 'parcours_depart_declare'],
+  ['nouveau_poste_declare', 'parcours_depart_declare'],
+  ['depart_observe', 'parcours_depart_observe'],
+];
+const druidRecordUrl = (key) => `/?page=RESEARCHER_DETAIL&id=${encodeURIComponent(key)}`;
+/** End dates of a person over its Annuaire rows (a membership is over only when every row is ended). */
+function endsByKey(annuaire) {
+  const out = new Map();
+  for (const r of annuaire) {
+    const f = r.fields;
+    const cur = out.get(r.key) || { employmentEnd: '', memberships: [], rec: r };
+    const ee = typeof f.employment_end_date === 'number' && f.employment_end_date ? new Date(f.employment_end_date * 1000).toISOString().slice(0, 10) : String(f.employment_end_date || '').trim();
+    if (ee > cur.employmentEnd) cur.employmentEnd = ee;
+    cur.memberships.push(String(f.affiliation_end_date || '').trim());
+    out.set(r.key, cur);
+  }
+  for (const v of out.values()) v.ended = !!v.employmentEnd || (v.memberships.length > 0 && v.memberships.every(Boolean));
+  return out;
+}
+const sourcesFr = (list) => (list || []).map((x) => (x === 'orcid' ? 'ORCID' : x === 'scopus' ? 'Scopus' : 'les publications')).join(' + ');
+function departDescription(sig) {
+  const dest = sig.destination ? `, pour ${sig.destination}` : '';
+  switch (sig.type) {
+    case 'depart_confirme': return `Départ confirmé par ${sourcesFr(sig.sources)} : parti vers ${sig.date}${dest}. Fin d’emploi proposée : ${sig.date}.`;
+    case 'depart_declare': return `ORCID : le dernier poste à l’établissement s’est terminé en ${sig.date}${sig.destination ? ` ; nouveau poste à ${sig.destination}${sig.destinationStart ? ` depuis ${sig.destinationStart}` : ''}` : ''}.`;
+    case 'nouveau_poste_declare': return `ORCID : nouveau poste à ${sig.destination} depuis ${sig.date}.`;
+    default: return `Publications : aucune affiliée à l’établissement après ${sig.date} ; ${sig.count} affiliées ailleurs${sig.destination ? `, surtout ${sig.destination}` : ''}.`;
+  }
+}
+
 const RULES = {
   orcid_deux_ids: {
     type: 'orcid_deux_ids',
@@ -347,6 +391,65 @@ const RULES = {
       });
     },
   },
+  parcours_depart: {
+    type: 'parcours_depart_observe',
+    types: ['parcours_depart_confirme', 'parcours_depart_declare', 'parcours_depart_observe'],
+    sources: ['parcours'],
+    detect(ctx) {
+      const out = [];
+      for (const [key, e] of endsByKey(ctx.annuaire)) {
+        const line = ctx.parcours[key];
+        if (!line || e.ended) continue;   // an end date entered since the computation closes the task
+        const found = PARCOURS_DEPART.map(([sig, type]) => ({ sig: (line.signals || []).find((x) => x.type === sig), type })).find((x) => x.sig);
+        if (!found) continue;
+        const others = (line.signals || []).filter((x) => x !== found.sig && PARCOURS_DEPART.some(([t]) => t === x.type));
+        out.push({
+          key, rec: e.rec, type: found.type,
+          description: [departDescription(found.sig), ...others.map(departDescription),
+            'À vérifier puis saisir la fin d’emploi dans la fiche Druid (bloc « Parcours », bouton « Reporter … en fin d’emploi »).'].join('\n'),
+          lien: druidRecordUrl(key),
+        });
+      }
+      return out;
+    },
+  },
+  parcours_statut_incoherent: {
+    type: 'parcours_statut_incoherent',
+    sources: ['parcours'],
+    detect(ctx) {
+      const out = [];
+      for (const [key, e] of endsByKey(ctx.annuaire)) {
+        const sig = (ctx.parcours[key]?.signals || []).find((x) => x.type === 'statut_incoherent');
+        if (!sig || !e.ended) continue;   // end date removed since the computation: nothing left to check
+        out.push({
+          key, rec: e.rec,
+          description: sig.lastLocal
+            ? `La fiche est close (${sig.endYear}), mais des publications sont encore affiliées à l’établissement en ${sig.lastLocal} : date de fin saisie trop tôt, personnel hospitalier ou émérite ? Vérifier la date de fin et le statut.`
+            : `La fiche est close (${sig.endYear}), mais ORCID indique un poste en cours dans l’établissement : vérifier la date de fin et le statut.`,
+          lien: druidRecordUrl(key),
+        });
+      }
+      return out;
+    },
+  },
+  parcours_identifiant_suspect: {
+    type: 'parcours_identifiant_suspect',
+    sources: ['parcours'],
+    detect(ctx) {
+      const out = [];
+      for (const [key, e] of endsByKey(ctx.annuaire)) {
+        const sig = (ctx.parcours[key]?.signals || []).find((x) => x.type === 'identifiant_suspect');
+        if (!sig || e.ended) continue;
+        const via = (sig.sources || []).map((x) => (x === 'scopus' ? 'le profil Scopus' : 'les publications')).join(' et ');
+        out.push({
+          key, rec: e.rec,
+          description: `D’après ${via}, les identifiants de la fiche ne mentionnent jamais l’établissement : identifiant d’un homonyme ? Vérifier ORCID, OpenAlex et Scopus dans « Alignement des identifiants chercheurs ».`,
+          lien: druidRecordUrl(key),
+        });
+      }
+      return out;
+    },
+  },
   abes_orcid: {
     type: 'idref_ajouter_orcid',
     sources: ['idref'],
@@ -396,6 +499,7 @@ async function main() {
     scopus: loadJson('scopus_align_cache.json'),
     idref: loadJson('idref_align_cache.json'),
     ldap: loadJson('ldap_status_cache.json'),
+    parcours: loadJson(PARCOURS_INDEX),
   };
   let existing = [];
   try { existing = (await common.gristGet(`/docs/${DOC}/tables/${schema.TASKS_TABLE}/records`)).records || []; }
@@ -497,7 +601,7 @@ async function main() {
   writeProgress({ running: false, total: rules.length, done, ...stats, startedAt: nowIso, finishedAt: new Date().toISOString() });
 }
 
-module.exports = { RULES, DEFAULT_RULES, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups };
+module.exports = { RULES, DEFAULT_RULES, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups };
 
 if (require.main === module) {
   main().catch((e) => {

@@ -63,6 +63,12 @@ const TASK_TYPES = {
   annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false },
   annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false },
   annuaire_identifiant_partage: { base: 'Annuaire', canal: 'interne', email: false },
+  // Career path (docs/plan-parcours-affiliations.md, lot 4): signals of scripts/sync_affiliation_history.cjs.
+  parcours_depart_confirme: { base: 'Annuaire', canal: 'interne', email: false },
+  parcours_depart_declare: { base: 'Annuaire', canal: 'interne', email: false },
+  parcours_depart_observe: { base: 'Annuaire', canal: 'interne', email: false },
+  parcours_statut_incoherent: { base: 'Annuaire', canal: 'interne', email: false },
+  parcours_identifiant_suspect: { base: 'Annuaire', canal: 'interne', email: false },
   autre: { base: 'Autre', canal: 'interne', email: false },
 };
 
@@ -100,6 +106,11 @@ const TITLES_FR = {
   annuaire_doublon: 'Deux fiches pour la même personne : fusionner',
   annuaire_doublon_a_verifier: 'Identifiants communs : même personne ou homonymes ?',
   annuaire_identifiant_partage: 'Identifiant porté par deux personnes : le corriger',
+  parcours_depart_confirme: 'Départ confirmé par plusieurs sources : saisir la fin d’emploi',
+  parcours_depart_declare: 'Départ déclaré dans ORCID : saisir la fin d’emploi',
+  parcours_depart_observe: 'Départ probable d’après les publications : vérifier',
+  parcours_statut_incoherent: 'Fiche close mais activité locale récente : vérifier la date de fin',
+  parcours_identifiant_suspect: 'Identifiants jamais affiliés à l’établissement : homonyme ?',
   autre: 'Autre',
 };
 
