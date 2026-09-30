@@ -156,7 +156,7 @@ async function main() {
   const people = await loadPeople();
   const cache = (() => { try { return JSON.parse(fs.readFileSync(INDEX_PATH, 'utf8')); } catch (e) { return {}; } })();
   const dryEntries = {};
-  const updatedIndex = {};
+  let updatedIndex = {};   // index lines of the CURRENT chunk only (merged then cleared, see below)
   const hierarchy = SRC.loadHierarchy(HIERARCHY_PATH);
   const fresh = (e, p) => e && !e.incomplete?.length && e.idsSignature === idsSignature(p) && (Date.now() - new Date(e.computedAt).getTime()) < MAX_AGE_DAYS * 864e5;
   let targets = people.filter((p) => p.uid || p.orcid || p.openalex.length || p.scopus.length);
@@ -238,7 +238,10 @@ async function main() {
     if (elsevier?.aborted() && !disabled.has('scopus')) { disabled.add('scopus'); console.warn(`[parcours] Scopus stopped: ${elsevier.aborted()} — next entries marked incomplete`); }
     if (!DRY_RUN) {
       // Merge on write: a concurrent run (full run / API refresh) keeps its own keys.
+      // Only this chunk's keys: re-merging the keys of earlier chunks would overwrite a newer line
+      // written meanwhile by an API refresh of the same person.
       STORE.mergeIndex(ENTRIES_DIR, updatedIndex);
+      updatedIndex = {};
       const merged = SRC.loadHierarchy(HIERARCHY_PATH);
       for (const [table, rows] of Object.entries(hierarchy)) merged[table] = { ...(merged[table] || {}), ...rows };
       STORE.writeJsonAtomic(HIERARCHY_PATH, merged);
@@ -249,6 +252,9 @@ async function main() {
   if (!stopReason && disabled.size) stopReason = `sources disabled during the run: ${[...disabled].join(', ')}${elsevier?.aborted() ? ` (${elsevier.aborted()})` : ''}`;
   writeProgress(false, done);
   console.log(`[parcours] Done. ${JSON.stringify(counts)}${stopReason ? ` — ${stopReason}` : ''}. Quota Scopus: ${JSON.stringify(elsevier?.quota || {})}`);
+  // One-person run (API refresh): a failed fetch or resolver must not look like a success — the API
+  // would otherwise serve the previous entry as freshly recomputed.
+  if (ONLY_UID && (counts.failed > 0 || (stopReason && !counts.computed && !counts.kept))) process.exitCode = 2;
   if (DRY_RUN) {
     for (const r of targets.slice(0, hasFlag('verbose') ? targets.length : 5)) {
       const e = dryEntries[r.key];
