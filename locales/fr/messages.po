@@ -12531,3 +12531,7 @@ msgstr "Chercher cette fiche sur {0}"
 #: components/researchers/UnifiedAlignPage.tsx:299
 msgid "Search this record again on {0}"
 msgstr "Chercher de nouveau cette fiche sur {0}"
+
+#: components/researchers/UnifiedAlignPage.tsx:132
+msgid "{n, plural, one {# candidate ?} other {# candidates ?}}"
+msgstr "{n, plural, one {# candidat ?} other {# candidats ?}}"

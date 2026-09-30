@@ -154,3 +154,22 @@
 .page-header[data-compact] .page-header-icon { width: 1.25rem; height: 1.25rem; }
 .page-header[data-compact] .page-header-top { margin-bottom: .5rem; }
 .page-header[data-compact] .count-badge { height: 1.5rem; font-size: 12px; }
+
+/* Unified alignment table (components/researchers/UnifiedAlignPage.tsx): one column per source,
+   --src-count of them. Sized on the table's own width (container query), not on the screen's: the
+   sidebar takes part of it. Wide: badges with a wording (.ua-text); narrow: pictogram + count
+   (.ua-icon), short column headers; very narrow (phone): the person on its own line, the source
+   badges on the line below, aligned under the column headers. */
+.unified-table { container-type: inline-size; }
+.unified-grid { grid-template-columns: 28px minmax(240px, 1fr) repeat(var(--src-count, 5), minmax(110px, 170px)); }
+.unified-table .ua-icon { display: none; }
+@container (max-width: 879px) {
+  .unified-grid { grid-template-columns: 28px minmax(140px, 1fr) repeat(var(--src-count, 5), minmax(40px, 64px)); }
+  .unified-table .ua-text { display: none; }
+  .unified-table .ua-icon { display: inline-flex; }
+}
+@container (max-width: 479px) {
+  .unified-grid { grid-template-columns: 28px repeat(var(--src-count, 5), minmax(0, 1fr)); row-gap: .375rem; }
+  .unified-grid > :nth-child(2) { grid-column: 2 / -1; }
+  .unified-grid > :nth-child(3) { grid-column-start: 2; }
+}

@@ -92,7 +92,7 @@ export const AlignLaunchModal: React.FC<Props> = ({ mode, labo, group, sources, 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" role="dialog" aria-modal="true">
       <div className="w-full max-w-3xl max-h-[92vh] flex flex-col rounded-hero bg-cream-100 dark:bg-[#201e1a] shadow-soft-lg border border-white/50 dark:border-white/10 overflow-hidden">
-        <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-3 border-b border-ink/5 dark:border-white/5">
+        <div className="flex items-start justify-between gap-4 px-4 sm:px-6 pt-5 pb-3 border-b border-ink/5 dark:border-white/5">
           <div>
             <h2 className="font-disp text-lg font-bold text-ink dark:text-[#f5f2ea]">
               {mode === 'verify' ? <Trans>Check the existing identifiers</Trans> : <Trans>Search the missing identifiers</Trans>}
@@ -104,7 +104,7 @@ export const AlignLaunchModal: React.FC<Props> = ({ mode, labo, group, sources, 
           <button type="button" onClick={onClose} className="p-1.5 rounded-full hover:bg-white/70 dark:hover:bg-white/10" aria-label={t`Close`}><X className="w-4 h-4" /></button>
         </div>
 
-        <div className="flex-1 overflow-auto px-6 py-4 space-y-4 text-[13px]">
+        <div className="flex-1 overflow-auto px-4 sm:px-6 py-4 space-y-4 text-[13px]">
           {error && <p className="text-[#b3441f] dark:text-[#e08a6a] font-semibold">{error}</p>}
           {!estimate && !error && (
             <p className="flex items-center gap-2 text-muted dark:text-[#8f897c]"><RefreshCw className="w-4 h-4 animate-spin" /> <Trans>Counting the records to process…</Trans></p>
@@ -121,7 +121,8 @@ export const AlignLaunchModal: React.FC<Props> = ({ mode, labo, group, sources, 
                   <span><Trans>All records of the scope (full rerun)</Trans></span>
                 </label>
               </div>
-              <table className="w-full">
+              <div className="overflow-x-auto -mx-1 px-1">
+              <table className="w-full min-w-[480px]">
                 <thead className="text-[11px] uppercase tracking-wide text-muted-light dark:text-[#8f897c]">
                   <tr>
                     <th className="text-left py-1.5"><Trans>Source</Trans></th>
@@ -166,6 +167,7 @@ export const AlignLaunchModal: React.FC<Props> = ({ mode, labo, group, sources, 
                   })}
                 </tbody>
               </table>
+              </div>
               {pools && shown.includes('scopus') && (
                 <div className="rounded-2xl bg-white/60 dark:bg-white/5 border border-ink/5 dark:border-white/10 px-4 py-3 text-[12.5px] text-muted dark:text-[#b8b1a3] space-y-1">
                   <p className="font-semibold text-ink dark:text-[#f5f2ea]"><Trans>Scopus — weekly Elsevier quota</Trans></p>
@@ -182,7 +184,7 @@ export const AlignLaunchModal: React.FC<Props> = ({ mode, labo, group, sources, 
           )}
         </div>
 
-        <div className="flex items-center justify-end gap-2 px-6 py-4 border-t border-ink/5 dark:border-white/5">
+        <div className="flex items-center justify-end gap-2 px-4 sm:px-6 py-4 border-t border-ink/5 dark:border-white/5">
           <PixelBtn onClick={onClose}><Trans>Cancel</Trans></PixelBtn>
           <PixelBtn onClick={launch} disabled={!estimate || nothing} tone="bg-ink text-white hover:bg-black dark:bg-accent dark:text-ink dark:hover:bg-accent-strong">
             <RotateCw className="w-4 h-4" /> <Trans>Start</Trans>

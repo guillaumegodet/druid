@@ -12531,3 +12531,7 @@ msgstr "Search this record on {0}"
 #: components/researchers/UnifiedAlignPage.tsx:299
 msgid "Search this record again on {0}"
 msgstr "Search this record again on {0}"
+
+#: components/researchers/UnifiedAlignPage.tsx:132
+msgid "{n, plural, one {# candidate ?} other {# candidates ?}}"
+msgstr "{n, plural, one {# candidate ?} other {# candidates ?}}"

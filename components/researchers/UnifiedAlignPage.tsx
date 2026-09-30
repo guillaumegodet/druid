@@ -3,6 +3,7 @@ import { useCompactHeader } from '../../hooks/useCompactHeader';
 import {
   RefreshCw, RotateCw, Check, Link2, Users, GraduationCap, Briefcase, Save, CheckSquare, Square,
   ChevronDown, ChevronRight, Sparkles, AlertTriangle, Zap, ArrowRight, GitCompare, Shuffle, ExternalLink, CircleStop,
+  CircleDashed, CircleHelp, SearchX, UsersRound,
 } from 'lucide-react';
 import {
   ALIGN_SOURCE_META, buildUnifiedUpdates, unifiedAmbigKey, unifiedCandidateId, unifiedFillKey,
@@ -41,6 +42,8 @@ import {
  */
 
 const SOURCE_LABEL: Record<UnifiedAlignSource, string> = { idref: 'IdRef', orcid: 'ORCID', hal: 'HAL', openalex: 'OpenAlex', scopus: 'Scopus' };
+/** Column headers of the narrow table (pictogram badges, index.css .unified-table). */
+const SOURCE_SHORT: Record<UnifiedAlignSource, string> = { idref: 'IdRef', orcid: 'ORCID', hal: 'HAL', openalex: 'OA', scopus: 'Sco.' };
 const SOURCE_ORDER: UnifiedAlignSource[] = ['idref', 'orcid', 'hal', 'openalex', 'scopus'];
 const MODE_LABEL: Record<AlignMode, MessageDescriptor> = { search: msg`Find missing`, verify: msg`Check existing ones` };
 
@@ -90,49 +93,69 @@ const SourcePastille: React.FC<{
   const { t } = useLingui();
   const label = SOURCE_LABEL[src];
   // Full-width badge in its source column (the sticky column header names the source), so the
-  // eye scans one column per identifier; the wording is the state, not the source.
-  const base = `inline-flex w-full min-h-[32px] items-center justify-center gap-1.5 px-2.5 py-1 rounded-full text-[12.5px] font-semibold transition-colors ${isOpen ? 'ring-2 ring-accent-strong' : ''}`;
+  // eye scans one column per identifier; the wording is the state, not the source. Two renderings,
+  // switched by the width of the table (index.css, .unified-table container): `ua-text` (wording)
+  // when wide, `ua-icon` (pictogram + count) when narrow — the title/aria-label carries the meaning.
+  const base = `inline-flex w-full min-h-[32px] items-center justify-center gap-1.5 px-1.5 py-1 rounded-full text-[12.5px] font-semibold transition-colors ${isOpen ? 'ring-2 ring-accent-strong' : ''}`;
   const nbConflicts = cell?.conflicts?.length ?? 0;
-  const warn = nbConflicts > 0 ? <AlertTriangle className="w-3.5 h-3.5" /> : null;
+  const warn = nbConflicts > 0 ? <AlertTriangle className="w-3.5 h-3.5 shrink-0" /> : null;
+  const both = (text: React.ReactNode, icon: React.ReactNode) => (
+    <><span className="ua-text">{text}</span><span className="ua-icon items-center gap-0.5">{icon}</span></>
+  );
+  const count = (n: number) => <span className="font-mono text-[11.5px]">{n}</span>;
 
   if (!cell) return <span className="block w-full text-center text-muted-faint text-[12px]">—</span>;
   if (cell.status === 'strong') {
     const fill = cell.fill || [];
-    const tone = fill.some(isStrongScore)
+    const strong = fill.some(isStrongScore);
+    const tone = strong
       ? 'bg-[rgba(46,160,102,.14)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.18)] dark:text-[#5fd39a] border border-transparent'
       : 'bg-white/70 dark:bg-white/10 border border-ink/10 dark:border-white/15';
     if (fill.length === 1) {
       const key = unifiedFillKey(rowId, src, unifiedCandidateId(src, fill[0].candidate));
+      const title = t`${label}: one candidate to check — tick to fill in, click to see it`;
       return (
         <span className={`${base} ${tone} cursor-pointer hover:border-accent-strong ${selected.has(key) ? '!bg-accent/25 !border-accent-strong' : ''}`}>
-          <input type="checkbox" checked={selected.has(key)} onChange={() => onToggleSelect(key)} className="accent-[#1c1b19] dark:accent-[#f4d24a]" onClick={(e) => e.stopPropagation()} />
-          <span onClick={onToggleOpen} className="flex-1 text-center" title={t`${label}: one candidate to check — tick to fill in, click to see it`}>{fill.some(isStrongScore) ? t`strong candidate` : t`candidate`}{warn}</span>
+          <input type="checkbox" checked={selected.has(key)} onChange={() => onToggleSelect(key)} className="accent-[#1c1b19] dark:accent-[#f4d24a]" onClick={(e) => e.stopPropagation()} aria-label={title} />
+          <span onClick={onToggleOpen} className="flex-1 inline-flex items-center justify-center gap-1" title={title}>
+            {both(strong ? t`strong candidate` : t`candidate`, strong ? <Sparkles className="w-3.5 h-3.5" /> : <CircleDashed className="w-3.5 h-3.5" />)}{warn}
+          </span>
         </span>
       );
     }
-    return <button onClick={onToggleOpen} className={`${base} ${tone}`} title={t`${label}: candidates to check`}><Plural value={fill.length} one="# candidate" other="# candidates" />{warn}</button>;
+    const title = t`${label}: candidates to check`;
+    return <button onClick={onToggleOpen} className={`${base} ${tone}`} title={title} aria-label={title}>{both(<Plural value={fill.length} one="# candidate" other="# candidates" />, <><UsersRound className="w-3.5 h-3.5" />{count(fill.length)}</>)}{warn}</button>;
   }
   if (cell.status === 'ambiguous') {
-    return <button onClick={onToggleOpen} title={t`${label}: ambiguous — pick a candidate or ignore`} className={`${base} bg-[rgba(231,111,154,.15)] text-[#a3436a] dark:bg-[rgba(231,111,154,.2)] dark:text-[#e88fb0]`}><Plural value={cell.ambiguous?.candidates.length ?? 0} one="# candidate ?" other="# candidates ?" />{warn}</button>;
+    const n = cell.ambiguous?.candidates.length ?? 0;
+    const title = t`${label}: ambiguous — pick a candidate or ignore`;
+    return <button onClick={onToggleOpen} title={title} aria-label={title} className={`${base} bg-[rgba(231,111,154,.15)] text-[#a3436a] dark:bg-[rgba(231,111,154,.2)] dark:text-[#e88fb0]`}>{both(<Plural value={n} one="# candidate ?" other="# candidates ?" />, <><CircleHelp className="w-3.5 h-3.5" />{count(n)}</>)}{warn}</button>;
   }
   if (cell.status === 'arbitrate') {
-    return <button onClick={onToggleOpen} title={t`Name mismatch between the record and its IdRef entry — confirm or detach`} className={`${base} ${cell.arbitrate?.suspect ? 'bg-[rgba(214,69,69,.14)] text-[#b23b3b] dark:text-[#f08c8c]' : 'bg-[rgba(231,111,154,.15)] text-[#a3436a] dark:bg-[rgba(231,111,154,.2)] dark:text-[#e88fb0]'}`}><GitCompare className="w-3.5 h-3.5" /> {t`name mismatch`}{warn}</button>;
+    const title = t`Name mismatch between the record and its IdRef entry — confirm or detach`;
+    return <button onClick={onToggleOpen} title={title} aria-label={title} className={`${base} ${cell.arbitrate?.suspect ? 'bg-[rgba(214,69,69,.14)] text-[#b23b3b] dark:text-[#f08c8c]' : 'bg-[rgba(231,111,154,.15)] text-[#a3436a] dark:bg-[rgba(231,111,154,.2)] dark:text-[#e88fb0]'}`}><GitCompare className="w-3.5 h-3.5 shrink-0" /><span className="ua-text">{t`name mismatch`}</span>{warn}</button>;
   }
   if (cell.status === 'redirect') {
-    return <button onClick={onToggleOpen} title={t`IdRef entry merged/replaced by ABES — update the PPN`} className={`${base} bg-[rgba(112,72,232,.14)] text-[#6b3fbf] dark:bg-[rgba(112,72,232,.22)] dark:text-[#b9a1f0]`}><Shuffle className="w-3.5 h-3.5" /> {t`replaced entry`}</button>;
+    const title = t`IdRef entry merged/replaced by ABES — update the PPN`;
+    return <button onClick={onToggleOpen} title={title} aria-label={title} className={`${base} bg-[rgba(112,72,232,.14)] text-[#6b3fbf] dark:bg-[rgba(112,72,232,.22)] dark:text-[#b9a1f0]`}><Shuffle className="w-3.5 h-3.5 shrink-0" /><span className="ua-text">{t`replaced entry`}</span></button>;
   }
   if (cell.status === 'conflict') {
-    return <button onClick={onToggleOpen} title={t`${label}: conflict to review`} className={`${base} bg-[rgba(224,158,42,.18)] text-[#8a6113] dark:bg-[rgba(224,158,42,.16)] dark:text-[#f0c266]`}><AlertTriangle className="w-3.5 h-3.5" /> <Plural value={nbConflicts} one="conflict" other="# conflicts" /></button>;
+    const title = t`${label}: conflict to review`;
+    return <button onClick={onToggleOpen} title={title} aria-label={title} className={`${base} bg-[rgba(224,158,42,.18)] text-[#8a6113] dark:bg-[rgba(224,158,42,.16)] dark:text-[#f0c266]`}><AlertTriangle className="w-3.5 h-3.5 shrink-0" />{both(<Plural value={nbConflicts} one="conflict" other="# conflicts" />, count(nbConflicts))}</button>;
   }
   if (cell.status === 'present') {
+    const title = t`Already filled in: ${(cell.existing || []).join(', ')}`;
     return (
-      <button onClick={onToggleOpen} title={t`Already filled in: ${(cell.existing || []).join(', ')}`}
+      <button onClick={onToggleOpen} title={title} aria-label={title}
         className={`${base} bg-[rgba(46,160,102,.10)] text-[#1f7a4d]/80 dark:text-[#5fd39a]/80`}>
-        <Check className="w-3.5 h-3.5" /> {t`filled in`}
+        <Check className="w-3.5 h-3.5 shrink-0" /><span className="ua-text">{t`filled in`}</span>
       </button>
     );
   }
-  if (cell.status === 'not_found') return <span className="block w-full text-center text-muted-faint text-[12px]" title={t`No candidate found during the last ${label} run.`}>{t`not found`}</span>;
+  if (cell.status === 'not_found') {
+    const title = t`No candidate found during the last ${label} run.`;
+    return <span className="flex w-full items-center justify-center text-muted-faint text-[12px]" title={title} aria-label={title}>{both(t`not found`, <SearchX className="w-3.5 h-3.5" />)}</span>;
+  }
   return <span className="block w-full text-center text-muted-faint text-[12px]" title={t`Never searched on this source`}>·</span>;
 };
 
@@ -545,7 +568,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
               {laboOptions.map((l) => <option key={l} value={l}>{l}</option>)}
             </select>
           )}
-          <div className="flex items-center gap-1 rounded-full bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white/70 dark:border-white/15 p-1 shadow-soft">
+          <div className="flex flex-wrap items-center gap-1 rounded-3xl bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white/70 dark:border-white/15 p-1 shadow-soft">
             {groupBtn('personnel', <Users className="w-3.5 h-3.5" />, <Trans>Staff ({groupCounts.personnel})</Trans>)}
             {groupBtn('doctorants', <GraduationCap className="w-3.5 h-3.5" />, <Trans>PhD students ({groupCounts.doctorants})</Trans>)}
             {groupBtn('hors_recherche', <Briefcase className="w-3.5 h-3.5" />, <Trans>No research duty ({groupCounts.hors_recherche})</Trans>,
@@ -638,18 +661,18 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
               {filteredRows.length === 0 ? (
                 <p className="text-[13px] text-muted-faint py-8"><Trans>No records to show for this filter.</Trans></p>
               ) : (
-                <div className="rounded-card border border-ink/8 dark:border-white/8 bg-white/40 dark:bg-white/[.03]">
+                <div className="unified-table rounded-card border border-ink/8 dark:border-white/8 bg-white/40 dark:bg-white/[.03]">
                   {/* One column per source: the header names the source, the badges say the state. No
                       overflow wrapper here: it would break the sticky header (own scroll context). */}
                   <div>
                   <div className="grid unified-grid sticky -top-4 z-10 rounded-t-card items-center px-3 py-2 bg-[#f3efe4] dark:bg-[#24231f] border-b border-ink/8 dark:border-white/10 text-[10.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c]"
-                    style={{ gridTemplateColumns: `28px minmax(260px, 1fr) repeat(${sources.length}, minmax(110px, 170px))` }}>
+                    style={{ '--src-count': sources.length } as React.CSSProperties}>
                     <span />
                     <span><Trans>Person</Trans></span>
                     {sources.map((s) => (
                       <button key={s} type="button" onClick={() => setSrcFilter((f) => (f === s ? '' : s))} title={srcFilter === s ? t`Remove the source filter` : t`Only records with something to do on ${SOURCE_LABEL[s]}`}
                         className={`text-center rounded-full py-0.5 transition-colors ${srcFilter === s ? 'bg-ink text-white dark:bg-accent dark:text-ink' : srcFilter ? 'opacity-40 hover:opacity-100' : 'hover:text-ink dark:hover:text-[#f5f2ea]'}`}>
-                        {SOURCE_LABEL[s]} <span className={`font-mono normal-case tracking-normal ${srcFilter === s ? 'opacity-80' : 'text-muted-faint'}`}>{sourceCounts[s]}</span>
+                        <span className="ua-text">{SOURCE_LABEL[s]}</span><span className="ua-icon justify-center">{SOURCE_SHORT[s]}</span> <span className={`ua-text font-mono normal-case tracking-normal ${srcFilter === s ? 'opacity-80' : 'text-muted-faint'}`}>{sourceCounts[s]}</span>
                       </button>
                     ))}
                   </div>
@@ -661,7 +684,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
                     return (
                       <div key={row.id} className={`border-b border-ink/5 dark:border-white/5 last:border-b-0 ${rowTone}`}>
                         <div className="grid unified-grid items-center px-3 py-2 hover:bg-white/70 dark:hover:bg-white/[.06] transition-colors"
-                          style={{ gridTemplateColumns: `28px minmax(260px, 1fr) repeat(${sources.length}, minmax(110px, 170px))` }}>
+                          style={{ '--src-count': sources.length } as React.CSSProperties}>
                           <button type="button" onClick={() => setOpenKey((k) => (k && k.startsWith(`${row.id}::`) ? null : rowSourceKey(row.id, sources.find((s) => isActionableCell(row.sources[s])) || sources[0])))}
                             title={rowOpenSrc ? t`Close` : t`Open the detail`} className="flex items-center justify-center w-7 h-7 rounded-full text-muted-faint hover:bg-ink/5 dark:hover:bg-white/10">
                             {rowOpenSrc ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
@@ -690,7 +713,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
                           ))}
                         </div>
                         {rowOpenSrc && openCell && (
-                          <div className="px-5 pb-4 pl-12 pt-3 border-t border-ink/5 dark:border-white/5 bg-white/50 dark:bg-white/[.03]">
+                          <div className="px-3 sm:px-5 pb-4 sm:pl-12 pt-3 border-t border-ink/5 dark:border-white/5 bg-white/50 dark:bg-white/[.03]">
                             <div className="text-[10.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c] mb-2">{SOURCE_LABEL[rowOpenSrc]} — {row.displayName}</div>
                             <SourceDrawer src={rowOpenSrc} row={row} cell={openCell} selected={selected} onToggleSelect={toggleSelect}
                               chosen={chosen} onChoose={onChoose} onClearChoice={onClearChoice}
