@@ -209,7 +209,7 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
                         {openId === x.id && (
                           <tr className="border-t border-ink/5 dark:border-white/5 bg-white/50 dark:bg-white/[.03]">
                             <td colSpan={8} className="px-4 py-4">
-                              <TaskDetail task={x} me={me} researcher={resolveResearcher(x)} onTransition={transition} onPatch={patch} onOpenResearcher={onOpenResearcher}
+                              <TaskDetail task={x} me={me} researcher={resolveResearcher(x)} onTransition={transition} onPatch={patch}
                                 mergePairs={onMerge ? mergePairsOf(x, rowIdOfUid) : []} onMerge={onMerge} />
                             </td>
                           </tr>
@@ -237,11 +237,10 @@ const TaskDetail: React.FC<{
   researcher?: Researcher;
   onTransition: TasksState['transition'];
   onPatch: TasksState['patch'];
-  onOpenResearcher: (task: Task) => void;
   /** Record pairs of a « shared identifiers » task the merge assistant can open. */
   mergePairs: { uids: [string, string]; rowIds: [number, number] }[];
   onMerge?: (rowIds: [number, number]) => void;
-}> = ({ task, me, researcher, onTransition, onPatch, onOpenResearcher, mergePairs, onMerge }) => {
+}> = ({ task, me, researcher, onTransition, onPatch, mergePairs, onMerge }) => {
   const { t, i18n } = useLingui();
   const [events, setEvents] = useState<TaskEvent[] | null>(null);
   const [pending, setPending] = useState<PendingAction>(null);
@@ -292,9 +291,6 @@ const TaskDetail: React.FC<{
         <div className="flex flex-wrap items-center gap-2">
           {task.lien && (
             <a href={task.lien} target="_blank" rel="noopener noreferrer" className="btn-pill h-8 text-[12px]"><ExternalLink className="w-3.5 h-3.5" /> <Trans>Open the link</Trans></a>
-          )}
-          {(task.chercheur || task.uid_dyna) && (
-            <button type="button" onClick={() => onOpenResearcher(task)} className="btn-pill h-8 text-[12px]"><User className="w-3.5 h-3.5" /> <Trans>Open the record</Trans></button>
           )}
           {onMerge && mergePairs.map((p) => (
             <button key={p.uids.join('+')} type="button" onClick={() => onMerge(p.rowIds)} className="btn-pill h-8 text-[12px]"

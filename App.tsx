@@ -166,8 +166,8 @@ function App() {
   const [todoTab, setTodoTab] = useState<TodoTab>('doublons');
   const [taskForm, setTaskForm] = useState<{ researcher: Researcher | null } | null>(null);
   const openTodo = (tab?: TodoTab) => {
-    if (tab) { setTodoTab(tab); setUrlState({ tab }); }
     setViewAndUrl(ViewState.TASKS);
+    if (tab) { setTodoTab(tab); setUrlState({ tab }); }
   };
   /** Opens the Druid record of a task's researcher (Grist row id first, uid_dyna fallback). */
   const openTaskResearcher = (task: Task) => {
@@ -215,10 +215,13 @@ function App() {
     setViewAndUrl(ViewState.ADMIN);
   };
 
-  // Sync with the URL
+  // Sync with the URL (on load and on the browser's back/forward: `urlVersion` then
+  // re-runs the record selection below).
+  const [urlVersion, setUrlVersion] = useState(0);
   const { setUrlState } = useUrlState(
     { page: ViewState.RESEARCHERS_LIST, id: null, tab: null },
     (newState) => {
+      setUrlVersion((v) => v + 1);
       // Legacy « Doublons » page URL → « À traiter » section, Doublons tab.
       if (String(newState.page) === 'DUPLICATES') { setCurrentView(ViewState.TASKS); setTodoTab('doublons'); return; }
       if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'affiliations' || newState.tab === 'conflits')) setTodoTab(newState.tab);
@@ -240,7 +243,7 @@ function App() {
   const openReport = (id: number | null) => {
     setReportId(id);
     setCurrentView(ViewState.REPORTS);
-    setUrlState({ page: ViewState.REPORTS, id: id == null ? null : String(id) });
+    setUrlState({ page: ViewState.REPORTS, id: id == null ? null : String(id) }, { push: true });
   };
 
   // Effect selecting the entity when an ID is present in the URL (once the data is loaded)
@@ -270,12 +273,12 @@ function App() {
       // `researchers` is already filtered by rights (see useDruidData): an id
       // outside the scope (or nonexistent) matches nothing → fall back to the list
       // rather than leaving an empty record displayed.
-      if (r) setSelectedResearcher(r); else setViewAndUrl(ViewState.RESEARCHERS_LIST);
+      if (r) setSelectedResearcher(r); else setViewAndUrl(ViewState.RESEARCHERS_LIST, false);
     } else if (id && page === ViewState.STRUCTURE_DETAIL && structures.length > 0) {
       const s = structures.find(st => st.id === id);
-      if (s) setSelectedStructure(s); else setViewAndUrl(ViewState.STRUCTURES_LIST);
+      if (s) setSelectedStructure(s); else setViewAndUrl(ViewState.STRUCTURES_LIST, false);
     }
-  }, [loading, researchers, structures]);
+  }, [loading, researchers, structures, urlVersion]);
 
   // Unified alignment page: (re)loads the aggregated diff on opening and on mode change —
   // no heavy run here (see rerunUnifiedAlign), same contract as the 4 legacy pages.
@@ -325,7 +328,7 @@ function App() {
     if ((superAdminOnly.includes(currentView) && !isSuperAdmin()) ||
         (establishmentOnly.includes(currentView) && !canUseEstablishmentTools()) ||
         (currentView === ViewState.LDAP_ALIGN && !hasCapability('HAS_LDAP'))) {
-      setViewAndUrl(ViewState.RESEARCHERS_LIST);
+      setViewAndUrl(ViewState.RESEARCHERS_LIST, false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView]);
@@ -387,19 +390,21 @@ function App() {
   const handleResearcherSelect = (researcher: Researcher) => {
     setSelectedResearcher(researcher);
     setCurrentView(ViewState.RESEARCHER_DETAIL);
-    setUrlState({ page: ViewState.RESEARCHER_DETAIL, id: researcher.id });
+    setUrlState({ page: ViewState.RESEARCHER_DETAIL, id: researcher.id }, { push: true });
   };
 
   const handleStructureSelect = (structure: Structure) => {
     setSelectedStructure(structure);
     setCurrentView(ViewState.STRUCTURE_DETAIL);
-    setUrlState({ page: ViewState.STRUCTURE_DETAIL, id: structure.id });
+    setUrlState({ page: ViewState.STRUCTURE_DETAIL, id: structure.id }, { push: true });
   };
 
-  const setViewAndUrl = (view: ViewState) => {
+  /** Navigates to a page. `push` adds a history entry (back button); redirects of the
+   *  guards (record not found, missing rights) replace the current one instead. */
+  const setViewAndUrl = (view: ViewState, push = true) => {
     setCurrentView(view);
     if (view === ViewState.REPORTS) setReportId(null); // the menu opens the list
-    setUrlState({ page: view, id: null });
+    setUrlState({ page: view, id: null }, { push });
   };
 
   const handleNewResearcher = () => {
@@ -650,7 +655,7 @@ function App() {
   const handleCreateStructure = (init: Partial<Structure> = {}) => {
     setSelectedStructure(GristService.blankStructure(init));
     setCurrentView(ViewState.STRUCTURE_DETAIL);
-    setUrlState({ page: ViewState.STRUCTURE_DETAIL, id: null });
+    setUrlState({ page: ViewState.STRUCTURE_DETAIL, id: null }, { push: true });
   };
 
   const handleSaveStructure = async (updatedStructure: Structure) => {

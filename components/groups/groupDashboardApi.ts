@@ -3,6 +3,7 @@
 // session required — same origin, the cookie is sent automatically.
 
 import { Researcher } from '../../types';
+import { redirectToLogin } from '../../lib/auth';
 // Same contract as the structures ETL console (same /status endpoint on the server.cjs side): imported
 // rather than redefined, so as not to diverge silently (code review lot 7c, finding 2).
 import type { EtlStatus } from '../etl/etlConsoleApi';
@@ -75,7 +76,7 @@ async function asJson<T>(resp: Response): Promise<T> {
     // fallback as etlConsoleApi.ts. Without it, GroupDashboardSection (poll every 4 s) swallowed the
     // 401 as a « erreur transitoire » and retried indefinitely without ever redirecting to the login
     // (code review lot 7c).
-    window.location.assign('/auth/login');
+    redirectToLogin();
     return new Promise<T>(() => {}); // the navigation interrupts the flow
   }
   const data = await resp.json().catch(() => ({}));

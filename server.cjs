@@ -246,9 +246,16 @@ app.use((req, res, next) => {
 // (native Keycloak login screen, backed by the federated LDAP).
 const KEYCLOAK_IDP_HINT = process.env.KEYCLOAK_IDP_HINT || '';
 
+// Page to come back to after the login (`?next=`, set by the auth guard): a local path
+// only — no scheme, no `//host`, no backslash, never /auth/* — else open redirect or loop.
+const safeReturnTo = (next) =>
+  typeof next === 'string' && /^\/(?![\/\\])/.test(next) && !next.includes('\\') &&
+  !next.startsWith('/auth/') && next.length <= 2000 ? next : '/';
+
 app.get('/auth/login', (req, res) => {
   const state = crypto.randomBytes(16).toString('hex');
   req.session.oauthState = state;
+  req.session.returnTo = safeReturnTo(req.query.next);
   const url = `${KC_BASE}/auth?response_type=code&client_id=${KEYCLOAK_CLIENT_ID}` +
     `&redirect_uri=${encodeURIComponent(CALLBACK_URI)}` +
     `&state=${state}&scope=openid%20profile%20email` +
@@ -263,8 +270,12 @@ app.get('/auth/callback', async (req, res) => {
   // code — login forced via CSRF (review of 2026-09-16, point 2).
   const expected = req.session.oauthState;
   if (typeof code !== 'string' || !code || typeof state !== 'string' || !state || !expected || state !== expected) {
-    return res.status(400).send('Invalid OAuth state');
+    // Callback already consumed, reached again through the browser history (back button,
+    // restored tab): nothing to exchange, the session is valid → back into the application.
+    if (req.session.user) return res.redirect('/');
+    return res.status(400).send('Invalid OAuth state — <a href="/auth/login">log in again</a>');
   }
+  const returnTo = safeReturnTo(req.session.returnTo);
   try {
     const tokenRes = await fetch(`${KC_BASE}/token`, {
       method: 'POST',
@@ -311,7 +322,7 @@ app.get('/auth/callback', async (req, res) => {
     };
     console.log(`[Auth] Logged in: ${req.session.user.preferred_username}` +
       (access.isLabViewer ? ` (labo_viewer → ${access.annuaireLabs.join(', ') || 'aucun labo'})` : ''));
-    res.redirect('/');
+    res.redirect(returnTo);
   } catch (err) {
     console.error('[Auth] Callback error:', err);
     res.status(500).send('Authentication error');
@@ -370,7 +381,9 @@ app.use((req, res, next) => {
   if (isPublic || req.session.user) return next();
   // API calls get 401, browser navigation gets redirect
   if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Unauthorized' });
-  res.redirect('/auth/login');
+  // Keep the requested page (?page=TASKS&tab=…) across the Keycloak round trip.
+  res.redirect(req.method === 'GET' && req.originalUrl !== '/'
+    ? `/auth/login?next=${encodeURIComponent(req.originalUrl)}` : '/auth/login');
 });
 
 // ── Anti-CSRF ───────────────────────────────────────────────────────────────
@@ -3469,6 +3482,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  app, gristProxyGuard, gristProxyDecision, rejectCrossSite, csvEscape, runningProgress, settleProgress, startBackgroundRun,
+  app, gristProxyGuard, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
   buildPeopleCsv, buildStructuresCsv, gristCell, countCsvRecords, normalizeFuzzyDate, fuzzyDateBound, isFuzzyDatePast,
 };

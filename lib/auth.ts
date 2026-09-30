@@ -105,6 +105,12 @@ const showUnknownInstance = (): void => {
   root.replaceChildren(p);
 };
 
+/** Back to the login, then to the current page (server-side `?next=`). `replace`: the dead page
+ *  leaves no history entry, so the back button never lands on the OAuth callback. */
+export const redirectToLogin = (): void => {
+  window.location.replace(`/auth/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+};
+
 export const initKeycloak = (onAuthenticated: () => void): void => {
   fetch('/api/me')
     .then((res) => {
@@ -113,7 +119,7 @@ export const initKeycloak = (onAuthenticated: () => void): void => {
         return null;
       }
       if (!res.ok) {
-        window.location.href = '/auth/login';
+        redirectToLogin();
         return null;
       }
       return res.json() as Promise<UserInfo>;
@@ -128,7 +134,7 @@ export const initKeycloak = (onAuthenticated: () => void): void => {
       }
     })
     .catch(() => {
-      window.location.href = '/auth/login';
+      redirectToLogin();
     });
 };
 

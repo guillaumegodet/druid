@@ -4,6 +4,8 @@
 // lots: docs/archive/plan-console-etl-native.md. Keycloak session required — same
 // origin, the cookie is sent automatically.
 
+import { redirectToLogin } from '../../lib/auth';
+
 export interface SousStructure {
   id: string;
   acronym: string;
@@ -171,7 +173,7 @@ async function asJson<T>(resp: Response): Promise<T> {
   if (resp.status === 401) {
     // Keycloak session expired or lost (e.g. Druid container recreated: in-memory
     // sessions): go through the login again, which brings back to the application.
-    window.location.assign('/auth/login');
+    redirectToLogin();
     return new Promise<T>(() => {}); // the navigation interrupts the flow
   }
   const data = await resp.json().catch(() => ({}));

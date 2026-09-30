@@ -4,7 +4,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { app, rejectCrossSite, csvEscape, runningProgress, settleProgress, startBackgroundRun } =
+const { app, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun } =
   require(path.join(__dirname, '../../server.cjs'));
 
 let ko = 0;
@@ -41,6 +41,14 @@ const csrf = (method, p, headers = {}) => new Promise((resolve) => {
   check('callback without state', await status('/auth/callback?code=abc'), 400);
   check('callback state without session (undefined === undefined before)', await status('/auth/callback?code=abc&state=xyz'), 400);
   check('callback state tableau', await status('/auth/callback?code=abc&state=a&state=b'), 400);
+  // Requested page kept across the login (back button / shared links, 2026-09-30).
+  const location = async (p) => (await fetch(base + p, { redirect: 'manual' })).headers.get('location');
+  check('guard keeps the requested page', await location('/?page=TASKS&tab=taches'), '/auth/login?next=%2F%3Fpage%3DTASKS%26tab%3Dtaches');
+  check('guard on / without next', await location('/'), '/auth/login');
+  check('returnTo local path', safeReturnTo('/?page=TASKS&tab=taches'), '/?page=TASKS&tab=taches');
+  for (const bad of ['//evil.example', '/\\evil.example', 'https://evil.example', '/auth/callback?code=x', undefined, ['/x']]) {
+    check(`returnTo rejects ${JSON.stringify(bad)}`, safeReturnTo(bad), '/');
+  }
   check('sync-sovisuplus without session', await status('/api/sync-sovisuplus', { method: 'POST' }), 401);
   check('sync-ldap-trigger without session', await status('/api/sync-ldap-trigger'), 401);
   check('newsletter/generate without session', await status('/api/newsletter/generate', { method: 'POST' }), 401);
