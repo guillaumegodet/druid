@@ -44,7 +44,7 @@ const readProgress = (dir) => readJson(progressFile(dir), null);
 /**
  * May this user trigger a live recomputation of a record (API quotas)? Institution scope, or a lab
  * right on the record's lab — the same scope as editing the record.
- *   access = session access (allSlugs, labAnchors), labos = LABO values of the person's Annuaire rows,
+ *   access = session access (allSlugs, labAnchors), labs = LABO column of the person's directory rows,
  *   normalize = normalizeAcronym of server.cjs.
  */
 function canRefresh(access, labos, normalize) {

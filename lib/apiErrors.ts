@@ -66,6 +66,15 @@ export const API_ERRORS = [
   msg`Invalid PDF`,
   msg`Generation not found`,
   msg`PDF not archived`,
+  // career path of a researcher (docs/plan-parcours-affiliations.md, lot 2)
+  msg`Invalid record key`,
+  msg`Career path not computed yet for this record`,
+  msg`Grist unreachable`,
+  msg`No Annuaire record for this key`,
+  msg`Refresh outside your scope`,
+  msg`Too many refreshes in progress, retry in a minute`,
+  msg`Career-path computation failed`,
+  msg`No usable identifier for this record`,
   // tasks (« À traiter › Tâches », docs/plan-chantiers-taches.md)
   msg`Task not found`,
   msg`Unknown event action`,

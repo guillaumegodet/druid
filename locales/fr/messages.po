@@ -204,6 +204,7 @@ msgstr "Chargement du tableau de bord…"
 #: components/reports/HistoryDialog.tsx:78
 #: components/reports/ReportEditor.tsx:264
 #: components/reports/ReportsPage.tsx:134
+#: components/researchers/AffiliationHistorySection.tsx:198
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:347
 msgid "Loading…"
@@ -579,9 +580,9 @@ msgid "The group will be kept as soon as it has at least one member."
 msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 
 #: components/GroupList.tsx:168
-#: components/ResearcherDetail.tsx:294
-#: components/ResearcherDetail.tsx:446
-#: components/ResearcherDetail.tsx:549
+#: components/ResearcherDetail.tsx:295
+#: components/ResearcherDetail.tsx:454
+#: components/ResearcherDetail.tsx:557
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
 #: components/reports/NewReportDialog.tsx:311
@@ -765,187 +766,187 @@ msgstr "Types d'emploi (top 10)"
 msgid "Breakdown by lab (top 8)"
 msgstr "Répartition par labo (top 8)"
 
-#: components/ResearcherDetail.tsx:112
+#: components/ResearcherDetail.tsx:113
 msgid "Manual validation (Druid)"
 msgstr "Validation manuelle (Druid)"
 
 #. placeholder {0}: next.displayName
-#: components/ResearcherDetail.tsx:190
+#: components/ResearcherDetail.tsx:191
 msgid "Filled from LDAP: {0}."
 msgstr "Rempli depuis le LDAP : {0}."
 
-#: components/ResearcherDetail.tsx:198
+#: components/ResearcherDetail.tsx:199
 msgid "Lab: {lab}."
 msgstr "Labo : {lab}."
 
 #. placeholder {0}: otherLabs.join(', ')
-#: components/ResearcherDetail.tsx:200
+#: components/ResearcherDetail.tsx:201
 msgid "Other labs in LDAP: {0} — add them as memberships if relevant."
 msgstr "Autres labos dans le LDAP : {0} — à ajouter en appartenances si pertinent."
 
-#: components/ResearcherDetail.tsx:202
+#: components/ResearcherDetail.tsx:203
 msgid "none"
 msgstr "aucune"
 
-#: components/ResearcherDetail.tsx:203
+#: components/ResearcherDetail.tsx:204
 msgid "No known lab among the LDAP affectations (principal: {affectation}): choose it in Memberships."
 msgstr "Aucun labo connu parmi les affectations LDAP (principale : {affectation}) : choisissez-le dans Appartenances."
 
-#: components/ResearcherDetail.tsx:209
+#: components/ResearcherDetail.tsx:210
 msgid "This uid already has a directory record ({labs}): check it before creating a duplicate."
 msgstr "Cet uid a déjà une fiche dans l'annuaire ({labs}) : vérifiez-la avant de créer un doublon."
 
-#: components/ResearcherDetail.tsx:234
+#: components/ResearcherDetail.tsx:235
 msgid "Back to the list"
 msgstr "Retour à la liste"
 
-#: components/ResearcherDetail.tsx:240
+#: components/ResearcherDetail.tsx:241
 #: components/Sidebar.tsx:155
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "Personnel"
 
-#: components/ResearcherDetail.tsx:252
+#: components/ResearcherDetail.tsx:253
 #: components/researchers/DuplicatesPage.tsx:142
 msgid "Directory"
 msgstr "Annuaire"
 
-#: components/ResearcherDetail.tsx:262
+#: components/ResearcherDetail.tsx:263
 msgid "Open the Grist document (Annuaire table)"
 msgstr "Ouvrir le document Grist (table Annuaire)"
 
-#: components/ResearcherDetail.tsx:271
+#: components/ResearcherDetail.tsx:272
 msgid "Validated record — click to review / unvalidate"
 msgstr "Fiche fiabilisée — cliquer pour revoir / dévalider"
 
-#: components/ResearcherDetail.tsx:271
+#: components/ResearcherDetail.tsx:272
 msgid "Validate this record"
 msgstr "Fiabiliser cette fiche"
 
-#: components/ResearcherDetail.tsx:274
+#: components/ResearcherDetail.tsx:275
 msgid "Validated record"
 msgstr "Fiche validée"
 
-#: components/ResearcherDetail.tsx:274
-#: components/ResearcherDetail.tsx:465
+#: components/ResearcherDetail.tsx:275
+#: components/ResearcherDetail.tsx:473
 msgid "Validate the record"
 msgstr "Valider la fiche"
 
-#: components/ResearcherDetail.tsx:280
+#: components/ResearcherDetail.tsx:281
 msgid "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 msgstr "Créer une tâche à réaliser hors Druid pour ce chercheur (IdRef, ORCID, HAL…)"
 
-#: components/ResearcherDetail.tsx:283
+#: components/ResearcherDetail.tsx:284
 msgid "Report a correction"
 msgstr "Signaler une correction"
 
-#: components/ResearcherDetail.tsx:291
+#: components/ResearcherDetail.tsx:292
 msgid "Export PDF"
 msgstr "Export PDF"
 
-#: components/ResearcherDetail.tsx:299
+#: components/ResearcherDetail.tsx:300
 #: components/StructureDetail.tsx:139
 #: components/dashboard/NewsletterPanel.tsx:400
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
 
-#: components/ResearcherDetail.tsx:299
+#: components/ResearcherDetail.tsx:300
 msgid "Create the record"
 msgstr "Créer la fiche"
 
-#: components/ResearcherDetail.tsx:331
 #: components/ResearcherDetail.tsx:332
+#: components/ResearcherDetail.tsx:333
 msgid "Edit photo (URL)"
 msgstr "Modifier la photo (URL)"
 
-#: components/ResearcherDetail.tsx:339
+#: components/ResearcherDetail.tsx:340
 msgid "Photo unavailable"
 msgstr "Photo inaccessible"
 
 #. placeholder {0}: researcher.uid || t`not provided`
 #. placeholder {1}: researcher.lastSync
-#: components/ResearcherDetail.tsx:357
+#: components/ResearcherDetail.tsx:358
 msgid "UID: {0} · Last sync: {1}"
 msgstr "UID : {0} · Dernière synchro : {1}"
 
-#: components/ResearcherDetail.tsx:357
+#: components/ResearcherDetail.tsx:358
 msgid "not provided"
 msgstr "non renseigné"
 
-#: components/ResearcherDetail.tsx:397
+#: components/ResearcherDetail.tsx:405
 msgid "Profile photo"
 msgstr "Photo de profil"
 
-#: components/ResearcherDetail.tsx:412
+#: components/ResearcherDetail.tsx:420
 msgid "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 msgstr "Indiquez l'adresse (http/https) d'une image publique : page du labo, annuaire, HAL… Laissez vide pour revenir aux initiales."
 
-#: components/ResearcherDetail.tsx:417
+#: components/ResearcherDetail.tsx:425
 msgid "Photo URL"
 msgstr "URL de la photo"
 
-#: components/ResearcherDetail.tsx:428
+#: components/ResearcherDetail.tsx:436
 msgid "The URL must start with http:// or https://."
 msgstr "L'URL doit commencer par http:// ou https://."
 
-#: components/ResearcherDetail.tsx:432
+#: components/ResearcherDetail.tsx:440
 msgid "The change will be written to Grist (photo_url column) when you click “Save”."
 msgstr "La modification sera écrite dans Grist (colonne photo_url) au clic sur « Enregistrer »."
 
-#: components/ResearcherDetail.tsx:442
+#: components/ResearcherDetail.tsx:450
 msgid "Remove photo"
 msgstr "Retirer la photo"
 
-#: components/ResearcherDetail.tsx:448
+#: components/ResearcherDetail.tsx:456
 msgid "Apply"
 msgstr "Appliquer"
 
-#: components/ResearcherDetail.tsx:477
+#: components/ResearcherDetail.tsx:485
 msgid "Validated status"
 msgstr "Statut validé"
 
-#: components/ResearcherDetail.tsx:491
+#: components/ResearcherDetail.tsx:499
 #: components/dashboard/MediaSourcesAdmin.tsx:217
 msgid "Scope"
 msgstr "Portée"
 
-#: components/ResearcherDetail.tsx:504
+#: components/ResearcherDetail.tsx:512
 msgid "Source"
 msgstr "Source"
 
-#: components/ResearcherDetail.tsx:509
+#: components/ResearcherDetail.tsx:517
 msgid "E.g. 2026 lab survey, HR list…"
 msgstr "Ex. Enquête labo 2026, liste RH…"
 
-#: components/ResearcherDetail.tsx:517
+#: components/ResearcherDetail.tsx:525
 msgid "Date (auto)"
 msgstr "Date (auto)"
 
-#: components/ResearcherDetail.tsx:521
+#: components/ResearcherDetail.tsx:529
 msgid "Validated by (auto)"
 msgstr "Validé par (auto)"
 
 #. placeholder {0}: existingValidation.validationDate
 #. placeholder {1}: existingValidation.validatedBy
-#: components/ResearcherDetail.tsx:529
+#: components/ResearcherDetail.tsx:537
 msgid "Already validated on {0} by {1}."
 msgstr "Déjà validée le {0} par {1}."
 
 #. placeholder {0}: existingValidation.validationDate
-#: components/ResearcherDetail.tsx:530
+#: components/ResearcherDetail.tsx:538
 msgid "Already validated on {0}."
 msgstr "Déjà validée le {0}."
 
-#: components/ResearcherDetail.tsx:541
+#: components/ResearcherDetail.tsx:549
 msgid "Unvalidate"
 msgstr "Dévalider"
 
-#: components/ResearcherDetail.tsx:557
+#: components/ResearcherDetail.tsx:565
 msgid "Revalidate"
 msgstr "Revalider"
 
-#: components/ResearcherDetail.tsx:557
+#: components/ResearcherDetail.tsx:565
 #: components/dashboard/MediaMentionsPanel.tsx:317
 #: components/dashboard/NewsletterPanel.tsx:437
 #: components/researchers/GroupModal.tsx:65
@@ -2270,6 +2271,7 @@ msgid "Group of {0} institutions too large for this on-demand computation (max {
 msgstr "Groupe de {0} établissements trop grand pour ce calcul à la demande (max {MAX_PEER_TOPIC_RORS}) — réduisez la sélection ci-dessus."
 
 #: components/dashboard/BenchmarkTab.tsx:1439
+#: components/researchers/AffiliationHistorySection.tsx:191
 msgid "Computing…"
 msgstr "Calcul en cours…"
 
@@ -2677,6 +2679,7 @@ msgstr "À propos de « {title} »"
 #: components/reports/HistoryDialog.tsx:72
 #: components/reports/NewReportDialog.tsx:170
 #: components/reports/ShareDialog.tsx:94
+#: components/researchers/AffiliationHistorySection.tsx:91
 #: components/researchers/UnifiedAlignPage.tsx:603
 msgid "Close"
 msgstr "Fermer"
@@ -2781,6 +2784,7 @@ msgstr "{0} publication(s)"
 
 #: components/dashboard/FundersTab.tsx:53
 #: components/dashboard/FundersTab.tsx:202
+#: components/researchers/AffiliationHistorySection.tsx:40
 msgid "publications"
 msgstr "publications"
 
@@ -3467,6 +3471,7 @@ msgid "Harvested sources ({0})"
 msgstr "Sources moissonnées ({0})"
 
 #: components/dashboard/MediaSourcesAdmin.tsx:197
+#: components/researchers/AffiliationHistorySection.tsx:191
 #: components/researchers/DuplicatesPage.tsx:115
 #: components/researchers/DuplicatesPage.tsx:128
 #: components/researchers/ImportConflictsPage.tsx:117
@@ -3661,6 +3666,7 @@ msgstr "Les publications n'ont pas pu être chargées."
 
 #: components/dashboard/NetworkTab.tsx:374
 #: components/dashboard/NewsTab.tsx:707
+#: components/researchers/AffiliationHistorySection.tsx:98
 msgid "(untitled)"
 msgstr "(sans titre)"
 
@@ -3671,6 +3677,7 @@ msgstr "(sans titre)"
 #: components/dashboard/report/composeReportPdf.ts:70
 #: components/dashboard/report/pdfDoc.ts:128
 #: components/reports/HistoryDialog.tsx:106
+#: components/researchers/AffiliationHistorySection.tsx:244
 msgid "Publications"
 msgstr "Publications"
 
@@ -8200,6 +8207,192 @@ msgstr "Classeur XLSX"
 msgid "Mark as sent"
 msgstr "Marquer comme envoyé"
 
+#: components/researchers/AffiliationHistorySection.tsx:42
+msgid "Departure confirmed by {sources}: left around {date}, towards {dest}."
+msgstr "Départ confirmé par {sources} : parti vers {date}, pour {dest}."
+
+#: components/researchers/AffiliationHistorySection.tsx:42
+msgid "Departure confirmed by {sources}: left around {date}."
+msgstr "Départ confirmé par {sources} : parti vers {date}."
+
+#: components/researchers/AffiliationHistorySection.tsx:46
+msgid "ORCID: the last position at the institution ended in {date}."
+msgstr "ORCID : le dernier poste dans l’établissement s’est terminé en {date}."
+
+#: components/researchers/AffiliationHistorySection.tsx:50
+msgid "ORCID: new position at {dest} since {date}."
+msgstr "ORCID : nouveau poste à {dest} depuis {date}."
+
+#: components/researchers/AffiliationHistorySection.tsx:56
+msgid "Publications: none affiliated to the institution after {date}; {count} affiliated elsewhere, mostly {dest}."
+msgstr "Publications : aucune affiliée à l’établissement après {date} ; {count} affiliées ailleurs, surtout {dest}."
+
+#: components/researchers/AffiliationHistorySection.tsx:57
+msgid "Publications: none affiliated to the institution after {date}; {count} affiliated elsewhere."
+msgstr "Publications : aucune affiliée à l’établissement après {date} ; {count} affiliées ailleurs."
+
+#: components/researchers/AffiliationHistorySection.tsx:60
+msgid "Scopus: current affiliation {dest} (computed by Elsevier from the latest publications)."
+msgstr "Scopus : affiliation courante {dest} (déduite par Elsevier des dernières publications)."
+
+#: components/researchers/AffiliationHistorySection.tsx:65
+msgid "The record ended in {endYear}, yet publications are still affiliated to the institution in {lastLocal}."
+msgstr "La fiche est close en {endYear}, mais des publications sont encore affiliées à l’établissement en {lastLocal}."
+
+#: components/researchers/AffiliationHistorySection.tsx:66
+msgid "The record ended in {endYear}, yet ORCID shows an ongoing position at the institution."
+msgstr "La fiche est close en {endYear}, mais ORCID indique un poste en cours dans l’établissement."
+
+#: components/researchers/AffiliationHistorySection.tsx:69
+msgid "Identifiers to check: their publications or profile never mention the institution (homonym or wrong identifier?)."
+msgstr "Identifiants à vérifier : leurs publications ou leur profil ne mentionnent jamais l’établissement (homonyme ou identifiant erroné ?)."
+
+#: components/researchers/AffiliationHistorySection.tsx:90
+msgid "Publications affiliated to {name}"
+msgstr "Publications affiliées à {name}"
+
+#: components/researchers/AffiliationHistorySection.tsx:93
+msgid "Only the most recent publications of the record are kept for this list."
+msgstr "Seules les publications les plus récentes de la fiche sont conservées pour cette liste."
+
+#: components/researchers/AffiliationHistorySection.tsx:107
+msgid "No publication: this establishment only comes from ORCID."
+msgstr "Aucune publication : cet établissement ne vient que d’ORCID."
+
+#: components/researchers/AffiliationHistorySection.tsx:159
+msgid "CRISalid graph ({nGraph})"
+msgstr "graphe CRISalid ({nGraph})"
+
+#: components/researchers/AffiliationHistorySection.tsx:160
+msgid "OpenAlex ({nOpenalex})"
+msgstr "OpenAlex ({nOpenalex})"
+
+#: components/researchers/AffiliationHistorySection.tsx:161
+msgid "Scopus ({nScopus})"
+msgstr "Scopus ({nScopus})"
+
+#: components/researchers/AffiliationHistorySection.tsx:162
+msgid "ORCID ({nOrcid} positions)"
+msgstr "ORCID ({nOrcid} postes)"
+
+#: components/researchers/AffiliationHistorySection.tsx:180
+msgid "Career path"
+msgstr "Parcours"
+
+#: components/researchers/AffiliationHistorySection.tsx:184
+msgid "Computed on {computedAt} · {sourcesText}"
+msgstr "Calculé le {computedAt} · {sourcesText}"
+
+#: components/researchers/AffiliationHistorySection.tsx:185
+msgid "incomplete (source unavailable at that time)"
+msgstr "incomplet (source indisponible au moment du calcul)"
+
+#: components/researchers/AffiliationHistorySection.tsx:190
+msgid "Recompute now from the identifiers of the record (about ten seconds)"
+msgstr "Recalculer maintenant à partir des identifiants de la fiche (une dizaine de secondes)"
+
+#: components/researchers/AffiliationHistorySection.tsx:202
+msgid "Not computed yet: the weekly computation is in progress ({runDone}/{runTotal} records). Use « Refresh » to compute this record now."
+msgstr "Pas encore calculé : le calcul hebdomadaire est en cours ({runDone}/{runTotal} fiches). Utilisez « Actualiser » pour calculer cette fiche tout de suite."
+
+#: components/researchers/AffiliationHistorySection.tsx:203
+msgid "Not computed yet. The path is built from the ORCID, IdHAL, IdRef, OpenAlex and Scopus identifiers of the record (see « Researcher identifiers alignment »): use « Refresh » once they are filled."
+msgstr "Pas encore calculé. Le parcours est construit à partir des identifiants ORCID, IdHAL, IdRef, OpenAlex et Scopus de la fiche (voir « Alignement des identifiants chercheurs ») : utilisez « Actualiser » une fois qu’ils sont renseignés."
+
+#: components/researchers/AffiliationHistorySection.tsx:220
+msgid "End of employment set to {endSuggestion} — save the record to keep it."
+msgstr "Fin d’emploi renseignée à {endSuggestion} — enregistrez la fiche pour la conserver."
+
+#: components/researchers/AffiliationHistorySection.tsx:221
+msgid "Report {endSuggestion} as end of employment"
+msgstr "Reporter {endSuggestion} en fin d’emploi"
+
+#: components/researchers/AffiliationHistorySection.tsx:223
+msgid "Start of employment set to {startSuggestion} — save the record to keep it."
+msgstr "Début d’emploi renseigné à {startSuggestion} — enregistrez la fiche pour le conserver."
+
+#: components/researchers/AffiliationHistorySection.tsx:224
+msgid "Report {startSuggestion} as start of employment"
+msgstr "Reporter {startSuggestion} en début d’emploi"
+
+#: components/researchers/AffiliationHistorySection.tsx:233
+msgid "No affiliated publication and no ORCID position found for the identifiers of this record."
+msgstr "Aucune publication affiliée ni aucun poste ORCID trouvé pour les identifiants de cette fiche."
+
+#: components/researchers/AffiliationHistorySection.tsx:241
+msgid "Establishment"
+msgstr "Établissement"
+
+#: components/researchers/AffiliationHistorySection.tsx:245
+msgid "Count"
+msgstr "Nombre"
+
+#: components/researchers/AffiliationHistorySection.tsx:264
+#: components/researchers/AffiliationTimelineChart.tsx:81
+msgid "ongoing"
+msgstr "en cours"
+
+#: components/researchers/AffiliationHistorySection.tsx:264
+msgid "invited"
+msgstr "invité"
+
+#: components/researchers/AffiliationHistorySection.tsx:266
+msgid "current"
+msgstr "courante"
+
+#: components/researchers/AffiliationHistorySection.tsx:266
+msgid "history"
+msgstr "historique"
+
+#: components/researchers/AffiliationHistorySection.tsx:275
+msgid "{totalPubs} publications, {withAffiliation} with an affiliation. A publication counts for each establishment it declares, so the counts may exceed the total. National organisms (CNRS, Inserm…) are shown but never read as a departure."
+msgstr "{totalPubs} publications, dont {withAffiliation} avec une affiliation. Une publication compte pour chaque établissement qu’elle déclare : la somme peut dépasser le total. Les organismes nationaux (CNRS, Inserm…) sont affichés mais jamais lus comme un départ."
+
+#: components/researchers/AffiliationTimelineChart.tsx:34
+msgid "Local (the institution and its site)"
+msgstr "Local (l’établissement et son site)"
+
+#: components/researchers/AffiliationTimelineChart.tsx:34
+msgid "Elsewhere"
+msgstr "Ailleurs"
+
+#: components/researchers/AffiliationTimelineChart.tsx:34
+msgid "National organism"
+msgstr "Organisme national"
+
+#: components/researchers/AffiliationTimelineChart.tsx:34
+msgid "Unresolved"
+msgstr "Non résolu"
+
+#: components/researchers/AffiliationTimelineChart.tsx:48
+msgid "Employment in Druid"
+msgstr "Emploi dans Druid"
+
+#: components/researchers/AffiliationTimelineChart.tsx:60
+msgid "ORCID position (ongoing)"
+msgstr "Poste ORCID (en cours)"
+
+#: components/researchers/AffiliationTimelineChart.tsx:60
+#: components/researchers/AffiliationTimelineChart.tsx:81
+msgid "ORCID position"
+msgstr "Poste ORCID"
+
+#: components/researchers/AffiliationTimelineChart.tsx:77
+msgid "{n} publication(s)"
+msgstr "{n} publication(s)"
+
+#: components/researchers/AffiliationTimelineChart.tsx:81
+msgid "ORCID invited position"
+msgstr "Poste invité ORCID"
+
+#: components/researchers/AffiliationTimelineChart.tsx:100
+msgid "Affiliations over time"
+msgstr "Affiliations au fil du temps"
+
+#: components/researchers/AffiliationTimelineChart.tsx:101
+msgid "Dots: publications of the year · bars: positions declared in ORCID · grey band: employment entered in Druid"
+msgstr "Points : publications de l’année · barres : postes déclarés dans ORCID · bande grise : emploi saisi dans Druid"
+
 #: components/researchers/AffiliationsTable.tsx:39
 msgid "{value} (not in list)"
 msgstr "{value} (hors liste)"
@@ -10974,210 +11167,242 @@ msgid "PDF not archived"
 msgstr "PDF non archivé"
 
 #: lib/apiErrors.ts:70
+msgid "Invalid record key"
+msgstr "Clé de fiche invalide"
+
+#: lib/apiErrors.ts:71
+msgid "Career path not computed yet for this record"
+msgstr "Parcours pas encore calculé pour cette fiche"
+
+#: lib/apiErrors.ts:72
+msgid "Grist unreachable"
+msgstr "Grist injoignable"
+
+#: lib/apiErrors.ts:73
+msgid "No Annuaire record for this key"
+msgstr "Aucune fiche de l’Annuaire pour cette clé"
+
+#: lib/apiErrors.ts:74
+msgid "Refresh outside your scope"
+msgstr "Recalcul hors de votre périmètre"
+
+#: lib/apiErrors.ts:75
+msgid "Too many refreshes in progress, retry in a minute"
+msgstr "Trop de recalculs en cours, réessayez dans une minute"
+
+#: lib/apiErrors.ts:76
+msgid "Career-path computation failed"
+msgstr "Le calcul du parcours a échoué"
+
+#: lib/apiErrors.ts:77
+msgid "No usable identifier for this record"
+msgstr "Aucun identifiant exploitable pour cette fiche"
+
+#: lib/apiErrors.ts:79
 msgid "Task not found"
 msgstr "Tâche introuvable"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:80
 msgid "Unknown event action"
 msgstr "Action d’événement inconnue"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:81
 msgid "Empty comment"
 msgstr "Commentaire vide"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:82
 msgid "Nothing to update"
 msgstr "Rien à mettre à jour"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:83
 msgid "Unknown task type"
 msgstr "Type de tâche inconnu"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:84
 msgid "Unknown status"
 msgstr "Statut inconnu"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:85
 msgid "Transition not allowed"
 msgstr "Transition non autorisée"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:86
 msgid "Task detection already running"
 msgstr "Détection des tâches déjà en cours"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:88
 msgid "Name required"
 msgstr "Nom requis"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:89
 msgid "Empty list"
 msgstr "Liste vide"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:90
 msgid "List of identifiers expected"
 msgstr "Liste d'identifiants attendue"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:91
 msgid "Invalid mention identifier"
 msgstr "Identifiant de mention invalide"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:92
 msgid "Invalid source identifier"
 msgstr "Identifiant de source invalide"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:93
 msgid "researchers and structures arrays required"
 msgstr "Tableaux researchers et structures requis"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:94
 msgid "Keycloak admin API unreachable"
 msgstr "API d'administration Keycloak injoignable"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:95
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "API ETL (druid-etl-api) injoignable"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:97
 msgid "Grist path not allowed by the proxy"
 msgstr "Chemin Grist non autorisé par le proxy"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:98
 msgid "Writing to the document root is refused"
 msgstr "Écriture sur la racine du document refusée"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:99
 msgid "Writing to the table definition is refused"
 msgstr "Écriture sur la définition de la table refusée"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:100
 msgid "Method not relayed"
 msgstr "Méthode non relayée"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:101
 msgid "Method not relayed on /tables"
 msgstr "Méthode non relayée sur /tables"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:102
 msgid "Table creation not allowed"
 msgstr "Création de table non autorisée"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:103
 msgid "Table not writable through the proxy"
 msgstr "Table non modifiable via le proxy"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:104
 msgid "Write outside scope"
 msgstr "Écriture hors périmètre"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:105
 msgid "Creation outside scope"
 msgstr "Création hors périmètre"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:106
 msgid "Rows outside scope or unknown"
 msgstr "Ligne(s) hors périmètre ou inconnue(s)"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:107
 msgid "Scope check failed"
 msgstr "Vérification du périmètre impossible"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:108
 msgid "Grist writes require the institution right"
 msgstr "Écriture Grist réservée au droit établissement"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:109
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Écriture Grist réservée aux utilisateurs identifiés (Cloudflare Access)"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:110
 msgid "Read-only instance: writes are disabled"
 msgstr "Instance en lecture seule : les modifications sont désactivées"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:111
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter indisponible sur cette instance"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:112
 msgid "Missing id for PATCH"
 msgstr "id manquant pour PATCH"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:113
 msgid "Invalid Grist identifiers"
 msgstr "Identifiants Grist invalides"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:114
 msgid "Body with a records array expected"
 msgstr "Corps avec un tableau records attendu"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:116
 msgid "An LDAP synchronization is already running"
 msgstr "Une synchronisation LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:117
 msgid "An LDAP structures synchronization is already running"
 msgstr "Une synchronisation LDAP structures est déjà en cours"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:118
 msgid "An LDAP search is already running"
 msgstr "Une recherche LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:119
 msgid "An IdRef alignment is already running"
 msgstr "Un alignement IdRef est déjà en cours"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:120
 msgid "Alignment already running"
 msgstr "Un alignement est déjà en cours"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:121
 msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:122
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:124
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:125
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:126
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:127
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:129
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:130
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:131
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:132
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:134
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:135
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:136
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
