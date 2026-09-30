@@ -541,7 +541,9 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
 
   const { compact, onScrollCapture } = useCompactHeader();
   return (
-    <div className="flex flex-col h-full" onScrollCapture={onScrollCapture}>
+    // Phones (< md): the whole page scrolls — the banner, filters and buttons go up with the table
+    // instead of keeping two thirds of the screen; the footer (Apply) stays stuck at the bottom.
+    <div className="flex flex-col h-full max-md:overflow-y-auto" onScrollCapture={onScrollCapture}>
       <header className="page-header px-4 md:px-7 pt-6 pb-4" data-compact={compact || undefined}>
         <div className="page-header-top flex flex-wrap items-center justify-between gap-3 mb-4">
           <div className="flex items-center gap-3">
@@ -615,7 +617,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
           onClose={() => setLaunchOpen(false)} onLaunch={launch} />
       )}
 
-      <div className="flex-1 overflow-auto px-4 md:px-7 py-4" data-page-scroll>
+      <div className="flex-1 md:overflow-auto px-4 md:px-7 py-4" data-page-scroll>
         {!diff ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted-faint gap-3">
             <RefreshCw className="w-8 h-8 animate-spin" />
@@ -665,7 +667,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
                   {/* One column per source: the header names the source, the badges say the state. No
                       overflow wrapper here: it would break the sticky header (own scroll context). */}
                   <div>
-                  <div className="grid unified-grid sticky -top-4 z-10 rounded-t-card items-center px-3 py-2 bg-[#f3efe4] dark:bg-[#24231f] border-b border-ink/8 dark:border-white/10 text-[10.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c]"
+                  <div className="grid unified-grid sticky -top-4 max-md:top-0 z-10 rounded-t-card items-center px-3 py-2 bg-[#f3efe4] dark:bg-[#24231f] border-b border-ink/8 dark:border-white/10 text-[10.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c]"
                     style={{ '--src-count': sources.length } as React.CSSProperties}>
                     <span />
                     <span><Trans>Person</Trans></span>
@@ -739,7 +741,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
         )}
       </div>
 
-      <footer className="px-4 md:px-7 py-4 border-t border-ink/5 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl flex flex-wrap items-center justify-between gap-3">
+      <footer className="max-md:sticky max-md:bottom-0 max-md:z-20 px-4 md:px-7 py-4 border-t border-ink/5 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl flex flex-wrap items-center justify-between gap-3">
         <span className="text-[12px] text-muted-faint">{diff ? t`Generated on ${generatedAt}` : ''}</span>
         {onApply && (
           <PixelBtn onClick={handleApply} disabled={applying || updates.length === 0} tone="bg-ink text-white hover:bg-black dark:bg-accent dark:text-ink dark:hover:bg-accent-strong">
