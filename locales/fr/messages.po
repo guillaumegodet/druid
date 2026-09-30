@@ -12535,3 +12535,13 @@ msgstr "Chercher de nouveau cette fiche sur {0}"
 #: components/researchers/UnifiedAlignPage.tsx:132
 msgid "{n, plural, one {# candidate ?} other {# candidates ?}}"
 msgstr "{n, plural, one {# candidat ?} other {# candidats ?}}"
+
+#: components/Sidebar.tsx:256
+#: components/Sidebar.tsx:257
+msgid "Close the menu"
+msgstr "Fermer le menu"
+
+#: components/Sidebar.tsx:256
+#: components/Sidebar.tsx:257
+msgid "Menu"
+msgstr "Menu"
