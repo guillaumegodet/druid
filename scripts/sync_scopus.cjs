@@ -45,9 +45,10 @@ const fs = require('fs');
 const common = require('./lib/align_common.cjs');
 const { createElsevierClient } = require('./lib/elsevier_client.cjs');
 const {
-  normalize, extractOrcid, nameMatch, heterogeneousFirstNames, getUrl, runPool, applyTargetFilters, makeStore, today,
+  normalize, extractOrcid, nameMatch, heterogeneousFirstNames, getUrl, runPool, makeStore, today,
   gristGet, loadRejected, pushReview, ensureReviewTable, DOC,
 } = common;
+const { selectTargets, scopusIdOf, scopusMarkedAbsent } = require('./lib/align_targets.cjs');
 
 // ── Parameters ───────────────────────────────────────────────────────────────
 const OPTS = common.commonOptions({ modes: ['search', 'verify', 'push'], concurrency: 3 });
@@ -480,9 +481,7 @@ function buildScopusReviewColumns() {
 }
 
 /** Numeric ID_SCOPUS of a record ('' when empty, 0 or an explicit text such as « absent »). */
-const scopusIdOf = (p) => (/^\d{6,12}$/.test(digits(p.scopus)) && String(p.scopus).trim() !== '0' ? digits(p.scopus) : '');
-/** Explicit non-numeric text in ID_SCOPUS (« absent »…): treated as filled by hand, never searched. */
-const scopusMarkedAbsent = (p) => !scopusIdOf(p) && String(p.scopus ?? '').trim() !== '' && String(p.scopus).trim() !== '0';
+// scopusIdOf / scopusMarkedAbsent: scripts/lib/align_targets.cjs (shared with the run estimate).
 
 function buildReviewRows(cache, all, rejected) {
   const byKey = new Map(all.map((p) => [p.key, p]));
@@ -526,14 +525,10 @@ async function main() {
   if (PUSH_GRIST && await ensureReviewTable(REVIEW_TABLE, buildScopusReviewColumns())) console.log(`[scopus] review table ${REVIEW_TABLE} created`);
   const labNames = await loadLabNames();
   const affils = MODE === 'push' ? new Map() : await loadAffiliations();
-  let targets = MODE === 'push' ? [] : all.filter((p) => p.first || p.last);
-  const markedAbsent = targets.filter(scopusMarkedAbsent).length;
-  if (MODE === 'verify') targets = targets.filter((p) => scopusIdOf(p) || (String(p.scopus ?? '').trim() && !scopusMarkedAbsent(p)));
-  else targets = targets.filter((p) => !scopusIdOf(p) && !scopusMarkedAbsent(p));
-  targets = applyTargetFilters(targets, { labo: LABO_FILTER, group: GROUP_FILTER });
-  const eligible = targets.length;
-  if (!FORCE) targets = targets.filter((p) => !cache[p.key] || cache[p.key].mode !== MODE || cache[p.key].status === 'error');
-  if (LIMIT > 0) targets = targets.slice(0, LIMIT);
+  const markedAbsent = MODE === 'push' ? 0 : all.filter((p) => (p.first || p.last) && scopusMarkedAbsent(p)).length;
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('scopus', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  let targets = sel.targets;
+  const eligible = sel.eligible.length;
 
   console.log(`[scopus] ${all.length} Annuaire records, ${eligible} eligible (${MODE}${LABO_FILTER ? `, labo ${LABO_FILTER}` : ''}${GROUP_FILTER ? `, group ${GROUP_FILTER}` : ''}), ${targets.length} to process${FORCE ? ' (force)' : ''}${MODE === 'search' && markedAbsent ? `, ${markedAbsent} marked absent by hand (skipped)` : ''}.`);
   const counts = { found: 0, ambiguous: 0, not_found: 0, error: 0, checked: 0, not_found_scopus: 0, invalid: 0, nameMismatch: 0, sansAffiliation: 0, merged: 0 };

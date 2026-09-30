@@ -12385,3 +12385,120 @@ msgstr "Aucun alignement en cours"
 #: lib/unifiedAlignRuns.ts:62
 msgid "{0} stop failed: {1}"
 msgstr "Échec de l’arrêt {0} : {1}"
+
+#. placeholder {0}: fmt(cost.requests)
+#: components/researchers/AlignLaunchModal.tsx:75
+msgid "≈ {0} requests"
+msgstr "≈ {0} requêtes"
+
+#. placeholder {0}: fmt(cost.search)
+#: components/researchers/AlignLaunchModal.tsx:77
+msgid "{0} Author Search"
+msgstr "{0} Author Search"
+
+#. placeholder {0}: fmt(cost.author)
+#: components/researchers/AlignLaunchModal.tsx:78
+msgid "{0} Author Retrieval"
+msgstr "{0} Author Retrieval"
+
+#: components/researchers/AlignLaunchModal.tsx:96
+msgid "Check the existing identifiers"
+msgstr "Vérifier les identifiants existants"
+
+#: components/researchers/AlignLaunchModal.tsx:96
+msgid "Search the missing identifiers"
+msgstr "Rechercher les identifiants manquants"
+
+#: components/researchers/AlignLaunchModal.tsx:99
+msgid "Scope: {labo}"
+msgstr "Périmètre : {labo}"
+
+#: components/researchers/AlignLaunchModal.tsx:99
+msgid "Scope: all structures"
+msgstr "Périmètre : toutes les structures"
+
+#: components/researchers/AlignLaunchModal.tsx:99
+msgid "No research duty"
+msgstr "Sans obligation de recherche"
+
+#: components/researchers/AlignLaunchModal.tsx:99
+msgid "Staff"
+msgstr "Personnel"
+
+#: components/researchers/AlignLaunchModal.tsx:108
+msgid "Counting the records to process…"
+msgstr "Décompte des fiches à traiter…"
+
+#: components/researchers/AlignLaunchModal.tsx:115
+msgid "Only the records never searched (or in error)"
+msgstr "Seulement les fiches jamais cherchées (ou en erreur)"
+
+#: components/researchers/AlignLaunchModal.tsx:119
+msgid "All records of the scope (full rerun)"
+msgstr "Toutes les fiches du périmètre (relance complète)"
+
+#: components/researchers/AlignLaunchModal.tsx:127
+msgid "Cap"
+msgstr "Plafond"
+
+#: components/researchers/AlignLaunchModal.tsx:128
+msgid "Estimated cost"
+msgstr "Coût estimé"
+
+#. placeholder {0}: fmt(e.eligible - e.pending)
+#: components/researchers/AlignLaunchModal.tsx:146
+msgid "{0} already searched"
+msgstr "{0} déjà cherchées"
+
+#. placeholder {0}: sourceLabel[s]
+#: components/researchers/AlignLaunchModal.tsx:152
+msgid "Maximum number of records for {0}"
+msgstr "Nombre maximal de fiches pour {0}"
+
+#: components/researchers/AlignLaunchModal.tsx:158
+msgid "Beyond the Elsevier calls available this week — lower the cap"
+msgstr "Dépasse les appels Elsevier disponibles cette semaine — baissez le plafond"
+
+#: components/researchers/AlignLaunchModal.tsx:169
+msgid "Scopus — weekly Elsevier quota"
+msgstr "Scopus — quota hebdomadaire Elsevier"
+
+#. placeholder {0}: fmt(pools.search?.available ?? 0)
+#. placeholder {1}: fmt(pools.author?.available ?? 0)
+#. placeholder {2}: fmt(estimate.scopus.affordable ?? 0)
+#: components/researchers/AlignLaunchModal.tsx:170
+msgid "Available for the alignment: {0} Author Search, {1} Author Retrieval — about {2} records."
+msgstr "Disponible pour l’alignement : {0} Author Search, {1} Author Retrieval — environ {2} fiches."
+
+#. placeholder {0}: Math.round(estimate.scopus.reserve1 * 100)
+#: components/researchers/AlignLaunchModal.tsx:173
+msgid "Key 1 keeps {0} % of its quota for the SoVisu+ harvester; the backup key is then used in full."
+msgstr "La clé 1 garde {0} % de son quota pour le moissonneur SoVisu+ ; la clé de secours est ensuite utilisée en entier."
+
+#. placeholder {0}: Math.round(estimate.scopus.reserve1 * 100)
+#: components/researchers/AlignLaunchModal.tsx:174
+msgid "Key 1 keeps {0} % of its quota for the SoVisu+ harvester."
+msgstr "La clé 1 garde {0} % de son quota pour le moissonneur SoVisu+."
+
+#. placeholder {0}: pools.search.asOf.slice(0, 10)
+#. placeholder {1}: pools.search.reset ?? '?'
+#: components/researchers/AlignLaunchModal.tsx:175
+msgid "Figures of the last Scopus run ({0}); quotas reset on {1}."
+msgstr "Chiffres du dernier run Scopus ({0}) ; remise à zéro des quotas le {1}."
+
+#: components/researchers/AlignLaunchModal.tsx:186
+msgid "Start"
+msgstr "Lancer"
+
+#: components/researchers/UnifiedAlignPage.tsx:534
+msgid "Choose the sources, see the number of records and the cost, then start the search on the filtered lab and group"
+msgstr "Choisir les sources, voir le nombre de fiches et le coût, puis lancer la recherche sur le labo et le groupe filtrés"
+
+#: components/researchers/UnifiedAlignPage.tsx:536
+msgid "Search everywhere…"
+msgstr "Rechercher partout…"
+
+#. placeholder {0}: r.status
+#: lib/unifiedAlignRuns.ts:146
+msgid "Estimate failed: {0}"
+msgstr "Échec de l’estimation : {0}"

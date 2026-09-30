@@ -3331,6 +3331,44 @@ app.get('/api/align/:source/trigger', requireEstablishmentScope, (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// Launch window of the unified alignment page (docs/plan-recherche-alignement-maitrisee.md, lot 2):
+// per source, records of the scope lacking (search) or carrying (verify) the identifier, of which
+// never processed; cost per record; for Scopus, the Elsevier calls the alignment may still spend this
+// week (key 1 keeps its share for the SoVisu+ harvester). Same selection as the scripts
+// (scripts/lib/align_targets.cjs). The Annuaire read is kept one minute (window reopened, scope changed).
+const alignTargets = require('./scripts/lib/align_targets.cjs');
+const alignEstimate = require('./scripts/lib/align_estimate.cjs');
+let estimateAnnuaire = { at: 0, rows: null };
+app.get('/api/align/estimate', requireEstablishmentScope, async (req, res) => {
+  const mode = req.query.mode === 'verify' ? 'verify' : 'search';
+  const labo = String(req.query.labo || '').trim().toUpperCase().slice(0, 120);
+  const group = ALIGN_GROUPS.includes(req.query.group) ? req.query.group : '';
+  try {
+    if (!estimateAnnuaire.rows || Date.now() - estimateAnnuaire.at > 60000) {
+      estimateAnnuaire = { at: Date.now(), rows: await require('./scripts/lib/align_common.cjs').fetchAnnuaire() };
+    }
+    const sources = {};
+    for (const [src, spec] of Object.entries(alignTargets.TARGET_SOURCES)) {
+      if (!spec.modes.includes(mode)) continue;
+      const cache = readProgress(spec.cachePath) || {};
+      const sel = alignTargets.selectTargets(src, estimateAnnuaire.rows, cache, { mode, labo, group });
+      sources[src] = { eligible: sel.eligible.length, pending: sel.pending.length, unit: alignEstimate.ALIGN_COST[src][mode] || {} };
+    }
+    const keyCount = [process.env.SCOPUS_API_KEY, process.env.SCOPUS_API_KEY_2].filter((k) => String(k || '').trim()).length;
+    // Same share as scripts/sync_scopus.cjs (SCOPUS_KEY1_RESERVE, 30 % by default).
+    const reserve1 = Math.min(0.9, Math.max(0, parseFloat(process.env.SCOPUS_KEY1_RESERVE ?? '0.3') || 0));
+    const budget = alignEstimate.scopusBudget({
+      snapshots: [readProgress(ALIGN_SOURCES.scopus.progress), AH_STORE.readProgress(AFFILIATION_HISTORY_DIR)],
+      keyCount, reserve1,
+    });
+    const affordable = alignEstimate.affordable(budget, mode);
+    res.json({ mode, labo, group, sources, scopus: { ...budget, affordable: Number.isFinite(affordable) ? affordable : null } });
+  } catch (e) {
+    console.error('[align] estimate failed', e);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // « Stop » button of the unified alignment page (docs/plan-recherche-alignement-maitrisee.md, lot 1).
 app.post('/api/align/:source/stop', requireEstablishmentScope, (req, res) => {
   const src = ALIGN_SOURCES[req.params.source];

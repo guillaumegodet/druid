@@ -45,6 +45,7 @@
 const fs = require('fs');
 const common = require('./lib/align_common.cjs');   // shared foundation: HTTP/retry, pool, Grist, cache/progress, review
 const { getArg, hasFlag, getUrl, runPool, gristGet, gristWrite, normalize, extractPpn, makeStore } = common;
+const { selectTargets } = require('./lib/align_targets.cjs');
 
 // fast-xml-parser is only required for the identifier enrichment (XML authority record).
 // Lazily loaded so that the --name demo works without node_modules.
@@ -65,11 +66,8 @@ const LABO_FILTER = (getArg('labo', '') || '').trim().toUpperCase(); // `--labo=
 // « doctorants » = TYPE_EMPLOI=DOCTORANT (LIB_TYPE_EMPLOI is NOT reliable for this sort: empty for
 // almost all PhD students in the Nantes Annuaire, checked 2026-09-07); « hors_recherche » = HR label
 // « Personnel [non] titulaire n'ayant pas d'obligation statutaire de recherche »; « personnel » = the rest.
-// Same logic as alignGroupOf in scripts/lib/align_common.cjs and lib/gristService.ts.
+// Applied by selectTargets (scripts/lib/align_targets.cjs) with alignGroupOf of scripts/lib/align_common.cjs.
 const GROUP_FILTER = (getArg('group', '') || '').trim().toLowerCase();
-const isDoctorantEmployment = (p) => String(p.typeEmploi || '').trim().toUpperCase() === 'DOCTORANT';
-const isHorsRechercheEmployment = (p) => /n'ayant pas d'obligation statutaire de recherche/i.test(String(p.libTypeEmploi || '').replace(/[’‘]/g, "'"));
-const alignGroupOf = (p) => (isDoctorantEmployment(p) ? 'doctorants' : isHorsRechercheEmployment(p) ? 'hors_recherche' : 'personnel');
 const CONCURRENCY = parseInt(getArg('concurrency', '4'), 10) || 4;
 const USE_REFS = hasFlag('refs');           // enables the references call (expensive)
 const USE_NEO4J = hasFlag('neo4j');         // context = publication titles (Neo4j)
@@ -571,14 +569,13 @@ async function main() {
   const today = new Date().toISOString().slice(0, 10);
   const all = await fetchAnnuaire();
   const cache = store.loadCache();                            // resume: merge with the existing cache
-  let targets = all.filter((p) => !extractPpn(p.idref) && (p.first || p.last));
-  if (LABO_FILTER) targets = targets.filter((p) => String(p.labo || '').trim().toUpperCase() === LABO_FILTER);
-  if (['personnel', 'doctorants', 'hors_recherche'].includes(GROUP_FILTER)) targets = targets.filter((p) => alignGroupOf(p) === GROUP_FILTER);
-  const sansIdref = targets.length;
-  if (!FORCE) targets = targets.filter((p) => !cache[p.key] || !cache[p.key].status);  // skips the already processed ones
-  const remaining = targets.length;
-  const nbExternes = targets.filter((p) => !p.uid).length;
-  if (LIMIT > 0) targets = targets.slice(0, LIMIT);
+  // Records without IdRef of the scope; without --force, the already processed ones are skipped
+  // (scripts/lib/align_targets.cjs, shared with the run estimate of the launch window).
+  const sel = selectTargets('idref', all, cache, { labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE });
+  const sansIdref = sel.eligible.length;
+  const remaining = FORCE ? sansIdref : sel.pending.length;
+  const nbExternes = (FORCE ? sel.eligible : sel.pending).filter((p) => !p.uid).length;
+  let targets = LIMIT > 0 ? (FORCE ? sel.eligible : sel.pending).slice(0, LIMIT) : (FORCE ? sel.eligible : sel.pending);
 
   // Context sources (optional)
   let laboDesc = {};

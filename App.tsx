@@ -34,6 +34,7 @@ import { TaskForm } from './components/researchers/TaskForm';
 import { useTasks } from './hooks/useTasks';
 import type { Task } from './lib/tasks';
 import { MergeResearchersModal } from './components/researchers/MergeResearchersModal';
+import type { AlignLaunchChoice } from './components/researchers/AlignLaunchModal';
 import { getUserInfo } from './lib/auth';
 import { UnifiedAlignPage } from './components/researchers/UnifiedAlignPage';
 import type { LdapCandProgress } from './components/researchers/LdapCandidatesPage';
@@ -684,7 +685,7 @@ function App() {
   /** « Rechercher partout »: runs runUnifiedAlign (lot 1) on the 4 sources in parallel, tracks
    *  the aggregated progress, reloads the diff at the end. `labo`/`group`: always provided by
    *  UnifiedAlignPage (never a global run, see docs/plan-alignement-unifie.md §5). */
-  const rerunUnifiedAlign = async (mode: AlignMode, labo?: string, group?: AlignGroup) => {
+  const rerunUnifiedAlign = async (mode: AlignMode, labo?: string, group?: AlignGroup, choice?: AlignLaunchChoice) => {
     if (!hasCapability('HAS_SERVER_JOBS')) {
       setError(t`Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed.`);
       return;
@@ -692,8 +693,8 @@ function App() {
     try {
       setError('');
       setUnifiedProgress({});
-      await runUnifiedAlign(UNIFIED_ALIGN_SOURCES, mode, {
-        labo, group,
+      await runUnifiedAlign(choice?.sources ?? UNIFIED_ALIGN_SOURCES, mode, {
+        labo, group, force: choice?.force, limits: choice?.limits,
         onProgress: (src, p) => setUnifiedProgress((prev) => ({ ...prev, [src]: p })),
       });
       setUnifiedProgress(null);

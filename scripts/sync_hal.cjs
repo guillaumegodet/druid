@@ -33,9 +33,10 @@
  */
 const common = require('./lib/align_common.cjs');
 const {
-  normalize, extractPpn, nameMatch, getUrl, runPool, applyTargetFilters, makeStore, today,
+  normalize, extractPpn, nameMatch, getUrl, runPool, makeStore, today,
   gristGet, gristPatchGrouped, withTrace, loadRejected, pushReview, DOC, heterogeneousFirstNames,
 } = common;
+const { selectTargets } = require('./lib/align_targets.cjs');
 
 // ── Parameters ───────────────────────────────────────────────────────────────
 const OPTS = common.commonOptions({ modes: ['search', 'verify', 'push'], concurrency: 4 });
@@ -485,13 +486,9 @@ async function main() {
   console.log(`[hal] mode=${MODE} concurrency=${CONCURRENCY}${PUSH_GRIST ? '' : ' (dry run: no Grist write)'}`);
 
   const all = await common.fetchAnnuaire();
-  let targets = MODE === 'push' ? [] : all.filter((p) => p.first || p.last);
-  if (MODE === 'verify') targets = targets.filter((p) => String(p.idhal || '').trim());
-  else targets = targets.filter((p) => !String(p.idhal || '').trim());
-  targets = applyTargetFilters(targets, { labo: LABO_FILTER, group: GROUP_FILTER });
-  const eligible = targets.length;
-  if (!FORCE) targets = targets.filter((p) => !cache[p.key] || cache[p.key].mode !== MODE || cache[p.key].status === 'error');
-  if (LIMIT > 0) targets = targets.slice(0, LIMIT);
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('hal', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  let targets = sel.targets;
+  const eligible = sel.eligible.length;
 
   console.log(`[hal] ${all.length} Annuaire records, ${eligible} eligible (${MODE}${LABO_FILTER ? `, labo ${LABO_FILTER}` : ''}${GROUP_FILTER ? `, group ${GROUP_FILTER}` : ''}), ${targets.length} to process${FORCE ? ' (force)' : ''}.`);
   const counts = { found: 0, ambiguous: 0, not_found: 0, error: 0, checked: 0, not_found_hal: 0, nameMismatch: 0 };

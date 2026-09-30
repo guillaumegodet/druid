@@ -33,10 +33,13 @@ export interface UnifiedRunProgress {
 
 const label = (src: UnifiedAlignSource): string => (src === 'idref' ? 'IdRef' : ALIGN_SOURCE_META[src].label);
 
-const triggerUrl = (src: UnifiedAlignSource, mode: AlignMode, labo?: string, group?: AlignGroup): string => {
+const triggerUrl = (src: UnifiedAlignSource, mode: AlignMode, labo?: string, group?: AlignGroup, force = false, limit = 0): string => {
   const q = new URLSearchParams();
   if (labo) q.set('labo', labo);
   if (group) q.set('group', group);
+  // Incremental by default (never processed or in error); force = reprocess the scope in full.
+  if (force) q.set('force', '1');
+  if (limit > 0) q.set('limit', String(limit));
   if (src === 'idref') {
     // Only mode covered by the unified view: plain Qualinka (see plan §5) — the caller must
     // never request idref outside 'search' mode (guard below), but we set it explicitly.
@@ -78,9 +81,15 @@ export async function stopUnifiedRun(src: UnifiedAlignSource): Promise<void> {
 export async function runUnifiedAlign(
   sources: UnifiedAlignSource[],
   mode: AlignMode,
-  opts: { labo?: string; group?: AlignGroup; onProgress?: (src: UnifiedAlignSource, p: UnifiedRunProgress) => void; pollIntervalMs?: number } = {},
+  opts: {
+    labo?: string; group?: AlignGroup; onProgress?: (src: UnifiedAlignSource, p: UnifiedRunProgress) => void; pollIntervalMs?: number;
+    /** Reprocess the records already searched too (launch window, « full rerun »). */
+    force?: boolean;
+    /** Maximum number of records per source (launch window; Scopus capped by default). */
+    limits?: Partial<Record<UnifiedAlignSource, number>>;
+  } = {},
 ): Promise<Partial<Record<UnifiedAlignSource, UnifiedRunProgress>>> {
-  const { labo, group, onProgress, pollIntervalMs = 2000 } = opts;
+  const { labo, group, onProgress, pollIntervalMs = 2000, force = false, limits = {} } = opts;
   const results: Partial<Record<UnifiedAlignSource, UnifiedRunProgress>> = {};
 
   await Promise.all(sources.map(async (src) => {
@@ -89,7 +98,7 @@ export async function runUnifiedAlign(
     const report = (p: UnifiedRunProgress) => { results[src] = p; onProgress?.(src, p); };
     report({ running: true, total: 0, done: 0 });
     try {
-      const trig = await fetch(triggerUrl(src, mode, labo, group));
+      const trig = await fetch(triggerUrl(src, mode, labo, group, force, limits[src] || 0));
       // 409 = a run is already in progress for this source: simply switch to tracking
       // (same convention as runAlign/rerunIdref in App.tsx).
       if (!trig.ok && trig.status !== 409) {
@@ -111,3 +120,41 @@ export async function runUnifiedAlign(
 
   return results;
 }
+
+/** Per source, what a run of the launch window would process (GET /api/align/estimate). */
+export interface AlignSourceEstimate {
+  /** Records of the scope lacking (search) or carrying (verify) the identifier. */
+  eligible: number;
+  /** Of which never processed in this mode, or in error — what an incremental run takes. */
+  pending: number;
+  /** API calls per record: `requests` (no quota), or per Elsevier pool (`search`, `author`). */
+  unit: Record<string, number>;
+}
+export interface ElsevierPoolBudget { available: number; remaining: number | null; key: number; reset: string | null; asOf: string | null }
+export interface AlignEstimate {
+  mode: AlignMode;
+  sources: Partial<Record<UnifiedAlignSource, AlignSourceEstimate>>;
+  scopus: { keys: number; reserve1: number; pools: Record<string, ElsevierPoolBudget>; affordable: number | null };
+}
+
+export async function fetchAlignEstimate(mode: AlignMode, labo?: string, group?: AlignGroup): Promise<AlignEstimate> {
+  const q = new URLSearchParams({ mode });
+  if (labo) q.set('labo', labo);
+  if (group) q.set('group', group);
+  const r = await fetch(`/api/align/estimate?${q}`, { cache: 'no-store' });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(translateApiError(String(d.error || '')) || t`Estimate failed: ${r.status}`);
+  return d as AlignEstimate;
+}
+
+/** Default cap of a Scopus run in the launch window (decision D3: ≈ 850 calls per Elsevier API). */
+export const SCOPUS_DEFAULT_LIMIT = 500;
+
+/** Calls a run of `n` records costs, per pool (same rounding as scripts/lib/align_estimate.cjs). */
+export const estimateCost = (unit: Record<string, number>, n: number): Record<string, number> =>
+  Object.fromEntries(Object.entries(unit).map(([pool, c]) => [pool, Math.ceil(c * n)]));
+
+/** Scopus: true when a run of `n` records exceeds the Elsevier calls still available on a pool. */
+export const exceedsBudget = (unit: Record<string, number>, n: number, pools: Record<string, ElsevierPoolBudget>): boolean =>
+  Object.entries(estimateCost(unit, n)).some(([pool, c]) => pool in pools && c > pools[pool].available);
+

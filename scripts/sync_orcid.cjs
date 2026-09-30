@@ -33,9 +33,10 @@
  */
 const common = require('./lib/align_common.cjs');
 const {
-  normalize, stripAccents, extractOrcid, isValidOrcid, nameMatch, getUrl, runPool, applyTargetFilters, makeStore, today,
+  normalize, stripAccents, extractOrcid, isValidOrcid, nameMatch, getUrl, runPool, makeStore, today,
   gristGet, loadRejected, pushReview, DOC,
 } = common;
+const { selectTargets } = require('./lib/align_targets.cjs');
 const hal = require('./sync_hal.cjs');   // byIdhal (pass 0), extractIdhal
 
 // ── Parameters ───────────────────────────────────────────────────────────────
@@ -504,13 +505,9 @@ async function main() {
 
   const all = await common.fetchAnnuaire();
   const labNames = await loadLabNames();
-  let targets = MODE === 'push' ? [] : all.filter((p) => p.first || p.last);
-  if (MODE === 'verify') targets = targets.filter((p) => String(p.orcid || '').trim());
-  else targets = targets.filter((p) => !String(p.orcid || '').trim());
-  targets = applyTargetFilters(targets, { labo: LABO_FILTER, group: GROUP_FILTER });
-  const eligible = targets.length;
-  if (!FORCE) targets = targets.filter((p) => !cache[p.key] || cache[p.key].mode !== MODE || cache[p.key].status === 'error');
-  if (LIMIT > 0) targets = targets.slice(0, LIMIT);
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('orcid', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  let targets = sel.targets;
+  const eligible = sel.eligible.length;
 
   console.log(`[orcid] ${all.length} Annuaire records, ${eligible} eligible (${MODE}${LABO_FILTER ? `, labo ${LABO_FILTER}` : ''}${GROUP_FILTER ? `, group ${GROUP_FILTER}` : ''}), ${targets.length} to process${FORCE ? ' (force)' : ''}.`);
   const counts = { found: 0, ambiguous: 0, not_found: 0, error: 0, checked: 0, not_found_orcid: 0, invalid: 0, nameMismatch: 0, sansAffiliation: 0 };

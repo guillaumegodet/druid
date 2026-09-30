@@ -32,9 +32,12 @@ OpenAlex, Scopus): **one row per person, one column per identifier**.
 - **Find missing** / **Check existing ones**: choose the mode. The first looks for missing
   identifiers, the second rechecks those already filled in (merged authority records,
   profiles that have disappeared, diverging names).
-- **Search everywhere** runs the search in parallel on all sources, for the chosen
-  structure. Progress is shown per source under the button. Only the records never searched
-  (or in error) are processed: running it again does not redo the work already done.
+- **Search everywhere…** opens a launch window for the chosen structure and group: one line
+  per source with the number of records to process, a cap and the estimated cost. Untick the
+  sources you do not need. By default only the records never searched (or in error) are
+  processed; **All records of the scope** also reruns those already searched. Scopus is capped
+  at 500 records by default, and unticked when this week's quota is not enough. Progress is
+  then shown per source under the button.
 - **Stop**, next to a source's progress, interrupts its search: the records in progress finish,
   what was found is kept, and the next search resumes where it stopped.
 

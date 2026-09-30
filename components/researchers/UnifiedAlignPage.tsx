@@ -12,6 +12,7 @@ import type {
   PersonAlignUpdate, ReviewMixedItem, UnifiedAlignDiff, UnifiedAlignSource, UnifiedArbitrateDecision,
 } from '../../lib/gristService';
 import type { UnifiedRunProgress } from '../../lib/unifiedAlignRuns';
+import { AlignLaunchModal, type AlignLaunchChoice } from './AlignLaunchModal';
 import { numberLocale } from '../../lib/i18n';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
@@ -295,8 +296,9 @@ interface UnifiedAlignPageProps {
   /** Progress of the last « Rechercher partout » — one entry per source in progress/finished. */
   progress?: Partial<Record<UnifiedAlignSource, UnifiedRunProgress>> | null;
   applying?: boolean;
-  /** Must stay scoped to the filtered lab/group (decision of 2026-09-21, plan §5) — never a global run. */
-  onRerunAll: (mode: AlignMode, labo?: string, group?: AlignGroup) => void;
+  /** Scoped to the filtered lab/group; `choice` = sources, full rerun and caps picked in the launch
+   * window (docs/plan-recherche-alignement-maitrisee.md, lot 2). */
+  onRerunAll: (mode: AlignMode, labo?: string, group?: AlignGroup, choice?: AlignLaunchChoice) => void;
   /** « Stop » of one source's run: records in progress finish, what was found is kept. */
   onStop?: (src: UnifiedAlignSource) => Promise<void>;
   /** Receives the updates already grouped per record (buildUnifiedUpdates) — written by GristService.applyUnifiedUpdates. */
@@ -321,6 +323,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
   const [srcFilter, setSrcFilter] = useState<UnifiedAlignSource | ''>('');
   // Sources whose « Stop » was clicked, until their run closes its progress.
   const [stopping, setStopping] = useState<Set<UnifiedAlignSource>>(new Set());
+  const [launchOpen, setLaunchOpen] = useState(false);
   useEffect(() => {
     if (!progress) setStopping(new Set());
   }, [progress]);
@@ -451,7 +454,11 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
   };
   const confirmRerun = () => {
     if (hasUnsaved && !window.confirm(t`Some selections or decisions are not applied yet — rerunning will clear them. Continue?`)) return;
-    onRerunAll(mode, labo || undefined, group);
+    setLaunchOpen(true);
+  };
+  const launch = (choice: AlignLaunchChoice) => {
+    setLaunchOpen(false);
+    onRerunAll(mode, labo || undefined, group, choice);
   };
   // After a rejection / a mixed identity: the selection of the discarded candidate no longer makes sense.
   const forgetCandidate = (row: PersonAlignRow, src: UnifiedAlignSource, cand: Candidate) => {
@@ -524,9 +531,9 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
           </div>
           <div className="flex-1" />
           <PixelBtn onClick={confirmRerun} disabled={anyRunning} tone="bg-ink text-white hover:bg-black dark:bg-accent dark:text-ink dark:hover:bg-accent-strong"
-            title={labo ? t`Parallel search on ${labo} (IdRef/ORCID/HAL/OpenAlex)` : t`Parallel search on the filtered group (all structures) — never a global run`}>
+            title={t`Choose the sources, see the number of records and the cost, then start the search on the filtered lab and group`}>
             {anyRunning ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCw className="w-4 h-4" />}
-            {anyRunning ? t`Search running…` : t`Search everywhere`}
+            {anyRunning ? t`Search running…` : t`Search everywhere…`}
           </PixelBtn>
         </div>
         {progress && (
@@ -558,6 +565,10 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
           </div>
         )}
       </header>
+      {launchOpen && (
+        <AlignLaunchModal mode={mode} labo={labo || undefined} group={group} sources={sources} sourceLabel={SOURCE_LABEL}
+          onClose={() => setLaunchOpen(false)} onLaunch={launch} />
+      )}
 
       <div className="flex-1 overflow-auto px-4 md:px-7 py-4" data-page-scroll>
         {!diff ? (

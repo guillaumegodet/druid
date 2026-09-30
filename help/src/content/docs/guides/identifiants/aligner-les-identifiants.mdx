@@ -32,9 +32,12 @@ ORCID, HAL, OpenAlex, Scopus) : **une ligne par personne, une colonne par identi
 - **Rechercher manquants** / **Vérifier les existants** : choisissez le mode. Le premier
   cherche les identifiants absents, le second revérifie ceux qui sont déjà renseignés
   (notices fusionnées, profils disparus, noms divergents).
-- **Rechercher partout** lance la recherche en parallèle sur toutes les sources, pour la
-  structure choisie. L'avancement s'affiche par source sous le bouton. Seules les fiches jamais
-  cherchées (ou en erreur) sont traitées : relancer ne refait pas le travail déjà fait.
+- **Rechercher partout…** ouvre une fenêtre de lancement pour la structure et le groupe choisis :
+  une ligne par source avec le nombre de fiches à traiter, un plafond et le coût estimé. Décochez
+  les sources inutiles. Par défaut, seules les fiches jamais cherchées (ou en erreur) sont traitées ;
+  **Toutes les fiches du périmètre** relance aussi celles déjà cherchées. Scopus est plafonné à
+  500 fiches par défaut, et décoché quand le quota de la semaine ne suffit pas. L'avancement
+  s'affiche ensuite par source sous le bouton.
 - **Arrêter**, à côté de l'avancement d'une source, interrompt sa recherche : les fiches en cours
   se terminent, ce qui a été trouvé est conservé, et la recherche suivante reprend là où elle
   s'est arrêtée.

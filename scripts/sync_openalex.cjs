@@ -41,10 +41,11 @@
  */
 const common = require('./lib/align_common.cjs');
 const {
-  normalize, nameMatch, extractOrcid, getUrl, runPool, applyTargetFilters, makeStore, today,
+  normalize, nameMatch, extractOrcid, getUrl, runPool, makeStore, today,
   gristGet, gristPatchGrouped, gristPatchRecords, withTrace, loadRejected, loadReviewDecisions, pushReview, DOC,
   heterogeneousFirstNames, DECISION_MIXED, DECISION_TODO,
 } = common;
+const { selectTargets, extractAId, parseIds } = require('./lib/align_targets.cjs');
 
 // ── Parameters ───────────────────────────────────────────────────────────────
 const OPTS = common.commonOptions({ modes: ['search', 'verify', 'push'], concurrency: 3 });
@@ -112,19 +113,7 @@ const { loadCache, writeCache, writeProgress } = store;
 
 // ── Helpers identifiants ─────────────────────────────────────────────────────
 /** "https://openalex.org/A5038332349", " a5038332349 " → "A5038332349". */
-function extractAId(raw) {
-  const m = String(raw || '').match(/(A\d{4,})/i);
-  return m ? m[1].toUpperCase() : '';
-}
-/** List of A-ids from a pipe-separated cell (tolerates , ; spaces and URLs). Deduplicated, order kept. */
-function parseIds(v) {
-  const out = [];
-  for (const x of String(v || '').split(/[|,;\s]+/)) {
-    const a = extractAId(x);
-    if (a && !out.includes(a)) out.push(a);
-  }
-  return out;
-}
+// extractAId / parseIds: scripts/lib/align_targets.cjs (shared with the run estimate of the launch window).
 const joinIds = (ids) => ids.join('|');
 const instId = (v) => { const m = String(v || '').match(/(I\d+)/); return m ? m[1] : ''; };
 const rorId = (v) => String(v || '').trim().replace(/^https?:\/\/ror\.org\//, '').toLowerCase();
@@ -772,13 +761,9 @@ async function main() {
   const labs = MODE === 'push' ? new Map() : await loadLabs();
   const decisions = await loadReviewDecisions(REVIEW_TABLE, 'OpenAlex_candidat', extractAId);
   for (const [k, d] of decisions) if (d.decision === DECISION_MIXED) MIXED_KEYS.add(k);
-  let targets = MODE === 'push' ? [] : all.filter((p) => p.first || p.last);
-  if (MODE === 'verify') targets = targets.filter((p) => parseIds(p.openalexIds).length);
-  else targets = targets.filter((p) => !parseIds(p.openalexIds).length && String(p.statut || '').trim().toUpperCase() !== 'DEPART');
-  targets = applyTargetFilters(targets, { labo: LABO_FILTER, group: GROUP_FILTER });
-  const eligible = targets.length;
-  if (!FORCE) targets = targets.filter((p) => !cache[p.key] || cache[p.key].mode !== MODE || cache[p.key].status === 'error');
-  if (LIMIT > 0) targets = targets.slice(0, LIMIT);
+  const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('openalex', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT });
+  let targets = sel.targets;
+  const eligible = sel.eligible.length;
 
   console.log(`[openalex] ${all.length} Annuaire records, ${eligible} eligible (${MODE}${LABO_FILTER ? `, labo ${LABO_FILTER}` : ''}${GROUP_FILTER ? `, group ${GROUP_FILTER}` : ''}), ${targets.length} to process${FORCE ? ' (force)' : ''}.`);
   const counts = { found: 0, ambiguous: 0, not_found: 0, error: 0, checked: 0, direct: 0, changed: 0, nameMismatch: 0 };
