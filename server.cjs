@@ -2912,6 +2912,83 @@ app.get('/api/ldap/person/:uid', async (req, res) => {
   }
 });
 
+// ── Career path of a researcher (docs/plan-parcours-affiliations.md, lot 2) ──────
+// Output of scripts/sync_affiliation_history.cjs (weekly ofelia job): one file per person in
+// AFFILIATION_HISTORY_DIR (bind-mounted cache-data/affiliation_history). Reading follows the record's
+// scope (every authenticated right reads the Annuaire); a live refresh calls the external APIs
+// (quotas), so it needs the institution scope or a lab right on the record's lab.
+const AH_STORE = require('./scripts/lib/affiliation_history_store.cjs');
+const AFFILIATION_HISTORY_DIR = process.env.AFFILIATION_HISTORY_DIR || path.join(__dirname, 'affiliation_history');
+const AH_REFRESH_TIMEOUT_MS = 120000;
+const AH_MAX_PARALLEL_REFRESH = 2;
+const ahRefreshing = new Map();   // key → Promise of the running one-person job
+const hasAnyRight = (access) => !!(access?.allSlugs || access?.labAnchors?.length || access?.annuaireLabs?.length);
+const ahRunInfo = () => {
+  const p = AH_STORE.readProgress(AFFILIATION_HISTORY_DIR);
+  return p ? { running: !!p.running, done: p.done || 0, total: p.total || 0, startedAt: p.startedAt || null } : null;
+};
+/** LABO values of the Annuaire rows of a person key (uid_dyna, or g<rowId> for records without uid). */
+const annuaireLabosOf = async (key) => {
+  const byRow = /^g(\d+)$/.exec(key);
+  const r = await fetch(`${GRIST_API_BASE}/docs/${process.env.VITE_GRIST_DOC_ID}/sql`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(byRow
+      ? { sql: 'SELECT "LABO" AS v FROM "Annuaire" WHERE id = ?', args: [Number(byRow[1])] }
+      : { sql: 'SELECT "LABO" AS v FROM "Annuaire" WHERE "uid_dyna" = ?', args: [key] }),
+  });
+  if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
+  return ((await r.json()).records || []).map((row) => row.fields.v || '');
+};
+/** Runs the job for ONE person (index merged on write, full-run progress untouched). */
+const refreshAffiliationHistory = (key) => new Promise((resolve, reject) => {
+  const child = spawn('node', [path.join(__dirname, 'scripts/sync_affiliation_history.cjs'), `--uid=${key}`, '--force', `--dir=${AFFILIATION_HISTORY_DIR}`],
+    { cwd: __dirname, stdio: ['ignore', 'pipe', 'pipe'] });
+  let tail = '';
+  const keep = (b) => { tail = (tail + b.toString()).slice(-2000); };
+  child.stdout.on('data', keep);
+  child.stderr.on('data', keep);
+  const timer = setTimeout(() => child.kill('SIGTERM'), AH_REFRESH_TIMEOUT_MS);
+  child.on('error', (err) => { clearTimeout(timer); reject(err); });
+  child.on('exit', (code, signal) => {
+    clearTimeout(timer);
+    if (code === 0) resolve();
+    else reject(new Error(`job ended with ${code ?? signal}: ${tail.split('\n').filter(Boolean).slice(-2).join(' | ')}`));
+  });
+});
+
+app.get('/api/researchers/:key/affiliation-history', (req, res) => {
+  if (!hasAnyRight(req.session.user?.access)) return res.status(403).json({ error: 'Forbidden' });
+  const key = String(req.params.key || '');
+  if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
+  const entry = AH_STORE.readEntry(AFFILIATION_HISTORY_DIR, key);
+  if (!entry) return res.status(404).json({ error: 'Career path not computed yet for this record', run: ahRunInfo() });
+  res.json({ entry, run: ahRunInfo() });
+});
+
+app.post('/api/researchers/:key/affiliation-history/refresh', async (req, res) => {
+  const access = req.session.user?.access;
+  if (!hasAnyRight(access)) return res.status(403).json({ error: 'Forbidden' });
+  const key = String(req.params.key || '');
+  if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
+  let labos;
+  try { labos = await annuaireLabosOf(key); }
+  catch (err) { console.error('[affiliation-history] Grist', err.message); return res.status(502).json({ error: 'Grist unreachable' }); }
+  if (!labos.length) return res.status(404).json({ error: 'No Annuaire record for this key' });
+  if (!AH_STORE.canRefresh(access, labos, normalizeAcronym)) return res.status(403).json({ error: 'Refresh outside your scope' });
+  let job = ahRefreshing.get(key);
+  if (!job) {
+    if (ahRefreshing.size >= AH_MAX_PARALLEL_REFRESH) return res.status(429).json({ error: 'Too many refreshes in progress, retry in a minute' });
+    job = refreshAffiliationHistory(key).finally(() => ahRefreshing.delete(key));
+    ahRefreshing.set(key, job);
+  }
+  try { await job; }
+  catch (err) { console.error('[affiliation-history] refresh', key, err.message); return res.status(502).json({ error: 'Career-path computation failed' }); }
+  const entry = AH_STORE.readEntry(AFFILIATION_HISTORY_DIR, key);
+  if (!entry) return res.status(404).json({ error: 'No usable identifier for this record' });
+  res.json({ entry, run: ahRunInfo() });
+});
+
 // ── LDAP Structures sync ────────────────────────────────────────────────────
 app.get('/api/sync-structures-ldap-trigger', requireEstablishmentScope, (req, res) => {
   const running = runningProgress(STRUCT_LDAP_PROGRESS_PATH);

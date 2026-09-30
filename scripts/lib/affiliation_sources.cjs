@@ -295,18 +295,7 @@ async function resolveHierarchy(hierarchy, orgs, { mailto = process.env.OPENALEX
 function loadHierarchy(path) {
   try { return { ...emptyHierarchy(), ...JSON.parse(fs.readFileSync(path, 'utf8')) }; } catch (e) { return emptyHierarchy(); }
 }
-/** Atomic write (temporary file + rename): a crash never leaves a truncated JSON behind. */
-function writeJsonAtomic(path, data) {
-  const tmp = `${path}.tmp-${process.pid}`;
-  fs.writeFileSync(tmp, JSON.stringify(data));
-  try { fs.renameSync(tmp, path); }
-  catch (e) {
-    // Bind-mounted single file (Docker): rename over it fails (EBUSY) → rewrite in place.
-    fs.writeFileSync(path, fs.readFileSync(tmp)); fs.unlinkSync(tmp);
-  }
-}
-
 module.exports = {
   memAvailableMb, createGraphReader, normSourceId, openalexPublications, scopusPublications, scopusProfiles,
-  orcidPeriods, resolveHierarchy, loadHierarchy, writeJsonAtomic,
+  orcidPeriods, resolveHierarchy, loadHierarchy,
 };

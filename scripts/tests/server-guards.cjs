@@ -44,6 +44,8 @@ const csrf = (method, p, headers = {}) => new Promise((resolve) => {
   check('sync-sovisuplus without session', await status('/api/sync-sovisuplus', { method: 'POST' }), 401);
   check('sync-ldap-trigger without session', await status('/api/sync-ldap-trigger'), 401);
   check('newsletter/generate without session', await status('/api/newsletter/generate', { method: 'POST' }), 401);
+  check('affiliation-history without session', await status('/api/researchers/abc/affiliation-history'), 401);
+  check('affiliation-history refresh without session', await status('/api/researchers/abc/affiliation-history/refresh', { method: 'POST' }), 401);
   check('photo proxy forbidden host', await status('/api/public/photo?src=http://crisalid-neo4j:7474/'), 403);
   check('photo proxy invalid src', await status('/api/public/photo?src=nope'), 400);
   server.close();

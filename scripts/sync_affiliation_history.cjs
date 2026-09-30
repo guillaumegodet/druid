@@ -43,13 +43,14 @@ const common = require('./lib/align_common.cjs');
 const { getArg, hasFlag, gristGet, DOC, runPool, extractOrcid, today } = common;
 const AH = require('./lib/affiliation_history.cjs');
 const SRC = require('./lib/affiliation_sources.cjs');
+const STORE = require('./lib/affiliation_history_store.cjs');
 const { createElsevierClient } = require('./lib/elsevier_client.cjs');
 const { affiliationHistorySchema } = require('./instances/instanceConfig.cjs');
 
-const ENTRIES_DIR = getArg('dir', 'affiliation_history');
-const INDEX_PATH = `${ENTRIES_DIR}/_index.json`;
-const PROGRESS_PATH = `${ENTRIES_DIR}/_progress.json`;
-const HIERARCHY_PATH = `${ENTRIES_DIR}/_hierarchy.json`;
+const ENTRIES_DIR = getArg('dir', process.env.AFFILIATION_HISTORY_DIR || 'affiliation_history');
+const INDEX_PATH = STORE.indexFile(ENTRIES_DIR);
+const PROGRESS_PATH = STORE.progressFile(ENTRIES_DIR);
+const HIERARCHY_PATH = STORE.hierarchyFile(ENTRIES_DIR);
 const LIMIT = parseInt(getArg('limit', '0'), 10) || 0;
 const LABO = String(getArg('labo', '') || '').trim().toUpperCase();
 const ONLY_UID = String(getArg('uid', '') || '').trim();
@@ -64,8 +65,6 @@ const SCOPUS_RESERVE = parseFloat(getArg('scopus-reserve', '0.4'));
 const OPENALEX_KEY = hasFlag('no-key') ? '' : (process.env.OPENALEX_API_KEY || '');
 const MAX_CONSECUTIVE_FAILURES = 5;
 const MAX_PUBS_STORED = 300;
-/** File of one person's entry (keys are uid_dyna values or g<rowId>; anything else is escaped). */
-const entryPath = (key) => `${ENTRIES_DIR}/p-${String(key).replace(/[^A-Za-z0-9._-]/g, (ch) => `~${ch.charCodeAt(0).toString(16)}`)}.json`;
 /** Index line of an entry: what the list, the rules and the incremental runs need. */
 const indexLine = (e) => ({ computedAt: e.computedAt, idsSignature: e.idsSignature, incomplete: e.incomplete, totals: e.totals, firstLocal: e.firstLocal, lastLocal: e.lastLocal, signals: e.signals });
 const TODAY = today();
@@ -157,6 +156,7 @@ async function main() {
   const people = await loadPeople();
   const cache = (() => { try { return JSON.parse(fs.readFileSync(INDEX_PATH, 'utf8')); } catch (e) { return {}; } })();
   const dryEntries = {};
+  const updatedIndex = {};
   const hierarchy = SRC.loadHierarchy(HIERARCHY_PATH);
   const fresh = (e, p) => e && !e.incomplete?.length && e.idsSignature === idsSignature(p) && (Date.now() - new Date(e.computedAt).getTime()) < MAX_AGE_DAYS * 864e5;
   let targets = people.filter((p) => p.uid || p.orcid || p.openalex.length || p.scopus.length);
@@ -178,7 +178,8 @@ async function main() {
   const counts = { computed: 0, kept: 0, failed: 0, incomplete: 0, signals: {} };
   const startedAt = new Date().toISOString();
   let stopReason = null;
-  const writeProgress = (running, done) => { if (!DRY_RUN) try { fs.writeFileSync(PROGRESS_PATH, JSON.stringify({ running, total: targets.length, done, ...counts, disabled: [...disabled], quota: elsevier?.quota || {}, startedAt, ...(stopReason ? { warning: stopReason } : {}) })); } catch (e) { /* noop */ } };
+  // A one-person run (--uid, the API « refresh ») never touches the progress of the full run.
+  const writeProgress = (running, done) => { if (!DRY_RUN && !ONLY_UID) try { fs.writeFileSync(PROGRESS_PATH, JSON.stringify({ running, total: targets.length, done, ...counts, disabled: [...disabled], quota: elsevier?.quota || {}, startedAt, ...(stopReason ? { warning: stopReason } : {}) })); } catch (e) { /* noop */ } };
   writeProgress(true, 0);
 
   let done = 0;
@@ -228,13 +229,20 @@ async function main() {
       const old = cache[r.p.key];
       if (entry.incomplete.length && old && !old.incomplete?.length && old.idsSignature === entry.idsSignature) { counts.kept++; continue; }
       cache[r.p.key] = indexLine(entry);
-      if (DRY_RUN) dryEntries[r.p.key] = entry; else SRC.writeJsonAtomic(entryPath(r.p.key), entry);
+      updatedIndex[r.p.key] = cache[r.p.key];
+      if (DRY_RUN) dryEntries[r.p.key] = entry; else STORE.writeJsonAtomic(STORE.entryFile(ENTRIES_DIR, r.p.key), entry);
       counts.computed++;
       if (entry.incomplete.length) counts.incomplete++;
       for (const s of entry.signals) counts.signals[s.type] = (counts.signals[s.type] || 0) + 1;
     }
     if (elsevier?.aborted() && !disabled.has('scopus')) { disabled.add('scopus'); console.warn(`[parcours] Scopus stopped: ${elsevier.aborted()} — next entries marked incomplete`); }
-    if (!DRY_RUN) { SRC.writeJsonAtomic(INDEX_PATH, cache); SRC.writeJsonAtomic(HIERARCHY_PATH, hierarchy); }
+    if (!DRY_RUN) {
+      // Merge on write: a concurrent run (full run / API refresh) keeps its own keys.
+      STORE.mergeIndex(ENTRIES_DIR, updatedIndex);
+      const merged = SRC.loadHierarchy(HIERARCHY_PATH);
+      for (const [table, rows] of Object.entries(hierarchy)) merged[table] = { ...(merged[table] || {}), ...rows };
+      STORE.writeJsonAtomic(HIERARCHY_PATH, merged);
+    }
     writeProgress(true, done);
     console.log(`[parcours] ${done}/${targets.length} · computed ${counts.computed} · failed ${counts.failed} · incomplete ${counts.incomplete} · mem ${SRC.memAvailableMb() ?? '?'} MB`);
   }
