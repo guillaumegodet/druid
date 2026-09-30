@@ -56,7 +56,6 @@ const FORCE = OPTS.force || !!LABO_FILTER;
 const MAX_ENRICH = Math.max(0, parseInt(common.getArg('enrich', '3'), 10) || 0);
 const ELS = 'https://api.elsevier.com/content';
 const API_KEY = process.env.SCOPUS_API_KEY || '';
-const INST_TOKEN = process.env.SCOPUS_INST_TOKEN || '';
 const REVIEW_TABLE = 'Alignement_Scopus';
 const SOURCE = 'Scopus';
 const TARGET = 'ID_SCOPUS';
@@ -84,7 +83,8 @@ const store = makeStore({ cachePath: 'scopus_align_cache.json', progressPath: 's
 const { loadCache, writeCache, writeProgress } = store;
 
 // ── Elsevier client (throttle, quotas, abort): scripts/lib/elsevier_client.cjs ─────
-const elsevier = createElsevierClient({ tag: 'scopus', ratePerS: RATE_PER_S, rateLimitWaitMs: RATE_LIMIT_WAIT_MS, marginMs: RATE_MARGIN_MS, apiKey: API_KEY, instToken: INST_TOKEN });
+// Keys read by the client: SCOPUS_API_KEY, then the backup SCOPUS_API_KEY_2 once a pool is exhausted.
+const elsevier = createElsevierClient({ tag: 'scopus', ratePerS: RATE_PER_S, rateLimitWaitMs: RATE_LIMIT_WAIT_MS, marginMs: RATE_MARGIN_MS });
 const QUOTA = elsevier.quota;
 const els = (pool, path, params) => elsevier.get(pool, path, params);
 const digits = (v) => String(v || '').replace(/\D/g, '');

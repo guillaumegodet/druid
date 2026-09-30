@@ -9,10 +9,21 @@
  * Quotas are weekly and per API pool (Author Search, Author Retrieval, Affiliation, Scopus Search):
  * the client reads x-ratelimit-* and aborts the run when a pool is exhausted, or when the remaining
  * share falls under `reserve` (share of the weekly limit left to the other jobs, decision D9).
+ * Backup key (2026-09-30): SCOPUS_API_KEY_2 (+ SCOPUS_INST_TOKEN_2) takes over, pool by pool, once
+ * the first key has exhausted a pool; the run stops only when the last key is exhausted, and
+ * `reserve` only applies to that last key.
  */
 const { getUrl } = require('./align_common.cjs');
 
 const ELS = 'https://api.elsevier.com/content';
+
+/** API keys of the environment, in order of use: SCOPUS_API_KEY, then the backup SCOPUS_API_KEY_2,
+ * each with its optional institution token. Empty variables are left out. */
+function envKeys(env = process.env) {
+  return [['SCOPUS_API_KEY', 'SCOPUS_INST_TOKEN'], ['SCOPUS_API_KEY_2', 'SCOPUS_INST_TOKEN_2']]
+    .map(([key, token]) => ({ apiKey: String(env[key] || '').trim(), instToken: String(env[token] || '').trim() }))
+    .filter((k) => k.apiKey);
+}
 
 /**
  * @param {object} o
@@ -21,9 +32,14 @@ const ELS = 'https://api.elsevier.com/content';
  * @param {number} [o.reserve=0]   share (0-1) of each weekly limit never consumed by this run
  * @param {number} [o.rateLimitWaitMs=700] wait after a 429 of rate (Elsevier clears within the second)
  * @param {number} [o.marginMs=40] extra spacing between two requests of a pool
+ * @param {{ apiKey: string, instToken?: string }[]} [o.keys] keys in order of use (default: envKeys())
+ * @param {Function} [o.getUrlImpl] HTTP layer (tests)
  */
-function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rateLimitWaitMs = 700, marginMs = 40, apiKey = process.env.SCOPUS_API_KEY || '', instToken = process.env.SCOPUS_INST_TOKEN || '' } = {}) {
-  const headers = { Accept: 'application/json', 'X-ELS-APIKey': apiKey, ...(instToken ? { 'X-ELS-Insttoken': instToken } : {}) };
+function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rateLimitWaitMs = 700, marginMs = 40, keys = envKeys(), getUrlImpl = getUrl } = {}) {
+  const headersOf = keys.map((k) => ({ Accept: 'application/json', 'X-ELS-APIKey': k.apiKey, ...(k.instToken ? { 'X-ELS-Insttoken': k.instToken } : {}) }));
+  /** Index of the key in use per pool: a key exhausted on one API may still serve the others. */
+  const keyOf = {};
+  const keyLabel = (k) => (keys.length > 1 ? ` (key ${k + 1}/${keys.length})` : '');
   const nextSlot = {};
   /** One slot chain per pool: requests of a pool are spaced by 1/rate, pools run independently. */
   async function throttle(pool) {
@@ -40,13 +56,24 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
     if (!aborted) { aborted = reason; console.error(`[${tag}] RUN STOPPED: ${reason}`); }
   }
   const resetDate = (h) => { const t = parseInt(h['x-ratelimit-reset'] || '0', 10); return t ? new Date(t * 1000).toISOString().slice(0, 10) : '?'; };
-  function trackQuota(pool, h) {
+  /** Pool exhausted on its current key: switches to the next key (true), or stops the run (false). */
+  function exhausted(pool, reason) {
+    const k = keyOf[pool] || 0;
+    if (k + 1 < keys.length) {
+      keyOf[pool] = k + 1;
+      console.warn(`[${tag}] ${reason}${keyLabel(k)} — switching to key ${k + 2}`);
+      return true;
+    }
+    abort(`${reason}${keys.length > 1 ? ` — all ${keys.length} keys exhausted` : ''}`);
+    return false;
+  }
+  function trackQuota(pool, h, k) {
     if (!h || h['x-ratelimit-remaining'] === undefined) return;
     const remaining = parseInt(h['x-ratelimit-remaining'], 10);
     const limit = parseInt(h['x-ratelimit-limit'] || '0', 10) || 0;
-    quota[pool] = { remaining, limit, reset: resetDate(h) };
-    if (remaining <= 0) abort(`weekly Elsevier quota exhausted (${pool} API, reset ${quota[pool].reset})`);
-    else if (reserve > 0 && limit && remaining <= Math.floor(limit * reserve)) abort(`weekly Elsevier quota share reached (${pool} API: ${remaining}/${limit} left for the other jobs, reset ${quota[pool].reset})`);
+    quota[pool] = { remaining, limit, reset: resetDate(h), ...(keys.length > 1 ? { key: k + 1 } : {}) };
+    if (remaining <= 0) exhausted(pool, `weekly Elsevier quota exhausted (${pool} API, reset ${quota[pool].reset})`);
+    else if (reserve > 0 && limit && k === keys.length - 1 && remaining <= Math.floor(limit * reserve)) abort(`weekly Elsevier quota share reached (${pool} API${keyLabel(k)}: ${remaining}/${limit} left for the other jobs, reset ${quota[pool].reset})`);
   }
   /**
    * GET JSON on an Elsevier API. `pool` = quota pool name. Returns the body, `{ notFound: true }` on 404,
@@ -56,26 +83,32 @@ function createElsevierClient({ tag = 'scopus', ratePerS = {}, reserve = 0, rate
    * override the defaults (25 s, 5 tries) for heavy pages.
    */
   async function get(pool, path, params, opts = {}) {
-    if (aborted || !apiKey) return null;
+    if (aborted || !keys.length) return null;
     await throttle(pool);
     const url = `${ELS}${path}${params ? `?${new URLSearchParams(params)}` : ''}`;
-    try {
-      const r = await getUrl(url, { json: true, withHeaders: true, headers, timeout: opts.timeout || 25000, tries: opts.tries || 5, noRetry: [400, 401, 403, 404], rateLimitWaitMs });
-      trackQuota(pool, r.headers);
-      return r.body;
-    } catch (e) {
-      const h = e.headers || {};
-      const els = String(h['x-els-status'] || '');
-      if (e.status === 404) return { notFound: true };
-      if (e.status === 401 || e.status === 403) abort(`HTTP ${e.status} ${els || ''} — API key refused or IP not entitled (the API must go through the university proxy)`.trim());
-      else if (/QUOTA_EXCEEDED/i.test(els) || (e.status === 429 && h['x-ratelimit-remaining'] !== undefined && parseInt(h['x-ratelimit-remaining'], 10) <= 0)) abort(`weekly Elsevier quota exhausted (${pool} API${h['x-ratelimit-reset'] ? `, reset ${resetDate(h)}` : ''})`);
-      else if (e.status === 429) console.warn(`[${tag}] ${path}: rate limit (429) still hit after retries — record marked in error, quota untouched`);
-      else if (e.status === 400 && opts.badRequestAsValue) return { badRequest: true };
-      else console.warn(`[${tag}] ${path}: ${e.message}`);
-      return null;
+    // One try per key at most: a quota refusal moves the pool to the next key and replays the request.
+    for (let attempt = 0; attempt < keys.length && !aborted; attempt++) {
+      const k = keyOf[pool] || 0;
+      try {
+        const r = await getUrlImpl(url, { json: true, withHeaders: true, headers: headersOf[k], timeout: opts.timeout || 25000, tries: opts.tries || 5, noRetry: [400, 401, 403, 404], rateLimitWaitMs });
+        trackQuota(pool, r.headers, k);
+        return r.body;
+      } catch (e) {
+        const h = e.headers || {};
+        const els = String(h['x-els-status'] || '');
+        if (e.status === 404) return { notFound: true };
+        if (e.status === 401 || e.status === 403) abort(`HTTP ${e.status} ${els || ''}${keyLabel(k)} — API key refused or IP not entitled (the API must go through the university proxy)`.replace(/\s+/g, ' ').trim());
+        else if (/QUOTA_EXCEEDED/i.test(els) || (e.status === 429 && h['x-ratelimit-remaining'] !== undefined && parseInt(h['x-ratelimit-remaining'], 10) <= 0)) {
+          if (exhausted(pool, `weekly Elsevier quota exhausted (${pool} API${h['x-ratelimit-reset'] ? `, reset ${resetDate(h)}` : ''})`)) continue;
+        } else if (e.status === 429) console.warn(`[${tag}] ${path}: rate limit (429) still hit after retries — record marked in error, quota untouched`);
+        else if (e.status === 400 && opts.badRequestAsValue) return { badRequest: true };
+        else console.warn(`[${tag}] ${path}: ${e.message}`);
+        return null;
+      }
     }
+    return null;
   }
-  return { get, quota, abort, aborted: () => aborted, hasKey: !!apiKey };
+  return { get, quota, abort, aborted: () => aborted, hasKey: keys.length > 0, keyCount: keys.length };
 }
 
-module.exports = { createElsevierClient, ELS };
+module.exports = { createElsevierClient, envKeys, ELS };
