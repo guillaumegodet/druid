@@ -148,7 +148,9 @@ export async function fetchAlignEstimate(mode: AlignMode, labo?: string, group?:
   if (group) q.set('group', group);
   const r = await fetch(`/api/align/estimate?${q}`, { cache: 'no-store' });
   const d = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(translateApiError(String(d.error || '')) || t`Estimate failed: ${r.status}`);
+  // An instance without this route answers with the SPA fallback (200 + index.html, unreadable as
+  // JSON → {}): treated as a failure rather than an estimate without `sources`.
+  if (!r.ok || !d.sources) throw new Error(translateApiError(String(d.error || '')) || t`Estimate failed: ${r.status}`);
   return d as AlignEstimate;
 }
 

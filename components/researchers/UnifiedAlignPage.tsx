@@ -21,6 +21,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { HelpButton } from '../HelpButton';
 import { VIEW_HELP } from '../../lib/helpLinks';
 import { ViewState } from '../../types';
+import { hasCapability } from '../../lib/auth';
 import {
   StatCard, ProposalRow, PixelBtn, MatchedBadge, MixedBtn, RejectBtn, MixedSection, ArbitrageCard,
   IdrefCandidateLine, AlignCandidateLine, ExistingPill,
@@ -530,6 +531,9 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
     setToast(t`Profile ${unifiedCandidateId(src, cand)} flagged as “Mixed identity” — ticket opened in the review table.`);
   };
 
+  // Runs and their estimate are server.cjs routes: without server jobs (Cloudflare instances) the
+  // page only reviews the already computed candidates — a click would reach the SPA fallback.
+  const canRun = hasCapability('HAS_SERVER_JOBS');
   const anyRunning = sources.some((s) => !!progress?.[s]?.running);
   const generatedAt = diff ? new Date(diff.generatedAt).toLocaleString(numberLocale()) : '';
   const melees = useMemo<ReviewMixedItem[]>(() => sources.flatMap((s) => diff?.melees?.[s] || []), [diff, sources]);
@@ -577,11 +581,11 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
               t`Permanent or non-permanent staff with no statutory research duty (LIB_TYPE_EMPLOI) — may hold researcher identifiers, but aligning them is a low priority, as for PhD students`)}
           </div>
           <div className="flex-1" />
-          <PixelBtn onClick={confirmRerun} disabled={anyRunning} tone="bg-ink text-white hover:bg-black dark:bg-accent dark:text-ink dark:hover:bg-accent-strong"
+          {canRun && <PixelBtn onClick={confirmRerun} disabled={anyRunning} tone="bg-ink text-white hover:bg-black dark:bg-accent dark:text-ink dark:hover:bg-accent-strong"
             title={t`Choose the sources, see the number of records and the cost, then start the search on the filtered lab and group`}>
             {anyRunning ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCw className="w-4 h-4" />}
             {anyRunning ? t`Search running…` : t`Search everywhere…`}
-          </PixelBtn>
+          </PixelBtn>}
         </div>
         {progress && (
           <div className="flex flex-wrap gap-3 mt-2 text-[11px] font-semibold text-muted dark:text-[#8f897c]">
@@ -725,7 +729,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
                               onReject={onRejectCandidate ? (c, nb) => rejectCand(row, rowOpenSrc, c, nb) : undefined}
                               onMixed={onMixedCandidate ? (c, nb) => mixedCand(row, rowOpenSrc, c, nb) : undefined}
                               mode={mode} sourceBusy={!!progress?.[rowOpenSrc]?.running}
-                              onSearchRecord={rowOpenSrc === 'idref' && mode === 'verify' ? undefined : () => searchRecord(row, rowOpenSrc)} />
+                              onSearchRecord={!canRun || (rowOpenSrc === 'idref' && mode === 'verify') ? undefined : () => searchRecord(row, rowOpenSrc)} />
                           </div>
                         )}
                       </div>
