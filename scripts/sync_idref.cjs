@@ -9,7 +9,7 @@
  *
  * Reads the Grist `Annuaire` table directly (env VITE_GRIST_DOC_ID / GRIST_API_KEY,
  * like the /api/sync-structures-csv endpoint) and writes an `idref_align_cache.json` cache
- * (key = uid_dyna) consumed by GristService.computeIdrefDiff on the front-end side.
+ * (key = uid_dyna, or g<rowId> without LDAP identity) consumed by GristService.computeIdrefDiff on the front-end side.
  *
  * Modes (--mode=):
  *   search  (default): for the records WITHOUT IdRef → search by name.
@@ -243,9 +243,9 @@ function buildCandidate(fields, { query = null, scientificFilter = false } = {})
 }
 
 // ── Grist ─────────────────────────────────────────────────────────────────────
-/** Annuaire records with an LDAP identity (uid_dyna) — key of the idref_align_cache.json cache. */
+/** Annuaire records — idref_align_cache.json key = uid_dyna, or g<rowId> without LDAP identity (p.key). */
 async function fetchAnnuaire() {
-  return (await common.fetchAnnuaire()).filter((p) => p.uid);
+  return common.fetchAnnuaire();
 }
 
 // Export of the pure functions (unit tests; main only runs when invoked directly).
@@ -267,7 +267,7 @@ async function main() {
   else targets = all.filter((p) => !extractPpn(p.idref) && (p.first || p.last)); // search
   targets = applyTargetFilters(targets, { labo: LABO_FILTER, group: GROUP_FILTER });
   const eligible = targets.length;
-  if (!FORCE) targets = targets.filter((p) => !cache[p.uid] || cache[p.uid].mode !== MODE || cache[p.uid].status === 'notice_error');
+  if (!FORCE) targets = targets.filter((p) => !cache[p.key] || cache[p.key].mode !== MODE || cache[p.key].status === 'notice_error');
   if (LIMIT > 0) targets = targets.slice(0, LIMIT);
 
   console.log(`[idref] ${all.length} Annuaire records, ${eligible} eligible (${MODE}${LABO_FILTER ? `, labo ${LABO_FILTER}` : ''}${GROUP_FILTER ? `, group ${GROUP_FILTER}` : ''}), ${targets.length} to process${FORCE ? ' (force)' : ''}.`);
@@ -281,9 +281,9 @@ async function main() {
       // Merged/replaced authority record (IdRef 301) → status 'redirected' + newPpn: the page offers to « Mettre à
       // jour » the Annuaire IdRef; the replacement record is re-read to display its name.
       const { notice, ppn: finalPpn, redirectedFrom, missing } = await resolveNotice(ppn);
-      if (missing) { cache[p.uid] = { mode: 'verify', queryName, ppn, status: 'notice_missing', newPpn: redirectedFrom ? finalPpn : undefined, checkedAt: today }; return; }
+      if (missing) { cache[p.key] = { mode: 'verify', queryName, ppn, status: 'notice_missing', newPpn: redirectedFrom ? finalPpn : undefined, checkedAt: today }; return; }
       if (!notice) {
-        cache[p.uid] = redirectedFrom
+        cache[p.key] = redirectedFrom
           ? { mode: 'verify', queryName, ppn, status: 'redirected', newPpn: finalPpn, candidates: [], checkedAt: today }
           : { mode: 'verify', queryName, ppn, status: 'notice_error', checkedAt: today };
         return;
@@ -291,7 +291,7 @@ async function main() {
       const cand = buildCandidate(parseNotice(notice), {}); // no filter: we read the known authority record
       const nameForms = [normalize(cand.fullName), normalize(`${cand.fullName.split(' ').reverse().join(' ')}`)];
       const nameMismatch = !!cand.fullName && !nameForms.includes(normalize(queryName));
-      cache[p.uid] = redirectedFrom
+      cache[p.key] = redirectedFrom
         ? { mode: 'verify', queryName, ppn, status: 'redirected', newPpn: finalPpn, nameMismatch, candidates: [cand], checkedAt: today }
         : { mode: 'verify', queryName, ppn, status: 'checked', nameMismatch, candidates: [cand], checkedAt: today };
     } else {
@@ -306,7 +306,7 @@ async function main() {
       }
       const status = candidates.length === 0 ? 'not_found' : candidates.length === 1 ? 'found' : 'ambiguous';
       if (status !== 'not_found') found++;
-      cache[p.uid] = { mode: 'search', queryName, status, candidates, checkedAt: today };
+      cache[p.key] = { mode: 'search', queryName, status, candidates, checkedAt: today };
     }
   }, CONCURRENCY, (done) => {
     if (done % 10 === 0 || done === targets.length) {

@@ -2806,7 +2806,10 @@ export const GristService = {
 
     const nameOf = (f: any) => `${(f['Nom'] || '').toUpperCase()} ${f['Prenom'] || ''}`.trim();
     const byUid: Record<string, any> = {};
-    for (const rec of records) { const u = rec.fields['uid_dyna']; if (u && !byUid[u]) byUid[u] = rec; }
+    const byRecId: Record<string, any> = {};
+    for (const rec of records) { const u = rec.fields['uid_dyna']; if (u && !byUid[u]) byUid[u] = rec; byRecId[String(rec.id)] = rec; }
+    // Cache key = uid_dyna, or g<rowId> for a record without LDAP identity (instances without LDAP), as computeAlignDiff.
+    const recFor = (key: string) => byUid[key] || (/^g\d+$/.test(key) ? byRecId[key.slice(1)] : undefined);
 
     // Tolerant comparisons (PPN on digits+X, ORCID/IdHAL on trim/lower)
     const ppnDigits = (v: any) => String(v || '').match(/([0-9]{6,}[0-9X])/i)?.[1]?.toUpperCase() || '';
@@ -2867,13 +2870,14 @@ export const GristService = {
     };
 
     let cacheTotal = 0;
-    for (const [uid, raw] of Object.entries(cache)) {
+    for (const [key, raw] of Object.entries(cache)) {
       const entry: any = raw;
       if (entry.mode !== mode) continue;       // view per mode (the cache may hold both)
       cacheTotal++;
-      const rec = byUid[uid];
+      const rec = recFor(key);
       if (!rec) continue;                       // cache entry without Annuaire record (uid gone)
       const f = rec.fields;
+      const uid = f['uid_dyna'] || key;
       const id = `G-${rec.id}`;
       const displayName = entry.queryName || nameOf(f);
       const group = alignGroupOf(f);
