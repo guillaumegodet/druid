@@ -16,6 +16,16 @@ updates:
       # Minor and patch versions together; each major version gets its own pull request (breaking changes).
       npm-minor-patch:
         update-types: [minor, patch]
+      # The Lingui packages move together (a lone @lingui/core major breaks the build).
+      lingui:
+        patterns: ['@lingui/*']
+    ignore:
+      # Majors planned by hand: Lingui (catalog/macro migration), and @types/node, which follows the Node
+      # version of the Docker image (an LTS line, not the newest release).
+      - dependency-name: '@lingui/*'
+        update-types: [version-update:semver-major]
+      - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
 
   # Help centre (separate Starlight site, help/).
   - package-ecosystem: npm
@@ -48,3 +58,7 @@ updates:
     commit-message:
       prefix: build
       include: scope
+    ignore:
+      # The image follows a Node LTS line; the move to the next LTS is done by hand (odd/current releases skipped).
+      - dependency-name: node
+        update-types: [version-update:semver-major]
