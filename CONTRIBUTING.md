@@ -68,6 +68,27 @@ et affichée dans l'application (sous le logo).
 - **Tag** : annoté et signé (`git tag -s vX.Y.Z`), créé par la procédure de release après recette de
   l'image sur l'environnement de test.
 
+## Releases
+
+Trois commandes, chacune à sa place :
+
+| Étape | Où | Commande | Ce qu'elle fait |
+|---|---|---|---|
+| 1. Préparer | dépôt à jour sur `main` | `scripts/release/prepare.sh X.Y.Z` | version de `package.json`, section `[X.Y.Z]` du CHANGELOG, PR `chore(release)` |
+| 2. Signer | **poste qui détient la clé de signature** | `scripts/release/tag.sh X.Y.Z` | après fusion de la PR : tag annoté **signé** `vX.Y.Z`, poussé |
+| 3. Déployer | serveur | `deploy.sh test X.Y.Z`, recette, puis `deploy.sh prod X.Y.Z` | voir ci-dessous |
+
+`scripts/release/deploy.sh` refuse un tag non annoté, non signé par une clé autorisée, dont `package.json` ne
+porte pas la version ou dont la CI n'est pas verte. Il construit l'image **une fois par version**, depuis une
+extraction propre du tag (jamais depuis une copie de travail), la déploie sur le test puis, après recette, la
+**même image** en production. Avant la production : sauvegarde du document Grist et des fichiers d'exécution ;
+après : contrôle de santé, et retour automatique à l'image précédente en cas d'échec. Chaque déploiement est
+consigné (date, opérateur, cible, version, commit, image, résultat). Revenir à une version antérieure :
+`deploy.sh prod <version> --skip-test-check`.
+
+Les réglages propres à une instance (chemins, fichiers compose, noms d'images) sont lus dans un fichier de
+configuration privé (`DRUID_DEPLOY_CONFIG`).
+
 ## Données
 
 Une évolution qui modifie la structure des données (colonnes ou tables Grist) ou qui doit corriger des

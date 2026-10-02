@@ -39,6 +39,8 @@ jobs:
         run: npm test
       - name: Comment language
         run: npm run lint:comments
+      - name: Release scripts
+        run: shellcheck scripts/release/*.sh
 
       - name: Instance registry
         run: |
