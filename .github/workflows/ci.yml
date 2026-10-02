@@ -27,6 +27,11 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --no-audit --no-fund
+      # Known vulnerabilities of the production dependencies: reported, not blocking yet (plan RSSI lot 2;
+      # the backlog is handled in lot 7 and by the Dependabot security updates).
+      - name: Dependency audit (report only)
+        continue-on-error: true
+        run: npm audit --omit=dev --audit-level=high
 
       - name: Types
         run: npx tsc --noEmit
@@ -69,3 +74,14 @@ jobs:
           CF_PAGES: '1'
           DRUID_INSTANCE: demo
         run: npm run build
+
+  # Conventional Commits on the commits a pull request brings (CONTRIBUTING.md): they feed the CHANGELOG.
+  commit-messages:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - run: node scripts/release/check-commit-messages.cjs "origin/${{ github.base_ref }}" "${{ github.event.pull_request.head.sha }}"

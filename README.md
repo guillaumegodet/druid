@@ -121,6 +121,12 @@ l'image Docker, le commit et la date arrivent par les arguments de build `GIT_SH
 sont aussi posés en labels OCI (`docker inspect`). `GET /api/health` (public, sans session) répond
 `{"status":"ok"}` et sert au `HEALTHCHECK` de l'image.
 
+### Branches, versions et mises en production
+
+Évolutions par branche et pull request (CI obligatoire), versions numérotées SemVer, environnement de test
+séparé de la production : voir [`CONTRIBUTING.md`](CONTRIBUTING.md). Les changements de chaque version sont
+dans [`CHANGELOG.md`](CHANGELOG.md).
+
 ### Langues et conventions
 
 - **Interface bilingue anglais / français**, gérée avec LinguiJS : les chaînes sources sont en anglais, les
