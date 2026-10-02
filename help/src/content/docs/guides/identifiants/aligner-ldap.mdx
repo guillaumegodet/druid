@@ -15,8 +15,9 @@ import QuiOu from '../../../../components/QuiOu.astro';
 
 L'annuaire LDAP de l'établissement dit si un compte est actif et donne le grade, l'employeur
 et les dates d'emploi des agents. Pour en profiter, chaque fiche doit porter l'**uid** de la
-personne. La page **Alignement LDAP** a deux onglets : **Rechercher manquants** (relier les
-fiches sans uid) et **Vérifier les existants** (reporter les changements de l'annuaire).
+personne. La page **Alignement LDAP** a trois onglets : **Rechercher manquants** (relier les
+fiches sans uid), **Vérifier les existants** (reporter les changements de l'annuaire) et
+**Arrivées et départs** (repérer les personnels arrivés ou partis depuis une date).
 
 ## Rechercher manquants : relier les fiches sans uid
 
@@ -51,17 +52,40 @@ l'annuaire qui n'ont aucune fiche dans Druid.
 La liste **Orphelins** montre les fiches dont l'uid n'existe plus dans l'annuaire : départ
 probable, à vérifier sur la fiche (statut, fin d'emploi).
 
+## Arrivées et départs : repérer les nouveaux et les partants
+
+1. Ouvrez **Arrivées et départs** et choisissez une date dans **Depuis le** (par défaut, le
+   1er du mois précédent). Druid interroge l'annuaire en direct (quelques secondes).
+2. **Arrivées** : les comptes créés depuis cette date, et les comptes **précréés** (arrivée
+   **à venir**), qui n'ont pas encore de fiche. Pour chacun : nom, catégorie, affectation
+   principale, laboratoire reconnu, date de création du compte, fin de contrat.
+   - Cliquez sur une catégorie pour la masquer ou l'afficher : vacataires, stagiaires,
+     prestataires et apprentis sont masqués par défaut.
+   - **Affectés à un labo seulement** ne garde que les personnes dont une affectation
+     correspond à un laboratoire de Druid.
+   - **Créer** ouvre la fiche de création déjà remplie depuis l'annuaire (nom, civilité,
+     e-mail, grade, emploi, laboratoire) : relisez-la, puis enregistrez. Vous revenez
+     ensuite sur la liste, d'où la personne a disparu.
+3. **Départs** : les fiches dont le compte est passé **en sursis**, a été **verrouillé** ou est
+   devenu **inactif** depuis cette date, sauf celles déjà au statut **Parti**.
+   **Marquer parti** pose le statut LDAP « DEPART » et met la fin d'emploi et la fin
+   d'appartenance à la date du changement d'état du compte (sauf si une fin plus ancienne est
+   déjà saisie) : la fiche passe alors au statut **Parti**.
+
 ## Ce qui se passe ensuite
 
 - Les uid rattachés et les champs mis à jour sont écrits dans l'annuaire partagé.
-- Seules les fiches cochées sont modifiées ; aucune fiche n'est créée.
+- Seules les fiches cochées sont modifiées ; les onglets **Rechercher manquants** et
+  **Vérifier les existants** ne créent aucune fiche.
 - Les statuts sont recalculés avec les nouvelles données (voir
   [Statuts des personnes](/donnees/statuts-des-personnes/)).
 
 ## Limites connues
 
-- **Les personnes de l'annuaire sans fiche** ne sont pas créées automatiquement : il faut
-  créer leur fiche à la main.
+- **Les personnes de l'annuaire sans fiche** ne sont pas créées automatiquement : utilisez
+  **Créer** dans **Arrivées et départs**, ou créez leur fiche à la main.
+- **Une personne qui revient avec son ancien compte** n'apparaît pas dans les arrivées : seule
+  la création du compte date une arrivée dans l'annuaire.
 - **Le rapprochement par nom** peut se tromper entre homonymes : ne cochez qu'après
   vérification.
 - **Les agents d'autres organismes** (CNRS, Inserm…) ont parfois un compte hébergé : leur

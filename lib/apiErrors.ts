@@ -127,6 +127,8 @@ export const API_ERRORS = [
   msg`Invalid uid`,
   msg`No LDAP entry for this uid`,
   msg`LDAP directory unreachable`,
+  // LDAP arrivals and departures since a date
+  msg`Invalid date`,
   // inter-lab « Réseau » (docs/plan-reseau-inter-labos.md)
   msg`No network data`,
   msg`Unreadable network data`,

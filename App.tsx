@@ -39,6 +39,7 @@ import { getUserInfo } from './lib/auth';
 import { UnifiedAlignPage } from './components/researchers/UnifiedAlignPage';
 import type { LdapCandProgress } from './components/researchers/LdapCandidatesPage';
 import { LdapAlignPage, LdapAlignMode } from './components/researchers/LdapAlignPage';
+import type { LdapDeparture } from './lib/ldapMoves';
 import type { LdapRunProgress } from './components/researchers/LdapVerifyPanel';
 import { LdapCandidatesDiff, LdapResolved } from './lib/gristService';
 import { StructuresLdapReview } from './components/structures/StructuresLdapReview';
@@ -122,6 +123,20 @@ function App() {
   // Two-tab LDAP alignment (docs/archive/plan-reorganisation-sync-ldap.md, lot 2): `ldapDiff`
   // (LDAP ↔ Annuaire comparison) feeds the « Vérifier les existants » tab.
   const [ldapMode, setLdapMode] = useState<LdapAlignMode>('search');
+  /** Page the researcher form returns to (save or back): the LDAP page when « Create » of its
+   * « Arrivées et départs » tab opened the form, the list otherwise. */
+  const [detailReturnView, setDetailReturnView] = useState<ViewState>(ViewState.RESEARCHERS_LIST);
+  // « Mark as left » clicked row after row: the researchers are reloaded once the admin pauses.
+  const departuresRefreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (currentView !== ViewState.RESEARCHER_DETAIL && currentView !== ViewState.LDAP_ALIGN) setDetailReturnView(ViewState.RESEARCHERS_LIST);
+  }, [currentView]);
+  const handleMarkDeparted = async (d: LdapDeparture, accountLabel: string) => {
+    if (!d.researcher.uid) return;
+    await GristService.markLdapDeparted(d.researcher.uid, d.since, accountLabel);
+    if (departuresRefreshTimer.current) clearTimeout(departuresRefreshTimer.current);
+    departuresRefreshTimer.current = setTimeout(() => { refreshData(); }, 5000);
+  };
   const [ldapProgress, setLdapProgress] = useState<LdapRunProgress | null>(null);
   const [ldapApplying, setLdapApplying] = useState(false);
   const loadLdapDiff = async () => {
@@ -387,8 +402,9 @@ function App() {
     }
   };
 
-  const handleResearcherSelect = (researcher: Researcher) => {
+  const handleResearcherSelect = (researcher: Researcher, returnView: ViewState = ViewState.RESEARCHERS_LIST) => {
     setSelectedResearcher(researcher);
+    setDetailReturnView(returnView);
     setCurrentView(ViewState.RESEARCHER_DETAIL);
     setUrlState({ page: ViewState.RESEARCHER_DETAIL, id: researcher.id }, { push: true });
   };
@@ -407,10 +423,12 @@ function App() {
     setUrlState({ page: view, id: null }, { push });
   };
 
-  const handleNewResearcher = () => {
+  /** New record; with `ldapUid` (« Create » of the LDAP arrivals) the form fills itself from LDAP
+   * and returns to the LDAP page. */
+  const handleNewResearcher = (ldapUid?: string) => {
     const newResearcher: Researcher = {
       id: `NEW-${Date.now()}`,
-      uid: '',
+      uid: ldapUid || '',
       lastName: '',
       firstName: '',
       displayName: 'Nouveau personnel',
@@ -441,6 +459,7 @@ function App() {
       civility: ''
     };
     setSelectedResearcher(newResearcher);
+    setDetailReturnView(ldapUid ? ViewState.LDAP_ALIGN : ViewState.RESEARCHERS_LIST);
     setCurrentView(ViewState.RESEARCHER_DETAIL);
   };
 
@@ -595,7 +614,9 @@ function App() {
         await GristService.updateResearcher(updatedResearcher);
       }
       await refreshData(); // Refresh to see the new record
-      setCurrentView(ViewState.RESEARCHERS_LIST);
+      if (detailReturnView === ViewState.LDAP_ALIGN) setViewAndUrl(ViewState.LDAP_ALIGN, false);
+      else setCurrentView(ViewState.RESEARCHERS_LIST);
+      setDetailReturnView(ViewState.RESEARCHERS_LIST);
     } catch (err: any) {
       setError(apiErrorText(err) || t`Error while saving`);
     } finally {
@@ -779,7 +800,7 @@ function App() {
             researchers={researchers}
             setResearchers={setResearchers}
             onSelectResearcher={handleResearcherSelect}
-            onNewResearcher={writable ? handleNewResearcher : undefined}
+            onNewResearcher={writable ? () => handleNewResearcher() : undefined}
             loading={loading}
             onManualSync={() => refreshData()}
             onOpenDuplicates={isSuperAdmin() ? () => openTodo() : undefined}
@@ -794,7 +815,8 @@ function App() {
           <ResearcherDetail
             researcher={selectedResearcher}
             structures={structures}
-            onBack={() => setViewAndUrl(ViewState.RESEARCHERS_LIST)}
+            onBack={() => { setViewAndUrl(detailReturnView); setDetailReturnView(ViewState.RESEARCHERS_LIST); }}
+            autoLdapLookup={detailReturnView === ViewState.LDAP_ALIGN && selectedResearcher.id.startsWith('NEW-') && !!selectedResearcher.uid}
             onSave={writable ? handleSaveResearcher : undefined}
             onValidate={writable ? handleValidateResearcher : undefined}
             isSaving={loading}
@@ -863,6 +885,11 @@ function App() {
             ldapApplying={ldapApplying}
             onRerunLdap={rerunLdapVerify}
             onApplyLdap={handleApplyLdap}
+            researchers={researchers}
+            structures={structures}
+            onCreateFromLdap={writable ? (uid) => handleNewResearcher(uid) : undefined}
+            onOpenResearcher={(r) => handleResearcherSelect(r, ViewState.LDAP_ALIGN)}
+            onMarkDeparted={writable ? handleMarkDeparted : undefined}
           />
         );
       case ViewState.TASKS:

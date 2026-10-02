@@ -75,4 +75,4 @@ function lookupLdapPerson(uid) {
   });
 }
 
-module.exports = { lookupLdapPerson, isValidUid };
+module.exports = { lookupLdapPerson, isValidUid, toPerson, ATTRIBUTES, LDAP_BASE };

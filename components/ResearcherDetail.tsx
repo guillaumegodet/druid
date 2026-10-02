@@ -49,13 +49,15 @@ interface ResearcherDetailProps {
   /** « Report a correction »: opens the « À traiter › Tâches » form with this researcher
    * prefilled (docs/plan-chantiers-taches.md, lot 2). Admins only — undefined hides the button. */
   onReportTask?: (researcher: Researcher) => void;
+  /** Record opened by « Create » of the LDAP arrivals: « Fill from LDAP » runs once on opening. */
+  autoLdapLookup?: boolean;
 }
 
 /**
  * @component ResearcherDetail
  * @description Detail view allowing full editing of a researcher profile.
  */
-export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, onBack, onSave, isSaving, onNavigateToStructure, onValidate, structures = [], onCreateTeam, onReportTask }) => {
+export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, onBack, onSave, isSaving, onNavigateToStructure, onValidate, structures = [], onCreateTeam, onReportTask, autoLdapLookup }) => {
   const { t } = useLingui();
   // Local state for the form
   const [localResearcher, setLocalResearcher] = useState<Researcher>({...researcher});
@@ -185,7 +187,9 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
   };
 
   /** « Fill from LDAP » (record being created): LDAP entry → civil status, employment, lab. */
+  const [autoLookup, setAutoLookup] = useState(!!autoLdapLookup);
   const handleLdapLookup = async (uid: string): Promise<LdapLookupOutcome> => {
+    setAutoLookup(false); // a remount of the tab must not fill the record again over the user's edits
     const person = await fetchLdapPerson(uid);
     const { researcher: next, lab, otherLabs } = prefillFromLdap(localResearcher, person, structures, employerOptions);
     setLocalResearcher(next);
@@ -374,6 +378,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
             onCreateTeam={onCreateTeam}
             employerOptions={employerOptions}
             onLdapLookup={onSave && localResearcher.id.startsWith('NEW-') && hasCapability('HAS_LDAP') ? handleLdapLookup : undefined}
+            ldapAutoRun={autoLookup}
           />
           {/* Career path (docs/plan-parcours-affiliations.md, lot 3): affiliations of the publications,
               ORCID positions, Scopus profile — full width. Needs the server job (Docker instances). */}
