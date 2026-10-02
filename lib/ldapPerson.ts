@@ -109,15 +109,27 @@ export const prefillFromLdap = (
     ldapPrefill: { etat: person.etat, date: today },
   };
 
-  // Labs = structures of level « Unité » whose local_id (supannCodeEntite) is one of the affectation codes.
+  const labs = labsFromAffectations(person, labIndex(structures));
+  return { researcher: next, lab: labs[0] || '', otherLabs: labs.slice(1) };
+};
+
+/** Labs = structures of level « Unité » by local_id (supannCodeEntite) → name as in the membership menu. */
+export const labIndex = (structures: Structure[]): Map<string, string> => {
   const labByCode = new Map<string, string>();
   for (const s of structures) {
     const name = s.acronym || s.officialName;
     if (s.level === StructureLevel.ENTITE && s.localId && name) labByCode.set(String(s.localId), name);
   }
+  return labByCode;
+};
+
+/** Labs among the LDAP affectation codes, the principal affectation first. */
+export const labsFromAffectations = (
+  person: Pick<LdapPerson, 'affectationPrincipale' | 'affectationCodes'>,
+  labByCode: Map<string, string>,
+): string[] => {
   const codes = [person.affectationPrincipale, ...person.affectationCodes].filter(Boolean);
-  const labs = Array.from(new Set(codes.map((c) => labByCode.get(c)).filter((l): l is string => !!l)));
-  return { researcher: next, lab: labs[0] || '', otherLabs: labs.slice(1) };
+  return Array.from(new Set(codes.map((c) => labByCode.get(c)).filter((l): l is string => !!l)));
 };
 
 /** GET /api/ldap/person/:uid → the entry, or an Error carrying the (translated) server message. */

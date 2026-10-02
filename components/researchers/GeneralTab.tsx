@@ -50,6 +50,8 @@ interface GeneralTabProps {
   onCreateTeam?: (structureName: string) => void;
   /** « Fill from LDAP » on a record being created (LDAP instances only) — undefined hides it. */
   onLdapLookup?: (uid: string) => Promise<LdapLookupOutcome>;
+  /** Runs « Fill from LDAP » on mount (record opened from the LDAP arrivals). */
+  ldapAutoRun?: boolean;
 }
 
 export const GeneralTab: React.FC<GeneralTabProps> = ({
@@ -65,6 +67,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
   employerOptions = [],
   onCreateTeam,
   onLdapLookup,
+  ldapAutoRun = false,
 }) => {
   const { t } = useLingui();
   return (
@@ -183,7 +186,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
          <div className="section-label mb-4"><Trans>Personal details</Trans></div>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {onLdapLookup && (
-              <LdapUidLookup uid={researcher.uid || ''} onUidChange={(v) => onUpdateField('uid', v)} onLookup={onLdapLookup} />
+              <LdapUidLookup uid={researcher.uid || ''} onUidChange={(v) => onUpdateField('uid', v)} onLookup={onLdapLookup} autoRun={ldapAutoRun} />
             )}
             <div>
               <label className={fieldLabel}><Trans context="honorific">Title</Trans></label>

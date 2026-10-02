@@ -2925,6 +2925,23 @@ app.get('/api/ldap/person/:uid', async (req, res) => {
   }
 });
 
+// « Arrivals and departures » tab of the LDAP alignment page: staff accounts created / left since
+// ?since=AAAA-MM-JJ (scripts/lib/ldap_moves.cjs). Live search, institution tools only.
+app.get('/api/ldap/moves', requireEstablishmentScope, async (req, res) => {
+  if (!process.env.LDAP_URL || !process.env.LDAP_BIND_DN || !process.env.LDAP_BIND_PASSWORD) {
+    return res.status(404).json({ error: 'LDAP not configured on this instance' });
+  }
+  const { findLdapMoves, toLdapDay } = require('./scripts/lib/ldap_moves.cjs');
+  const since = String(req.query.since || '').trim();
+  if (!toLdapDay(since)) return res.status(400).json({ error: 'Invalid date' });
+  try {
+    res.json(await findLdapMoves(since));
+  } catch (err) {
+    console.error('[LDAP moves]', err.message);
+    res.status(502).json({ error: 'LDAP directory unreachable' });
+  }
+});
+
 // ── Career path of a researcher (docs/plan-parcours-affiliations.md, lot 2) ──────
 // Output of scripts/sync_affiliation_history.cjs (weekly ofelia job): one file per person in
 // AFFILIATION_HISTORY_DIR (bind-mounted cache-data/affiliation_history). Reading follows the record's

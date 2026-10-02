@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DownloadCloud, RefreshCw, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 
@@ -12,13 +12,15 @@ interface Props {
   onUidChange: (uid: string) => void;
   /** Fetches the LDAP entry and fills the record; rejects with a displayable message. */
   onLookup: (uid: string) => Promise<LdapLookupOutcome>;
+  /** Runs the lookup once on mount (record opened by « Create » of the LDAP arrivals). */
+  autoRun?: boolean;
 }
 
 /**
  * UID field of a record being created, with « Fill from LDAP »: the directory entry fills the
  * civil status, email, grade, employment and lab (lib/ldapPerson.ts). Enter triggers the lookup.
  */
-export const LdapUidLookup: React.FC<Props> = ({ uid, onUidChange, onLookup }) => {
+export const LdapUidLookup: React.FC<Props> = ({ uid, onUidChange, onLookup, autoRun = false }) => {
   const { t } = useLingui();
   const [loading, setLoading] = useState(false);
   const [outcome, setOutcome] = useState<LdapLookupOutcome | null>(null);
@@ -37,6 +39,10 @@ export const LdapUidLookup: React.FC<Props> = ({ uid, onUidChange, onLookup }) =
       setLoading(false);
     }
   };
+  useEffect(() => {
+    if (autoRun) void run();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="md:col-span-2">

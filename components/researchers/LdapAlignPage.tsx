@@ -7,10 +7,12 @@ import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { LdapCandidatesPage, LdapCandProgress } from './LdapCandidatesPage';
 import { LdapVerifyPanel, LdapRunProgress } from './LdapVerifyPanel';
+import { LdapMovesPanel } from './LdapMovesPanel';
+import type { LdapDeparture } from '../../lib/ldapMoves';
 import { PixelBtn } from './alignAtoms';
 import { HelpButton } from '../HelpButton';
 import { VIEW_HELP } from '../../lib/helpLinks';
-import { ViewState } from '../../types';
+import { ViewState, Researcher, Structure } from '../../types';
 
 /**
  * Two-tab LDAP alignment (docs/archive/plan-reorganisation-sync-ldap.md, lot 2), same template as
@@ -18,13 +20,15 @@ import { ViewState } from '../../types';
  * - « Rechercher manquants »: records without uid ↔ LDAP staff (LdapCandidatesPage) + LDAP uids
  * without Annuaire record (informative, creation planned in phase 2);
  * - « Vérifier les existants »: LDAP-authoritative fields to update + orphans
- *    (LdapVerifyPanel, ex-modale « Revue de synchronisation LDAP »).
+ *    (LdapVerifyPanel, ex-modale « Revue de synchronisation LDAP »);
+ * - « Arrivées et départs »: staff accounts created / left since a date (LdapMovesPanel, live
+ *    LDAP search, no run).
  * Two distinct runs behind the two tabs (/api/sync-ldap-candidates-trigger and
  * /api/sync-ldap-trigger), each with its own progress.
  */
 
-export type LdapAlignMode = 'search' | 'verify';
-const MODE_LABEL: Record<LdapAlignMode, MessageDescriptor> = { search: msg`Find missing`, verify: msg`Check existing ones` };
+export type LdapAlignMode = 'search' | 'verify' | 'moves';
+const MODE_LABEL: Record<LdapAlignMode, MessageDescriptor> = { search: msg`Find missing`, verify: msg`Check existing ones`, moves: msg`Arrivals and departures` };
 
 interface Props {
   mode: LdapAlignMode;
@@ -40,11 +44,16 @@ interface Props {
   ldapApplying: boolean;
   onRerunLdap: () => void;
   onApplyLdap: (ids: string[]) => void;
+  researchers: Researcher[];
+  structures: Structure[];
+  onCreateFromLdap?: (uid: string) => void;
+  onOpenResearcher: (researcher: Researcher) => void;
+  onMarkDeparted?: (departure: LdapDeparture, accountLabel: string) => Promise<void>;
 }
 
-export const LdapAlignPage: React.FC<Props> = ({ mode, onModeChange, candDiff, candProgress, candApplying, onRerunCandidates, onApplyCandidates, onMerge, ldapDiff, ldapProgress, ldapApplying, onRerunLdap, onApplyLdap }) => {
+export const LdapAlignPage: React.FC<Props> = ({ mode, onModeChange, candDiff, candProgress, candApplying, onRerunCandidates, onApplyCandidates, onMerge, ldapDiff, ldapProgress, ldapApplying, onRerunLdap, onApplyLdap, researchers, structures, onCreateFromLdap, onOpenResearcher, onMarkDeparted }) => {
   const { t } = useLingui();
-  const running = mode === 'search' ? !!candProgress?.running : !!ldapProgress?.running;
+  const running = mode === 'search' ? !!candProgress?.running : mode === 'verify' ? !!ldapProgress?.running : false;
   const ldapWithoutRecord = ldapDiff?.ldapWithoutRecord ?? [];
 
   const ldapWithoutRecordSection = (
@@ -80,14 +89,16 @@ export const LdapAlignPage: React.FC<Props> = ({ mode, onModeChange, candDiff, c
               <p className="page-header-sub text-[15px] text-muted dark:text-[#8f897c] mt-1.5">
                 {mode === 'search'
                   ? <Trans>Link records without a uid to LDAP staff</Trans>
-                  : <Trans>Carry over to the Directory the LDAP-authoritative fields that changed (status, employment, name…)</Trans>}
+                  : mode === 'verify'
+                    ? <Trans>Carry over to the Directory the LDAP-authoritative fields that changed (status, employment, name…)</Trans>
+                    : <Trans>Spot the staff who arrived or left since a date</Trans>}
               </p>
             </div>
             <HelpButton path={VIEW_HELP[ViewState.LDAP_ALIGN]} />
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {(['search', 'verify'] as LdapAlignMode[]).map((m) => (
+          {(['search', 'verify', 'moves'] as LdapAlignMode[]).map((m) => (
             <button key={m} onClick={() => onModeChange(m)} disabled={running}
               className={`inline-flex items-center h-10 px-4 rounded-full font-disp text-[13px] font-semibold transition-colors disabled:opacity-50 ${mode === m ? 'bg-accent border border-accent-strong text-ink' : 'bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/15 text-muted dark:text-[#8f897c] hover:bg-white dark:hover:bg-white/15'}`}>
               {t(MODE_LABEL[m])}
@@ -107,6 +118,10 @@ export const LdapAlignPage: React.FC<Props> = ({ mode, onModeChange, candDiff, c
       {mode === 'search' ? (
         <div className="flex-1 min-h-0">
           <LdapCandidatesPage embedded diff={candDiff} progress={candProgress} applying={candApplying} onRerun={onRerunCandidates} onApply={onApplyCandidates} onMerge={onMerge} footer={ldapWithoutRecordSection} />
+        </div>
+      ) : mode === 'moves' ? (
+        <div className="flex-1 min-h-0">
+          <LdapMovesPanel researchers={researchers} structures={structures} onCreate={onCreateFromLdap} onOpenResearcher={onOpenResearcher} onMarkDeparted={onMarkDeparted} />
         </div>
       ) : (
         <div className="flex-1 min-h-0">

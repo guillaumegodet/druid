@@ -15,8 +15,9 @@ import QuiOu from '../../../../../components/QuiOu.astro';
 
 The institution's LDAP directory says whether an account is active and gives the grade,
 employer and employment dates of staff. To benefit from it, each record must hold the
-person's **uid**. The **LDAP alignment** page has two tabs: **Find missing** (link records
-without a uid) and **Check existing ones** (carry over the directory's changes).
+person's **uid**. The **LDAP alignment** page has three tabs: **Find missing** (link records
+without a uid), **Check existing ones** (carry over the directory's changes) and **Arrivals
+and departures** (spot the staff who arrived or left since a date).
 
 ## Find missing: link records without a uid
 
@@ -51,17 +52,40 @@ the directory who have no record in Druid.
 The **Orphans** list shows the records whose uid no longer exists in the directory: probable
 departure, to be checked on the record (status, employment end).
 
+## Arrivals and departures: spot newcomers and leavers
+
+1. Open **Arrivals and departures** and pick a date in **Since** (by default, the 1st of the
+   previous month). Druid queries the directory live (a few seconds).
+2. **Arrivals**: accounts created since that date, and **pre-created** accounts (arrival **to
+   come**), that have no record yet. For each one: name, category, principal affectation,
+   recognised laboratory, account creation date, contract end.
+   - Click a category to hide or show it: temporary lecturers, interns, contractors and
+     apprentices are hidden by default.
+   - **Assigned to a lab only** keeps the people whose affectations include a Druid
+     laboratory.
+   - **Create** opens the creation form already filled from the directory (name, title,
+     e-mail, grade, employment, laboratory): review it, then save. You then come back to the
+     list, from which the person has gone.
+3. **Departures**: records whose account entered a **grace period**, was **locked** or became
+   **inactive** since that date, except those already **Left**. **Mark as left** sets the LDAP
+   status to « DEPART » and the employment and membership end to the date of the account's
+   change of state (unless an earlier end is already recorded): the record then becomes
+   **Left**.
+
 ## What happens next
 
 - The linked uids and updated fields are written to the shared directory.
-- Only ticked records are changed; no record is created.
+- Only ticked records are changed; the **Find missing** and **Check existing ones** tabs
+  create no record.
 - Statuses are recalculated with the new data (see
   [Statuses of people](/en/donnees/statuts-des-personnes/)).
 
 ## Known limitations
 
-- **People in the directory without a record** are not created automatically: their record
-  must be created by hand.
+- **People in the directory without a record** are not created automatically: use
+  **Create** in **Arrivals and departures**, or create their record by hand.
+- **A person coming back with their former account** does not appear among the arrivals: only
+  the account creation dates an arrival in the directory.
 - **Matching by name** can get namesakes wrong: only tick after checking.
 - **Staff of other organisations** (CNRS, Inserm…) sometimes have a hosted account: their
   status follows their employer, not the state of the account (see
