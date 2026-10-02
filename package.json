@@ -22,7 +22,7 @@
     "@lingui/react": "^5.9.5",
     "dotenv": "^16.4.5",
     "echarts": "^6.0.0",
-    "express": "^4.19.2",
+    "express": "^4.22.3",
     "express-session": "^1.18.1",
     "fast-xml-parser": "^4.5.0",
     "http-proxy-middleware": "^3.0.3",
