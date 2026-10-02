@@ -11617,402 +11617,406 @@ msgid "Cross-site request refused"
 msgstr "Cross-site request refused"
 
 #: lib/apiErrors.ts:29
+msgid "This instance is reserved to administrators"
+msgstr "This instance is reserved to administrators"
+
+#: lib/apiErrors.ts:30
 msgid "Invalid slug"
 msgstr "Invalid slug"
 
-#: lib/apiErrors.ts:30
+#: lib/apiErrors.ts:31
 msgid "Invalid structure slug"
 msgstr "Invalid structure slug"
 
-#: lib/apiErrors.ts:31
+#: lib/apiErrors.ts:32
 msgid "Invalid group slug (expected: groupe-…)"
 msgstr "Invalid group slug (expected: groupe-…)"
 
-#: lib/apiErrors.ts:32
+#: lib/apiErrors.ts:33
 msgid "Invalid id"
 msgstr "Invalid id"
 
-#: lib/apiErrors.ts:33
+#: lib/apiErrors.ts:34
 msgid "Not found"
 msgstr "Not found"
 
-#: lib/apiErrors.ts:34
+#: lib/apiErrors.ts:35
 msgid "Unknown structure"
 msgstr "Unknown structure"
 
-#: lib/apiErrors.ts:35
+#: lib/apiErrors.ts:36
 msgid "Unknown Druid instance for this host"
 msgstr "Unknown Druid instance for this host"
 
-#: lib/apiErrors.ts:37
+#: lib/apiErrors.ts:38
 msgid "ILAAS_API_KEY not configured (druid service env)"
 msgstr "ILAAS_API_KEY not configured (druid service env)"
 
-#: lib/apiErrors.ts:38
+#: lib/apiErrors.ts:39
 msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 
-#: lib/apiErrors.ts:39
+#: lib/apiErrors.ts:40
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID not configured"
 
-#: lib/apiErrors.ts:40
+#: lib/apiErrors.ts:41
 msgid "VITE_GRIST_DOC_ID / GRIST_API_KEY not configured"
 msgstr "VITE_GRIST_DOC_ID / GRIST_API_KEY not configured"
 
-#: lib/apiErrors.ts:41
+#: lib/apiErrors.ts:42
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY not configured"
 
-#: lib/apiErrors.ts:42
+#: lib/apiErrors.ts:43
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY not configured on Cloudflare"
 
-#: lib/apiErrors.ts:43
+#: lib/apiErrors.ts:44
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "No OpenAlex identifier configured for this structure"
 
-#: lib/apiErrors.ts:44
+#: lib/apiErrors.ts:45
 msgid "No dashboard data for this structure"
 msgstr "No dashboard data for this structure"
 
-#: lib/apiErrors.ts:46
+#: lib/apiErrors.ts:47
 msgid "messages[] required"
 msgstr "messages[] required"
 
-#: lib/apiErrors.ts:47
+#: lib/apiErrors.ts:48
 msgid "Assistant unavailable"
 msgstr "Assistant unavailable"
 
-#: lib/apiErrors.ts:48
+#: lib/apiErrors.ts:49
 msgid "Help assistant not configured"
 msgstr "Help assistant not configured"
 
-#: lib/apiErrors.ts:49
+#: lib/apiErrors.ts:50
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 
-#: lib/apiErrors.ts:50
+#: lib/apiErrors.ts:51
 msgid "Generation interrupted"
 msgstr "Generation interrupted"
 
-#: lib/apiErrors.ts:51
+#: lib/apiErrors.ts:52
 msgid "Generation failed"
 msgstr "Generation failed"
 
-#: lib/apiErrors.ts:52
+#: lib/apiErrors.ts:53
 msgid "Analysis failed"
 msgstr "Analysis failed"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:54
 msgid "Missing theme"
 msgstr "Missing theme"
 
-#: lib/apiErrors.ts:54
+#: lib/apiErrors.ts:55
 msgid "No publication to analyze"
 msgstr "No publication to analyze"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:56
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex unreachable"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:58
 msgid "Report not found"
 msgstr "Report not found"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:59
 msgid "Not allowed on this report"
 msgstr "Not allowed on this report"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:60
 msgid "Invalid report definition"
 msgstr "Invalid report definition"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:61
 msgid "Report changed since it was loaded"
 msgstr "Report changed since it was loaded"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:62
 msgid "Invalid report share"
 msgstr "Invalid report share"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:63
 msgid "Invalid report generation"
 msgstr "Invalid report generation"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:64
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Read-only instance: reports are kept in the browser"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:65
 msgid "Invalid AI task"
 msgstr "Invalid AI task"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:66
 msgid "PDF archiving is not configured on this instance"
 msgstr "PDF archiving is not configured on this instance"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:67
 msgid "Invalid PDF"
 msgstr "Invalid PDF"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:68
 msgid "Generation not found"
 msgstr "Generation not found"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:69
 msgid "PDF not archived"
 msgstr "PDF not archived"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:71
 msgid "Invalid record key"
 msgstr "Invalid record key"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:72
 msgid "Career path not computed yet for this record"
 msgstr "Career path not computed yet for this record"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:73
 msgid "Grist unreachable"
 msgstr "Grist unreachable"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:74
 msgid "No Annuaire record for this key"
 msgstr "No Annuaire record for this key"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:75
 msgid "Refresh outside your scope"
 msgstr "Refresh outside your scope"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:76
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Too many refreshes in progress, retry in a minute"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:77
 msgid "Career-path computation failed"
 msgstr "Career-path computation failed"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:78
 msgid "No usable identifier for this record"
 msgstr "No usable identifier for this record"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:79
 msgid "Unknown suggestion"
 msgstr "Unknown suggestion"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:81
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:82
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:83
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:84
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:85
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:86
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:87
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:88
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:90
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:91
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:92
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:93
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:94
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:95
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:96
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:97
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:99
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:100
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:101
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:102
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:103
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:104
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:105
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:106
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:107
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:108
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:109
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:110
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:111
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:112
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:113
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:114
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:115
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:116
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:118
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:119
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:120
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:121
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:122
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:123
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:124
 msgid "No alignment running"
 msgstr "No alignment running"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:125
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:127
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:128
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:129
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:130
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:132
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:134
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:135
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:136
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:137
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:139
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:140
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:141
 msgid "Load failed"
 msgstr "Load failed"
 
