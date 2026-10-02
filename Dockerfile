@@ -1,5 +1,5 @@
 # Build stage
-FROM node:20-slim AS build
+FROM node:24-slim AS build
 
 # No instance setting is compiled into the bundle: the front receives its Grist doc and settings
 # from /api/me at runtime (lib/instanceRuntime.ts), so the same image serves the test and the
@@ -18,7 +18,7 @@ COPY . .
 RUN npm run build
 
 # Production stage
-FROM node:20-slim
+FROM node:24-slim
 
 # Image metadata (OCI): `docker inspect` tells which release a container runs.
 ARG GIT_SHA=""

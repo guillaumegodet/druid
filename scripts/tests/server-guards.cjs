@@ -54,6 +54,11 @@ const csrf = (method, p, headers = {}) => new Promise((resolve) => {
   check('health without session', health.status, 200);
   check('health body', await health.json(), { status: 'ok' });
   check('me without session', await status('/api/me'), 401);
+  // Security headers (lot 7): framing refused except for the embed pages, no X-Powered-By.
+  const hdr = (await fetch(base + '/api/health')).headers;
+  check('security headers', [hdr.get('x-content-type-options'), hdr.get('x-frame-options'), hdr.get('x-powered-by'), hdr.get('referrer-policy')],
+    ['nosniff', 'SAMEORIGIN', null, 'strict-origin-when-cross-origin']);
+  check('embed pages can be framed', (await fetch(base + '/embed/x', { redirect: 'manual' })).headers.get('x-frame-options'), null);
   check('sync-sovisuplus without session', await status('/api/sync-sovisuplus', { method: 'POST' }), 401);
   check('sync-ldap-trigger without session', await status('/api/sync-ldap-trigger'), 401);
   check('newsletter/generate without session', await status('/api/newsletter/generate', { method: 'POST' }), 401);
