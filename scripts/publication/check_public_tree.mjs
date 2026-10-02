@@ -56,8 +56,10 @@ const escapeRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 const denylist = process.env.PUBLIC_DENYLIST
   ? fs.readFileSync(process.env.PUBLIC_DENYLIST, 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'))
   : [];
+// Names are matched whatever their case: an identifier written in lower case (a task channel named
+// after a colleague, found on 2026-10-02) escaped the case-sensitive check.
 if (denylist.length) {
-  CHECKS.push({ kind: 'denylisted name', re: new RegExp(`(?<![\\w-])(${denylist.map(escapeRe).join('|')})(?![\\w-])`, 'g'), keep: () => true });
+  CHECKS.push({ kind: 'denylisted name', re: new RegExp(`(?<![\\w-])(${denylist.map(escapeRe).join('|')})(?![\\w-])`, 'gi'), keep: () => true });
 }
 const mask = (s) => (s.length <= 6 ? '***' : `${s.slice(0, 3)}…${s.slice(-3)}`);
 
