@@ -4,7 +4,7 @@
 // mock nor global.fetch needed since lot 2 (extraction into a pure function, see
 // docs/plan-architecture-multi-instances.md), on the same mold as functions-guards.mjs
 // (Centrale repo) for gristGuard.
-const { gristProxyDecision } = require(require('path').join(__dirname, '../../server.cjs'));
+const { gristProxyDecision, filterScopedRecords, pickKeys } = require(require('path').join(__dirname, '../../server.cjs'));
 const DOC = 'docA';
 // Simulated Grist rows: value of the scope column by id, injected in place
 // of a real Grist SQL call.
@@ -28,6 +28,13 @@ const cases = [
   ['GET autre doc autorisé', 'GET', `docs/docB/tables/T/records`, null, LAB, 'NEXT'],
   ['GET doc inconnu', 'GET', `docs/docZ/tables/Annuaire/records`, null, ETAB, 403],
   ['GET orgs', 'GET', `orgs`, null, ETAB, 403],
+  // Lab-scoped reads (plan-separation-test-prod-rssi.md, lot 7).
+  ['GET Taches, lab right', 'GET', `docs/${DOC}/tables/Taches/records`, null, LAB, 403],
+  ['GET Alignement_IdRef, lab right', 'GET', `docs/${DOC}/tables/Alignement_IdRef/records`, null, LAB, 403],
+  ['GET Taches, institution right', 'GET', `docs/${DOC}/tables/Taches/records`, null, ETAB, 'NEXT'],
+  ['GET Structures, lab right', 'GET', `docs/${DOC}/tables/Structures/records`, null, LAB, 'NEXT'],
+  ['GET Annuaire columns, lab right', 'GET', `docs/${DOC}/tables/Annuaire/columns`, null, LAB, 'NEXT'],
+  ['GET Annuaire, no right at all', 'GET', `docs/${DOC}/tables/Annuaire/records`, null, NOBODY, 'NEXT'],
   ['GET sql', 'GET', `docs/${DOC}/sql`, null, ETAB, 403],
   ['DELETE doc (étab)', 'DELETE', `docs/${DOC}`, null, ETAB, 403],
   ['PUT', 'PUT', `docs/${DOC}/tables/Annuaire/records`, {}, ETAB, 405],
@@ -66,6 +73,21 @@ const cases = [
     if (!ok) ko++;
     console.log(`${ok ? 'ok ' : 'KO '} ${name} → ${r.code}${r.err ? ' (' + r.err + ')' : ''}${ok ? '' : ' attendu ' + exp}`);
   }
-  console.log(ko ? `${ko} failure(s)` : `${cases.length} cases OK`);
+  // Rows actually returned to a lab right (proxy response filter) and LDAP cache restriction.
+  const extra = [];
+  const dec = await gristProxyDecision({ method: 'GET', path: `docs/${DOC}/tables/Annuaire/records?filter=x`, access: LAB, fetchRowScopes });
+  const kept = filterScopedRecords({ records: [{ id: 1, fields: { LABO: 'LS2N' } }, { id: 2, fields: { LABO: 'IETR' } }, { id: 3, fields: { LABO: 'ls2n ' } }] }, dec.filter);
+  extra.push(['Annuaire filtered on the labs of the right', kept.records.map((r) => r.id), [1, 3]]);
+  const none = await gristProxyDecision({ method: 'GET', path: `docs/${DOC}/tables/Annuaire/records`, access: NOBODY, fetchRowScopes });
+  extra.push(['no lab: no row', filterScopedRecords({ records: [{ id: 1, fields: { LABO: 'LS2N' } }] }, none.filter).records.length, 0]);
+  const full = await gristProxyDecision({ method: 'GET', path: `docs/${DOC}/tables/Annuaire/records`, access: ETAB, fetchRowScopes });
+  extra.push(['institution right: no filter', full.filter ?? null, null]);
+  extra.push(['LDAP cache restricted to the uids', pickKeys({ a: 1, b: 2, c: 3 }, new Set(['a', 'c'])), { a: 1, c: 3 }]);
+  for (const [name, got, want] of extra) {
+    const ok = JSON.stringify(got) === JSON.stringify(want);
+    if (!ok) ko++;
+    console.log(`${ok ? 'ok ' : 'KO '} ${name}${ok ? '' : ` → ${JSON.stringify(got)} attendu ${JSON.stringify(want)}`}`);
+  }
+  console.log(ko ? `${ko} failure(s)` : `${cases.length + extra.length} cases OK`);
   process.exit(ko ? 1 : 0);
 })();

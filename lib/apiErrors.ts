@@ -27,6 +27,7 @@ export const API_ERRORS = [
   msg`Administrators only`,
   msg`Cross-site request refused`,
   msg`This instance is reserved to administrators`,
+  msg`Grist reads outside the lab scope`,
   msg`Invalid slug`,
   msg`Invalid structure slug`,
   msg`Invalid group slug (expected: groupe-…)`,
