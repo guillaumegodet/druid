@@ -63,15 +63,33 @@ export const IdentificationTab: React.FC<IdentificationTabProps> = ({
                   />
                </div>
                <div>
-                  <label className={labelClass}>{isNew ? t`local_id (generated on creation)` : t`local_id (supannCodeEntite) — read only`}</label>
-                  <input
-                    type="text"
-                    value={isNew
-                      ? (structure.acronym ? GristService.makeLocalId(structure) : '')   // preview, generated on creation
-                      : (structure.localId || '')}
-                    readOnly disabled
-                    className={`${readOnlyClass} font-mono`}
-                  />
+                  {isNew ? (
+                    <>
+                      <label className={labelClass}><Trans>Entity code (supannCodeEntite / local_id)</Trans></label>
+                      {/* Known institutional code (e.g. supannCodeEntite 1485) → pivot of the structure in cdb / the
+                          CRISalid graph (uid local-<code>). Left empty, a D-/T- id is generated on creation (preview). */}
+                      <input
+                        type="text"
+                        value={structure.localId || ''}
+                        onChange={(e) => onUpdateField('localId', e.target.value.trim())}
+                        placeholder={structure.acronym ? GristService.makeLocalId(structure) : ''}
+                        className="input-soft font-mono"
+                      />
+                      <p className="mt-1 text-[11px] text-muted-light dark:text-[#8f897c]">
+                        <Trans>Enter the institution's entity code if it exists (LDAP supannCodeEntite). It cannot be changed afterwards. Left empty, the identifier shown is generated.</Trans>
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <label className={labelClass}><Trans>local_id (supannCodeEntite) — read only</Trans></label>
+                      <input
+                        type="text"
+                        value={structure.localId || ''}
+                        readOnly disabled
+                        className={`${readOnlyClass} font-mono`}
+                      />
+                    </>
+                  )}
                </div>
              </div>
           </div>
