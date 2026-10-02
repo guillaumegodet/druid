@@ -4,6 +4,25 @@ import * as XLSX from 'xlsx';
 import { Researcher, Structure } from '../types';
 
 /**
+ * Reports an export made in the browser to the server audit log (POST /api/audit/export,
+ * plan-separation-test-prod-rssi.md lot 6): the file never goes through the server, so without this
+ * nobody could tell who took which list. Fire-and-forget: a failure (Cloudflare instance without the
+ * route, network) never blocks the download.
+ */
+export const reportExport = (format: 'csv' | 'xlsx' | 'pdf', name: string, rows: number): void => {
+  try {
+    void fetch('/api/audit/export', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ format, name, rows }),
+      keepalive: true,
+    }).catch(() => undefined);
+  } catch {
+    // fetch refused before sending (read-only instance guard): nothing to report
+  }
+};
+
+/**
  * Service exporting data in various formats.
  */
 export const ExportService = {
@@ -13,7 +32,8 @@ export const ExportService = {
    */
   exportToCSV: (data: any[], fileName: string, separator: ',' | ';' = ',') => {
     if (data.length === 0) return;
-    
+    reportExport('csv', fileName, data.length);
+
     const headers = Object.keys(data[0]);
     const csvContent = [
       headers.join(separator),
@@ -39,6 +59,7 @@ export const ExportService = {
    * Exports a list as Excel (XLSX)
    */
   exportToExcel: (data: any[], fileName: string) => {
+    reportExport('xlsx', fileName, data.length);
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
@@ -50,6 +71,7 @@ export const ExportService = {
    * sheet is still created (headers only) to keep the file structure.
    */
   exportWorkbook: (sheets: Array<{ name: string; rows: any[]; headers?: string[] }>, fileName: string) => {
+    reportExport('xlsx', fileName, sheets.reduce((n, sheet) => n + sheet.rows.length, 0));
     const workbook = XLSX.utils.book_new();
     for (const sheet of sheets) {
       const ws = sheet.rows.length
@@ -64,6 +86,7 @@ export const ExportService = {
    * Exports the researcher records as PDF (table format)
    */
   exportResearchersPDF: (researchers: Researcher[]) => {
+    reportExport('pdf', 'chercheurs_druid', researchers.length);
     const doc = new jsPDF();
     doc.text('Annuaire de la Recherche - Druid', 14, 15);
     
@@ -88,6 +111,7 @@ export const ExportService = {
    * Exports a detailed individual researcher record
    */
   exportSingleResearcherPDF: (researcher: Researcher) => {
+    reportExport('pdf', 'fiche_chercheur', 1);
     const doc = new jsPDF();
     
     // Header

@@ -12,6 +12,15 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- Journaux d'accès et d'audit (une ligne JSON par événement, dans `DRUID_LOG_DIR`) : chaque requête (utilisateur,
+  adresse réelle derrière la passerelle, chemin sans paramètres, statut, durée) ; connexions et échecs, déconnexions,
+  écritures Grist (table, lignes, noms des champs — jamais les valeurs), exports faits dans le navigateur, tâches
+  lancées, consultations d'administration, appels aux modèles de langue, refus d'accès.
+
+### Sécurité
+- Les URL complètes des appels Grist (avec leurs filtres) ne sont plus écrites dans la sortie du conteneur.
+
 ## [1.0.0] — 2026-10-02
 
 Première version numérotée : état de Druid à la mise en place des releases, avec les évolutions ci-dessous
