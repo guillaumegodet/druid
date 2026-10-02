@@ -2782,6 +2782,12 @@ const GRIST_LAB_TABLES_EXTRA = {
 // Main-doc tables without a scope column but open to record writes
 // for the lab right (merge / restore log).
 const GRIST_LAB_TABLES_LOG = new Set(['Fusions_log']);
+// Main-doc tables a lab right may READ (plan-separation-test-prod-rssi.md, lot 7): the directory, filtered on the
+// labs of the user (GRIST_LAB_READ_FILTER), and organisational tables without personal data. Every other table
+// (tasks, alignment reviews, arbitrations…) belongs to the institution tools and is refused.
+const GRIST_LAB_READABLE_TABLES = new Set(['Annuaire', 'Structures', 'Etablissements', 'Newsletter', 'Fusions_log']);
+// Tables whose rows are filtered in the proxy response, on the column of GRIST_LAB_SCOPE.
+const GRIST_LAB_READ_FILTER = new Set(['Annuaire']);
 // « LS2N[fr]|LS2N[en] » → « LS2N » (same rule as gristService.parseMultiLabel, fr preferred).
 const multiLabelValue = (raw) => {
   const parts = String(raw || '').split('|').map((p) => p.trim()).filter(Boolean).map((p) => {
@@ -2833,7 +2839,16 @@ const gristProxyDecision = async ({ method, path, access, body, fetchRowScopes }
     return { ok: false, status: 403, error: 'Grist path not allowed by the proxy' };
   }
   const [, doc, tablesSeg, table, sub] = m;
-  if (method === 'GET') return { ok: true };
+  if (method === 'GET') {
+    // Institution right, document metadata, list of tables, side documents: as before.
+    if (access?.allSlugs || !tablesSeg || !table || doc !== process.env.VITE_GRIST_DOC_ID) return { ok: true };
+    if (!GRIST_LAB_READABLE_TABLES.has(table)) {
+      return { ok: false, status: 403, error: 'Grist reads outside the lab scope' };
+    }
+    return GRIST_LAB_READ_FILTER.has(table) && sub === 'records'
+      ? { ok: true, filter: { col: GRIST_LAB_SCOPE[table].col, anchor: GRIST_LAB_SCOPE[table].anchor, anchors: access?.labAnchors || [] } }
+      : { ok: true };
+  }
   if (!tablesSeg) return { ok: false, status: 403, error: 'Writing to the document root is refused' };
   if (!['POST', 'PATCH', 'DELETE'].includes(method)) {
     return { ok: false, status: 405, error: `Method not relayed: ${method}` };
@@ -2905,8 +2920,17 @@ const gristProxyGuard = async (req, res, next) => {
     body: req.body,
     fetchRowScopes: gristScopeOfRows,
   });
-  if (decision.ok) return next();
+  if (decision.ok) {
+    res.locals.gristReadFilter = decision.filter || null;
+    return next();
+  }
   res.status(decision.status).json({ error: decision.error });
+};
+
+/** Records of a Grist /records response kept for a lab right: those whose scope column is one of its labs. Pure. */
+const filterScopedRecords = (payload, { col, anchor, anchors }) => {
+  const records = Array.isArray(payload?.records) ? payload.records : [];
+  return { ...payload, records: records.filter((r) => anchors.includes(anchor(r?.fields?.[col]))) };
 };
 
 // ── Grist proxy ────────────────────────────────────────────────────────────
@@ -2930,8 +2954,13 @@ app.all('/api/grist/*', gristProxyGuard, async (req, res) => {
       options.body = JSON.stringify(req.body);
     }
     const response = await fetch(targetUrl, options);
-    const responseText = await response.text();
+    let responseText = await response.text();
     if (!response.ok) console.error(`[Proxy Grist Error Body]: ${responseText}`);
+    // Lab right: only the rows of its labs leave the server (the client-side filter of useDruidData is a
+    // display convenience, not a protection).
+    if (response.ok && res.locals.gristReadFilter) {
+      responseText = JSON.stringify(filterScopedRecords(JSON.parse(responseText), res.locals.gristReadFilter));
+    }
     res.status(response.status).set('Content-Type', 'application/json').send(responseText);
   } catch (err) {
     console.error('[Proxy Error]', err);
@@ -3526,19 +3555,51 @@ app.get('/api/sync-ldap-candidates-progress', requireEstablishmentScope, (req, r
   }
 });
 
+// uid_dyna of the directory rows of the given labs (LABO anchors), from Grist; one read per 5 minutes.
+let labUidsCache = { at: 0, rows: null };
+const labUidsOf = async (anchors) => {
+  if (!anchors.length) return new Set();
+  if (!labUidsCache.rows || Date.now() - labUidsCache.at > 5 * 60 * 1000) {
+    const r = await fetch(`${GRIST_API_BASE}/docs/${process.env.VITE_GRIST_DOC_ID}/sql`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sql: 'SELECT uid_dyna AS uid, LABO AS labo FROM Annuaire', args: [] }),
+    });
+    if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
+    labUidsCache = { at: Date.now(), rows: ((await r.json()).records || []).map((x) => x.fields) };
+  }
+  const anchorOf = GRIST_LAB_SCOPE.Annuaire.anchor;
+  return new Set(labUidsCache.rows.filter((x) => x.uid && anchors.includes(anchorOf(x.labo))).map((x) => String(x.uid)));
+};
+/** Entries of an object keyed by uid, restricted to the given uids. Pure. */
+const pickKeys = (obj, keys) => Object.fromEntries(Object.entries(obj || {}).filter(([k]) => keys.has(k)));
+
 // ── Static + SPA fallback ──────────────────────────────────────────────────
 // Caches produced by the scripts (LDAP, IdRef, Qualinka, structures): served from the app
 // root (bind-mounted files, see druid.yaml) and not from dist/ — after an image rebuild,
 // dist/ starts empty again and the UI showed « 0 à renseigner » until the next run
 // (see the 2026-09-09 incident). Fallback on dist/ if the root file does not exist.
+// Access (plan-separation-test-prod-rssi.md, lot 7): these files hold personal data of the whole university
+// (the LDAP cache: birth date, grade, status of ~16,000 staff). The institution right gets them whole; a lab right
+// only gets the LDAP statuses of the people of its labs (the staff list needs them), nothing else.
 for (const cacheFile of ['ldap_status_cache.json', 'ldap_candidates_cache.json', 'structures_ldap_cache.json', 'idref_align_cache.json', 'idref_align_qualinka_cache.json', 'orcid_align_cache.json', 'hal_align_cache.json', 'openalex_align_cache.json', 'scopus_align_cache.json']) {
-  app.get(`/${cacheFile}`, (req, res) => {
+  app.get(`/${cacheFile}`, async (req, res) => {
+    const access = req.session.user?.access;
+    const full = !!access?.allSlugs;
+    if (!full && cacheFile !== 'ldap_status_cache.json') return res.status(403).json({ error: 'Forbidden' });
     const root = path.join(__dirname, cacheFile);
     const dist = path.join(__dirname, 'dist', cacheFile);
     const file = (fs.existsSync(root) && fs.statSync(root).size > 0) ? root : (fs.existsSync(dist) ? dist : null);
     if (!file) return res.status(404).json({ error: `No run yet: ${cacheFile} missing` });
     res.set('Cache-Control', 'no-store');
-    res.sendFile(file);
+    if (full) return res.sendFile(file);
+    try {
+      const uids = await labUidsOf(access?.labAnchors || []);
+      res.json(pickKeys(JSON.parse(fs.readFileSync(file, 'utf8')), uids));
+    } catch (err) {
+      console.error('[Cache] lab-scoped LDAP cache:', err.message);
+      res.status(502).json({ error: 'Scope check failed' });
+    }
   });
 }
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -3576,6 +3637,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  app, activity, restrictToAdmins, gristProxyGuard, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
+  app, activity, restrictToAdmins, gristProxyGuard, filterScopedRecords, pickKeys, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
   buildPeopleCsv, buildStructuresCsv, gristCell, countCsvRecords, normalizeFuzzyDate, fuzzyDateBound, isFuzzyDatePast,
 };
