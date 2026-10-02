@@ -13,6 +13,11 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Sécurité
+- Lectures filtrées côté serveur pour les droits « labo » : l'`Annuaire` ne renvoie plus que les lignes de leurs
+  laboratoires, les tables d'administration (tâches, revues d'alignement, arbitrages…) leur sont refusées, le cache
+  LDAP (date de naissance, corps, statut de tout le personnel) est réduit aux agents de leurs laboratoires et les
+  caches d'alignement sont réservés au droit établissement. Auparavant, le filtrage n'avait lieu que dans le
+  navigateur : tout compte connecté pouvait obtenir l'annuaire complet.
 - Vérification des certificats TLS rétablie partout : serveur (elle était coupée pour tous les appels sortants),
   scripts d'alignement (tunnel du proxy), client LDAPS, scripts ponctuels. Les services appelés présentent tous un
   certificat public valide, y compris à travers le proxy de l'université (vérifié le 2026-10-02).
