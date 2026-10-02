@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.2.1] — 2026-10-02
+
 ### Sécurité
 - La recherche d'une personne dans l'annuaire LDAP par uid (« Remplir depuis le LDAP » à la création d'une fiche)
   est réservée au droit établissement ; elle était ouverte à tout droit labo, donc à tout compte connecté.
