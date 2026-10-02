@@ -2,6 +2,7 @@ import { t } from '@lingui/core/macro';
 import { Researcher, ResearcherStatus, Affiliation, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
 import { getPoleFromLab } from './mappings';
 import { hasCapability } from './auth';
+import { purgeStoredDirectory } from './directoryStorage';
 import { ResearcherListSchema, StructureListSchema } from './schemas';
 import { getGradeFromNcorps } from './gradeTypology';
 import { ldapGradeFor, resolveGrade, hasEmeritusTrace, isRetireeWithoutEmeritus, EmeritusSignals } from './emeritus';
@@ -867,13 +868,12 @@ async function employerToGristFields(employer?: string): Promise<Record<string, 
   }
 }
 
-// v2: public id = uid/ext_ + gristRowId (the old cache stored id=G-<rowId> without gristRowId → bump to invalidate)
-const RESEARCHERS_CACHE_KEY = 'druid_researchers_cache_v2';
-const STRUCTURES_CACHE_KEY = 'druid_structures_cache';
-// One timestamp PER cache: with a shared key, a successful structures refresh marked the
-// researchers cache as fresh although its fetch had just failed (review lot 2, finding 3).
-const RESEARCHERS_UPDATED_AT_KEY = 'druid_researchers_updated_at';
-const STRUCTURES_UPDATED_AT_KEY = 'druid_structures_updated_at';
+// Cache of the directory and of the structures, in MEMORY only (plan-separation-test-prod-rssi.md, lot 7): it used
+// to be kept in localStorage, i.e. on the disk of every browser that ever opened Druid, after the logout and for the
+// other users of the same computer. It now lasts as long as the tab. One timestamp per cache: with a shared one, a
+// successful structures refresh marked the researchers cache as fresh although its fetch had failed (review lot 2).
+const memoryCache: { researchers?: { updatedAt: string; data: Researcher[] }; structures?: { updatedAt: string; data: Structure[] } } = {};
+purgeStoredDirectory();
 
 /** Lowercase ASCII slug used to build an ext_ identifier (accents removed, non-alphanumerics -> '-'). */
 const slugForExtId = (s: string): string =>
@@ -1419,12 +1419,10 @@ export const GristService = {
   fetchResearchers: async (force = false): Promise<Researcher[]> => {
     try {
       const remoteUpdatedAt = await GristService.getDocUpdatedAt();
-      const cachedData = localStorage.getItem(RESEARCHERS_CACHE_KEY);
-      const cachedUpdatedAt = localStorage.getItem(RESEARCHERS_UPDATED_AT_KEY);
-
-      if (!force && cachedData && cachedUpdatedAt === remoteUpdatedAt) {
+      const cached = memoryCache.researchers;
+      if (!force && cached && cached.updatedAt === remoteUpdatedAt) {
         console.log('Using cached researchers...');
-        return JSON.parse(cachedData);
+        return cached.data;
       }
 
       console.log('Fetching fresh researchers from Grist...');
@@ -1662,22 +1660,11 @@ export const GristService = {
       }
 
       const researchers = validation.success ? validation.data : researchersGrouped as Researcher[];
-      // NON-blocking cache write: an exceeded localStorage quota must not lose the
-      // fresh data (otherwise we fell into the catch → empty « Aucun chercheur » list).
-      try {
-        localStorage.removeItem('druid_researchers_cache'); // legacy v1 key: frees up space
-        localStorage.removeItem('druid_grist_updated_at'); // legacy shared timestamp (before 2026-09-17)
-        localStorage.setItem(RESEARCHERS_CACHE_KEY, JSON.stringify(researchers));
-        localStorage.setItem(RESEARCHERS_UPDATED_AT_KEY, remoteUpdatedAt);
-      } catch (cacheErr) {
-        console.warn('Researchers cache not written (localStorage quota) — data loaded anyway:', cacheErr);
-        try { localStorage.removeItem(RESEARCHERS_CACHE_KEY); } catch { /* noop */ }
-      }
+      memoryCache.researchers = { updatedAt: remoteUpdatedAt, data: researchers };
       return researchers;
     } catch (error) {
       console.error('Grist Sync Error:', error);
-      const cached = localStorage.getItem(RESEARCHERS_CACHE_KEY);
-      return cached ? JSON.parse(cached) : [];
+      return memoryCache.researchers?.data ?? [];
     }
   },
 
@@ -1687,12 +1674,10 @@ export const GristService = {
   fetchStructures: async (force = false): Promise<Structure[]> => {
     try {
       const remoteUpdatedAt = await GristService.getDocUpdatedAt();
-      const cachedData = localStorage.getItem(STRUCTURES_CACHE_KEY);
-      const cachedUpdatedAt = localStorage.getItem(STRUCTURES_UPDATED_AT_KEY);
-
-      if (!force && cachedData && cachedUpdatedAt === remoteUpdatedAt) {
+      const cached = memoryCache.structures;
+      if (!force && cached && cached.updatedAt === remoteUpdatedAt) {
         console.log('Using cached structures...');
-        return JSON.parse(cachedData);
+        return cached.data;
       }
 
       console.log('Fetching fresh structures from Grist...');
@@ -1773,19 +1758,11 @@ export const GristService = {
       // Hierarchical parent read from the inclusions (« Appartenances » tab), the stored
       // `parent_structure` column being only a fallback — see lib/structureHierarchy.ts.
       const structures = withDerivedParents(validation.success ? (validation.data as Structure[]) : (structuresMapped as Structure[]));
-      // Non-blocking cache write (localStorage quota) — same rule as fetchResearchers.
-      try {
-        localStorage.setItem(STRUCTURES_CACHE_KEY, JSON.stringify(structures));
-        localStorage.setItem(STRUCTURES_UPDATED_AT_KEY, remoteUpdatedAt);
-      } catch (cacheErr) {
-        console.warn('Structures cache not written (localStorage quota) — data loaded anyway:', cacheErr);
-        try { localStorage.removeItem(STRUCTURES_CACHE_KEY); localStorage.removeItem(STRUCTURES_UPDATED_AT_KEY); } catch { /* noop */ }
-      }
+      memoryCache.structures = { updatedAt: remoteUpdatedAt, data: structures };
       return structures;
     } catch (error) {
       console.error('Grist Structures Sync Error:', error);
-      const cached = localStorage.getItem(STRUCTURES_CACHE_KEY);
-      return cached ? JSON.parse(cached) : [];
+      return memoryCache.structures?.data ?? [];
     }
   },
 

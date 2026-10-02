@@ -3,7 +3,7 @@ import { ArrowLeft, Save, RefreshCw, FileDown, ExternalLink, Database, ShieldChe
 import { Researcher, ResearcherStatus, Affiliation, Structure, StructureLevel, ViewState } from '../types';
 import { GristService } from '../lib/gristService';
 import { ExportService } from '../lib/exportService';
-import { getUserInfo, hasCapability } from '../lib/auth';
+import { canUseEstablishmentTools, getUserInfo, hasCapability } from '../lib/auth';
 import type { ValidationInfo, ValidationScope } from '../lib/validation';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { STATUS_LABELS, VALIDATION_SCOPE_LABELS } from '../lib/researcherLabels';
@@ -377,7 +377,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
             teamOptions={teamOptions}
             onCreateTeam={onCreateTeam}
             employerOptions={employerOptions}
-            onLdapLookup={onSave && localResearcher.id.startsWith('NEW-') && hasCapability('HAS_LDAP') ? handleLdapLookup : undefined}
+            onLdapLookup={onSave && localResearcher.id.startsWith('NEW-') && hasCapability('HAS_LDAP') && canUseEstablishmentTools() ? handleLdapLookup : undefined}
             ldapAutoRun={autoLookup}
           />
           {/* Career path (docs/plan-parcours-affiliations.md, lot 3): affiliations of the publications,
