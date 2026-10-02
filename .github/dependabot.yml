@@ -1,0 +1,50 @@
+# Dependency updates (druid-internal/docs/plan-separation-test-prod-rssi.md, lot 2).
+# Security updates are separate: enabled in the repository settings, Dependabot opens one pull request
+# per advisory as soon as it is published. The version updates below are grouped and monthly, so that
+# they land on main (hence on the test instance) in a few pull requests, before the next release.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      # Minor and patch versions together; each major version gets its own pull request (breaking changes).
+      npm-minor-patch:
+        update-types: [minor, patch]
+
+  # Help centre (separate Starlight site, help/).
+  - package-ecosystem: npm
+    directory: /help
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 2
+    commit-message:
+      prefix: build
+      include: scope
+    groups:
+      help-minor-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ['*']
+
+  # Base image of the Docker build (node:<major>-slim).
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: build
+      include: scope
