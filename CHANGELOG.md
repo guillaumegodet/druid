@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.0.0] — 2026-10-02
+
 Première version numérotée : état de Druid à la mise en place des releases, avec les évolutions ci-dessous
 (depuis la publication du code le 2026-09-24).
 
