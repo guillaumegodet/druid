@@ -27,6 +27,14 @@ const DRUID_ENV = (process.env.DRUID_ENV || 'production').trim().toLowerCase() |
 // super admins and shares nothing publicly (plan-separation-test-prod-rssi.md, lot 3).
 const ADMINS_ONLY = DRUID_ENV !== 'production';
 
+// Access and audit logs (scripts/lib/activity_log.cjs, plan-separation-test-prod-rssi.md lot 6): JSON lines in
+// DRUID_LOG_DIR (mounted outside the container, rotated by the host), stdout without it.
+const { createActivityLog, gristWriteSummary, auditEventOf, isQuietPath } = require('./scripts/lib/activity_log.cjs');
+const activity = createActivityLog({ dir: process.env.DRUID_LOG_DIR || '', environment: DRUID_ENV });
+// Client address behind the gateway: X-Forwarded-For is only believed from the proxies listed in TRUST_PROXY
+// (the gateway network, e.g. 192.168.64.0/20) — otherwise req.ip is the direct peer.
+if (process.env.TRUST_PROXY) app.set('trust proxy', process.env.TRUST_PROXY.split(',').map((s) => s.trim()).filter(Boolean));
+
 // Bypassing SSL verification for internal network proxying to Grist
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -249,9 +257,26 @@ app.get('/api/health', (req, res) => {
   res.set('Cache-Control', 'no-store').json({ status: 'ok' });
 });
 
-// Logger
+// Access log + audit events of each request, written when the response is sent (status known). Path
+// without the query string; the user is the one of the session at that moment.
 app.use((req, res, next) => {
-  console.log(`[Request] ${req.method} ${req.url}`);
+  const started = process.hrtime.bigint();
+  const id = crypto.randomBytes(6).toString('hex');
+  res.set('X-Request-Id', id);
+  res.on('finish', () => {
+    const user = req.session?.user?.preferred_username || null;
+    const base = { req: id, user, ip: req.ip, method: req.method, path: req.path, status: res.statusCode };
+    if (!isQuietPath(req.path)) {
+      activity.access({ ...base, ms: Number((process.hrtime.bigint() - started) / 1000000n),
+        bytes: Number(res.get('Content-Length')) || undefined });
+    }
+    const event = auditEventOf({ method: req.method, path: req.path, status: res.statusCode, signedIn: !!user });
+    if (event === 'grist.write') {
+      activity.audit(event, { ...base, ...gristWriteSummary(req.method, req.path.replace('/api/grist/', ''), req.body) });
+    } else if (event) {
+      activity.audit(event, base);
+    }
+  });
   next();
 });
 
@@ -290,6 +315,7 @@ app.get('/auth/callback', async (req, res) => {
     // Callback already consumed, reached again through the browser history (back button,
     // restored tab): nothing to exchange, the session is valid → back into the application.
     if (req.session.user) return res.redirect('/');
+    activity.audit('auth.login_failed', { ip: req.ip, reason: 'invalid_state' });
     return res.status(400).send('Invalid OAuth state — <a href="/auth/login">log in again</a>');
   }
   const returnTo = safeReturnTo(req.session.returnTo);
@@ -307,6 +333,7 @@ app.get('/auth/callback', async (req, res) => {
     const tokenData = await tokenRes.json();
     if (!tokenData.access_token) {
       console.error('[Auth] Token exchange failed:', tokenData);
+      activity.audit('auth.login_failed', { ip: req.ip, reason: 'token_exchange', error: String(tokenData.error || '') });
       return res.status(401).send('Authentication failed');
     }
     // Decode JWT payload (trusted source — Keycloak)
@@ -337,16 +364,22 @@ app.get('/auth/callback', async (req, res) => {
       roles: payload.realm_access?.roles || [],
       access,
     };
+    activity.audit('auth.login', {
+      user: req.session.user.preferred_username, ip: req.ip, superAdmin: access.isSuperAdmin,
+      scope: access.allSlugs ? 'all' : access.labAnchors, labViewer: access.isLabViewer,
+    });
     console.log(`[Auth] Logged in: ${req.session.user.preferred_username}` +
       (access.isLabViewer ? ` (labo_viewer → ${access.annuaireLabs.join(', ') || 'aucun labo'})` : ''));
     res.redirect(returnTo);
   } catch (err) {
     console.error('[Auth] Callback error:', err);
+    activity.audit('auth.login_failed', { ip: req.ip, reason: 'error' });
     res.status(500).send('Authentication error');
   }
 });
 
 app.get('/auth/logout', (req, res) => {
+  activity.audit('auth.logout', { user: req.session?.user?.preferred_username || null, ip: req.ip });
   req.session.destroy(() => {
     const postLogout = encodeURIComponent(APP_URL);
     res.redirect(
@@ -440,6 +473,18 @@ const rejectCrossSite = (req, res, next) => {
   next();
 };
 app.use(rejectCrossSite);
+
+// Exports made in the browser (lists, Excel, PDF, ABES file — lib/exportService.ts) reported for the audit log:
+// the server never sees those files. Always 204; a malformed report is logged as it comes, truncated.
+app.post('/api/audit/export', (req, res) => {
+  const b = req.body && typeof req.body === 'object' ? req.body : {};
+  activity.audit('data.export', {
+    user: req.session.user?.preferred_username || null, ip: req.ip,
+    format: String(b.format || '').slice(0, 10), name: String(b.name || '').slice(0, 120),
+    rows: Number.isFinite(b.rows) ? Math.max(0, Math.floor(b.rows)) : null,
+  });
+  res.status(204).end();
+});
 
 // ── Image proxy for anti-bot protected sources (e.g. IETR/Anubis) ────────────
 // Some lab websites serve a "you're not a bot" challenge page to browser
@@ -2871,8 +2916,6 @@ app.all('/api/grist/*', gristProxyGuard, async (req, res) => {
   const apiKey = GRIST_API_KEY;
   if (!apiKey) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
 
-  console.log(`[Proxy] -> ${targetUrl}`);
-
   try {
     const options = {
       method: req.method,
@@ -3524,12 +3567,15 @@ if (require.main === module) {
       + `running on http://0.0.0.0:${PORT} — environment: ${DRUID_ENV}`);
   });
 
+  // Log files reopened after a rotation by the host (logrotate postrotate: docker kill -s HUP <container>).
+  process.on('SIGHUP', () => activity.reopen());
+
   // No WebSocket is served (the Streamlit /dashboard upgrade went away
   // with the native ETL console): every upgrade is refused.
   server.on('upgrade', (req, socket) => socket.destroy());
 }
 
 module.exports = {
-  app, restrictToAdmins, gristProxyGuard, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
+  app, activity, restrictToAdmins, gristProxyGuard, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
   buildPeopleCsv, buildStructuresCsv, gristCell, countCsvRecords, normalizeFuzzyDate, fuzzyDateBound, isFuzzyDatePast,
 };
