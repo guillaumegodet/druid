@@ -48,7 +48,6 @@
  */
 'use strict';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 try { require('dotenv').config(); } catch { /* dotenv optional */ }
 
 const fs = require('fs');

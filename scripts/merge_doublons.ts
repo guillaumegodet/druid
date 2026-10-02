@@ -21,7 +21,6 @@ import {
 } from '../lib/mergeProposal';
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from '../lib/mergeLog';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // FortiGate (see scripts/sync_idref.cjs)
 const GRIST_BASE = 'https://grist.numerique.gouv.fr/api';
 const DOC = process.env.VITE_GRIST_DOC_ID;
 const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;

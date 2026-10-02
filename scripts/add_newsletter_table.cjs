@@ -19,9 +19,6 @@
  */
 'use strict';
 
-// FortiGate: the proxy performs SSL inspection (see docker/CLAUDE.md).
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 try { require('dotenv').config(); } catch { /* dotenv optional */ }
 
 const API_URL = process.env.GRIST_API_URL || 'https://grist.numerique.gouv.fr/api';

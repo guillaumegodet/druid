@@ -15,7 +15,6 @@ import { readFileSync, writeFileSync } from 'fs';
 import { hasEmeritusTrace, emeritusGradeFor, EMERITUS_GRADES } from '../lib/emeritus';
 import { getGradeFromNcorps } from '../lib/gradeTypology';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // FortiGate (see scripts/sync_idref.cjs)
 const GRIST_BASE = process.env.GRIST_BASE_URL || 'https://grist.numerique.gouv.fr/api';
 const DOC = process.env.VITE_GRIST_DOC_ID;
 const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;
