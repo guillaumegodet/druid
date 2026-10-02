@@ -117,7 +117,7 @@ describe('lot 6 — ABES export closes the covered « lot ABES » tasks', () => 
       task(1, { type: 'idref_ajouter_orcid', chercheur: 10 }),
       task(2, { type: 'idref_ajouter_idhal', chercheur: 10 }),                 // type not covered
       task(3, { type: 'idref_ajouter_orcid', uid_dyna: 'abc', chercheur: 0 }), // matched on uid
-      task(4, { type: 'idref_ajouter_orcid', chercheur: 10, canal: 'natacha' }), // other channel
+      task(4, { type: 'idref_ajouter_orcid', chercheur: 10, canal: 'correspondant_idref' }), // other channel
       task(5, { type: 'idref_ajouter_orcid', chercheur: 10, statut: 'fait' }),   // already closed
       task(6, { type: 'idref_ajouter_orcid', chercheur: 99 }),                 // not exported
     ];

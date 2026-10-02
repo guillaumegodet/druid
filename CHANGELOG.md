@@ -34,9 +34,16 @@ Première version numérotée à venir (1.0.0) : état de Druid à la mise en pl
 - Navigation : menu sous 1 320 px de large, bouton « précédent » du navigateur et page demandée conservée à la connexion.
 - L'image Docker ne contient plus aucun réglage d'instance : la même image sert le test et la production.
 
+- Tâches « À traiter » : le canal du correspondant autorités s'appelle désormais `correspondant_idref`.
+
 ### Corrigé
 - Alignement IdRef : les fiches sans uid_dyna sont aussi recherchées.
 - « Rechercher partout » masqué sur les instances sans tâches serveur (plantage sur Cloudflare).
 
 ### Sécurité
 - Plus de mot de passe Neo4j par défaut dans les scripts d'alignement.
+- Garde de publication insensible à la casse pour la liste de noms.
+
+### Migration
+- `scripts/migrations/001-tasks-channel-rename.cjs --from=<ancienne valeur> --apply` : renomme le canal des
+  tâches existantes (table `Taches`) et met à jour les choix de la colonne. À lancer juste après le déploiement.

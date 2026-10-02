@@ -18,7 +18,7 @@ const EVENTS_TABLE = 'Taches_evenements';
 const BASES = ['IdRef', 'ORCID', 'HAL', 'OpenAlex', 'Scopus', 'Annuaire', 'RH', 'Autre'];
 
 /** Who / what processes the task (decision of 2026-09-23: no per-role queue yet). */
-const CANALS = ['natacha', 'lot_abes', 'email_chercheur', 'support_externe', 'interne'];
+const CANALS = ['correspondant_idref', 'lot_abes', 'email_chercheur', 'support_externe', 'interne'];
 
 /** Workflow. `resolue_auto` is reserved for the detection rules (lot 5). */
 const STATUSES = ['a_faire', 'en_cours', 'en_attente', 'fait', 'abandonnee', 'resolue_auto'];
@@ -40,12 +40,12 @@ const PRIORITIES = ['basse', 'normale', 'haute'];
 const TASK_TYPES = {
   idref_ajouter_orcid: { base: 'IdRef', canal: 'lot_abes', email: false },
   idref_ajouter_idhal: { base: 'IdRef', canal: 'lot_abes', email: false },
-  idref_corriger_dates: { base: 'IdRef', canal: 'natacha', email: false },
-  idref_deces: { base: 'IdRef', canal: 'natacha', email: false },
-  idref_corriger_affiliation: { base: 'IdRef', canal: 'natacha', email: false },
-  idref_fusionner: { base: 'IdRef', canal: 'natacha', email: false },
-  idref_creer: { base: 'IdRef', canal: 'natacha', email: false },
-  idref_corriger_nom: { base: 'IdRef', canal: 'natacha', email: false },
+  idref_corriger_dates: { base: 'IdRef', canal: 'correspondant_idref', email: false },
+  idref_deces: { base: 'IdRef', canal: 'correspondant_idref', email: false },
+  idref_corriger_affiliation: { base: 'IdRef', canal: 'correspondant_idref', email: false },
+  idref_fusionner: { base: 'IdRef', canal: 'correspondant_idref', email: false },
+  idref_creer: { base: 'IdRef', canal: 'correspondant_idref', email: false },
+  idref_corriger_nom: { base: 'IdRef', canal: 'correspondant_idref', email: false },
   orcid_deux_ids: { base: 'ORCID', canal: 'email_chercheur', email: true },
   orcid_absent: { base: 'ORCID', canal: 'email_chercheur', email: true },
   orcid_profil_vide: { base: 'ORCID', canal: 'email_chercheur', email: true },
@@ -60,10 +60,10 @@ const TASK_TYPES = {
   orcid_ajouter_poste: { base: 'ORCID', canal: 'email_chercheur', email: true },
   orcid_relier_scopus: { base: 'ORCID', canal: 'email_chercheur', email: true },
   scopus_profil_errone: { base: 'Scopus', canal: 'email_chercheur', email: true },
-  rh_depart: { base: 'RH', canal: 'natacha', email: false },
-  rh_retraite: { base: 'RH', canal: 'natacha', email: false },
-  rh_mutation: { base: 'RH', canal: 'natacha', email: false },
-  rh_deces: { base: 'RH', canal: 'natacha', email: false },
+  rh_depart: { base: 'RH', canal: 'correspondant_idref', email: false },
+  rh_retraite: { base: 'RH', canal: 'correspondant_idref', email: false },
+  rh_mutation: { base: 'RH', canal: 'correspondant_idref', email: false },
+  rh_deces: { base: 'RH', canal: 'correspondant_idref', email: false },
   annuaire_fin_emploi: { base: 'Annuaire', canal: 'interne', email: false },
   annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false },
   annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false },

@@ -12,7 +12,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { translateApiError } from './apiErrors';
 
 export type TaskBase = 'IdRef' | 'ORCID' | 'HAL' | 'OpenAlex' | 'Scopus' | 'Annuaire' | 'RH' | 'Autre';
-export type TaskCanal = 'natacha' | 'lot_abes' | 'email_chercheur' | 'support_externe' | 'interne';
+export type TaskCanal = 'correspondant_idref' | 'lot_abes' | 'email_chercheur' | 'support_externe' | 'interne';
 export type TaskStatus = 'a_faire' | 'en_cours' | 'en_attente' | 'fait' | 'abandonnee' | 'resolue_auto';
 export type TaskPriority = 'basse' | 'normale' | 'haute';
 export type TaskEventAction =
@@ -32,12 +32,12 @@ export interface TaskTypeMeta {
 export const TASK_TYPES = {
   idref_ajouter_orcid: { base: 'IdRef', canal: 'lot_abes', email: false, label: msg`IdRef — add the ORCID to the record` },
   idref_ajouter_idhal: { base: 'IdRef', canal: 'lot_abes', email: false, label: msg`IdRef — add the IdHAL to the record` },
-  idref_corriger_dates: { base: 'IdRef', canal: 'natacha', email: false, label: msg`IdRef — fix the dates` },
-  idref_deces: { base: 'IdRef', canal: 'natacha', email: false, label: msg`IdRef — record a death` },
-  idref_corriger_affiliation: { base: 'IdRef', canal: 'natacha', email: false, label: msg`IdRef — fix the affiliation / note` },
-  idref_fusionner: { base: 'IdRef', canal: 'natacha', email: false, label: msg`IdRef — merge two records` },
-  idref_creer: { base: 'IdRef', canal: 'natacha', email: false, label: msg`IdRef — create the record` },
-  idref_corriger_nom: { base: 'IdRef', canal: 'natacha', email: false, label: msg`IdRef — fix the name form` },
+  idref_corriger_dates: { base: 'IdRef', canal: 'correspondant_idref', email: false, label: msg`IdRef — fix the dates` },
+  idref_deces: { base: 'IdRef', canal: 'correspondant_idref', email: false, label: msg`IdRef — record a death` },
+  idref_corriger_affiliation: { base: 'IdRef', canal: 'correspondant_idref', email: false, label: msg`IdRef — fix the affiliation / note` },
+  idref_fusionner: { base: 'IdRef', canal: 'correspondant_idref', email: false, label: msg`IdRef — merge two records` },
+  idref_creer: { base: 'IdRef', canal: 'correspondant_idref', email: false, label: msg`IdRef — create the record` },
+  idref_corriger_nom: { base: 'IdRef', canal: 'correspondant_idref', email: false, label: msg`IdRef — fix the name form` },
   orcid_deux_ids: { base: 'ORCID', canal: 'email_chercheur', email: true, label: msg`ORCID — two identifiers` },
   orcid_absent: { base: 'ORCID', canal: 'email_chercheur', email: true, label: msg`ORCID — no identifier, invite to create one` },
   orcid_profil_vide: { base: 'ORCID', canal: 'email_chercheur', email: true, label: msg`ORCID — empty profile` },
@@ -50,10 +50,10 @@ export const TASK_TYPES = {
   orcid_ajouter_poste: { base: 'ORCID', canal: 'email_chercheur', email: true, label: msg`ORCID — add the position at the institution` },
   orcid_relier_scopus: { base: 'ORCID', canal: 'email_chercheur', email: true, label: msg`ORCID — link the Scopus profile` },
   scopus_profil_errone: { base: 'Scopus', canal: 'email_chercheur', email: true, label: msg`Scopus — wrong author profile` },
-  rh_depart: { base: 'RH', canal: 'natacha', email: false, label: msg`HR — departure to propagate` },
-  rh_retraite: { base: 'RH', canal: 'natacha', email: false, label: msg`HR — retirement to propagate` },
-  rh_mutation: { base: 'RH', canal: 'natacha', email: false, label: msg`HR — transfer to propagate` },
-  rh_deces: { base: 'RH', canal: 'natacha', email: false, label: msg`HR — death to propagate` },
+  rh_depart: { base: 'RH', canal: 'correspondant_idref', email: false, label: msg`HR — departure to propagate` },
+  rh_retraite: { base: 'RH', canal: 'correspondant_idref', email: false, label: msg`HR — retirement to propagate` },
+  rh_mutation: { base: 'RH', canal: 'correspondant_idref', email: false, label: msg`HR — transfer to propagate` },
+  rh_deces: { base: 'RH', canal: 'correspondant_idref', email: false, label: msg`HR — death to propagate` },
   annuaire_fin_emploi: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — employment end to enter` },
   annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — two records for the same person: merge` },
   annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — shared identifiers: same person or namesakes?` },
@@ -73,7 +73,7 @@ export const isTaskType = (v: string): v is TaskType => v in TASK_TYPES;
 export const TASK_BASES: TaskBase[] = ['IdRef', 'ORCID', 'HAL', 'OpenAlex', 'Scopus', 'Annuaire', 'RH', 'Autre'];
 
 export const CANAL_LABELS: Record<TaskCanal, MessageDescriptor> = {
-  natacha: msg`Authorities correspondent (IdRef)`,
+  correspondant_idref: msg`Authorities correspondent (IdRef)`,
   lot_abes: msg`ABES batch (export)`,
   email_chercheur: msg`Email to the researcher`,
   support_externe: msg`External support (provider)`,
