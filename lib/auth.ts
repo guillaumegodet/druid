@@ -1,4 +1,5 @@
 import { normalizeAcronym } from './normalize';
+import { purgeStoredDirectory } from './directoryStorage';
 import { installReadOnlyFetchGuard } from './readOnly';
 import { gristPublicBaseUrl, setInstanceInfo, type InstanceInfo } from './instanceRuntime';
 
@@ -224,5 +225,6 @@ export const canSeeStructure = (acronymOrSlug: string): boolean => {
 };
 
 export const logout = (): void => {
+  purgeStoredDirectory();
   window.location.href = '/auth/logout';
 };

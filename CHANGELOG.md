@@ -12,6 +12,15 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Sécurité
+- La recherche d'une personne dans l'annuaire LDAP par uid (« Remplir depuis le LDAP » à la création d'une fiche)
+  est réservée au droit établissement ; elle était ouverte à tout droit labo, donc à tout compte connecté.
+- Les tableaux de bord de groupe (liste, création, calcul, suppression, recherche d'auteurs) sont réservés aux
+  super-administrateurs côté serveur, comme la page Groupes ; tout compte connecté pouvait en créer et lancer un calcul.
+- L'annuaire et les structures ne sont plus copiés dans le stockage local du navigateur (ils restaient sur le disque
+  après la déconnexion, accessibles aux autres utilisateurs du poste) : cache en mémoire le temps de l'onglet, et les
+  copies existantes sont effacées au chargement de Druid et à la déconnexion.
+
 ## [1.2.0] — 2026-10-02
 
 ### Sécurité

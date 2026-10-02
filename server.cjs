@@ -1903,6 +1903,10 @@ const requireGroupSlug = (req, res) => {
   return false;
 };
 
+// Group dashboards (list, creation, ETL runs, deletion, author search): managed from the Groups page, which is
+// reserved to super admins — the server now enforces it too (plan-separation-test-prod-rssi.md, lot 7; before,
+// any signed-in account could create a group and start an ETL run).
+app.use('/api/groups', requireSuperAdmin);
 app.get('/api/groups/dashboards', (req, res) =>
   relayGroupApi(res, 'GET', '/api/groups'));
 app.post('/api/groups/dashboards', (req, res) => {
@@ -3018,11 +3022,9 @@ app.get('/api/sync-ldap-progress', requireEstablishmentScope, (req, res) => {
 // ── Single-person LDAP lookup (researcher creation form) ─────────────────────
 // « Fill from LDAP » button: live search by uid (scripts/lib/ldap_person.cjs). Open to every
 // right that can create an Annuaire record (institution or lab), not only institution tools.
-app.get('/api/ldap/person/:uid', async (req, res) => {
-  const access = req.session.user?.access;
-  if (!access?.allSlugs && !access?.labAnchors?.length && !access?.annuaireLabs?.length) {
-    return res.status(403).json({ error: 'Forbidden' });
-  }
+// Directory lookup of ANY university account by uid: institution right only (plan-separation-test-prod-rssi.md,
+// lot 7 — it was open to every lab right, i.e. to any signed-in account through the implicit right).
+app.get('/api/ldap/person/:uid', requireEstablishmentScope, async (req, res) => {
   if (!process.env.LDAP_URL || !process.env.LDAP_BIND_DN || !process.env.LDAP_BIND_PASSWORD) {
     return res.status(404).json({ error: 'LDAP not configured on this instance' });
   }
