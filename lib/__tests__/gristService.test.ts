@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import {
   parseOpenalexIds, groupQualifiedRows, planAffiliationRows, alignGroupOf, gristDateToIso, pivotUnifiedAlignDiffs,
-  buildUnifiedUpdates, unifiedFillKey, unifiedAmbigKey,
+  buildUnifiedUpdates, unifiedFillKey, unifiedAmbigKey, resolveNewStructureLocalId,
 } from '../gristService';
 import type { AlignDiff, IdrefDiff, UnifiedAlignDiff, PersonAlignRow } from '../gristService';
 
@@ -386,5 +386,26 @@ describe('buildUnifiedUpdates (docs/plan-alignement-unifie.md, lot 2)', () => {
   it('ambiguous case not arbitrated (no chosen): no write for this source', () => {
     const r = row({ sources: { hal: { status: 'ambiguous', ambiguous: { candidates: [{ id: 'jdupont' } as any] } } } });
     expect(buildUnifiedUpdates(unifiedDiff([r], ['hal']), new Set(), {})).toEqual([]);
+  });
+});
+
+describe('resolveNewStructureLocalId (entity code entered on creation)', () => {
+  const generate = () => 'D-SCD';
+
+  it('keeps the entered supannCodeEntite (trimmed)', () => {
+    expect(resolveNewStructureLocalId(' 1485 ', generate)).toBe('1485');
+    expect(resolveNewStructureLocalId('UMR_6183.a-1', generate)).toBe('UMR_6183.a-1');
+  });
+
+  it('falls back to the generated D-/T- id when nothing is entered', () => {
+    expect(resolveNewStructureLocalId('', generate)).toBe('D-SCD');
+    expect(resolveNewStructureLocalId(undefined, generate)).toBe('D-SCD');
+  });
+
+  it('rejects a code that cannot become a graph uid (spaces, accents, slashes)', () => {
+    expect(() => resolveNewStructureLocalId('14 85', generate)).toThrow();
+    expect(() => resolveNewStructureLocalId('SCD/BU', generate)).toThrow();
+    expect(() => resolveNewStructureLocalId('é1485', generate)).toThrow();
+    expect(() => resolveNewStructureLocalId('-1485', generate)).toThrow();
   });
 });

@@ -1382,6 +1382,20 @@ export interface LdapCandidatesDiff {
   uidTaken?: Record<string, { gristRowId: number; name: string }>;
 }
 
+/**
+ * `local_id` of a structure being created: the entity code entered on creation (supannCodeEntite, e.g. 1485)
+ * or, failing that, the generated D-/T- id. It becomes the Neo4j uid `local-<local_id>` through cdb, hence
+ * no spaces or special characters.
+ */
+export const resolveNewStructureLocalId = (entered: unknown, generate: () => string): string => {
+  const code = String(entered ?? '').trim();
+  if (!code) return generate();
+  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(code)) {
+    throw new Error(t`Invalid entity code “${code}”: letters, digits, “-”, “_” or “.” only`);
+  }
+  return code;
+};
+
 export const GristService = {
   /**
    * Fetches the last modification date of the Grist document.
@@ -2078,7 +2092,7 @@ export const GristService = {
     return records.length;
   },
 
-  /** Local id of a structure created from Druid (no supannCodeEntite): `T-<LABO>-<SIGLE>` for a
+  /** Local id of a structure created from Druid when no entity code (supannCodeEntite) is entered: `T-<LABO>-<SIGLE>` for a
    * team (convention already in place in the table, e.g. T-GEM-MULTIX), `D-<SIGLE>` otherwise. */
   makeLocalId: (structure: Pick<Structure, 'level' | 'acronym' | 'parentStructure'>): string => {
     const slug = (s: string) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -2122,7 +2136,8 @@ export const GristService = {
 
   /**
    * Creates a structure in the Grist « Structures » table (« Nouvelle structure » page, or
-   * « Ajouter une équipe… » entry of the researcher record's Team menu). The `local_id` is generated (makeLocalId);
+   * « Ajouter une équipe… » entry of the researcher record's Team menu). The `local_id` is the entity code
+   * entered on creation (supannCodeEntite), otherwise generated (makeLocalId);
    * for a team, `parent_structure` = lab and `inclusions` = `local-<lab local_id>` (consistent with
    * structures.csv / cdb). Refuses a duplicate acronym + lab. Returns the Druid id `S-<rowId>`.
    */
@@ -2145,7 +2160,8 @@ export const GristService = {
       : lab?.localId ? [{ refType: 'local', ref: lab.localId, startDate: today }] : [];
     const genericType = level === StructureLevel.EQUIPE ? 'team' : level === StructureLevel.ETABLISSEMENT ? 'institution' : 'unit';
     const type = String(structure.type || '').trim() || (level === StructureLevel.EQUIPE ? 'TEAM' : '');
-    const localId = String(structure.localId || '').trim() || GristService.makeLocalId({ level: structure.level, acronym, parentStructure: parent });
+    const localId = resolveNewStructureLocalId(structure.localId,
+      () => GristService.makeLocalId({ level: structure.level, acronym, parentStructure: parent }));
     if (allStructures.some((s) => s.localId === localId)) throw new Error(t`local_id “${localId}” already used`);
     const rawScopus = structure.identifiers?.scopusId;
     const scopusNum = rawScopus ? Number(rawScopus) : null;
