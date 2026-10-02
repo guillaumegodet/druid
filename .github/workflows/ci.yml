@@ -54,6 +54,7 @@ jobs:
           GRIST_EXTRA_DOC_IDS=5aREUrB1kuFAcVY4GTUDfA,docB node scripts/tests/grist-proxy-guard.cjs
           node scripts/tests/cdb-export.cjs
           node scripts/tests/idref-qualinka.cjs
+          node scripts/tests/migration-001.cjs
       # Structural rules only: the list of names lives in a private repository (local pre-push hook).
       - name: Publication guard
         run: node scripts/publication/check_public_tree.mjs
