@@ -23,6 +23,9 @@ const PORT = process.env.PORT || 3000;
 // otherwise (`test` for the test instance, which then shows a banner). Sent by /api/me.
 const BUILD_INFO = require('./scripts/build-info.cjs').readBuildInfo(__dirname);
 const DRUID_ENV = (process.env.DRUID_ENV || 'production').trim().toLowerCase() || 'production';
+// A non-production instance (the test one) may hold a copy of the production data: it is reserved to
+// super admins and shares nothing publicly (plan-separation-test-prod-rssi.md, lot 3).
+const ADMINS_ONLY = DRUID_ENV !== 'production';
 
 // Bypassing SSL verification for internal network proxying to Grist
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -359,6 +362,17 @@ app.get('/auth/logout', (req, res) => {
 // also used to filter the Annuaire/Structures (every Grist lab, dashboard
 // or not). The biblio-data intersection remains specific to
 // /api/dashboard-structures (see getAllowedSlugs above).
+// Non-production instance: a signed-in user who is not a super admin gets nothing but the logout. The
+// auth routes and the liveness probe stay reachable; the anonymous case is left to the auth guard below.
+const restrictToAdmins = (req, res, next) => {
+  if (!ADMINS_ONLY || !req.session?.user || req.path.startsWith('/auth/') || req.path === '/api/health') return next();
+  if (req.session.user.access?.isSuperAdmin) return next();
+  if (req.path.startsWith('/api/')) return res.status(403).json({ error: 'This instance is reserved to administrators' });
+  res.status(403).type('text/plain').send(
+    `Druid ${DRUID_ENV} instance: reserved to administrators. Log out: /auth/logout`);
+};
+app.use(restrictToAdmins);
+
 app.get('/api/me', (req, res) => {
   if (!req.session.user) return res.status(401).json({ error: 'Unauthorized' });
   const { name, email, preferred_username, roles, access } = req.session.user;
@@ -391,8 +405,8 @@ app.use((req, res, next) => {
     // Public sharing of the dashboard dataviz: embed page, bibliometric
     // data (derived from the open sources OpenAlex/BSO) and base map.
     // Everything else stays behind Keycloak.
-    req.path.startsWith('/embed') ||
-    req.path.startsWith('/api/public/') ||
+    // Not on a non-production instance (reserved to administrators).
+    (!ADMINS_ONLY && (req.path.startsWith('/embed') || req.path.startsWith('/api/public/'))) ||
     req.path === '/vendor/world.json';
   if (isPublic || req.session.user) return next();
   // API calls get 401, browser navigation gets redirect
@@ -3516,6 +3530,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  app, gristProxyGuard, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
+  app, restrictToAdmins, gristProxyGuard, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
   buildPeopleCsv, buildStructuresCsv, gristCell, countCsvRecords, normalizeFuzzyDate, fuzzyDateBound, isFuzzyDatePast,
 };
