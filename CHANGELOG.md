@@ -13,6 +13,11 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Sécurité
+- En-têtes de sécurité HTTP sur toutes les réponses (`nosniff`, `Referrer-Policy`, `Permissions-Policy`,
+  `X-Frame-Options` sauf pages `embed`), plus d'en-tête `X-Powered-By`.
+- Export Excel : bibliothèque SheetJS 0.20.3 (distribution officielle) à la place de `xlsx` 0.18 du registre npm,
+  qui portait deux vulnérabilités sans correctif (pollution de prototype, ReDoS).
+- Image et CI sur Node.js 24 (LTS) ; Node 20 n'a plus de correctifs de sécurité depuis avril 2026.
 - Lectures filtrées côté serveur pour les droits « labo » : l'`Annuaire` ne renvoie plus que les lignes de leurs
   laboratoires, les tables d'administration (tâches, revues d'alignement, arbitrages…) leur sont refusées, le cache
   LDAP (date de naissance, corps, statut de tout le personnel) est réduit aux agents de leurs laboratoires et les

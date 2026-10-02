@@ -246,6 +246,21 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
+// Security headers (plan-separation-test-prod-rssi.md, lot 7), on every response. Framing is refused except for the
+// embed pages, which are made to be shown in an <iframe> on other sites. No Strict-Transport-Security while the
+// site is served over plain HTTP.
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.set({
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
+    'Cross-Origin-Opener-Policy': 'same-origin',
+  });
+  if (!req.path.startsWith('/embed')) res.set('X-Frame-Options', 'SAMEORIGIN');
+  next();
+});
+
 // Liveness probe (Docker HEALTHCHECK, deployment smoke test): public, before the logger (one call
 // every 30 s would flood the log) and before the auth guard. Answers that the process serves
 // requests, nothing more — no version, no dependency check: the version is for signed-in users
