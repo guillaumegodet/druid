@@ -1,11 +1,19 @@
 import path from 'path';
+import { createRequire } from 'module';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import { lingui } from '@lingui/vite-plugin';
 
+// Version, commit and date of the build (scripts/build-info.cjs, written by `npm run build`; computed
+// on the fly by the development server), compiled into the bundle for lib/buildInfo.ts.
+const { readBuildInfo } = createRequire(import.meta.url)('./scripts/build-info.cjs');
+
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
+      define: {
+        __DRUID_BUILD__: JSON.stringify(readBuildInfo(__dirname)),
+      },
       server: {
         port: 3000,
         host: '0.0.0.0',

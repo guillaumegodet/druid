@@ -454,7 +454,7 @@ msgid "Sources"
 msgstr "Sources"
 
 #: components/DashboardPage.tsx:312
-#: components/Sidebar.tsx:183
+#: components/Sidebar.tsx:184
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Dashboard"
@@ -470,13 +470,13 @@ msgid "Structure or group"
 msgstr "Structure or group"
 
 #: components/DashboardPage.tsx:328
-#: components/Sidebar.tsx:181
+#: components/Sidebar.tsx:182
 #: components/reports/ReportControls.tsx:47
 msgid "Structures"
 msgstr "Structures"
 
 #: components/DashboardPage.tsx:336
-#: components/Sidebar.tsx:182
+#: components/Sidebar.tsx:183
 #: components/reports/ReportControls.tsx:51
 msgid "Groups"
 msgstr "Groups"
@@ -691,8 +691,8 @@ msgstr "Help for this page (opens the help centre in a new tab)"
 
 #: components/ResearcherDashboard.tsx:69
 #: components/ResearcherDashboard.tsx:104
-#: components/Sidebar.tsx:234
-#: components/Sidebar.tsx:280
+#: components/Sidebar.tsx:241
+#: components/Sidebar.tsx:287
 #: components/dashboard/NewsTab.tsx:231
 msgid "Unknown"
 msgstr "Unknown"
@@ -807,7 +807,7 @@ msgid "Back to the list"
 msgstr "Back to the list"
 
 #: components/ResearcherDetail.tsx:246
-#: components/Sidebar.tsx:180
+#: components/Sidebar.tsx:181
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "People"
@@ -979,36 +979,36 @@ msgstr "List view (table)"
 msgid "Chart view"
 msgstr "Chart view"
 
-#: components/Sidebar.tsx:104
-#: components/Sidebar.tsx:272
+#: components/Sidebar.tsx:105
+#: components/Sidebar.tsx:279
 msgid "Alignment tools"
 msgstr "Alignment tools"
 
-#: components/Sidebar.tsx:110
-#: components/Sidebar.tsx:191
+#: components/Sidebar.tsx:111
+#: components/Sidebar.tsx:192
 #: components/researchers/UnifiedAlignPage.tsx:556
 msgid "Researcher identifier alignment"
 msgstr "Researcher identifier alignment"
 
-#: components/Sidebar.tsx:115
-#: components/Sidebar.tsx:193
+#: components/Sidebar.tsx:116
+#: components/Sidebar.tsx:194
 #: components/researchers/LdapAlignPage.tsx:88
 msgid "LDAP alignment"
 msgstr "LDAP alignment"
 
-#: components/Sidebar.tsx:135
+#: components/Sidebar.tsx:136
 msgid "Switch to English"
 msgstr "Switch to English"
 
-#: components/Sidebar.tsx:135
+#: components/Sidebar.tsx:136
 msgid "Passer en français"
 msgstr "Passer en français"
 
-#: components/Sidebar.tsx:136
+#: components/Sidebar.tsx:137
 msgid "Change language"
 msgstr "Change language"
 
-#: components/Sidebar.tsx:184
+#: components/Sidebar.tsx:185
 #: components/reports/ReportEditor.tsx:256
 #: components/reports/ReportEditor.tsx:271
 #: components/reports/ReportEditor.tsx:301
@@ -1017,44 +1017,44 @@ msgstr "Change language"
 msgid "My reports"
 msgstr "My reports"
 
-#: components/Sidebar.tsx:185
+#: components/Sidebar.tsx:186
 #: components/admin/AdminPage.tsx:99
 msgid "Administration"
 msgstr "Administration"
 
-#: components/Sidebar.tsx:209
+#: components/Sidebar.tsx:210
 msgid "Druid logo"
 msgstr "Druid logo"
 
-#: components/Sidebar.tsx:221
-#: components/Sidebar.tsx:221
+#: components/Sidebar.tsx:228
+#: components/Sidebar.tsx:228
 msgid "Light mode"
 msgstr "Light mode"
 
-#: components/Sidebar.tsx:221
-#: components/Sidebar.tsx:221
+#: components/Sidebar.tsx:228
+#: components/Sidebar.tsx:228
 msgid "Dark mode"
 msgstr "Dark mode"
 
-#: components/Sidebar.tsx:225
-#: components/Sidebar.tsx:225
+#: components/Sidebar.tsx:232
+#: components/Sidebar.tsx:232
 msgid "Help centre (new tab)"
 msgstr "Help centre (new tab)"
 
-#: components/Sidebar.tsx:244
-#: components/Sidebar.tsx:245
-#: components/Sidebar.tsx:284
-#: components/Sidebar.tsx:284
+#: components/Sidebar.tsx:251
+#: components/Sidebar.tsx:252
+#: components/Sidebar.tsx:291
+#: components/Sidebar.tsx:291
 msgid "Log out"
 msgstr "Log out"
 
-#: components/Sidebar.tsx:256
-#: components/Sidebar.tsx:257
+#: components/Sidebar.tsx:263
+#: components/Sidebar.tsx:264
 msgid "Close the menu"
 msgstr "Close the menu"
 
-#: components/Sidebar.tsx:256
-#: components/Sidebar.tsx:257
+#: components/Sidebar.tsx:263
+#: components/Sidebar.tsx:264
 msgid "Menu"
 msgstr "Menu"
 
@@ -7524,6 +7524,10 @@ msgstr "Dashboard generated"
 #: components/groups/GroupDashboardSection.tsx:218
 msgid "Last generation: {0}"
 msgstr "Last generation: {0}"
+
+#: components/layout/EnvironmentBanner.tsx:19
+msgid "{name} instance — not the production version: the data may be reset at any time."
+msgstr "{name} instance — not the production version: the data may be reset at any time."
 
 #: components/layout/ReadOnlyBanner.tsx:16
 msgid "Demonstration instance — fictitious data, read-only: changes are not saved."

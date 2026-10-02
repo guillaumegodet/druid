@@ -108,9 +108,18 @@ Principales variables d'environnement (`.env`) :
   groupes).
 - `PIPELINES_URL`, `PIPELINES_API_KEY` : assistant de recherche CRISalid.
 - `VITE_HELP_URL` : adresse du centre d'aide.
+- `DRUID_ENV` : environnement affiché (`production` par défaut ; toute autre valeur, par exemple `test`,
+  ajoute un bandeau en haut de l'application).
 
 En production, l'image Docker (`Dockerfile`, `node server.cjs` sur le port 3000) est lancée par le projet
-compose de l'établissement, hors de ce dépôt.
+compose de l'établissement, hors de ce dépôt. Aucun réglage d'instance n'est compilé dans l'image (le
+front reçoit son document Grist par `/api/me`) : la même image sert l'instance de test et la production.
+
+**Version et santé.** `npm run build` écrit `build-info.json` (version de `package.json`, commit, date ;
+script `scripts/build-info.cjs`). La version s'affiche sous le logo et dans `/api/me` (`build`). Dans
+l'image Docker, le commit et la date arrivent par les arguments de build `GIT_SHA` et `BUILD_DATE`, et
+sont aussi posés en labels OCI (`docker inspect`). `GET /api/health` (public, sans session) répond
+`{"status":"ok"}` et sert au `HEALTHCHECK` de l'image.
 
 ### Langues et conventions
 

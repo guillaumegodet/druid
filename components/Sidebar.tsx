@@ -5,6 +5,7 @@ import { ViewState } from '../types';
 import { canSeeAdmin, canUseEstablishmentTools, getUserInfo, isSuperAdmin, logout, hasCapability } from '../lib/auth';
 import { currentLocale, setLocale, type Locale } from '../lib/i18n';
 import { helpUrl } from '../lib/helpLinks';
+import { versionDetails, versionLabel } from '../lib/buildInfo';
 
 // 2026 redesign (variant 1A « barre supérieure soft glass »): this component now
 // renders the horizontal navigation bar. The `Sidebar` name is kept
@@ -207,7 +208,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isO
         {/* Logo */}
         <div className="flex items-center gap-3 shrink-0">
           <img src="/druid-logo.png" alt={t`Druid logo`} className="w-[38px] h-[38px] object-contain" />
-          <div className="font-disp font-bold text-[19px] text-ink dark:text-[#f5f2ea] tracking-tight">Druid</div>
+          <div className="leading-none">
+            <div className="font-disp font-bold text-[19px] text-ink dark:text-[#f5f2ea] tracking-tight">Druid</div>
+            {/* Release in use (lib/buildInfo.ts): what a user quotes when reporting a problem. */}
+            <div className="mt-0.5 text-[10.5px] font-medium text-muted-lighter dark:text-[#8f897c] tabular-nums" title={versionDetails()}>
+              {versionLabel()}
+            </div>
+          </div>
         </div>
 
         {/* Pill navigation (wide screens: 1320 px and more, measured on the French labels) */}

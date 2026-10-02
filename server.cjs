@@ -18,6 +18,12 @@ const crypto = require('crypto');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Build identity (version, commit, date — scripts/build-info.cjs) and deployment environment
+// (druid-internal/docs/plan-separation-test-prod-rssi.md, lot 1): `production` unless DRUID_ENV says
+// otherwise (`test` for the test instance, which then shows a banner). Sent by /api/me.
+const BUILD_INFO = require('./scripts/build-info.cjs').readBuildInfo(__dirname);
+const DRUID_ENV = (process.env.DRUID_ENV || 'production').trim().toLowerCase() || 'production';
+
 // Bypassing SSL verification for internal network proxying to Grist
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -232,6 +238,14 @@ const sessionMiddleware = session({
 });
 app.use(sessionMiddleware);
 
+// Liveness probe (Docker HEALTHCHECK, deployment smoke test): public, before the logger (one call
+// every 30 s would flood the log) and before the auth guard. Answers that the process serves
+// requests, nothing more — no version, no dependency check: the version is for signed-in users
+// (/api/me) and for the operator (labels of the image).
+app.get('/api/health', (req, res) => {
+  res.set('Cache-Control', 'no-store').json({ status: 'ok' });
+});
+
 // Logger
 app.use((req, res, next) => {
   console.log(`[Request] ${req.method} ${req.url}`);
@@ -362,6 +376,8 @@ app.get('/api/me', (req, res) => {
     },
     capabilities: CAPABILITIES,
     instance: INSTANCE_INFO,
+    build: BUILD_INFO,
+    environment: DRUID_ENV,
   });
 });
 
@@ -3490,7 +3506,8 @@ if (require.main === module) {
     if (settleProgress(f, 'Interrompu par un redémarrage du serveur')) console.warn(`[Sync] ${f}: run interrupted, file closed`);
   }
   const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Druid Server running on http://0.0.0.0:${PORT}`);
+    console.log(`Druid ${BUILD_INFO.version} (${BUILD_INFO.sha || 'unknown commit'}, built ${BUILD_INFO.builtAt}) `
+      + `running on http://0.0.0.0:${PORT} — environment: ${DRUID_ENV}`);
   });
 
   // No WebSocket is served (the Streamlit /dashboard upgrade went away

@@ -73,6 +73,8 @@ interface UserInfo {
   capabilities: DruidCapabilities;
   /** Settings of the instance (lib/instanceRuntime.ts, plan-architecture-multi-instances lot 6 a). */
   instance?: InstanceInfo;
+  /** Deployment environment (server DRUID_ENV): `production`, `test`… Absent on Cloudflare = production. */
+  environment?: string;
 }
 
 const EMPTY_ACCESS: DruidAccess = { isSuperAdmin: false, isMediaAdmin: false, isLabViewer: false, annuaireLabs: [], allowedSlugs: [] };
@@ -137,6 +139,12 @@ export const initKeycloak = (onAuthenticated: () => void): void => {
       redirectToLogin();
     });
 };
+
+/** Deployment environment of the server (druid-internal/docs/plan-separation-test-prod-rssi.md, lot 1):
+ *  anything but `production` shows the environment banner. */
+export const getEnvironment = (): string => _userInfo?.environment || 'production';
+
+export const isProductionEnvironment = (): boolean => getEnvironment() === 'production';
 
 export const getRoles = (): string[] => _userInfo?.roles ?? [];
 

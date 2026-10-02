@@ -1,5 +1,9 @@
 node_modules
 dist
+# History and local state of the repository: never in an image (the commit comes in through the
+# GIT_SHA build ARG); build-info.json is rewritten by the build itself.
+.git
+build-info.json
 dist-ssr
 *.log
 # Secrets locaux (VITE_GRIST_API_KEY, LDAP_BIND_PASSWORD…) : COPY . . dans le Dockerfile les
