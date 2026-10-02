@@ -13,38 +13,38 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:128
+#: App.tsx:129
 msgid "Error computing the LDAP diff"
 msgstr "Erreur lors du calcul du diff LDAP"
 
-#: App.tsx:138
+#: App.tsx:139
 msgid "Error searching for duplicates"
 msgstr "Erreur lors de la recherche des doublons"
 
-#: App.tsx:162
+#: App.tsx:163
 msgid "Researcher not found in the loaded scope"
 msgstr "Chercheur introuvable dans le périmètre chargé"
 
-#: App.tsx:175
+#: App.tsx:176
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Chercheur de la tâche introuvable dans le périmètre chargé"
 
-#: App.tsx:303
+#: App.tsx:307
 msgid "Error reading LDAP candidates"
 msgstr "Erreur lecture candidats LDAP"
 
 #. placeholder {0}: trig.status
-#: App.tsx:340
+#: App.tsx:344
 msgid "LDAP search trigger failed: {0}"
 msgstr "Déclenchement recherche LDAP : {0}"
 
-#: App.tsx:354
+#: App.tsx:358
 msgid "Error during the LDAP search"
 msgstr "Erreur lors de la recherche LDAP"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:368
+#: App.tsx:372
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -52,106 +52,106 @@ msgstr ""
 "\n"
 "{0} ignorée(s) : uid déjà porté par une autre ligne du même labo ({1}) — utiliser « Fusionner »."
 
-#: App.tsx:370
+#: App.tsx:374
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "Rattachement LDAP : {updated} fiche(s) rattachée(s) (uid_dyna écrit dans Grist).{skippedMsg}"
 
-#: App.tsx:372
+#: App.tsx:376
 msgid "Error attaching LDAP records"
 msgstr "Erreur lors du rattachement LDAP"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:379
+#: App.tsx:383
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "Rattachement LDAP interrompu après {0} fiche(s) écrite(s) — {1}"
 
-#: App.tsx:451
-#: App.tsx:458
+#: App.tsx:457
+#: App.tsx:464
 msgid "Server error"
 msgstr "Erreur serveur"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:459
+#: App.tsx:465
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "Fichiers SoVisu+ mis à jour : {0} structures (structures.csv), {1} personnes (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:459
+#: App.tsx:465
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} ignorée(s) (sans uid)"
 
-#: App.tsx:461
+#: App.tsx:467
 msgid "Error synchronizing with SoVisu+"
 msgstr "Erreur lors de la synchronisation SoVisu+"
 
-#: App.tsx:471
+#: App.tsx:477
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "Synchronisation LDAP : indisponible sur cette instance (pas de job serveur) — la comparaison sur le cache existant reste consultable."
 
 #. placeholder {0}: trig.status
-#: App.tsx:481
+#: App.tsx:487
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "Déclenchement synchronisation LDAP : {0}"
 
-#: App.tsx:495
+#: App.tsx:501
 msgid "Error during the LDAP synchronization"
 msgstr "Erreur lors de la synchronisation LDAP"
 
-#: App.tsx:507
+#: App.tsx:513
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "Mise à jour LDAP appliquée : {updated} fiche(s) écrite(s) dans Grist."
 
-#: App.tsx:509
+#: App.tsx:515
 msgid "Error writing the LDAP updates"
 msgstr "Erreur lors de l'écriture des mises à jour LDAP"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:516
+#: App.tsx:522
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "Écriture LDAP interrompue après {0} fiche(s) écrite(s) — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:550
+#: App.tsx:556
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation appliquée : {0} fiche(s) écrite(s) dans Grist."
 
-#: App.tsx:552
+#: App.tsx:558
 msgid "Error applying the validations"
 msgstr "Erreur lors de l'application des validations"
 
-#: App.tsx:565
+#: App.tsx:571
 msgid "This record has no Grist row: validation impossible."
 msgstr "Cette fiche n'a pas de ligne Grist : validation impossible."
 
-#: App.tsx:577
+#: App.tsx:583
 msgid "Error validating the record"
 msgstr "Erreur lors de la validation de la fiche"
 
-#: App.tsx:594
+#: App.tsx:600
 msgid "Error while saving"
 msgstr "Erreur lors de l'enregistrement"
 
-#: App.tsx:625
+#: App.tsx:631
 msgid "Error computing the LDAP structures diff"
 msgstr "Erreur lors du calcul du diff structures LDAP"
 
-#: App.tsx:639
+#: App.tsx:645
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "Structures LDAP : {updated} mise(s) à jour, {created} création(s) dans Grist."
 
-#: App.tsx:641
+#: App.tsx:647
 msgid "Error writing the LDAP structures"
 msgstr "Erreur lors de l'écriture des structures LDAP"
 
-#: App.tsx:663
+#: App.tsx:669
 msgid "Error saving the structure"
 msgstr "Erreur lors de l'enregistrement de la structure"
 
-#: App.tsx:672
+#: App.tsx:678
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -159,44 +159,44 @@ msgstr ""
 "Profil {candidateId} marqué « Identité mêlée » pour {displayName}.\n"
 "Note (facultative) : qui possède quoi, ce qu'il faudrait scinder…"
 
-#: App.tsx:681
+#: App.tsx:687
 msgid "Error loading the unified view"
 msgstr "Erreur lors du chargement de la vue unifiée"
 
-#: App.tsx:689
+#: App.tsx:695
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Alignement unifié : indisponible sur cette instance (pas de job serveur pour lancer un run) — la revue des candidats déjà calculés reste consultable."
 
-#: App.tsx:703
+#: App.tsx:709
 msgid "Error during the unified alignment"
 msgstr "Erreur lors de l'alignement unifié"
 
-#: App.tsx:720
+#: App.tsx:726
 msgid "Error writing (unified view)"
 msgstr "Erreur lors de l'écriture (vue unifiée)"
 
-#: App.tsx:754
+#: App.tsx:760
 msgid "Error rejecting the candidate"
 msgstr "Erreur lors du rejet du candidat"
 
-#: App.tsx:885
+#: App.tsx:892
 msgid "Qualification error"
 msgstr "Erreur de qualification"
 
-#: App.tsx:889
+#: App.tsx:896
 msgid "Requalification error"
 msgstr "Erreur de requalification"
 
-#: App.tsx:895
+#: App.tsx:902
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Ligne Grist {gristRowId} introuvable dans le périmètre chargé"
 
-#: App.tsx:914
+#: App.tsx:921
 msgid "Loading dashboard…"
 msgstr "Chargement du tableau de bord…"
 
-#: App.tsx:932
-#: App.tsx:944
+#: App.tsx:939
+#: App.tsx:951
 #: components/dashboard/EmbedPage.tsx:88
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
@@ -206,24 +206,24 @@ msgstr "Chargement du tableau de bord…"
 #: components/reports/ReportsPage.tsx:134
 #: components/researchers/AffiliationHistorySection.tsx:211
 #: components/researchers/MergeLogPanel.tsx:64
-#: components/researchers/TasksPage.tsx:347
+#: components/researchers/TasksPage.tsx:343
 msgid "Loading…"
 msgstr "Chargement…"
 
-#: App.tsx:953
+#: App.tsx:960
 msgid "View not found"
 msgstr "Vue introuvable"
 
-#: App.tsx:977
+#: App.tsx:984
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Votre compte a un droit « labo », mais aucune fiche de l'Annuaire ne porte votre identifiant avec un laboratoire en cours — contactez un administrateur pour faire mettre à jour votre fiche."
 
-#: App.tsx:981
+#: App.tsx:988
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "Aucun périmètre ne vous a été attribué dans Druid pour l'instant — contactez un administrateur pour qu'il vous rattache à une structure (groupe Keycloak <0>labo_viewer</0> ou <1>dashboard_viewer</1> sous votre labo)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1022
+#: App.tsx:1029
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Alignement unifié : {0} référentiel(s) en cours"
 
@@ -357,7 +357,7 @@ msgid "Stop the answer"
 msgstr "Interrompre la réponse"
 
 #: components/ChatWidget.tsx:497
-#: components/researchers/TasksPage.tsx:361
+#: components/researchers/TasksPage.tsx:357
 msgid "Send"
 msgstr "Envoyer"
 
@@ -423,6 +423,7 @@ msgstr "Équipes"
 
 #: components/DashboardPage.tsx:90
 #: components/dashboard/report/reportCatalog.ts:100
+#: components/researchers/AlignLaunchModal.tsx:101
 msgid "PhD students"
 msgstr "Doctorants"
 
@@ -453,7 +454,7 @@ msgid "Sources"
 msgstr "Sources"
 
 #: components/DashboardPage.tsx:312
-#: components/Sidebar.tsx:163
+#: components/Sidebar.tsx:184
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Tableau de bord"
@@ -469,13 +470,13 @@ msgid "Structure or group"
 msgstr "Structure ou groupe"
 
 #: components/DashboardPage.tsx:328
-#: components/Sidebar.tsx:158
+#: components/Sidebar.tsx:182
 #: components/reports/ReportControls.tsx:47
 msgid "Structures"
 msgstr "Structures"
 
 #: components/DashboardPage.tsx:336
-#: components/Sidebar.tsx:161
+#: components/Sidebar.tsx:183
 #: components/reports/ReportControls.tsx:51
 msgid "Groups"
 msgstr "Groupes"
@@ -588,13 +589,14 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/reports/NewReportDialog.tsx:311
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:194
+#: components/researchers/AlignLaunchModal.tsx:188
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
 #: components/researchers/MergeResearchersModal.tsx:291
 #: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
-#: components/researchers/TasksPage.tsx:322
+#: components/researchers/TasksPage.tsx:318
 #: components/structures/StructuresLdapReview.tsx:131
 msgid "Cancel"
 msgstr "Annuler"
@@ -688,7 +690,8 @@ msgstr "Aide sur cette page (ouvre le centre d'aide dans un nouvel onglet)"
 
 #: components/ResearcherDashboard.tsx:69
 #: components/ResearcherDashboard.tsx:104
-#: components/Sidebar.tsx:215
+#: components/Sidebar.tsx:241
+#: components/Sidebar.tsx:287
 #: components/dashboard/NewsTab.tsx:231
 msgid "Unknown"
 msgstr "Inconnu"
@@ -786,6 +789,7 @@ msgid "Other labs in LDAP: {0} — add them as memberships if relevant."
 msgstr "Autres labos dans le LDAP : {0} — à ajouter en appartenances si pertinent."
 
 #: components/ResearcherDetail.tsx:204
+#: components/researchers/AlignLaunchModal.tsx:153
 msgid "none"
 msgstr "aucune"
 
@@ -802,7 +806,7 @@ msgid "Back to the list"
 msgstr "Retour à la liste"
 
 #: components/ResearcherDetail.tsx:242
-#: components/Sidebar.tsx:155
+#: components/Sidebar.tsx:181
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "Personnel"
@@ -913,6 +917,7 @@ msgid "Scope"
 msgstr "Portée"
 
 #: components/ResearcherDetail.tsx:519
+#: components/researchers/AlignLaunchModal.tsx:128
 msgid "Source"
 msgstr "Source"
 
@@ -973,33 +978,36 @@ msgstr "Vue liste (tableau)"
 msgid "Chart view"
 msgstr "Vue dataviz (graphiques)"
 
-#: components/Sidebar.tsx:87
+#: components/Sidebar.tsx:105
+#: components/Sidebar.tsx:279
 msgid "Alignment tools"
 msgstr "Outils d'alignement"
 
-#: components/Sidebar.tsx:93
-#: components/researchers/UnifiedAlignPage.tsx:483
+#: components/Sidebar.tsx:111
+#: components/Sidebar.tsx:192
+#: components/researchers/UnifiedAlignPage.tsx:556
 msgid "Researcher identifier alignment"
 msgstr "Alignement des identifiants chercheurs"
 
-#: components/Sidebar.tsx:98
+#: components/Sidebar.tsx:116
+#: components/Sidebar.tsx:194
 #: components/researchers/LdapAlignPage.tsx:79
 msgid "LDAP alignment"
 msgstr "Alignement LDAP"
 
-#: components/Sidebar.tsx:118
+#: components/Sidebar.tsx:136
 msgid "Switch to English"
 msgstr "Switch to English"
 
-#: components/Sidebar.tsx:118
+#: components/Sidebar.tsx:136
 msgid "Passer en français"
 msgstr "Passer en français"
 
-#: components/Sidebar.tsx:119
+#: components/Sidebar.tsx:137
 msgid "Change language"
 msgstr "Changer de langue"
 
-#: components/Sidebar.tsx:164
+#: components/Sidebar.tsx:185
 #: components/reports/ReportEditor.tsx:256
 #: components/reports/ReportEditor.tsx:271
 #: components/reports/ReportEditor.tsx:301
@@ -1008,31 +1016,46 @@ msgstr "Changer de langue"
 msgid "My reports"
 msgstr "Mes rapports"
 
-#: components/Sidebar.tsx:167
+#: components/Sidebar.tsx:186
 #: components/admin/AdminPage.tsx:99
 msgid "Administration"
 msgstr "Administration"
 
-#: components/Sidebar.tsx:177
+#: components/Sidebar.tsx:210
 msgid "Druid logo"
 msgstr "Logo Druid"
 
-#: components/Sidebar.tsx:191
+#: components/Sidebar.tsx:228
+#: components/Sidebar.tsx:228
 msgid "Light mode"
 msgstr "Mode clair"
 
-#: components/Sidebar.tsx:191
+#: components/Sidebar.tsx:228
+#: components/Sidebar.tsx:228
 msgid "Dark mode"
 msgstr "Mode sombre"
 
-#: components/Sidebar.tsx:201
-#: components/Sidebar.tsx:202
+#: components/Sidebar.tsx:232
+#: components/Sidebar.tsx:232
 msgid "Help centre (new tab)"
 msgstr "Centre d'aide (nouvel onglet)"
 
-#: components/Sidebar.tsx:224
+#: components/Sidebar.tsx:251
+#: components/Sidebar.tsx:252
+#: components/Sidebar.tsx:291
+#: components/Sidebar.tsx:291
 msgid "Log out"
 msgstr "Déconnexion"
+
+#: components/Sidebar.tsx:263
+#: components/Sidebar.tsx:264
+msgid "Close the menu"
+msgstr "Fermer le menu"
+
+#: components/Sidebar.tsx:263
+#: components/Sidebar.tsx:264
+msgid "Menu"
+msgstr "Menu"
 
 #: components/StructureDetail.tsx:42
 msgid "Identification"
@@ -2681,7 +2704,8 @@ msgstr "À propos de « {title} »"
 #: components/reports/NewReportDialog.tsx:170
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/AffiliationHistorySection.tsx:100
-#: components/researchers/UnifiedAlignPage.tsx:603
+#: components/researchers/AlignLaunchModal.tsx:104
+#: components/researchers/UnifiedAlignPage.tsx:695
 msgid "Close"
 msgstr "Fermer"
 
@@ -4096,7 +4120,7 @@ msgid "Discard"
 msgstr "Écarter"
 
 #: components/dashboard/NewsletterPanel.tsx:454
-#: components/researchers/TasksPage.tsx:269
+#: components/researchers/TasksPage.tsx:268
 msgid "Reopen"
 msgstr "Rouvrir"
 
@@ -4421,7 +4445,7 @@ msgstr "Filtres"
 
 #: components/dashboard/PublicationsListTab.tsx:262
 #: components/reports/ReportEditor.tsx:378
-#: components/researchers/UnifiedAlignPage.tsx:549
+#: components/researchers/UnifiedAlignPage.tsx:641
 msgid "Remove this filter"
 msgstr "Retirer ce filtre"
 
@@ -7296,7 +7320,7 @@ msgstr "En cours"
 
 #: components/etl/EtlMaintenancePanels.tsx:153
 #: components/reports/ReportEditor.tsx:322
-#: components/researchers/TasksPage.tsx:345
+#: components/researchers/TasksPage.tsx:341
 msgid "History"
 msgstr "Historique"
 
@@ -7379,8 +7403,8 @@ msgid "Save to Grist"
 msgstr "Enregistrer dans Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3393
-#: lib/gristService.ts:3502
+#: lib/gristService.ts:3397
+#: lib/gristService.ts:3506
 msgid "Search error"
 msgstr "Erreur de recherche"
 
@@ -7492,6 +7516,10 @@ msgstr "Tableau de bord généré"
 #: components/groups/GroupDashboardSection.tsx:218
 msgid "Last generation: {0}"
 msgstr "Dernière génération : {0}"
+
+#: components/layout/EnvironmentBanner.tsx:19
+msgid "{name} instance — not the production version: the data may be reset at any time."
+msgstr "Instance {name} — ce n'est pas la version de production : les données peuvent être réinitialisées à tout moment."
 
 #: components/layout/ReadOnlyBanner.tsx:16
 msgid "Demonstration instance — fictitious data, read-only: changes are not saved."
@@ -8147,7 +8175,7 @@ msgid "rows to send"
 msgstr "lignes à envoyer"
 
 #: components/researchers/AbesExportModal.tsx:199
-#: components/researchers/UnifiedAlignPage.tsx:557
+#: components/researchers/UnifiedAlignPage.tsx:649
 msgid "conflicts"
 msgstr "conflits"
 
@@ -8169,7 +8197,7 @@ msgid "{0} records have an IdRef but their notice has not been re-read: run “A
 msgstr "{0} fiches ont un IdRef mais leur notice n'a pas été relue : lancez « Aligner IdRef → Vérifier les existants » puis rouvrez cet export."
 
 #: components/researchers/AbesExportModal.tsx:223
-#: components/researchers/UnifiedAlignPage.tsx:585
+#: components/researchers/UnifiedAlignPage.tsx:677
 msgid "Person"
 msgstr "Personne"
 
@@ -8531,6 +8559,118 @@ msgstr "Ajouter une équipe (plusieurs équipes possibles dans le même labo)"
 msgid "No affiliation recorded."
 msgstr "Aucune appartenance renseignée."
 
+#. placeholder {0}: fmt(cost.requests)
+#: components/researchers/AlignLaunchModal.tsx:77
+msgid "≈ {0} requests"
+msgstr "≈ {0} requêtes"
+
+#. placeholder {0}: fmt(cost.search)
+#: components/researchers/AlignLaunchModal.tsx:79
+msgid "{0} Author Search"
+msgstr "{0} Author Search"
+
+#. placeholder {0}: fmt(cost.author)
+#: components/researchers/AlignLaunchModal.tsx:80
+msgid "{0} Author Retrieval"
+msgstr "{0} Author Retrieval"
+
+#: components/researchers/AlignLaunchModal.tsx:98
+msgid "Check the existing identifiers"
+msgstr "Vérifier les identifiants existants"
+
+#: components/researchers/AlignLaunchModal.tsx:98
+msgid "Search the missing identifiers"
+msgstr "Rechercher les identifiants manquants"
+
+#: components/researchers/AlignLaunchModal.tsx:101
+msgid "Scope: {labo}"
+msgstr "Périmètre : {labo}"
+
+#: components/researchers/AlignLaunchModal.tsx:101
+msgid "Scope: all structures"
+msgstr "Périmètre : toutes les structures"
+
+#: components/researchers/AlignLaunchModal.tsx:101
+msgid "No research duty"
+msgstr "Sans obligation de recherche"
+
+#: components/researchers/AlignLaunchModal.tsx:101
+msgid "Staff"
+msgstr "Personnel"
+
+#: components/researchers/AlignLaunchModal.tsx:110
+msgid "Counting the records to process…"
+msgstr "Décompte des fiches à traiter…"
+
+#: components/researchers/AlignLaunchModal.tsx:117
+msgid "Only the records never searched (or in error)"
+msgstr "Seulement les fiches jamais cherchées (ou en erreur)"
+
+#: components/researchers/AlignLaunchModal.tsx:121
+msgid "All records of the scope (full rerun)"
+msgstr "Toutes les fiches du périmètre (relance complète)"
+
+#: components/researchers/AlignLaunchModal.tsx:129
+#: components/researchers/DuplicatesPage.tsx:143
+#: components/researchers/ListHeader.tsx:121
+#: components/researchers/OpenAlexAffiliationsPage.tsx:93
+#: components/researchers/TodoPage.tsx:61
+msgid "To process"
+msgstr "À traiter"
+
+#: components/researchers/AlignLaunchModal.tsx:130
+msgid "Cap"
+msgstr "Plafond"
+
+#: components/researchers/AlignLaunchModal.tsx:131
+msgid "Estimated cost"
+msgstr "Coût estimé"
+
+#. placeholder {0}: fmt(e.eligible - e.pending)
+#: components/researchers/AlignLaunchModal.tsx:149
+msgid "{0} already searched"
+msgstr "{0} déjà cherchées"
+
+#. placeholder {0}: sourceLabel[s]
+#: components/researchers/AlignLaunchModal.tsx:155
+msgid "Maximum number of records for {0}"
+msgstr "Nombre maximal de fiches pour {0}"
+
+#: components/researchers/AlignLaunchModal.tsx:161
+msgid "Beyond the Elsevier calls available this week — lower the cap"
+msgstr "Dépasse les appels Elsevier disponibles cette semaine — baissez le plafond"
+
+#: components/researchers/AlignLaunchModal.tsx:173
+msgid "Scopus — weekly Elsevier quota"
+msgstr "Scopus — quota hebdomadaire Elsevier"
+
+#. placeholder {0}: fmt(pools.search?.available ?? 0)
+#. placeholder {1}: fmt(pools.author?.available ?? 0)
+#. placeholder {2}: fmt(estimate.scopus.affordable ?? 0)
+#: components/researchers/AlignLaunchModal.tsx:174
+msgid "Available for the alignment: {0} Author Search, {1} Author Retrieval — about {2} records."
+msgstr "Disponible pour l’alignement : {0} Author Search, {1} Author Retrieval — environ {2} fiches."
+
+#. placeholder {0}: Math.round(estimate.scopus.reserve1 * 100)
+#: components/researchers/AlignLaunchModal.tsx:177
+msgid "Key 1 keeps {0} % of its quota for the SoVisu+ harvester; the backup key is then used in full."
+msgstr "La clé 1 garde {0} % de son quota pour le moissonneur SoVisu+ ; la clé de secours est ensuite utilisée en entier."
+
+#. placeholder {0}: Math.round(estimate.scopus.reserve1 * 100)
+#: components/researchers/AlignLaunchModal.tsx:178
+msgid "Key 1 keeps {0} % of its quota for the SoVisu+ harvester."
+msgstr "La clé 1 garde {0} % de son quota pour le moissonneur SoVisu+."
+
+#. placeholder {0}: pools.search.asOf.slice(0, 10)
+#. placeholder {1}: pools.search.reset ?? '?'
+#: components/researchers/AlignLaunchModal.tsx:179
+msgid "Figures of the last Scopus run ({0}); quotas reset on {1}."
+msgstr "Chiffres du dernier run Scopus ({0}) ; remise à zéro des quotas le {1}."
+
+#: components/researchers/AlignLaunchModal.tsx:190
+msgid "Start"
+msgstr "Lancer"
+
 #: components/researchers/DuplicateQualifyPanel.tsx:31
 msgid "Main row:"
 msgstr "Ligne principale :"
@@ -8607,13 +8747,6 @@ msgstr "Fiches partageant un même uid_dyna — fusionner, ou qualifier un multi
 msgid "Looking for duplicates…"
 msgstr "Recherche des doublons…"
 
-#: components/researchers/DuplicatesPage.tsx:143
-#: components/researchers/ListHeader.tsx:121
-#: components/researchers/OpenAlexAffiliationsPage.tsx:93
-#: components/researchers/TodoPage.tsx:61
-msgid "To process"
-msgstr "À traiter"
-
 #: components/researchers/DuplicatesPage.tsx:146
 msgid "Qualified multi-affiliations"
 msgstr "Multi-rattachements qualifiés"
@@ -8659,7 +8792,7 @@ msgid "Qualify"
 msgstr "Qualifier"
 
 #: components/researchers/DuplicatesPage.tsx:209
-#: components/researchers/TasksPage.tsx:302
+#: components/researchers/TasksPage.tsx:298
 msgid "Open the merge assistant"
 msgstr "Ouvrir l'assistant de fusion"
 
@@ -8688,7 +8821,7 @@ msgstr "Requalifier"
 
 #: components/researchers/DuplicatesPage.tsx:272
 #: components/researchers/LdapVerifyPanel.tsx:162
-#: components/researchers/UnifiedAlignPage.tsx:655
+#: components/researchers/UnifiedAlignPage.tsx:749
 msgid "Generated on {generatedAt}"
 msgstr "Généré le {generatedAt}"
 
@@ -8990,7 +9123,6 @@ msgid "No conflict left to settle."
 msgstr "Plus aucun conflit à arbitrer."
 
 #: components/researchers/ImportConflictsPage.tsx:173
-#: components/researchers/TasksPage.tsx:297
 msgid "Open the record"
 msgstr "Ouvrir la fiche"
 
@@ -9045,12 +9177,12 @@ msgid "First {MAX_PEOPLE} records out of {0} — narrow with the filters."
 msgstr "{MAX_PEOPLE} premières fiches sur {0} — affinez avec les filtres."
 
 #: components/researchers/LdapAlignPage.tsx:27
-#: components/researchers/UnifiedAlignPage.tsx:44
+#: components/researchers/UnifiedAlignPage.tsx:49
 msgid "Find missing"
 msgstr "Rechercher manquants"
 
 #: components/researchers/LdapAlignPage.tsx:27
-#: components/researchers/UnifiedAlignPage.tsx:44
+#: components/researchers/UnifiedAlignPage.tsx:49
 msgid "Check existing ones"
 msgstr "Vérifier les existants"
 
@@ -9218,8 +9350,8 @@ msgstr "Homonymes à arbitrer ({0}) — {arbitratedCount, plural, one {# tranch�
 #. placeholder {0}: a.candidates.length
 #. placeholder {0}: cell.ambiguous.candidates.length
 #: components/researchers/LdapCandidatesPage.tsx:255
-#: components/researchers/UnifiedAlignPage.tsx:112
-#: components/researchers/UnifiedAlignPage.tsx:238
+#: components/researchers/UnifiedAlignPage.tsx:128
+#: components/researchers/UnifiedAlignPage.tsx:268
 #: components/researchers/ValidationImportReview.tsx:197
 msgid "{0, plural, one {# candidate} other {# candidates}}"
 msgstr "{0, plural, one {# candidat} other {# candidats}}"
@@ -9312,7 +9444,7 @@ msgid "No orphan."
 msgstr "Aucun orphelin."
 
 #: components/researchers/LdapVerifyPanel.tsx:166
-#: components/researchers/UnifiedAlignPage.tsx:659
+#: components/researchers/UnifiedAlignPage.tsx:753
 #: components/structures/StructuresLdapReview.tsx:134
 msgid "Writing…"
 msgstr "Écriture…"
@@ -9320,7 +9452,7 @@ msgstr "Écriture…"
 #. placeholder {0}: selected.size
 #. placeholder {0}: updates.length
 #: components/researchers/LdapVerifyPanel.tsx:166
-#: components/researchers/UnifiedAlignPage.tsx:659
+#: components/researchers/UnifiedAlignPage.tsx:753
 msgid "Apply ({0})"
 msgstr "Appliquer ({0})"
 
@@ -10012,27 +10144,27 @@ msgid "{hidden} more suggestions will show once these are done."
 msgstr "{hidden} autres suggestions apparaîtront une fois celles-ci traitées."
 
 #: components/researchers/SuggestionsSection.tsx:211
-#: components/researchers/TasksPage.tsx:407
+#: components/researchers/TasksPage.tsx:403
 msgid "Subject"
 msgstr "Objet"
 
 #: components/researchers/SuggestionsSection.tsx:214
-#: components/researchers/TasksPage.tsx:394
+#: components/researchers/TasksPage.tsx:390
 msgid "Subject:"
 msgstr "Objet :"
 
 #: components/researchers/SuggestionsSection.tsx:215
-#: components/researchers/TasksPage.tsx:411
+#: components/researchers/TasksPage.tsx:407
 msgid "Copy the email"
 msgstr "Copier l’email"
 
 #: components/researchers/SuggestionsSection.tsx:218
-#: components/researchers/TasksPage.tsx:415
+#: components/researchers/TasksPage.tsx:411
 msgid "Open in the mail client"
 msgstr "Ouvrir dans la messagerie"
 
 #: components/researchers/SuggestionsSection.tsx:219
-#: components/researchers/TasksPage.tsx:401
+#: components/researchers/TasksPage.tsx:397
 msgid "no email in the Directory"
 msgstr "pas d’email dans l’Annuaire"
 
@@ -10177,107 +10309,107 @@ msgstr "À compléter"
 msgid "Directory not loaded yet: researcher links open once the list is available."
 msgstr "Annuaire pas encore chargé : les liens vers les fiches s’ouvriront quand la liste sera disponible."
 
-#: components/researchers/TasksPage.tsx:261
+#: components/researchers/TasksPage.tsx:260
 msgid "Action failed"
 msgstr "Action impossible"
 
-#: components/researchers/TasksPage.tsx:265
+#: components/researchers/TasksPage.tsx:264
 msgid "Take over"
 msgstr "Prendre en charge"
 
-#: components/researchers/TasksPage.tsx:265
+#: components/researchers/TasksPage.tsx:264
 msgid "Resume"
 msgstr "Reprendre"
 
-#: components/researchers/TasksPage.tsx:266
+#: components/researchers/TasksPage.tsx:265
 #: lib/tasks.ts:102
 msgid "Put on hold"
 msgstr "Mettre en attente"
 
-#: components/researchers/TasksPage.tsx:267
+#: components/researchers/TasksPage.tsx:266
 msgid "Mark as done"
 msgstr "Marquer fait"
 
-#: components/researchers/TasksPage.tsx:268
+#: components/researchers/TasksPage.tsx:267
 msgid "Drop"
 msgstr "Abandonner"
 
-#: components/researchers/TasksPage.tsx:269
+#: components/researchers/TasksPage.tsx:268
 msgid "Back to “to do”"
 msgstr "Remettre « à faire »"
 
-#: components/researchers/TasksPage.tsx:283
+#: components/researchers/TasksPage.tsx:282
 msgid "Created by"
 msgstr "Créée par"
 
-#: components/researchers/TasksPage.tsx:284
+#: components/researchers/TasksPage.tsx:283
 msgid "Taken over by"
 msgstr "Prise en charge par"
 
-#: components/researchers/TasksPage.tsx:285
+#: components/researchers/TasksPage.tsx:284
 msgid "Closed by"
 msgstr "Clôturée par"
 
-#: components/researchers/TasksPage.tsx:287
+#: components/researchers/TasksPage.tsx:286
 msgid "Verified"
 msgstr "Vérifiée"
 
-#: components/researchers/TasksPage.tsx:290
+#: components/researchers/TasksPage.tsx:289
 msgid "Waiting for:"
 msgstr "En attente de :"
 
-#: components/researchers/TasksPage.tsx:291
+#: components/researchers/TasksPage.tsx:290
 msgid "Resolution:"
 msgstr "Résolution :"
 
-#: components/researchers/TasksPage.tsx:294
+#: components/researchers/TasksPage.tsx:293
 msgid "Open the link"
 msgstr "Ouvrir le lien"
 
-#: components/researchers/TasksPage.tsx:301
+#: components/researchers/TasksPage.tsx:297
 msgid "The task closes itself at the next detection, once the records are merged"
 msgstr "La tâche se ferme d’elle-même à la prochaine détection, une fois les fiches fusionnées"
 
 #. placeholder {0}: p.uids[0]
 #. placeholder {1}: p.uids[1]
-#: components/researchers/TasksPage.tsx:302
+#: components/researchers/TasksPage.tsx:298
 msgid "Merge {0} + {1}"
 msgstr "Fusionner {0} + {1}"
 
-#: components/researchers/TasksPage.tsx:318
+#: components/researchers/TasksPage.tsx:314
 msgid "Waiting for what? (researcher's answer, ABES batch, external support…)"
 msgstr "En attente de quoi ? (réponse du chercheur, lot ABES, support externe…)"
 
-#: components/researchers/TasksPage.tsx:318
+#: components/researchers/TasksPage.tsx:314
 msgid "Resolution (optional)"
 msgstr "Résolution (facultatif)"
 
-#: components/researchers/TasksPage.tsx:328
+#: components/researchers/TasksPage.tsx:324
 msgid "Assign to (username)"
 msgstr "Assigner à (identifiant)"
 
-#: components/researchers/TasksPage.tsx:329
+#: components/researchers/TasksPage.tsx:325
 msgid "Reassign"
 msgstr "Réassigner"
 
-#: components/researchers/TasksPage.tsx:330
+#: components/researchers/TasksPage.tsx:326
 msgid "Assign to me"
 msgstr "Me l’assigner"
 
-#: components/researchers/TasksPage.tsx:337
+#: components/researchers/TasksPage.tsx:333
 msgid "Email sent to the researcher"
 msgstr "Email envoyé au chercheur"
 
-#: components/researchers/TasksPage.tsx:359
+#: components/researchers/TasksPage.tsx:355
 msgid "Add a comment…"
 msgstr "Ajouter un commentaire…"
 
-#: components/researchers/TasksPage.tsx:400
+#: components/researchers/TasksPage.tsx:396
 #: lib/tasks.ts:78
 msgid "Email to the researcher"
 msgstr "Email au chercheur"
 
-#: components/researchers/TasksPage.tsx:420
+#: components/researchers/TasksPage.tsx:416
 msgid "Mark as sent (task on hold)"
 msgstr "Marquer envoyé (tâche en attente)"
 
@@ -10325,287 +10457,341 @@ msgstr "Conflits annuaire {conflictSource}"
 msgid "Directory conflicts"
 msgstr "Conflits annuaire"
 
-#: components/researchers/UnifiedAlignPage.tsx:108
+#: components/researchers/UnifiedAlignPage.tsx:117
 msgid "{label}: one candidate to check — tick to fill in, click to see it"
 msgstr "{label} : un candidat à vérifier — cocher pour renseigner, cliquer pour le voir"
 
-#: components/researchers/UnifiedAlignPage.tsx:108
+#: components/researchers/UnifiedAlignPage.tsx:122
 msgid "strong candidate"
 msgstr "candidat fort"
 
-#: components/researchers/UnifiedAlignPage.tsx:108
+#: components/researchers/UnifiedAlignPage.tsx:122
 msgid "candidate"
 msgstr "candidat"
 
-#: components/researchers/UnifiedAlignPage.tsx:112
+#: components/researchers/UnifiedAlignPage.tsx:127
 msgid "{label}: candidates to check"
 msgstr "{label} : candidats à vérifier"
 
-#: components/researchers/UnifiedAlignPage.tsx:115
+#: components/researchers/UnifiedAlignPage.tsx:132
 msgid "{label}: ambiguous — pick a candidate or ignore"
 msgstr "{label} : ambigu — choisir un candidat ou ignorer"
 
-#. placeholder {0}: cell.ambiguous?.candidates.length ?? 0
-#: components/researchers/UnifiedAlignPage.tsx:115
-msgid "{0, plural, one {# candidate ?} other {# candidates ?}}"
-msgstr "{0, plural, one {# candidat ?} other {# candidats ?}}"
+#: components/researchers/UnifiedAlignPage.tsx:133
+msgid "{n, plural, one {# candidate ?} other {# candidates ?}}"
+msgstr "{n, plural, one {# candidat ?} other {# candidats ?}}"
 
-#: components/researchers/UnifiedAlignPage.tsx:118
+#: components/researchers/UnifiedAlignPage.tsx:136
 msgid "Name mismatch between the record and its IdRef entry — confirm or detach"
 msgstr "Écart de nom entre la fiche et sa notice IdRef — confirmer ou détacher"
 
-#: components/researchers/UnifiedAlignPage.tsx:118
+#: components/researchers/UnifiedAlignPage.tsx:137
 msgid "name mismatch"
 msgstr "nom divergent"
 
-#: components/researchers/UnifiedAlignPage.tsx:121
+#: components/researchers/UnifiedAlignPage.tsx:140
 msgid "IdRef entry merged/replaced by ABES — update the PPN"
 msgstr "Notice IdRef fusionnée/remplacée par l'ABES — mettre à jour le PPN"
 
-#: components/researchers/UnifiedAlignPage.tsx:121
+#: components/researchers/UnifiedAlignPage.tsx:141
 msgid "replaced entry"
 msgstr "notice remplacée"
 
-#: components/researchers/UnifiedAlignPage.tsx:124
+#: components/researchers/UnifiedAlignPage.tsx:144
 msgid "{label}: conflict to review"
 msgstr "{label} : conflit à revoir"
 
-#: components/researchers/UnifiedAlignPage.tsx:124
+#: components/researchers/UnifiedAlignPage.tsx:145
 msgid "{nbConflicts, plural, one {conflict} other {# conflicts}}"
 msgstr "{nbConflicts, plural, one {conflit} other {# conflits}}"
 
 #. placeholder {0}: (cell.existing || []).join(', ')
-#: components/researchers/UnifiedAlignPage.tsx:128
+#: components/researchers/UnifiedAlignPage.tsx:148
 msgid "Already filled in: {0}"
 msgstr "Déjà renseigné : {0}"
 
-#: components/researchers/UnifiedAlignPage.tsx:130
+#: components/researchers/UnifiedAlignPage.tsx:152
 msgid "filled in"
 msgstr "renseigné"
 
-#: components/researchers/UnifiedAlignPage.tsx:134
+#: components/researchers/UnifiedAlignPage.tsx:157
 msgid "No candidate found during the last {label} run."
 msgstr "Aucun candidat trouvé lors du dernier run {label}."
 
-#: components/researchers/UnifiedAlignPage.tsx:134
+#: components/researchers/UnifiedAlignPage.tsx:158
 msgid "not found"
 msgstr "non trouvé"
 
-#: components/researchers/UnifiedAlignPage.tsx:135
+#: components/researchers/UnifiedAlignPage.tsx:160
 msgid "Never searched on this source"
 msgstr "Jamais recherché sur ce référentiel"
 
-#: components/researchers/UnifiedAlignPage.tsx:143
+#: components/researchers/UnifiedAlignPage.tsx:168
 msgid "The directory's IdRef points to a record merged or removed by ABES: IdRef redirects to the record replacing it. “Update” replaces the old PPN with the new one."
 msgstr "L'IdRef de l'Annuaire pointe vers une notice fusionnée ou supprimée par l'ABES : IdRef redirige vers la notice qui la remplace. « Mettre à jour » remplace l'ancien PPN par le nouveau."
 
-#: components/researchers/UnifiedAlignPage.tsx:155
+#: components/researchers/UnifiedAlignPage.tsx:180
 msgid "The replacement record's name differs from the directory — check before updating"
 msgstr "Le nom de la notice de remplacement diffère de l'Annuaire — vérifier avant de mettre à jour"
 
 #. placeholder {0}: r.ppn
 #. placeholder {1}: r.newPpn
-#: components/researchers/UnifiedAlignPage.tsx:155
+#: components/researchers/UnifiedAlignPage.tsx:180
 msgid "Replaces {0} with {1} in the IdRef column"
 msgstr "Remplace {0} par {1} dans la colonne IdRef"
 
-#: components/researchers/UnifiedAlignPage.tsx:156
+#: components/researchers/UnifiedAlignPage.tsx:181
 msgid "Update"
 msgstr "Mettre à jour"
 
-#: components/researchers/UnifiedAlignPage.tsx:163
+#: components/researchers/UnifiedAlignPage.tsx:188
 msgid "Name mismatch: the replacement record does not carry the directory name — check that it is the same person."
 msgstr "Nom divergent : la notice de remplacement ne porte pas le nom de l'Annuaire — vérifier qu'il s'agit bien de la même personne."
 
-#: components/researchers/UnifiedAlignPage.tsx:166
+#: components/researchers/UnifiedAlignPage.tsx:191
 msgid "Replacement record unreadable during the run — check on IdRef before updating."
 msgstr "Notice de remplacement illisible lors du run — vérifier sur IdRef avant de mettre à jour."
 
-#: components/researchers/UnifiedAlignPage.tsx:205
+#: components/researchers/UnifiedAlignPage.tsx:235
 msgid "Already in the Directory:"
 msgstr "Déjà dans l'Annuaire :"
 
-#: components/researchers/UnifiedAlignPage.tsx:238
+#: components/researchers/UnifiedAlignPage.tsx:268
 msgid "Ambiguous — decide"
 msgstr "Ambigu — arbitrer"
 
-#: components/researchers/UnifiedAlignPage.tsx:258
+#: components/researchers/UnifiedAlignPage.tsx:288
 msgid "Ignore (write nothing)"
 msgstr "Ignorer (ne rien écrire)"
 
 #. placeholder {0}: SOURCE_LABEL[src]
-#: components/researchers/UnifiedAlignPage.tsx:285
+#: components/researchers/UnifiedAlignPage.tsx:315
 msgid "No candidate found during the last {0} run."
 msgstr "Aucun candidat trouvé lors du dernier run {0}."
 
-#. placeholder {0}: SOURCE_LABEL[src]
-#: components/researchers/UnifiedAlignPage.tsx:286
-msgid "Never searched on this source for this record — use “Search everywhere” or the dedicated {0} page."
-msgstr "Jamais recherché sur ce référentiel pour cette fiche — « Rechercher partout » ou la page {0} dédiée."
+#: components/researchers/UnifiedAlignPage.tsx:316
+msgid "Never searched on this source for this record."
+msgstr "Jamais cherchée sur cette source."
 
-#: components/researchers/UnifiedAlignPage.tsx:423
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:321
+msgid "A {0} search is already running — wait for it to finish"
+msgstr "Une recherche {0} est déjà en cours — attendez qu’elle se termine"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:321
+msgid "Runs {0} on this record only, even if it was already searched (after a name correction, for instance)"
+msgstr "Lance {0} sur cette seule fiche, même si elle a déjà été cherchée (après une correction de nom, par exemple)"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:323
+msgid "Check this record again on {0}"
+msgstr "Revérifier cette fiche sur {0}"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:323
+msgid "Search this record on {0}"
+msgstr "Chercher cette fiche sur {0}"
+
+#. placeholder {0}: SOURCE_LABEL[src]
+#: components/researchers/UnifiedAlignPage.tsx:323
+msgid "Search this record again on {0}"
+msgstr "Chercher de nouveau cette fiche sur {0}"
+
+#: components/researchers/UnifiedAlignPage.tsx:480
 msgid "{count} record(s) written to Grist."
 msgstr "{count} fiche(s) écrite(s) dans Grist."
 
 #. placeholder {0}: r.ppn
 #. placeholder {1}: r.newPpn
-#: components/researchers/UnifiedAlignPage.tsx:435
+#: components/researchers/UnifiedAlignPage.tsx:492
 msgid "IdRef updated in Grist: {0} → {1}."
 msgstr "IdRef mis à jour dans Grist : {0} → {1}."
 
-#: components/researchers/UnifiedAlignPage.tsx:438
+#: components/researchers/UnifiedAlignPage.tsx:495
+#: components/researchers/UnifiedAlignPage.tsx:506
 msgid "Some selections or decisions are not applied yet — rerunning will clear them. Continue?"
 msgstr "Des sélections ou arbitrages ne sont pas encore appliqués — relancer le run les effacera. Continuer ?"
 
 #. placeholder {0}: unifiedCandidateId(src, cand)
 #. placeholder {1}: row.displayName || row.uid
-#: components/researchers/UnifiedAlignPage.tsx:458
+#: components/researchers/UnifiedAlignPage.tsx:526
 msgid "Candidate {0} dismissed for {1} — it will not be suggested again."
 msgstr "Candidat {0} écarté pour {1} — il ne sera plus proposé."
 
 #. placeholder {0}: unifiedCandidateId(src, cand)
-#: components/researchers/UnifiedAlignPage.tsx:463
+#: components/researchers/UnifiedAlignPage.tsx:531
 msgid "Profile {0} flagged as “Mixed identity” — ticket opened in the review table."
 msgstr "Profil {0} marqué « Identité mêlée » — ticket ouvert dans la table de revue."
 
-#: components/researchers/UnifiedAlignPage.tsx:484
+#: components/researchers/UnifiedAlignPage.tsx:557
 msgid "IdRef · ORCID · HAL · OpenAlex · Scopus — one row per person, one column per identifier"
 msgstr "IdRef · ORCID · HAL · OpenAlex · Scopus — une ligne par personne, une colonne par identifiant"
 
-#: components/researchers/UnifiedAlignPage.tsx:498
+#: components/researchers/UnifiedAlignPage.tsx:571
 msgid "Restricts both the display AND the run to one structure"
 msgstr "Restreint l'affichage ET le run à une structure de recherche"
 
-#: components/researchers/UnifiedAlignPage.tsx:500
+#: components/researchers/UnifiedAlignPage.tsx:573
 msgid "All structures"
 msgstr "Toutes les structures"
 
 #. placeholder {0}: groupCounts.personnel
-#: components/researchers/UnifiedAlignPage.tsx:505
+#: components/researchers/UnifiedAlignPage.tsx:578
 msgid "Staff ({0})"
 msgstr "Personnel ({0})"
 
 #. placeholder {0}: groupCounts.doctorants
-#: components/researchers/UnifiedAlignPage.tsx:506
+#: components/researchers/UnifiedAlignPage.tsx:579
 msgid "PhD students ({0})"
 msgstr "Doctorants ({0})"
 
 #. placeholder {0}: groupCounts.hors_recherche
-#: components/researchers/UnifiedAlignPage.tsx:507
+#: components/researchers/UnifiedAlignPage.tsx:580
 msgid "No research duty ({0})"
 msgstr "Sans obligation de recherche ({0})"
 
-#: components/researchers/UnifiedAlignPage.tsx:508
+#: components/researchers/UnifiedAlignPage.tsx:581
 msgid "Permanent or non-permanent staff with no statutory research duty (LIB_TYPE_EMPLOI) — may hold researcher identifiers, but aligning them is a low priority, as for PhD students"
 msgstr "Personnel titulaire ou non titulaire n'ayant pas d'obligation statutaire de recherche (LIB_TYPE_EMPLOI) — peut avoir des identifiants chercheur, mais l'alignement est une priorité basse, comme pour les doctorants"
 
-#: components/researchers/UnifiedAlignPage.tsx:512
-msgid "Parallel search on {labo} (IdRef/ORCID/HAL/OpenAlex)"
-msgstr "Recherche parallèle sur {labo} (IdRef/ORCID/HAL/OpenAlex)"
+#: components/researchers/UnifiedAlignPage.tsx:585
+msgid "Choose the sources, see the number of records and the cost, then start the search on the filtered lab and group"
+msgstr "Choisir les sources, voir le nombre de fiches et le coût, puis lancer la recherche sur le labo et le groupe filtrés"
 
-#: components/researchers/UnifiedAlignPage.tsx:512
-msgid "Parallel search on the filtered group (all structures) — never a global run"
-msgstr "Recherche parallèle sur le groupe filtré (toutes structures) — jamais un run global"
-
-#: components/researchers/UnifiedAlignPage.tsx:514
+#: components/researchers/UnifiedAlignPage.tsx:587
 msgid "Search running…"
 msgstr "Recherche en cours…"
 
-#: components/researchers/UnifiedAlignPage.tsx:514
-msgid "Search everywhere"
-msgstr "Rechercher partout"
+#: components/researchers/UnifiedAlignPage.tsx:587
+msgid "Search everywhere…"
+msgstr "Rechercher partout…"
 
-#: components/researchers/UnifiedAlignPage.tsx:524
+#: components/researchers/UnifiedAlignPage.tsx:600
 msgid "error"
 msgstr "erreur"
 
-#: components/researchers/UnifiedAlignPage.tsx:524
+#. placeholder {0}: p.done ?? 0
+#. placeholder {1}: p.total ?? '?'
+#: components/researchers/UnifiedAlignPage.tsx:600
+msgid "stopped at {0}/{1}"
+msgstr "arrêté à {0}/{1}"
+
+#: components/researchers/UnifiedAlignPage.tsx:600
 msgid "done"
 msgstr "terminé"
 
-#: components/researchers/UnifiedAlignPage.tsx:536
+#. placeholder {0}: q.reset
+#: components/researchers/UnifiedAlignPage.tsx:602
+msgid "Remaining weekly quota of the Elsevier Author Search API (reset {0})"
+msgstr "Quota hebdomadaire restant de l’API Elsevier Author Search (remise à zéro le {0})"
+
+#. placeholder {0}: q.key
+#. placeholder {1}: q.remaining.toLocaleString(numberLocale())
+#: components/researchers/UnifiedAlignPage.tsx:603
+msgid "key {0}: {1} searches left"
+msgstr "clé {0} : {1} recherches restantes"
+
+#. placeholder {0}: q.remaining.toLocaleString(numberLocale())
+#: components/researchers/UnifiedAlignPage.tsx:603
+msgid "{0} searches left"
+msgstr "{0} recherches restantes"
+
+#: components/researchers/UnifiedAlignPage.tsx:609
+msgid "Stops this source: the records in progress finish, what was found is kept; the next run resumes with the records not searched yet"
+msgstr "Arrête cette source : les fiches en cours se terminent, ce qui a été trouvé est conservé ; la prochaine recherche reprend avec les fiches pas encore cherchées"
+
+#: components/researchers/UnifiedAlignPage.tsx:610
+msgid "Stopping…"
+msgstr "Arrêt en cours…"
+
+#: components/researchers/UnifiedAlignPage.tsx:610
+msgid "Stop"
+msgstr "Arrêter"
+
+#: components/researchers/UnifiedAlignPage.tsx:628
 msgid "Loading the unified view…"
 msgstr "Chargement de la vue unifiée…"
 
-#: components/researchers/UnifiedAlignPage.tsx:541
+#: components/researchers/UnifiedAlignPage.tsx:633
 msgid "Records to process"
 msgstr "Fiches à traiter"
 
-#: components/researchers/UnifiedAlignPage.tsx:543
+#: components/researchers/UnifiedAlignPage.tsx:635
 msgid "Candidates to check"
 msgstr "Candidats à cocher"
 
-#: components/researchers/UnifiedAlignPage.tsx:544
+#: components/researchers/UnifiedAlignPage.tsx:636
 msgid "Ambiguous"
 msgstr "Ambigus"
 
-#: components/researchers/UnifiedAlignPage.tsx:545
+#: components/researchers/UnifiedAlignPage.tsx:637
 msgid "Name mismatches / replaced entries"
 msgstr "Écarts de nom / notices remplacées"
 
-#: components/researchers/UnifiedAlignPage.tsx:546
+#: components/researchers/UnifiedAlignPage.tsx:638
 msgid "Conflicts"
 msgstr "Conflits"
 
-#: components/researchers/UnifiedAlignPage.tsx:549
+#: components/researchers/UnifiedAlignPage.tsx:641
 msgid "Show only this kind of work"
 msgstr "N'afficher que ce type de travail"
 
-#: components/researchers/UnifiedAlignPage.tsx:557
+#: components/researchers/UnifiedAlignPage.tsx:649
 msgid "Filtered view"
 msgstr "Vue filtrée"
 
-#: components/researchers/UnifiedAlignPage.tsx:557
+#: components/researchers/UnifiedAlignPage.tsx:649
 msgid "candidates to check"
 msgstr "candidats à vérifier"
 
-#: components/researchers/UnifiedAlignPage.tsx:557
+#: components/researchers/UnifiedAlignPage.tsx:649
 msgid "ambiguous"
 msgstr "ambigus"
 
-#: components/researchers/UnifiedAlignPage.tsx:557
+#: components/researchers/UnifiedAlignPage.tsx:649
 msgid "name mismatches / replaced entries"
 msgstr "noms divergents / notices remplacées"
 
-#: components/researchers/UnifiedAlignPage.tsx:558
+#: components/researchers/UnifiedAlignPage.tsx:650
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: components/researchers/UnifiedAlignPage.tsx:565
+#: components/researchers/UnifiedAlignPage.tsx:657
 msgid "Only empty cells are filled in; no existing value is overwritten (OpenAlex: checked profiles are added to the list, nothing is removed). Conflicts are listed for manual review."
 msgstr "Seules les cellules vides sont renseignées ; aucune valeur existante n'est écrasée (OpenAlex : les profils cochés sont ajoutés à la liste, rien n'est retiré). Les conflits sont listés pour revue manuelle."
 
-#: components/researchers/UnifiedAlignPage.tsx:571
+#: components/researchers/UnifiedAlignPage.tsx:663
 msgid "Uncheck all strong candidates"
 msgstr "Décocher tous les candidats forts"
 
-#: components/researchers/UnifiedAlignPage.tsx:571
+#: components/researchers/UnifiedAlignPage.tsx:663
 msgid "Check all strong candidates"
 msgstr "Cocher tous les candidats forts"
 
-#: components/researchers/UnifiedAlignPage.tsx:576
+#: components/researchers/UnifiedAlignPage.tsx:668
 msgid "No records to show for this filter."
 msgstr "Aucune fiche à afficher pour ce filtre."
 
-#: components/researchers/UnifiedAlignPage.tsx:587
+#: components/researchers/UnifiedAlignPage.tsx:679
 msgid "Remove the source filter"
 msgstr "Retirer le filtre de source"
 
 #. placeholder {0}: SOURCE_LABEL[s]
-#: components/researchers/UnifiedAlignPage.tsx:587
+#: components/researchers/UnifiedAlignPage.tsx:679
 msgid "Only records with something to do on {0}"
 msgstr "Seulement les fiches avec quelque chose à faire sur {0}"
 
-#: components/researchers/UnifiedAlignPage.tsx:603
+#: components/researchers/UnifiedAlignPage.tsx:695
 msgid "Open the detail"
 msgstr "Ouvrir le détail"
 
-#: components/researchers/UnifiedAlignPage.tsx:608
+#: components/researchers/UnifiedAlignPage.tsx:700
 #: components/researchers/alignAtoms.tsx:197
 msgid "Identifier already shared by the record and the profile — near certainty"
 msgstr "Identifiant déjà commun entre la fiche et le profil — quasi-certitude"
 
-#: components/researchers/UnifiedAlignPage.tsx:612
+#: components/researchers/UnifiedAlignPage.tsx:704
 msgid "Open the researcher record in a new tab"
 msgstr "Ouvrir la fiche du chercheur dans un nouvel onglet"
 
@@ -10806,8 +10992,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Homonyme sans preuve d'affiliation"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3404
-#: lib/gristService.ts:3530
+#: lib/gristService.ts:3408
+#: lib/gristService.ts:3534
 msgid "Suspected mixed identity"
 msgstr "Identité mêlée suspectée"
 
@@ -11638,50 +11824,54 @@ msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
 #: lib/apiErrors.ts:123
+msgid "No alignment running"
+msgstr "Aucun alignement en cours"
+
+#: lib/apiErrors.ts:124
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:126
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:127
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:128
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:129
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:131
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:132
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:133
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:134
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:136
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:137
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:138
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
@@ -11692,8 +11882,8 @@ msgstr "Erreur création colonnes de rattachement : {0}"
 
 #: lib/gristService.ts:770
 #: lib/gristService.ts:2541
-#: lib/gristService.ts:3209
-#: lib/gristService.ts:3823
+#: lib/gristService.ts:3213
+#: lib/gristService.ts:3827
 msgid "Grist error (table list)"
 msgstr "Erreur Grist (liste des tables)"
 
@@ -11832,157 +12022,157 @@ msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Ligne recréée (#{restoredRowId}) mais ligne conservée #{0} non rétablie : {1}"
 
 #: lib/gristService.ts:2611
-#: lib/gristService.ts:3138
-#: lib/gristService.ts:3608
-#: lib/gristService.ts:3687
+#: lib/gristService.ts:3142
+#: lib/gristService.ts:3612
+#: lib/gristService.ts:3691
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Erreur Grist (lecture Annuaire avant écriture)"
 
-#: lib/gristService.ts:2895
-#: lib/gristService.ts:2934
-#: lib/gristService.ts:3096
-#: lib/gristService.ts:3509
-#: lib/gristService.ts:3537
+#: lib/gristService.ts:2899
+#: lib/gristService.ts:2938
+#: lib/gristService.ts:3100
+#: lib/gristService.ts:3513
+#: lib/gristService.ts:3541
 msgid "Identifier mismatch"
 msgstr "Divergence identifiant"
 
-#: lib/gristService.ts:2913
+#: lib/gristService.ts:2917
 msgid "Record deleted"
 msgstr "Notice supprimée"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2913
+#: lib/gristService.ts:2917
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0} : la notice n'existe plus sur IdRef (404) — corriger ou retirer l'IdRef de l'Annuaire"
 
-#: lib/gristService.ts:2917
+#: lib/gristService.ts:2921
 msgid "Record unreadable"
 msgstr "Notice illisible"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2917
+#: lib/gristService.ts:2921
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0} : notice IdRef inaccessible (erreur réseau ou IdRef indisponible lors du run — relancer)"
 
-#: lib/gristService.ts:3202
+#: lib/gristService.ts:3206
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "La revue Grist ne concerne que le mode « recherche des manquants »"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3217
-#: lib/gristService.ts:3831
+#: lib/gristService.ts:3221
+#: lib/gristService.ts:3835
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Erreur création table {IDREF_REVIEW_TABLE} : {0}"
 
-#: lib/gristService.ts:3393
-#: lib/gristService.ts:3400
-#: lib/gristService.ts:3502
-#: lib/gristService.ts:3524
+#: lib/gristService.ts:3397
+#: lib/gristService.ts:3404
+#: lib/gristService.ts:3506
+#: lib/gristService.ts:3528
 msgid "API unreachable during the run — rerun."
 msgstr "API injoignable lors du run — relancer."
 
-#: lib/gristService.ts:3400
-#: lib/gristService.ts:3524
+#: lib/gristService.ts:3404
+#: lib/gristService.ts:3528
 msgid "Verification error"
 msgstr "Erreur de vérification"
 
-#: lib/gristService.ts:3403
-#: lib/gristService.ts:3532
+#: lib/gristService.ts:3407
+#: lib/gristService.ts:3536
 msgid "Name mismatch"
 msgstr "Nom divergent"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3403
+#: lib/gristService.ts:3407
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} « {1} » ≠ Annuaire « {displayName} »"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3404
+#: lib/gristService.ts:3408
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} « {1} » : {2} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#: lib/gristService.ts:3407
+#: lib/gristService.ts:3411
 msgid "{a} merged into {b}"
 msgstr "{a} fusionné dans {b}"
 
-#: lib/gristService.ts:3408
+#: lib/gristService.ts:3412
 msgid "{a} gone"
 msgstr "{a} disparu"
 
-#: lib/gristService.ts:3409
+#: lib/gristService.ts:3413
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = profil ORCID manquant"
 
-#: lib/gristService.ts:3411
+#: lib/gristService.ts:3415
 msgid "List to fix (not written)"
 msgstr "Liste à corriger (non écrite)"
 
-#: lib/gristService.ts:3411
+#: lib/gristService.ts:3415
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → relancer le run (écriture directe) ou corriger OpenAlex_ids"
 
-#: lib/gristService.ts:3515
+#: lib/gristService.ts:3519
 msgid "Unknown ORCID"
 msgstr "ORCID inconnu"
 
-#: lib/gristService.ts:3515
+#: lib/gristService.ts:3519
 msgid "Unknown Scopus Author ID"
 msgstr "Scopus Author ID inconnu"
 
-#: lib/gristService.ts:3515
+#: lib/gristService.ts:3519
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL inconnu de HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3516
+#: lib/gristService.ts:3520
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 
-#: lib/gristService.ts:3520
+#: lib/gristService.ts:3524
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3520
+#: lib/gristService.ts:3524
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
 
-#: lib/gristService.ts:3521
+#: lib/gristService.ts:3525
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3521
+#: lib/gristService.ts:3525
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
 
-#: lib/gristService.ts:3529
+#: lib/gristService.ts:3533
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3529
+#: lib/gristService.ts:3533
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3530
+#: lib/gristService.ts:3534
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3532
+#: lib/gristService.ts:3536
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire « {displayName} » ≠ profil « {0} »{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3780
+#: lib/gristService.ts:3784
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} absente : lancez d'abord un run {1} (elle est créée par le script)."
 
@@ -12328,220 +12518,27 @@ msgstr "Modifiée"
 msgid "Resolved automatically"
 msgstr "Résolue automatiquement"
 
+#. placeholder {0}: label(src)
+#. placeholder {1}: r.status
+#: lib/unifiedAlignRuns.ts:68
+msgid "{0} stop failed: {1}"
+msgstr "Échec de l’arrêt {0} : {1}"
+
 #. placeholder {0}: trig.status
-#: lib/unifiedAlignRuns.ts:76
+#: lib/unifiedAlignRuns.ts:111
 msgid "{lbl} trigger failed: {0}"
 msgstr "Déclenchement {lbl} : {0}"
 
 #. placeholder {0}: translateApiError(p.error)
-#: lib/unifiedAlignRuns.ts:82
+#: lib/unifiedAlignRuns.ts:117
 msgid "{lbl} alignment: {0}"
 msgstr "Alignement {lbl} : {0}"
 
-#: lib/unifiedAlignRuns.ts:87
+#: lib/unifiedAlignRuns.ts:122
 msgid "Error during the {lbl} alignment"
 msgstr "Erreur lors de l'alignement {lbl}"
 
-#. placeholder {0}: p.done ?? 0
-#. placeholder {1}: p.total ?? '?'
-#: components/researchers/UnifiedAlignPage.tsx:542
-msgid "stopped at {0}/{1}"
-msgstr "arrêté à {0}/{1}"
-
-#. placeholder {0}: q.reset
-#: components/researchers/UnifiedAlignPage.tsx:544
-msgid "Remaining weekly quota of the Elsevier Author Search API (reset {0})"
-msgstr "Quota hebdomadaire restant de l’API Elsevier Author Search (remise à zéro le {0})"
-
-#. placeholder {0}: q.key
-#. placeholder {1}: q.remaining.toLocaleString(numberLocale())
-#: components/researchers/UnifiedAlignPage.tsx:545
-msgid "key {0}: {1} searches left"
-msgstr "clé {0} : {1} recherches restantes"
-
-#. placeholder {0}: q.remaining.toLocaleString(numberLocale())
-#: components/researchers/UnifiedAlignPage.tsx:545
-msgid "{0} searches left"
-msgstr "{0} recherches restantes"
-
-#: components/researchers/UnifiedAlignPage.tsx:551
-msgid "Stops this source: the records in progress finish, what was found is kept; the next run resumes with the records not searched yet"
-msgstr "Arrête cette source : les fiches en cours se terminent, ce qui a été trouvé est conservé ; la prochaine recherche reprend avec les fiches pas encore cherchées"
-
-#: components/researchers/UnifiedAlignPage.tsx:552
-msgid "Stopping…"
-msgstr "Arrêt en cours…"
-
-#: components/researchers/UnifiedAlignPage.tsx:552
-msgid "Stop"
-msgstr "Arrêter"
-
-#: lib/apiErrors.ts:123
-msgid "No alignment running"
-msgstr "Aucun alignement en cours"
-
-#. placeholder {0}: label(src)
-#. placeholder {1}: r.status
-#: lib/unifiedAlignRuns.ts:62
-msgid "{0} stop failed: {1}"
-msgstr "Échec de l’arrêt {0} : {1}"
-
-#. placeholder {0}: fmt(cost.requests)
-#: components/researchers/AlignLaunchModal.tsx:75
-msgid "≈ {0} requests"
-msgstr "≈ {0} requêtes"
-
-#. placeholder {0}: fmt(cost.search)
-#: components/researchers/AlignLaunchModal.tsx:77
-msgid "{0} Author Search"
-msgstr "{0} Author Search"
-
-#. placeholder {0}: fmt(cost.author)
-#: components/researchers/AlignLaunchModal.tsx:78
-msgid "{0} Author Retrieval"
-msgstr "{0} Author Retrieval"
-
-#: components/researchers/AlignLaunchModal.tsx:96
-msgid "Check the existing identifiers"
-msgstr "Vérifier les identifiants existants"
-
-#: components/researchers/AlignLaunchModal.tsx:96
-msgid "Search the missing identifiers"
-msgstr "Rechercher les identifiants manquants"
-
-#: components/researchers/AlignLaunchModal.tsx:99
-msgid "Scope: {labo}"
-msgstr "Périmètre : {labo}"
-
-#: components/researchers/AlignLaunchModal.tsx:99
-msgid "Scope: all structures"
-msgstr "Périmètre : toutes les structures"
-
-#: components/researchers/AlignLaunchModal.tsx:99
-msgid "No research duty"
-msgstr "Sans obligation de recherche"
-
-#: components/researchers/AlignLaunchModal.tsx:99
-msgid "Staff"
-msgstr "Personnel"
-
-#: components/researchers/AlignLaunchModal.tsx:108
-msgid "Counting the records to process…"
-msgstr "Décompte des fiches à traiter…"
-
-#: components/researchers/AlignLaunchModal.tsx:115
-msgid "Only the records never searched (or in error)"
-msgstr "Seulement les fiches jamais cherchées (ou en erreur)"
-
-#: components/researchers/AlignLaunchModal.tsx:119
-msgid "All records of the scope (full rerun)"
-msgstr "Toutes les fiches du périmètre (relance complète)"
-
-#: components/researchers/AlignLaunchModal.tsx:127
-msgid "Cap"
-msgstr "Plafond"
-
-#: components/researchers/AlignLaunchModal.tsx:128
-msgid "Estimated cost"
-msgstr "Coût estimé"
-
-#. placeholder {0}: fmt(e.eligible - e.pending)
-#: components/researchers/AlignLaunchModal.tsx:146
-msgid "{0} already searched"
-msgstr "{0} déjà cherchées"
-
-#. placeholder {0}: sourceLabel[s]
-#: components/researchers/AlignLaunchModal.tsx:152
-msgid "Maximum number of records for {0}"
-msgstr "Nombre maximal de fiches pour {0}"
-
-#: components/researchers/AlignLaunchModal.tsx:158
-msgid "Beyond the Elsevier calls available this week — lower the cap"
-msgstr "Dépasse les appels Elsevier disponibles cette semaine — baissez le plafond"
-
-#: components/researchers/AlignLaunchModal.tsx:169
-msgid "Scopus — weekly Elsevier quota"
-msgstr "Scopus — quota hebdomadaire Elsevier"
-
-#. placeholder {0}: fmt(pools.search?.available ?? 0)
-#. placeholder {1}: fmt(pools.author?.available ?? 0)
-#. placeholder {2}: fmt(estimate.scopus.affordable ?? 0)
-#: components/researchers/AlignLaunchModal.tsx:170
-msgid "Available for the alignment: {0} Author Search, {1} Author Retrieval — about {2} records."
-msgstr "Disponible pour l’alignement : {0} Author Search, {1} Author Retrieval — environ {2} fiches."
-
-#. placeholder {0}: Math.round(estimate.scopus.reserve1 * 100)
-#: components/researchers/AlignLaunchModal.tsx:173
-msgid "Key 1 keeps {0} % of its quota for the SoVisu+ harvester; the backup key is then used in full."
-msgstr "La clé 1 garde {0} % de son quota pour le moissonneur SoVisu+ ; la clé de secours est ensuite utilisée en entier."
-
-#. placeholder {0}: Math.round(estimate.scopus.reserve1 * 100)
-#: components/researchers/AlignLaunchModal.tsx:174
-msgid "Key 1 keeps {0} % of its quota for the SoVisu+ harvester."
-msgstr "La clé 1 garde {0} % de son quota pour le moissonneur SoVisu+."
-
-#. placeholder {0}: pools.search.asOf.slice(0, 10)
-#. placeholder {1}: pools.search.reset ?? '?'
-#: components/researchers/AlignLaunchModal.tsx:175
-msgid "Figures of the last Scopus run ({0}); quotas reset on {1}."
-msgstr "Chiffres du dernier run Scopus ({0}) ; remise à zéro des quotas le {1}."
-
-#: components/researchers/AlignLaunchModal.tsx:186
-msgid "Start"
-msgstr "Lancer"
-
-#: components/researchers/UnifiedAlignPage.tsx:534
-msgid "Choose the sources, see the number of records and the cost, then start the search on the filtered lab and group"
-msgstr "Choisir les sources, voir le nombre de fiches et le coût, puis lancer la recherche sur le labo et le groupe filtrés"
-
-#: components/researchers/UnifiedAlignPage.tsx:536
-msgid "Search everywhere…"
-msgstr "Rechercher partout…"
-
 #. placeholder {0}: r.status
-#: lib/unifiedAlignRuns.ts:146
+#: lib/unifiedAlignRuns.ts:153
 msgid "Estimate failed: {0}"
 msgstr "Échec de l’estimation : {0}"
-
-#: components/researchers/UnifiedAlignPage.tsx:292
-msgid "Never searched on this source for this record."
-msgstr "Jamais cherchée sur cette source."
-
-#. placeholder {0}: SOURCE_LABEL[src]
-#: components/researchers/UnifiedAlignPage.tsx:297
-msgid "A {0} search is already running — wait for it to finish"
-msgstr "Une recherche {0} est déjà en cours — attendez qu’elle se termine"
-
-#. placeholder {0}: SOURCE_LABEL[src]
-#: components/researchers/UnifiedAlignPage.tsx:297
-msgid "Runs {0} on this record only, even if it was already searched (after a name correction, for instance)"
-msgstr "Lance {0} sur cette seule fiche, même si elle a déjà été cherchée (après une correction de nom, par exemple)"
-
-#. placeholder {0}: SOURCE_LABEL[src]
-#: components/researchers/UnifiedAlignPage.tsx:299
-msgid "Check this record again on {0}"
-msgstr "Revérifier cette fiche sur {0}"
-
-#. placeholder {0}: SOURCE_LABEL[src]
-#: components/researchers/UnifiedAlignPage.tsx:299
-msgid "Search this record on {0}"
-msgstr "Chercher cette fiche sur {0}"
-
-#. placeholder {0}: SOURCE_LABEL[src]
-#: components/researchers/UnifiedAlignPage.tsx:299
-msgid "Search this record again on {0}"
-msgstr "Chercher de nouveau cette fiche sur {0}"
-
-#: components/researchers/UnifiedAlignPage.tsx:132
-msgid "{n, plural, one {# candidate ?} other {# candidates ?}}"
-msgstr "{n, plural, one {# candidat ?} other {# candidats ?}}"
-
-#: components/Sidebar.tsx:256
-#: components/Sidebar.tsx:257
-msgid "Close the menu"
-msgstr "Fermer le menu"
-
-#: components/Sidebar.tsx:256
-#: components/Sidebar.tsx:257
-msgid "Menu"
-msgstr "Menu"

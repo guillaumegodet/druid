@@ -49,6 +49,11 @@ const csrf = (method, p, headers = {}) => new Promise((resolve) => {
   for (const bad of ['//evil.example', '/\\evil.example', 'https://evil.example', '/auth/callback?code=x', undefined, ['/x']]) {
     check(`returnTo rejects ${JSON.stringify(bad)}`, safeReturnTo(bad), '/');
   }
+  // Liveness probe (plan-separation-test-prod-rssi lot 1): public, and says nothing about the build.
+  const health = await fetch(base + '/api/health');
+  check('health without session', health.status, 200);
+  check('health body', await health.json(), { status: 'ok' });
+  check('me without session', await status('/api/me'), 401);
   check('sync-sovisuplus without session', await status('/api/sync-sovisuplus', { method: 'POST' }), 401);
   check('sync-ldap-trigger without session', await status('/api/sync-ldap-trigger'), 401);
   check('newsletter/generate without session', await status('/api/newsletter/generate', { method: 'POST' }), 401);

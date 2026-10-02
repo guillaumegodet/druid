@@ -1,5 +1,6 @@
 import React from 'react';
-import { hasCapability } from '../../lib/auth';
+import { getEnvironment, hasCapability, isProductionEnvironment } from '../../lib/auth';
+import { EnvironmentBanner } from './EnvironmentBanner';
 import { ReadOnlyBanner } from './ReadOnlyBanner';
 
 interface MainLayoutProps {
@@ -33,6 +34,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({
 
       {sidebar}
 
+      {!isProductionEnvironment() && <EnvironmentBanner environment={getEnvironment()} />}
       {hasCapability('READ_ONLY') && <ReadOnlyBanner />}
 
       <main className="flex-1 overflow-hidden relative" id="main-content">

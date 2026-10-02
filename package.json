@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/prepare-cloudflare-assets.cjs && vite build",
+    "build": "node scripts/build-info.cjs && node scripts/prepare-cloudflare-assets.cjs && vite build",
     "preview": "vite preview",
     "i18n:extract": "lingui extract --clean",
     "i18n:compile": "lingui compile",

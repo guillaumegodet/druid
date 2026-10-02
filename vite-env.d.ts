@@ -8,9 +8,6 @@ interface ImportMetaEnv {
   readonly VITE_GRIST_PUBLIC_BASE_URL?: string
   /** Grist web interface hosting the doc (default https://grist.numerique.gouv.fr). */
   readonly VITE_GRIST_UI_URL?: string
-  readonly VITE_KEYCLOAK_URL: string
-  readonly VITE_KEYCLOAK_REALM: string
-  readonly VITE_KEYCLOAK_CLIENT_ID: string
 }
 
 interface ImportMeta {
