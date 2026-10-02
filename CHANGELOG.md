@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.2.0] — 2026-10-02
+
 ### Sécurité
 - En-têtes de sécurité HTTP sur toutes les réponses (`nosniff`, `Referrer-Policy`, `Permissions-Policy`,
   `X-Frame-Options` sauf pages `embed`), plus d'en-tête `X-Powered-By`.
