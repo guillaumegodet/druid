@@ -18,7 +18,7 @@
     "export:abes": "mkdir -p scripts/.build && esbuild scripts/export_abes.ts --bundle --platform=node --format=cjs --external:xlsx --outfile=scripts/.build/export_abes.cjs --log-level=warning && node scripts/.build/export_abes.cjs"
   },
   "dependencies": {
-    "@lingui/core": "^5.9.5",
+    "@lingui/core": "^6.8.0",
     "@lingui/react": "^5.9.5",
     "dotenv": "^16.4.5",
     "echarts": "^6.0.0",
