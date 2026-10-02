@@ -12,12 +12,15 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
-Première version numérotée à venir (1.0.0) : état de Druid à la mise en place des releases, plus les
-évolutions ci-dessous (depuis la publication du code le 2026-09-24).
+Première version numérotée : état de Druid à la mise en place des releases, avec les évolutions ci-dessous
+(depuis la publication du code le 2026-09-24).
+
 
 ### Ajouté
 - Version de l'application affichée sous le logo ; route `/api/health` et contrôle de santé de l'image Docker ;
   bandeau signalant une instance de test (`DRUID_ENV`).
+- Procédure de release : `scripts/release/prepare.sh`, `tag.sh` (tag signé), `deploy.sh test|prod` (vérifications,
+  sauvegarde, retour automatique à la version précédente, journal des déploiements).
 - Instance hors production (`DRUID_ENV` ≠ `production`) réservée aux super-administrateurs, sans partage public
   (pages `embed` et `/api/public` fermées).
 - Saisie du code entité (supannCodeEntite) à la création d'une structure.
@@ -48,4 +51,5 @@ Première version numérotée à venir (1.0.0) : état de Druid à la mise en pl
 
 ### Migration
 - `scripts/migrations/001-tasks-channel-rename.cjs --from=<ancienne valeur> --apply` : renomme le canal des
-  tâches existantes (table `Taches`) et met à jour les choix de la colonne. À lancer juste après le déploiement.
+  tâches existantes (table `Taches`) et met à jour les choix de la colonne. À lancer juste après le déploiement
+  (déjà appliquée à Nantes le 2026-10-02 ; idempotente).
