@@ -18,6 +18,8 @@ Première version numérotée à venir (1.0.0) : état de Druid à la mise en pl
 ### Ajouté
 - Version de l'application affichée sous le logo ; route `/api/health` et contrôle de santé de l'image Docker ;
   bandeau signalant une instance de test (`DRUID_ENV`).
+- Instance hors production (`DRUID_ENV` ≠ `production`) réservée aux super-administrateurs, sans partage public
+  (pages `embed` et `/api/public` fermées).
 - Saisie du code entité (supannCodeEntite) à la création d'une structure.
 - Onglet « Arrivées et départs » de l'alignement LDAP : personnels arrivés ou partis depuis une date.
 - Bloc « Parcours » de la fiche chercheur (affiliations des publications, ORCID, Scopus), « Suggestions de
