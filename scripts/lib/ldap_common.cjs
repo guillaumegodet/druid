@@ -24,10 +24,10 @@ if (!BIND_PW) {
   process.exit(1);
 }
 
-/** rejectUnauthorized:false: the FortiGate certificate chain is absent from Node's default store
- * (see docker/CLAUDE.md) — same workaround for the three LDAP scripts. */
+/** LDAPS client with certificate verification: the directory presents a public certificate (GEANT TLS),
+ * checked on 2026-10-02 (plan-separation-test-prod-rssi.md, lot 7 — the former FortiGate workaround is gone). */
 function createLdapClient() {
-  return ldap.createClient({ url: LDAP_URL, tlsOptions: { rejectUnauthorized: false } });
+  return ldap.createClient({ url: LDAP_URL });
 }
 
 /** --key=value CLI argument (same convention as scripts/lib/align_common.cjs::getArg). */

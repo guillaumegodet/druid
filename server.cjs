@@ -35,9 +35,6 @@ const activity = createActivityLog({ dir: process.env.DRUID_LOG_DIR || '', envir
 // (the gateway network, e.g. 192.168.64.0/20) — otherwise req.ip is the direct peer.
 if (process.env.TRUST_PROXY) app.set('trust proxy', process.env.TRUST_PROXY.split(',').map((s) => s.trim()).filter(Boolean));
 
-// Bypassing SSL verification for internal network proxying to Grist
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 // Keycloak / OAuth2 config (server-side — no Web Crypto needed)
 // Deployment URLs come from the environment (druid.yaml for Nantes); the defaults suit local development.
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL || 'http://localhost:8080';

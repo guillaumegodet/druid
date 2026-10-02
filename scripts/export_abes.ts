@@ -31,7 +31,6 @@ import { normalizeFuzzyDate, isFuzzyDatePast } from '../lib/dates';
 import type { Researcher, Structure } from '../types';
 import type { Institution } from '../lib/gristService';
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0'; // FortiGate (see scripts/sync_idref.cjs)
 const GRIST_BASE = 'https://grist.numerique.gouv.fr/api';
 const DOC = process.env.VITE_GRIST_DOC_ID || process.env.GRIST_DOC_ID;
 const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;

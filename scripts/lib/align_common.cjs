@@ -20,10 +20,6 @@ const http = require('http');
 const https = require('https');
 const tls = require('tls');
 
-// FortiGate: SSL inspection may invalidate the certificates seen inside the container
-// (same convention as server.cjs).
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 // ── CLI ───────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
 /** --name=value (the value may contain « = »). */
@@ -165,7 +161,7 @@ class ConnectProxyAgent extends https.Agent {
     });
     req.once('connect', (res, socket) => {
       if (res.statusCode !== 200) { socket.destroy(); return cb(new Error(`Proxy CONNECT ${res.statusCode}`)); }
-      cb(null, tls.connect({ socket, servername: options.host, rejectUnauthorized: false }));
+      cb(null, tls.connect({ socket, servername: options.host }));
     });
     req.once('error', cb);
     req.end();
@@ -184,7 +180,7 @@ function agentFor(url) {
 /** GET via https.request (proxy path) → { status, text }. */
 function httpsGet(url, { headers = {}, timeout = 8000, agent } = {}) {
   return new Promise((resolve, reject) => {
-    const req = https.request(url, { method: 'GET', headers, agent, rejectUnauthorized: false }, (res) => {
+    const req = https.request(url, { method: 'GET', headers, agent }, (res) => {
       const chunks = [];
       res.on('data', (c) => chunks.push(c));
       res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, retryAfter: res.headers['retry-after'], location: res.headers['location'], text: Buffer.concat(chunks).toString('utf8') }));
