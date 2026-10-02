@@ -26,7 +26,7 @@ SKIP_TEST_CHECK=${3:-}
 TAG="v$VERSION"
 
 CONFIG=${DRUID_DEPLOY_CONFIG:-}
-[ -n "$CONFIG" ] && [ -r "$CONFIG" ] || die "DRUID_DEPLOY_CONFIG must name the instance config file"
+if [ -z "$CONFIG" ] || [ ! -r "$CONFIG" ]; then die "DRUID_DEPLOY_CONFIG must name the instance config file"; fi
 # shellcheck source=/dev/null
 . "$CONFIG"
 : "${SRC_REPO:?}" "${RELEASES_DIR:?}" "${ALLOWED_SIGNERS:?}" "${GITHUB_REPO:?}" "${DEPLOY_LOG:?}" "${COMPOSE_DIR:?}"
@@ -78,7 +78,7 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
     git -C "$SRC_REPO" worktree add -q --detach "$TREE" "$TAG"
   fi
   [ "$(git -C "$TREE" rev-parse HEAD)" = "$SHA" ] || fail "$TREE is not at $TAG"
-  git -C "$TREE" diff --quiet HEAD && [ -z "$(git -C "$TREE" status --porcelain)" ] || fail "$TREE is not clean"
+  [ -z "$(git -C "$TREE" status --porcelain)" ] || fail "$TREE is not clean"
   AVAIL=$(awk '/MemAvailable/ {print int($2 / 1024)}' /proc/meminfo)
   [ "$AVAIL" -ge "$MIN_MEM_MB" ] || fail "only $AVAIL MB of memory available (minimum $MIN_MEM_MB) — build postponed"
   say "building $IMAGE"
@@ -127,7 +127,7 @@ if [ -n "$BACKUP_DIR" ]; then
   if [ -n "$GRIST_ENV_FILE" ]; then
     DOC=$(sed -n 's/^VITE_GRIST_DOC_ID=//p' "$GRIST_ENV_FILE" | tail -1)
     KEY=$(sed -n 's/^GRIST_API_KEY=//p' "$GRIST_ENV_FILE" | tail -1)
-    [ -n "$DOC" ] && [ -n "$KEY" ] || fail "Grist doc or key not found in $GRIST_ENV_FILE"
+    if [ -z "$DOC" ] || [ -z "$KEY" ]; then fail "Grist doc or key not found in $GRIST_ENV_FILE"; fi
     OUT="$BACKUP_DIR/grist-$STAMP-before-$TAG.grist"
     (umask 077 && curl -fsS --max-time 600 -H "Authorization: Bearer $KEY" "$GRIST_API_URL/docs/$DOC/download" -o "$OUT") \
       || fail "backup of the Grist doc"
@@ -169,12 +169,14 @@ fi
 # Data operations of this version (CHANGELOG « Migration »): reminded here, run by hand.
 MIGRATION=$(git -C "$SRC_REPO" show "$TAG:CHANGELOG.md" | awk -v v="## [$VERSION]" '
   index($0, v) == 1 {on=1; next} on && /^## \[/ {exit} on && /^### / {mig = ($0 ~ /Migration/); next} on && mig')
-[ -n "$(echo "$MIGRATION" | tr -d '[:space:]')" ] && printf 'deploy: data operations to run now (CHANGELOG):\n%s\n' "$MIGRATION"
+if [ -n "$(echo "$MIGRATION" | tr -d '[:space:]')" ]; then
+  printf 'deploy: data operations to run now (CHANGELOG):\n%s\n' "$MIGRATION"
+fi
 
 # Housekeeping: keep the images (and checkouts) of the last KEEP_VERSIONS versions.
 docker image ls "$PROD_IMAGE" --format '{{.Tag}}' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | tail -n +"$((KEEP_VERSIONS + 1))" |
   while read -r old; do
     docker image rm "$PROD_IMAGE:$old" >/dev/null 2>&1 || true
-    [ -d "$RELEASES_DIR/$old" ] && git -C "$SRC_REPO" worktree remove --force "$RELEASES_DIR/$old" 2>/dev/null || true
+    if [ -d "$RELEASES_DIR/$old" ]; then git -C "$SRC_REPO" worktree remove --force "$RELEASES_DIR/$old" 2>/dev/null || true; fi
   done
 exit 0
