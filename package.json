@@ -29,7 +29,7 @@
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "ldapjs": "^3.0.7",
-    "lucide-react": "^0.562.0",
+    "lucide-react": "^1.48.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "recharts": "^3.8.1",
