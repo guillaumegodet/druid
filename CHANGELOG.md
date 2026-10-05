@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- En-tête : le centre d'aide, la langue, le thème clair/sombre, l'Administration et la déconnexion sont regroupés
+  dans un menu « Mon compte » (menu déroulant sur grand écran, section en bas du menu ☰ sur mobile). La langue et
+  le thème s'y choisissent par un sélecteur qui montre le choix actif. La barre de navigation complète s'affiche
+  dès 1 180 px de large au lieu de 1 320.
+
 ## [1.2.1] — 2026-10-02
 
 ### Sécurité
