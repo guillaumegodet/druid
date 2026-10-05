@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
 import {
   parseOpenalexIds, groupQualifiedRows, planAffiliationRows, alignGroupOf, gristDateToIso, pivotUnifiedAlignDiffs,
-  buildUnifiedUpdates, unifiedFillKey, unifiedAmbigKey, resolveNewStructureLocalId,
+  buildUnifiedUpdates, unifiedFillKey, unifiedAmbigKey, resolveNewStructureLocalId, traceColumnsFor,
 } from '../gristService';
-import type { AlignDiff, IdrefDiff, UnifiedAlignDiff, PersonAlignRow } from '../gristService';
+import type { AlignDiff, IdrefDiff, UnifiedAlignDiff, PersonAlignRow, AnnuaireColumnMeta } from '../gristService';
 
 // lib/gristService.ts (3337 lines) keeps most of its logic inside the GristService
 // object (methods not exported individually, see docs/archive/plan-fusion-demo-2026-09.md
@@ -407,5 +407,29 @@ describe('resolveNewStructureLocalId (entity code entered on creation)', () => {
     expect(() => resolveNewStructureLocalId('SCD/BU', generate)).toThrow();
     expect(() => resolveNewStructureLocalId('é1485', generate)).toThrow();
     expect(() => resolveNewStructureLocalId('-1485', generate)).toThrow();
+  });
+});
+
+describe('traceColumnsFor (traceability columns of an Annuaire write)', () => {
+  const col = (id: string, type = 'Text'): AnnuaireColumnMeta => ({ id, label: id, type, isFormula: false });
+
+  it('writes both columns when the schema has them', () => {
+    const cols = [col('Scopus_derniere_maj'), col('Scopus_champs_modifies')];
+    expect(traceColumnsFor(cols, 'Scopus', '2026-10-05', ['ID_SCOPUS', 'ORCID'])).toEqual({
+      Scopus_derniere_maj: '2026-10-05', Scopus_champs_modifies: 'ID_SCOPUS|ORCID',
+    });
+  });
+
+  it('skips the columns missing from the schema (Centrale without Scopus_*, "Invalid column")', () => {
+    const cols = [col('ORCID_derniere_maj'), col('ORCID_champs_modifies')];
+    expect(traceColumnsFor(cols, 'Scopus', '2026-10-05', ['ID_SCOPUS'])).toEqual({});
+    expect(traceColumnsFor([col('HAL_champs_modifies')], 'HAL', '2026-10-05', ['IdHAL'])).toEqual({ HAL_champs_modifies: 'IdHAL' });
+  });
+
+  it('writes an epoch into a Date column', () => {
+    const cols = [col('IdRef_derniere_maj', 'Date'), col('IdRef_champs_modifies')];
+    expect(traceColumnsFor(cols, 'IdRef', '2026-01-15', ['IdRef'])).toEqual({
+      IdRef_derniere_maj: 1768435200, IdRef_champs_modifies: 'IdRef',
+    });
   });
 });
