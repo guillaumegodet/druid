@@ -50,6 +50,11 @@ describe('ResearcherSchema', () => {
 });
 
 describe('AffiliationSchema', () => {
+  it('keeps membershipType (stripped before, then erased in Grist on the next save)', () => {
+    const result = AffiliationSchema.safeParse({ structureName: 'LPPL', membershipType: 'stat_mmb' });
+    expect(result.success && result.data.membershipType).toBe('stat_mmb');
+  });
+
   it('defaults isPrimary to false when not provided', () => {
     const result = AffiliationSchema.safeParse({ structureName: 'IRISA' });
     expect(result.success && result.data.isPrimary).toBe(false);

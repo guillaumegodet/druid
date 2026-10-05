@@ -5,7 +5,9 @@ import {
   StructureNature, 
   StructureStatus, 
   StructureMission, 
-  LineageType 
+  LineageType,
+  MEMBERSHIP_TYPES,
+  MembershipType
 } from '../types';
 
 /**
@@ -24,6 +26,9 @@ export const AffiliationSchema = z.object({
   startDate: z.string().default(''),
   endDate: z.string().optional().nullable(),
   isPrimary: z.boolean().default(false),
+  // Must be declared: z.object strips unknown keys, so a missing entry blanked the type on read
+  // and every later save of the record wrote membership_type = null.
+  membershipType: z.enum(MEMBERSHIP_TYPES as [MembershipType, ...MembershipType[]]).optional(),
   role: z.enum(['PRINCIPAL', 'SECONDAIRE', 'HISTORIQUE']).optional(),
   gristRowId: z.number().optional(),
 });
