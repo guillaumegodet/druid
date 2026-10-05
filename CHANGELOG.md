@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.3.0] — 2026-10-05
+
 ### Modifié
 - En-tête : le centre d'aide, la langue, le thème clair/sombre, l'Administration et la déconnexion sont regroupés
   dans un menu « Mon compte » (menu déroulant sur grand écran, section en bas du menu ☰ sur mobile). La langue et
