@@ -766,6 +766,21 @@ function coerceNumericColumns(cols: AnnuaireColumnMeta[], fields: Record<string,
   return fields;
 }
 
+/**
+ * Traceability columns of a write by `label` into the Annuaire (`<Label>_derniere_maj`,
+ * `<Label>_champs_modifies`), keeping only those present in the schema: a doc where they were never
+ * provisioned (Centrale had no Scopus_* columns until 2026-10-05) would otherwise get the whole PATCH
+ * rejected by Grist ("Invalid column"). `<Label>_derniere_maj` is written as an epoch when the column is
+ * Date (Centrale), as AAAA-MM-JJ text otherwise.
+ */
+export function traceColumnsFor(cols: AnnuaireColumnMeta[], label: string, today: string, modified: string[]): Record<string, any> {
+  const out: Record<string, any> = {};
+  const lastUpdate = cols.find((c) => c.id === `${label}_derniere_maj`);
+  if (lastUpdate) out[lastUpdate.id] = lastUpdate.type === 'Date' ? toGristEpoch(today) : today;
+  if (cols.some((c) => c.id === `${label}_champs_modifies`)) out[`${label}_champs_modifies`] = modified.join('|');
+  return out;
+}
+
 async function ensureMergeLogTable(): Promise<void> {
   const tablesResp = await fetch(`${gristDocUrl()}/tables`);
   if (!tablesResp.ok) throw new Error(t`Grist error (table list)`);
@@ -3166,10 +3181,9 @@ export const GristService = {
     // Data_source (LDAP, Nantes) is missing from the Annuaire schema on instances without LDAP
     // (Centrale): including it without a guard makes Grist reject the whole PATCH ("Invalid column").
     // IdRef_derniere_maj is Date on Centrale, Text on Nantes (schema divergence predating
-    // the catch-up): a text PATCH on a Date column is also refused by Grist.
+    // the catch-up): a text PATCH on a Date column is also refused by Grist (both handled by traceColumnsFor).
     const cols = await fetchAnnuaireColumnsInternal();
     const hasDataSourceCol = cols.some((c) => c.id === 'Data_source');
-    const lastUpdateIsDate = cols.find((c) => c.id === 'IdRef_derniere_maj')?.type === 'Date';
 
     const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error(t`Grist error (reading the Annuaire before writing)`);
@@ -3192,8 +3206,7 @@ export const GristService = {
         const hasIdref = curSrc.split(/[|,]/).map((s: string) => s.trim().toUpperCase()).includes('IDREF');
         fields['Data_source'] = hasIdref ? curSrc : (curSrc ? `${curSrc}|IdRef` : 'IdRef');
       }
-      fields['IdRef_derniere_maj'] = lastUpdateIsDate ? toGristEpoch(today) : today;
-      fields['IdRef_champs_modifies'] = Object.keys(e.fields).join('|');
+      Object.assign(fields, traceColumnsFor(cols, 'IdRef', today, Object.keys(e.fields)));
       const note = `[${today}] MAJ IdRef: ${Object.keys(e.fields).join(', ')}`;
       const curCom = (cur['Commentaires'] || '').toString();
       fields['Commentaires'] = curCom ? `${curCom}\n${note}` : note;
@@ -3639,7 +3652,6 @@ export const GristService = {
 
     const cols = await fetchAnnuaireColumnsInternal();
     const hasDataSourceCol = cols.some((c) => c.id === 'Data_source');
-    const lastUpdateIsDate = (label: string) => cols.find((c) => c.id === `${label}_derniere_maj`)?.type === 'Date';
 
     const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error(t`Grist error (reading the Annuaire before writing)`);
@@ -3672,8 +3684,7 @@ export const GristService = {
         Object.assign(fields, srcFields);
         labels.push(label);
         noteParts.push(`${label}: ${Object.keys(srcFields).join(', ')}`);
-        fields[`${label}_derniere_maj`] = lastUpdateIsDate(label) ? toGristEpoch(today) : today;
-        fields[`${label}_champs_modifies`] = Object.keys(srcFields).join('|');
+        Object.assign(fields, traceColumnsFor(cols, label, today, Object.keys(srcFields)));
       }
       if (!labels.length) return null;
 
@@ -3719,7 +3730,6 @@ export const GristService = {
     // (Centrale): including it without a guard makes Grist reject the whole PATCH ("Invalid column").
     const cols = await fetchAnnuaireColumnsInternal();
     const hasDataSourceCol = cols.some((c) => c.id === 'Data_source');
-    const lastUpdateIsDate = cols.find((c) => c.id === `${label}_derniere_maj`)?.type === 'Date';
     const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
     if (!resp.ok) throw new Error(t`Grist error (reading the Annuaire before writing)`);
     const { records } = await resp.json();
@@ -3734,8 +3744,7 @@ export const GristService = {
         const has = curSrc.split(/[|,]/).map((s: string) => s.trim().toUpperCase()).includes(label.toUpperCase());
         fields['Data_source'] = has ? curSrc : (curSrc ? `${curSrc}|${label}` : label);
       }
-      fields[`${label}_derniere_maj`] = lastUpdateIsDate ? toGristEpoch(today) : today;
-      fields[`${label}_champs_modifies`] = modified.join('|');
+      Object.assign(fields, traceColumnsFor(cols, label, today, modified));
       const note = `[${today}] MAJ ${label}: ${what}`;
       const curCom = (cur['Commentaires'] || '').toString();
       fields['Commentaires'] = curCom ? `${curCom}\n${note}` : note;
