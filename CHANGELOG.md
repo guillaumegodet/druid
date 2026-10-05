@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- Alignement des identifiants chercheurs : valider des candidats n'échoue plus (« Invalid column
+  "Scopus_champs_modifies" ») sur une instance dont l'Annuaire n'a pas les colonnes de traçabilité d'une source
+  (`<Source>_derniere_maj`, `<Source>_champs_modifies`) ; l'identifiant est écrit, la traçabilité absente est
+  ignorée. Pour la créer : `node scripts/add_align_columns.cjs --apply`.
+
 ## [1.3.0] — 2026-10-05
 
 ### Modifié
