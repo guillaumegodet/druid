@@ -18,6 +18,7 @@
  */
 
 import { isValidatedCell } from './validation';
+import { FTE_COLUMNS } from './fte';
 
 /** LABO values that do not designate a lab: `zzz` = parking of LDAP people outside the
  *  lab scope (LDAP update of 2026-06-02, never validated), empty = record without affiliation. */
@@ -95,7 +96,14 @@ const isEmpty = (v: any): boolean =>
 const norm = (v: any): string => (isEmpty(v) ? '' : typeof v === 'string' ? v.trim() : JSON.stringify(v));
 /** Columns compared case-insensitively (addresses, identifiers). */
 const CASE_INSENSITIVE_FIELDS: ReadonlySet<string> = new Set(['Email', 'IdHAL', 'ORCID']);
-const normCol = (col: string, v: any): string => (CASE_INSENSITIVE_FIELDS.has(col) ? norm(v).toLowerCase() : norm(v));
+/** Numeric columns where 0 is a value and not « empty » (FTEs: 0 = no research time, lib/fte.ts). */
+const ZERO_IS_VALUE_FIELDS: ReadonlySet<string> = new Set(Object.values(FTE_COLUMNS));
+const isEmptyCell = (col: string, v: any): boolean =>
+  ZERO_IS_VALUE_FIELDS.has(col) ? v === null || v === undefined || v === '' : isEmpty(v);
+const normCol = (col: string, v: any): string => {
+  if (ZERO_IS_VALUE_FIELDS.has(col)) return isEmptyCell(col, v) ? '' : String(v);
+  return CASE_INSENSITIVE_FIELDS.has(col) ? norm(v).toLowerCase() : norm(v);
+};
 
 /**
  * Decodes a Grist Date cell into a comparable value (epoch seconds as a number,
@@ -184,8 +192,8 @@ export function buildMergeProposal(keep: MergeRow, drop: MergeRow, columns: Merg
     }
 
     if (normCol(col.id, kv) === normCol(col.id, dv)) { fields.push({ ...base, kind: 'same', choice: 'keep', reason: 'equal' }); continue; }
-    if (isEmpty(kv) && !isEmpty(dv)) { fields.push({ ...base, kind: 'fill', choice: 'drop', reason: 'fill' }); continue; }
-    if (!isEmpty(kv) && isEmpty(dv)) { fields.push({ ...base, kind: 'same', choice: 'keep', reason: 'fill' }); continue; }
+    if (isEmptyCell(col.id, kv) && !isEmptyCell(col.id, dv)) { fields.push({ ...base, kind: 'fill', choice: 'drop', reason: 'fill' }); continue; }
+    if (!isEmptyCell(col.id, kv) && isEmptyCell(col.id, dv)) { fields.push({ ...base, kind: 'same', choice: 'keep', reason: 'fill' }); continue; }
 
     if (MERGE_CONCAT_FIELDS.has(col.id)) { fields.push({ ...base, kind: 'concat', choice: 'both', reason: 'concat' }); continue; }
     if (LATEST_WINS_FIELDS.has(col.id)) {

@@ -22,6 +22,7 @@ import { PARKING_LABOS, classifyDuplicate, LdapDuplicateKind } from './mergeProp
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from './mergeLog';
 import { withDerivedParents } from './structureHierarchy';
 import { gristDocUrl } from './instanceRuntime';
+import { FTE_COLUMNS, parseFteCell, fteGristFields } from './fte';
 import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
@@ -1027,6 +1028,17 @@ async function fuzzyDateCellEncoder(): Promise<FuzzyDateEncoder> {
   };
 }
 
+/** FTE cells of an Annuaire write (lib/fte.ts): columns of the document only, null when empty.
+ * Column list unavailable → nothing written (the rest of the record is still saved). */
+async function fteCellFields(values: { fte?: number | null; researchFte?: number | null }): Promise<Record<string, number | null>> {
+  try {
+    return fteGristFields(await fetchAnnuaireColumnsInternal(), values);
+  } catch (e) {
+    console.warn('[gristService] Annuaire columns unavailable, FTE not written:', e);
+    return {};
+  }
+}
+
 // --- Helpers for the Structures V2 table format (= structures.csv of the directory bridge) ---
 
 /**
@@ -1594,6 +1606,9 @@ export const GristService = {
             internalTypology: fields['LIB_TYPE_EMPLOI'] || '',
             startDate: fromGristFuzzyDate(fields['employment_start_date']),
             endDate: fromGristFuzzyDate(fields['employment_end_date']),
+            // Optional columns (lib/fte.ts): absent or empty → null, a real 0 is kept.
+            fte: parseFteCell(fields[FTE_COLUMNS.fte]),
+            researchFte: parseFteCell(fields[FTE_COLUMNS.researchFte]),
           },
           affiliations: [{
             structureName: fields['LABO'] || '',
@@ -1805,6 +1820,7 @@ export const GristService = {
       'employment_end_date': encodeDate('employment_end_date', researcher.employment.endDate),
       'Corps_grade': researcher.employment.grade || null,
       'TYPE_EMPLOI': researcher.employment.contractType || null,
+      ...(await fteCellFields(researcher.employment)),
       'ORCID': researcher.identifiers.orcid,
       'IdRef': researcher.identifiers.idref,
       'IdHAL': researcher.identifiers.halId,
@@ -1900,6 +1916,7 @@ export const GristService = {
       'employment_end_date': encodeDate('employment_end_date', researcher.employment.endDate),
       'Corps_grade': researcher.employment.grade || null,
       'TYPE_EMPLOI': researcher.employment.contractType || null,
+      ...(await fteCellFields(researcher.employment)),
       // Declared public social media accounts (tracked by media monitoring).
       'Bluesky': researcher.socials?.bluesky || null,
       'Mastodon': researcher.socials?.mastodon || null,
