@@ -852,7 +852,6 @@ msgstr "Retour à la liste"
 
 #: components/ResearcherDetail.tsx:246
 #: components/Sidebar.tsx:158
-#: components/dashboard/StaffSection.tsx:377
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "Personnel"
@@ -4849,12 +4848,12 @@ msgstr "Publications / ETP recherche / an"
 
 #. placeholder {0}: fmt(rate.overall.rate, 1)
 #: components/dashboard/StaffSection.tsx:196
-msgid "Average {0}"
-msgstr "Moyenne {0}"
+msgid "All brackets {0}"
+msgstr "Ensemble {0}"
 
 #: components/dashboard/StaffSection.tsx:265
-msgid "Rate = publications ÷ (research FTE × years of presence in the lab over the period). Age = publication year − birth year. A publication counts once in each age bracket where it has an author present that year. PhD students, emeriti and members without research FTE are out of the rate. Research FTE: value of the Annuaire, otherwise default from the grade (teacher-researcher 0.5, researcher 1, support staff 0), flagged as estimated. Brackets of fewer than 3 people are merged with a neighbour. Authors are matched to members by name: a member publishing under another spelling counts 0. The current year stops at the reference date."
-msgstr "Taux = publications ÷ (ETP recherche × années de présence au labo sur la période). Âge = année de publication − année de naissance. Une publication compte une fois dans chaque tranche d'âge où elle a un auteur présent cette année-là. Les doctorants, les émérites et les membres sans ETP recherche sont hors du taux. ETP recherche : valeur de l'Annuaire, sinon valeur par défaut selon le grade (enseignant-chercheur 0,5, chercheur 1, personnel d'appui 0), signalée comme estimée. Les tranches de moins de 3 personnes sont fusionnées avec une voisine. Les auteurs sont rapprochés des membres par le nom : un membre qui publie sous une autre graphie compte 0. L'année en cours s'arrête à la date de référence."
+msgid "Rate = publications ÷ (research FTE × years of presence in the lab over the period). Age = publication year − birth year. A publication counts once in each age bracket where it has an author present that year. PhD students, emeriti and members without research FTE are out of the rate. Research FTE: value of the Annuaire, otherwise default from the grade (teacher-researcher 0.5, researcher 1, support staff 0), flagged as estimated. Brackets of fewer than 3 people are merged with a neighbour. Authors are matched to members by name: a member publishing under another spelling counts 0. The current year stops at the reference date. « All brackets » counts each publication once: it is lower than the sum of the brackets, and its rate may lie below most of them (a publication co-signed by two brackets counts in each)."
+msgstr "Taux = publications ÷ (ETP recherche × années de présence au labo sur la période). Âge = année de publication − année de naissance. Une publication compte une fois dans chaque tranche d'âge où elle a un auteur présent cette année-là. Les doctorants, les émérites et les membres sans ETP recherche sont hors du taux. ETP recherche : valeur de l'Annuaire, sinon valeur par défaut selon le grade (enseignant-chercheur 0,5, chercheur 1, personnel d'appui 0), signalée comme estimée. Les tranches de moins de 3 personnes sont fusionnées avec une voisine. Les auteurs sont rapprochés des membres par le nom : un membre qui publie sous une autre graphie compte 0. L'année en cours s'arrête à la date de référence. « Toutes tranches » compte chaque publication une seule fois : le total est inférieur à la somme des tranches, et son taux peut être sous la plupart d'entre elles (une publication cosignée par deux tranches compte dans chacune)."
 
 #: components/dashboard/StaffSection.tsx:280
 msgid "Population"
@@ -4872,8 +4871,8 @@ msgstr "La période inclut {currentYear}, dont les publications ne sont pas enco
 
 #. placeholder {0}: staff.filter((m) => m.former).length
 #: components/dashboard/StaffSection.tsx:310
-msgid "{0} former members"
-msgstr "{0} anciens membres"
+msgid "Former members: {0}"
+msgstr "Anciens membres : {0}"
 
 #. placeholder {0}: fmt(b.estimatedFteYears, 1)
 #. placeholder {0}: fmt(kpis.estimatedResearchFte, 1)
@@ -4892,8 +4891,8 @@ msgstr "Membres publiants"
 
 #. placeholder {0}: kpis.unmatched
 #: components/dashboard/StaffSection.tsx:318
-msgid "{0} without matched publications excluded"
-msgstr "{0} sans publication rapprochée exclus"
+msgid "Without matched author (excluded): {0}"
+msgstr "Sans auteur rapproché (exclus) : {0}"
 
 #: components/dashboard/StaffSection.tsx:323
 msgid "Publication rate by age bracket"
@@ -4934,8 +4933,8 @@ msgstr "Publications par membre"
 
 #. placeholder {0}: distribution.unmatched
 #: components/dashboard/StaffSection.tsx:354
-msgid "Members by number of publications over {periodLabel} — {0} members without matched author left out"
-msgstr "Membres selon leur nombre de publications sur {periodLabel} — {0} membres sans auteur rapproché écartés"
+msgid "Members by number of publications over {periodLabel} — without matched author (left out): {0}"
+msgstr "Membres selon leur nombre de publications sur {periodLabel} — sans auteur rapproché (écartés) : {0}"
 
 #: components/dashboard/StaffSection.tsx:355
 msgid "Members by number of publications over {periodLabel}"
@@ -4953,6 +4952,10 @@ msgstr "Télécharger le CSV"
 msgid "Age bracket"
 msgstr "Tranche d'âge"
 
+#: components/dashboard/StaffSection.tsx:377
+msgid "Number of people"
+msgstr "Personnes"
+
 #: components/dashboard/StaffSection.tsx:378
 msgid "Research FTE-years"
 msgstr "Années-ETP recherche"
@@ -4968,17 +4971,17 @@ msgstr "Population : {populationLabel}."
 #. placeholder {0}: rate.excluded.phdOrEmeritus
 #. placeholder {1}: rate.excluded.noResearchFte
 #: components/dashboard/StaffSection.tsx:407
-msgid "Out of the rate: {0} PhD students or emeriti, {1} without research FTE."
-msgstr "Hors du taux : {0} doctorants ou émérites, {1} sans ETP recherche."
+msgid "Out of the rate: PhD students or emeriti ({0}), without research FTE ({1})."
+msgstr "Hors du taux : doctorants ou émérites ({0}), sans ETP recherche ({1})."
 
 #: components/dashboard/StaffSection.tsx:409
-msgid "{masked} people of unknown age not shown (fewer than 3)."
-msgstr "{masked} personnes d'âge inconnu non affichées (moins de 3)."
+msgid "Unknown age not shown: {masked} (fewer than 3 people)."
+msgstr "Âge inconnu non affiché : {masked} (moins de 3 personnes)."
 
 #. placeholder {0}: rate.excluded.undatedFormer
 #: components/dashboard/StaffSection.tsx:410
-msgid "{0} former members without end date left out."
-msgstr "{0} anciens membres sans date de fin écartés."
+msgid "Former members without end date (left out): {0}."
+msgstr "Anciens membres sans date de fin (écartés) : {0}."
 
 #: components/dashboard/StaffSection.tsx:411
 msgid "* includes research FTE estimated from the grade."

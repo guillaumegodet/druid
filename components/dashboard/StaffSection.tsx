@@ -193,7 +193,7 @@ export const StaffSection: React.FC<{
         silent: true,
         symbol: 'none',
         lineStyle: { color: theme.inkMuted, type: 'dashed' as const },
-        label: { color: theme.inkSecondary, fontSize: 11, formatter: t`Average ${fmt(rate.overall.rate, 1)}` },
+        label: { color: theme.inkSecondary, fontSize: 11, formatter: t`All brackets ${fmt(rate.overall.rate, 1)}` },
         data: [{ yAxis: Number(rate.overall.rate.toFixed(2)) }],
       },
     }],
@@ -262,7 +262,7 @@ export const StaffSection: React.FC<{
     })),
   }), [distribution, theme, labels, t]);
 
-  const methodText = t`Rate = publications ÷ (research FTE × years of presence in the lab over the period). Age = publication year − birth year. A publication counts once in each age bracket where it has an author present that year. PhD students, emeriti and members without research FTE are out of the rate. Research FTE: value of the Annuaire, otherwise default from the grade (teacher-researcher 0.5, researcher 1, support staff 0), flagged as estimated. Brackets of fewer than 3 people are merged with a neighbour. Authors are matched to members by name: a member publishing under another spelling counts 0. The current year stops at the reference date.`;
+  const methodText = t`Rate = publications ÷ (research FTE × years of presence in the lab over the period). Age = publication year − birth year. A publication counts once in each age bracket where it has an author present that year. PhD students, emeriti and members without research FTE are out of the rate. Research FTE: value of the Annuaire, otherwise default from the grade (teacher-researcher 0.5, researcher 1, support staff 0), flagged as estimated. Brackets of fewer than 3 people are merged with a neighbour. Authors are matched to members by name: a member publishing under another spelling counts 0. The current year stops at the reference date. « All brackets » counts each publication once: it is lower than the sum of the brackets, and its rate may lie below most of them (a publication co-signed by two brackets counts in each).`;
 
   const downloadCsv = () => {
     const esc = (v: string | number) => {
@@ -307,7 +307,7 @@ export const StaffSection: React.FC<{
       )}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCard label={t`Headcount`} value={fmt(kpis.headcount)} icon={<Users className="w-5 h-5" />} color={theme.series[3]}
-          hint={filter.presence === 'period' ? t`${staff.filter((m) => m.former).length} former members` : undefined} />
+          hint={filter.presence === 'period' ? t`Former members: ${staff.filter((m) => m.former).length}` : undefined} />
         <KpiCard label={t`Research FTE`} value={fmt(kpis.researchFte, 1)} icon={<Gauge className="w-5 h-5" />} color={theme.series[5]}
           hint={kpis.estimatedResearchFte > 0 ? t`of which ${fmt(kpis.estimatedResearchFte, 1)} estimated from the grade` : t`PhD students and emeriti excluded`} />
         <KpiCard label={t`Publications / research FTE / year`} value={kpis.publicationsPerFteYear === null ? '—' : fmt(kpis.publicationsPerFteYear, 2)}
@@ -315,7 +315,7 @@ export const StaffSection: React.FC<{
           onClick={onOpenList && rate.overall.authorYears.length ? () => openBracket('overall', rate.overall.authorYears) : undefined} />
         <KpiCard label={t`Publishing members`} value={kpis.publishingShare === null ? '—' : `${fmt(kpis.publishingShare * 100)} %`}
           icon={<Activity className="w-5 h-5" />} color={theme.series[0]}
-          hint={kpis.unmatched > 0 ? t`${kpis.unmatched} without matched publications excluded` : periodLabel} />
+          hint={kpis.unmatched > 0 ? t`Without matched author (excluded): ${kpis.unmatched}` : periodLabel} />
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
@@ -351,7 +351,7 @@ export const StaffSection: React.FC<{
         <EChartCard
           title={t`Publications per member`}
           subtitle={distribution.unmatched > 0
-            ? t`Members by number of publications over ${periodLabel} — ${distribution.unmatched} members without matched author left out`
+            ? t`Members by number of publications over ${periodLabel} — without matched author (left out): ${distribution.unmatched}`
             : t`Members by number of publications over ${periodLabel}`}
           option={distributionOption}
           exportName="chercheurs-publications-par-membre"
@@ -374,7 +374,7 @@ export const StaffSection: React.FC<{
             <thead className="text-left text-[11px] uppercase tracking-wide text-muted-light dark:text-[#8f897c]">
               <tr>
                 <th className="px-3 py-2"><Trans>Age bracket</Trans></th>
-                <th className="px-3 py-2 text-right"><Trans>People</Trans></th>
+                <th className="px-3 py-2 text-right"><Trans>Number of people</Trans></th>
                 <th className="px-3 py-2 text-right"><Trans>Research FTE-years</Trans></th>
                 <th className="px-3 py-2 text-right"><Trans>Publications</Trans></th>
                 <th className="px-3 py-2 text-right"><Trans>Publications / FTE / year</Trans></th>
@@ -404,10 +404,10 @@ export const StaffSection: React.FC<{
         <p className="text-[11px] text-muted-light dark:text-[#8f897c]">
           <Trans>Population: {populationLabel}.</Trans>{' '}
           {rate.excluded.phdOrEmeritus + rate.excluded.noResearchFte > 0 && (
-            <Trans>Out of the rate: {rate.excluded.phdOrEmeritus} PhD students or emeriti, {rate.excluded.noResearchFte} without research FTE.</Trans>
+            <Trans>Out of the rate: PhD students or emeriti ({rate.excluded.phdOrEmeritus}), without research FTE ({rate.excluded.noResearchFte}).</Trans>
           )}{' '}
-          {masked > 0 && <Trans>{masked} people of unknown age not shown (fewer than 3).</Trans>}{' '}
-          {rate.excluded.undatedFormer > 0 && <Trans>{rate.excluded.undatedFormer} former members without end date left out.</Trans>}{' '}
+          {masked > 0 && <Trans>Unknown age not shown: {masked} (fewer than 3 people).</Trans>}{' '}
+          {rate.excluded.undatedFormer > 0 && <Trans>Former members without end date (left out): {rate.excluded.undatedFormer}.</Trans>}{' '}
           {rate.brackets.some((b) => b.estimatedFteYears > 0) && <Trans>* includes research FTE estimated from the grade.</Trans>}
         </p>
         <details className="text-[11px] text-muted-light dark:text-[#8f897c]">
