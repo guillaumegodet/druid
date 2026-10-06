@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.4.0] — 2026-10-06
+
 ### Ajouté
 - Tableau de bord, onglet **Chercheurs** : filtre de population (appartenance au labo, catégorie — permanents,
   non-permanents, doctorants, émérites — et présence : membres actuels ou présents sur la période, au prorata),
@@ -36,6 +38,9 @@ données à exécuter au déploiement).
   documents Nantes (prod et test) le 2026-10-06.
 
 ### Corrigé
+- Fiche chercheur : le type d'appartenance au labo (membre statutaire, associé…) s'affiche à nouveau dans la carte
+  « Appartenances » ; il était perdu à la lecture, et enregistrer la fiche effaçait la valeur dans Grist
+  (`membership_type` remis à vide).
 - Alignement des identifiants chercheurs : valider des candidats n'échoue plus (« Invalid column
   "Scopus_champs_modifies" ») sur une instance dont l'Annuaire n'a pas les colonnes de traçabilité d'une source
   (`<Source>_derniere_maj`, `<Source>_champs_modifies`) ; l'identifiant est écrit, la traçabilité absente est
