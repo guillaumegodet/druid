@@ -5,6 +5,7 @@ import { isValidationStale } from '../lib/validation';
 import { POLE_LAB_MAPPING, getPoleFromLab } from '../lib/mappings';
 import { useUrlState } from './useUrlState';
 import { fuzzyDateLowerBound, fuzzyDateUpperBound } from '../lib/dates';
+import { matchesMembershipFilter } from '../lib/membershipFilter';
 
 export type SortKey = 'displayName' | 'status' | 'employer' | 'structureName' | 'team';
 
@@ -52,6 +53,7 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
   const [filterValidation, setFilterValidation] = useState<string[]>([]);
   const [filterEmployers, setFilterEmployers] = useState<string[]>([]);
   const [filterLabs, setFilterLabs] = useState<string[]>([]);
+  const [filterMemberships, setFilterMemberships] = useState<string[]>([]);
   const [filterGrades, setFilterGrades] = useState<string[]>([]);
   const [filterContractTypes, setFilterContractTypes] = useState<string[]>([]);
   const [filterPoles, setFilterPoles] = useState<string[]>([]);
@@ -65,13 +67,14 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
   const splitFilter = (v: string) => (v ? v.split(',').filter(Boolean) : []);
 
   const { setUrlState } = useUrlState(
-    { search: '', status: '', validation: '', employer: '', lab: '', grade: '', contractType: '', pole: '', parcours: '', mode: 'list' },
+    { search: '', status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '', mode: 'list' },
     (newState) => {
       if (newState.search !== undefined) setSearchTerm(newState.search || '');
       if (newState.status !== undefined) setFilterStatuses(splitFilter(newState.status || ''));
       if (newState.validation !== undefined) setFilterValidation(splitFilter(newState.validation || ''));
       if (newState.employer !== undefined) setFilterEmployers(splitFilter(newState.employer || ''));
       if (newState.lab !== undefined) setFilterLabs(splitFilter(newState.lab || ''));
+      if (newState.membership !== undefined) setFilterMemberships(splitFilter(newState.membership || ''));
       if (newState.grade !== undefined) setFilterGrades(splitFilter(newState.grade || ''));
       if (newState.contractType !== undefined) setFilterContractTypes(splitFilter(newState.contractType || ''));
       if (newState.pole !== undefined) setFilterPoles(splitFilter(newState.pole || ''));
@@ -129,6 +132,7 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
     const matchesValidation = matchesValidationFilter(r);
     const matchesEmployer = filterEmployers.length === 0 || filterEmployers.includes(r.employment.employer);
     const matchesLab = filterLabs.length === 0 || filterLabs.includes(primaryLab);
+    const matchesMembership = matchesMembershipFilter(r, filterMemberships);
     const matchesGrade = filterGrades.length === 0 || filterGrades.includes(r.employment.grade || '');
     const matchesContractType = filterContractTypes.length === 0 || filterContractTypes.includes(r.employment.contractType || '');
     const matchesPole = filterPoles.length === 0 || filterPoles.includes(r.nuFields?.pole || '');
@@ -145,9 +149,9 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
       (!idFilters.scopus || !!r.identifiers.scopusId);
     const key = affiliationHistoryKey(r);
     const matchesParcours = !parcoursSignals || matchesParcoursFilter(key ? parcoursSignals[key] : undefined, filterParcours);
-    return matchesSearch && matchesStatus && matchesValidation && matchesEmployer && matchesLab && matchesGrade &&
+    return matchesSearch && matchesStatus && matchesValidation && matchesEmployer && matchesLab && matchesMembership && matchesGrade &&
       matchesContractType && matchesPole && matchesPeriod && matchesIds && matchesParcours;
-  }), [enrichedResearchers, searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, idFilters, now, parcoursSignals, filterParcours]);
+  }), [enrichedResearchers, searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterMemberships, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, idFilters, now, parcoursSignals, filterParcours]);
 
   // Counter of the « Career path » filter options, over every record of the list (not the filtered ones).
   const parcoursCount = useMemo(
@@ -187,7 +191,7 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, filterParcours]);
+  }, [searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterMemberships, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, filterParcours]);
 
   const handleSort = (key: SortKey) => {
     setSortConfig(prev => ({
@@ -201,10 +205,19 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
   const updateValidation = (vals: string[]) => { setFilterValidation(vals); setUrlState({ validation: vals.join(',') }); };
   const updateEmployers = (vals: string[]) => { setFilterEmployers(vals); setUrlState({ employer: vals.join(',') }); };
   const updateLabs = (vals: string[]) => { setFilterLabs(vals); setUrlState({ lab: vals.join(',') }); };
+  const updateMemberships = (vals: string[]) => { setFilterMemberships(vals); setUrlState({ membership: vals.join(',') }); };
   const updateGrades = (vals: string[]) => { setFilterGrades(vals); setUrlState({ grade: vals.join(',') }); };
   const updateContractTypes = (vals: string[]) => { setFilterContractTypes(vals); setUrlState({ contractType: vals.join(',') }); };
   const updatePoles = (vals: string[]) => { setFilterPoles(vals); setUrlState({ pole: vals.join(',') }); };
   const updateParcours = (vals: string[]) => { setFilterParcours(vals); setUrlState({ parcours: vals.join(',') }); };
+  /** « Clear all » of the filter bar: every filter except the search, in a single URL update. */
+  const clearFilters = () => {
+    setFilterStatuses([]); setFilterValidation([]); setFilterEmployers([]); setFilterLabs([]);
+    setFilterMemberships([]); setFilterGrades([]); setFilterContractTypes([]); setFilterPoles([]);
+    setFilterParcours([]); setFilterDateStart(''); setFilterDateEnd('');
+    setIdFilters({ orcid: false, hal: false, idref: false, scopus: false });
+    setUrlState({ status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '' });
+  };
   const updateViewMode = (val: 'list' | 'dashboard') => { setViewMode(val); setUrlState({ mode: val }); };
 
   return {
@@ -214,6 +227,7 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
     filterValidation, updateValidation,
     filterEmployers, updateEmployers,
     filterLabs, updateLabs,
+    filterMemberships, updateMemberships,
     filterGrades, updateGrades,
     filterContractTypes, updateContractTypes,
     filterPoles, updatePoles,
@@ -221,6 +235,7 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
     filterDateStart, setFilterDateStart,
     filterDateEnd, setFilterDateEnd,
     idFilters, setIdFilters,
+    clearFilters,
     employers, labs, grades, contractTypes, poles, allGroups,
     sortedResearchers, paginatedResearchers, totalPages,
     sortConfig, handleSort,

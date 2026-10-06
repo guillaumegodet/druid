@@ -4,6 +4,7 @@ import { Affiliation, MEMBERSHIP_TYPES, MembershipType } from '../../types';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FuzzyDateInput } from './FuzzyDateInput';
 import { formatFuzzyDate } from '../../lib/dates';
+import { MEMBERSHIP_LABELS } from '../../lib/researcherLabels';
 
 /** Team option: name + parent lab (to filter by chosen structure). */
 export interface TeamOption {
@@ -39,17 +40,6 @@ const OutOfListOption: React.FC<{ value: string; options: string[] }> = ({ value
   return value && !options.includes(value) ? <option value={value}>{t`${value} (not in list)`}</option> : null;
 };
 
-/** Labels of the cdb membership types (CRISalid vocabulary, exported as is in people.csv). */
-const useMembershipLabels = (): Record<MembershipType, string> => {
-  const { t } = useLingui();
-  return {
-    stat_mmb: t`Statutory member`,
-    assoc_mmb: t`Associate member`,
-    second_mmb: t`Secondary affiliation`,
-    visit_mmb: t`Visiting member`,
-  };
-};
-
 /** Sentinel value of the « Ajouter une équipe… » entry of the Team menu. */
 const NEW_TEAM_VALUE = '__new_team__';
 
@@ -72,7 +62,6 @@ export const AffiliationsTable: React.FC<AffiliationsTableProps> = ({
   // Teams proposed for a structure: those attached to this lab if known
   // (parentStructure), otherwise all (unknown parent or empty lab).
   const { t } = useLingui();
-  const membershipLabels = useMembershipLabels();
   // Teams proposed for a structure: ONLY those attached to this lab (parent_structure
   // of the Structures table, compared case-insensitively). Empty lab or no known team → empty list, the
   // current value staying selectable via OutOfListOption.
@@ -176,7 +165,7 @@ export const AffiliationsTable: React.FC<AffiliationsTableProps> = ({
                 >
                   <option value="">{t`— Membership type —`}</option>
                   {MEMBERSHIP_TYPES.map((m) => (
-                    <option key={m} value={m}>{membershipLabels[m]}</option>
+                    <option key={m} value={m}>{t(MEMBERSHIP_LABELS[m])}</option>
                   ))}
                 </select>
                 <label className="flex items-center gap-1.5 text-[11px] font-semibold text-white/60">
