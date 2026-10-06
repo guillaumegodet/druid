@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.4.0] — 2026-10-06
+
 ### Ajouté
 - Tableau de bord, onglet **Chercheurs** : filtre de population (appartenance au labo, catégorie — permanents,
   non-permanents, doctorants, émérites — et présence : membres actuels ou présents sur la période, au prorata),
