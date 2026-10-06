@@ -4,6 +4,8 @@ import { Researcher, Affiliation } from '../../types';
 import { AffiliationsTable, TeamOption } from './AffiliationsTable';
 import { GradeSelect } from './GradeSelect';
 import { FuzzyDateInput } from './FuzzyDateInput';
+import { FteInput } from './FteInput';
+import { useFteColumns } from '../../hooks/useFteColumns';
 import { LdapUidLookup, LdapLookupOutcome } from './LdapUidLookup';
 import { Trans, useLingui } from '@lingui/react/macro';
 
@@ -70,6 +72,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
   ldapAutoRun = false,
 }) => {
   const { t } = useLingui();
+  const showFte = useFteColumns();
   return (
     // `contents`: the cards become items of the 2-column grid defined
     // in ResearcherDetail (left col. 300px: photo + identifiers; right col.:
@@ -303,6 +306,18 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                  <FuzzyDateInput value={researcher.employment.endDate || ''} onChange={(d) => onUpdateField('endDate', d, 'employment')} className={secInput} wrapperClassName="w-full" />
                </div>
              </div>
+             {showFte && (
+               <div className="grid grid-cols-2 gap-4">
+                 <div>
+                   <label className={secLabel} title={t`Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided.`}><Trans>FTE (working time)</Trans></label>
+                   <FteInput value={researcher.employment.fte} onChange={(v) => onUpdateField('fte', v, 'employment')} className={secInput} />
+                 </div>
+                 <div>
+                   <label className={secLabel} title={t`Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time.`}><Trans>Research FTE</Trans></label>
+                   <FteInput value={researcher.employment.researchFte} onChange={(v) => onUpdateField('researchFte', v, 'employment')} className={secInput} />
+                 </div>
+               </div>
+             )}
              <div className="flex gap-6 items-end md:col-span-2">
                <div className="flex-1">
                   <label className="flex items-center gap-3 cursor-pointer">

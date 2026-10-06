@@ -4481,7 +4481,7 @@ msgid "Lab"
 msgstr "Laboratoire"
 
 #: components/dashboard/PublicationsListTab.tsx:348
-#: components/researchers/GeneralTab.tsx:266
+#: components/researchers/GeneralTab.tsx:269
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Type d'emploi"
@@ -4560,6 +4560,7 @@ msgid "Top 20 internal authors, grouped and coloured by {0}"
 msgstr "Top 20 des auteurs internes, regroupés et colorés par {0}"
 
 #: components/dashboard/ResearchersTab.tsx:112
+#: components/researchers/FteInput.tsx:29
 msgid "Not provided"
 msgstr "Non renseigné"
 
@@ -7409,8 +7410,8 @@ msgid "Save to Grist"
 msgstr "Enregistrer dans Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3430
-#: lib/gristService.ts:3539
+#: lib/gristService.ts:3460
+#: lib/gristService.ts:3569
 msgid "Search error"
 msgstr "Erreur de recherche"
 
@@ -8917,6 +8918,10 @@ msgstr "Identifiants :"
 msgid "Dates:"
 msgstr "Dates :"
 
+#: components/researchers/FteInput.tsx:31
+msgid "Enter a value between 0 and 1 (e.g. 0.5), or leave empty"
+msgstr "Saisir une valeur entre 0 et 1 (ex. 0,5), ou laisser vide"
+
 #: components/researchers/FuzzyDateInput.tsx:64
 msgid "Unrecognized date: enter YYYY-MM-DD, YYYY-MM or YYYY"
 msgstr "Date non reconnue : saisir AAAA-MM-JJ, AAAA-MM ou AAAA"
@@ -8929,117 +8934,133 @@ msgstr "AAAA-MM-JJ, AAAA-MM ou AAAA"
 msgid "Pick a full date from the calendar"
 msgstr "Choisir une date complète dans le calendrier"
 
-#: components/researchers/GeneralTab.tsx:80
+#: components/researchers/GeneralTab.tsx:83
 msgid "Researcher identifiers"
 msgstr "Identifiants chercheur"
 
-#: components/researchers/GeneralTab.tsx:132
+#: components/researchers/GeneralTab.tsx:135
 msgid "HAL numeric identifier (idHal_i)"
 msgstr "Identifiant numérique HAL (idHal_i)"
 
-#: components/researchers/GeneralTab.tsx:143
+#: components/researchers/GeneralTab.tsx:146
 msgid "Digits only, e.g. 123456"
 msgstr "Numérique, ex. 123456"
 
-#: components/researchers/GeneralTab.tsx:186
+#: components/researchers/GeneralTab.tsx:189
 msgid "Personal details"
 msgstr "État civil"
 
-#: components/researchers/GeneralTab.tsx:192
+#: components/researchers/GeneralTab.tsx:195
 msgctxt "honorific"
 msgid "Title"
 msgstr "Civilité"
 
-#: components/researchers/GeneralTab.tsx:200
+#: components/researchers/GeneralTab.tsx:203
 msgid "Last name"
 msgstr "Nom d'usage"
 
-#: components/researchers/GeneralTab.tsx:204
+#: components/researchers/GeneralTab.tsx:207
 msgid "First name"
 msgstr "Prénom"
 
-#: components/researchers/GeneralTab.tsx:208
+#: components/researchers/GeneralTab.tsx:211
 #: lib/importConflicts.ts:66
 msgid "Nationality"
 msgstr "Nationalité"
 
-#: components/researchers/GeneralTab.tsx:212
+#: components/researchers/GeneralTab.tsx:215
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date de naissance"
 
-#: components/researchers/GeneralTab.tsx:223
+#: components/researchers/GeneralTab.tsx:226
 #: components/researchers/LdapUidLookup.tsx:49
 msgid "UID (Dyna)"
 msgstr "UID (Dyna)"
 
-#: components/researchers/GeneralTab.tsx:238
+#: components/researchers/GeneralTab.tsx:241
 msgid "Employment & contract"
 msgstr "Emploi & contrat"
 
-#: components/researchers/GeneralTab.tsx:241
+#: components/researchers/GeneralTab.tsx:244
 msgid "Employing institution"
 msgstr "Établissement employeur"
 
-#: components/researchers/GeneralTab.tsx:247
+#: components/researchers/GeneralTab.tsx:250
 msgid "— None —"
 msgstr "— Aucun —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:249
+#: components/researchers/GeneralTab.tsx:252
 msgid "{0} (not in list)"
 msgstr "{0} (hors liste)"
 
-#: components/researchers/GeneralTab.tsx:257
+#: components/researchers/GeneralTab.tsx:260
 msgid "Grade / Rank"
 msgstr "Grade / Corps"
 
-#: components/researchers/GeneralTab.tsx:273
+#: components/researchers/GeneralTab.tsx:276
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Non défini —"
 
-#: components/researchers/GeneralTab.tsx:298
+#: components/researchers/GeneralTab.tsx:301
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Début d'emploi"
 
-#: components/researchers/GeneralTab.tsx:298
+#: components/researchers/GeneralTab.tsx:301
 msgid "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Dates du contrat / de l'emploi (colonnes Grist employment_*), distinctes des dates d'appartenance au labo saisies dans la carte Appartenances. Date imprécise acceptée : AAAA ou AAAA-MM."
 
-#: components/researchers/GeneralTab.tsx:302
+#: components/researchers/GeneralTab.tsx:305
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Fin d'emploi"
 
-#: components/researchers/GeneralTab.tsx:302
+#: components/researchers/GeneralTab.tsx:305
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Fin de contrat / d'emploi (AAAA, AAAA-MM ou AAAA-MM-JJ). Pour une fiche externe (sans état LDAP), une date passée fait passer le statut à « Parti » ; avec une fin d'appartenance passée aussi, « Parti » s'applique même à une fiche validée."
 
-#: components/researchers/GeneralTab.tsx:315
+#: components/researchers/GeneralTab.tsx:312
+msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
+msgstr "Part d'un temps plein (0 à 1, ex. 0,5). Vide = non renseigné."
+
+#: components/researchers/GeneralTab.tsx:312
+msgid "FTE (working time)"
+msgstr "ETP (quotité)"
+
+#: components/researchers/GeneralTab.tsx:316
+msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
+msgstr "Équivalent temps plein recherche (0 à 1) : en général 0,5 pour un enseignant-chercheur, 1 pour un chercheur à temps plein. Vide = non renseigné (le tableau de bord appliquera une valeur par défaut selon le grade) ; 0 = aucun temps de recherche."
+
+#: components/researchers/GeneralTab.tsx:316
+msgid "Research FTE"
+msgstr "ETP recherche"
+
+#: components/researchers/GeneralTab.tsx:330
 msgid "Accredited to supervise research (HDR)"
 msgstr "Habilité à diriger des recherches (HDR)"
 
-#: components/researchers/GeneralTab.tsx:320
+#: components/researchers/GeneralTab.tsx:335
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "Année HDR"
 
-#: components/researchers/GeneralTab.tsx:336
+#: components/researchers/GeneralTab.tsx:351
 msgid "Cluster"
 msgstr "Pôle"
 
-#: components/researchers/GeneralTab.tsx:340
+#: components/researchers/GeneralTab.tsx:355
 msgid "Faculty"
 msgstr "Composante"
 
-#: components/researchers/GeneralTab.tsx:344
+#: components/researchers/GeneralTab.tsx:359
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "ED de rattachement"
 
-#: components/researchers/GeneralTab.tsx:348
+#: components/researchers/GeneralTab.tsx:363
 msgid "Location (site)"
 msgstr "Localisation (site)"
 
@@ -11123,8 +11144,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Homonyme sans preuve d'affiliation"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3441
-#: lib/gristService.ts:3567
+#: lib/gristService.ts:3471
+#: lib/gristService.ts:3597
 msgid "Suspected mixed identity"
 msgstr "Identité mêlée suspectée"
 
@@ -12023,307 +12044,307 @@ msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:662
+#: lib/gristService.ts:663
 msgid "Error creating the affiliation columns: {0}"
 msgstr "Erreur création colonnes de rattachement : {0}"
 
-#: lib/gristService.ts:771
-#: lib/gristService.ts:2534
-#: lib/gristService.ts:3246
-#: lib/gristService.ts:3860
+#: lib/gristService.ts:787
+#: lib/gristService.ts:2566
+#: lib/gristService.ts:3276
+#: lib/gristService.ts:3886
 msgid "Grist error (table list)"
 msgstr "Erreur Grist (liste des tables)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:778
+#: lib/gristService.ts:794
 msgid "Error creating table {MERGE_LOG_TABLE}: {0}"
 msgstr "Erreur de création de la table {MERGE_LOG_TABLE} : {0}"
 
-#: lib/gristService.ts:1394
+#: lib/gristService.ts:1421
 msgid "Invalid entity code “{code}”: letters, digits, “-”, “_” or “.” only"
 msgstr "Code entité « {code} » invalide : lettres, chiffres, « - », « _ » ou « . » uniquement"
 
-#: lib/gristService.ts:1841
+#: lib/gristService.ts:1872
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/gristService.ts:1853
+#: lib/gristService.ts:1884
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/gristService.ts:1855
+#: lib/gristService.ts:1886
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1926
+#: lib/gristService.ts:1958
 msgid "Grist error (writing the secondary affiliations): {0}"
 msgstr "Erreur Grist (écriture des appartenances secondaires) : {0}"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:1947
+#: lib/gristService.ts:1979
 msgid "Grist error (creating the secondary affiliations): {0}"
 msgstr "Erreur Grist (création des appartenances secondaires) : {0}"
 
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:1959
-#: lib/gristService.ts:2515
+#: lib/gristService.ts:1991
+#: lib/gristService.ts:2547
 msgid "Grist error (merge log): {0}"
 msgstr "Erreur Grist (journal des fusions) : {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:1963
+#: lib/gristService.ts:1995
 msgid "Grist error (deleting the removed affiliations): {0}"
 msgstr "Erreur Grist (suppression des appartenances retirées) : {0}"
 
-#: lib/gristService.ts:1989
+#: lib/gristService.ts:2021
 msgid "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne `groupes` existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2010
+#: lib/gristService.ts:2042
 msgid "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne `openalex_author_id` existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2123
+#: lib/gristService.ts:2155
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/gristService.ts:2126
+#: lib/gristService.ts:2158
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
 #. placeholder {0}: dup.acronym
 #. placeholder {1}: level === StructureLevel.EQUIPE ? t` in ${parent}` : ''
-#: lib/gristService.ts:2132
+#: lib/gristService.ts:2164
 msgid "A structure “{0}” already exists{1}"
 msgstr "Une structure « {0} » existe déjà{1}"
 
-#: lib/gristService.ts:2132
+#: lib/gristService.ts:2164
 msgid " in {parent}"
 msgstr " dans {parent}"
 
-#: lib/gristService.ts:2142
+#: lib/gristService.ts:2174
 msgid "local_id “{localId}” already used"
 msgstr "local_id « {localId} » déjà utilisé"
 
 #. placeholder {0}: await resp.text()
-#: lib/gristService.ts:2175
+#: lib/gristService.ts:2207
 msgid "Error creating the Grist structure: {0}"
 msgstr "Erreur création Structure Grist : {0}"
 
-#: lib/gristService.ts:2183
+#: lib/gristService.ts:2215
 msgid "Invalid ID"
 msgstr "ID invalide"
 
-#: lib/gristService.ts:2414
+#: lib/gristService.ts:2446
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2456
+#: lib/gristService.ts:2488
 msgid "Grist error (de-qualification): {0}"
 msgstr "Erreur Grist (dé-qualification) : {0}"
 
-#: lib/gristService.ts:2498
+#: lib/gristService.ts:2530
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/gristService.ts:2502
+#: lib/gristService.ts:2534
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2522
+#: lib/gristService.ts:2554
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Erreur Grist (écriture ligne conservée, journal #{logId}) : {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2527
+#: lib/gristService.ts:2559
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Erreur Grist (suppression ligne absorbée, journal #{logId}) : {0}"
 
-#: lib/gristService.ts:2538
-#: lib/gristService.ts:2560
+#: lib/gristService.ts:2570
+#: lib/gristService.ts:2592
 msgid "Grist error (merge log)"
 msgstr "Erreur Grist (journal des fusions)"
 
-#: lib/gristService.ts:2562
+#: lib/gristService.ts:2594
 msgid "Merge #{logId} not found"
 msgstr "Fusion #{logId} introuvable"
 
-#: lib/gristService.ts:2563
+#: lib/gristService.ts:2595
 msgid "Merge #{logId} already restored"
 msgstr "Fusion #{logId} déjà restaurée"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2573
+#: lib/gristService.ts:2605
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Erreur Grist (recréation de la ligne) : {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2583
+#: lib/gristService.ts:2615
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Ligne recréée (#{restoredRowId}) mais journal des fusions non mis à jour : {0} — ne pas relancer la restauration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2591
+#: lib/gristService.ts:2623
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Ligne recréée (#{restoredRowId}) mais ligne conservée #{0} non rétablie : {1}"
 
-#: lib/gristService.ts:2604
-#: lib/gristService.ts:3175
-#: lib/gristService.ts:3645
-#: lib/gristService.ts:3724
+#: lib/gristService.ts:2636
+#: lib/gristService.ts:3206
+#: lib/gristService.ts:3674
+#: lib/gristService.ts:3751
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Erreur Grist (lecture Annuaire avant écriture)"
 
-#: lib/gristService.ts:2932
-#: lib/gristService.ts:2971
-#: lib/gristService.ts:3133
-#: lib/gristService.ts:3546
-#: lib/gristService.ts:3574
+#: lib/gristService.ts:2964
+#: lib/gristService.ts:3003
+#: lib/gristService.ts:3165
+#: lib/gristService.ts:3576
+#: lib/gristService.ts:3604
 msgid "Identifier mismatch"
 msgstr "Divergence identifiant"
 
-#: lib/gristService.ts:2950
+#: lib/gristService.ts:2982
 msgid "Record deleted"
 msgstr "Notice supprimée"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2950
+#: lib/gristService.ts:2982
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0} : la notice n'existe plus sur IdRef (404) — corriger ou retirer l'IdRef de l'Annuaire"
 
-#: lib/gristService.ts:2954
+#: lib/gristService.ts:2986
 msgid "Record unreadable"
 msgstr "Notice illisible"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2954
+#: lib/gristService.ts:2986
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0} : notice IdRef inaccessible (erreur réseau ou IdRef indisponible lors du run — relancer)"
 
-#: lib/gristService.ts:3239
+#: lib/gristService.ts:3269
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "La revue Grist ne concerne que le mode « recherche des manquants »"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3254
-#: lib/gristService.ts:3868
+#: lib/gristService.ts:3284
+#: lib/gristService.ts:3894
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Erreur création table {IDREF_REVIEW_TABLE} : {0}"
 
-#: lib/gristService.ts:3430
-#: lib/gristService.ts:3437
-#: lib/gristService.ts:3539
-#: lib/gristService.ts:3561
+#: lib/gristService.ts:3460
+#: lib/gristService.ts:3467
+#: lib/gristService.ts:3569
+#: lib/gristService.ts:3591
 msgid "API unreachable during the run — rerun."
 msgstr "API injoignable lors du run — relancer."
 
-#: lib/gristService.ts:3437
-#: lib/gristService.ts:3561
+#: lib/gristService.ts:3467
+#: lib/gristService.ts:3591
 msgid "Verification error"
 msgstr "Erreur de vérification"
 
-#: lib/gristService.ts:3440
-#: lib/gristService.ts:3569
+#: lib/gristService.ts:3470
+#: lib/gristService.ts:3599
 msgid "Name mismatch"
 msgstr "Nom divergent"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3440
+#: lib/gristService.ts:3470
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} « {1} » ≠ Annuaire « {displayName} »"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3441
+#: lib/gristService.ts:3471
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} « {1} » : {2} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#: lib/gristService.ts:3444
+#: lib/gristService.ts:3474
 msgid "{a} merged into {b}"
 msgstr "{a} fusionné dans {b}"
 
-#: lib/gristService.ts:3445
+#: lib/gristService.ts:3475
 msgid "{a} gone"
 msgstr "{a} disparu"
 
-#: lib/gristService.ts:3446
+#: lib/gristService.ts:3476
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = profil ORCID manquant"
 
-#: lib/gristService.ts:3448
+#: lib/gristService.ts:3478
 msgid "List to fix (not written)"
 msgstr "Liste à corriger (non écrite)"
 
-#: lib/gristService.ts:3448
+#: lib/gristService.ts:3478
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → relancer le run (écriture directe) ou corriger OpenAlex_ids"
 
-#: lib/gristService.ts:3552
+#: lib/gristService.ts:3582
 msgid "Unknown ORCID"
 msgstr "ORCID inconnu"
 
-#: lib/gristService.ts:3552
+#: lib/gristService.ts:3582
 msgid "Unknown Scopus Author ID"
 msgstr "Scopus Author ID inconnu"
 
-#: lib/gristService.ts:3552
+#: lib/gristService.ts:3582
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL inconnu de HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3553
+#: lib/gristService.ts:3583
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 
-#: lib/gristService.ts:3557
+#: lib/gristService.ts:3587
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3557
+#: lib/gristService.ts:3587
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
 
-#: lib/gristService.ts:3558
+#: lib/gristService.ts:3588
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3558
+#: lib/gristService.ts:3588
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
 
-#: lib/gristService.ts:3566
+#: lib/gristService.ts:3596
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3566
+#: lib/gristService.ts:3596
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3567
+#: lib/gristService.ts:3597
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3569
+#: lib/gristService.ts:3599
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire « {displayName} » ≠ profil « {0} »{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3817
+#: lib/gristService.ts:3843
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} absente : lancez d'abord un run {1} (elle est créée par le script)."
 

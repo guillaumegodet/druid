@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ResearcherSchema, AffiliationSchema, ResearcherListSchema } from '../schemas';
+import { ResearcherSchema, AffiliationSchema, EmploymentSchema, ResearcherListSchema } from '../schemas';
 import { ResearcherStatus } from '../../types';
 
 const minimalResearcher = {
@@ -46,6 +46,20 @@ describe('ResearcherSchema', () => {
       const result = ResearcherSchema.safeParse({ ...minimalResearcher, status });
       expect(result.success).toBe(true);
     }
+  });
+});
+
+describe('EmploymentSchema', () => {
+  it('keeps the FTEs, a real 0 included (stripped, they would be erased in Grist on the next save)', () => {
+    const result = EmploymentSchema.safeParse({ employer: 'U ANGERS', fte: 1, researchFte: 0 });
+    expect(result.success && result.data.fte).toBe(1);
+    expect(result.success && result.data.researchFte).toBe(0);
+  });
+
+  it('accepts missing or null FTEs, rejects an FTE above 1', () => {
+    expect(EmploymentSchema.safeParse({ employer: '', fte: null }).success).toBe(true);
+    expect(EmploymentSchema.safeParse({ employer: '' }).success).toBe(true);
+    expect(EmploymentSchema.safeParse({ employer: '', researchFte: 1.5 }).success).toBe(false);
   });
 });
 

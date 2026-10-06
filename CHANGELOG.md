@@ -12,6 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- Fiche chercheur, carte « Emploi & contrat » : deux champs **ETP (quotité)** et **ETP recherche** (0 à 1), enregistrés
+  dans les colonnes `etp_quotite` / `etp_recherche` de l'Annuaire. Vide = non renseigné, distinct de 0 (aucun temps de
+  recherche), y compris lors d'une fusion de doublons. Les champs n'apparaissent que si l'Annuaire de l'instance a les
+  deux colonnes. Préalable au taux de publication par ETP recherche de l'onglet Chercheurs du tableau de bord.
+
+### Migration
+- Créer les colonnes ETP dans l'Annuaire d'une instance qui veut les saisir : `node scripts/add_fte_columns.cjs --apply`
+  (colonnes Numeric vides, et formule « nouvelles lignes = vide » pour que Grist n'y mette pas 0). Fait sur les
+  documents Nantes (prod et test) le 2026-10-06.
+
 ### Corrigé
 - Alignement des identifiants chercheurs : valider des candidats n'échoue plus (« Invalid column
   "Scopus_champs_modifies" ») sur une instance dont l'Annuaire n'a pas les colonnes de traçabilité d'une source

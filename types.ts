@@ -70,6 +70,8 @@ export interface Employment {
   cnu?: string;            // Section of the Conseil National des Universités
   startDate?: string;
   endDate?: string;
+  fte?: number | null;         // Overall FTE (« quotité agent »), 0-1; null = not provided (lib/fte.ts)
+  researchFte?: number | null; // Research FTE, 0-1; null = not provided, 0 = no research time
   ldapFields?: string[];   // Fields whose value comes from LDAP (not editable in the app)
 }
 

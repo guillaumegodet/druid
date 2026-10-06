@@ -41,6 +41,10 @@ export const EmploymentSchema = z.object({
   cnu: z.string().optional().nullable(),
   startDate: z.string().optional().nullable(),
   endDate: z.string().optional().nullable(),
+  // FTEs (lib/fte.ts): declared here, otherwise Zod strips them on read and the next save
+  // writes null over the Grist value (same trap as membershipType, fix 73537d2).
+  fte: z.number().min(0).max(1).optional().nullable(),
+  researchFte: z.number().min(0).max(1).optional().nullable(),
   ldapFields: z.array(z.string()).optional().default([]),
 });
 
