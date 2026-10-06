@@ -22,6 +22,9 @@ données à exécuter au déploiement).
   émérites sont hors du taux ; les tranches de moins de 3 personnes sont fusionnées. Le classement des auteurs suit
   le filtre. Clic sur une tranche : liste des publications correspondantes (nouveau filtre « auteur × année »).
   Nécessite un export druid-biblio du 2026-10-06 ou plus récent (sinon l'onglet reste inchangé).
+- Centre d'aide (fr, en) : page « Lire les effectifs et le taux de publication par ETP » (population, lecture des
+  graphiques, export, méthode, limites), ETP sur la fiche, Nouveautés d'octobre ; le bouton « ? » de l'onglet
+  Chercheurs y mène.
 - Fiche chercheur, carte « Emploi & contrat » : deux champs **ETP (quotité)** et **ETP recherche** (0 à 1), enregistrés
   dans les colonnes `etp_quotite` / `etp_recherche` de l'Annuaire. Vide = non renseigné, distinct de 0 (aucun temps de
   recherche), y compris lors d'une fusion de doublons. Les champs n'apparaissent que si l'Annuaire de l'instance a les
