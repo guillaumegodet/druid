@@ -71,9 +71,11 @@ const ToggleChip: React.FC<{ active: boolean; onClick: () => void; children: Rea
   </button>
 );
 
-/** Section of the « More filters » panel: caption + toggle chips. */
-const ChipGroup: React.FC<{ label: string; options: Option[]; selected: string[]; onChange: (vals: string[]) => void }> = ({ label, options, selected, onChange }) => (
-  <div>
+/** Section of the « More filters » panel: caption + toggle chips. `wide` = long list (e.g. employment
+ * types, about 25 values) laid out on the full width below the short groups, so that it does not
+ * stretch their row and leave holes under them. */
+const ChipGroup: React.FC<{ label: string; options: Option[]; selected: string[]; onChange: (vals: string[]) => void; wide?: boolean }> = ({ label, options, selected, onChange, wide = false }) => (
+  <div className={wide ? 'basis-full' : 'max-w-full'}>
     <div className="text-[10.5px] font-bold uppercase tracking-[.07em] text-muted-light dark:text-[#8f897c] mb-1.5">{label}</div>
     <div className="flex flex-wrap gap-1.5">
       {options.map((o) => (
@@ -266,14 +268,13 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
 
     {/* « More filters » panel: secondary filters as toggle chips */}
     {moreOpen && (
-      <div className="rounded-2xl bg-white/55 dark:bg-white/5 border border-white/70 dark:border-white/10 p-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="rounded-2xl bg-white/55 dark:bg-white/5 border border-white/70 dark:border-white/10 p-4 flex flex-wrap gap-x-8 gap-y-4">
         {hasStatusValidation && (
           <ChipGroup label={t`Validation`} options={validationOptions} selected={filterValidation} onChange={onValidationChange} />
         )}
         {showParcours && (
           <ChipGroup label={t`Career path`} options={parcoursOptions} selected={filterParcours} onChange={onParcoursChange!} />
         )}
-        <ChipGroup label={t`Employment type`} options={toOptions(contractTypes)} selected={filterContractTypes} onChange={onContractTypeChange} />
         <ChipGroup label={t`Cluster`} options={toOptions(poles)} selected={filterPoles} onChange={onPoleChange} />
         <ChipGroup label={t`Identifiers present`} options={idOptions} selected={selectedIds} onChange={setSelectedIds} />
         <div>
@@ -284,6 +285,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             <input type="date" aria-label={t`End of the period`} value={filterDateEnd} onChange={e => onDateEndChange(e.target.value)} className={dateInput} />
           </div>
         </div>
+        <ChipGroup label={t`Employment type`} options={toOptions(contractTypes)} selected={filterContractTypes} onChange={onContractTypeChange} wide />
       </div>
     )}
   </div>

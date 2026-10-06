@@ -683,7 +683,7 @@ msgid "Search for a group…"
 msgstr "Rechercher un groupe…"
 
 #: components/GroupList.tsx:221
-#: components/researchers/FilterPanel.tsx:179
+#: components/researchers/FilterPanel.tsx:181
 msgid "Group"
 msgstr "Groupe"
 
@@ -1126,7 +1126,7 @@ msgstr "Tutelles"
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
 #: components/etl/EtlMaintenancePanels.tsx:268
-#: components/researchers/FilterPanel.tsx:213
+#: components/researchers/FilterPanel.tsx:215
 #: components/researchers/ListHeader.tsx:48
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
 #: components/researchers/ResearcherTable.tsx:92
@@ -1958,7 +1958,7 @@ msgstr "Retirer cette université"
 #: components/dashboard/NewsTab.tsx:678
 #: components/dashboard/PartnerInstitutionPicker.tsx:138
 #: components/dashboard/PublicationsListTab.tsx:275
-#: components/researchers/FilterPanel.tsx:262
+#: components/researchers/FilterPanel.tsx:264
 msgid "Clear all"
 msgstr "Tout effacer"
 
@@ -3424,7 +3424,7 @@ msgstr "Dernière collecte : {0}."
 #: components/reports/HistoryDialog.tsx:105
 #: components/reports/NewReportDialog.tsx:228
 #: components/reports/ReportControls.tsx:83
-#: components/researchers/FilterPanel.tsx:156
+#: components/researchers/FilterPanel.tsx:158
 msgid "Period"
 msgstr "Période"
 
@@ -3898,7 +3898,7 @@ msgstr "Citations (déjà reçues)"
 #: components/dashboard/NewsTab.tsx:610
 #: components/dashboard/NewsTab.tsx:692
 #: components/researchers/AbesExportModal.tsx:229
-#: components/researchers/FilterPanel.tsx:197
+#: components/researchers/FilterPanel.tsx:199
 #: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
@@ -4022,7 +4022,7 @@ msgid "Under review"
 msgstr "En validation"
 
 #: components/dashboard/NewsletterPanel.tsx:49
-#: components/researchers/FilterPanel.tsx:132
+#: components/researchers/FilterPanel.tsx:134
 #: components/researchers/LdapVerifyPanel.tsx:124
 #: components/researchers/StatusBadge.tsx:80
 msgid "Validated"
@@ -4497,8 +4497,8 @@ msgid "Lab"
 msgstr "Laboratoire"
 
 #: components/dashboard/PublicationsListTab.tsx:349
-#: components/researchers/FilterPanel.tsx:153
-#: components/researchers/FilterPanel.tsx:276
+#: components/researchers/FilterPanel.tsx:155
+#: components/researchers/FilterPanel.tsx:288
 #: components/researchers/GeneralTab.tsx:269
 #: lib/importConflicts.ts:64
 msgid "Employment type"
@@ -4591,7 +4591,7 @@ msgstr "Aucune"
 
 #: components/dashboard/ResearchersTab.tsx:208
 #: components/researchers/AbesExportModal.tsx:228
-#: components/researchers/FilterPanel.tsx:220
+#: components/researchers/FilterPanel.tsx:222
 #: components/researchers/ResearcherTable.tsx:88
 #: lib/importConflicts.ts:73
 msgid "Employer"
@@ -4765,7 +4765,7 @@ msgid "Presets"
 msgstr "Raccourcis"
 
 #: components/dashboard/StaffSection.tsx:96
-#: components/researchers/FilterPanel.tsx:204
+#: components/researchers/FilterPanel.tsx:206
 msgid "Membership"
 msgstr "Appartenance"
 
@@ -8628,8 +8628,8 @@ msgid "ORCID ({nOrcid} positions)"
 msgstr "ORCID ({nOrcid} postes)"
 
 #: components/researchers/AffiliationHistorySection.tsx:193
-#: components/researchers/FilterPanel.tsx:152
-#: components/researchers/FilterPanel.tsx:274
+#: components/researchers/FilterPanel.tsx:154
+#: components/researchers/FilterPanel.tsx:276
 msgid "Career path"
 msgstr "Parcours"
 
@@ -9126,108 +9126,108 @@ msgstr "Requalifier"
 msgid "Generated on {generatedAt}"
 msgstr "Généré le {generatedAt}"
 
-#: components/researchers/FilterPanel.tsx:129
+#: components/researchers/FilterPanel.tsx:131
 msgid "Not specified"
 msgstr "Non renseigné"
 
-#: components/researchers/FilterPanel.tsx:133
+#: components/researchers/FilterPanel.tsx:135
 msgid "Validated (expired)"
 msgstr "Validé (périmé)"
 
-#: components/researchers/FilterPanel.tsx:134
+#: components/researchers/FilterPanel.tsx:136
 msgid "Not validated"
 msgstr "Non validé"
 
-#: components/researchers/FilterPanel.tsx:137
+#: components/researchers/FilterPanel.tsx:139
 msgid "Probable departure ({nDepart})"
 msgstr "Départ probable ({nDepart})"
 
-#: components/researchers/FilterPanel.tsx:138
+#: components/researchers/FilterPanel.tsx:140
 msgid "Confirmed departure ({nConfirmed})"
 msgstr "Départ confirmé ({nConfirmed})"
 
-#: components/researchers/FilterPanel.tsx:139
+#: components/researchers/FilterPanel.tsx:141
 msgid "Inconsistent status ({nIncoherent})"
 msgstr "Statut incohérent ({nIncoherent})"
 
-#: components/researchers/FilterPanel.tsx:140
+#: components/researchers/FilterPanel.tsx:142
 msgid "Identifiers to check ({nSuspect})"
 msgstr "Identifiants à vérifier ({nSuspect})"
 
-#: components/researchers/FilterPanel.tsx:151
-#: components/researchers/FilterPanel.tsx:271
+#: components/researchers/FilterPanel.tsx:153
+#: components/researchers/FilterPanel.tsx:273
 msgid "Validation"
 msgstr "Validation"
 
-#: components/researchers/FilterPanel.tsx:154
-#: components/researchers/FilterPanel.tsx:277
+#: components/researchers/FilterPanel.tsx:156
+#: components/researchers/FilterPanel.tsx:278
 #: components/researchers/GeneralTab.tsx:351
 msgid "Cluster"
 msgstr "Pôle"
 
-#: components/researchers/FilterPanel.tsx:155
+#: components/researchers/FilterPanel.tsx:157
 #: components/researchers/ResearcherTable.tsx:89
 #: lib/importConflicts.ts:97
 msgid "Identifiers"
 msgstr "Identifiants"
 
-#: components/researchers/FilterPanel.tsx:170
+#: components/researchers/FilterPanel.tsx:172
 msgid "Search for a researcher, a lab, an identifier…"
 msgstr "Rechercher un chercheur, un labo, un identifiant…"
 
-#: components/researchers/FilterPanel.tsx:184
+#: components/researchers/FilterPanel.tsx:186
 msgid "Merge the two selected records"
 msgstr "Fusionner les deux fiches sélectionnées"
 
-#: components/researchers/FilterPanel.tsx:184
+#: components/researchers/FilterPanel.tsx:186
 msgid "Select exactly two Grist records to merge"
 msgstr "Sélectionnez exactement deux fiches Grist à fusionner"
 
-#: components/researchers/FilterPanel.tsx:187
+#: components/researchers/FilterPanel.tsx:189
 #: components/structures/LifecycleTab.tsx:135
 msgctxt "noun"
 msgid "Merge"
 msgstr "Fusion"
 
-#: components/researchers/FilterPanel.tsx:198
+#: components/researchers/FilterPanel.tsx:200
 msgid "Lab of the primary affiliation"
 msgstr "Labo de l'affiliation principale"
 
-#: components/researchers/FilterPanel.tsx:205
+#: components/researchers/FilterPanel.tsx:207
 msgid "Membership type in the lab of the primary affiliation"
 msgstr "Type d'appartenance au labo de l'affiliation principale"
 
-#: components/researchers/FilterPanel.tsx:226
+#: components/researchers/FilterPanel.tsx:228
 #: lib/importConflicts.ts:63
 msgid "Grade"
 msgstr "Corps-grade"
 
-#: components/researchers/FilterPanel.tsx:243
+#: components/researchers/FilterPanel.tsx:245
 msgid "Fewer filters"
 msgstr "Moins de filtres"
 
-#: components/researchers/FilterPanel.tsx:243
+#: components/researchers/FilterPanel.tsx:245
 msgid "More filters"
 msgstr "Plus de filtres"
 
 #. placeholder {0}: f.label
-#: components/researchers/FilterPanel.tsx:254
+#: components/researchers/FilterPanel.tsx:256
 msgid "Remove the filter {0}"
 msgstr "Retirer le filtre {0}"
 
-#: components/researchers/FilterPanel.tsx:278
+#: components/researchers/FilterPanel.tsx:279
 msgid "Identifiers present"
 msgstr "Identifiants présents"
 
-#: components/researchers/FilterPanel.tsx:280
+#: components/researchers/FilterPanel.tsx:281
 msgid "Employment period"
 msgstr "Période d'emploi"
 
-#: components/researchers/FilterPanel.tsx:282
+#: components/researchers/FilterPanel.tsx:283
 msgid "Start of the period"
 msgstr "Début de la période"
 
-#: components/researchers/FilterPanel.tsx:284
+#: components/researchers/FilterPanel.tsx:285
 msgid "End of the period"
 msgstr "Fin de la période"
 
