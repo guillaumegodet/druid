@@ -167,7 +167,27 @@ export interface MemberMeta {
   employer?: string | null;
   /** Internal author matched by name (null if no publication). */
   authorId: number | null;
+  /* Researchers tab attributes (druid-biblio biblio_etl/staff.py, exports since 2026-10-06; absent
+   * or null in older exports and for groups). */
+  /** Lab membership (cdb vocabulary: stat_mmb, assoc_mmb…), null when not provided. */
+  membershipType?: string | null;
+  /** permanent / non_permanent / doctorant / emeritus, null when unknown. */
+  category?: StaffCategory | null;
+  /** Overall FTE (« quotité »), 0-1. */
+  fte?: number | null;
+  /** Research FTE, 0-1: Annuaire value, or grade default when `researchFteEstimated`. */
+  researchFte?: number | null;
+  researchFteEstimated?: boolean;
+  /** Birth year — authenticated export only (null in the anonymized variant). */
+  birthYear?: number | null;
+  /** Membership dates (YYYY, YYYY-MM or YYYY-MM-DD). */
+  startDate?: string | null;
+  endDate?: string | null;
+  /** Former members only: « parti » (validated), « ldap » (LDAP departure), « historique ». */
+  departureReason?: string | null;
 }
+
+export type StaffCategory = 'permanent' | 'non_permanent' | 'doctorant' | 'emeritus';
 
 export interface CountryName {
   fr: string;
@@ -332,6 +352,8 @@ export interface DashboardDataset {
   benchmark?: BenchmarkData | null;
   authors: AuthorMeta[];
   members: MemberMeta[];
+  /** Validated members who left (Researchers tab pro rata counts only; absent from older exports). */
+  formerMembers?: MemberMeta[];
   /** Author ids matched to the headcounts (also present in the public variant). */
   effectifsAuthorIds: number[];
   countryNames: Record<string, CountryName>;
