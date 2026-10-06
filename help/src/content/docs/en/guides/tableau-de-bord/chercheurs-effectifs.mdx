@@ -1,0 +1,96 @@
+---
+title: "Read the staff and the publication rate per FTE"
+description: "Filter a lab's population, read the publication rate per research FTE and per age bracket, export the table for an application."
+sidebar:
+  order: 7
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure"
+	menu="Dashboard › Researchers"
+/>
+
+The **Researchers** tab crosses the list of the lab's validated members with its
+publications: headcount, research FTE, publication rate per FTE and per age bracket, age
+pyramid. It answers application questions such as « how many publications per permanent
+research FTE and per year, by age, over 2022-2025? ».
+
+These charts only appear once the structure's member list has been regenerated since
+October 2026 (ETL console). They are not offered for groups nor in publicly shared dataviz.
+
+## Choose the population
+
+The banner at the top of the tab sets who is counted. It applies to every chart of the tab,
+including the ranking of the most prolific researchers.
+
+- **Presets**: **Everyone**, **Statutory members and PhD students** (without associate
+  members) or **Permanent staff**.
+- **Membership**: statutory, associate, secondary, visiting member, or not provided. It is
+  the membership type entered in the « Memberships » card of the record.
+- **Category**: permanent staff (tenured, permanent contracts), non-permanent staff
+  (fixed-term contracts, ATER, post-docs, associates), PhD students, emeriti. It is derived
+  from the grade of the record, otherwise from the employment type.
+- **Presence**: **Current members**, or **Present during the period**, which adds the
+  validated members who left during the period, counted pro rata of their presence.
+- **Period**: specific to these indicators, by default the last four complete years. The
+  current year is not fully harvested yet: if you include it, a warning reminds you that its
+  rate is underestimated.
+
+The settings are kept in the page address: **Copy link** shares the view as it is.
+
+## Read the indicators and charts
+
+- **Indicators**: headcount, research FTE (and the part estimated from the grade),
+  publications per research FTE per year, share of the members who published over the
+  period.
+- **Publication rate by age bracket**: publications ÷ (research FTE × years of presence),
+  by bracket (under 35, 35-44, 45-54, 55 and over). The age is the person's age **in the
+  year of the publication**. The **All brackets** line gives the rate of the whole
+  population.
+- **Publications by age bracket and year**: the same, year by year.
+- **Age pyramid**: headcount or research FTE by bracket and category, age in the current
+  year.
+- **Publications per member**: how many members have 0, 1-2, 3-5… publications over the
+  period.
+
+Click a bar, a table cell or the rate indicator to open the list of the matching
+publications.
+
+## Export for an application
+
+The **Rate by age bracket** table repeats the figures of the chart: people, research
+FTE-years, publications and rate. **Download CSV** exports it with the structure, the period,
+the chosen population and the method note. Each chart can also be exported as an image (see
+[Export data and reports](/en/guides/tableau-de-bord/exporter/)).
+
+## Method
+
+- **Research FTE**: the value entered in the record (« Employment & contract » card).
+  Otherwise, a default from the grade, flagged « estimated »: teacher-researcher 0.5,
+  researcher 1, support staff 0. A research FTE of 0 entered in the record is kept.
+- **PhD students and emeriti never count in the rate**, even with a research FTE, nor do the
+  members without research FTE. They stay in the headcount and the pyramid.
+- **Presence**: each year only counts for the share spent in the lab, from the membership
+  dates of the record. Without dates, the person counts over the whole period.
+- **Whole counting**: a publication counts once in each bracket where it has an author
+  present that year. The **All brackets** line counts it only once: it is therefore often
+  below most bars, this is not an error.
+- **Statistical secrecy**: a bracket of fewer than 3 people is merged with a neighbour (for
+  instance « 45 and over »); a too small group of unknown age is not shown.
+
+## Known limitations
+
+- **Authors are recognised by their name**: a member publishing under another spelling
+  counts zero publications. The number of members without a matched author is shown.
+- **Only validated members count**, and former members who are no longer in the lab's
+  directory are not taken into account.
+- **Age and FTE depend on the record**: a missing or wrong birth date, grade or research FTE
+  skews the rate. Complete the records before an application (see
+  [Read a researcher record](/en/guides/personnes/lire-une-fiche/)).
+
+## See also
+
+- [Correct a person's status or affiliation](/en/guides/personnes/fiabiliser-statut-rattachement/)
+- [Indicators](/en/donnees/indicateurs/)

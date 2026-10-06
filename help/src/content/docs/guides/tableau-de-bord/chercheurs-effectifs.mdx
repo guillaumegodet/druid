@@ -1,0 +1,97 @@
+---
+title: "Lire les effectifs et le taux de publication par ETP"
+description: "Filtrer la population d'un labo, lire le taux de publication par ETP recherche et par tranche d'âge, exporter le tableau pour un dossier."
+sidebar:
+  order: 7
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure"
+	menu="Tableau de bord › Chercheurs"
+/>
+
+L'onglet **Chercheurs** croise la liste des membres validés du labo avec ses publications :
+effectif, ETP recherche, taux de publication par ETP et par tranche d'âge, pyramide des âges.
+Il répond à des questions de dossier comme « combien de publications par ETP recherche
+permanent et par an, selon l'âge, sur 2022-2025 ? ».
+
+Ces graphiques n'apparaissent que si la liste des membres de la structure a été regénérée
+depuis octobre 2026 (console ETL). Ils ne sont pas proposés pour les groupes ni dans les
+dataviz partagées publiquement.
+
+## Choisir la population
+
+Le bandeau en haut de l'onglet règle qui est compté. Il s'applique à tous les graphiques de
+l'onglet, y compris le classement des chercheurs les plus prolifiques.
+
+- **Raccourcis** : **Tout le monde**, **Statutaires et doctorants** (sans les membres
+  associés) ou **Permanents**.
+- **Appartenance** : membre statutaire, associé, secondaire, invité, ou non renseigné. C'est
+  le type d'appartenance saisi dans la carte « Appartenances » de la fiche.
+- **Catégorie** : permanents (titulaires, CDI), non permanents (CDD, ATER, post-doctorants,
+  associés), doctorants, émérites. Elle se déduit du grade de la fiche, sinon du type
+  d'emploi.
+- **Présence** : **Membres actuels**, ou **Présents sur la période**, qui ajoute les membres
+  validés partis pendant la période, comptés au prorata de leur présence.
+- **Période** : propre à ces indicateurs, par défaut les quatre dernières années complètes.
+  L'année en cours n'est pas encore entièrement moissonnée : si vous l'incluez, un
+  avertissement rappelle que son taux est sous-estimé.
+
+Les réglages sont conservés dans l'adresse de la page : **Copier le lien** partage la vue
+telle quelle.
+
+## Lire les indicateurs et les graphiques
+
+- **Indicateurs** : effectif, ETP recherche (dont la part estimée d'après le grade),
+  publications par ETP recherche et par an, part des membres qui ont publié sur la période.
+- **Taux de publication par tranche d'âge** : publications ÷ (ETP recherche × années de
+  présence), par tranche (moins de 35 ans, 35-44, 45-54, 55 ans et plus). L'âge est celui de
+  la personne **l'année de la publication**. La ligne **Ensemble** donne le taux de toute la
+  population.
+- **Publications par tranche d'âge et par année** : la même chose, année par année.
+- **Pyramide des âges** : effectif ou ETP recherche par tranche et par catégorie, âge de
+  l'année en cours.
+- **Publications par membre** : combien de membres ont 0, 1-2, 3-5… publications sur la
+  période.
+
+Cliquez sur une barre, une case du tableau ou l'indicateur du taux pour ouvrir la liste des
+publications correspondantes.
+
+## Exporter pour un dossier
+
+Le tableau **Taux par tranche d'âge** reprend les chiffres du graphique : personnes,
+années-ETP recherche, publications et taux. **Télécharger le CSV** l'exporte avec la
+structure, la période, la population choisie et la note de méthode. Chaque graphique
+s'exporte aussi en image (voir [Exporter des données et des rapports](/guides/tableau-de-bord/exporter/)).
+
+## Méthode
+
+- **ETP recherche** : la valeur saisie dans la fiche (carte « Emploi & contrat »). À défaut,
+  une valeur par défaut selon le grade, signalée « estimée » : enseignant-chercheur 0,5,
+  chercheur 1, personnel d'appui 0. Un ETP recherche de 0 saisi dans la fiche est respecté.
+- **Doctorants et émérites ne comptent jamais dans le taux**, même avec un ETP recherche, ni
+  les membres sans ETP recherche. Ils restent dans les effectifs et la pyramide.
+- **Présence** : chaque année ne compte que pour la part passée au labo, d'après les dates
+  d'appartenance de la fiche. Sans date, la personne compte sur toute la période.
+- **Comptage entier** : une publication compte une fois dans chaque tranche où elle a un
+  auteur présent cette année-là. La ligne **Ensemble** la compte une seule fois : elle est
+  donc souvent sous la plupart des barres, ce n'est pas une erreur.
+- **Secret statistique** : une tranche de moins de 3 personnes est fusionnée avec une voisine
+  (par exemple « 45 ans et plus ») ; un groupe d'âge inconnu trop petit n'est pas affiché.
+
+## Limites connues
+
+- **Les auteurs sont reconnus par leur nom** : un membre qui publie sous une autre graphie
+  compte zéro publication. Le nombre de membres sans auteur rapproché est indiqué.
+- **Seuls les membres validés comptent**, et les départs anciens qui ne sont plus dans
+  l'annuaire du labo ne sont pas pris en compte.
+- **Âge et ETP dépendent de la fiche** : date de naissance, grade et ETP recherche
+  manquants ou faux faussent le taux. Complétez les fiches avant un dossier (voir
+  [Lire une fiche chercheur](/guides/personnes/lire-une-fiche/)).
+
+## Voir aussi
+
+- [Corriger le statut ou le rattachement d'une personne](/guides/personnes/fiabiliser-statut-rattachement/)
+- [Indicateurs](/donnees/indicateurs/)

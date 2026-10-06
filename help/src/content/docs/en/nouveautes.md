@@ -8,6 +8,19 @@ sidebar:
 The changes in Druid you may notice, month by month. Some features only exist on the
 instances that have them (see [Instances and features](/en/donnees/instances-fonctionnalites/)).
 
+## October 2026
+
+### Dashboard
+
+- **Richer Researchers tab**: population filter (membership, category, presence),
+  headcount, research FTE, **publication rate per research FTE and per age bracket**, age
+  pyramid, publications per member, table exportable as CSV. See
+  [Read the staff and the publication rate per FTE](/en/guides/tableau-de-bord/chercheurs-effectifs/).
+
+### People
+
+- **FTE (working time) and Research FTE** on the record, « Employment & contract » card.
+
 ## September 2026
 
 ### Help

@@ -9,6 +9,19 @@ Les évolutions de Druid que vous pouvez remarquer, mois par mois. Certaines fon
 n'existent que sur les instances qui en disposent (voir
 [Instances et fonctionnalités](/donnees/instances-fonctionnalites/)).
 
+## Octobre 2026
+
+### Tableau de bord
+
+- **Onglet Chercheurs enrichi** : filtre de la population (appartenance, catégorie,
+  présence), effectif, ETP recherche, **taux de publication par ETP recherche et par tranche
+  d'âge**, pyramide des âges, publications par membre, tableau exportable en CSV. Voir
+  [Lire les effectifs et le taux de publication par ETP](/guides/tableau-de-bord/chercheurs-effectifs/).
+
+### Personnes
+
+- **ETP (quotité) et ETP recherche** sur la fiche, carte « Emploi & contrat ».
+
 ## Septembre 2026
 
 ### Aide
