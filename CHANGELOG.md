@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.5.0] — 2026-10-06
+
 ### Ajouté
 - Liste du personnel : filtre **Appartenance** (statutaire, associé, affiliation secondaire, invité, non renseigné),
   appliqué à l'affiliation principale comme le filtre Labo ; paramètre d'URL `membership`.
