@@ -250,7 +250,7 @@ msgstr "s'ouvre dans un nouvel onglet"
 
 #: components/AccountMenu.tsx:117
 #: components/AccountMenu.tsx:120
-#: components/dashboard/PublicationsListTab.tsx:301
+#: components/dashboard/PublicationsListTab.tsx:302
 msgid "Language"
 msgstr "Langue"
 
@@ -471,6 +471,7 @@ msgid "Teams"
 msgstr "Équipes"
 
 #: components/DashboardPage.tsx:90
+#: components/dashboard/StaffSection.tsx:41
 #: components/dashboard/report/reportCatalog.ts:100
 #: components/researchers/AlignLaunchModal.tsx:101
 msgid "PhD students"
@@ -488,7 +489,7 @@ msgstr "Réseau"
 
 #: components/DashboardPage.tsx:93
 #: components/dashboard/PublicationsListModal.tsx:46
-#: components/dashboard/PublicationsListTab.tsx:213
+#: components/dashboard/PublicationsListTab.tsx:214
 #: components/reports/ReportEditor.tsx:435
 msgid "Publication list"
 msgstr "Liste des publications"
@@ -561,6 +562,8 @@ msgstr "Affiliation"
 
 #: components/DashboardPage.tsx:365
 #: components/ResearcherDashboard.tsx:193
+#: components/dashboard/StaffSection.tsx:294
+#: components/dashboard/StaffSection.tsx:309
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:288
 #: components/dashboard/report/ReportWizard.tsx:477
@@ -1217,6 +1220,7 @@ msgid "Structure deletion: not available"
 msgstr "Suppression de structures : non disponible"
 
 #: components/StructureList.tsx:424
+#: components/dashboard/StaffSection.tsx:280
 #: components/dashboard/report/ReportWizard.tsx:271
 #: components/dashboard/report/composeReportPdf.ts:63
 #: components/reports/NewReportDialog.tsx:224
@@ -1260,7 +1264,7 @@ msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 #: components/dashboard/ImpactTab.tsx:248
 #: components/dashboard/JournalsTab.tsx:283
 #: components/dashboard/NewsTab.tsx:781
-#: components/dashboard/PublicationsListTab.tsx:483
+#: components/dashboard/PublicationsListTab.tsx:484
 #: components/dashboard/report/ReportWizard.tsx:490
 msgid "Previous"
 msgstr "Précédent"
@@ -1274,7 +1278,7 @@ msgstr "Précédent"
 #: components/dashboard/ImpactTab.tsx:254
 #: components/dashboard/JournalsTab.tsx:289
 #: components/dashboard/NewsTab.tsx:792
-#: components/dashboard/PublicationsListTab.tsx:494
+#: components/dashboard/PublicationsListTab.tsx:495
 #: components/dashboard/report/ReportWizard.tsx:495
 msgid "Next"
 msgstr "Suivant"
@@ -1418,8 +1422,8 @@ msgid "Total actually paid"
 msgstr "Total réellement payé"
 
 #: components/dashboard/ApcTab.tsx:442
-#: components/dashboard/PublicationsListTab.tsx:402
-#: components/dashboard/publicationFilters.ts:242
+#: components/dashboard/PublicationsListTab.tsx:403
+#: components/dashboard/publicationFilters.ts:258
 msgid "APC paid"
 msgstr "APC payés"
 
@@ -1472,8 +1476,8 @@ msgstr "Exporter (CSV)"
 #: components/dashboard/AxesTab.tsx:207
 #: components/dashboard/CharteTab.tsx:391
 #: components/dashboard/ImpactTab.tsx:209
-#: components/dashboard/PublicationsListTab.tsx:283
-#: components/dashboard/PublicationsListTab.tsx:436
+#: components/dashboard/PublicationsListTab.tsx:284
+#: components/dashboard/PublicationsListTab.tsx:437
 #: components/dashboard/report/reportTables.ts:46
 msgid "Year"
 msgstr "Année"
@@ -1485,8 +1489,8 @@ msgstr "Payé"
 #: components/dashboard/ApcTab.tsx:482
 #: components/dashboard/MediaSourcesAdmin.tsx:216
 #: components/dashboard/NewsTab.tsx:650
-#: components/dashboard/PublicationsListTab.tsx:439
-#: components/dashboard/ResearchersTab.tsx:133
+#: components/dashboard/PublicationsListTab.tsx:440
+#: components/dashboard/ResearchersTab.tsx:207
 #: components/dashboard/TeamsTab.tsx:148
 #: components/researchers/TaskForm.tsx:95
 #: components/structures/IdentificationTab.tsx:131
@@ -1517,7 +1521,7 @@ msgstr "hybride"
 #: components/dashboard/ImpactTab.tsx:251
 #: components/dashboard/JournalsTab.tsx:286
 #: components/dashboard/NewsTab.tsx:784
-#: components/dashboard/PublicationsListTab.tsx:486
+#: components/dashboard/PublicationsListTab.tsx:487
 msgid "Page {0} / {pageCount}"
 msgstr "Page {0} / {pageCount}"
 
@@ -1618,7 +1622,7 @@ msgstr "Exporter la liste APC (CSV)"
 #: components/dashboard/ApcTab.tsx:745
 #: components/dashboard/ImpactTab.tsx:212
 #: components/dashboard/JournalsTab.tsx:201
-#: components/dashboard/PublicationsListTab.tsx:438
+#: components/dashboard/PublicationsListTab.tsx:439
 #: components/dashboard/report/reportTables.ts:48
 msgid "Journal"
 msgstr "Revue"
@@ -1698,7 +1702,7 @@ msgstr "Titre, DOI ou revue…"
 #: components/dashboard/ImpactTab.tsx:210
 #: components/dashboard/MediaSourcesAdmin.tsx:384
 #: components/dashboard/NewsTab.tsx:690
-#: components/dashboard/PublicationsListTab.tsx:437
+#: components/dashboard/PublicationsListTab.tsx:438
 #: components/dashboard/report/reportTables.ts:47
 #: lib/importConflicts.ts:62
 msgid "Title"
@@ -1952,7 +1956,7 @@ msgstr "Retirer cette université"
 #: components/dashboard/BenchmarkTab.tsx:528
 #: components/dashboard/NewsTab.tsx:678
 #: components/dashboard/PartnerInstitutionPicker.tsx:138
-#: components/dashboard/PublicationsListTab.tsx:274
+#: components/dashboard/PublicationsListTab.tsx:275
 msgid "Clear all"
 msgstr "Tout effacer"
 
@@ -2438,7 +2442,7 @@ msgstr "Équipes avec au moins 3 publications analysables"
 #: components/dashboard/CharteTab.tsx:340
 #: components/dashboard/NewsTab.tsx:620
 #: components/dashboard/PublicationsListTab.tsx:44
-#: components/dashboard/PublicationsListTab.tsx:312
+#: components/dashboard/PublicationsListTab.tsx:313
 msgctxt "feminine"
 msgid "All"
 msgstr "Toutes"
@@ -2721,6 +2725,8 @@ msgid "Description"
 msgstr "Description"
 
 #: components/dashboard/EChartCard.tsx:299
+#: components/dashboard/StaffSection.tsx:281
+#: components/dashboard/StaffSection.tsx:414
 #: components/dashboard/report/pdfDoc.ts:359
 msgid "Method"
 msgstr "Méthode"
@@ -2808,7 +2814,7 @@ msgstr "Source : Druid (OpenAlex, BSO)"
 #. placeholder {0}: row.item.count
 #: components/dashboard/FundersTab.tsx:48
 #: components/dashboard/FundersTab.tsx:92
-#: components/dashboard/ResearchersTab.tsx:66
+#: components/dashboard/ResearchersTab.tsx:72
 msgid "{0} publication(s)"
 msgstr "{0} publication(s)"
 
@@ -2934,6 +2940,7 @@ msgid "Funder"
 msgstr "Financeur"
 
 #: components/dashboard/FundersTab.tsx:354
+#: components/dashboard/StaffSection.tsx:105
 #: components/researchers/LdapMovesPanel.tsx:168
 #: components/researchers/LdapMovesPanel.tsx:227
 msgid "Category"
@@ -3014,7 +3021,7 @@ msgstr "Citations"
 
 #: components/dashboard/ImpactTab.tsx:215
 #: components/dashboard/MarketShareSection.tsx:24
-#: components/dashboard/PublicationsListTab.tsx:336
+#: components/dashboard/PublicationsListTab.tsx:337
 #: components/researchers/AffiliationsTable.tsx:237
 #: components/researchers/AffiliationsTable.tsx:277
 #: lib/importConflicts.ts:74
@@ -3406,6 +3413,8 @@ msgid "Last collection: {0}."
 msgstr "Dernière collecte : {0}."
 
 #: components/dashboard/MediaMentionsPanel.tsx:490
+#: components/dashboard/StaffSection.tsx:123
+#: components/dashboard/StaffSection.tsx:280
 #: components/dashboard/report/ReportWizard.tsx:278
 #: components/dashboard/report/composeReportPdf.ts:64
 #: components/dashboard/report/pdfDoc.ts:126
@@ -3705,6 +3714,8 @@ msgstr "(sans titre)"
 
 #: components/dashboard/NewsTab.tsx:42
 #: components/dashboard/NewsTab.tsx:585
+#: components/dashboard/StaffSection.tsx:254
+#: components/dashboard/StaffSection.tsx:379
 #: components/dashboard/charts/YearlyEvolutionChart.tsx:41
 #: components/dashboard/kpiItems.ts:34
 #: components/dashboard/report/composeReportPdf.ts:70
@@ -3842,7 +3853,7 @@ msgid "Most cited"
 msgstr "Plus citées"
 
 #: components/dashboard/NewsTab.tsx:564
-#: components/dashboard/PublicationsListTab.tsx:246
+#: components/dashboard/PublicationsListTab.tsx:247
 msgid "Export as CSV (filtered results)"
 msgstr "Exporter en CSV (résultats filtrés)"
 
@@ -3863,7 +3874,7 @@ msgid "1 active filter"
 msgstr "1 filtre actif"
 
 #: components/dashboard/NewsTab.tsx:592
-#: components/dashboard/PublicationsListTab.tsx:295
+#: components/dashboard/PublicationsListTab.tsx:296
 #: components/dashboard/benchmarkAggregates.ts:280
 #: components/dashboard/charts/OpenAccessDonutChart.tsx:55
 #: components/dashboard/embedRegistry.tsx:259
@@ -4432,164 +4443,172 @@ msgid "Open in the tab"
 msgstr "Ouvrir dans l’onglet"
 
 #. placeholder {0}: rows.length
-#: components/dashboard/PublicationsListTab.tsx:216
+#: components/dashboard/PublicationsListTab.tsx:217
 msgid "{0, plural, one {# publication over the period} other {# publications over the period}}"
 msgstr "{0, plural, one {# publication sur la période} other {# publications sur la période}}"
 
-#: components/dashboard/PublicationsListTab.tsx:217
+#: components/dashboard/PublicationsListTab.tsx:218
 msgid "{activeCount, plural, one {# filter} other {# filters}}"
 msgstr "{activeCount, plural, one {# filtre} other {# filtres}}"
 
-#: components/dashboard/PublicationsListTab.tsx:225
+#: components/dashboard/PublicationsListTab.tsx:226
 msgid "Title, journal or DOI…"
 msgstr "Titre, revue ou DOI…"
 
-#: components/dashboard/PublicationsListTab.tsx:233
+#: components/dashboard/PublicationsListTab.tsx:234
 msgid "Show filters"
 msgstr "Afficher les filtres"
 
-#: components/dashboard/PublicationsListTab.tsx:236
+#: components/dashboard/PublicationsListTab.tsx:237
 #: components/dashboard/report/composeReportPdf.ts:68
 msgid "Filters"
 msgstr "Filtres"
 
-#: components/dashboard/PublicationsListTab.tsx:262
+#: components/dashboard/PublicationsListTab.tsx:263
 #: components/reports/ReportEditor.tsx:378
 #: components/researchers/UnifiedAlignPage.tsx:641
 msgid "Remove this filter"
 msgstr "Retirer ce filtre"
 
-#: components/dashboard/PublicationsListTab.tsx:289
+#: components/dashboard/PublicationsListTab.tsx:290
 msgid "Document type"
 msgstr "Type de document"
 
-#: components/dashboard/PublicationsListTab.tsx:308
+#: components/dashboard/PublicationsListTab.tsx:309
 msgid "Journal (exact name)"
 msgstr "Revue (nom exact)"
 
-#: components/dashboard/PublicationsListTab.tsx:324
+#: components/dashboard/PublicationsListTab.tsx:325
 msgid "SJR quartile"
 msgstr "Quartile SJR"
 
-#: components/dashboard/PublicationsListTab.tsx:330
+#: components/dashboard/PublicationsListTab.tsx:331
 msgid "NU access (journal)"
 msgstr "Accès NU (revue)"
 
-#: components/dashboard/PublicationsListTab.tsx:342
+#: components/dashboard/PublicationsListTab.tsx:343
 msgctxt "long form"
 msgid "Lab"
 msgstr "Laboratoire"
 
-#: components/dashboard/PublicationsListTab.tsx:348
+#: components/dashboard/PublicationsListTab.tsx:349
 #: components/researchers/GeneralTab.tsx:269
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Type d'emploi"
 
-#: components/dashboard/PublicationsListTab.tsx:354
+#: components/dashboard/PublicationsListTab.tsx:355
 msgid "Collaboration"
 msgstr "Collaboration"
 
-#: components/dashboard/PublicationsListTab.tsx:360
+#: components/dashboard/PublicationsListTab.tsx:361
 msgid "Partner country"
 msgstr "Pays partenaire"
 
-#: components/dashboard/PublicationsListTab.tsx:366
+#: components/dashboard/PublicationsListTab.tsx:367
 msgid "Domain"
 msgstr "Domaine"
 
-#: components/dashboard/PublicationsListTab.tsx:372
+#: components/dashboard/PublicationsListTab.tsx:373
 #: components/dashboard/TeamsTab.tsx:331
 msgid "Subfield"
 msgstr "Sous-discipline"
 
-#: components/dashboard/PublicationsListTab.tsx:378
+#: components/dashboard/PublicationsListTab.tsx:379
 msgid "Strategic axis"
 msgstr "Axe stratégique"
 
-#: components/dashboard/PublicationsListTab.tsx:384
+#: components/dashboard/PublicationsListTab.tsx:385
 msgid "Sources (provenance)"
 msgstr "Sources (provenance)"
 
-#: components/dashboard/PublicationsListTab.tsx:392
-#: components/dashboard/publicationFilters.ts:240
+#: components/dashboard/PublicationsListTab.tsx:393
+#: components/dashboard/publicationFilters.ts:256
 msgid "PhD student involved"
 msgstr "Doctorant impliqué"
 
-#: components/dashboard/PublicationsListTab.tsx:397
-#: components/dashboard/publicationFilters.ts:241
+#: components/dashboard/PublicationsListTab.tsx:398
+#: components/dashboard/publicationFilters.ts:257
 msgid "International collaboration"
 msgstr "Collaboration internationale"
 
-#: components/dashboard/PublicationsListTab.tsx:407
-#: components/dashboard/publicationFilters.ts:243
+#: components/dashboard/PublicationsListTab.tsx:408
+#: components/dashboard/publicationFilters.ts:259
 msgid "Top 10% citations"
 msgstr "Top 10 % citations"
 
-#: components/dashboard/PublicationsListTab.tsx:412
-#: components/dashboard/publicationFilters.ts:244
+#: components/dashboard/PublicationsListTab.tsx:413
+#: components/dashboard/publicationFilters.ts:260
 msgid "Top 1% citations"
 msgstr "Top 1 % citations"
 
-#: components/dashboard/PublicationsListTab.tsx:417
+#: components/dashboard/PublicationsListTab.tsx:418
 msgid "National licence"
 msgstr "Licence nationale"
 
-#: components/dashboard/PublicationsListTab.tsx:423
+#: components/dashboard/PublicationsListTab.tsx:424
 msgid "Compliant with the charter"
 msgstr "Conforme à la charte"
 
-#: components/dashboard/PublicationsListTab.tsx:440
+#: components/dashboard/PublicationsListTab.tsx:441
 msgid "Access"
 msgstr "Accès"
 
-#: components/dashboard/ResearchersTab.tsx:65
+#: components/dashboard/ResearchersTab.tsx:71
 msgid "Team(s): {teams}"
 msgstr "Équipe(s) : {teams}"
 
-#: components/dashboard/ResearchersTab.tsx:92
-#: components/dashboard/ResearchersTab.tsx:188
+#: components/dashboard/ResearchersTab.tsx:98
+#: components/dashboard/ResearchersTab.tsx:286
 #: components/dashboard/embedRegistry.tsx:465
 #: components/dashboard/embedRegistry.tsx:473
 msgid "Most prolific researchers"
 msgstr "Chercheurs les plus prolifiques"
 
 #. placeholder {0}: dimLabel.toLowerCase()
-#: components/dashboard/ResearchersTab.tsx:93
+#: components/dashboard/ResearchersTab.tsx:99
 msgid "Top 20 internal authors, grouped and coloured by {0}"
 msgstr "Top 20 des auteurs internes, regroupés et colorés par {0}"
 
-#: components/dashboard/ResearchersTab.tsx:112
+#: components/dashboard/ResearchersTab.tsx:161
+#: components/dashboard/StaffSection.tsx:38
+#: components/dashboard/StaffSection.tsx:42
 #: components/researchers/FteInput.tsx:29
 msgid "Not provided"
 msgstr "Non renseigné"
 
-#: components/dashboard/ResearchersTab.tsx:131
-#: components/dashboard/ResearchersTab.tsx:163
+#: components/dashboard/ResearchersTab.tsx:205
+#: components/dashboard/ResearchersTab.tsx:229
 msgid "None"
 msgstr "Aucune"
 
-#: components/dashboard/ResearchersTab.tsx:134
+#: components/dashboard/ResearchersTab.tsx:208
 #: components/researchers/AbesExportModal.tsx:228
 #: components/researchers/ResearcherTable.tsx:88
 #: lib/importConflicts.ts:73
 msgid "Employer"
 msgstr "Employeur"
 
-#: components/dashboard/ResearchersTab.tsx:158
+#: components/dashboard/ResearchersTab.tsx:250
 msgid "No internal author identified over the period."
 msgstr "Aucun auteur interne identifié sur la période."
 
-#: components/dashboard/ResearchersTab.tsx:170
+#. placeholder {0}: range.start
+#. placeholder {1}: range.end
+#: components/dashboard/ResearchersTab.tsx:261
+msgid "Ranking below: restricted to the filtered population, over the dashboard period ({0}–{1})."
+msgstr "Classement ci-dessous : restreint à la population filtrée, sur la période du tableau de bord ({0}–{1})."
+
+#: components/dashboard/ResearchersTab.tsx:268
 msgid "Colour and grouping"
 msgstr "Couleur et regroupement"
 
 #. placeholder {0}: dimLabel.toLowerCase()
-#: components/dashboard/ResearchersTab.tsx:181
+#: components/dashboard/ResearchersTab.tsx:279
 msgid "grouped by {0} — sharing unavailable for this view"
 msgstr "regroupés par {0} — partage indisponible sur cette vue"
 
-#: components/dashboard/ResearchersTab.tsx:189
+#: components/dashboard/ResearchersTab.tsx:287
 msgid "Top 20 internal authors (number of publications over the period)"
 msgstr "Top 20 des auteurs internes (nombre de publications sur la période)"
 
@@ -4681,6 +4700,292 @@ msgstr "Diagnostic OpenAlex des notices du harvester"
 #: components/dashboard/SourcesTab.tsx:102
 msgid "records whose main source is the harvester — “structure not credited” = affiliation corrections to request"
 msgstr "notices dont le harvester est la source principale — « structure non créditée » = corrections d'affiliation à demander"
+
+#: components/dashboard/StaffSection.tsx:38
+msgid "Statutory"
+msgstr "Statutaire"
+
+#: components/dashboard/StaffSection.tsx:38
+msgid "Associate"
+msgstr "Associé"
+
+#: components/dashboard/StaffSection.tsx:38
+msgid "Secondary"
+msgstr "Secondaire"
+
+#: components/dashboard/StaffSection.tsx:38
+msgid "Visiting"
+msgstr "Invité"
+
+#: components/dashboard/StaffSection.tsx:41
+#: components/dashboard/StaffSection.tsx:79
+msgid "Permanent staff"
+msgstr "Permanents"
+
+#: components/dashboard/StaffSection.tsx:41
+msgid "Non-permanent staff"
+msgstr "Non permanents"
+
+#: components/dashboard/StaffSection.tsx:42
+msgid "Emeriti"
+msgstr "Émérites"
+
+#: components/dashboard/StaffSection.tsx:45
+msgid "Age unknown"
+msgstr "Âge inconnu"
+
+#. placeholder {0}: m[1]
+#: components/dashboard/StaffSection.tsx:47
+msgid "Under {0}"
+msgstr "Moins de {0} ans"
+
+#. placeholder {0}: m[1]
+#: components/dashboard/StaffSection.tsx:49
+msgid "{0} and over"
+msgstr "{0} ans et plus"
+
+#: components/dashboard/StaffSection.tsx:74
+msgid "Everyone"
+msgstr "Tout le monde"
+
+#: components/dashboard/StaffSection.tsx:76
+msgid "Statutory members and PhD students"
+msgstr "Statutaires et doctorants"
+
+#: components/dashboard/StaffSection.tsx:85
+msgid "Presets"
+msgstr "Raccourcis"
+
+#: components/dashboard/StaffSection.tsx:96
+msgid "Lab membership type (Annuaire « membership_type »)"
+msgstr "Type d'appartenance au labo (Annuaire « membership_type »)"
+
+#: components/dashboard/StaffSection.tsx:96
+msgid "Membership"
+msgstr "Appartenance"
+
+#: components/dashboard/StaffSection.tsx:105
+msgid "From the grade, else the employment type"
+msgstr "D'après le grade, sinon le type d'emploi"
+
+#: components/dashboard/StaffSection.tsx:114
+msgid "Presence"
+msgstr "Présence"
+
+#: components/dashboard/StaffSection.tsx:116
+msgid "Current members"
+msgstr "Membres actuels"
+
+#: components/dashboard/StaffSection.tsx:119
+msgid "Also counts the validated members who left during the period, pro rata of their presence"
+msgstr "Compte aussi les membres validés partis pendant la période, au prorata de leur présence"
+
+#: components/dashboard/StaffSection.tsx:120
+msgid "Present during the period"
+msgstr "Présents sur la période"
+
+#: components/dashboard/StaffSection.tsx:153
+msgid "all memberships"
+msgstr "toutes appartenances"
+
+#: components/dashboard/StaffSection.tsx:154
+msgid "all categories"
+msgstr "toutes catégories"
+
+#: components/dashboard/StaffSection.tsx:155
+msgid "members present during the period"
+msgstr "membres présents sur la période"
+
+#: components/dashboard/StaffSection.tsx:155
+msgid "current members"
+msgstr "membres actuels"
+
+#: components/dashboard/StaffSection.tsx:161
+#: components/dashboard/StaffSection.tsx:278
+#: components/dashboard/StaffSection.tsx:386
+msgid "All brackets"
+msgstr "Toutes tranches"
+
+#: components/dashboard/StaffSection.tsx:162
+msgid "Age {label}, {periodLabel} ({populationLabel})"
+msgstr "Âge : {label}, {periodLabel} ({populationLabel})"
+
+#. placeholder {0}: fmt(b.estimatedFteYears, 1)
+#: components/dashboard/StaffSection.tsx:172
+msgid "(of which {0} estimated)"
+msgstr "(dont {0} estimés)"
+
+#. placeholder {0}: fmt(b.rate ?? 0, 2)
+#: components/dashboard/StaffSection.tsx:175
+msgid "{0} publications per research FTE per year"
+msgstr "{0} publications par ETP recherche et par an"
+
+#. placeholder {0}: b.publications
+#. placeholder {0}: p.value[2]
+#. placeholder {0}: resolved.publicationCount
+#: components/dashboard/StaffSection.tsx:176
+#: components/dashboard/StaffSection.tsx:210
+#: components/reports/ReportEditor.tsx:386
+msgid "{0} publications"
+msgstr "{0} publications"
+
+#. placeholder {0}: fmt(b.fteYears, 1)
+#: components/dashboard/StaffSection.tsx:177
+msgid "{0} research FTE-years"
+msgstr "{0} années-ETP recherche"
+
+#. placeholder {0}: b.people
+#. placeholder {0}: stored.shares.length
+#: components/dashboard/StaffSection.tsx:178
+#: components/reports/ReportEditor.tsx:283
+msgid "{0} people"
+msgstr "{0} personne(s)"
+
+#: components/dashboard/StaffSection.tsx:185
+#: components/dashboard/StaffSection.tsx:313
+msgid "Publications / research FTE / year"
+msgstr "Publications / ETP recherche / an"
+
+#. placeholder {0}: fmt(rate.overall.rate, 1)
+#: components/dashboard/StaffSection.tsx:196
+msgid "All brackets {0}"
+msgstr "Ensemble {0}"
+
+#: components/dashboard/StaffSection.tsx:265
+msgid "Rate = publications ÷ (research FTE × years of presence in the lab over the period). Age = publication year − birth year. A publication counts once in each age bracket where it has an author present that year. PhD students, emeriti and members without research FTE are out of the rate. Research FTE: value of the Annuaire, otherwise default from the grade (teacher-researcher 0.5, researcher 1, support staff 0), flagged as estimated. Brackets of fewer than 3 people are merged with a neighbour. Authors are matched to members by name: a member publishing under another spelling counts 0. The current year stops at the reference date. « All brackets » counts each publication once: it is lower than the sum of the brackets, and its rate may lie below most of them (a publication co-signed by two brackets counts in each)."
+msgstr "Taux = publications ÷ (ETP recherche × années de présence au labo sur la période). Âge = année de publication − année de naissance. Une publication compte une fois dans chaque tranche d'âge où elle a un auteur présent cette année-là. Les doctorants, les émérites et les membres sans ETP recherche sont hors du taux. ETP recherche : valeur de l'Annuaire, sinon valeur par défaut selon le grade (enseignant-chercheur 0,5, chercheur 1, personnel d'appui 0), signalée comme estimée. Les tranches de moins de 3 personnes sont fusionnées avec une voisine. Les auteurs sont rapprochés des membres par le nom : un membre qui publie sous une autre graphie compte 0. L'année en cours s'arrête à la date de référence. « Toutes tranches » compte chaque publication une seule fois : le total est inférieur à la somme des tranches, et son taux peut être sous la plupart d'entre elles (une publication cosignée par deux tranches compte dans chacune)."
+
+#: components/dashboard/StaffSection.tsx:280
+msgid "Population"
+msgstr "Population"
+
+#: components/dashboard/StaffSection.tsx:295
+#: components/dashboard/StaffSection.tsx:311
+#: components/researchers/GeneralTab.tsx:316
+msgid "Research FTE"
+msgstr "ETP recherche"
+
+#: components/dashboard/StaffSection.tsx:305
+msgid "The period includes {currentYear}, whose publications are not all harvested yet: the rate of that year is underestimated."
+msgstr "La période inclut {currentYear}, dont les publications ne sont pas encore toutes moissonnées : le taux de cette année est sous-estimé."
+
+#. placeholder {0}: staff.filter((m) => m.former).length
+#: components/dashboard/StaffSection.tsx:310
+msgid "Former members: {0}"
+msgstr "Anciens membres : {0}"
+
+#. placeholder {0}: fmt(b.estimatedFteYears, 1)
+#. placeholder {0}: fmt(kpis.estimatedResearchFte, 1)
+#: components/dashboard/StaffSection.tsx:312
+#: components/dashboard/StaffSection.tsx:388
+msgid "of which {0} estimated from the grade"
+msgstr "dont {0} estimés selon le grade"
+
+#: components/dashboard/StaffSection.tsx:312
+msgid "PhD students and emeriti excluded"
+msgstr "hors doctorants et émérites"
+
+#: components/dashboard/StaffSection.tsx:316
+msgid "Publishing members"
+msgstr "Membres publiants"
+
+#. placeholder {0}: kpis.unmatched
+#: components/dashboard/StaffSection.tsx:318
+msgid "Without matched author (excluded): {0}"
+msgstr "Sans auteur rapproché (exclus) : {0}"
+
+#: components/dashboard/StaffSection.tsx:323
+msgid "Publication rate by age bracket"
+msgstr "Taux de publication par tranche d'âge"
+
+#: components/dashboard/StaffSection.tsx:324
+msgid "Publications per research FTE and per year, {periodLabel} — age at publication; PhD students and emeriti excluded"
+msgstr "Publications par ETP recherche et par an, {periodLabel} — âge à la publication ; hors doctorants et émérites"
+
+#: components/dashboard/StaffSection.tsx:329
+#: components/dashboard/StaffSection.tsx:339
+msgid "No research FTE in this population (missing values, or only PhD students and emeriti)."
+msgstr "Aucun ETP recherche dans cette population (valeurs manquantes, ou seulement des doctorants et des émérites)."
+
+#: components/dashboard/StaffSection.tsx:333
+msgid "Publications by age bracket and year"
+msgstr "Publications par tranche d'âge et par année"
+
+#: components/dashboard/StaffSection.tsx:334
+msgid "A publication counts once in each bracket where it has an author"
+msgstr "Une publication compte une fois dans chaque tranche où elle a un auteur"
+
+#: components/dashboard/StaffSection.tsx:342
+msgid "Age pyramid"
+msgstr "Pyramide des âges"
+
+#: components/dashboard/StaffSection.tsx:343
+msgid "Age in {currentYear}, by category"
+msgstr "Âge en {currentYear}, par catégorie"
+
+#: components/dashboard/StaffSection.tsx:349
+msgid "Too few people with a known birth year to show the ages."
+msgstr "Trop peu de personnes avec une année de naissance connue pour afficher les âges."
+
+#: components/dashboard/StaffSection.tsx:352
+msgid "Publications per member"
+msgstr "Publications par membre"
+
+#. placeholder {0}: distribution.unmatched
+#: components/dashboard/StaffSection.tsx:354
+msgid "Members by number of publications over {periodLabel} — without matched author (left out): {0}"
+msgstr "Membres selon leur nombre de publications sur {periodLabel} — sans auteur rapproché (écartés) : {0}"
+
+#: components/dashboard/StaffSection.tsx:355
+msgid "Members by number of publications over {periodLabel}"
+msgstr "Membres selon leur nombre de publications sur {periodLabel}"
+
+#: components/dashboard/StaffSection.tsx:366
+msgid "Rate by age bracket — table"
+msgstr "Taux par tranche d'âge — tableau"
+
+#: components/dashboard/StaffSection.tsx:369
+msgid "Download CSV"
+msgstr "Télécharger le CSV"
+
+#: components/dashboard/StaffSection.tsx:376
+msgid "Age bracket"
+msgstr "Tranche d'âge"
+
+#: components/dashboard/StaffSection.tsx:377
+msgid "Number of people"
+msgstr "Personnes"
+
+#: components/dashboard/StaffSection.tsx:378
+msgid "Research FTE-years"
+msgstr "Années-ETP recherche"
+
+#: components/dashboard/StaffSection.tsx:380
+msgid "Publications / FTE / year"
+msgstr "Publications / ETP / an"
+
+#: components/dashboard/StaffSection.tsx:405
+msgid "Population: {populationLabel}."
+msgstr "Population : {populationLabel}."
+
+#. placeholder {0}: rate.excluded.phdOrEmeritus
+#. placeholder {1}: rate.excluded.noResearchFte
+#: components/dashboard/StaffSection.tsx:407
+msgid "Out of the rate: PhD students or emeriti ({0}), without research FTE ({1})."
+msgstr "Hors du taux : doctorants ou émérites ({0}), sans ETP recherche ({1})."
+
+#: components/dashboard/StaffSection.tsx:409
+msgid "Unknown age not shown: {masked} (fewer than 3 people)."
+msgstr "Âge inconnu non affiché : {masked} (moins de 3 personnes)."
+
+#. placeholder {0}: rate.excluded.undatedFormer
+#: components/dashboard/StaffSection.tsx:410
+msgid "Former members without end date (left out): {0}."
+msgstr "Anciens membres sans date de fin (écartés) : {0}."
+
+#: components/dashboard/StaffSection.tsx:411
+msgid "* includes research FTE estimated from the grade."
+msgstr "* inclut des ETP recherche estimés selon le grade."
 
 #: components/dashboard/TeamsTab.tsx:78
 msgid "Unassigned"
@@ -5618,7 +5923,7 @@ msgid "Archives (former subscription)"
 msgstr "Archives (ancien abonnement)"
 
 #: components/dashboard/phase4Aggregates.ts:27
-#: components/dashboard/publicationFilters.ts:239
+#: components/dashboard/publicationFilters.ts:255
 #: components/dashboard/themeKpis.ts:103
 msgid "National licence (ISTEX)"
 msgstr "Licence nationale (ISTEX)"
@@ -5639,157 +5944,161 @@ msgstr "Accès fermé, indisponible à NU"
 msgid "Access not determined"
 msgstr "Accès non déterminé"
 
-#: components/dashboard/publicationFilters.ts:245
+#: components/dashboard/publicationFilters.ts:261
 msgid "Signature compliant with the charter"
 msgstr "Signature conforme à la charte"
 
-#: components/dashboard/publicationFilters.ts:246
+#: components/dashboard/publicationFilters.ts:262
 msgid "Acknowledges a funder"
 msgstr "Cite un financeur"
 
 #. placeholder {0}: f.year
-#: components/dashboard/publicationFilters.ts:261
+#: components/dashboard/publicationFilters.ts:277
 msgid "Year: {0}"
 msgstr "Année : {0}"
 
 #. placeholder {0}: f.pubType
-#: components/dashboard/publicationFilters.ts:262
+#: components/dashboard/publicationFilters.ts:278
 msgid "Type: {0}"
 msgstr "Type : {0}"
 
 #. placeholder {0}: oaLabel(f.oaStatus)
-#: components/dashboard/publicationFilters.ts:263
+#: components/dashboard/publicationFilters.ts:279
 msgid "Open access: {0}"
 msgstr "Accès ouvert : {0}"
 
 #. placeholder {0}: languageLabel(f.language)
-#: components/dashboard/publicationFilters.ts:264
+#: components/dashboard/publicationFilters.ts:280
 msgid "Language: {0}"
 msgstr "Langue : {0}"
 
 #. placeholder {0}: f.journal
-#: components/dashboard/publicationFilters.ts:265
+#: components/dashboard/publicationFilters.ts:281
 msgid "Journal: {0}"
 msgstr "Revue : {0}"
 
 #. placeholder {0}: f.publisher
-#: components/dashboard/publicationFilters.ts:266
+#: components/dashboard/publicationFilters.ts:282
 msgid "Publisher: {0}"
 msgstr "Éditeur : {0}"
 
 #. placeholder {0}: f.quartile
-#: components/dashboard/publicationFilters.ts:267
+#: components/dashboard/publicationFilters.ts:283
 msgid "Quartile: {0}"
 msgstr "Quartile : {0}"
 
 #. placeholder {0}: accessLabel(f.journalAccess)
-#: components/dashboard/publicationFilters.ts:268
+#: components/dashboard/publicationFilters.ts:284
 msgid "NU access: {0}"
 msgstr "Accès NU : {0}"
 
 #. placeholder {0}: f.team
-#: components/dashboard/publicationFilters.ts:269
+#: components/dashboard/publicationFilters.ts:285
 msgid "Team: {0}"
 msgstr "Équipe : {0}"
 
 #. placeholder {0}: f.sousStructure
-#: components/dashboard/publicationFilters.ts:270
+#: components/dashboard/publicationFilters.ts:286
 msgid "Lab: {0}"
 msgstr "Labo : {0}"
 
 #. placeholder {0}: f.memberType
-#: components/dashboard/publicationFilters.ts:271
+#: components/dashboard/publicationFilters.ts:287
 msgid "Employment type: {0}"
 msgstr "Type d'emploi : {0}"
 
-#: components/dashboard/publicationFilters.ts:274
+#: components/dashboard/publicationFilters.ts:290
 msgid "Author: {author}"
 msgstr "Auteur : {author}"
 
+#: components/dashboard/publicationFilters.ts:293
+msgid "Selected researchers"
+msgstr "Chercheurs sélectionnés"
+
 #. placeholder {0}: f.collabType
-#: components/dashboard/publicationFilters.ts:276
+#: components/dashboard/publicationFilters.ts:295
 msgid "Collaboration: {0}"
 msgstr "Collaboration : {0}"
 
 #. placeholder {0}: ctx.countryLabel(f.country)
-#: components/dashboard/publicationFilters.ts:277
+#: components/dashboard/publicationFilters.ts:296
 msgid "Country: {0}"
 msgstr "Pays : {0}"
 
 #. placeholder {0}: f.nantesPartner
-#: components/dashboard/publicationFilters.ts:278
+#: components/dashboard/publicationFilters.ts:297
 msgid "NU lab: {0}"
 msgstr "Labo NU : {0}"
 
 #. placeholder {0}: f.nationalPartner
-#: components/dashboard/publicationFilters.ts:279
+#: components/dashboard/publicationFilters.ts:298
 msgid "National partner: {0}"
 msgstr "Partenaire national : {0}"
 
 #. placeholder {0}: f.partnerInstitution
-#: components/dashboard/publicationFilters.ts:281
+#: components/dashboard/publicationFilters.ts:300
 msgid "Partner: {0}"
 msgstr "Partenaire : {0}"
 
 #. placeholder {0}: names[0]
-#: components/dashboard/publicationFilters.ts:287
+#: components/dashboard/publicationFilters.ts:306
 msgid "Partner institution: {0}"
 msgstr "Institution partenaire : {0}"
 
-#: components/dashboard/publicationFilters.ts:287
+#: components/dashboard/publicationFilters.ts:306
 msgid "Partner institutions: {joined}"
 msgstr "Institutions partenaires : {joined}"
 
 #. placeholder {0}: f.domain
-#: components/dashboard/publicationFilters.ts:290
+#: components/dashboard/publicationFilters.ts:309
 msgid "Domain: {0}"
 msgstr "Domaine : {0}"
 
 #. placeholder {0}: f.subfield
-#: components/dashboard/publicationFilters.ts:291
+#: components/dashboard/publicationFilters.ts:310
 msgid "Subfield: {0}"
 msgstr "Sous-discipline : {0}"
 
 #. placeholder {0}: f.topic
-#: components/dashboard/publicationFilters.ts:292
+#: components/dashboard/publicationFilters.ts:311
 msgid "Topic: {0}"
 msgstr "Topic : {0}"
 
 #. placeholder {0}: f.themeKeys[0]
-#: components/dashboard/publicationFilters.ts:297
+#: components/dashboard/publicationFilters.ts:316
 msgid "Subject: {0}"
 msgstr "Sujet : {0}"
 
-#: components/dashboard/publicationFilters.ts:297
+#: components/dashboard/publicationFilters.ts:316
 msgid "Subjects: {joined}"
 msgstr "Sujets : {joined}"
 
 #. placeholder {0}: f.theme
-#: components/dashboard/publicationFilters.ts:300
+#: components/dashboard/publicationFilters.ts:319
 msgid "Axis: {0}"
 msgstr "Axe : {0}"
 
 #. placeholder {0}: f.axe
-#: components/dashboard/publicationFilters.ts:301
+#: components/dashboard/publicationFilters.ts:320
 msgid "Strategic axis: {0}"
 msgstr "Axe stratégique : {0}"
 
 #. placeholder {0}: f.sourceCombo
-#: components/dashboard/publicationFilters.ts:302
+#: components/dashboard/publicationFilters.ts:321
 msgid "Sources: {0}"
 msgstr "Sources : {0}"
 
 #. placeholder {0}: f.maxAuthors
-#: components/dashboard/publicationFilters.ts:303
+#: components/dashboard/publicationFilters.ts:322
 msgid "Excluding large collaborations (≤ {0} authors)"
 msgstr "Hors grandes collaborations (≤ {0} auteurs)"
 
-#: components/dashboard/publicationFilters.ts:306
+#: components/dashboard/publicationFilters.ts:325
 msgid "Funders: {category}"
 msgstr "Financeurs : {category}"
 
 #. placeholder {0}: f.funder
-#: components/dashboard/publicationFilters.ts:308
+#: components/dashboard/publicationFilters.ts:327
 msgid "Funder: {0}"
 msgstr "Financeur : {0}"
 
@@ -7775,11 +8084,6 @@ msgstr "{0} graphique(s) n'ont pas pu être capturés et ont été laissés de c
 msgid "This report can no longer be opened: its definition does not match the current format ({0})."
 msgstr "Ce rapport ne peut plus être ouvert : sa définition ne correspond plus au format actuel ({0})."
 
-#. placeholder {0}: stored.shares.length
-#: components/reports/ReportEditor.tsx:283
-msgid "{0} people"
-msgstr "{0} personne(s)"
-
 #: components/reports/ReportEditor.tsx:284
 msgid "everyone"
 msgstr "tout le monde"
@@ -7852,11 +8156,6 @@ msgstr "Mention en pied de chaque page du PDF (ex. Document de travail interne)"
 #: components/reports/ReportEditor.tsx:356
 msgid "Footer note"
 msgstr "Mention de pied de page"
-
-#. placeholder {0}: resolved.publicationCount
-#: components/reports/ReportEditor.tsx:386
-msgid "{0} publications"
-msgstr "{0} publications"
 
 #: components/reports/ReportEditor.tsx:392
 msgid "This report was changed elsewhere since you opened it; your latest changes are not saved."
@@ -9033,10 +9332,6 @@ msgstr "ETP (quotité)"
 #: components/researchers/GeneralTab.tsx:316
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Équivalent temps plein recherche (0 à 1) : en général 0,5 pour un enseignant-chercheur, 1 pour un chercheur à temps plein. Vide = non renseigné (le tableau de bord appliquera une valeur par défaut selon le grade) ; 0 = aucun temps de recherche."
-
-#: components/researchers/GeneralTab.tsx:316
-msgid "Research FTE"
-msgstr "ETP recherche"
 
 #: components/researchers/GeneralTab.tsx:330
 msgid "Accredited to supervise research (HDR)"

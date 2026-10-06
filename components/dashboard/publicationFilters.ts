@@ -54,6 +54,13 @@ export interface PubFilters {
   memberType?: string;
   /** Specific internal author (dataset id). */
   authorId?: number;
+  /**
+   * « authorId:year » pairs: publications of the given year with one of those authors — the
+   * Researchers tab drill-down (an age bracket, a member's years of presence: staffAggregates.ts).
+   * Shown as one chip titled `authorYearsLabel`.
+   */
+  authorYears?: string[];
+  authorYearsLabel?: string;
   /** Involves at least one PhD student. */
   hasPhd?: boolean;
   /** Collaboration category (collabTypes values of the export). */
@@ -160,6 +167,11 @@ export function buildFilterContext(dataset: DashboardDataset): FilterContext {
   };
 }
 
+/** Set of an `authorYears` filter, built once per filter array (matchesFilters runs per publication). */
+const authorYearSets = new WeakMap<string[], Set<string>>();
+const authorYearSet = (pairs: string[]): Set<string> =>
+  authorYearSets.get(pairs) ?? authorYearSets.set(pairs, new Set(pairs)).get(pairs)!;
+
 export function matchesFilters(
   p: DashboardPublication,
   f: PubFilters,
@@ -191,6 +203,10 @@ export function matchesFilters(
     if (!ok) return false;
   }
   if (f.authorId != null && !p.authorIds.includes(f.authorId)) return false;
+  if (f.authorYears && f.authorYears.length > 0) {
+    const pairs = authorYearSet(f.authorYears);
+    if (!p.authorIds.some((id) => pairs.has(`${id}:${p.year}`))) return false;
+  }
   if (f.hasPhd && !p.hasPhd) return false;
   if (f.collabType && !p.collabTypes.includes(f.collabType)) return false;
   if (f.country && !p.countries.includes(f.country)) return false;
@@ -273,6 +289,9 @@ export function describeFilters(f: PubFilters, ctx: FilterContext): FilterChip[]
     const author = ctx.authorLabelById.get(f.authorId) ?? `#${f.authorId}`;
     push('authorId', _(msg`Author: ${author}`));
   }
+  if (f.authorYears && f.authorYears.length > 0) {
+    push('authorYears', f.authorYearsLabel || _(msg`Selected researchers`));
+  }
   if (f.collabType) push('collabType', _(msg`Collaboration: ${f.collabType}`));
   if (f.country) push('country', _(msg`Country: ${ctx.countryLabel(f.country)}`));
   if (f.nantesPartner) push('nantesPartner', _(msg`NU lab: ${f.nantesPartner}`));
@@ -316,7 +335,7 @@ export function countActiveFilters(f: PubFilters): number {
   // charteSeuil goes with charterCompliant (same chip, see describeFilters) — counting it separately
   // inflated the « N filtres actifs » badge with no matching chip (review lot 9a).
   return Object.entries(f).filter(
-    ([k, v]) => k !== 'q' && k !== 'charteSeuil' && v != null && v !== '' && !(Array.isArray(v) && v.length === 0),
+    ([k, v]) => k !== 'q' && k !== 'charteSeuil' && k !== 'authorYearsLabel' && v != null && v !== '' && !(Array.isArray(v) && v.length === 0),
   ).length;
 }
 
