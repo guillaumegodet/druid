@@ -2,7 +2,7 @@
  * @file fte.ts
  * @description Full-time equivalents of a researcher: overall FTE (« quotité agent ») and research
  * FTE, stored in the optional Grist Annuaire columns `etp_quotite` and `etp_recherche` (Numeric,
- * created on 2026-10-06 — docs/plan-chercheurs-age-etp.md, lot 1).
+ * created on 2026-10-06 — lot 1 of the research FTE plan, see the README of docs).
  *
  * An empty cell (null) means « not provided » and is NOT the same as 0: a professor fully
  * discharged from research has a research FTE of 0, while a missing value will later get a default

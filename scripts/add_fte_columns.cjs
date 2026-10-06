@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * add_fte_columns.cjs — provisions in the `Annuaire` table the two FTE columns of the record
- * (docs/plan-chercheurs-age-etp.md, lot 1; lib/fte.ts):
+ * (lot 1 of the research FTE plan; lib/fte.ts):
  *   - etp_quotite: overall FTE (« quotité agent »), Numeric 0-1;
  *   - etp_recherche: research FTE, Numeric 0-1 (0 = no research time).
  *
