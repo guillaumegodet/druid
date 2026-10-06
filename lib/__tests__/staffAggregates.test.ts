@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import {
   filterStaff, presenceByYear, ageBracketOf, mergedBracketLabel, mergeSmallBrackets, publicationRateByAge,
-  agePyramid, publicationsPerMember, staffKpis, hasStaffAttributes, DEFAULT_STAFF_FILTER, StaffMember, StaffFilter,
+  agePyramid, publicationsPerMember, staffKpis, hasStaffAttributes, publicationsDistribution, publicationStepLabel,
+  DEFAULT_STAFF_FILTER, StaffMember, StaffFilter,
 } from '../../components/dashboard/staffAggregates';
 import type { DashboardPublication, MemberMeta } from '../../components/dashboard/types';
 
@@ -122,6 +123,12 @@ describe('publicationRateByAge', () => {
     expect(r.overall.byYear).toEqual([2, 0, 0, 1, 0]);
   });
 
+  it('author × year pairs of each bracket, for the drill-down to the list', () => {
+    expect(byKey['<35'].authorYears).toEqual(['4:2022', '4:2023']);
+    expect(byKey['35-44'].authorYears).toEqual(['1:2022', '1:2023', '1:2024']);
+    expect(byKey['55+'].authorYears).toEqual(['2:2024', '2:2025', '2:2026']);
+  });
+
   it('FTE-years pro rata of presence (D2), estimated part kept apart (D4)', () => {
     // D: FTE 1 × (2022 + 2023 up to 08-31).
     expect(byKey['<35'].fteYears).toBeCloseTo(1 + 243 / 365, 6);
@@ -169,6 +176,20 @@ describe('publicationsPerMember and staffKpis', () => {
 
   it('counts the years of presence only', () => {
     expect(Object.fromEntries(per.map((m) => [m.label, m.count]))).toEqual({ A: 2, B: 1, C: 0, Assoc: 0 });
+  });
+
+  it('years of presence of each member, for the drill-down', () => {
+    expect(per.find((m) => m.label === 'B')!.authorYears).toEqual(['2:2024', '2:2025', '2:2026']);
+  });
+
+  it('distribution by publication-count step, non-publishing members included', () => {
+    const dist = publicationsDistribution(per);
+    expect(dist.steps).toEqual(['0', '1-2', '3-5', '6-10', '11-20', '21+']);
+    expect(dist.categories).toEqual(['permanent', 'doctorant', 'none']);
+    expect(dist.members[0]).toEqual([0, 1, 1]);   // C and Assoc: no publication
+    expect(dist.members[1]).toEqual([2, 0, 0]);   // A (2) and B (1)
+    expect(dist.unmatched).toBe(0);
+    expect(publicationStepLabel(5)).toBe('21+');
   });
 
   it('indicators of the population', () => {

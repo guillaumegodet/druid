@@ -13,6 +13,15 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- Tableau de bord, onglet **Chercheurs** : filtre de population (appartenance au labo, catégorie — permanents,
+  non-permanents, doctorants, émérites — et présence : membres actuels ou présents sur la période, au prorata),
+  raccourci « Statutaires et doctorants », période propre (par défaut les 4 dernières années complètes). Nouveaux
+  indicateurs : effectif, ETP recherche, publications par ETP recherche et par an, part de membres publiants ;
+  graphiques **taux de publication par tranche d'âge** (âge à la publication), publications par tranche et par année,
+  pyramide des âges, publications par membre ; tableau exportable en CSV avec la note de méthode. Doctorants et
+  émérites sont hors du taux ; les tranches de moins de 3 personnes sont fusionnées. Le classement des auteurs suit
+  le filtre. Clic sur une tranche : liste des publications correspondantes (nouveau filtre « auteur × année »).
+  Nécessite un export druid-biblio du 2026-10-06 ou plus récent (sinon l'onglet reste inchangé).
 - Fiche chercheur, carte « Emploi & contrat » : deux champs **ETP (quotité)** et **ETP recherche** (0 à 1), enregistrés
   dans les colonnes `etp_quotite` / `etp_recherche` de l'Annuaire. Vide = non renseigné, distinct de 0 (aucun temps de
   recherche), y compris lors d'une fusion de doublons. Les champs n'apparaissent que si l'Annuaire de l'instance a les

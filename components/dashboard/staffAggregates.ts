@@ -171,8 +171,10 @@ export interface BracketRate {
   rate: number | null;
   /** Publications per year of the range (heatmap). */
   byYear: number[];
-  /** Publication indexes (drill-down to the list). */
+  /** Publication indexes. */
   pubIndexes: number[];
+  /** « authorId:year » pairs of the bracket (drill-down: PubFilters.authorYears). */
+  authorYears: string[];
 }
 
 export interface PublicationRateResult {
@@ -183,8 +185,13 @@ export interface PublicationRateResult {
   excluded: { phdOrEmeritus: number; noResearchFte: number; undatedFormer: number; maskedUnknownAge: number };
 }
 
-interface Cell { people: Set<string>; fteYears: number; estimated: number; pubs: Set<number>; byYear: Map<number, Set<number>> }
-const newCell = (): Cell => ({ people: new Set(), fteYears: 0, estimated: 0, pubs: new Set(), byYear: new Map() });
+interface Cell {
+  people: Set<string>; fteYears: number; estimated: number; pubs: Set<number>; byYear: Map<number, Set<number>>;
+  authorYears: Set<string>;
+}
+const newCell = (): Cell => ({
+  people: new Set(), fteYears: 0, estimated: 0, pubs: new Set(), byYear: new Map(), authorYears: new Set(),
+});
 
 export function publicationRateByAge(
   pubs: DashboardPublication[],
@@ -219,6 +226,8 @@ export function publicationRateByAge(
         if (m.researchFteEstimated) c.estimated += fte * frac;
       }
       if (m.authorId !== null && m.authorId !== undefined) {
+        cell(k).authorYears.add(`${m.authorId}:${y}`);
+        overall.authorYears.add(`${m.authorId}:${y}`);
         const byYear = bracketOfAuthor.get(m.authorId) ?? bracketOfAuthor.set(m.authorId, new Map()).get(m.authorId)!;
         byYear.set(y, k);
       }
@@ -252,6 +261,7 @@ export function publicationRateByAge(
     rate: c.fteYears > 0 ? c.pubs.size / c.fteYears : null,
     byYear: years.map((y) => c.byYear.get(y)?.size ?? 0),
     pubIndexes: Array.from(c.pubs).sort((a, b) => a - b),
+    authorYears: Array.from(c.authorYears).sort(),
   });
   const union = (keys: string[]): Cell => {
     const out = newCell();
@@ -262,6 +272,7 @@ export function publicationRateByAge(
       out.fteYears += c.fteYears;
       out.estimated += c.estimated;
       c.pubs.forEach((i) => out.pubs.add(i));
+      c.authorYears.forEach((a) => out.authorYears.add(a));
       for (const [y, s] of c.byYear) {
         const t = out.byYear.get(y) ?? out.byYear.set(y, new Set()).get(y)!;
         s.forEach((i) => t.add(i));
@@ -329,6 +340,8 @@ export interface MemberPublications {
   count: number;
   /** False when no author of the corpus was matched to the member (name spelling): count unknown. */
   matched: boolean;
+  /** « authorId:year » pairs of the years of presence (drill-down: PubFilters.authorYears). */
+  authorYears: string[];
 }
 
 /** Publications of each member over the range, counted only for the years of presence. */
@@ -342,7 +355,9 @@ export function publicationsPerMember(
   for (const m of staff) {
     if (m.authorId === null || m.authorId === undefined) continue;
     const ys = new Set(Array.from(presenceByYear(m, range, asOf)).filter(([, f]) => f > 0).map(([y]) => y));
-    presentYears.set(m.authorId, ys);
+    // A former member and a current one can share an author (same normalized name): union.
+    const known = presentYears.get(m.authorId);
+    presentYears.set(m.authorId, known ? new Set([...known, ...ys]) : ys);
   }
   const counts = new Map<number, number>();
   for (const p of pubs) {
@@ -353,8 +368,47 @@ export function publicationsPerMember(
   }
   return staff.map((m) => {
     const matched = m.authorId !== null && m.authorId !== undefined;
-    return { key: m.key, label: m.label, category: categoryKeyOf(m), matched, count: matched ? counts.get(m.authorId!) ?? 0 : 0 };
+    const years = matched ? Array.from(presentYears.get(m.authorId!) ?? []).sort() : [];
+    return {
+      key: m.key, label: m.label, category: categoryKeyOf(m), matched,
+      count: matched ? counts.get(m.authorId!) ?? 0 : 0,
+      authorYears: years.map((y) => `${m.authorId}:${y}`),
+    };
   });
+}
+
+/** Publication-count steps of the distribution chart (lower bounds; the last one is open). */
+export const PUBLICATION_STEPS = [0, 1, 3, 6, 11, 21] as const;
+
+export const publicationStepLabel = (i: number): string => {
+  const lo = PUBLICATION_STEPS[i];
+  const next = PUBLICATION_STEPS[i + 1];
+  if (next === undefined) return `${lo}+`;
+  return next - 1 === lo ? String(lo) : `${lo}-${next - 1}`;
+};
+
+export interface PublicationsDistribution {
+  steps: string[];
+  categories: CategoryKey[];
+  /** members[step][category] — matched members only. */
+  members: number[][];
+  /** Members not matched to any author (left out: their count is unknown). */
+  unmatched: number;
+}
+
+/** Number of members per publication-count step and category (non-publishing members included). */
+export function publicationsDistribution(perMember: MemberPublications[]): PublicationsDistribution {
+  const matched = perMember.filter((m) => m.matched);
+  const categories = CATEGORY_KEYS.filter((c) => matched.some((m) => m.category === c));
+  const stepOf = (n: number) => PUBLICATION_STEPS.reduce((acc, lo, i) => (n >= lo ? i : acc), 0);
+  const members = PUBLICATION_STEPS.map(() => categories.map(() => 0));
+  for (const m of matched) members[stepOf(m.count)][categories.indexOf(m.category)]++;
+  return {
+    steps: PUBLICATION_STEPS.map((_, i) => publicationStepLabel(i)),
+    categories,
+    members,
+    unmatched: perMember.length - matched.length,
+  };
 }
 
 export interface StaffKpis {

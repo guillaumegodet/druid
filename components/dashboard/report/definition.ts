@@ -43,6 +43,10 @@ export const pubFiltersSchema = z.strictObject({
   sousStructure: str.optional(),
   memberType: str.optional(),
   authorId: z.number().int().optional(),
+  // Researchers tab drill-down (« authorId:year » pairs of an age bracket): can exceed maxKeys, but the
+  // staff charts are not shareable, so a report never carries it — bounded generously anyway.
+  authorYears: z.array(z.string().regex(/^\d+:\d{4}$/)).max(5000).optional(),
+  authorYearsLabel: str.optional(),
   hasPhd: z.boolean().optional(),
   collabType: str.optional(),
   country: str.optional(),

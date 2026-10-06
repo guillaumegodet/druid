@@ -102,6 +102,7 @@ export const PublicationsListTab: React.FC<{
     // then re-checking the Charter filter silently reused a threshold left by an earlier
     // drill-down instead of the export default (review lot 9a).
     if (!next.charterCompliant) delete next.charteSeuil;
+    if (!next.authorYears?.length) { delete next.authorYears; delete next.authorYearsLabel; }
     for (const k of Object.keys(next) as (keyof PubFilters)[]) {
       if (next[k] == null || next[k] === '' || next[k] === false) delete next[k];
     }
