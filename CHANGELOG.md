@@ -12,6 +12,16 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- Liste du personnel : filtre **Appartenance** (statutaire, associé, affiliation secondaire, invité, non renseigné),
+  appliqué à l'affiliation principale comme le filtre Labo ; paramètre d'URL `membership`.
+
+### Modifié
+- Liste du personnel : filtres sur une seule ligne de pastilles compactes (Labo, Appartenance, Statut, Employeur,
+  Corps-grade) ; Validation, Parcours, Type d'emploi, Pôle, Identifiants présents et Période d'emploi passent dans
+  un panneau « Plus de filtres », dont les valeurs actives restent visibles en puces supprimables ; bouton
+  « Tout effacer ».
+
 ## [1.4.0] — 2026-10-06
 
 ### Ajouté

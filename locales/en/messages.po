@@ -683,7 +683,7 @@ msgid "Search for a group…"
 msgstr "Search for a group…"
 
 #: components/GroupList.tsx:221
-#: components/researchers/FilterPanel.tsx:94
+#: components/researchers/FilterPanel.tsx:179
 msgid "Group"
 msgstr "Group"
 
@@ -1126,6 +1126,7 @@ msgstr "Supervising bodies"
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
 #: components/etl/EtlMaintenancePanels.tsx:268
+#: components/researchers/FilterPanel.tsx:213
 #: components/researchers/ListHeader.tsx:48
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
 #: components/researchers/ResearcherTable.tsx:92
@@ -1957,6 +1958,7 @@ msgstr "Remove this university"
 #: components/dashboard/NewsTab.tsx:678
 #: components/dashboard/PartnerInstitutionPicker.tsx:138
 #: components/dashboard/PublicationsListTab.tsx:275
+#: components/researchers/FilterPanel.tsx:262
 msgid "Clear all"
 msgstr "Clear all"
 
@@ -3022,8 +3024,8 @@ msgstr "Citations"
 #: components/dashboard/ImpactTab.tsx:215
 #: components/dashboard/MarketShareSection.tsx:24
 #: components/dashboard/PublicationsListTab.tsx:337
-#: components/researchers/AffiliationsTable.tsx:237
-#: components/researchers/AffiliationsTable.tsx:277
+#: components/researchers/AffiliationsTable.tsx:226
+#: components/researchers/AffiliationsTable.tsx:266
 #: lib/importConflicts.ts:74
 #: lib/structureLabels.ts:17
 msgid "Team"
@@ -3422,6 +3424,7 @@ msgstr "Last collection: {0}."
 #: components/reports/HistoryDialog.tsx:105
 #: components/reports/NewReportDialog.tsx:228
 #: components/reports/ReportControls.tsx:83
+#: components/researchers/FilterPanel.tsx:156
 msgid "Period"
 msgstr "Period"
 
@@ -3895,6 +3898,7 @@ msgstr "Citations (already received)"
 #: components/dashboard/NewsTab.tsx:610
 #: components/dashboard/NewsTab.tsx:692
 #: components/researchers/AbesExportModal.tsx:229
+#: components/researchers/FilterPanel.tsx:197
 #: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
@@ -4018,6 +4022,7 @@ msgid "Under review"
 msgstr "Under review"
 
 #: components/dashboard/NewsletterPanel.tsx:49
+#: components/researchers/FilterPanel.tsx:132
 #: components/researchers/LdapVerifyPanel.tsx:124
 #: components/researchers/StatusBadge.tsx:80
 msgid "Validated"
@@ -4492,6 +4497,8 @@ msgid "Lab"
 msgstr "Lab"
 
 #: components/dashboard/PublicationsListTab.tsx:349
+#: components/researchers/FilterPanel.tsx:153
+#: components/researchers/FilterPanel.tsx:276
 #: components/researchers/GeneralTab.tsx:269
 #: lib/importConflicts.ts:64
 msgid "Employment type"
@@ -4584,6 +4591,7 @@ msgstr "None"
 
 #: components/dashboard/ResearchersTab.tsx:208
 #: components/researchers/AbesExportModal.tsx:228
+#: components/researchers/FilterPanel.tsx:220
 #: components/researchers/ResearcherTable.tsx:88
 #: lib/importConflicts.ts:73
 msgid "Employer"
@@ -4757,12 +4765,13 @@ msgid "Presets"
 msgstr "Presets"
 
 #: components/dashboard/StaffSection.tsx:96
-msgid "Lab membership type (Annuaire « membership_type »)"
-msgstr "Lab membership type (Annuaire « membership_type »)"
-
-#: components/dashboard/StaffSection.tsx:96
+#: components/researchers/FilterPanel.tsx:204
 msgid "Membership"
 msgstr "Membership"
+
+#: components/dashboard/StaffSection.tsx:96
+msgid "Lab membership type (Annuaire « membership_type »)"
+msgstr "Lab membership type (Annuaire « membership_type »)"
 
 #: components/dashboard/StaffSection.tsx:105
 msgid "From the grade, else the employment type"
@@ -7906,7 +7915,7 @@ msgstr "This report already holds the maximum number of blocks."
 
 #: components/reports/AddToReportDialog.tsx:198
 #: components/reports/ShareDialog.tsx:157
-#: components/researchers/AffiliationsTable.tsx:113
+#: components/researchers/AffiliationsTable.tsx:102
 msgid "Add"
 msgstr "Add"
 
@@ -8619,6 +8628,8 @@ msgid "ORCID ({nOrcid} positions)"
 msgstr "ORCID ({nOrcid} positions)"
 
 #: components/researchers/AffiliationHistorySection.tsx:193
+#: components/researchers/FilterPanel.tsx:152
+#: components/researchers/FilterPanel.tsx:274
 msgid "Career path"
 msgstr "Career path"
 
@@ -8732,136 +8743,120 @@ msgstr "Affiliations over time"
 msgid "Dots: publications of the year · bars: positions declared in ORCID · grey band: employment entered in Druid"
 msgstr "Dots: publications of the year · bars: positions declared in ORCID · grey band: employment entered in Druid"
 
-#: components/researchers/AffiliationsTable.tsx:39
+#: components/researchers/AffiliationsTable.tsx:40
 msgid "{value} (not in list)"
 msgstr "{value} (not in list)"
 
-#: components/researchers/AffiliationsTable.tsx:46
-msgid "Statutory member"
-msgstr "Statutory member"
-
-#: components/researchers/AffiliationsTable.tsx:47
-msgid "Associate member"
-msgstr "Associate member"
-
-#: components/researchers/AffiliationsTable.tsx:48
-msgid "Secondary affiliation"
-msgstr "Secondary affiliation"
-
-#: components/researchers/AffiliationsTable.tsx:49
-msgid "Visiting member"
-msgstr "Visiting member"
-
-#: components/researchers/AffiliationsTable.tsx:108
+#: components/researchers/AffiliationsTable.tsx:97
 msgid "Affiliations & history"
 msgstr "Affiliations & history"
 
-#: components/researchers/AffiliationsTable.tsx:129
+#: components/researchers/AffiliationsTable.tsx:118
 msgid "Primary affiliation"
 msgstr "Primary affiliation"
 
-#: components/researchers/AffiliationsTable.tsx:133
+#: components/researchers/AffiliationsTable.tsx:122
 msgid "Former affiliation (directory row qualified HISTORIQUE)"
 msgstr "Former affiliation (directory row qualified HISTORIQUE)"
 
-#: components/researchers/AffiliationsTable.tsx:133
+#: components/researchers/AffiliationsTable.tsx:122
 msgid "Concurrent affiliation (directory row qualified SECONDAIRE)"
 msgstr "Concurrent affiliation (directory row qualified SECONDAIRE)"
 
-#: components/researchers/AffiliationsTable.tsx:135
+#: components/researchers/AffiliationsTable.tsx:124
 msgid "former"
 msgstr "former"
 
-#: components/researchers/AffiliationsTable.tsx:135
+#: components/researchers/AffiliationsTable.tsx:124
 msgid "secondary"
 msgstr "secondary"
 
-#: components/researchers/AffiliationsTable.tsx:143
+#: components/researchers/AffiliationsTable.tsx:132
 msgid "— Structure —"
 msgstr "— Structure —"
 
-#: components/researchers/AffiliationsTable.tsx:152
+#: components/researchers/AffiliationsTable.tsx:141
 msgid "Show this structure's detailed record"
 msgstr "Show this structure's detailed record"
 
-#: components/researchers/AffiliationsTable.tsx:160
+#: components/researchers/AffiliationsTable.tsx:149
 #: components/structures/GovernanceTab.tsx:140
 msgid "Remove this affiliation"
 msgstr "Remove this affiliation"
 
-#: components/researchers/AffiliationsTable.tsx:169
+#: components/researchers/AffiliationsTable.tsx:158
 msgid "Lab membership"
 msgstr "Lab membership"
 
-#: components/researchers/AffiliationsTable.tsx:174
+#: components/researchers/AffiliationsTable.tsx:163
 msgid "Membership type in the structure (CRISalid vocabulary, membership_type column of people.csv)"
 msgstr "Membership type in the structure (CRISalid vocabulary, membership_type column of people.csv)"
 
-#: components/researchers/AffiliationsTable.tsx:177
+#: components/researchers/AffiliationsTable.tsx:166
 msgid "— Membership type —"
 msgstr "— Membership type —"
 
-#: components/researchers/AffiliationsTable.tsx:183
+#: components/researchers/AffiliationsTable.tsx:172
 msgid "from"
 msgstr "from"
 
-#: components/researchers/AffiliationsTable.tsx:187
+#: components/researchers/AffiliationsTable.tsx:176
 msgid "Date of entry into the structure (not the hiring date) — YYYY, YYYY-MM or YYYY-MM-DD"
 msgstr "Date of entry into the structure (not the hiring date) — YYYY, YYYY-MM or YYYY-MM-DD"
 
-#: components/researchers/AffiliationsTable.tsx:194
+#: components/researchers/AffiliationsTable.tsx:183
 msgctxt "date range"
 msgid "to"
 msgstr "to"
 
-#: components/researchers/AffiliationsTable.tsx:198
+#: components/researchers/AffiliationsTable.tsx:187
 msgid "Date of leaving the structure — empty while the membership is ongoing — YYYY, YYYY-MM or YYYY-MM-DD"
 msgstr "Date of leaving the structure — empty while the membership is ongoing — YYYY, YYYY-MM or YYYY-MM-DD"
 
-#: components/researchers/AffiliationsTable.tsx:209
+#: components/researchers/AffiliationsTable.tsx:198
 msgid "The employment end (Employment card) is already set to this date"
 msgstr "The employment end (Employment card) is already set to this date"
 
-#: components/researchers/AffiliationsTable.tsx:212
+#: components/researchers/AffiliationsTable.tsx:201
 msgid "= employment end"
 msgstr "= employment end"
 
 #. placeholder {0}: formatFuzzyDate(employmentEndDate)
-#: components/researchers/AffiliationsTable.tsx:219
+#: components/researchers/AffiliationsTable.tsx:208
 msgid "Replace the employment end ({0}) with this date"
 msgstr "Replace the employment end ({0}) with this date"
 
-#: components/researchers/AffiliationsTable.tsx:220
+#: components/researchers/AffiliationsTable.tsx:209
 msgid "Copy this date as the employment end (Employment card)"
 msgstr "Copy this date as the employment end (Employment card)"
 
-#: components/researchers/AffiliationsTable.tsx:223
+#: components/researchers/AffiliationsTable.tsx:212
 msgid "→ employment end"
 msgstr "→ employment end"
 
 #. placeholder {0}: aff.structureName
-#: components/researchers/AffiliationsTable.tsx:247
+#: components/researchers/AffiliationsTable.tsx:236
 msgid "No known team for {0} in the Structures table"
 msgstr "No known team for {0} in the Structures table"
 
-#: components/researchers/AffiliationsTable.tsx:250
+#: components/researchers/AffiliationsTable.tsx:239
 msgid "— Team —"
 msgstr "— Team —"
 
 #. placeholder {0}: aff.structureName
-#: components/researchers/AffiliationsTable.tsx:256
+#: components/researchers/AffiliationsTable.tsx:245
 msgid "+ Add a team to {0}…"
 msgstr "+ Add a team to {0}…"
 
-#: components/researchers/AffiliationsTable.tsx:265
+#: components/researchers/AffiliationsTable.tsx:254
 msgid "Remove this team"
 msgstr "Remove this team"
 
-#: components/researchers/AffiliationsTable.tsx:274
+#: components/researchers/AffiliationsTable.tsx:263
 msgid "Add a team (several teams allowed within the same lab)"
 msgstr "Add a team (several teams allowed within the same lab)"
 
-#: components/researchers/AffiliationsTable.tsx:289
+#: components/researchers/AffiliationsTable.tsx:278
 msgid "No affiliation recorded."
 msgstr "No affiliation recorded."
 
@@ -9131,91 +9126,110 @@ msgstr "Requalify"
 msgid "Generated on {generatedAt}"
 msgstr "Generated on {generatedAt}"
 
-#: components/researchers/FilterPanel.tsx:85
+#: components/researchers/FilterPanel.tsx:129
+msgid "Not specified"
+msgstr "Not specified"
+
+#: components/researchers/FilterPanel.tsx:133
+msgid "Validated (expired)"
+msgstr "Validated (expired)"
+
+#: components/researchers/FilterPanel.tsx:134
+msgid "Not validated"
+msgstr "Not validated"
+
+#: components/researchers/FilterPanel.tsx:137
+msgid "Probable departure ({nDepart})"
+msgstr "Probable departure ({nDepart})"
+
+#: components/researchers/FilterPanel.tsx:138
+msgid "Confirmed departure ({nConfirmed})"
+msgstr "Confirmed departure ({nConfirmed})"
+
+#: components/researchers/FilterPanel.tsx:139
+msgid "Inconsistent status ({nIncoherent})"
+msgstr "Inconsistent status ({nIncoherent})"
+
+#: components/researchers/FilterPanel.tsx:140
+msgid "Identifiers to check ({nSuspect})"
+msgstr "Identifiers to check ({nSuspect})"
+
+#: components/researchers/FilterPanel.tsx:151
+#: components/researchers/FilterPanel.tsx:271
+msgid "Validation"
+msgstr "Validation"
+
+#: components/researchers/FilterPanel.tsx:154
+#: components/researchers/FilterPanel.tsx:277
+#: components/researchers/GeneralTab.tsx:351
+msgid "Cluster"
+msgstr "Cluster"
+
+#: components/researchers/FilterPanel.tsx:155
+#: components/researchers/ResearcherTable.tsx:89
+#: lib/importConflicts.ts:97
+msgid "Identifiers"
+msgstr "Identifiers"
+
+#: components/researchers/FilterPanel.tsx:170
 msgid "Search for a researcher, a lab, an identifier…"
 msgstr "Search for a researcher, a lab, an identifier…"
 
-#: components/researchers/FilterPanel.tsx:99
+#: components/researchers/FilterPanel.tsx:184
 msgid "Merge the two selected records"
 msgstr "Merge the two selected records"
 
-#: components/researchers/FilterPanel.tsx:99
+#: components/researchers/FilterPanel.tsx:184
 msgid "Select exactly two Grist records to merge"
 msgstr "Select exactly two Grist records to merge"
 
-#: components/researchers/FilterPanel.tsx:102
+#: components/researchers/FilterPanel.tsx:187
 #: components/structures/LifecycleTab.tsx:135
 msgctxt "noun"
 msgid "Merge"
 msgstr "Merge"
 
-#: components/researchers/FilterPanel.tsx:116
-msgid "STATUS"
-msgstr "STATUS"
+#: components/researchers/FilterPanel.tsx:198
+msgid "Lab of the primary affiliation"
+msgstr "Lab of the primary affiliation"
 
-#: components/researchers/FilterPanel.tsx:122
-msgid "VALIDATION"
-msgstr "VALIDATION"
+#: components/researchers/FilterPanel.tsx:205
+msgid "Membership type in the lab of the primary affiliation"
+msgstr "Membership type in the lab of the primary affiliation"
 
-#: components/researchers/FilterPanel.tsx:124
-msgid "VALIDATED"
-msgstr "VALIDATED"
+#: components/researchers/FilterPanel.tsx:226
+#: lib/importConflicts.ts:63
+msgid "Grade"
+msgstr "Grade"
 
-#: components/researchers/FilterPanel.tsx:125
-msgid "VALIDATED (EXPIRED)"
-msgstr "VALIDATED (EXPIRED)"
+#: components/researchers/FilterPanel.tsx:243
+msgid "Fewer filters"
+msgstr "Fewer filters"
 
-#: components/researchers/FilterPanel.tsx:126
-msgid "NOT VALIDATED"
-msgstr "NOT VALIDATED"
+#: components/researchers/FilterPanel.tsx:243
+msgid "More filters"
+msgstr "More filters"
 
-#: components/researchers/FilterPanel.tsx:135
-msgid "CAREER PATH"
-msgstr "CAREER PATH"
+#. placeholder {0}: f.label
+#: components/researchers/FilterPanel.tsx:254
+msgid "Remove the filter {0}"
+msgstr "Remove the filter {0}"
 
-#: components/researchers/FilterPanel.tsx:137
-msgid "PROBABLE DEPARTURE ({nDepart})"
-msgstr "PROBABLE DEPARTURE ({nDepart})"
+#: components/researchers/FilterPanel.tsx:278
+msgid "Identifiers present"
+msgstr "Identifiers present"
 
-#: components/researchers/FilterPanel.tsx:138
-msgid "CONFIRMED DEPARTURE ({nConfirmed})"
-msgstr "CONFIRMED DEPARTURE ({nConfirmed})"
+#: components/researchers/FilterPanel.tsx:280
+msgid "Employment period"
+msgstr "Employment period"
 
-#: components/researchers/FilterPanel.tsx:139
-msgid "INCONSISTENT STATUS ({nIncoherent})"
-msgstr "INCONSISTENT STATUS ({nIncoherent})"
+#: components/researchers/FilterPanel.tsx:282
+msgid "Start of the period"
+msgstr "Start of the period"
 
-#: components/researchers/FilterPanel.tsx:140
-msgid "IDENTIFIERS TO CHECK ({nSuspect})"
-msgstr "IDENTIFIERS TO CHECK ({nSuspect})"
-
-#: components/researchers/FilterPanel.tsx:147
-msgid "EMPLOYER"
-msgstr "EMPLOYER"
-
-#: components/researchers/FilterPanel.tsx:153
-msgid "LAB (PRIMARY AFFIL.)"
-msgstr "LAB (PRIMARY AFFIL.)"
-
-#: components/researchers/FilterPanel.tsx:159
-msgid "GRADE / RANK"
-msgstr "GRADE / RANK"
-
-#: components/researchers/FilterPanel.tsx:165
-msgid "EMPLOYMENT TYPE"
-msgstr "EMPLOYMENT TYPE"
-
-#: components/researchers/FilterPanel.tsx:171
-msgid "CLUSTER"
-msgstr "CLUSTER"
-
-#: components/researchers/FilterPanel.tsx:181
-msgid "Identifiers:"
-msgstr "Identifiers:"
-
-#: components/researchers/FilterPanel.tsx:213
-msgid "Dates:"
-msgstr "Dates:"
+#: components/researchers/FilterPanel.tsx:284
+msgid "End of the period"
+msgstr "End of the period"
 
 #: components/researchers/FteInput.tsx:31
 msgid "Enter a value between 0 and 1 (e.g. 0.5), or leave empty"
@@ -9341,10 +9355,6 @@ msgstr "Accredited to supervise research (HDR)"
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "HDR year"
-
-#: components/researchers/GeneralTab.tsx:351
-msgid "Cluster"
-msgstr "Cluster"
 
 #: components/researchers/GeneralTab.tsx:355
 msgid "Faculty"
@@ -10230,15 +10240,14 @@ msgstr "Will be deleted: G-{0}. A trace is added to Data_source and Commentaires
 msgid "Merging…"
 msgstr "Merging…"
 
-#: components/researchers/MultiSelectFilter.tsx:34
-#: components/researchers/MultiSelectFilter.tsx:58
-msgid "ALL"
-msgstr "ALL"
-
 #. placeholder {0}: selected.length
-#: components/researchers/MultiSelectFilter.tsx:37
+#: components/researchers/MultiSelectFilter.tsx:44
 msgid "{0} selected"
 msgstr "{0} selected"
+
+#: components/researchers/MultiSelectFilter.tsx:77
+msgid "Clear selection"
+msgstr "Clear selection"
 
 #: components/researchers/OpenAlexAffiliationsPage.tsx:66
 msgid "All labs"
@@ -10290,11 +10299,6 @@ msgstr "Identity"
 msgctxt "membership"
 msgid "Affiliation"
 msgstr "Affiliation"
-
-#: components/researchers/ResearcherTable.tsx:89
-#: lib/importConflicts.ts:97
-msgid "Identifiers"
-msgstr "Identifiers"
 
 #: components/researchers/ResearcherTable.tsx:113
 #: components/researchers/ResearcherTable.tsx:113
@@ -12643,10 +12647,6 @@ msgstr "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} missing: run {1} first (the script creates it)."
 
-#: lib/importConflicts.ts:63
-msgid "Grade"
-msgstr "Grade"
-
 #: lib/importConflicts.ts:67
 msgid "HDR"
 msgstr "HDR"
@@ -12730,6 +12730,22 @@ msgstr "status"
 #: lib/researcherLabels.ts:22
 msgid "affiliation"
 msgstr "affiliation"
+
+#: lib/researcherLabels.ts:27
+msgid "Statutory member"
+msgstr "Statutory member"
+
+#: lib/researcherLabels.ts:28
+msgid "Associate member"
+msgstr "Associate member"
+
+#: lib/researcherLabels.ts:29
+msgid "Secondary affiliation"
+msgstr "Secondary affiliation"
+
+#: lib/researcherLabels.ts:30
+msgid "Visiting member"
+msgstr "Visiting member"
 
 #: lib/structureLabels.ts:15
 msgid "Intermediate str."
