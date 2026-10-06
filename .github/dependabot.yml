@@ -20,11 +20,14 @@ updates:
       lingui:
         patterns: ['@lingui/*']
     ignore:
-      # Majors planned by hand: Lingui (catalog/macro migration), and @types/node, which follows the Node
-      # version of the Docker image (an LTS line, not the newest release).
+      # Majors planned by hand: Lingui (catalog/macro migration), @types/node, which follows the Node
+      # version of the Docker image (an LTS line, not the newest release), and Tailwind (v4 moves the
+      # configuration into the CSS and needs its own PostCSS plugin: a migration, not a bump).
       - dependency-name: '@lingui/*'
         update-types: [version-update:semver-major]
       - dependency-name: '@types/node'
+        update-types: [version-update:semver-major]
+      - dependency-name: 'tailwindcss'
         update-types: [version-update:semver-major]
 
   # Help centre (separate Starlight site, help/).
