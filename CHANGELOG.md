@@ -24,6 +24,12 @@ données à exécuter au déploiement).
   un panneau « Plus de filtres », dont les valeurs actives restent visibles en puces supprimables ; bouton
   « Tout effacer ».
 
+### Sécurité
+- `proxy-addr` 2.0.8 : l'adresse IP du client (journaux d'accès et d'audit, derrière `TRUST_PROXY`) ne peut plus
+  être usurpée par une adresse IPv6 encapsulant de l'IPv4 (alerte critique).
+- Outillage de build et de test, sans effet sur l'application servie : `vitest` 5 et `tinypool` (deux alertes
+  critiques), `source-map-js` 1.2.2 (application et centre d'aide), `@babel/core` 7.29.7.
+
 ## [1.4.0] — 2026-10-06
 
 ### Ajouté
