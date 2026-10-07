@@ -109,7 +109,7 @@ export const EmbedPage: React.FC = () => {
           <p className="px-2 text-[11px] text-muted-lighter dark:text-[#8f897c]">
             {data.name} — {range.start}–{range.end}
             {effectifs && <> · <Trans>staff scope</Trans></>}
-            {filterCaption && <> · <Trans>filters:</Trans> {filterCaption}</>} · <Trans>Source: Druid / druid-biblio (OpenAlex, BSO)</Trans>
+            {filterCaption && <> · <Trans>filters:</Trans> {filterCaption}</>} · <Trans>Source: Druid / druid-biblio (CRISalid, OpenAlex, HAL, BSO)</Trans>
           </p>
         )}
       </div>
