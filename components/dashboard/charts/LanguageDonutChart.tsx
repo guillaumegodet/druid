@@ -12,7 +12,9 @@ export const LanguageDonutChart: React.FC<{
   data: CountItem[];
   /** Click on a slice (language code) — opens the filtered list. */
   onSelect?: (key: string) => void;
-}> = ({ data, onSelect }) => {
+  title?: string;
+  exportName?: string;
+}> = ({ data, onSelect, title, exportName = 'langues' }) => {
   const t = useVizTheme();
   const { t: tr } = useLingui();
 
@@ -49,9 +51,9 @@ export const LanguageDonutChart: React.FC<{
 
   return (
     <EChartCard
-      title={tr`Publication languages`}
+      title={title ?? tr`Publication languages`}
       option={option}
-      exportName="langues"
+      exportName={exportName}
       onSeriesClick={
         onSelect ? (p) => folded[p.dataIndex] && onSelect(folded[p.dataIndex].key) : undefined
       }

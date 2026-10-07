@@ -11,9 +11,13 @@ import { LARGE_COLLAB_AUTHORS } from './partnerKpis';
 import { KpiGrid } from './KpiCards';
 import { CountryTrendChart } from './charts/CountryTrendChart';
 import { TopCountriesChart } from './charts/TopCountriesChart';
-import { RankBarChart } from './charts/TeamCharts';
+import { RankBarChart, TeamDonutChart } from './charts/TeamCharts';
 import { FwciHistogramChart } from './charts/FwciHistogramChart';
 import { QuartileChart } from './charts/QuartileChart';
+import { MatrixHeatmapChart } from './charts/MatrixHeatmapChart';
+import { SpecializationChart } from './charts/SpecializationChart';
+import { CountryFundersChart } from './charts/CountryFundersChart';
+import { LanguageDonutChart } from './charts/LanguageDonutChart';
 import { numberLocale } from '../../lib/i18n';
 
 // URL parameters of the sub-tab (shareable link, docs/plan-collaboration-pays.md § 2).
@@ -96,6 +100,7 @@ export const CountrySection: React.FC<{
   }
 
   const fmt = (n: number) => n.toLocaleString(numberLocale());
+  const pctOf = (n: number) => (focus.total ? `${Math.round((n / focus.total) * 100)} %` : '—');
   const listFilters: PubFilters = { country: cc, ...(maxAuthors ? { maxAuthors } : {}) };
   const open = onOpenList ? (extra: PubFilters = {}) => onOpenList({ ...listFilters, ...extra }) : undefined;
   const country = focus.label;
@@ -103,6 +108,11 @@ export const CountrySection: React.FC<{
   const hasAuthorCount = dataset.publications.some((p) => typeof p.authorCount === 'number');
   const hasParents = focus.pubs.some((p) => p.partnerInstitutions.some((o) => o.cc === cc && o.parent));
   const inOptions = options.some((o) => o.cc === cc);
+  // Filter of a unit (lab / team) in the publication list, when the export has one.
+  const unitFilter = (unit: string): PubFilters | null =>
+    focus.units.filterKey === 'team' ? { team: unit }
+      : focus.units.filterKey === 'sousStructure' ? { sousStructure: unit }
+        : null;
 
   return (
     <div className="flex flex-col gap-4">
@@ -220,6 +230,7 @@ export const CountrySection: React.FC<{
                 data={focus.units.top.map((u) => ({ label: u.key, count: u.count, teams: [] }))}
                 colorSlot={2}
                 height={Math.max(280, focus.units.top.length * 26 + 60)}
+                onItemClick={open && focus.units.filterKey ? (unit) => open(unitFilter(unit) ?? {}) : undefined}
               />
             )}
             <RankBarChart
@@ -233,6 +244,57 @@ export const CountrySection: React.FC<{
             />
           </div>
 
+          {focus.matrix.cells.length > 0 && (
+            <MatrixHeatmapChart
+              title={t`Who works with whom`}
+              subtitle={
+                focus.units.kind === 'teams'
+                  ? t`Co-publications between the main teams and the main institutions of ${country}`
+                  : t`Co-publications between the main labs and the main institutions of ${country}`
+              }
+              exportName="pays-matrice"
+              rows={focus.matrix.units}
+              cols={focus.matrix.institutions}
+              cells={focus.matrix.cells}
+              onCellClick={
+                open
+                  ? (x, y) => {
+                      const inst = focus.institutions[x];
+                      if (inst) open({ partnerKeys: inst.partnerKeys, ...(unitFilter(focus.matrix.units[y]) ?? {}) });
+                    }
+                  : undefined
+              }
+            />
+          )}
+
+          <h3 className={sectionTitle}><Trans>Themes</Trans></h3>
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
+            <div className="lg:col-span-2">
+              <TeamDonutChart
+                title={t`Domains of the co-publications`}
+                exportName="pays-domaines"
+                data={focus.domains.map((d) => ({ name: d.key, value: d.count }))}
+                onSelect={open ? (domain) => open({ domain }) : undefined}
+              />
+            </div>
+            <div className="lg:col-span-3">
+              <RankBarChart
+                title={t`Main subfields`}
+                exportName="pays-sous-disciplines"
+                data={focus.topSubfields.map((s) => ({ label: s.key, count: s.count, teams: [] }))}
+                colorSlot={5}
+                height={Math.max(320, focus.topSubfields.length * 26 + 60)}
+                onItemClick={open ? (subfield) => open({ subfield }) : undefined}
+              />
+            </div>
+          </div>
+          <SpecializationChart
+            data={focus.specialization}
+            country={country}
+            minCount={focus.specializationMin}
+            onSelect={open ? (subfield) => open({ subfield }) : undefined}
+          />
+
           <h3 className={sectionTitle}><Trans>Impact</Trans></h3>
           <p className={note}>
             <Trans>
@@ -243,6 +305,49 @@ export const CountrySection: React.FC<{
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <FwciHistogramChart data={impact.fwciHistogram} />
             <QuartileChart data={impact.quartiles} onSelect={open ? (quartile) => open({ quartile }) : undefined} />
+          </div>
+
+          <h3 className={sectionTitle}><Trans>Funding</Trans></h3>
+          <p className={note}>
+            <Trans>
+              {fmt(focus.funded)} co-publications acknowledge at least one funder ({pctOf(focus.funded)}): {fmt(focus.funderOrigins.country)} a funder of {country}, {fmt(focus.funderOrigins.europe)} a European one, {fmt(focus.funderOrigins.france)} a French one.
+            </Trans>
+          </p>
+          <CountryFundersChart
+            data={focus.funders}
+            country={country}
+            onSelect={open ? (funder) => open({ funder }) : undefined}
+          />
+
+          <h3 className={sectionTitle}><Trans>Other countries and languages</Trans></h3>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <TeamDonutChart
+              title={t`Bilateral or with other countries`}
+              exportName="pays-bilateral"
+              data={[
+                { name: t`${country} only`, value: focus.bilateral },
+                { name: t`With other foreign countries`, value: focus.multilateral },
+              ]}
+            />
+            <TopCountriesChart
+              data={focus.thirdCountries.map((c) => ({
+                iso2: c.cc,
+                fr: c.label,
+                echarts: dataset.countryNames[c.cc]?.echarts ?? '',
+                eu: dataset.countryNames[c.cc]?.eu ?? false,
+                count: c.count,
+              }))}
+              top={focus.thirdCountries.length}
+              title={t`Other countries of the multilateral co-publications`}
+              exportName="pays-pays-tiers"
+              height={320}
+            />
+            <LanguageDonutChart
+              data={focus.languages}
+              title={t`Languages of the co-publications`}
+              exportName="pays-langues"
+              onSelect={open ? (language) => open({ language }) : undefined}
+            />
           </div>
         </>
       )}

@@ -35,7 +35,7 @@ const PUBS = [
     funders: [{ id: 'F1', name: 'Canadian council', ror: null, cc: 'CA' }, { id: null, name: 'ANR', ror: null, cc: 'FR' }] }),
   // 2. Multilateral with DE, a university and its hospital, a funder of unknown country.
   pub({ year: 2022, title: 'P2', partnerInstitutions: [UNIV_A, HOSP_A, DE], countries: ['CA', 'DE'], authorIds: [1, 2], fwci: 3,
-    funders: [{ id: 'F9', name: 'Mystery fund', ror: null }] }),
+    funders: [{ id: 'F9', name: 'Mystery fund', ror: null }, { id: null, name: 'European Commission', ror: null }] }),
   // 3. US institution missing from `countries`: still a third country.
   pub({ year: 2023, title: 'P3', partnerInstitutions: [UNIV_B, US], subfields: ['Urban Studies'], fwci: 4 }),
   // 4. Canada known only through its institution, flagged national by an old export.
@@ -136,7 +136,12 @@ describe('aggregateCountryFocus', () => {
   });
 
   it('gives the internal labs, researchers and the lab × institution matrix', () => {
-    expect(f.units).toEqual({ kind: 'labs', top: [{ key: 'LAB-A', count: 5 }, { key: 'LAB-B', count: 1 }], count: 2, without: 1 });
+    expect(f.units).toEqual({
+      kind: 'labs', top: [{ key: 'LAB-A', count: 5 }, { key: 'LAB-B', count: 1 }], count: 2, without: 1, filterKey: null,
+    });
+    // A lab corpus carries its teams on the publications: they can open the list.
+    const lab = { ...DS, publications: PUBS.map((p) => ({ ...p, teams: ['TEAM-1'] })) };
+    expect(aggregateCountryFocus(lab, RANGE, 'CA').units).toMatchObject({ kind: 'teams', filterKey: 'team' });
     expect(f.researchers.count).toBe(2);
     expect(f.researchers.top[0]).toMatchObject({ id: 1, label: 'Researcher One (LAB-A)', count: 5 });
     expect(f.matrix.units).toEqual(['LAB-A', 'LAB-B']);
@@ -156,8 +161,13 @@ describe('aggregateCountryFocus', () => {
 
   it('classifies the funders by country', () => {
     expect(f.funded).toBe(2);
-    expect(f.funderOrigins).toEqual({ country: 1, france: 1, other: 0, unknown: 1 });
-    expect(f.funders.map((x) => `${x.name}:${x.origin}`)).toEqual(['ANR:france', 'Canadian council:country', 'Mystery fund:unknown']);
+    expect(f.funderOrigins).toEqual({ country: 1, europe: 1, france: 1, other: 0, unknown: 1 });
+    // Canonical names of the Funding tab (ANR → its full name), so the list filter finds them.
+    expect(f.funders.map((x) => `${x.name}:${x.origin}`)).toEqual([
+      'Agence Nationale de la Recherche:france', 'Canadian council:country', 'Commission européenne:europe', 'Mystery fund:unknown',
+    ]);
+    const ctx = buildFilterContext(DS);
+    expect(titles(f.pubs.filter((p) => matchesFilters(p, { funder: 'Commission européenne' }, ctx)))).toEqual(['P2']);
   });
 
   it('compares the impact with the other international co-publications, large ones left out', () => {

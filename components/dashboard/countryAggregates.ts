@@ -9,6 +9,7 @@
 // co-publications (§ 4.1 of the plan; fixed in druid-biblio, kept here as a safety net).
 
 import { partnerKey, researcherLabel, unitsOfDataset } from './collabAggregates';
+import { canonFunderName, funderCategory, fundersOf, hasFunding } from './fundersAggregates';
 import { countryLabel } from './labels';
 import type { CountItem, YearRange } from './overviewAggregates';
 import { compareImpact, halfTrend, LARGE_COLLAB_AUTHORS, OPEN_STATUSES, type ImpactComparison } from './partnerKpis';
@@ -98,9 +99,10 @@ export interface CountrySpecialization {
   index: number;
 }
 
-export type FunderOrigin = 'country' | 'france' | 'other' | 'unknown';
+export type FunderOrigin = 'country' | 'europe' | 'france' | 'other' | 'unknown';
 
 export interface CountryFunder {
+  /** Canonical name (canonFunderName), the `funder` filter of the publication list. */
   name: string;
   cc: string | null;
   origin: FunderOrigin;
@@ -131,7 +133,14 @@ export interface CountryFocus {
   withRegion: number;
   mapPoints: CountryMapPoint[];
   bounds: GeoBounds | null;
-  units: { kind: 'labs' | 'teams' | null; top: CountItem[]; count: number; without: number };
+  units: {
+    kind: 'labs' | 'teams' | null;
+    top: CountItem[];
+    count: number;
+    without: number;
+    /** Filter of the publication list matching a unit, when there is one (labs carried by the authors: none). */
+    filterKey: 'sousStructure' | 'team' | null;
+  };
   researchers: { count: number; top: { id: number; label: string; count: number; teams: string[] }[] };
   /** Internal units × institutions of the country (top × top, co-publications). */
   matrix: { units: string[]; institutions: string[]; cells: { x: number; y: number; v: number }[] };
@@ -177,6 +186,17 @@ function institutionKey(o: Institution, group: boolean): { key: string; name: st
     return { key: o.parent.ror || `name:${o.parent.name}`, name: o.parent.name, ror: o.parent.ror ?? null };
   }
   return { key: o.ror || `name:${o.name}`, name: o.name, ror: o.ror ?? null };
+}
+
+/**
+ * Origin of a funder for country `cc`: the country itself, Europe (European Commission, ERC… have
+ * no country in OpenAlex), France, another country, or unknown.
+ */
+function funderOrigin(name: string, funderCc: string | null, cc: string): FunderOrigin {
+  if (funderCc === cc) return 'country';
+  if (funderCategory(name) === 'Europe') return 'europe';
+  if (funderCc === 'FR') return 'france';
+  return funderCc ? 'other' : 'unknown';
 }
 
 /** Weighted quantile of values (`q` in 0-1). */
@@ -388,24 +408,23 @@ export function aggregateCountryFocus(
     })
     .sort((a, b) => b.index - a.index || b.count - a.count);
 
-  // ── Funders
+  // ── Funders: canonical names of the Funding tab (funders + funders of the awards), so that a
+  // click opens the same publications; country from the export (funders[].cc).
   const funderCount = new Map<string, CountryFunder>();
-  const funderOrigins: Record<FunderOrigin, number> = { country: 0, france: 0, other: 0, unknown: 0 };
+  const funderOrigins: Record<FunderOrigin, number> = { country: 0, europe: 0, france: 0, other: 0, unknown: 0 };
   let funded = 0;
   for (const p of pubs) {
-    const fs = p.funders ?? [];
-    if (fs.length) funded += 1;
+    if (hasFunding(p)) funded += 1;
+    const ccOf = new Map<string, string>();
+    for (const f of p.funders ?? []) if (f?.name && f.cc) ccOf.set(canonFunderName(f.name), f.cc);
     const origins = new Set<FunderOrigin>();
-    const seen = new Set<string>();
-    for (const f of fs) {
-      if (!f.name || seen.has(f.name)) continue;
-      seen.add(f.name);
-      const fcc = f.cc ?? null;
-      const origin: FunderOrigin = !fcc ? 'unknown' : fcc === cc ? 'country' : fcc === 'FR' ? 'france' : 'other';
-      origins.add(origin);
-      const entry = funderCount.get(f.name) ?? { name: f.name, cc: fcc, origin, count: 0 };
+    for (const name of fundersOf(p)) {
+      const entry = funderCount.get(name) ?? { name, cc: null, origin: 'unknown' as FunderOrigin, count: 0 };
+      entry.cc = entry.cc ?? ccOf.get(name) ?? null;
+      entry.origin = funderOrigin(name, entry.cc, cc);
       entry.count += 1;
-      funderCount.set(f.name, entry);
+      funderCount.set(name, entry);
+      origins.add(funderOrigin(name, ccOf.get(name) ?? entry.cc, cc));
     }
     for (const o of origins) funderOrigins[o] += 1;
   }
@@ -435,7 +454,15 @@ export function aggregateCountryFocus(
     withRegion,
     mapPoints,
     bounds: countryBounds(mapPoints),
-    units: { kind: units.kind, top: sorted(unitCount, topUnits), count: unitCount.size, without },
+    units: {
+      kind: units.kind,
+      top: sorted(unitCount, topUnits),
+      count: unitCount.size,
+      without,
+      filterKey: scope.some((p) => p.sousStructures.length > 0)
+        ? 'sousStructure'
+        : scope.some((p) => p.teams.some((x) => x && x !== 'Non identifié')) ? 'team' : null,
+    },
     researchers: { count: authorCount.size, top: researchersTop },
     matrix,
     domains: sorted(domainCount),
