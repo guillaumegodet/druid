@@ -1,5 +1,5 @@
 // Charts of the « By country » sub-tab, shared by the tab (CountrySection, with clicks opening the
-// publication list) and the embed registry (reports, /embed: no click) — docs/plan-collaboration-pays.md,
+// publication list) and the embed registry (reports, /embed: no click) — docs/archive/plan-collaboration-pays.md,
 // lot 5. Each takes the country focus (aggregateCountryFocus) and an optional `open` callback adding
 // its own filter to the country one.
 

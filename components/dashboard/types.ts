@@ -57,7 +57,7 @@ export interface DashboardPublication {
     region?: string;
     /**
      * Parent university of a hospital or institute (never set on a university), only when
-     * known — exports since 2026-10-07 (docs/plan-collaboration-pays.md, lot 1 a).
+     * known — exports since 2026-10-07 (docs/archive/plan-collaboration-pays.md, lot 1 a).
      */
     parent?: { ror: string | null; name: string };
   }[];

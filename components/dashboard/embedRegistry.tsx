@@ -254,7 +254,7 @@ const useLabRanking = ({ dataset, range }: EmbedChartProps) =>
   }, [dataset, range]);
 
 /**
- * Chart of the « By country » sub-tab (docs/plan-collaboration-pays.md, lot 5): the country comes from
+ * Chart of the « By country » sub-tab (docs/archive/plan-collaboration-pays.md, lot 5): the country comes from
  * the `country` filter, the « group affiliates » option from the `group` parameter.
  */
 const countryEntry = (label: MessageDescriptor, C: React.FC<CountryChartProps>): Entry => ({

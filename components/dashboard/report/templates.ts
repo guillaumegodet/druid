@@ -156,7 +156,7 @@ const internationalReport: ReportTemplate = {
 };
 
 /**
- * « Collaboration avec un pays » (docs/plan-collaboration-pays.md § 3): the report scope is the
+ * « Collaboration avec un pays » (docs/archive/plan-collaboration-pays.md § 3): the report scope is the
  * co-publications with one partner country (country filter) and its charts are about that country
  * only — its institutions, the internal labs and researchers involved, themes, impact, funders. Large
  * collaborations count in the volumes but are left out of the impact blocks; no figure is written

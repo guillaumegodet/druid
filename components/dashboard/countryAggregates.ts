@@ -1,4 +1,4 @@
-// Aggregations of the « Pays » sub-tab of the Collaborations tab (docs/plan-collaboration-pays.md,
+// Aggregations of the « Pays » sub-tab of the Collaborations tab (docs/archive/plan-collaboration-pays.md,
 // lot 1): everything about ONE partner country — its institutions only (never the other countries'),
 // the internal labs and researchers involved, themes and specialization, funders, impact, map
 // framing. The other countries appear only twice: the rank of the country among the partners and

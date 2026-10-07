@@ -1,4 +1,4 @@
-// Encyclopedia entries « signed » by the editors of the work (docs/plan-collaboration-pays.md,
+// Encyclopedia entries « signed » by the editors of the work (docs/archive/plan-collaboration-pays.md,
 // lot 1 b). OpenAlex gives the editors of some reference works as the authors of every
 // entry: 1 264 entries of a 2023 encyclopedia carried 10 editors from 6 countries, i.e.
 // false international collaborations and one editor shown as the most prolific author.

@@ -5,7 +5,7 @@ import { aggregateNetwork } from '../../components/dashboard/networkAggregates';
 import { aggregateResearchers } from '../../components/dashboard/structureAggregates';
 import type { DashboardDataset, DashboardPublication } from '../../components/dashboard/types';
 
-// Encyclopedia entries signed by the editors of the work (docs/plan-collaboration-pays.md,
+// Encyclopedia entries signed by the editors of the work (docs/archive/plan-collaboration-pays.md,
 // lot 1 b). Fictitious structure: author 1 is one of the editors of a reference work whose
 // three entries carry editors from JP and US; one real co-publication with Canada.
 const JP = { name: 'Tokyo Institute', cc: 'JP', city: null, lat: null, lon: null, ror: '0jp' };
