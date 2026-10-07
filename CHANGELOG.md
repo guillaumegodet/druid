@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.6.0] — 2026-10-07
+
 ### Ajouté
 - Personnel : la **présence** (Présent, Départ, Parti), l'**employeur** et le **compte LDAP** de l'établissement
   (actif, en fermeture, aucun) remplacent le statut Interne / Externe, qui mélangeait les trois. La présence suit
