@@ -26,10 +26,11 @@ function serverLiterals(): { file: string; text: string; raw: string }[] {
     for (const name of readdirSync(dir)) {
       const p = join(dir, name);
       if (statSync(p).isDirectory()) walk(p);
-      else if (/\.js$/.test(name)) files.push(p);
+      else if (/\.(js|ts)$/.test(name)) files.push(p);
     }
   };
   walk(join(ROOT, 'functions'));
+  walk(join(ROOT, 'lib/directory'));   // domain API (/api/v1), served by server.cjs and functions/
   const out: { file: string; text: string; raw: string }[] = [];
   for (const file of files) {
     const src = readFileSync(file, 'utf8');

@@ -1,11 +1,9 @@
 import { t } from '@lingui/core/macro';
-import { Researcher, ResearcherStatus, Presence, Affiliation, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
-import { getPoleFromLab } from './mappings';
+import { Researcher, ResearcherStatus, Presence, Affiliation, Structure, Membership, StructureLevel } from '../types';
 import { hasCapability } from './auth';
 import { purgeStoredDirectory } from './directoryStorage';
-import { ResearcherListSchema, StructureListSchema } from './schemas';
 import { getGradeFromNcorps } from './gradeTypology';
-import { ldapGradeFor, resolveGrade, hasEmeritusTrace, isRetireeWithoutEmeritus, EmeritusSignals } from './emeritus';
+import { ldapGradeFor, resolveGrade, hasEmeritusTrace, EmeritusSignals } from './emeritus';
 import { parseValidation, validationToGristFields, ValidationInfo, isExternalEmployer } from './validation';
 import { normalizeFuzzyDate, isFuzzyDatePast, fuzzyDateLowerBound, fuzzyDateUpperBound } from './dates';
 
@@ -20,12 +18,18 @@ export interface LdapFieldChange {
 
 import { PARKING_LABOS, classifyDuplicate, LdapDuplicateKind } from './mergeProposal';
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from './mergeLog';
-import { withDerivedParents } from './structureHierarchy';
 import { gristDocUrl } from './instanceRuntime';
-import { FTE_COLUMNS, parseFteCell, fteGristFields } from './fte';
+import { fteGristFields } from './fte';
 import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson';
-import { HR_ID_COLUMN, normalizeHrId, hrIdCell, hrIdProposal } from './hrId';
-import { derivePresence, employerKindOf, ldapAccountOf, legacyStatus, presenceFromValidated, PresenceInput } from './presence';
+import { HR_ID_COLUMN, hrIdCell, hrIdProposal } from './hrId';
+import { DirectoryApi } from './directoryApi';
+import {
+  RATTACHEMENT_COL, RattachementRole, Institution, fromGristDate, fromGristFuzzyDate, AFFILIATION_START_COL,
+  AFFILIATION_END_COL, MEMBERSHIP_TYPE_COL, parseMultiLabel,
+} from './directory/gristMapping';
+// Moved to lib/directory/gristMapping.ts (migration plan, lot 1), re-exported for the existing importers.
+export { RATTACHEMENT_COL, groupQualifiedRows } from './directory/gristMapping';
+export type { RattachementRole, Institution } from './directory/gristMapping';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
 
@@ -648,9 +652,7 @@ export interface MergeLogEntry {
 }
 
 /** Qualification columns for multi-affiliations (duplicate merge plan, lot 1). */
-export const RATTACHEMENT_COL = 'rattachement';
 export const DUPLICATE_DECISION_COL = 'doublon_decision';
-export type RattachementRole = 'PRINCIPAL' | 'SECONDAIRE' | 'HISTORIQUE';
 const RATTACHEMENT_CHOICES: RattachementRole[] = ['PRINCIPAL', 'SECONDAIRE', 'HISTORIQUE'];
 
 /** Creates the `rattachement` (Choice) and `doublon_decision` (Text) columns if missing. Idempotent. */
@@ -668,35 +670,6 @@ async function ensureAffiliationColumns(): Promise<void> {
   _annuaireColumnsCache = null;
 }
 
-/**
- * Groups the QUALIFIED Annuaire rows of the same person (same uid_dyna, exactly one
- * `rattachement = PRINCIPAL` row) into a single Druid researcher carried by the principal row,
- * with one membership per row (SECONDAIRE = concurrent, HISTORIQUE = ended).
- * Unqualified groups remain distinct records (visible for arbitration).
- * In-place mutation; returns the filtered list.
- */
-export function groupQualifiedRows(researchers: any[], rowRole: Record<number, RattachementRole | ''>, rowEnd: Record<number, string>): any[] {
-  const byUid = new Map<string, any[]>();
-  for (const r of researchers) if (r.uid) { if (!byUid.has(r.uid)) byUid.set(r.uid, []); byUid.get(r.uid)!.push(r); }
-  const drop = new Set<number>();
-  for (const rows of byUid.values()) {
-    if (rows.length < 2) continue;
-    const principals = rows.filter((r) => rowRole[r.gristRowId] === 'PRINCIPAL');
-    if (principals.length !== 1) continue;                       // not qualified → unchanged
-    const others = rows.filter((r) => r !== principals[0] && rowRole[r.gristRowId]);
-    if (others.length !== rows.length - 1) continue;             // a row without role → unchanged
-    const main = principals[0];
-    main.affiliations = [
-      { ...main.affiliations[0], isPrimary: true, role: 'PRINCIPAL', gristRowId: main.gristRowId },
-      ...others.map((o) => ({
-        ...o.affiliations[0], isPrimary: false, role: rowRole[o.gristRowId], gristRowId: o.gristRowId,
-        endDate: rowRole[o.gristRowId] === 'HISTORIQUE' ? (rowEnd[o.gristRowId] || o.affiliations[0]?.endDate || '') : o.affiliations[0]?.endDate,
-      })),
-    ];
-    for (const o of others) drop.add(o.gristRowId);
-  }
-  return drop.size ? researchers.filter((r) => !drop.has(r.gristRowId)) : researchers;
-}
 
 /** Row plan of a record's memberships, the write-side counterpart of `groupQualifiedRows`. */
 export interface AffiliationRowPlan {
@@ -832,44 +805,14 @@ const distinctLabos = (records: any[]): string[] =>
   Array.from(new Set(records.map((r: any) => String(r.fields['LABO'] || '').trim()).filter(Boolean)))
     .sort((a, b) => a.localeCompare(b, 'fr'));
 
-/** Employing institution (Grist table `Etablissements`). */
-export interface Institution {
-  id: number;   // Grist rowId — value of the Annuaire's `Employeur` Reference column
-  name: string; // `Employeur` column (label)
-  uai: string;  // `UAI` column
-  ror: string;  // `ROR` column
-  idref: string; // `idref` column — IdRef PPN of the corporate body (ABES export, 510 employer)
-  label: string; // `Libelle` column — long form (e.g. « Nantes Université »), otherwise `Employeur`
-}
 
 // Simple in-memory cache: the Etablissements table rarely changes.
 let institutionsCache: Institution[] | null = null;
 
 async function fetchInstitutionsInternal(): Promise<Institution[]> {
   if (institutionsCache) return institutionsCache;
-  const resp = await fetch(`${gristDocUrl()}/tables/Etablissements/records`);
-  if (!resp.ok) throw new Error('Erreur Grist (Etablissements)');
-  const { records } = await resp.json();
-  const all = (records || [])
-    .map((r: any): Institution => ({
-      id: r.id,
-      name: r.fields['Employeur'] || '',
-      uai: r.fields['UAI'] || '',
-      ror: String(r.fields['ROR'] || ''),
-      idref: String(r.fields['idref'] || ''),
-      label: String(r.fields['Libelle'] || r.fields['Employeur'] || ''),
-    }))
-    .filter((e: Institution) => e.name)
-    .sort((a: Institution, b: Institution) => a.name.localeCompare(b.name, 'fr') || a.id - b.id);
-  // Defensive deduplication by label (the table once held a duplicated import —
-  // cleaned up on 2026-07-07): the first row per name is kept.
-  const seen = new Set<string>();
-  institutionsCache = all.filter((e: Institution) => {
-    if (seen.has(e.name)) return false;
-    seen.add(e.name);
-    return true;
-  });
-  return institutionsCache!;
+  institutionsCache = await DirectoryApi.institutions();
+  return institutionsCache;
 }
 
 /**
@@ -895,99 +838,16 @@ async function employerToGristFields(employer?: string): Promise<Record<string, 
 const memoryCache: { researchers?: { updatedAt: string; data: Researcher[] }; structures?: { updatedAt: string; data: Structure[] } } = {};
 purgeStoredDirectory();
 
-/** Lowercase ASCII slug used to build an ext_ identifier (accents removed, non-alphanumerics -> '-'). */
-const slugForExtId = (s: string): string =>
-  (s || '')
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase().trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
 
-/**
- * Assigns the public/central identifier of each researcher (in-place mutation).
- * - real uid_dyna present: id = uid (1st record). Duplicate uids (≈17): the 1st keeps the bare uid
- * (served by the URL), the next ones take `uid-<rowId>` to stay navigable/unique → reported in the console.
- * - No uid (records outside the LDAP directory): synthetic id `ext_<name>-<first-name initial>`,
- * suffixed with the rowId on collision. NB: for harvestable externals, this same `ext_`
- * is now PERSISTED in uid_dyna (+ people.csv) → they go through the « real uid » branch
- * above; the synthetic computation is only a fallback for externals without uid_dyna.
- */
-function assignPublicIds(researchers: any[]): void {
-  const used = new Set<string>();
-  const uidSeen = new Set<string>();
-  const dupUids = new Set<string>();
-
-  // 1) Records with a real uid
-  for (const r of researchers) {
-    if (!r.uid) continue;
-    if (!uidSeen.has(r.uid)) {
-      r.id = r.uid;
-      uidSeen.add(r.uid);
-    } else {
-      r.id = `${r.uid}-${r.gristRowId}`;
-      dupUids.add(r.uid);
-    }
-    used.add(r.id);
-  }
-
-  // 2) Records without uid -> synthetic identifier ext_<name>-<initial>
-  for (const r of researchers) {
-    if (r.id) continue;
-    const nom = slugForExtId(r.lastName);
-    const initiale = slugForExtId(r.firstName).charAt(0) || 'x';
-    const base = `ext_${nom || 'inconnu'}-${initiale}`;
-    let candidate = base;
-    if (used.has(candidate)) candidate = `${base}-${r.gristRowId}`;
-    r.id = candidate;
-    used.add(candidate);
-  }
-
-  if (dupUids.size > 0) {
-    console.warn(
-      `[Druid] ${dupUids.size} uid_dyna en doublon dans l'Annuaire — l'URL ouvre la 1re fiche ; ` +
-      `les doublons reçoivent un id suffixé. uids: ${[...dupUids].join(', ')}`
-    );
-  }
-}
 
 /** LDAP civility / free input → Grist Choice `Civilite` (F / M). A single definition: the LDAP
  * review, the LDAP diff and the attachment of LDAP candidates (which wrote a raw « Mme », review lot 2,
  * finding 2) doivent normaliser pareil. */
 // --- Helpers for Grist <-> Druid date conversion ---
 
-const fromGristDate = (rawDate: any): string => {
-  if (!rawDate) return '';
-  if (typeof rawDate === 'number') {
-    // Grist sometimes returns a timestamp (seconds)
-    try {
-      return new Date(rawDate * 1000).toISOString().split('T')[0];
-    } catch {
-      return '';
-    }
-  }
-  if (typeof rawDate === 'string') {
-    const parts = rawDate.split(/[-/]/);
-    if (parts.length === 3) {
-      // If it is in DD-MM-YYYY format, convert to YYYY-MM-DD
-      if (parts[0].length === 2 && parts[2].length === 4) {
-        return `${parts[2]}-${parts[1]}-${parts[0]}`;
-      }
-      return rawDate;
-    }
-  }
-  return String(rawDate);
-};
 
-/** Grist columns of the membership dates in the row's lab/team (Date, created on 2026-09-14),
- * distinct from the employment dates `employment_start_date` / `employment_end_date`. */
 /** Sentinel id of a structure being created (« Nouvelle structure » page). */
 export const NEW_STRUCTURE_ID = 'S-new';
-const AFFILIATION_START_COL = 'affiliation_start_date';
-const AFFILIATION_END_COL = 'affiliation_end_date';
-/** Membership type (Grist Choice: stat_mmb / assoc_mmb / second_mmb / visit_mmb, created on 2026-09-14). */
-const MEMBERSHIP_TYPE_COL = 'membership_type';
-const toMembershipType = (v: any): MembershipType | undefined =>
-  (MEMBERSHIP_TYPES as string[]).includes(String(v || '').trim()) ? (String(v).trim() as MembershipType) : undefined;
 
 /** The four employment / membership date columns holding reduced-precision dates (lib/dates.ts):
  * `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. Text columns once scripts/migrate_fuzzy_dates.cjs has run on the
@@ -995,9 +855,6 @@ const toMembershipType = (v: any): MembershipType | undefined =>
  * `fuzzyDateCellEncoder`). */
 const FUZZY_DATE_COLS = ['employment_start_date', 'employment_end_date', AFFILIATION_START_COL, AFFILIATION_END_COL] as const;
 
-/** Reads a fuzzy-date cell (epoch seconds, canonical text, or legacy DD-MM-YYYY text) → canonical
- * fuzzy date, `''` when empty or unreadable. */
-const fromGristFuzzyDate = (raw: any): string => normalizeFuzzyDate(raw) ?? fromGristDate(raw);
 
 /** Encodes a Druid date (ISO YYYY-MM-DD, or legacy DD-MM-YYYY text) for a Grist Date column:
  * epoch seconds, the only valid representation whatever the column's `dateFormat`. Until
@@ -1052,21 +909,6 @@ async function hrIdCellFields(hrId?: string): Promise<Record<string, number>> {
 
 // --- Helpers for the Structures V2 table format (= structures.csv of the directory bridge) ---
 
-/**
- * Decodes a V2 multi-label field such as `Valeur[fr]|Autre[en]`.
- * Returns the value in the preferred language (fr by default), otherwise the first one.
- */
-const parseMultiLabel = (raw: any, preferLang = 'fr'): string => {
-  if (!raw || typeof raw !== 'string') return '';
-  const parts = raw.split('|').map(p => p.trim()).filter(Boolean);
-  if (parts.length === 0) return '';
-  const parsed = parts.map(p => {
-    const m = p.match(/^(.*?)\s*\[([a-zA-Z]{2})\]\s*$/);
-    return m ? { value: m[1].trim(), lang: m[2].toLowerCase() } : { value: p, lang: '' };
-  });
-  const preferred = parsed.find(p => p.lang === preferLang);
-  return (preferred || parsed[0]).value;
-};
 
 /**
  * Re-encodes a simple value in the V2 multi-label format for writing (`Valeur[fr]`).
@@ -1076,68 +918,9 @@ const encodeMultiLabel = (value: any, lang = 'fr'): string => {
   return v ? `${v}[${lang}]` : '';
 };
 
-/**
- * Decodes the TUTELLES (institutions) part of the V2 `participations` field:
- *   `uai-0442953W[main_supervision][20000101-]|uai-0353074B[associated_supervision][...]`
- * Keeps ONLY the institution refs (`uai-`/`ror-`), not the participations in
- * other research structures (`local-`, see parseStructureParticipations).
- */
-const parseParticipations = (raw: any): { codes: string[]; pipe: string } => {
-  if (!raw || typeof raw !== 'string') return { codes: [], pipe: '' };
-  const codes = raw.split('|')
-    .map(p => p.trim())
-    .filter(Boolean)
-    .filter(p => !/^local-/i.test(p))
-    .map(p => p.split('[')[0].trim().replace(/^uai-/i, ''))
-    .filter(Boolean);
-  return { codes, pipe: codes.join('|') };
-};
 
-/**
- * Decodes the PARTICIPATIONS in other research structures (`local-<local_id>` refs)
- * of the V2 `participations` field — e.g. the weak membership of a lab in a pole.
- * Returns the bare local_ids (without the `local-` prefix) and their `|` join.
- */
-const parseStructureParticipations = (raw: any): { localIds: string[]; pipe: string } => {
-  if (!raw || typeof raw !== 'string') return { localIds: [], pipe: '' };
-  const localIds = raw.split('|')
-    .map(p => p.trim())
-    .filter(Boolean)
-    .filter(p => /^local-/i.test(p))
-    .map(p => p.split('[')[0].trim().replace(/^local-/i, ''))
-    .filter(Boolean);
-  return { localIds, pipe: localIds.join('|') };
-};
 
-/**
- * Derives the Druid level (StructureLevel) from generic_type + V2 type.
- * The `type` (UMR/UR/ER/UFR/POLE/EPE…) carries the RNSR level; `generic_type`
- * (institution/unit/team) is not enough (it put every unit at level 2).
- * institution (4)  : generic_type=institution, or type EPE/GE
- * intermediate (3) : UFR, POLE (faculties / grouping poles)
- * team (1)         : generic_type=team or type TEAM (internal teams of the
- * labs, Structures table = druid-biblio source of truth),
- * or type ER (RNSR research team)
- * unit (2)         : UMR, UR, … (default)
- */
-const deriveStructureLevel = (genericType: any, type?: any): string => {
-  const gt = String(genericType || '').toLowerCase();
-  const t = String(type || '').toUpperCase();
-  if (gt === 'institution' || t === 'EPE' || t === 'GE') return '4';
-  if (gt === 'team' || t === 'TEAM' || t === 'ER') return '1';
-  if (t === 'UFR' || t === 'POLE') return '3';
-  return '2';
-};
 
-/** V2 `main_mission`/`secondary_missions` (texte) -> StructureMission Druid. */
-const missionFromV2 = (raw: any): string | null => {
-  const v = String(raw || '').toLowerCase();
-  if (!v) return null;
-  if (v.includes('research') || v.includes('recherche')) return 'RECHERCHE';
-  if (v.includes('scient')) return 'SERVICES_SCIENTIFIQUES';
-  if (v.includes('admin')) return 'SERVICES_ADMINISTRATIFS';
-  return 'RECHERCHE';
-};
 
 /** Druid StructureMission -> V2 text value for writing. */
 const missionToV2 = (mission: any): string => {
@@ -1149,48 +932,13 @@ const missionToV2 = (mission: any): string => {
   }
 };
 
-/** `YYYYMMDD` (compact V2 format) -> `YYYY-MM-DD` (empty if invalid). */
-const compactToIso = (d: any): string => {
-  const s = String(d || '');
-  return /^\d{8}$/.test(s) ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : '';
-};
 /** `YYYY-MM-DD` -> `YYYYMMDD` (empty if invalid). */
 const isoToCompact = (d: any): string => {
   const s = String(d || '');
   return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.replace(/-/g, '') : '';
 };
 
-const SUPERVISION_CODES = new Set(['main_supervision', 'associated_supervision', 'participating_supervision']);
 
-/**
- * Decodes a V2 membership column (`inclusions` or `participations`) into Membership[].
- * Grammar of an entry: `<refType>-<ref>[<supervision>]?[<YYYYMMDD>-<YYYYMMDD>?]?`
- * refType ∈ local|uai|ror; a bare local_id (no prefix) is treated as `local`.
- * The brackets hold either a supervision code or a date range.
- */
-const parseMembershipList = (raw: any): Membership[] => {
-  if (!raw || typeof raw !== 'string') return [];
-  return raw.split('|').map(p => p.trim()).filter(Boolean).map((entry): Membership => {
-    const refPart = entry.split('[')[0].trim();
-    const m = refPart.match(/^(local|uai|ror)-(.+)$/i);
-    const refType = (m ? m[1].toLowerCase() : 'local') as Membership['refType'];
-    const ref = m ? m[2] : refPart;
-    let supervision: Membership['supervision'] = '';
-    let startDate = '';
-    let endDate = '';
-    const brackets = entry.match(/\[([^\]]*)\]/g) || [];
-    for (const b of brackets) {
-      const inner = b.slice(1, -1).trim();
-      if (SUPERVISION_CODES.has(inner)) {
-        supervision = inner as Membership['supervision'];
-      } else {
-        const dm = inner.match(/^(\d{8})?-(\d{8})?$/);
-        if (dm) { startDate = compactToIso(dm[1] || ''); endDate = compactToIso(dm[2] || ''); }
-      }
-    }
-    return { refType, ref, supervision, startDate, endDate };
-  });
-};
 
 /**
  * Re-encodes a Membership[] to the V2 column (`inclusions`/`participations`).
@@ -1452,354 +1200,30 @@ export const GristService = {
   },
 
   /**
-   * Fetches the list of researchers from Grist and maps them to the Druid format.
+   * Researchers of the directory, mapped and filtered to the user's labs by the server (domain API
+   * /api/v1/people, lib/directory/gristMapping.ts). The last good list is kept for the tab's lifetime and
+   * served again when the API fails, as before. `force` is kept for the callers: the server checks the
+   * document's modification date on every call.
    */
-  fetchResearchers: async (force = false): Promise<Researcher[]> => {
+  fetchResearchers: async (_force = false): Promise<Researcher[]> => {
     try {
-      const remoteUpdatedAt = await GristService.getDocUpdatedAt();
-      const cached = memoryCache.researchers;
-      if (!force && cached && cached.updatedAt === remoteUpdatedAt) {
-        console.log('Using cached researchers...');
-        return cached.data;
-      }
-
-      console.log('Fetching fresh researchers from Grist...');
-
-      // 2. Load the LDAP cache
-      let ldapCache: Record<string, any> = {};
-      try {
-        const ldapResp = await fetch('/ldap_status_cache.json');
-        if (ldapResp.ok) {
-          ldapCache = await ldapResp.json();
-        }
-      } catch (e) {
-        console.warn('LDAP cache not found.');
-      }
-      // No LDAP cache (instance without LDAP, test instance, sync never run): an uid missing from it
-      // proves nothing — presence then comes from the dates and validations only.
-      const ldapAvailable = Object.keys(ldapCache).length > 0;
-
-      // 3. Fetch the institutions
-      const institutionsResp = await fetch(`${gristDocUrl()}/tables/Etablissements/records`);
-      const institutionsMap: Record<number, string> = {};
-      const institutionsUaiMap: Record<number, string> = {};
-      if (institutionsResp.ok) {
-        const { records } = await institutionsResp.json();
-        records.forEach((r: any) => {
-          institutionsMap[r.id] = r.fields['Employeur'] || `Etab ${r.id}`;
-          institutionsUaiMap[r.id] = r.fields['UAI'] || '';
-        });
-      }
-
-      // 4. Fetch the researchers
-      const recordsResp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
-      if (!recordsResp.ok) throw new Error('Erreur Grist');
-      const { records } = await recordsResp.json();
-      if (!records || records.length === 0) return [];
-
-      // 5. Mapper
-      const researchersMapped = records.map((record: any) => {
-        const fields = record.fields;
-        const uid = fields['uid_dyna'];
-        const employerId = fields['Employeur'];
-        // Grist Reference column: an empty cell is 0 (not null) → no
-        // employer, we display empty rather than « ID: 0 ».
-        const employerName = (typeof employerId === 'number')
-          ? (employerId === 0 ? '' : (institutionsMap[employerId] || `ID: ${employerId}`))
-          : (employerId || '');
-
-        // Three axes (lib/presence.ts, docs/plan-statut-employeur-ldap.md): employer, LDAP account and
-        // presence. The uid only says whether there is an LDAP account to read (`ext_` = none).
-        const employerUai = (typeof employerId === 'number') ? institutionsUaiMap[employerId] : '';
-        // Known employer ≠ Nantes Université (INSERM, CNRS, Centrale…): the LDAP account is a hosted one —
-        // its state, category and corps describe the account, not the job.
-        const externalEmployer = isExternalEmployer(employerName, employerUai);
-        const employerKind = employerKindOf(employerName, employerUai);
-        const ldapEntry = uid ? ldapCache[uid] : undefined;
-        const ldapEtat: string | undefined = ldapEntry === undefined ? undefined : (typeof ldapEntry === 'string' ? ldapEntry : ldapEntry.etat);
-        const hasRealUid = typeof uid === 'string' && !!uid && !uid.startsWith('ext_');
-        const ldapAccount = ldapAccountOf(uid, ldapEtat);
-
-        const gristCiv = fields['Civilite'] || fields['Civilité'] || '';
-        let ldapCiv = '';
-        if (uid && ldapCache[uid] && (ldapCache[uid] as any).civilite) {
-          ldapCiv = (ldapCache[uid] as any).civilite;
-        }
-        
-        // LDAP first, otherwise Grist
-        let researcherCivility = normalizeCivility(ldapCiv || gristCiv);
-
-        // External employer: the LDAP category and corps describe the hosted account (« CDI
-        // UNIVERSITE », generic corps → « IR ») and not the actual job → keep the Grist values.
-        const ldapCategory: string = (!externalEmployer && uid && ldapCache[uid] && (ldapCache[uid] as any).categorie)
-          ? (ldapCache[uid] as any).categorie
-          : '';
-
-        const ldapEmpCorps: string = (!externalEmployer && uid && ldapCache[uid] && (ldapCache[uid] as any).empCorps)
-          ? (ldapCache[uid] as any).empCorps
-          : '';
-        // LDAP corps transposed to an emeritus code when dynaCategorie says emeritus (see lib/emeritus.ts).
-        const ldapGrade: string | null = ldapGradeFor(ldapCategory, ldapEmpCorps, fields['Corps_grade']);
-
-        const ldapEppn: string = (uid && ldapCache[uid] && (ldapCache[uid] as any).eppn)
-          ? (ldapCache[uid] as any).eppn
-          : '';
-
-        let researcherBirthDate = fromGristDate(fields['DATE_DE_NAISSANCE_JJ_MM_AAAA']);
-        let birthDateFromLdap = false;
-
-        if (uid && ldapCache[uid] && (ldapCache[uid] as any).birthDate) {
-          const ldapBirth = (ldapCache[uid] as any).birthDate;
-          if (/^\d{8}$/.test(ldapBirth)) {
-            researcherBirthDate = `${ldapBirth.substring(0, 4)}-${ldapBirth.substring(4, 6)}-${ldapBirth.substring(6, 8)}`;
-            birthDateFromLdap = true;
-          } else if (ldapBirth) {
-            researcherBirthDate = ldapBirth;
-            birthDateFromLdap = true;
-          }
-        }
-
-        // Emeritus status / retirement (see lib/emeritus.ts): trace of emeritus status ⇒ emeritus grade (PREM, MCFEM,
-        // DREM, CREM) even if Grist is not normalized yet; retired without emeritus status ⇒ Parti.
-        const baseGrade: string = ldapGrade ?? fields['Corps_grade'] ?? '';
-        const emeritusSignals: EmeritusSignals = {
-          grade: baseGrade, typeEmploi: fields['TYPE_EMPLOI'], libTypeEmploi: fields['LIB_TYPE_EMPLOI'], ldapCategory,
-        };
-        const finalGrade = resolveGrade(baseGrade, emeritusSignals);
-
-        // Reliability layer: a validation covering the status sets the presence (INTERNE / EXTERNE, written
-        // before 2026-10-07, read as PRESENT). `derivedPresence` = without it, to flag a conflict.
-        const validation = parseValidation(fields, fromGristDate);
-        const presenceInput: PresenceInput = {
-          employer: employerKind, hasRealUid: hasRealUid && ldapAvailable, ldapEtat,
-          employmentEnd: fromGristFuzzyDate(fields['employment_end_date']),
-          membershipEnd: fromGristFuzzyDate(fields[AFFILIATION_END_COL]),
-          retireeWithoutEmeritus: isRetireeWithoutEmeritus(emeritusSignals),
-        };
-        const derivedPresence = derivePresence(presenceInput);
-        const validatedPresence = validation.validated && validation.validationScope.includes('statut')
-          ? presenceFromValidated(fields['validated_status']) : undefined;
-        const presence = derivePresence({ ...presenceInput, validated: validatedPresence });
-
-        return {
-          id: '',                 // filled after the map (real uid, otherwise ext_<name>-<initial>) — see assignPublicIds
-          gristRowId: record.id,  // technical key for Grist writes
-          uid: uid || '',
-          civility: researcherCivility,
-          lastName: fields['Nom'] || '',
-          firstName: fields['Prenom'] || '',
-          displayName: `${fields['Nom']?.toUpperCase()} ${fields['Prenom']}`,
-          photoUrl: fields['photo_url'] || '',
-          annuaireUrl: fields['annuaire_url'] || '',
-          email: fields['Email'] || '',
-          eppn: ldapEppn,
-          hrId: normalizeHrId(fields[HR_ID_COLUMN]),
-          nationality: fields['Nationalite'] || '',
-          birthDate: researcherBirthDate,
-          status: legacyStatus(presence, employerKind, ldapAccount),
-          derivedStatus: legacyStatus(derivedPresence, employerKind, ldapAccount),
-          presence,
-          derivedPresence,
-          ldapAccount,
-          employerKind,
-          employment: {
-            employer: employerName,
-            institutionId: (typeof employerId === 'number') ? (institutionsUaiMap[employerId] || '') : '',
-            contractType: ldapCategory || fields['TYPE_EMPLOI'] || '',
-            grade: finalGrade,
-            ldapFields: [
-              ...(ldapCategory ? ['contractType'] : []),
-              ...(ldapGrade !== null ? ['grade'] : []),
-            ],
-            internalTypology: fields['LIB_TYPE_EMPLOI'] || '',
-            startDate: fromGristFuzzyDate(fields['employment_start_date']),
-            endDate: fromGristFuzzyDate(fields['employment_end_date']),
-            // Optional columns (lib/fte.ts): absent or empty → null, a real 0 is kept.
-            fte: parseFteCell(fields[FTE_COLUMNS.fte]),
-            researchFte: parseFteCell(fields[FTE_COLUMNS.researchFte]),
-          },
-          affiliations: [{
-            structureName: fields['LABO'] || '',
-            team: fields['team'] || '',
-            // Membership dates in the row's lab/team (affiliation_start/end_date columns, created on
-            // 2026-09-14), distinct from the employment dates (employment_start/end_date, « Emploi » card).
-            startDate: fromGristFuzzyDate(fields[AFFILIATION_START_COL]),
-            endDate: fromGristFuzzyDate(fields[AFFILIATION_END_COL]),
-            membershipType: toMembershipType(fields[MEMBERSHIP_TYPE_COL]),
-            isPrimary: true
-          }],
-          ldapFields: [...(birthDateFromLdap ? ['birthDate'] : [])],
-          // `groupes` column (names separated by « | ») — missing until
-          // scripts/add_groups_column.cjs has been applied → no group.
-          groups: String(fields['groupes'] || '')
-            .split('|')
-            .map((g: string) => g.trim())
-            .filter(Boolean),
-          identifiers: {
-            orcid: fields['ORCID'] || '',
-            idref: fields['IdRef'] || '',
-            halId: fields['IdHAL'] || '',
-            halIdNum: fields['IdHAL_i'] ? String(fields['IdHAL_i']) : '',   // filled by scripts/sync_hal.cjs (verify) or the Grist review
-            scopusId: fields['ID_SCOPUS'] ? String(fields['ID_SCOPUS']) : '',   // Numeric column in Grist → string (Zod schema)
-            openalexId: fields['openalex_author_id'] || '',
-            openalexIds: fields['OpenAlex_ids'] || '',   // reviewed list (scripts/sync_openalex.cjs + Grist review)
-          },
-          // Declared public social media accounts (media monitoring),
-          // editable from the record; columns created in phase 2 of media monitoring.
-          socials: {
-            bluesky: fields['Bluesky'] || '',
-            mastodon: fields['Mastodon'] || '',
-            youtube: fields['YouTube'] || '',
-            podcast: fields['Podcast_flux'] || '',
-            blog: fields['Blog'] || '',
-            linkedin: fields['LinkedIn'] || '',
-          },
-          // Academic profiles & public CVs (Grist Annuaire columns).
-          profiles: {
-            cvInstitutionnel: fields['CV_institutionnel'] || '',
-            cvSiteLabo: fields['CV_site_labo'] || '',
-            cvPdf: fields['CV_pdf_docx_'] || '',
-            cvHal: fields['CV_HAL'] || '',
-            academia: fields['Academia'] || '',
-            researchgate: fields['Researchgate'] || '',
-            googleScholar: fields['Profil_GS'] || '',
-            website: fields['Site_web'] || '',
-          },
-          nuFields: {
-            pole: fields['Pole_de_rattac'] || getPoleFromLab(fields['LABO']),
-            composante: fields['Composante_de_'],
-            location: fields['Localisation_S'],
-            doctoralSchool: fields['ED_de_rattache'],
-            hdr: fields['HDR'] === 'OUI',
-            hdrYear: fields['ANNEE_HDR'],
-          },
-          validation,
-          lastSync: new Date().toISOString().split('T')[0],
-        };
-      });
-
-      // Qualified multi-affiliations (`rattachement` column): a single record per person,
-      // carried by the PRINCIPAL row, the other rows becoming memberships.
-      const rowRole: Record<number, RattachementRole | ''> = {};
-      const rowEnd: Record<number, string> = {};
-      for (const record of records) {
-        rowRole[record.id] = (String(record.fields[RATTACHEMENT_COL] || '').trim().toUpperCase() as RattachementRole) || '';
-        rowEnd[record.id] = fromGristFuzzyDate(record.fields[AFFILIATION_END_COL]) || fromGristFuzzyDate(record.fields['employment_end_date']);
-      }
-      const researchersGrouped = groupQualifiedRows(researchersMapped, rowRole, rowEnd);
-
-      // Public/central identifier: real uid (uid_dyna) when present, otherwise ext_<name>-<initial>.
-      // The Grist rowId (gristRowId) stays internal for writes. See useUrlState / updateResearcher.
-      assignPublicIds(researchersGrouped);
-
-      const validation = ResearcherListSchema.safeParse(researchersGrouped);
-      if (!validation.success) {
-        console.warn('Zod Validation Warning (Researchers):', validation.error.format());
-      }
-
-      const researchers = validation.success ? validation.data : researchersGrouped as Researcher[];
-      memoryCache.researchers = { updatedAt: remoteUpdatedAt, data: researchers };
+      const researchers = await DirectoryApi.people();
+      memoryCache.researchers = { updatedAt: new Date().toISOString(), data: researchers };
       return researchers;
     } catch (error) {
-      console.error('Grist Sync Error:', error);
+      console.error('Directory API error (people):', error);
       return memoryCache.researchers?.data ?? [];
     }
   },
 
-  /**
-   * Fetches the list of structures with cache handling.
-   */
-  fetchStructures: async (force = false): Promise<Structure[]> => {
+  /** Structures of the directory (domain API /api/v1/structures), same fallback as fetchResearchers. */
+  fetchStructures: async (_force = false): Promise<Structure[]> => {
     try {
-      const remoteUpdatedAt = await GristService.getDocUpdatedAt();
-      const cached = memoryCache.structures;
-      if (!force && cached && cached.updatedAt === remoteUpdatedAt) {
-        console.log('Using cached structures...');
-        return cached.data;
-      }
-
-      console.log('Fetching fresh structures from Grist...');
-      // V2 « Structures » table: mirrors structures.csv of the CRISalid directory bridge.
-      const resp = await fetch(`${gristDocUrl()}/tables/Structures/records`);
-      if (!resp.ok) throw new Error('Erreur Structures Grist');
-      const { records } = await resp.json();
-      if (!records || records.length === 0) return [];
-
-      const { getTutelleName } = await import('./uaiMapping');
-
-      const structuresMapped = records.map((record: any) => {
-        const fields = record.fields;
-        // Supervising institutions: V2 `participations` field -> bare UAI codes (V1 `tutelles` equivalent).
-        const { codes: tutelleCodes, pipe: institutionCodes } = parseParticipations(fields['participations']);
-        const supervisors = tutelleCodes.map((uai: string) => getTutelleName(uai));
-        // Participations in other research structures (`local-` refs): bare local_ids.
-        const { pipe: structureParticipations } = parseStructureParticipations(fields['participations']);
-        const acronym = parseMultiLabel(fields['short_labels']);
-
-        return {
-          id: `S-${record.id}`,
-          localId: String(fields['local_id'] || ''),
-          level: deriveStructureLevel(fields['generic_type'], fields['type']),
-          nature: 'PUBLIC',
-          type: fields['type'] || '',
-          acronym,
-          officialName: parseMultiLabel(fields['long_labels']),
-          description: parseMultiLabel(fields['descriptions']),
-          cluster: getPoleFromLab(acronym) || '',
-          parentStructure: String(fields['parent_structure'] || ''), // fallback, overridden by withDerivedParents()
-          structureParticipations,
-          // Structured memberships (edited in the « Appartenances » tab)
-          inclusions: parseMembershipList(fields['inclusions']),
-          participations: parseMembershipList(fields['participations']),
-          code: String(fields['nns'] || ''),
-          rnsrId: String(fields['nns'] || ''),
-          status: 'ACTIVE',
-          historyLinks: [],
-          primaryMission: missionFromV2(fields['main_mission']) || 'RECHERCHE',
-          secondaryMission: missionFromV2(fields['secondary_missions']),
-          scientificDomains: [],
-          ercFields: [],
-          director: '',
-          supervisors,
-          institutionCodes,
-          rawParticipations: fields['participations'] || '',
-          doctoralSchools: [],
-          address: '',
-          zipCode: '',
-          city: '',
-          country: 'FR',
-          website: fields['web'] || '',
-          rorId: String(fields['ror'] || ''),
-          halCollectionUrl: fields['hal_collection'] || '',
-          identifiers: {
-            halStructIds: [],
-            // `idref` column (PPN of the corporate body record, created on 2026-09-11 for
-            // l'export ABES — docs/plan-export-abes-idref.md, lot 0).
-            idrefId: String(fields['idref'] || ''),
-            scopusId: String(fields['scopus'] || ''),
-            uai: String(fields['uai'] || ''),
-            isni: String(fields['isni'] || ''),
-            wikidata: String(fields['wikidata'] || ''),
-          },
-          signature: fields['signature'] || '',
-          ercField: fields['erc_research_field'] || '',
-          hceresAreas: fields['hceres_research_areas'] || '',
-          campus: fields['campus'] || '',
-        };
-      });
-
-      const validation = StructureListSchema.safeParse(structuresMapped);
-      if (!validation.success) {
-        console.warn('Zod Validation Warning (Structures):', validation.error.format());
-      }
-      
-      // Hierarchical parent read from the inclusions (« Appartenances » tab), the stored
-      // `parent_structure` column being only a fallback — see lib/structureHierarchy.ts.
-      const structures = withDerivedParents(validation.success ? (validation.data as Structure[]) : (structuresMapped as Structure[]));
-      memoryCache.structures = { updatedAt: remoteUpdatedAt, data: structures };
+      const structures = await DirectoryApi.structures();
+      memoryCache.structures = { updatedAt: new Date().toISOString(), data: structures };
       return structures;
     } catch (error) {
-      console.error('Grist Structures Sync Error:', error);
+      console.error('Directory API error (structures):', error);
       return memoryCache.structures?.data ?? [];
     }
   },
