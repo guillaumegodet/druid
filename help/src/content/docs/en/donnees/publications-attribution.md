@@ -89,6 +89,11 @@ institutions:
 A publication can combine several types. The co-affiliations of the same author with their
 supervising bodies do not count as a collaboration.
 
+The **countries** of a publication combine the affiliation countries given by each source
+(OpenAlex, HAL, BSO) and those of the co-signing foreign institutions. Until 7 October 2026, a
+single source was kept and some countries were missing: the international figures rose on that
+date.
+
 On instances connected to the CRISalid graph, **another laboratory of the institution** is
 also recognized when a co-author is a **member** of it according to the directory, even if
 their signature does not mention it (for instance a clinician who signs « CHU Nantes »). The

@@ -13,10 +13,24 @@ n'existent que sur les instances qui en disposent (voir
 
 ### Tableau de bord
 
+- **Collaborations › Par pays** : le bilan des collaborations avec un pays partenaire —
+  chiffres clés et rang, évolution, établissements du pays sur une carte et par province ou
+  région, labos et chercheurs impliqués, « qui travaille avec qui », thématiques et
+  spécialisation, impact, financeurs. Voir
+  [Analyser les collaborations](/guides/tableau-de-bord/collaborations/#faire-le-bilan-avec-un-pays).
+- **Pays des publications complétés** : les pays des institutions cosignataires sont désormais
+  pris en compte ; les chiffres internationaux augmentent.
 - **Onglet Chercheurs enrichi** : filtre de la population (appartenance, catégorie,
   présence), effectif, ETP recherche, **taux de publication par ETP recherche et par tranche
   d'âge**, pyramide des âges, publications par membre, tableau exportable en CSV. Voir
   [Lire les effectifs et le taux de publication par ETP](/guides/tableau-de-bord/chercheurs-effectifs/).
+
+### Rapports
+
+- **Nouveau modèle « Collaboration avec un pays »** : le bilan complet d'une collaboration avec un
+  pays, sans chiffre écrit en dur dans les textes. Le modèle **Collaborations internationales**
+  porte désormais sur tous les pays. Voir
+  [Modèles de rapport](/guides/rapports/modeles/#collaboration-avec-un-pays).
 
 ### Personnes
 

@@ -89,6 +89,11 @@ institutions :
 Une publication peut cumuler plusieurs types. Les co-affiliations d'un même auteur à ses
 tutelles ne comptent pas comme une collaboration.
 
+Les **pays** d'une publication réunissent les pays des affiliations donnés par chaque source
+(OpenAlex, HAL, BSO) et ceux des institutions étrangères cosignataires. Jusqu'au 7 octobre 2026,
+une seule source était retenue et des pays manquaient : les chiffres internationaux ont augmenté
+à cette date.
+
 Sur les instances reliées au graphe CRISalid, un **autre laboratoire de l'établissement** est
 aussi reconnu quand un co-auteur en est **membre** d'après l'annuaire, même s'il ne l'a pas
 mentionné dans sa signature (par exemple un clinicien qui signe « CHU Nantes »). C'est
