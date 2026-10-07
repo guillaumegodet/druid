@@ -69,7 +69,8 @@ still shows the affiliation… These tasks are labelled **auto** and **close by 
 detection** reruns it on demand.
 
 A rule also spots **different records carrying the same identifier** (ORCID, IdRef, IdHAL,
-Scopus): SoVisu+ refuses the second record that arrives with an identifier already taken.
+Scopus, or the **staff number**, which links an `ext_…` record to the record of its LDAP
+account): SoVisu+ refuses the second record that arrives with an identifier already taken.
 Depending on the names, the task has one of three types:
 
 | Type | What to do |
@@ -77,6 +78,14 @@ Depending on the names, the task has one of three types:
 | **Two records for the same person** | Merge: the **Open the merge assistant** button opens the pair; you choose there the uid to keep. |
 | **Shared identifiers: same person or namesakes?** | Partly different names, or the same names but two different IdRef (or ORCID…). Check: the same person under another name (usage name, typo) ⇒ merge; relatives or namesakes ⇒ remove the identifier from the wrong record. |
 | **Identifier carried by two people** | Remove the identifier from the record that should not carry it. When the IdHAL names one of the two people, the task is attached to the other record. |
+
+Other rules deal with the directory (see [Statuses of people](/en/donnees/statuts-des-personnes/)):
+
+| Type | What to do |
+|---|---|
+| **LDAP account found by the staff number: switch to the LDAP uid** | The record has an `ext_…` uid (or none) while its staff number is that of an LDAP account carried by no record. Check the warnings (a uid that does not look like the name: the staff number is probably wrong), then **Switch to the LDAP uid**. For a former `ext_…` record, a **SoVisu+: remove the identifiers of the former person** task is created: without it, SoVisu+ refuses the new uid. |
+| **Hosted LDAP account closing: probable departure?** | A person employed by another organisation whose hosted account is closing. Druid does not infer a departure from it: check with the laboratory, then fill in the end dates (the task closes by itself) or drop the task. |
+| **Employer to enter** | A record validated “external” before October 2026 without an employer: fill in the employer (CNRS, Inserm, university hospital…). |
 
 ## What happens next
 

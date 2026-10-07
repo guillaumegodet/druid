@@ -20,6 +20,16 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
 ### People
 
 - **FTE (working time) and Research FTE** on the record, « Employment & contract » card.
+- **End of “Internal / External”**: every record now shows its **presence** (Present,
+  Leaving, Left), its **employer** and its **LDAP account**, three independent pieces of
+  information. New **Presence**, **Employer** (home institution, other employers, not
+  specified) and **LDAP account** filters, and an **Internal staff** shortcut. Old links
+  filtered on a status still work. See [Statuses of people](/en/donnees/statuts-des-personnes/).
+- **Staff number** (HR identifier) shown on the record, taken from the LDAP directory.
+- **Employer deduced from LDAP** when creating a record (“Fill from LDAP”) when it is
+  certain: the institution's staff, CNRS accounts.
+- New **tasks**: switch an `ext_…` record to its LDAP uid (found by the staff number), hosted
+  LDAP account closing, employer to enter.
 
 ## September 2026
 

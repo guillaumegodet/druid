@@ -15,8 +15,8 @@ are the ones used to harvest each researcher's publications.
 
 ## What you can do with Druid
 
-- **Keep the directory up to date**: find a person, check their status (in post, left,
-  external…), their laboratory and team, correct a record.
+- **Keep the directory up to date**: find a person, check their presence (present,
+  leaving, left) and their employer, their laboratory and team, correct a record.
 - **Complete researcher identifiers**: IdRef, ORCID, IdHAL, OpenAlex, Scopus. Druid suggests
   candidates; you accept or reject them.
 - **Describe research structures**: laboratories, teams, faculties, with their identifiers
@@ -60,8 +60,9 @@ The details, with update frequencies, are in
 
 ## Three notions to know
 
-- **Status**: Internal, Leaving, Left or External. It is calculated automatically, and an
-  authorised person can confirm it by hand (“validate the record”). See
+- **Presence, employer, LDAP account**: presence (Present, Leaving, Left) is calculated
+  automatically, and an authorised person can confirm it by hand (“validate the record”);
+  the employer and the LDAP account are shown separately. See
   [Statuses of people](/en/donnees/statuts-des-personnes/).
 - **Primary affiliation**: the laboratory (and team) that counts for the affiliation of
   publications and for the export to CRISalid. See

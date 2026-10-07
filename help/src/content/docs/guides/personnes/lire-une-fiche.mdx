@@ -24,7 +24,8 @@ vérifie une information, qu'on la corrige et qu'on valide la fiche.
 
 ## L'en-tête
 
-- **Nom, photo et statut** (Interne, Départ, Parti, Externe), avec la pastille de
+- **Nom, photo et présence** (Présent, Départ, Parti), la clé **LDAP** si la personne a un
+  compte dans l'annuaire de l'établissement (« en fermeture » s'il va fermer), et la pastille de
   validation si la fiche a été validée : **Validé**, **Périmé** ou **Validé — conflit**. Le
   survol de la pastille indique la source et la date de la validation.
 - **UID** : l'identifiant de la personne dans l'annuaire de l'établissement (ou `ext_…`
@@ -74,7 +75,7 @@ les tableaux de bord à leur prochaine régénération.
 - **Une personne peut avoir plusieurs fiches** (une par laboratoire). La fiche affiche
   toutes ses appartenances, mais la validation et l'enregistrement portent sur la fiche
   ouverte.
-- **Le statut ne se modifie pas directement** : il est calculé. Pour le corriger, validez la
+- **La présence ne se modifie pas directement** : elle est calculée. Pour la corriger, validez la
   fiche ou renseignez les dates de fin (voir
   [Corriger le statut ou le rattachement](/guides/personnes/fiabiliser-statut-rattachement/)).
 

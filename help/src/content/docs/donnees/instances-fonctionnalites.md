@@ -22,7 +22,7 @@ dispose pas de la fonction, ou que votre profil ne la permet pas.
 | Fonction | Ce qu'elle apporte | Ce qui manque sans elle |
 |---|---|---|
 | **Annuaire LDAP de l'établissement** | Statuts calculés depuis l'état des comptes, synchronisation des grades et dates d'emploi, page **Alignement LDAP**, import des structures. | Statuts et données d'emploi saisis à la main ; pas d'onglet LDAP. |
-| **Statuts et validation manuelle** | Statuts Interne/Départ/Parti/Externe, pastilles de validation, import de listes fiabilisées. | Pas de colonne Statut ni de validation. |
+| **Statuts et validation manuelle** | Présence (Présent/Départ/Parti), raccourci Personnels internes, pastilles de validation, import de listes fiabilisées. | Pas de colonne Présence ni de validation. |
 | **Relance des recherches d'identifiants** | Boutons **Rechercher manquants**, **Rechercher partout**, **Vérifier les existants** sur la page d'alignement. | Les candidats sont calculés par l'équipe technique ; la page permet toujours de les valider. |
 | **Alignement IdRef enrichi** | Choix entre homonymes IdRef affiné grâce au graphe CRISalid. | Recherche IdRef simple, par nom et dates. |
 | **Console ETL** | Régénération des tableaux de bord depuis Druid, configuration des structures, contrôle des affiliations. | Tableaux de bord régénérés hors de Druid. |

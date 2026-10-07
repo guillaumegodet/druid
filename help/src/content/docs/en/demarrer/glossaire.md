@@ -15,10 +15,14 @@ Terms are grouped by theme. Each definition links to the page that explains it i
   several records if they belong to several laboratories.
 - **uid**: the person's identifier in the institution's LDAP directory. External people
   (without an account) get a dummy uid starting with `ext_`.
-- **Status**: *Internal* (in post), *Leaving* (departure announced), *Left* (no longer here)
-  or *External* (employed by another institution, or without an account). Calculated
-  automatically, unless validated by hand. → [Statuses of people](/en/donnees/statuts-des-personnes/)
-- **Validation**: manual confirmation of the status and/or the affiliation of a record, with
+- **Presence**: *Present*, *Leaving* (end announced) or *Left* (no longer here). Calculated
+  automatically, unless validated by hand. In October 2026 it replaced the *Internal /
+  External* status, which mixed up presence and employer. → [Statuses of people](/en/donnees/statuts-des-personnes/)
+- **Internal staff**: a shortcut of the list, people who are present and employed by the
+  institution. → [Statuses of people](/en/donnees/statuts-des-personnes/)
+- **LDAP account**: the person's account in the institution's directory (active, closing,
+  none); it only decides the presence for the institution's staff.
+- **Validation**: manual confirmation of the presence and/or the affiliation of a record, with
   a source and a date. It prevails over the automatic calculation for 18 months, after which
   the record is flagged *expired*. → [Statuses of people](/en/donnees/statuts-des-personnes/#manual-validation)
 - **Emeritus**: a retired academic or researcher who keeps a research activity. Druid gives

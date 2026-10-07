@@ -15,14 +15,14 @@ sidebar:
 :::
 
 CRISalid harvests the publications **of the people Druid sends it**, with **their
-identifiers**. A person who has left but is still “Internal”, a person who is present but
+identifiers**. A person who has left but is still “Present”, a person who is present but
 missing from the directory, a missing ORCID: so many publications lost or wrongly attributed.
 This walkthrough puts the guides in the right order.
 
 ## Step 1 — Take stock
 
 1. In **People**, filter on the laboratory (**Lab (primary affil.)**).
-2. Note the number of records, then switch to the **Charts** view: breakdown by status,
+2. Note the number of records, then switch to the **Charts** view: breakdown by presence and employer,
    identifier coverage. Keep these figures: they will help measure progress.
 3. Filter **Validation › Not validated**: these are the records to handle first.
 
@@ -58,7 +58,7 @@ Compare the laboratory's list with Druid's, person by person:
 |---|---|
 | Present in both, record correct | Nothing: it will be validated in step 5. |
 | Present in Druid, **left** according to the lab | Fill in the **membership end** and the **employment end** (**→ employment end** button). |
-| Present in Druid, **employed by a research organisation** (CNRS, Inserm…) | Fill in the **Employing institution**: they will become External. |
+| Present in Druid, **employed by a research organisation** (CNRS, Inserm…) | Fill in the **Employing institution**: they leave **Internal staff** and their hosted LDAP account no longer decides their presence. |
 | Wrong **team** or wrong **primary affiliation** | Correct the **Affiliations & history** card. |
 | Missing from Druid | Ask for their record to be created (**New** button, technical administrators). |
 

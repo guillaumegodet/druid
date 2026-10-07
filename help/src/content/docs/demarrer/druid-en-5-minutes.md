@@ -15,8 +15,8 @@ Druid sont celles qui permettent de moissonner les publications de chaque cherch
 
 ## Ce que vous pouvez faire avec Druid
 
-- **Tenir l'annuaire à jour** : retrouver une personne, vérifier son statut (en poste,
-  partie, externe…), son laboratoire et son équipe, corriger une fiche.
+- **Tenir l'annuaire à jour** : retrouver une personne, vérifier sa présence (présente,
+  en départ, partie) et son employeur, son laboratoire et son équipe, corriger une fiche.
 - **Compléter les identifiants chercheurs** : IdRef, ORCID, IdHAL, OpenAlex, Scopus. Druid
   propose des candidats ; vous acceptez ou rejetez.
 - **Décrire les structures de recherche** : laboratoires, équipes, composantes, avec leurs
@@ -62,8 +62,9 @@ Le détail, avec les fréquences de mise à jour, est dans
 
 ## Trois notions à connaître
 
-- **Statut** : Interne, Départ, Parti ou Externe. Il est calculé automatiquement, et une
-  personne habilitée peut le confirmer à la main (« valider la fiche »). Voir
+- **Présence, employeur, compte LDAP** : la présence (Présent, Départ, Parti) est calculée
+  automatiquement, et une personne habilitée peut la confirmer à la main (« valider la
+  fiche ») ; l'employeur et le compte LDAP sont affichés à part. Voir
   [Statuts des personnes](/donnees/statuts-des-personnes/).
 - **Rattachement principal** : le laboratoire (et l'équipe) qui compte pour la signature des
   publications et pour l'export vers CRISalid. Voir

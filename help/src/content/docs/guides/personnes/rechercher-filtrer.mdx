@@ -1,6 +1,6 @@
 ---
 title: "Rechercher et filtrer les personnels"
-description: "Trouver une personne, filtrer la liste par labo, statut, grade ou identifiant, et passer en vue graphiques."
+description: "Trouver une personne, filtrer la liste par labo, présence, employeur, grade ou identifiant, et passer en vue graphiques."
 sidebar:
   order: 1
 ---
@@ -27,9 +27,11 @@ Les listes déroulantes combinent plusieurs valeurs (sélection multiple) :
 
 | Filtre | Ce qu'il retient |
 |---|---|
-| **Statut** | Interne, Départ, Parti, Externe. |
+| **Personnels internes** (bouton) | Raccourci : personnes **présentes** et **employées par l'établissement**. |
+| **Présence** | Présent, Départ (fin annoncée), Parti. |
+| **Employeur** | **Établissement**, **Autres employeurs**, **Non renseigné**, ou un employeur précis (CNRS, Inserm…). |
+| **Compte LDAP** (Plus de filtres) | Compte actif, en fermeture, pas de compte. |
 | **Validation** | Fiches **validées**, **validées périmées** (plus de 18 mois) ou **non validées**. |
-| **Employeur** | L'établissement employeur. |
 | **Labo (affil. principale)** | Le laboratoire du rattachement principal. |
 | **Grade / corps**, **Type d'emploi** | Selon la carte Emploi de la fiche. |
 | **Pôle** | Le pôle ou la composante de rattachement. |
@@ -46,7 +48,7 @@ Le nombre de fiches retenues s'affiche à côté du titre.
 ## Passer en vue graphiques
 
 Le bouton **Dataviz** remplace le tableau par des graphiques calculés sur la liste filtrée :
-répartition par statut, parité femmes / hommes, tranches d'âge, grades, employeurs, types
+répartition par présence et employeur, parité femmes / hommes, tranches d'âge, grades, employeurs, types
 d'emploi, répartition par labo, taux de HDR et **couverture des identifiants**. **Liste**
 revient au tableau.
 

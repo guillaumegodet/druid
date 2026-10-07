@@ -16,10 +16,14 @@ détail.
   plusieurs fiches si elle appartient à plusieurs laboratoires.
 - **uid** : l'identifiant de la personne dans l'annuaire LDAP de l'établissement. Les personnes
   extérieures (sans compte) reçoivent un uid fictif commençant par `ext_`.
-- **Statut** : *Interne* (en poste), *Départ* (départ annoncé), *Parti* (n'est plus là) ou *Externe*
-  (employé par un autre établissement ou sans compte). Calculé automatiquement, sauf
-  validation manuelle. → [Statuts des personnes](/donnees/statuts-des-personnes/)
-- **Validation, fiabilisation** : confirmation à la main du statut et/ou du rattachement d'une fiche, avec une source et
+- **Présence** : *Présent*, *Départ* (fin annoncée) ou *Parti* (n'est plus là). Calculée
+  automatiquement, sauf validation manuelle. Elle a remplacé en octobre 2026 le statut
+  *Interne / Externe*, qui mélangeait présence et employeur. → [Statuts des personnes](/donnees/statuts-des-personnes/)
+- **Personnels internes** : raccourci de la liste, personnes présentes et employées par
+  l'établissement. → [Statuts des personnes](/donnees/statuts-des-personnes/)
+- **Compte LDAP** : compte de la personne dans l'annuaire de l'établissement (actif, en
+  fermeture, aucun) ; il ne décide de la présence que pour le personnel de l'établissement.
+- **Validation, fiabilisation** : confirmation à la main de la présence et/ou du rattachement d'une fiche, avec une source et
   une date. Elle l'emporte sur le calcul automatique pendant 18 mois, puis la fiche est
   signalée *périmée*. → [Statuts des personnes](/donnees/statuts-des-personnes/#validation-manuelle)
 - **Émérite** : enseignant-chercheur ou chercheur retraité qui conserve une activité de recherche. Druid
