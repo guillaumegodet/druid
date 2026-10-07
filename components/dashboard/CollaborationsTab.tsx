@@ -240,7 +240,7 @@ const InternalCollabSection: React.FC<{
 type SubTab = 'typology' | 'structure' | 'nantes' | 'national' | 'international' | 'country' | 'partners';
 const SUB_TABS: SubTab[] = ['typology', 'structure', 'nantes', 'national', 'international', 'country', 'partners'];
 
-/** Sub-tab of the shareable link (`?sub=`, docs/plan-collaboration-pays.md § 2). */
+/** Sub-tab of the shareable link (`?sub=`, docs/archive/plan-collaboration-pays.md § 2). */
 const readSubTab = (): SubTab => {
   const v = new URLSearchParams(window.location.search).get('sub');
   return SUB_TABS.includes(v as SubTab) ? (v as SubTab) : 'typology';

@@ -9,7 +9,7 @@ import {
 import { buildFilterContext, matchesFilters } from '../../components/dashboard/publicationFilters';
 import type { DashboardDataset, DashboardPublication } from '../../components/dashboard/types';
 
-// « Pays » sub-tab of the Collaborations tab (docs/plan-collaboration-pays.md, lot 1). Fictitious
+// « Pays » sub-tab of the Collaborations tab (docs/archive/plan-collaboration-pays.md, lot 1). Fictitious
 // institution export (labs carried by the authors): country CA with two universities and a hospital
 // affiliated with the first one, third countries DE and US, the cases found by the lot 0 audit.
 const UNIV_A = { name: 'Univ Alpha', cc: 'CA', city: 'Montréal', region: 'Quebec', lat: 45.5, lon: -73.6, ror: '0aaaaaaa1' };

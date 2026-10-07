@@ -136,7 +136,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   // université » template): the institutions are read from the block filters (partnerKeys).
   'partner-breakdown-top': { tab: 'collaborations', requires: ['partnerGroup'] },
   'partner-breakdown-evolution': { tab: 'collaborations', requires: ['partnerGroup'] },
-  // One partner country (« By country » sub-tab, docs/plan-collaboration-pays.md lot 5): the country
+  // One partner country (« By country » sub-tab, docs/archive/plan-collaboration-pays.md lot 5): the country
   // is read from the block filters.
   'pays-evolution': country(),
   'pays-rang': country(),

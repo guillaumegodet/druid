@@ -1,4 +1,4 @@
-// Key figures of the « Pays » sub-tab (docs/plan-collaboration-pays.md § 2, blocks A and I), from
+// Key figures of the « Pays » sub-tab (docs/archive/plan-collaboration-pays.md § 2, blocks A and I), from
 // aggregateCountryFocus. Same labels as the partner collaboration (partnerKpis.ts) where they mean
 // the same thing.
 
@@ -80,7 +80,7 @@ export function countryKpiItems(f: CountryFocus, listFilters: PubFilters = { cou
 export const countryImpactItems = (f: CountryFocus): KpiItem[] => impactComparisonItems(f.impact);
 
 /**
- * Country focus of a report block or an /embed chart (docs/plan-collaboration-pays.md, lot 5): the
+ * Country focus of a report block or an /embed chart (docs/archive/plan-collaboration-pays.md, lot 5): the
  * country comes from the `country` filter; rank, share of the international co-publications and
  * impact reference need the corpus WITHOUT that filter (`source`, the block scope with no filter),
  * restricted by the other filters. `maxAuthors` becomes the « exclude large collaborations » option.

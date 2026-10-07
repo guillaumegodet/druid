@@ -19,7 +19,7 @@ import {
 } from './CountryCharts';
 import { numberLocale } from '../../lib/i18n';
 
-// URL parameters of the sub-tab (shareable link, docs/plan-collaboration-pays.md § 2).
+// URL parameters of the sub-tab (shareable link, docs/archive/plan-collaboration-pays.md § 2).
 const readUrlState = () => {
   const p = new URLSearchParams(window.location.search);
   const cc = (p.get('cc') ?? '').toUpperCase();
@@ -44,7 +44,7 @@ const sectionTitle = 'font-disp font-semibold text-[15px] text-ink dark:text-[#f
 const note = 'text-xs text-muted-light dark:text-[#8f897c] px-1';
 
 /**
- * « Pays » sub-tab of the Collaborations tab (docs/plan-collaboration-pays.md, lot 2): the
+ * « Pays » sub-tab of the Collaborations tab (docs/archive/plan-collaboration-pays.md, lot 2): the
  * collaboration with ONE partner country — key figures, yearly trend, rank among the partner
  * countries, institutions of the country, internal labs and researchers, impact.
  */
