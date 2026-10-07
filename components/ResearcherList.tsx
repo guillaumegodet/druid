@@ -150,8 +150,7 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
           onApplyPreset={() => {
             // update* (not the raw setters): they also sync the URL — otherwise a reload or
             // a shared link after the ABES preset lost these filters (code review lot 7b).
-            filters.updateEmployers(['NANTES UNIVERSITE']);
-            filters.updateStatuses([ResearcherStatus.INTERNE]);
+            filters.setInternalShortcut(true);   // present + home employer
             filters.updateValidation(['validated', 'stale']);
           }}
           onClose={() => setShowAbesExport(false)}
@@ -211,8 +210,11 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
         <FilterPanel
           searchTerm={filters.searchTerm}
           onSearchChange={filters.updateSearch}
-          filterStatuses={filters.filterStatuses}
-          onStatusChange={filters.updateStatuses}
+          filterPresence={filters.filterPresence}
+          onPresenceChange={filters.updatePresence}
+          filterLdap={filters.filterLdap}
+          onLdapChange={filters.updateLdap}
+          onInternalShortcut={filters.setInternalShortcut}
           filterValidation={filters.filterValidation}
           onValidationChange={filters.updateValidation}
           filterEmployers={filters.filterEmployers}

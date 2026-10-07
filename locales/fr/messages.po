@@ -229,8 +229,8 @@ msgstr "Alignement unifié : {0} référentiel(s) en cours"
 
 #: components/AccountMenu.tsx:86
 #: components/AccountMenu.tsx:194
-#: components/ResearcherDashboard.tsx:69
-#: components/ResearcherDashboard.tsx:104
+#: components/ResearcherDashboard.tsx:73
+#: components/ResearcherDashboard.tsx:108
 #: components/dashboard/NewsTab.tsx:231
 msgid "Unknown"
 msgstr "Inconnu"
@@ -561,7 +561,7 @@ msgid "Affiliation"
 msgstr "Affiliation"
 
 #: components/DashboardPage.tsx:365
-#: components/ResearcherDashboard.tsx:193
+#: components/ResearcherDashboard.tsx:197
 #: components/dashboard/StaffSection.tsx:294
 #: components/dashboard/StaffSection.tsx:309
 #: components/dashboard/report/ReportWizard.tsx:197
@@ -633,9 +633,9 @@ msgid "The group will be kept as soon as it has at least one member."
 msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 
 #: components/GroupList.tsx:168
-#: components/ResearcherDetail.tsx:308
-#: components/ResearcherDetail.tsx:474
-#: components/ResearcherDetail.tsx:577
+#: components/ResearcherDetail.tsx:309
+#: components/ResearcherDetail.tsx:475
+#: components/ResearcherDetail.tsx:578
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
 #: components/reports/NewReportDialog.tsx:311
@@ -684,7 +684,7 @@ msgid "Search for a group…"
 msgstr "Rechercher un groupe…"
 
 #: components/GroupList.tsx:221
-#: components/researchers/FilterPanel.tsx:181
+#: components/researchers/FilterPanel.tsx:202
 msgid "Group"
 msgstr "Groupe"
 
@@ -742,289 +742,301 @@ msgstr "Aucun membre dans ce groupe"
 msgid "Help for this page (opens the help centre in a new tab)"
 msgstr "Aide sur cette page (ouvre le centre d'aide dans un nouvel onglet)"
 
-#: components/ResearcherDashboard.tsx:71
+#: components/ResearcherDashboard.tsx:51
+msgid "Present — institution"
+msgstr "Présents — établissement"
+
+#: components/ResearcherDashboard.tsx:52
+msgid "Present — other employer"
+msgstr "Présents — autre employeur"
+
+#: components/ResearcherDashboard.tsx:53
+msgid "Present — employer not specified"
+msgstr "Présents — employeur non renseigné"
+
+#: components/ResearcherDashboard.tsx:75
 msgid "Women"
 msgstr "Femmes"
 
-#: components/ResearcherDashboard.tsx:72
+#: components/ResearcherDashboard.tsx:76
 msgid "Men"
 msgstr "Hommes"
 
-#: components/ResearcherDashboard.tsx:80
+#: components/ResearcherDashboard.tsx:84
 msgid "< 30 years"
 msgstr "< 30 ans"
 
-#: components/ResearcherDashboard.tsx:81
+#: components/ResearcherDashboard.tsx:85
 msgid "31-45 years"
 msgstr "31-45 ans"
 
-#: components/ResearcherDashboard.tsx:82
+#: components/ResearcherDashboard.tsx:86
 msgid "46-60 years"
 msgstr "46-60 ans"
 
-#: components/ResearcherDashboard.tsx:83
+#: components/ResearcherDashboard.tsx:87
 msgid "61+ years"
 msgstr "61+ ans"
 
-#: components/ResearcherDashboard.tsx:116
-#: components/ResearcherDashboard.tsx:128
-#: components/ResearcherDashboard.tsx:140
+#: components/ResearcherDashboard.tsx:120
+#: components/ResearcherDashboard.tsx:132
+#: components/ResearcherDashboard.tsx:144
 msgid "Undefined"
 msgstr "Non défini"
 
-#: components/ResearcherDashboard.tsx:178
+#: components/ResearcherDashboard.tsx:182
 msgid "No data"
 msgstr "Aucune donnée"
 
-#: components/ResearcherDashboard.tsx:203
+#: components/ResearcherDashboard.tsx:207
 msgid "HDR rate"
 msgstr "Taux de HDR"
 
-#: components/ResearcherDashboard.tsx:213
+#: components/ResearcherDashboard.tsx:217
 msgid "Total HDR"
 msgstr "Total HDR"
 
-#: components/ResearcherDashboard.tsx:224
-msgid "Breakdown by status"
-msgstr "Répartition par statut"
+#: components/ResearcherDashboard.tsx:228
+msgid "Breakdown by presence and employer"
+msgstr "Répartition par présence et employeur"
 
-#: components/ResearcherDashboard.tsx:255
+#: components/ResearcherDashboard.tsx:259
 msgid "Gender balance"
 msgstr "Parité femmes / hommes"
 
-#: components/ResearcherDashboard.tsx:273
+#: components/ResearcherDashboard.tsx:277
 msgid "Age groups"
 msgstr "Tranches d'âge"
 
-#: components/ResearcherDashboard.tsx:293
+#: components/ResearcherDashboard.tsx:297
 msgid "Identifier coverage"
 msgstr "Couverture des identifiants"
 
-#: components/ResearcherDashboard.tsx:312
+#: components/ResearcherDashboard.tsx:316
 msgid "Employers (top 8)"
 msgstr "Employeurs (top 8)"
 
-#: components/ResearcherDashboard.tsx:331
+#: components/ResearcherDashboard.tsx:335
 msgid "Grades (top 8)"
 msgstr "Grades (top 8)"
 
-#: components/ResearcherDashboard.tsx:348
+#: components/ResearcherDashboard.tsx:352
 msgid "Employment types (top 10)"
 msgstr "Types d'emploi (top 10)"
 
-#: components/ResearcherDashboard.tsx:367
+#: components/ResearcherDashboard.tsx:371
 msgid "Breakdown by lab (top 8)"
 msgstr "Répartition par labo (top 8)"
 
-#: components/ResearcherDetail.tsx:116
+#: components/ResearcherDetail.tsx:117
 msgid "Manual validation (Druid)"
 msgstr "Validation manuelle (Druid)"
 
 #. placeholder {0}: next.displayName
-#: components/ResearcherDetail.tsx:200
+#: components/ResearcherDetail.tsx:201
 msgid "Filled from LDAP: {0}."
 msgstr "Rempli depuis le LDAP : {0}."
 
-#: components/ResearcherDetail.tsx:203
+#: components/ResearcherDetail.tsx:204
 msgid "Employer not deducible from LDAP (hosted account, ambiguous corps): choose it under Employment & contract."
 msgstr "Employeur non déductible du LDAP (compte hébergé, corps ambigu) : choisissez-le dans « Emploi & contrat »."
 
-#: components/ResearcherDetail.tsx:212
+#: components/ResearcherDetail.tsx:213
 msgid "Lab: {lab}."
 msgstr "Labo : {lab}."
 
 #. placeholder {0}: otherLabs.join(', ')
-#: components/ResearcherDetail.tsx:214
+#: components/ResearcherDetail.tsx:215
 msgid "Other labs in LDAP: {0} — add them as memberships if relevant."
 msgstr "Autres labos dans le LDAP : {0} — à ajouter en appartenances si pertinent."
 
-#: components/ResearcherDetail.tsx:216
+#: components/ResearcherDetail.tsx:217
 #: components/researchers/AlignLaunchModal.tsx:153
 msgid "none"
 msgstr "aucune"
 
-#: components/ResearcherDetail.tsx:217
+#: components/ResearcherDetail.tsx:218
 msgid "No known lab among the LDAP affectations (principal: {affectation}): choose it in Memberships."
 msgstr "Aucun labo connu parmi les affectations LDAP (principale : {affectation}) : choisissez-le dans Appartenances."
 
-#: components/ResearcherDetail.tsx:223
+#: components/ResearcherDetail.tsx:224
 msgid "This uid already has a directory record ({labs}): check it before creating a duplicate."
 msgstr "Cet uid a déjà une fiche dans l'annuaire ({labs}) : vérifiez-la avant de créer un doublon."
 
-#: components/ResearcherDetail.tsx:248
+#: components/ResearcherDetail.tsx:249
 msgid "Back to the list"
 msgstr "Retour à la liste"
 
-#: components/ResearcherDetail.tsx:254
+#: components/ResearcherDetail.tsx:255
 #: components/Sidebar.tsx:158
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "Personnel"
 
-#: components/ResearcherDetail.tsx:266
+#: components/ResearcherDetail.tsx:267
 #: components/researchers/DuplicatesPage.tsx:142
 msgid "Directory"
 msgstr "Annuaire"
 
-#: components/ResearcherDetail.tsx:276
+#: components/ResearcherDetail.tsx:277
 msgid "Open the Grist document (Annuaire table)"
 msgstr "Ouvrir le document Grist (table Annuaire)"
 
-#: components/ResearcherDetail.tsx:285
+#: components/ResearcherDetail.tsx:286
 msgid "Validated record — click to review / unvalidate"
 msgstr "Fiche fiabilisée — cliquer pour revoir / dévalider"
 
-#: components/ResearcherDetail.tsx:285
+#: components/ResearcherDetail.tsx:286
 msgid "Validate this record"
 msgstr "Fiabiliser cette fiche"
 
-#: components/ResearcherDetail.tsx:288
+#: components/ResearcherDetail.tsx:289
 msgid "Validated record"
 msgstr "Fiche validée"
 
-#: components/ResearcherDetail.tsx:288
-#: components/ResearcherDetail.tsx:493
+#: components/ResearcherDetail.tsx:289
+#: components/ResearcherDetail.tsx:494
 msgid "Validate the record"
 msgstr "Valider la fiche"
 
-#: components/ResearcherDetail.tsx:294
+#: components/ResearcherDetail.tsx:295
 msgid "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 msgstr "Créer une tâche à réaliser hors Druid pour ce chercheur (IdRef, ORCID, HAL…)"
 
-#: components/ResearcherDetail.tsx:297
+#: components/ResearcherDetail.tsx:298
 msgid "Report a correction"
 msgstr "Signaler une correction"
 
-#: components/ResearcherDetail.tsx:305
+#: components/ResearcherDetail.tsx:306
 msgid "Export PDF"
 msgstr "Export PDF"
 
-#: components/ResearcherDetail.tsx:313
+#: components/ResearcherDetail.tsx:314
 #: components/StructureDetail.tsx:139
 #: components/dashboard/NewsletterPanel.tsx:400
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
 
-#: components/ResearcherDetail.tsx:313
+#: components/ResearcherDetail.tsx:314
 msgid "Create the record"
 msgstr "Créer la fiche"
 
-#: components/ResearcherDetail.tsx:345
 #: components/ResearcherDetail.tsx:346
+#: components/ResearcherDetail.tsx:347
 msgid "Edit photo (URL)"
 msgstr "Modifier la photo (URL)"
 
-#: components/ResearcherDetail.tsx:353
+#: components/ResearcherDetail.tsx:354
 msgid "Photo unavailable"
 msgstr "Photo inaccessible"
 
 #. placeholder {0}: researcher.uid || t`not provided`
 #. placeholder {1}: researcher.lastSync
-#: components/ResearcherDetail.tsx:371
+#: components/ResearcherDetail.tsx:372
 msgid "UID: {0} · Last sync: {1}"
 msgstr "UID : {0} · Dernière synchro : {1}"
 
-#: components/ResearcherDetail.tsx:371
+#: components/ResearcherDetail.tsx:372
 msgid "not provided"
 msgstr "non renseigné"
 
-#: components/ResearcherDetail.tsx:425
+#: components/ResearcherDetail.tsx:426
 msgid "Profile photo"
 msgstr "Photo de profil"
 
-#: components/ResearcherDetail.tsx:440
+#: components/ResearcherDetail.tsx:441
 msgid "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 msgstr "Indiquez l'adresse (http/https) d'une image publique : page du labo, annuaire, HAL… Laissez vide pour revenir aux initiales."
 
-#: components/ResearcherDetail.tsx:445
+#: components/ResearcherDetail.tsx:446
 msgid "Photo URL"
 msgstr "URL de la photo"
 
-#: components/ResearcherDetail.tsx:456
+#: components/ResearcherDetail.tsx:457
 msgid "The URL must start with http:// or https://."
 msgstr "L'URL doit commencer par http:// ou https://."
 
-#: components/ResearcherDetail.tsx:460
+#: components/ResearcherDetail.tsx:461
 msgid "The change will be written to Grist (photo_url column) when you click “Save”."
 msgstr "La modification sera écrite dans Grist (colonne photo_url) au clic sur « Enregistrer »."
 
-#: components/ResearcherDetail.tsx:470
+#: components/ResearcherDetail.tsx:471
 msgid "Remove photo"
 msgstr "Retirer la photo"
 
-#: components/ResearcherDetail.tsx:476
+#: components/ResearcherDetail.tsx:477
 msgid "Apply"
 msgstr "Appliquer"
 
-#: components/ResearcherDetail.tsx:505
+#: components/ResearcherDetail.tsx:506
 msgid "Validated status"
 msgstr "Statut validé"
 
-#: components/ResearcherDetail.tsx:519
+#: components/ResearcherDetail.tsx:520
 #: components/dashboard/MediaSourcesAdmin.tsx:217
 msgid "Scope"
 msgstr "Portée"
 
-#: components/ResearcherDetail.tsx:532
+#: components/ResearcherDetail.tsx:533
 #: components/researchers/AlignLaunchModal.tsx:128
 msgid "Source"
 msgstr "Source"
 
-#: components/ResearcherDetail.tsx:537
+#: components/ResearcherDetail.tsx:538
 msgid "E.g. 2026 lab survey, HR list…"
 msgstr "Ex. Enquête labo 2026, liste RH…"
 
-#: components/ResearcherDetail.tsx:545
+#: components/ResearcherDetail.tsx:546
 msgid "Date (auto)"
 msgstr "Date (auto)"
 
-#: components/ResearcherDetail.tsx:549
+#: components/ResearcherDetail.tsx:550
 msgid "Validated by (auto)"
 msgstr "Validé par (auto)"
 
 #. placeholder {0}: existingValidation.validationDate
 #. placeholder {1}: existingValidation.validatedBy
-#: components/ResearcherDetail.tsx:557
+#: components/ResearcherDetail.tsx:558
 msgid "Already validated on {0} by {1}."
 msgstr "Déjà validée le {0} par {1}."
 
 #. placeholder {0}: existingValidation.validationDate
-#: components/ResearcherDetail.tsx:558
+#: components/ResearcherDetail.tsx:559
 msgid "Already validated on {0}."
 msgstr "Déjà validée le {0}."
 
-#: components/ResearcherDetail.tsx:569
+#: components/ResearcherDetail.tsx:570
 msgid "Unvalidate"
 msgstr "Dévalider"
 
-#: components/ResearcherDetail.tsx:585
+#: components/ResearcherDetail.tsx:586
 msgid "Revalidate"
 msgstr "Revalider"
 
-#: components/ResearcherDetail.tsx:585
+#: components/ResearcherDetail.tsx:586
 #: components/dashboard/MediaMentionsPanel.tsx:317
 #: components/dashboard/NewsletterPanel.tsx:437
 #: components/researchers/GroupModal.tsx:65
 msgid "Validate"
 msgstr "Valider"
 
-#: components/ResearcherList.tsx:189
+#: components/ResearcherList.tsx:188
 #: components/StructureList.tsx:301
 msgid "List"
 msgstr "Liste"
 
-#: components/ResearcherList.tsx:190
+#: components/ResearcherList.tsx:189
 #: components/StructureList.tsx:302
 msgid "Charts"
 msgstr "Dataviz"
 
-#: components/ResearcherList.tsx:198
+#: components/ResearcherList.tsx:197
 #: components/StructureList.tsx:310
 msgid "List view (table)"
 msgstr "Vue liste (tableau)"
 
-#: components/ResearcherList.tsx:198
+#: components/ResearcherList.tsx:197
 msgid "Chart view"
 msgstr "Vue dataviz (graphiques)"
 
@@ -1131,10 +1143,8 @@ msgstr "Tutelles"
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
 #: components/etl/EtlMaintenancePanels.tsx:268
-#: components/researchers/FilterPanel.tsx:215
 #: components/researchers/ListHeader.tsx:48
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
-#: components/researchers/ResearcherTable.tsx:92
 #: components/researchers/TasksPage.tsx:176
 msgid "Status"
 msgstr "Statut"
@@ -1257,7 +1267,7 @@ msgid "No structure found."
 msgstr "Aucune structure trouvée."
 
 #: components/StructureList.tsx:505
-#: components/researchers/ResearcherTable.tsx:168
+#: components/researchers/ResearcherTable.tsx:172
 msgid "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 
@@ -1963,7 +1973,7 @@ msgstr "Retirer cette université"
 #: components/dashboard/NewsTab.tsx:678
 #: components/dashboard/PartnerInstitutionPicker.tsx:138
 #: components/dashboard/PublicationsListTab.tsx:275
-#: components/researchers/FilterPanel.tsx:264
+#: components/researchers/FilterPanel.tsx:292
 msgid "Clear all"
 msgstr "Tout effacer"
 
@@ -3429,7 +3439,7 @@ msgstr "Dernière collecte : {0}."
 #: components/reports/HistoryDialog.tsx:105
 #: components/reports/NewReportDialog.tsx:228
 #: components/reports/ReportControls.tsx:83
-#: components/researchers/FilterPanel.tsx:158
+#: components/researchers/FilterPanel.tsx:179
 msgid "Period"
 msgstr "Période"
 
@@ -3903,7 +3913,7 @@ msgstr "Citations (déjà reçues)"
 #: components/dashboard/NewsTab.tsx:610
 #: components/dashboard/NewsTab.tsx:692
 #: components/researchers/AbesExportModal.tsx:229
-#: components/researchers/FilterPanel.tsx:199
+#: components/researchers/FilterPanel.tsx:220
 #: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
@@ -4027,9 +4037,9 @@ msgid "Under review"
 msgstr "En validation"
 
 #: components/dashboard/NewsletterPanel.tsx:49
-#: components/researchers/FilterPanel.tsx:134
+#: components/researchers/FilterPanel.tsx:143
 #: components/researchers/LdapVerifyPanel.tsx:136
-#: components/researchers/StatusBadge.tsx:80
+#: components/researchers/PresenceBadge.tsx:97
 msgid "Validated"
 msgstr "Validé"
 
@@ -4502,8 +4512,8 @@ msgid "Lab"
 msgstr "Laboratoire"
 
 #: components/dashboard/PublicationsListTab.tsx:349
-#: components/researchers/FilterPanel.tsx:155
-#: components/researchers/FilterPanel.tsx:288
+#: components/researchers/FilterPanel.tsx:176
+#: components/researchers/FilterPanel.tsx:319
 #: components/researchers/GeneralTab.tsx:276
 #: lib/importConflicts.ts:64
 msgid "Employment type"
@@ -4596,7 +4606,7 @@ msgstr "Aucune"
 
 #: components/dashboard/ResearchersTab.tsx:208
 #: components/researchers/AbesExportModal.tsx:228
-#: components/researchers/FilterPanel.tsx:222
+#: components/researchers/FilterPanel.tsx:250
 #: components/researchers/ResearcherTable.tsx:88
 #: lib/importConflicts.ts:73
 msgid "Employer"
@@ -4770,7 +4780,7 @@ msgid "Presets"
 msgstr "Raccourcis"
 
 #: components/dashboard/StaffSection.tsx:96
-#: components/researchers/FilterPanel.tsx:206
+#: components/researchers/FilterPanel.tsx:227
 msgid "Membership"
 msgstr "Appartenance"
 
@@ -4783,6 +4793,8 @@ msgid "From the grade, else the employment type"
 msgstr "D'après le grade, sinon le type d'emploi"
 
 #: components/dashboard/StaffSection.tsx:114
+#: components/researchers/FilterPanel.tsx:242
+#: components/researchers/ResearcherTable.tsx:92
 msgid "Presence"
 msgstr "Présence"
 
@@ -7733,8 +7745,8 @@ msgid "Save to Grist"
 msgstr "Enregistrer dans Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3510
-#: lib/gristService.ts:3619
+#: lib/gristService.ts:3502
+#: lib/gristService.ts:3611
 msgid "Search error"
 msgstr "Erreur de recherche"
 
@@ -8633,8 +8645,8 @@ msgid "ORCID ({nOrcid} positions)"
 msgstr "ORCID ({nOrcid} postes)"
 
 #: components/researchers/AffiliationHistorySection.tsx:193
-#: components/researchers/FilterPanel.tsx:154
-#: components/researchers/FilterPanel.tsx:276
+#: components/researchers/FilterPanel.tsx:175
+#: components/researchers/FilterPanel.tsx:307
 msgid "Career path"
 msgstr "Parcours"
 
@@ -9131,108 +9143,135 @@ msgstr "Requalifier"
 msgid "Generated on {generatedAt}"
 msgstr "Généré le {generatedAt}"
 
-#: components/researchers/FilterPanel.tsx:131
+#: components/researchers/FilterPanel.tsx:140
+#: components/researchers/FilterPanel.tsx:153
 msgid "Not specified"
 msgstr "Non renseigné"
 
-#: components/researchers/FilterPanel.tsx:135
+#: components/researchers/FilterPanel.tsx:144
 msgid "Validated (expired)"
 msgstr "Validé (périmé)"
 
-#: components/researchers/FilterPanel.tsx:136
+#: components/researchers/FilterPanel.tsx:145
 msgid "Not validated"
 msgstr "Non validé"
 
-#: components/researchers/FilterPanel.tsx:139
+#: components/researchers/FilterPanel.tsx:151
+msgid "Home institution"
+msgstr "Établissement"
+
+#: components/researchers/FilterPanel.tsx:152
+msgid "Other employers"
+msgstr "Autres employeurs"
+
+#: components/researchers/FilterPanel.tsx:159
 msgid "Probable departure ({nDepart})"
 msgstr "Départ probable ({nDepart})"
 
-#: components/researchers/FilterPanel.tsx:140
+#: components/researchers/FilterPanel.tsx:160
 msgid "Confirmed departure ({nConfirmed})"
 msgstr "Départ confirmé ({nConfirmed})"
 
-#: components/researchers/FilterPanel.tsx:141
+#: components/researchers/FilterPanel.tsx:161
 msgid "Inconsistent status ({nIncoherent})"
 msgstr "Statut incohérent ({nIncoherent})"
 
-#: components/researchers/FilterPanel.tsx:142
+#: components/researchers/FilterPanel.tsx:162
 msgid "Identifiers to check ({nSuspect})"
 msgstr "Identifiants à vérifier ({nSuspect})"
 
-#: components/researchers/FilterPanel.tsx:153
-#: components/researchers/FilterPanel.tsx:273
+#: components/researchers/FilterPanel.tsx:173
+#: components/researchers/FilterPanel.tsx:301
+#: components/researchers/LdapMovesPanel.tsx:225
+msgid "LDAP account"
+msgstr "Compte LDAP"
+
+#: components/researchers/FilterPanel.tsx:174
+#: components/researchers/FilterPanel.tsx:304
 msgid "Validation"
 msgstr "Validation"
 
-#: components/researchers/FilterPanel.tsx:156
-#: components/researchers/FilterPanel.tsx:278
+#: components/researchers/FilterPanel.tsx:177
+#: components/researchers/FilterPanel.tsx:309
 #: components/researchers/GeneralTab.tsx:358
 msgid "Cluster"
 msgstr "Pôle"
 
-#: components/researchers/FilterPanel.tsx:157
+#: components/researchers/FilterPanel.tsx:178
 #: components/researchers/ResearcherTable.tsx:89
 #: lib/importConflicts.ts:97
 msgid "Identifiers"
 msgstr "Identifiants"
 
-#: components/researchers/FilterPanel.tsx:172
+#: components/researchers/FilterPanel.tsx:193
 msgid "Search for a researcher, a lab, an identifier…"
 msgstr "Rechercher un chercheur, un labo, un identifiant…"
 
-#: components/researchers/FilterPanel.tsx:186
+#: components/researchers/FilterPanel.tsx:207
 msgid "Merge the two selected records"
 msgstr "Fusionner les deux fiches sélectionnées"
 
-#: components/researchers/FilterPanel.tsx:186
+#: components/researchers/FilterPanel.tsx:207
 msgid "Select exactly two Grist records to merge"
 msgstr "Sélectionnez exactement deux fiches Grist à fusionner"
 
-#: components/researchers/FilterPanel.tsx:189
+#: components/researchers/FilterPanel.tsx:210
 #: components/structures/LifecycleTab.tsx:135
 msgctxt "noun"
 msgid "Merge"
 msgstr "Fusion"
 
-#: components/researchers/FilterPanel.tsx:200
+#: components/researchers/FilterPanel.tsx:221
 msgid "Lab of the primary affiliation"
 msgstr "Labo de l'affiliation principale"
 
-#: components/researchers/FilterPanel.tsx:207
+#: components/researchers/FilterPanel.tsx:228
 msgid "Membership type in the lab of the primary affiliation"
 msgstr "Type d'appartenance au labo de l'affiliation principale"
 
-#: components/researchers/FilterPanel.tsx:228
+#: components/researchers/FilterPanel.tsx:237
+msgid "Present and employed by the institution"
+msgstr "Présents et employés par l’établissement"
+
+#: components/researchers/FilterPanel.tsx:237
+msgid "Internal staff"
+msgstr "Personnels internes"
+
+#: components/researchers/FilterPanel.tsx:243
+msgid "Presence in the unit: present, leaving (end announced), left"
+msgstr "Présence dans l’unité : présent, départ (fin annoncée), parti"
+
+#: components/researchers/FilterPanel.tsx:256
 #: lib/importConflicts.ts:63
 msgid "Grade"
 msgstr "Corps-grade"
 
-#: components/researchers/FilterPanel.tsx:245
+#: components/researchers/FilterPanel.tsx:273
 msgid "Fewer filters"
 msgstr "Moins de filtres"
 
-#: components/researchers/FilterPanel.tsx:245
+#: components/researchers/FilterPanel.tsx:273
 msgid "More filters"
 msgstr "Plus de filtres"
 
 #. placeholder {0}: f.label
-#: components/researchers/FilterPanel.tsx:256
+#: components/researchers/FilterPanel.tsx:284
 msgid "Remove the filter {0}"
 msgstr "Retirer le filtre {0}"
 
-#: components/researchers/FilterPanel.tsx:279
+#: components/researchers/FilterPanel.tsx:310
 msgid "Identifiers present"
 msgstr "Identifiants présents"
 
-#: components/researchers/FilterPanel.tsx:281
+#: components/researchers/FilterPanel.tsx:312
 msgid "Employment period"
 msgstr "Période d'emploi"
 
-#: components/researchers/FilterPanel.tsx:283
+#: components/researchers/FilterPanel.tsx:314
 msgid "Start of the period"
 msgstr "Début de la période"
 
-#: components/researchers/FilterPanel.tsx:285
+#: components/researchers/FilterPanel.tsx:316
 msgid "End of the period"
 msgstr "Fin de la période"
 
@@ -9803,10 +9842,6 @@ msgstr "Aucun départ à enregistrer depuis cette date."
 msgid "Druid status"
 msgstr "Statut Druid"
 
-#: components/researchers/LdapMovesPanel.tsx:225
-msgid "LDAP account"
-msgstr "Compte LDAP"
-
 #: components/researchers/LdapMovesPanel.tsx:249
 msgid "Marked as left"
 msgstr "Marqué parti"
@@ -9900,7 +9935,7 @@ msgid "Manually validated status — LDAP contradicts it. Unchecked by default: 
 msgstr "Statut validé manuellement — le LDAP le contredit. Décoché par défaut : arbitrer avant d'écraser."
 
 #: components/researchers/LdapVerifyPanel.tsx:128
-#: components/researchers/StatusBadge.tsx:80
+#: components/researchers/PresenceBadge.tsx:97
 msgid "Validated — conflict"
 msgstr "Validé — conflit"
 
@@ -10316,6 +10351,42 @@ msgstr "Publications dont l’affiliation brute OpenAlex ne correspond pas au la
 msgid "First {MAX_ROWS} rows out of {0} — narrow with the lab filter."
 msgstr "{MAX_ROWS} premières lignes sur {0} — affinez avec le filtre labo."
 
+#: components/researchers/PresenceBadge.tsx:35
+msgid "No status"
+msgstr "Aucun statut"
+
+#: components/researchers/PresenceBadge.tsx:52
+msgid "closing"
+msgstr "en fermeture"
+
+#: components/researchers/PresenceBadge.tsx:79
+msgid "Source: {source}"
+msgstr "Source : {source}"
+
+#: components/researchers/PresenceBadge.tsx:80
+msgid "Validated on {date}"
+msgstr "Validé le {date}"
+
+#: components/researchers/PresenceBadge.tsx:81
+msgid "Covers: {scope}"
+msgstr "Porte sur : {scope}"
+
+#: components/researchers/PresenceBadge.tsx:82
+msgid "By {by}"
+msgstr "Par {by}"
+
+#: components/researchers/PresenceBadge.tsx:83
+msgid "⚠ Conflict: the source (LDAP / dates) says “{derivedLabel}”"
+msgstr "⚠ Conflit : la source (LDAP / dates) indique « {derivedLabel} »"
+
+#: components/researchers/PresenceBadge.tsx:84
+msgid "⚠ Validation expired — to be rechecked"
+msgstr "⚠ Validation périmée — à revérifier"
+
+#: components/researchers/PresenceBadge.tsx:97
+msgid "Expired"
+msgstr "Périmé"
+
 #: components/researchers/ResearcherTable.tsx:86
 msgid "Identity"
 msgstr "Identité"
@@ -10330,54 +10401,26 @@ msgstr "Appartenance"
 msgid "Probable departure (career path)"
 msgstr "Départ probable (parcours)"
 
-#: components/researchers/ResearcherTable.tsx:157
+#: components/researchers/ResearcherTable.tsx:144
+msgid "Employer not specified"
+msgstr "Employeur non renseigné"
+
+#: components/researchers/ResearcherTable.tsx:161
 msgid "Synchronising with Grist…"
 msgstr "Synchronisation avec Grist en cours…"
 
-#: components/researchers/ResearcherTable.tsx:161
+#: components/researchers/ResearcherTable.tsx:165
 msgid "No researcher found."
 msgstr "Aucun chercheur trouvé."
 
-#: components/researchers/ResearcherTable.tsx:176
+#: components/researchers/ResearcherTable.tsx:180
 msgid "Prev."
 msgstr "Préc."
 
-#: components/researchers/ResearcherTable.tsx:202
+#: components/researchers/ResearcherTable.tsx:206
 msgctxt "short"
 msgid "Next"
 msgstr "Suiv."
-
-#: components/researchers/StatusBadge.tsx:34
-msgid "No status"
-msgstr "Aucun statut"
-
-#: components/researchers/StatusBadge.tsx:62
-msgid "Source: {source}"
-msgstr "Source : {source}"
-
-#: components/researchers/StatusBadge.tsx:63
-msgid "Validated on {date}"
-msgstr "Validé le {date}"
-
-#: components/researchers/StatusBadge.tsx:64
-msgid "Covers: {scope}"
-msgstr "Porte sur : {scope}"
-
-#: components/researchers/StatusBadge.tsx:65
-msgid "By {by}"
-msgstr "Par {by}"
-
-#: components/researchers/StatusBadge.tsx:66
-msgid "⚠ Conflict: the source (LDAP / dates) says “{derivedLabel}”"
-msgstr "⚠ Conflit : la source (LDAP / dates) indique « {derivedLabel} »"
-
-#: components/researchers/StatusBadge.tsx:67
-msgid "⚠ Validation expired — to be rechecked"
-msgstr "⚠ Validation périmée — à revérifier"
-
-#: components/researchers/StatusBadge.tsx:80
-msgid "Expired"
-msgstr "Périmé"
 
 #: components/researchers/SuggestionsSection.tsx:34
 msgid "Create an ORCID iD"
@@ -11484,8 +11527,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Homonyme sans preuve d'affiliation"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3521
-#: lib/gristService.ts:3647
+#: lib/gristService.ts:3513
+#: lib/gristService.ts:3639
 msgid "Suspected mixed identity"
 msgstr "Identité mêlée suspectée"
 
@@ -12384,325 +12427,325 @@ msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:666
+#: lib/gristService.ts:667
 msgid "Error creating the affiliation columns: {0}"
 msgstr "Erreur création colonnes de rattachement : {0}"
 
-#: lib/gristService.ts:790
-#: lib/gristService.ts:2614
-#: lib/gristService.ts:3326
-#: lib/gristService.ts:3936
+#: lib/gristService.ts:791
+#: lib/gristService.ts:2606
+#: lib/gristService.ts:3318
+#: lib/gristService.ts:3928
 msgid "Grist error (table list)"
 msgstr "Erreur Grist (liste des tables)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:797
+#: lib/gristService.ts:798
 msgid "Error creating table {MERGE_LOG_TABLE}: {0}"
 msgstr "Erreur de création de la table {MERGE_LOG_TABLE} : {0}"
 
-#: lib/gristService.ts:1436
+#: lib/gristService.ts:1432
 msgid "Invalid entity code “{code}”: letters, digits, “-”, “_” or “.” only"
 msgstr "Code entité « {code} » invalide : lettres, chiffres, « - », « _ » ou « . » uniquement"
 
-#: lib/gristService.ts:1889
+#: lib/gristService.ts:1881
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/gristService.ts:1901
+#: lib/gristService.ts:1893
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/gristService.ts:1903
+#: lib/gristService.ts:1895
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1975
+#: lib/gristService.ts:1967
 msgid "Grist error (writing the secondary affiliations): {0}"
 msgstr "Erreur Grist (écriture des appartenances secondaires) : {0}"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:1996
+#: lib/gristService.ts:1988
 msgid "Grist error (creating the secondary affiliations): {0}"
 msgstr "Erreur Grist (création des appartenances secondaires) : {0}"
 
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2008
-#: lib/gristService.ts:2595
+#: lib/gristService.ts:2000
+#: lib/gristService.ts:2587
 msgid "Grist error (merge log): {0}"
 msgstr "Erreur Grist (journal des fusions) : {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2012
+#: lib/gristService.ts:2004
 msgid "Grist error (deleting the removed affiliations): {0}"
 msgstr "Erreur Grist (suppression des appartenances retirées) : {0}"
 
-#: lib/gristService.ts:2038
+#: lib/gristService.ts:2030
 msgid "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne `groupes` existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2059
+#: lib/gristService.ts:2051
 msgid "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne `openalex_author_id` existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2172
+#: lib/gristService.ts:2164
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/gristService.ts:2175
+#: lib/gristService.ts:2167
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
 #. placeholder {0}: dup.acronym
 #. placeholder {1}: level === StructureLevel.EQUIPE ? t` in ${parent}` : ''
-#: lib/gristService.ts:2181
+#: lib/gristService.ts:2173
 msgid "A structure “{0}” already exists{1}"
 msgstr "Une structure « {0} » existe déjà{1}"
 
-#: lib/gristService.ts:2181
+#: lib/gristService.ts:2173
 msgid " in {parent}"
 msgstr " dans {parent}"
 
-#: lib/gristService.ts:2191
+#: lib/gristService.ts:2183
 msgid "local_id “{localId}” already used"
 msgstr "local_id « {localId} » déjà utilisé"
 
 #. placeholder {0}: await resp.text()
-#: lib/gristService.ts:2224
+#: lib/gristService.ts:2216
 msgid "Error creating the Grist structure: {0}"
 msgstr "Erreur création Structure Grist : {0}"
 
-#: lib/gristService.ts:2232
+#: lib/gristService.ts:2224
 msgid "Invalid ID"
 msgstr "ID invalide"
 
-#: lib/gristService.ts:2467
+#: lib/gristService.ts:2459
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2509
+#: lib/gristService.ts:2501
 msgid "Grist error (de-qualification): {0}"
 msgstr "Erreur Grist (dé-qualification) : {0}"
 
-#: lib/gristService.ts:2542
+#: lib/gristService.ts:2534
 msgid "Invalid LDAP uid: {toUid}"
 msgstr "Uid LDAP invalide : {toUid}"
 
-#: lib/gristService.ts:2544
+#: lib/gristService.ts:2536
 msgid "The uid {toUid} already has a directory record: merge the two records instead"
 msgstr "L’uid {toUid} a déjà une fiche dans l’annuaire : fusionnez plutôt les deux fiches"
 
 #. placeholder {0}: fromUid || '—'
-#: lib/gristService.ts:2547
+#: lib/gristService.ts:2539
 msgid "Record not found in Grist (uid {0})"
 msgstr "Fiche introuvable dans Grist (uid {0})"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2557
+#: lib/gristService.ts:2549
 msgid "Grist error (uid change): {0}"
 msgstr "Erreur Grist (changement d’uid) : {0}"
 
-#: lib/gristService.ts:2578
+#: lib/gristService.ts:2570
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/gristService.ts:2582
+#: lib/gristService.ts:2574
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2602
+#: lib/gristService.ts:2594
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Erreur Grist (écriture ligne conservée, journal #{logId}) : {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2607
+#: lib/gristService.ts:2599
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Erreur Grist (suppression ligne absorbée, journal #{logId}) : {0}"
 
-#: lib/gristService.ts:2618
-#: lib/gristService.ts:2640
+#: lib/gristService.ts:2610
+#: lib/gristService.ts:2632
 msgid "Grist error (merge log)"
 msgstr "Erreur Grist (journal des fusions)"
 
-#: lib/gristService.ts:2642
+#: lib/gristService.ts:2634
 msgid "Merge #{logId} not found"
 msgstr "Fusion #{logId} introuvable"
 
-#: lib/gristService.ts:2643
+#: lib/gristService.ts:2635
 msgid "Merge #{logId} already restored"
 msgstr "Fusion #{logId} déjà restaurée"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2653
+#: lib/gristService.ts:2645
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Erreur Grist (recréation de la ligne) : {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2663
+#: lib/gristService.ts:2655
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Ligne recréée (#{restoredRowId}) mais journal des fusions non mis à jour : {0} — ne pas relancer la restauration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2671
+#: lib/gristService.ts:2663
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Ligne recréée (#{restoredRowId}) mais ligne conservée #{0} non rétablie : {1}"
 
-#: lib/gristService.ts:2684
-#: lib/gristService.ts:3256
-#: lib/gristService.ts:3724
-#: lib/gristService.ts:3801
+#: lib/gristService.ts:2676
+#: lib/gristService.ts:3248
+#: lib/gristService.ts:3716
+#: lib/gristService.ts:3793
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Erreur Grist (lecture Annuaire avant écriture)"
 
-#: lib/gristService.ts:3014
-#: lib/gristService.ts:3053
-#: lib/gristService.ts:3215
-#: lib/gristService.ts:3626
-#: lib/gristService.ts:3654
+#: lib/gristService.ts:3006
+#: lib/gristService.ts:3045
+#: lib/gristService.ts:3207
+#: lib/gristService.ts:3618
+#: lib/gristService.ts:3646
 msgid "Identifier mismatch"
 msgstr "Divergence identifiant"
 
-#: lib/gristService.ts:3032
+#: lib/gristService.ts:3024
 msgid "Record deleted"
 msgstr "Notice supprimée"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3032
+#: lib/gristService.ts:3024
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0} : la notice n'existe plus sur IdRef (404) — corriger ou retirer l'IdRef de l'Annuaire"
 
-#: lib/gristService.ts:3036
+#: lib/gristService.ts:3028
 msgid "Record unreadable"
 msgstr "Notice illisible"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3036
+#: lib/gristService.ts:3028
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0} : notice IdRef inaccessible (erreur réseau ou IdRef indisponible lors du run — relancer)"
 
-#: lib/gristService.ts:3319
+#: lib/gristService.ts:3311
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "La revue Grist ne concerne que le mode « recherche des manquants »"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3334
-#: lib/gristService.ts:3944
+#: lib/gristService.ts:3326
+#: lib/gristService.ts:3936
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Erreur création table {IDREF_REVIEW_TABLE} : {0}"
 
-#: lib/gristService.ts:3510
-#: lib/gristService.ts:3517
-#: lib/gristService.ts:3619
-#: lib/gristService.ts:3641
+#: lib/gristService.ts:3502
+#: lib/gristService.ts:3509
+#: lib/gristService.ts:3611
+#: lib/gristService.ts:3633
 msgid "API unreachable during the run — rerun."
 msgstr "API injoignable lors du run — relancer."
 
-#: lib/gristService.ts:3517
-#: lib/gristService.ts:3641
+#: lib/gristService.ts:3509
+#: lib/gristService.ts:3633
 msgid "Verification error"
 msgstr "Erreur de vérification"
 
-#: lib/gristService.ts:3520
-#: lib/gristService.ts:3649
+#: lib/gristService.ts:3512
+#: lib/gristService.ts:3641
 msgid "Name mismatch"
 msgstr "Nom divergent"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3520
+#: lib/gristService.ts:3512
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} « {1} » ≠ Annuaire « {displayName} »"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3521
+#: lib/gristService.ts:3513
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} « {1} » : {2} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#: lib/gristService.ts:3524
+#: lib/gristService.ts:3516
 msgid "{a} merged into {b}"
 msgstr "{a} fusionné dans {b}"
 
-#: lib/gristService.ts:3525
+#: lib/gristService.ts:3517
 msgid "{a} gone"
 msgstr "{a} disparu"
 
-#: lib/gristService.ts:3526
+#: lib/gristService.ts:3518
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = profil ORCID manquant"
 
-#: lib/gristService.ts:3528
+#: lib/gristService.ts:3520
 msgid "List to fix (not written)"
 msgstr "Liste à corriger (non écrite)"
 
-#: lib/gristService.ts:3528
+#: lib/gristService.ts:3520
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → relancer le run (écriture directe) ou corriger OpenAlex_ids"
 
-#: lib/gristService.ts:3632
+#: lib/gristService.ts:3624
 msgid "Unknown ORCID"
 msgstr "ORCID inconnu"
 
-#: lib/gristService.ts:3632
+#: lib/gristService.ts:3624
 msgid "Unknown Scopus Author ID"
 msgstr "Scopus Author ID inconnu"
 
-#: lib/gristService.ts:3632
+#: lib/gristService.ts:3624
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL inconnu de HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3633
+#: lib/gristService.ts:3625
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 
-#: lib/gristService.ts:3637
+#: lib/gristService.ts:3629
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3637
+#: lib/gristService.ts:3629
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
 
-#: lib/gristService.ts:3638
+#: lib/gristService.ts:3630
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3638
+#: lib/gristService.ts:3630
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
 
-#: lib/gristService.ts:3646
+#: lib/gristService.ts:3638
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3646
+#: lib/gristService.ts:3638
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3647
+#: lib/gristService.ts:3639
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3649
+#: lib/gristService.ts:3641
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire « {displayName} » ≠ profil « {0} »{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3893
+#: lib/gristService.ts:3885
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} absente : lancez d'abord un run {1} (elle est créée par le script)."
 
@@ -12766,43 +12809,61 @@ msgstr "RH"
 msgid "Links"
 msgstr "Liens"
 
-#: lib/researcherLabels.ts:14
+#: lib/researcherLabels.ts:15
 msgid "Internal"
 msgstr "Interne"
 
-#: lib/researcherLabels.ts:15
+#: lib/researcherLabels.ts:16
+#: lib/researcherLabels.ts:24
 msgid "Leaving"
 msgstr "Départ"
 
-#: lib/researcherLabels.ts:16
+#: lib/researcherLabels.ts:17
+#: lib/researcherLabels.ts:25
 msgid "Left"
 msgstr "Parti"
 
-#: lib/researcherLabels.ts:17
+#: lib/researcherLabels.ts:18
 msgid "External"
 msgstr "Externe"
 
-#: lib/researcherLabels.ts:21
+#: lib/researcherLabels.ts:23
+msgid "Present"
+msgstr "Présent"
+
+#: lib/researcherLabels.ts:30
+msgid "Active account"
+msgstr "Compte actif"
+
+#: lib/researcherLabels.ts:31
+msgid "Account closing"
+msgstr "Compte en fermeture"
+
+#: lib/researcherLabels.ts:32
+msgid "No account"
+msgstr "Pas de compte"
+
+#: lib/researcherLabels.ts:36
 msgid "status"
 msgstr "statut"
 
-#: lib/researcherLabels.ts:22
+#: lib/researcherLabels.ts:37
 msgid "affiliation"
 msgstr "rattachement"
 
-#: lib/researcherLabels.ts:27
+#: lib/researcherLabels.ts:42
 msgid "Statutory member"
 msgstr "Membre statutaire"
 
-#: lib/researcherLabels.ts:28
+#: lib/researcherLabels.ts:43
 msgid "Associate member"
 msgstr "Membre associé"
 
-#: lib/researcherLabels.ts:29
+#: lib/researcherLabels.ts:44
 msgid "Secondary affiliation"
 msgstr "Rattachement secondaire"
 
-#: lib/researcherLabels.ts:30
+#: lib/researcherLabels.ts:45
 msgid "Visiting member"
 msgstr "Visiteur / invité"
 

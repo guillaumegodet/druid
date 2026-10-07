@@ -1475,6 +1475,9 @@ export const GristService = {
       } catch (e) {
         console.warn('LDAP cache not found.');
       }
+      // No LDAP cache (instance without LDAP, test instance, sync never run): an uid missing from it
+      // proves nothing — presence then comes from the dates and validations only.
+      const ldapAvailable = Object.keys(ldapCache).length > 0;
 
       // 3. Fetch the institutions
       const institutionsResp = await fetch(`${gristDocUrl()}/tables/Etablissements/records`);
@@ -1568,7 +1571,7 @@ export const GristService = {
         // before 2026-10-07, read as PRESENT). `derivedPresence` = without it, to flag a conflict.
         const validation = parseValidation(fields, fromGristDate);
         const presenceInput: PresenceInput = {
-          employer: employerKind, hasRealUid, ldapEtat,
+          employer: employerKind, hasRealUid: hasRealUid && ldapAvailable, ldapEtat,
           employmentEnd: fromGristFuzzyDate(fields['employment_end_date']),
           membershipEnd: fromGristFuzzyDate(fields[AFFILIATION_END_COL]),
           retireeWithoutEmeritus: isRetireeWithoutEmeritus(emeritusSignals),

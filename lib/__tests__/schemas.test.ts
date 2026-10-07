@@ -111,3 +111,16 @@ describe('ResearcherListSchema', () => {
     expect(result.success && result.data.length).toBe(0);
   });
 });
+
+describe('ResearcherSchema keeps the computed axes', () => {
+  it('presence, LDAP account, employer kind, derived status and eppn survive the parse', async () => {
+    const { Presence } = await import('../presence');
+    const parsed = ResearcherSchema.parse({
+      id: 'x', civility: '', lastName: 'A', firstName: 'B', displayName: 'A B', email: '', status: 'INTERNE',
+      employment: { employer: '' }, identifiers: {},
+      presence: Presence.DEPART, derivedPresence: Presence.PRESENT, ldapAccount: 'closing', employerKind: 'home',
+      derivedStatus: 'DEPART', eppn: 'a@example.org',
+    });
+    expect(parsed).toMatchObject({ presence: 'DEPART', derivedPresence: 'PRESENT', ldapAccount: 'closing', employerKind: 'home', derivedStatus: 'DEPART', eppn: 'a@example.org' });
+  });
+});

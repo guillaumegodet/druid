@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Search, Filter, Users, Merge, SlidersHorizontal, X } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { MEMBERSHIP_TYPES, ResearcherStatus } from '../../types';
+import { MEMBERSHIP_TYPES } from '../../types';
 import { MultiSelectFilter } from './MultiSelectFilter';
-import { MEMBERSHIP_LABELS, STATUS_LABELS } from '../../lib/researcherLabels';
+import { LDAP_ACCOUNT_LABELS, MEMBERSHIP_LABELS, PRESENCE_LABELS } from '../../lib/researcherLabels';
+import { EMPLOYER_EXTERNAL, EMPLOYER_HOME, EMPLOYER_NONE, LDAP_ACCOUNT_VALUES, PRESENCE_VALUES, isInternalShortcut } from '../../lib/presenceFilter';
 import { MEMBERSHIP_NONE } from '../../lib/membershipFilter';
 import type { IdFilters } from '../../hooks/useResearcherFilters';
 import { canWrite, hasCapability } from '../../lib/auth';
@@ -11,8 +12,14 @@ import { canWrite, hasCapability } from '../../lib/auth';
 interface FilterPanelProps {
   searchTerm: string;
   onSearchChange: (val: string) => void;
-  filterStatuses: string[];
-  onStatusChange: (vals: string[]) => void;
+  /** Presence axis (lib/presence.ts) — replaced the « status » filter. */
+  filterPresence: string[];
+  onPresenceChange: (vals: string[]) => void;
+  /** Institution LDAP account (instances with HAS_LDAP). */
+  filterLdap: string[];
+  onLdapChange: (vals: string[]) => void;
+  /** « Internal staff » shortcut: present + home employer (D6). */
+  onInternalShortcut: (on: boolean) => void;
   filterValidation: string[];
   onValidationChange: (vals: string[]) => void;
   filterEmployers: string[];
@@ -103,7 +110,9 @@ const ID_LABELS: Record<keyof IdFilters, string> = { orcid: 'ORCID', hal: 'HAL',
  * whose active values stay visible as removable chips when it is closed. */
 export const FilterPanel: React.FC<FilterPanelProps> = ({
   searchTerm, onSearchChange,
-  filterStatuses, onStatusChange,
+  filterPresence, onPresenceChange,
+  filterLdap, onLdapChange,
+  onInternalShortcut,
   filterValidation, onValidationChange,
   filterEmployers, onEmployerChange,
   filterLabs, onLabChange,
@@ -135,6 +144,17 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     { value: 'stale', label: t`Validated (expired)` },
     { value: 'not_validated', label: t`Not validated` },
   ];
+  const presenceOptions: Option[] = PRESENCE_VALUES.map((p) => ({ value: p, label: t(PRESENCE_LABELS[p]) }));
+  const ldapOptions: Option[] = LDAP_ACCOUNT_VALUES.map((a) => ({ value: a, label: t(LDAP_ACCOUNT_LABELS[a]) }));
+  // Employer kinds first (lib/presenceFilter.ts), then the names.
+  const employerOptions: Option[] = [
+    { value: EMPLOYER_HOME, label: t`Home institution` },
+    { value: EMPLOYER_EXTERNAL, label: t`Other employers` },
+    { value: EMPLOYER_NONE, label: t`Not specified` },
+    ...employers.filter((e) => !/^non renseign/i.test(e)).sort((a, b) => a.localeCompare(b)).map((e) => ({ value: e, label: e })),
+  ];
+  const showLdap = hasCapability('HAS_LDAP');
+  const internalOn = isInternalShortcut(filterPresence, filterEmployers);
   const parcoursOptions: Option[] = [
     { value: 'depart', label: t`Probable departure (${nDepart})` },
     { value: 'depart_confirme', label: t`Confirmed departure (${nConfirmed})` },
@@ -150,6 +170,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const labelsOf = (options: Option[], selected: string[]) =>
     selected.map((v) => options.find((o) => o.value === v)?.label ?? v).join(', ');
   const hiddenActive: { key: string; label: string; value: string; clear: () => void }[] = [
+    ...(showLdap && filterLdap.length ? [{ key: 'ldap', label: t`LDAP account`, value: labelsOf(ldapOptions, filterLdap), clear: () => onLdapChange([]) }] : []),
     ...(hasStatusValidation && filterValidation.length ? [{ key: 'validation', label: t`Validation`, value: labelsOf(validationOptions, filterValidation), clear: () => onValidationChange([]) }] : []),
     ...(showParcours && filterParcours.length ? [{ key: 'parcours', label: t`Career path`, value: labelsOf(parcoursOptions, filterParcours), clear: () => onParcoursChange!([]) }] : []),
     ...(filterContractTypes.length ? [{ key: 'contract', label: t`Employment type`, value: filterContractTypes.join(', '), clear: () => onContractTypeChange([]) }] : []),
@@ -158,7 +179,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     ...(filterDateStart || filterDateEnd ? [{ key: 'period', label: t`Period`, value: `${filterDateStart || '…'} → ${filterDateEnd || '…'}`, clear: () => { onDateStartChange(''); onDateEndChange(''); } }] : []),
   ];
   const anyActive = hiddenActive.length > 0 || filterLabs.length > 0 || filterMemberships.length > 0 ||
-    filterEmployers.length > 0 || filterGrades.length > 0 || (hasStatusValidation && filterStatuses.length > 0);
+    filterEmployers.length > 0 || filterGrades.length > 0 || (hasStatusValidation && filterPresence.length > 0);
 
   return (
   <div className="space-y-2.5 mb-4">
@@ -209,18 +230,25 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         selected={filterMemberships}
         onChange={onMembershipChange}
       />
-      {/* Internal/external status: configurable per instance (HAS_STATUS_VALIDATION). */}
+      {/* Presence (configurable per instance, HAS_STATUS_VALIDATION) and employer: two separate axes;
+          the « Internal staff » shortcut combines them (present + home employer). */}
+      {hasStatusValidation && (
+        <ToggleChip active={internalOn} onClick={() => onInternalShortcut(!internalOn)}>
+          <span title={t`Present and employed by the institution`}><Trans>Internal staff</Trans></span>
+        </ToggleChip>
+      )}
       {hasStatusValidation && (
         <MultiSelectFilter
-          label={t`Status`}
-          options={Object.values(ResearcherStatus).map((s) => ({ value: s, label: t(STATUS_LABELS[s]) }))}
-          selected={filterStatuses}
-          onChange={onStatusChange}
+          label={t`Presence`}
+          title={t`Presence in the unit: present, leaving (end announced), left`}
+          options={presenceOptions}
+          selected={filterPresence}
+          onChange={onPresenceChange}
         />
       )}
       <MultiSelectFilter
         label={t`Employer`}
-        options={toOptions(employers)}
+        options={employerOptions}
         selected={filterEmployers}
         onChange={onEmployerChange}
       />
@@ -269,6 +297,9 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     {/* « More filters » panel: secondary filters as toggle chips */}
     {moreOpen && (
       <div className="rounded-2xl bg-white/55 dark:bg-white/5 border border-white/70 dark:border-white/10 p-4 flex flex-wrap gap-x-8 gap-y-4">
+        {showLdap && (
+          <ChipGroup label={t`LDAP account`} options={ldapOptions} selected={filterLdap} onChange={onLdapChange} />
+        )}
         {hasStatusValidation && (
           <ChipGroup label={t`Validation`} options={validationOptions} selected={filterValidation} onChange={onValidationChange} />
         )}

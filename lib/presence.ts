@@ -15,7 +15,7 @@
  */
 import { ResearcherStatus } from '../types';
 import { fuzzyDateUpperBound, isFuzzyDatePast, todayIso } from './dates';
-import { isExternalEmployer } from './validation';
+import { isExternalEmployer, type ValidationInfo } from './validation';
 
 export enum Presence {
   PRESENT = 'PRESENT',
@@ -118,4 +118,15 @@ export const legacyStatus = (presence: Presence, employer: EmployerKind, ldapAcc
   if (presence === Presence.PARTI) return ResearcherStatus.PARTI;
   if (presence === Presence.DEPART) return ResearcherStatus.DEPART;
   return isHomeStaff(employer, ldapAccount) ? ResearcherStatus.INTERNE : ResearcherStatus.EXTERNE;
+};
+
+/**
+ * A validation covering the status contradicts what the sources (LDAP, dates) say about the presence:
+ * the displayed presence is the validated one, the badge flags the divergence. INTERNE vs EXTERNE is
+ * no longer a conflict (both mean present; the employer is a separate axis).
+ */
+export const hasPresenceConflict = (validation: ValidationInfo | undefined, derived: Presence | undefined): boolean => {
+  if (!derived || !validation?.validated || !validation.validationScope.includes('statut')) return false;
+  const validated = presenceFromValidated(validation.validatedStatus);
+  return !!validated && validated !== derived;
 };

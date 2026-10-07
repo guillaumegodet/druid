@@ -10,7 +10,7 @@ import {
 } from '../../lib/ldapMoves';
 import { formatFuzzyDate } from '../../lib/dates';
 import { usePersistedState } from '../../lib/usePersistedState';
-import { StatusBadge } from './StatusBadge';
+import { PresenceBadge } from './PresenceBadge';
 import { PixelBtn } from './alignAtoms';
 
 /**
@@ -239,7 +239,7 @@ export const LdapMovesPanel: React.FC<Props> = ({ researchers, structures, onCre
                             <div className="font-mono text-[11px] text-muted-faint">{d.person.uid}</div>
                           </td>
                           <td className={td}><div className="flex flex-wrap gap-1">{labs.length ? labs.map((l) => <Chip key={l}>{l}</Chip>) : <span className="text-muted-faint">—</span>}</div></td>
-                          <td className={td}><StatusBadge status={d.researcher.status} /></td>
+                          <td className={td}><PresenceBadge presence={d.researcher.presence} ldapAccount={d.researcher.ldapAccount} /></td>
                           <td className={td}>{t(ACCOUNT_LABEL(d.person.account))}</td>
                           <td className={`${td} whitespace-nowrap`}>{formatFuzzyDate(d.since)}</td>
                           <td className={td}>{d.person.categorie || '—'}</td>

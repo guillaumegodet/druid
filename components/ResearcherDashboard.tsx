@@ -3,10 +3,11 @@ import {
   PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid, LabelList
 } from 'recharts';
-import { Researcher, ResearcherStatus } from '../types';
+import { Researcher } from '../types';
 import { Users, UserPlus, Activity, PieChart as PieIcon, BarChart3 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { STATUS_LABELS } from '../lib/researcherLabels';
+import { PRESENCE_LABELS } from '../lib/researcherLabels';
+import { Presence } from '../lib/presence';
 
 interface ResearcherDashboardProps {
   researchers: Researcher[];
@@ -36,19 +37,22 @@ export const ResearcherDashboard: React.FC<ResearcherDashboardProps> = ({ resear
   // calls producing labels, otherwise the charts would keep the previous language.
   const { t } = useLingui();
 
+  // Presence × employer (lib/presence.ts): the present staff split by employer kind, then leaving / left.
   const statusData = useMemo(() => {
-    let interne = 0; let depart = 0; let parti = 0; let externe = 0;
+    let home = 0; let external = 0; let unknown = 0; let depart = 0; let parti = 0;
     researchers.forEach(r => {
-      if (r.status === ResearcherStatus.INTERNE) interne++;
-      else if (r.status === ResearcherStatus.DEPART) depart++;
-      else if (r.status === ResearcherStatus.PARTI) parti++;
-      else externe++;
+      if (r.presence === Presence.DEPART) depart++;
+      else if (r.presence === Presence.PARTI) parti++;
+      else if (r.employerKind === 'home') home++;
+      else if (r.employerKind === 'external') external++;
+      else unknown++;
     });
     return [
-      { name: t(STATUS_LABELS[ResearcherStatus.INTERNE]), value: interne, color: '#2ea066' }, // Green
-      { name: t(STATUS_LABELS[ResearcherStatus.DEPART]), value: depart, color: '#d64545' },  // Soft red
-      { name: t(STATUS_LABELS[ResearcherStatus.PARTI]), value: parti, color: '#3b5bdb' },    // Blue
-      { name: t(STATUS_LABELS[ResearcherStatus.EXTERNE]), value: externe, color: '#e09e2a' }, // Amber
+      { name: t`Present — institution`, value: home, color: '#2ea066' },          // Green
+      { name: t`Present — other employer`, value: external, color: '#e09e2a' },   // Amber
+      { name: t`Present — employer not specified`, value: unknown, color: '#b8ad94' },
+      { name: t(PRESENCE_LABELS[Presence.DEPART]), value: depart, color: '#d64545' },  // Soft red
+      { name: t(PRESENCE_LABELS[Presence.PARTI]), value: parti, color: '#3b5bdb' },    // Blue
     ].filter(d => d.value > 0);
   }, [researchers, t]);
 
@@ -221,7 +225,7 @@ export const ResearcherDashboard: React.FC<ResearcherDashboardProps> = ({ resear
         {/* Breakdown by status */}
         <div className="glass-card p-6 h-[380px] flex flex-col">
           <h3 className="font-disp text-lg font-bold tracking-tight mb-4 flex items-center gap-2 text-ink dark:text-[#f5f2ea]">
-            <PieIcon className="w-5 h-5 text-[#2ea066]" /> <Trans>Breakdown by status</Trans>
+            <PieIcon className="w-5 h-5 text-[#2ea066]" /> <Trans>Breakdown by presence and employer</Trans>
           </h3>
           <div className="flex-1 min-h-0">
             <ResponsiveContainer width="100%" height="100%">
