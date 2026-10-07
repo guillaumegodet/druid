@@ -12,6 +12,51 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.7.0] — 2026-10-07
+
+### Ajouté
+- Tableau de bord › Collaborations › **Par pays** : le bilan des collaborations avec un pays partenaire. Choix du
+  pays (du plus fréquent au moins fréquent, gardé dans le lien `?sub=country&cc=`), options « Exclure les grandes
+  collaborations (> 50 auteurs) » et « Regrouper hôpitaux et instituts avec leur université ». Chiffres clés
+  (co-publications, part de l'international, rang parmi les pays partenaires, tendance, part bilatérale,
+  chercheurs, labos, accès ouvert, grandes collaborations) ; évolution annuelle et rang du pays ; établissements
+  **du pays seulement** (carte cadrée sur leurs coordonnées, classement, provinces ou régions quand l'export les
+  connaît) ; labos et chercheurs impliqués, tableau « qui travaille avec qui » ; domaines, sous-disciplines et
+  indice de spécialisation ; impact comparé aux autres co-publications internationales des mêmes
+  sous-disciplines (hors publications de plus de 50 auteurs) ; financeurs par origine (pays, Europe, France,
+  autres) ; part bilatérale, autres pays, langues. Les clics ouvrent la liste des publications filtrée.
+- Rapports : modèle **« Collaboration avec un pays »** (présentation, synthèse IA, chiffres clés, dynamique et rang,
+  établissements et carte, personnes et labos, thématiques et spécialisation, analyse IA par grand thème, impact,
+  financements, autres pays et langues, liste des publications ; aucun chiffre écrit dans les textes). 15
+  graphiques `pays-*` et deux jeux de chiffres clés (collaboration avec un pays, impact) partageables et
+  ajoutables à un rapport depuis le sous-onglet, avec le pays et les options choisis. Ils lisent le pays dans les
+  filtres du rapport et le corpus complet pour le rang, la part de l'international et la référence d'impact
+  (aperçu, PDF, liens `/embed`).
+- Centre d'aide (fr, en) : guide « Analyser les collaborations » (sous-onglet Par pays, spécialisation, impact),
+  « Modèles de rapport », « Publications et attribution » (pays d'une publication), Nouveautés.
+
+### Modifié
+- Le pays d'une publication comprend aussi les pays de ses institutions partenaires (sous-onglet Par pays, filtre
+  « Pays » de la liste des publications). Les exports druid-biblio du 2026-10-07 réunissent les pays de toutes les
+  sources et recalculent le caractère international : les chiffres internationaux augmentent.
+- Modèle « Collaborations internationales » : plus de paramètre pays, il porte sur tous les pays (les rapports
+  enregistrés ne changent pas). Formulaire « Nouveau rapport » : le pays est obligatoire pour le modèle pays et la
+  liste propose les pays étrangers, institutions comprises.
+- Synthèse IA d'un rapport limité à un pays : traitée comme une collaboration (pistes de coopération, partenaire =
+  le pays).
+- Collaborations : le sous-onglet ouvert est gardé dans le lien (`?sub=`).
+
+### Corrigé
+- Notices d'encyclopédie « signées » par les directeurs de l'ouvrage (OpenAlex les donne comme auteurs de chaque
+  entrée) : marquées par druid-biblio (`isEditorialEntry`), elles ne comptent plus comme collaborations ni dans les
+  classements de chercheurs (classement, publications par membre et par âge, réseau de co-signatures), mais restent
+  dans les volumes de la structure.
+
+### Migration
+- Aucune opération au déploiement : les exports druid-biblio (pays complétés, région et université de tutelle des
+  établissements, pays des financeurs, notices éditoriales marquées) ont été régénérés le 2026-10-07 et sont déjà
+  servis à la production.
+
 ## [1.6.1] — 2026-10-07
 
 ### Corrigé
