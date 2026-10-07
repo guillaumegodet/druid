@@ -9,8 +9,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { createDirectoryApi } from '../lib/directory/api';
 import {
-  createGristDirectoryRepository, createGristReader, DirectoryScope, LdapCacheSnapshot,
+  createGristDirectoryRepository, createGristReader, DirectoryScope, GristReader, LdapCacheSnapshot,
 } from '../lib/directory/repository';
+import { createGristPublicationsStore } from '../lib/publications/store';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
 interface NodeRequest {
@@ -30,6 +31,8 @@ export interface ApiV1Options {
   gristApiBase: string;
   gristDocId: string;
   gristApiKey: string;
+  /** Other documents the instance may read (GRIST_EXTRA_DOC_IDS: axes curation of a structure). */
+  gristExtraDocIds?: string[];
   /** Folder holding ldap_status_cache.json (app root), dist/ being the fallback — same rule as the
    * /ldap_status_cache.json route of server.cjs. */
   appRoot: string;
@@ -86,18 +89,24 @@ const toWebRequest = (req: NodeRequest): Request => {
 
 /** Express handler of `/api/v1/*`. */
 export const createApiV1Handler = (options: ApiV1Options) => {
+  if (!options.gristDocId) throw new Error('VITE_GRIST_DOC_ID is not set: no directory document to serve');
   const api = createDirectoryApi();
-  const repository = createGristDirectoryRepository({
-    grist: createGristReader({
-      apiBase: options.gristApiBase,
-      docId: options.gristDocId,
-      apiKey: options.gristApiKey,
-      userAgent: 'Druid-CRISalid/1.0',
-    }),
-    loadLdapCache: ldapCacheLoader(options.appRoot),
-  });
+  const readers = new Map<string, GristReader>();
+  const allowedDocs = new Set([options.gristDocId, ...(options.gristExtraDocIds || [])].filter(Boolean));
+  const readerFor = (docId: string): GristReader | null => {
+    if (!allowedDocs.has(docId)) return null;
+    if (!readers.has(docId)) {
+      readers.set(docId, createGristReader({
+        apiBase: options.gristApiBase, docId, apiKey: options.gristApiKey, userAgent: 'Druid-CRISalid/1.0',
+      }));
+    }
+    return readers.get(docId)!;
+  };
+  const main = readerFor(options.gristDocId)!;
+  const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapCacheLoader(options.appRoot) });
+  const publications = createGristPublicationsStore({ main, readerFor });
   return async (req: NodeRequest, res: NodeResponse): Promise<void> => {
-    const response = await api.fetch(toWebRequest(req), { repository, scope: scopeOfSession(req) });
+    const response = await api.fetch(toWebRequest(req), { repository, publications, scope: scopeOfSession(req) });
     res.status(response.status);
     response.headers.forEach((value, name) => res.setHeader(name, value));
     res.end(Buffer.from(await response.arrayBuffer()));

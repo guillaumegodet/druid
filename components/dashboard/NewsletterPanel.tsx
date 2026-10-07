@@ -9,6 +9,8 @@ import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { apiErrorText } from '../../lib/apiErrors';
 import { gristDocId } from '../../lib/instanceRuntime';
+import { DirectoryApi } from '../../lib/directoryApi';
+import type { NewsletterItem, NewsletterStatus } from '../../lib/publications/newsletter';
 
 // Editorial workflow of the general-public newsletter: news items are generated
 // by /api/newsletter/generate (ILAAS LLM, OpenAlex articles ≤ 30 days) and
@@ -18,30 +20,12 @@ import { gristDocId } from '../../lib/instanceRuntime';
 // newsletter (phase 1: HTML export + recipients to paste into the mailing
 // mail institutionnel).
 
-// Always through the proxy (writes); doc of the instance from /api/me (lib/instanceRuntime.ts).
+// Reads through the domain API (/api/v1/newsletter, people); writes still through the proxy (migration plan,
+// lot 2) — doc of the instance from /api/me (lib/instanceRuntime.ts).
 const GRIST = '/api/grist';
 
-type Statut = 'genere' | 'envoye' | 'valide' | 'rejete' | 'publie';
-
-interface NlItem {
-  id: number;
-  work_id: string;
-  numero: string;
-  titre: string;
-  doi: string;
-  date_publication: string;
-  journal: string;
-  auteurs: string;
-  labs: string;
-  accroche: string;
-  resume: string;
-  statut: Statut;
-  chercheur_nom: string;
-  chercheur_email: string;
-  chercheur_photo: string;
-  chercheur_url: string;
-  valide_par: string;
-}
+type Statut = NewsletterStatus;
+type NlItem = NewsletterItem;
 
 const STATUT_META: Record<Statut, { label: MessageDescriptor; cls: string }> = {
   genere: { label: msg`Generated`, cls: 'bg-white/70 dark:bg-white/10 text-muted dark:text-[#c3beb0]' },
@@ -86,29 +70,7 @@ export const NewsletterPanel: React.FC<{
   const load = async () => {
     setLoading(true);
     try {
-      const data = await gristFetch(
-        `tables/Newsletter/records?filter=${encodeURIComponent(JSON.stringify({ slug: [slug] }))}`,
-      );
-      const rows: NlItem[] = (data.records || []).map((r: any) => ({
-        id: r.id,
-        work_id: String(r.fields.work_id || ''),
-        numero: String(r.fields.numero || ''),
-        titre: String(r.fields.titre || ''),
-        doi: String(r.fields.doi || ''),
-        date_publication: String(r.fields.date_publication || ''),
-        journal: String(r.fields.journal || ''),
-        auteurs: String(r.fields.auteurs || ''),
-        labs: String(r.fields.labs || ''),
-        accroche: String(r.fields.accroche || ''),
-        resume: String(r.fields.resume || ''),
-        statut: (String(r.fields.statut || 'genere') as Statut),
-        chercheur_nom: String(r.fields.chercheur_nom || ''),
-        chercheur_email: String(r.fields.chercheur_email || ''),
-        chercheur_photo: String(r.fields.chercheur_photo || ''),
-        chercheur_url: String(r.fields.chercheur_url || ''),
-        valide_par: String(r.fields.valide_par || ''),
-      }));
-      rows.sort((a, b) => (b.date_publication || '').localeCompare(a.date_publication || ''));
+      const rows: NlItem[] = await DirectoryApi.newsletter(slug);
       setItems(rows);
       setError('');
       setNumero((cur) => {
@@ -235,11 +197,13 @@ export const NewsletterPanel: React.FC<{
   const copyRecipients = async () => {
     try {
       const wanted = String(labo || '').toUpperCase();
-      const data = await gristFetch('tables/Annuaire/records');
+      // People of the directory (already limited to the user's labs by the server); a person belongs to the lab
+      // when one of their memberships is in it (one Annuaire row per membership before the API).
+      const people = await DirectoryApi.people();
       const emails = [...new Set(
-        (data.records || [])
-          .filter((r: any) => !wanted || String(r.fields.LABO || '').toUpperCase() === wanted)
-          .map((r: any) => String(r.fields.Email || '').trim())
+        people
+          .filter((p) => !wanted || p.affiliations.some((a) => String(a.structureName || '').toUpperCase() === wanted))
+          .map((p) => String(p.email || '').trim())
           .filter((e: string) => e.includes('@')),
       )];
       await navigator.clipboard.writeText(emails.join('; '));

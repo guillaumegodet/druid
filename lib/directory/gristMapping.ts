@@ -597,3 +597,51 @@ export function mapInstitutionRecords(records: GristRecord[]): Institution[] {
     return true;
   });
 }
+
+/** Row of the merge log (`Fusions_log` table). */
+export interface MergeLogEntry {
+  id: number;
+  uid_dyna: string;
+  Nom: string;
+  kept_rowid: number;
+  dropped_rowid: number;
+  auteur: string;
+  date: string;
+  note: string;
+  restaure: boolean;
+  restored_rowid: number | null;
+}
+
+/** Fusions_log rows → merge log, most recent first, `limit` entries (moved from GristService.listMerges). Pure. */
+export function mapMergeLogRecords(records: GristRecord[], limit: number): MergeLogEntry[] {
+  return records
+    .map((r: any) => ({
+      id: r.id, uid_dyna: r.fields.uid_dyna || '', Nom: r.fields.Nom || '',
+      kept_rowid: r.fields.kept_rowid, dropped_rowid: r.fields.dropped_rowid,
+      auteur: r.fields.auteur || '', date: r.fields.date || '', note: r.fields.note || '',
+      restaure: !!r.fields.restaure, restored_rowid: r.fields.restored_rowid ?? null,
+    }))
+    .sort((a: MergeLogEntry, b: MergeLogEntry) => b.date.localeCompare(a.date))
+    .slice(0, limit);
+}
+
+/** ABES export fingerprint of a record already sent (druid-internal docs/plan-export-abes-idref.md). */
+export interface AbesExportMark {
+  /** uid_dyna, or `g<rowId>` for a row without uid. */
+  key: string;
+  hash: string;
+  date: string;
+}
+
+/** Annuaire rows → fingerprints of the rows already sent to ABES (`ABES_export_hash` / `ABES_export_date`,
+ * absent columns ⇒ none) — moved from GristService.fetchAbesSent. Pure. */
+export function mapAbesExportMarks(records: GristRecord[]): AbesExportMark[] {
+  const out: AbesExportMark[] = [];
+  for (const r of records || []) {
+    const f = r.fields || {};
+    const hash = String(f['ABES_export_hash'] || '');
+    if (!hash) continue;
+    out.push({ key: f['uid_dyna'] || `g${r.id}`, hash, date: String(f['ABES_export_date'] || '') });
+  }
+  return out;
+}

@@ -24,12 +24,12 @@ import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson
 import { HR_ID_COLUMN, hrIdCell, hrIdProposal } from './hrId';
 import { DirectoryApi } from './directoryApi';
 import {
-  RATTACHEMENT_COL, RattachementRole, Institution, fromGristDate, fromGristFuzzyDate, AFFILIATION_START_COL,
+  RATTACHEMENT_COL, RattachementRole, Institution, MergeLogEntry, fromGristDate, fromGristFuzzyDate, AFFILIATION_START_COL,
   AFFILIATION_END_COL, MEMBERSHIP_TYPE_COL, parseMultiLabel,
 } from './directory/gristMapping';
 // Moved to lib/directory/gristMapping.ts (migration plan, lot 1), re-exported for the existing importers.
 export { RATTACHEMENT_COL, groupQualifiedRows } from './directory/gristMapping';
-export type { RattachementRole, Institution } from './directory/gristMapping';
+export type { RattachementRole, Institution, MergeLogEntry } from './directory/gristMapping';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
 
@@ -637,19 +637,6 @@ const IDREF_REVIEW_TABLE = 'Alignement_IdRef';
 /** Metadata of an Annuaire column (for merging: never write a formula). */
 export interface AnnuaireColumnMeta { id: string; label: string; type: string; isFormula: boolean }
 
-/** Row of the merge log (`Fusions_log` table). */
-export interface MergeLogEntry {
-  id: number;
-  uid_dyna: string;
-  Nom: string;
-  kept_rowid: number;
-  dropped_rowid: number;
-  auteur: string;
-  date: string;
-  note: string;
-  restaure: boolean;
-  restored_rowid: number | null;
-}
 
 /** Qualification columns for multi-affiliations (duplicate merge plan, lot 1). */
 export const DUPLICATE_DECISION_COL = 'doublon_decision';
@@ -1184,22 +1171,6 @@ export const resolveNewStructureLocalId = (entered: unknown, generate: () => str
 
 export const GristService = {
   /**
-   * Fetches the last modification date of the Grist document.
-   */
-  getDocUpdatedAt: async (): Promise<string> => {
-    try {
-      const resp = await fetch(`${gristDocUrl()}`);
-      if (resp.ok) {
-        const data = await resp.json();
-        return data.updatedAt || '';
-      }
-    } catch (e) {
-      console.warn('Could not fetch Doc info');
-    }
-    return '';
-  },
-
-  /**
    * Researchers of the directory, mapped and filtered to the user's labs by the server (domain API
    * /api/v1/people, lib/directory/gristMapping.ts). The last good list is kept for the tab's lifetime and
    * served again when the API fails, as before. `force` is kept for the callers: the server checks the
@@ -1506,16 +1477,8 @@ export const GristService = {
    * scripts/add_abes_columns.cjs; missing ⇒ empty object).
    */
   fetchAbesSent: async (): Promise<Record<string, { hash: string; date: string }>> => {
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
-    if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
-    const { records } = await resp.json();
     const out: Record<string, { hash: string; date: string }> = {};
-    for (const r of records || []) {
-      const f = r.fields || {};
-      const hash = String(f['ABES_export_hash'] || '');
-      if (!hash) continue;
-      out[f['uid_dyna'] || `g${r.id}`] = { hash, date: String(f['ABES_export_date'] || '') };
-    }
+    for (const m of await DirectoryApi.abesExports()) out[m.key] = { hash: m.hash, date: m.date };
     return out;
   },
 
@@ -2025,25 +1988,8 @@ export const GristService = {
     return { logId };
   },
 
-  /** Merge log, most recent first. */
-  listMerges: async (limit = 50): Promise<MergeLogEntry[]> => {
-    const tablesResp = await fetch(`${gristDocUrl()}/tables`);
-    if (!tablesResp.ok) throw new Error(t`Grist error (table list)`);
-    const { tables } = await tablesResp.json();
-    if (!tables.some((t: any) => t.id === MERGE_LOG_TABLE)) return [];
-    const resp = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`);
-    if (!resp.ok) throw new Error(t`Grist error (merge log)`);
-    const { records } = await resp.json();
-    return records
-      .map((r: any) => ({
-        id: r.id, uid_dyna: r.fields.uid_dyna || '', Nom: r.fields.Nom || '',
-        kept_rowid: r.fields.kept_rowid, dropped_rowid: r.fields.dropped_rowid,
-        auteur: r.fields.auteur || '', date: r.fields.date || '', note: r.fields.note || '',
-        restaure: !!r.fields.restaure, restored_rowid: r.fields.restored_rowid ?? null,
-      }))
-      .sort((a: MergeLogEntry, b: MergeLogEntry) => b.date.localeCompare(a.date))
-      .slice(0, limit);
-  },
+  /** Merge log, most recent first (domain API /api/v1/merges, institution right). */
+  listMerges: (limit = 50): Promise<MergeLogEntry[]> => DirectoryApi.merges(limit),
 
   /**
    * Undoes a merge: recreates the absorbed row from its snapshot (new rowId —
