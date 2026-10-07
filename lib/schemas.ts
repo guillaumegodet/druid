@@ -71,7 +71,7 @@ export const ResearcherIdentifiersSchema = z.object({
 
 export const ValidationInfoSchema = z.object({
   validated: z.boolean().default(false),
-  validatedStatus: z.nativeEnum(ResearcherStatus).optional(),
+  validatedStatus: z.nativeEnum(Presence).optional(),
   validationDate: z.string().optional(),
   validationSource: z.string().optional(),
   validationScope: z.array(z.enum(['statut', 'rattachement'])).default([]),

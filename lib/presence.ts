@@ -13,18 +13,13 @@
  *
  * Pure module (no network / DOM access): testable, used by gristService.
  */
-import { ResearcherStatus } from '../types';
+import { ResearcherStatus, Presence, type LdapAccountState, type EmployerKind } from '../types';
 import { fuzzyDateUpperBound, isFuzzyDatePast, todayIso } from './dates';
-import { isExternalEmployer, type ValidationInfo } from './validation';
+import { isExternalEmployer, normStatus, type ValidationInfo } from './validation';
 
-export enum Presence {
-  PRESENT = 'PRESENT',
-  DEPART = 'DEPART',   // end announced: LDAP account closing, or employment end within DEPARTURE_NOTICE_MONTHS
-  PARTI = 'PARTI',
-}
-
-export type LdapAccountState = 'active' | 'closing' | 'none';
-export type EmployerKind = 'home' | 'external' | 'unknown';
+// Defined in types.ts (validation.ts needs them without importing this module), re-exported here.
+export { Presence };
+export type { LdapAccountState, EmployerKind };
 
 /** An employment end this close is an announced departure (D1). Beyond it, the person is present:
  * a doctoral contract ending in three years says nothing about this year. */
@@ -45,13 +40,7 @@ export const ldapAccountOf = (uid: unknown, ldapEtat: unknown): LdapAccountState
 };
 
 /** Validated status → presence (D5): INTERNE / EXTERNE, written before 2026-10-07, mean « present ». */
-export const presenceFromValidated = (raw: unknown): Presence | undefined => {
-  const s = String(raw ?? '').trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
-  if (s === 'PRESENT' || s === 'INTERNE' || s === 'EXTERNE') return Presence.PRESENT;
-  if (s === 'DEPART') return Presence.DEPART;
-  if (s === 'PARTI') return Presence.PARTI;
-  return undefined;
-};
+export const presenceFromValidated = normStatus;
 
 /** `today` + n months, as YYYY-MM-DD (day clamped by Date). */
 const addMonths = (today: string, months: number): string => {

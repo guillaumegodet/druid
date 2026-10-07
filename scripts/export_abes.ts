@@ -28,6 +28,8 @@ import { computeAbesDiff, AbesExportOptions, abesTaskTypes } from '../lib/abesEx
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const tasksSchema = require('./lib/tasks_schema.cjs');
 import { normalizeFuzzyDate, isFuzzyDatePast } from '../lib/dates';
+import { normStatus } from '../lib/validation';
+import { Presence } from '../types';
 import type { Researcher, Structure } from '../types';
 import type { Institution } from '../lib/gristService';
 
@@ -92,7 +94,10 @@ async function main() {
     rowIdByUid.set(id, r.id);
     if (f.ABES_export_hash) alreadySent[id] = String(f.ABES_export_hash);
     const validated = f.validated === true;
-    const vs = String(f.validated_status || '').toUpperCase();
+    // Validated presence (PRESENT / DEPART / PARTI; INTERNE / EXTERNE before 2026-10-07) → the status this
+    // CLI filters on: the employer filter (Nantes Université by default) carries the « internal » part.
+    const vp = normStatus(f.validated_status);
+    const vs = vp === Presence.PRESENT ? 'INTERNE' : vp || '';
     // A past Grist employment end counts as a departure even if statut_dyna (LDAP) is still ACTIF (LDAP
     // lagging): same rule as lib/gristService.ts::isEmploymentEnded, otherwise a departed employee is
     // exported to ABES as an active internal (medium review of scripts/, finding export_abes.ts).

@@ -2,51 +2,36 @@ import { describe, it, expect } from 'vitest';
 import {
   parseValidation,
   validationToGristFields,
-  resolveStatus,
   isValidationStale,
   isAffiliationValidated,
-  hasValidationConflict,
+  normStatus,
   parseValidationScope,
   parseValidationList,
   computeValidationDiff,
   nameKey,
   ValidationInfo,
 } from '../validation';
-import { ResearcherStatus } from '../../types';
+import { Presence } from '../../types';
 
 const validated = (over: Partial<ValidationInfo> = {}): ValidationInfo => ({
   validated: true,
-  validatedStatus: ResearcherStatus.INTERNE,
+  validatedStatus: Presence.PRESENT,
   validationDate: '2026-06-01',
   validationSource: 'Liste Centrale 2026-06',
   validationScope: ['statut', 'rattachement'],
   ...over,
 });
 
-// ─── resolveStatus: validation takes precedence over the derived status ───────
+// ─── normStatus: validated values → presence ──────────────────────────────────
 
-describe('resolveStatus', () => {
-  it('returns the derived status when there is no validation', () => {
-    expect(resolveStatus(undefined, ResearcherStatus.DEPART)).toBe(ResearcherStatus.DEPART);
-  });
-
-  it('the INTERNE validation takes precedence over a DEPART derived status (LDAP lagging)', () => {
-    expect(resolveStatus(validated(), ResearcherStatus.DEPART)).toBe(ResearcherStatus.INTERNE);
-  });
-
-  it('ignores the validation if the scope does not cover the status', () => {
-    const v = validated({ validationScope: ['rattachement'] });
-    expect(resolveStatus(v, ResearcherStatus.DEPART)).toBe(ResearcherStatus.DEPART);
-  });
-
-  it('ignores a validation without a status', () => {
-    const v = validated({ validatedStatus: undefined });
-    expect(resolveStatus(v, ResearcherStatus.EXTERNE)).toBe(ResearcherStatus.EXTERNE);
-  });
-
-  it('ignores a validation set to false', () => {
-    const v = validated({ validated: false });
-    expect(resolveStatus(v, ResearcherStatus.EXTERNE)).toBe(ResearcherStatus.EXTERNE);
+describe('normStatus', () => {
+  it('reads the presence values and the legacy statuses (INTERNE / EXTERNE = present)', () => {
+    expect(normStatus('PRESENT')).toBe(Presence.PRESENT);
+    expect(normStatus('interne')).toBe(Presence.PRESENT);
+    expect(normStatus('EXTERNE')).toBe(Presence.PRESENT);
+    expect(normStatus('Départ')).toBe(Presence.DEPART);
+    expect(normStatus('PARTI')).toBe(Presence.PARTI);
+    expect(normStatus('?')).toBeUndefined();
   });
 });
 
@@ -71,17 +56,12 @@ describe('isValidationStale', () => {
   });
 });
 
-// ─── isAffiliationValidated / hasValidationConflict ──────────────────────────
+// ─── isAffiliationValidated ───────────────────────────────────────────────────
 
-describe('verrou rattachement & conflit', () => {
+describe('verrou rattachement', () => {
   it('affiliation locked when the scope covers it', () => {
     expect(isAffiliationValidated(validated())).toBe(true);
     expect(isAffiliationValidated(validated({ validationScope: ['statut'] }))).toBe(false);
-  });
-
-  it('conflict when the validated status diverges from the derived one', () => {
-    expect(hasValidationConflict(validated(), ResearcherStatus.DEPART)).toBe(true);
-    expect(hasValidationConflict(validated(), ResearcherStatus.INTERNE)).toBe(false);
   });
 });
 
@@ -110,7 +90,7 @@ describe('parseValidation', () => {
       validated_by: 'durand-j',
     });
     expect(v.validated).toBe(true);
-    expect(v.validatedStatus).toBe(ResearcherStatus.INTERNE);
+    expect(v.validatedStatus).toBe(Presence.PRESENT);
     expect(v.validationDate).toBe('2026-06-01');
     expect(v.validationSource).toBe('Liste LPPL');
     expect(v.validationScope).toEqual(['statut', 'rattachement']);
@@ -131,7 +111,7 @@ describe('validationToGristFields', () => {
   it('serializes a validation', () => {
     const f = validationToGristFields(validated());
     expect(f.validated).toBe(true);
-    expect(f.validated_status).toBe(ResearcherStatus.INTERNE);
+    expect(f.validated_status).toBe(Presence.PRESENT);
     expect(f.validation_scope).toBe('statut,rattachement');
   });
 
@@ -145,7 +125,7 @@ describe('validationToGristFields', () => {
   it('round-trip parse∘serialize', () => {
     const f = validationToGristFields(validated());
     const v = parseValidation(f);
-    expect(v.validatedStatus).toBe(ResearcherStatus.INTERNE);
+    expect(v.validatedStatus).toBe(Presence.PRESENT);
     expect(v.validationScope).toEqual(['statut', 'rattachement']);
   });
 });
@@ -167,15 +147,15 @@ describe('parseValidationList', () => {
 
   it('reads the status when present', () => {
     const rows = parseValidationList('nom;statut\nX Y;DEPART');
-    expect(rows[0].status).toBe(ResearcherStatus.DEPART);
+    expect(rows[0].status).toBe(Presence.DEPART);
   });
 });
 
 describe('computeValidationDiff', () => {
   const researchers = [
-    { id: 'G-1', uid: 'jdupont', email: 'jean.dupont@x.fr', displayName: 'DUPONT Jean', status: ResearcherStatus.DEPART },
-    { id: 'G-2', uid: 'amartin', email: 'alice@x.fr', displayName: 'MARTIN Alice', status: ResearcherStatus.EXTERNE },
-    { id: 'G-3', uid: '', email: '', displayName: 'MARTIN Alice', status: ResearcherStatus.EXTERNE }, // homonyme
+    { id: 'G-1', uid: 'jdupont', email: 'jean.dupont@x.fr', displayName: 'DUPONT Jean', presence: Presence.DEPART },
+    { id: 'G-2', uid: 'amartin', email: 'alice@x.fr', displayName: 'MARTIN Alice', presence: Presence.PRESENT },
+    { id: 'G-3', uid: '', email: '', displayName: 'MARTIN Alice', presence: Presence.PRESENT }, // homonyme
   ];
   const opts = { source: 'Liste Centrale', date: '2026-06-18', scope: ['statut', 'rattachement'] as const };
 
@@ -184,8 +164,8 @@ describe('computeValidationDiff', () => {
     expect(diff.matched).toHaveLength(1);
     expect(diff.matched[0].researcherId).toBe('G-1');
     expect(diff.matched[0].matchedBy).toBe('uid');
-    expect(diff.matched[0].newStatus).toBe(ResearcherStatus.INTERNE);
-    expect(diff.matched[0].overrides).toBe(true); // DEPART → INTERNE
+    expect(diff.matched[0].newStatus).toBe(Presence.PRESENT);
+    expect(diff.matched[0].overrides).toBe(true); // DEPART → PRESENT
   });
 
   it('matches by email when there is no uid', () => {
@@ -206,8 +186,8 @@ describe('computeValidationDiff', () => {
   });
 
   it('respects the row status when provided', () => {
-    const diff = computeValidationDiff(researchers, [{ raw: '', uid: 'jdupont', status: ResearcherStatus.DEPART }], { ...opts, scope: [...opts.scope] });
-    expect(diff.matched[0].newStatus).toBe(ResearcherStatus.DEPART);
+    const diff = computeValidationDiff(researchers, [{ raw: '', uid: 'jdupont', status: Presence.DEPART }], { ...opts, scope: [...opts.scope] });
+    expect(diff.matched[0].newStatus).toBe(Presence.DEPART);
     expect(diff.matched[0].overrides).toBe(false);
   });
 });

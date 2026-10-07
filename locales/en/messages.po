@@ -970,8 +970,8 @@ msgid "Apply"
 msgstr "Apply"
 
 #: components/ResearcherDetail.tsx:506
-msgid "Validated status"
-msgstr "Validated status"
+msgid "Validated presence"
+msgstr "Validated presence"
 
 #: components/ResearcherDetail.tsx:520
 #: components/dashboard/MediaSourcesAdmin.tsx:217
@@ -7745,8 +7745,8 @@ msgid "Save to Grist"
 msgstr "Save to Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3502
-#: lib/gristService.ts:3611
+#: lib/gristService.ts:3503
+#: lib/gristService.ts:3612
 msgid "Search error"
 msgstr "Search error"
 
@@ -11370,12 +11370,12 @@ msgid "Validation date"
 msgstr "Validation date"
 
 #: components/researchers/ValidationImportReview.tsx:125
-msgid "Default status"
-msgstr "Default status"
+msgid "Default presence"
+msgstr "Default presence"
 
 #: components/researchers/ValidationImportReview.tsx:133
-msgid "Used when the line does not specify a status."
-msgstr "Used when the line does not specify a status."
+msgid "Used when the line does not specify a status (present, leaving, left; internal and external read as present)."
+msgstr "Used when the line does not specify a status (present, leaving, left; internal and external read as present)."
 
 #: components/researchers/ValidationImportReview.tsx:136
 msgid "Validation scope"
@@ -11527,8 +11527,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Namesake with no affiliation evidence"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3513
-#: lib/gristService.ts:3639
+#: lib/gristService.ts:3514
+#: lib/gristService.ts:3640
 msgid "Suspected mixed identity"
 msgstr "Suspected mixed identity"
 
@@ -12432,9 +12432,9 @@ msgid "Error creating the affiliation columns: {0}"
 msgstr "Error creating the affiliation columns: {0}"
 
 #: lib/gristService.ts:791
-#: lib/gristService.ts:2606
-#: lib/gristService.ts:3318
-#: lib/gristService.ts:3928
+#: lib/gristService.ts:2607
+#: lib/gristService.ts:3319
+#: lib/gristService.ts:3929
 msgid "Grist error (table list)"
 msgstr "Grist error (table list)"
 
@@ -12472,7 +12472,7 @@ msgstr "Grist error (creating the secondary affiliations): {0}"
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
 #: lib/gristService.ts:2000
-#: lib/gristService.ts:2587
+#: lib/gristService.ts:2588
 msgid "Grist error (merge log): {0}"
 msgstr "Grist error (merge log): {0}"
 
@@ -12520,232 +12520,232 @@ msgstr "Error creating the Grist structure: {0}"
 msgid "Invalid ID"
 msgstr "Invalid ID"
 
-#: lib/gristService.ts:2459
+#: lib/gristService.ts:2460
 msgid "Qualification: primary row required"
 msgstr "Qualification: primary row required"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2501
+#: lib/gristService.ts:2502
 msgid "Grist error (de-qualification): {0}"
 msgstr "Grist error (de-qualification): {0}"
 
-#: lib/gristService.ts:2534
+#: lib/gristService.ts:2535
 msgid "Invalid LDAP uid: {toUid}"
 msgstr "Invalid LDAP uid: {toUid}"
 
-#: lib/gristService.ts:2536
+#: lib/gristService.ts:2537
 msgid "The uid {toUid} already has a directory record: merge the two records instead"
 msgstr "The uid {toUid} already has a directory record: merge the two records instead"
 
 #. placeholder {0}: fromUid || '—'
-#: lib/gristService.ts:2539
+#: lib/gristService.ts:2540
 msgid "Record not found in Grist (uid {0})"
 msgstr "Record not found in Grist (uid {0})"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2549
+#: lib/gristService.ts:2550
 msgid "Grist error (uid change): {0}"
 msgstr "Grist error (uid change): {0}"
 
-#: lib/gristService.ts:2570
+#: lib/gristService.ts:2571
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
-#: lib/gristService.ts:2574
+#: lib/gristService.ts:2575
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Merge: one of the rows no longer exists in Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2594
+#: lib/gristService.ts:2595
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Grist error (writing the kept row, log #{logId}): {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2599
+#: lib/gristService.ts:2600
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Grist error (deleting the absorbed row, log #{logId}): {0}"
 
-#: lib/gristService.ts:2610
-#: lib/gristService.ts:2632
+#: lib/gristService.ts:2611
+#: lib/gristService.ts:2633
 msgid "Grist error (merge log)"
 msgstr "Grist error (merge log)"
 
-#: lib/gristService.ts:2634
+#: lib/gristService.ts:2635
 msgid "Merge #{logId} not found"
 msgstr "Merge #{logId} not found"
 
-#: lib/gristService.ts:2635
+#: lib/gristService.ts:2636
 msgid "Merge #{logId} already restored"
 msgstr "Merge #{logId} already restored"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2645
+#: lib/gristService.ts:2646
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Grist error (re-creating the row): {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2655
+#: lib/gristService.ts:2656
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2663
+#: lib/gristService.ts:2664
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 
-#: lib/gristService.ts:2676
-#: lib/gristService.ts:3248
-#: lib/gristService.ts:3716
-#: lib/gristService.ts:3793
+#: lib/gristService.ts:2677
+#: lib/gristService.ts:3249
+#: lib/gristService.ts:3717
+#: lib/gristService.ts:3794
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Grist error (reading the Annuaire before writing)"
 
-#: lib/gristService.ts:3006
-#: lib/gristService.ts:3045
-#: lib/gristService.ts:3207
-#: lib/gristService.ts:3618
-#: lib/gristService.ts:3646
+#: lib/gristService.ts:3007
+#: lib/gristService.ts:3046
+#: lib/gristService.ts:3208
+#: lib/gristService.ts:3619
+#: lib/gristService.ts:3647
 msgid "Identifier mismatch"
 msgstr "Identifier mismatch"
 
-#: lib/gristService.ts:3024
+#: lib/gristService.ts:3025
 msgid "Record deleted"
 msgstr "Record deleted"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3024
+#: lib/gristService.ts:3025
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 
-#: lib/gristService.ts:3028
+#: lib/gristService.ts:3029
 msgid "Record unreadable"
 msgstr "Record unreadable"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3028
+#: lib/gristService.ts:3029
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 
-#: lib/gristService.ts:3311
+#: lib/gristService.ts:3312
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "The Grist review only applies to the “search for missing” mode"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3326
-#: lib/gristService.ts:3936
+#: lib/gristService.ts:3327
+#: lib/gristService.ts:3937
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 
-#: lib/gristService.ts:3502
-#: lib/gristService.ts:3509
-#: lib/gristService.ts:3611
-#: lib/gristService.ts:3633
+#: lib/gristService.ts:3503
+#: lib/gristService.ts:3510
+#: lib/gristService.ts:3612
+#: lib/gristService.ts:3634
 msgid "API unreachable during the run — rerun."
 msgstr "API unreachable during the run — rerun."
 
-#: lib/gristService.ts:3509
-#: lib/gristService.ts:3633
+#: lib/gristService.ts:3510
+#: lib/gristService.ts:3634
 msgid "Verification error"
 msgstr "Verification error"
 
-#: lib/gristService.ts:3512
-#: lib/gristService.ts:3641
+#: lib/gristService.ts:3513
+#: lib/gristService.ts:3642
 msgid "Name mismatch"
 msgstr "Name mismatch"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3512
+#: lib/gristService.ts:3513
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} “{1}” ≠ Annuaire “{displayName}”"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3513
+#: lib/gristService.ts:3514
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 
-#: lib/gristService.ts:3516
+#: lib/gristService.ts:3517
 msgid "{a} merged into {b}"
 msgstr "{a} merged into {b}"
 
-#: lib/gristService.ts:3517
+#: lib/gristService.ts:3518
 msgid "{a} gone"
 msgstr "{a} gone"
 
-#: lib/gristService.ts:3518
+#: lib/gristService.ts:3519
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = missing ORCID profile"
 
-#: lib/gristService.ts:3520
+#: lib/gristService.ts:3521
 msgid "List to fix (not written)"
 msgstr "List to fix (not written)"
 
-#: lib/gristService.ts:3520
+#: lib/gristService.ts:3521
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → rerun (direct write) or fix OpenAlex_ids"
 
-#: lib/gristService.ts:3624
+#: lib/gristService.ts:3625
 msgid "Unknown ORCID"
 msgstr "Unknown ORCID"
 
-#: lib/gristService.ts:3624
+#: lib/gristService.ts:3625
 msgid "Unknown Scopus Author ID"
 msgstr "Unknown Scopus Author ID"
 
-#: lib/gristService.ts:3624
+#: lib/gristService.ts:3625
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL unknown to HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3625
+#: lib/gristService.ts:3626
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0}: no profile — fix it in the Annuaire"
 
-#: lib/gristService.ts:3629
+#: lib/gristService.ts:3630
 msgid "Invalid ID_SCOPUS"
 msgstr "Invalid ID_SCOPUS"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3629
+#: lib/gristService.ts:3630
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 
-#: lib/gristService.ts:3630
+#: lib/gristService.ts:3631
 msgid "Invalid ORCID"
 msgstr "Invalid ORCID"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3630
+#: lib/gristService.ts:3631
 msgid "{0}: wrong format or check digit"
 msgstr "{0}: wrong format or check digit"
 
-#: lib/gristService.ts:3638
+#: lib/gristService.ts:3639
 msgid "Profile merged by Scopus"
 msgstr "Profile merged by Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3638
+#: lib/gristService.ts:3639
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3639
+#: lib/gristService.ts:3640
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — check the profile, flag it “Mixed identity” if needed"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3641
+#: lib/gristService.ts:3642
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3885
+#: lib/gristService.ts:3886
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} missing: run {1} first (the script creates it)."
 

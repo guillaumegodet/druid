@@ -1,5 +1,5 @@
 import { t } from '@lingui/core/macro';
-import { Researcher, ResearcherStatus, Affiliation, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
+import { Researcher, ResearcherStatus, Presence, Affiliation, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
 import { getPoleFromLab } from './mappings';
 import { hasCapability } from './auth';
 import { purgeStoredDirectory } from './directoryStorage';
@@ -2377,12 +2377,13 @@ export const GristService = {
             after: STATUT_DYNA_MAP[String(e.etat).toUpperCase()] || String(e.etat),
           });
         }
-        // Manually validated status contradicted by LDAP (e.g. « INTERNE validé » from a lab
-        // website, but dynaEtat = D): the record displays the validated status, so the departure stays
-        // invisible until the validation is aligned. Proposed as a change to arbitrate (conflict).
+        // Manually validated presence contradicted by LDAP (e.g. « present » from a lab website, but
+        // dynaEtat = D): the record displays the validated presence, so the departure stays invisible
+        // until the validation is aligned. Proposed as a change to arbitrate (conflict). For another
+        // employer the account is a hosted one and says nothing about the presence (D3).
         const v = parseValidation(f, fromGristDate);
-        if (e.etat && v.validated && v.validationScope.includes('statut') && v.validatedStatus) {
-          const derived = externalEmployer ? ResearcherStatus.EXTERNE : statusFromEtat(e.etat);
+        if (e.etat && !externalEmployer && v.validated && v.validationScope.includes('statut') && v.validatedStatus) {
+          const derived = String(e.etat).trim().toUpperCase().startsWith('D') ? Presence.DEPART : Presence.PRESENT;
           if (v.validatedStatus !== derived) {
             changes.push({ field: 'validated_status', label: 'Statut validé', before: v.validatedStatus, after: derived });
           }

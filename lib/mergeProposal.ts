@@ -17,7 +17,7 @@
  *    the most recent LDAP update, then the retained row.
  */
 
-import { isValidatedCell } from './validation';
+import { isValidatedCell, normStatus } from './validation';
 import { FTE_COLUMNS } from './fte';
 
 /** LABO values that do not designate a lab: `zzz` = parking of LDAP people outside the
@@ -276,12 +276,12 @@ export function autoMergeEligibility(p: MergeProposal, kind: LdapDuplicateKind):
     if (f.kind === 'conflict' && f.col === 'LABO' && kind !== 'parking') reasons.push('conflit LABO');
     if (f.kind === 'validation') {
       // Two validations (e.g. DRPI list + lab website) are only contradictory when the
-      // validated status differs (INTERNE vs EXTERNE): otherwise the most recent one is kept
-      // and the Data_source union preserves both provenances.
+      // validated presence differs (PRESENT vs PARTI; INTERNE and EXTERNE both read as PRESENT):
+      // otherwise the most recent one is kept and the Data_source union preserves both provenances.
       const vk = isValidatedCell(p.keep.fields['validated']);
       const vd = isValidatedCell(p.drop.fields['validated']);
-      const sk = String(p.keep.fields['validated_status'] || '').trim().toUpperCase();
-      const sd = String(p.drop.fields['validated_status'] || '').trim().toUpperCase();
+      const sk = normStatus(p.keep.fields['validated_status']) || String(p.keep.fields['validated_status'] || '').trim().toUpperCase();
+      const sd = normStatus(p.drop.fields['validated_status']) || String(p.drop.fields['validated_status'] || '').trim().toUpperCase();
       if (vk && vd && sk && sd && sk !== sd) reasons.push(`statuts validés contradictoires (${sk} / ${sd})`);
     }
   }

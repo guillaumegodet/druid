@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildMergeProposal, MergeColumnMeta, MergeRow } from '../mergeProposal';
+import { buildMergeProposal, autoMergeEligibility, MergeColumnMeta, MergeRow } from '../mergeProposal';
 
 const numCol = (id: string): MergeColumnMeta => ({ id, label: id, type: 'Numeric', isFormula: false });
 const row = (rowId: number, fields: Record<string, any>): MergeRow => ({ rowId, fields: { LABO: 'LPPL', ...fields } });
@@ -25,5 +25,18 @@ describe('buildMergeProposal — FTE columns (0 is a value, lib/fte.ts)', () => 
   it('other numeric columns keep the « 0 = empty » rule', () => {
     const f = fieldOf(row(1, { ID_SCOPUS: 0 }), row(2, { ID_SCOPUS: 57190000000 }), 'ID_SCOPUS');
     expect(f).toMatchObject({ kind: 'fill', choice: 'drop' });
+  });
+});
+
+describe('autoMergeEligibility — validated presences', () => {
+  const cols2: MergeColumnMeta[] = ['uid_dyna', 'validated', 'validated_status'].map((id) => ({ id, label: id, type: 'Text', isFormula: false }));
+  const pair = (a: string, b: string) => buildMergeProposal(
+    row(1, { uid_dyna: 'x', validated: true, validated_status: a }), row(2, { uid_dyna: 'x', validated: true, validated_status: b }), cols2);
+  it('INTERNE / EXTERNE / PRESENT all mean present: not contradictory', () => {
+    expect(autoMergeEligibility(pair('INTERNE', 'PRESENT'), 'same_labo').some((r) => r.includes('statuts validés'))).toBe(false);
+    expect(autoMergeEligibility(pair('INTERNE', 'EXTERNE'), 'same_labo').some((r) => r.includes('statuts validés'))).toBe(false);
+  });
+  it('present vs left is contradictory', () => {
+    expect(autoMergeEligibility(pair('PRESENT', 'PARTI'), 'same_labo').some((r) => r.includes('statuts validés contradictoires'))).toBe(true);
   });
 });

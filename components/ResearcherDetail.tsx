@@ -110,7 +110,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
   // ─── Validation (manual validation of the record) ──────────────────────────
   const existingValidation = localResearcher.validation;
   const [validationOpen, setValidationOpen] = useState(false);
-  const [vStatus, setVStatus] = useState<ResearcherStatus>(existingValidation?.validatedStatus ?? localResearcher.status);
+  const [vStatus, setVStatus] = useState<Presence>(existingValidation?.validatedStatus ?? localResearcher.presence ?? Presence.PRESENT);
   const [vScope, setVScope] = useState<ValidationScope[]>(
     existingValidation?.validationScope?.length ? existingValidation.validationScope : ['statut', 'rattachement'],
   );
@@ -503,14 +503,14 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
 
               {/* Validated status */}
               <label className="block">
-                <span className="block text-xs text-muted-lighter dark:text-[#8f897c] mb-1"><Trans>Validated status</Trans></span>
+                <span className="block text-xs text-muted-lighter dark:text-[#8f897c] mb-1"><Trans>Validated presence</Trans></span>
                 <select
                   value={vStatus}
-                  onChange={(e) => setVStatus(e.target.value as ResearcherStatus)}
+                  onChange={(e) => setVStatus(e.target.value as Presence)}
                   className="input-soft"
                 >
-                  {Object.values(ResearcherStatus).map((s) => (
-                    <option key={s} value={s}>{t(STATUS_LABELS[s])}</option>
+                  {Object.values(Presence).map((s) => (
+                    <option key={s} value={s}>{t(PRESENCE_LABELS[s])}</option>
                   ))}
                 </select>
               </label>
