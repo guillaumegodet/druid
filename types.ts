@@ -89,6 +89,7 @@ export interface NURelated {
 export interface Researcher {
   id: string;              // Public/central identifier = uid (uid_dyna) when present, else ext_<name>-<initial>. URL key.
   uid?: string;            // Institution staff number / LDAP uid_dyna (empty outside the directory). people.csv pivot.
+  hrId?: string;           // HR staff number (Mangue n° agent, LDAP supannEmpId) — read-only, see lib/hrId.ts.
   gristRowId?: number;     // Grist row number (technical) — required to write (PATCH by rowId). Never in the URL.
 
   // Civil status

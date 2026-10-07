@@ -83,6 +83,12 @@ describe('prefillFromLdap', () => {
     expect(prefillFromLdap(blank(), p, structures, employers).lab).toBe('');
   });
 
+  it('takes the HR staff number from supannEmpId, normalized', () => {
+    const { researcher: r } = prefillFromLdap(blank(), person({ empId: '0012345' }), structures, employers);
+    expect(r.hrId).toBe('12345');
+    expect(prefillFromLdap(blank(), person(), structures, employers).researcher.hrId).toBeUndefined();
+  });
+
   it('keeps typed values for the fields LDAP does not carry', () => {
     const typed = { ...blank(), nationality: 'Italienne', employment: { ...blank().employment, startDate: '2019-09' } };
     const p = person({ categorie: '', empCorps: '', dateFin: '2027-08-31' });

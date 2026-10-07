@@ -14,7 +14,7 @@ const LDAP_BASE = 'ou=People,dc=univ-nantes,dc=fr';
  * before reaching the filter (no LDAP filter injection). */
 const UID_RE = /^[a-z0-9][a-z0-9._-]{0,63}$/i;
 const ATTRIBUTES = ['uid', 'sn', 'givenName', 'mail', 'supannCivilite', 'supannOIDCDateDeNaissance',
-  'eduPersonPrincipalName', 'dynaEtat', 'dynaCategorie', 'supannEmpCorps', 'supannEmpProfil',
+  'eduPersonPrincipalName', 'dynaEtat', 'dynaCategorie', 'supannEmpCorps', 'supannEmpProfil', 'supannEmpId',
   'supannEtablissement', 'population', 'supannEntiteAffectation', 'supannEntiteAffectationPrincipale',
   'entiteAffectationLibelle', 'entiteAffectationPrincipaleLibelle'];
 
@@ -37,6 +37,7 @@ function toPerson(attrs) {
     categorie: first('dynacategorie'),
     empCorps: first('supannempcorps').replace(/^\{[^}]+\}/, ''),
     dateFin: extractDateFin(multi['supannempprofil'] || []),
+    empId: first('supannempid'),
     etablissementUai: first('supannetablissement').replace(/^\{[^}]+\}/, ''),
     population: first('population'),
     affectationCodes: (multi['supannentiteaffectation'] || []).map(String),
