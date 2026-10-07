@@ -11,6 +11,7 @@ import { HOME_EMPLOYER, isExternalEmployer } from './validation';
 import { translateApiError } from './apiErrors';
 import { normalizeHrId } from './hrId';
 import { hostingToolsOf, inferLdapEmployer, LdapEmployer } from './ldapEmployer';
+import { normalizeCivility } from './civility';
 
 /** Entry returned by /api/ldap/person/:uid. */
 export interface LdapPerson {
@@ -54,14 +55,7 @@ export const statusFromEtat = (etat: any): ResearcherStatus => {
   return ResearcherStatus.EXTERNE;
 };
 
-/** LDAP/Grist civility (« Mme », « M. », « Madame »…) → F / M. */
-export const normalizeCivility = (val: string): string => {
-  if (!val) return '';
-  const v = val.toUpperCase().trim();
-  if (v === 'F' || v === 'FEMME' || v.startsWith('MME') || v.startsWith('MLLE') || v.startsWith('MADAME')) return 'F';
-  if (v === 'M' || v === 'HOMME' || v.startsWith('M.') || v.startsWith('MONSIEUR') || v.startsWith('MR')) return 'M';
-  return v.charAt(0);
-};
+export { normalizeCivility };
 
 const isoBirthDate = (b: string): string => {
   const s = String(b || '').trim();

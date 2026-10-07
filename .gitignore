@@ -11,6 +11,8 @@ node_modules
 dist
 # Build identity, rewritten by every build (scripts/build-info.cjs).
 build-info.json
+# Server bundle of the domain API (npm run build:server).
+server-api.cjs
 dist-ssr
 # Env
 .env

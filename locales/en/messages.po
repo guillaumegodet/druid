@@ -8092,8 +8092,8 @@ msgid "Save to Grist"
 msgstr "Save to Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3503
-#: lib/gristService.ts:3612
+#: lib/gristService.ts:2927
+#: lib/gristService.ts:3036
 msgid "Search error"
 msgstr "Search error"
 
@@ -11883,8 +11883,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Namesake with no affiliation evidence"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3514
-#: lib/gristService.ts:3640
+#: lib/gristService.ts:2938
+#: lib/gristService.ts:3064
 msgid "Suspected mixed identity"
 msgstr "Suspected mixed identity"
 
@@ -12434,674 +12434,691 @@ msgstr "GRIST_API_KEY not configured"
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY not configured on Cloudflare"
 
-#: lib/apiErrors.ts:45
+#: lib/apiErrors.ts:46
+msgid "Unknown API route"
+msgstr "Unknown API route"
+
+#: lib/apiErrors.ts:47
+msgid "Directory storage unavailable"
+msgstr "Directory storage unavailable"
+
+#: lib/apiErrors.ts:48
+msgid "API v1 not built"
+msgstr "API v1 not built"
+
+#: lib/apiErrors.ts:49
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "No OpenAlex identifier configured for this structure"
 
-#: lib/apiErrors.ts:46
+#: lib/apiErrors.ts:50
 msgid "No dashboard data for this structure"
 msgstr "No dashboard data for this structure"
 
-#: lib/apiErrors.ts:48
+#: lib/apiErrors.ts:52
 msgid "messages[] required"
 msgstr "messages[] required"
 
-#: lib/apiErrors.ts:49
+#: lib/apiErrors.ts:53
 msgid "Assistant unavailable"
 msgstr "Assistant unavailable"
 
-#: lib/apiErrors.ts:50
+#: lib/apiErrors.ts:54
 msgid "Help assistant not configured"
 msgstr "Help assistant not configured"
 
-#: lib/apiErrors.ts:51
+#: lib/apiErrors.ts:55
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 
-#: lib/apiErrors.ts:52
+#: lib/apiErrors.ts:56
 msgid "Generation interrupted"
 msgstr "Generation interrupted"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:57
 msgid "Generation failed"
 msgstr "Generation failed"
 
-#: lib/apiErrors.ts:54
+#: lib/apiErrors.ts:58
 msgid "Analysis failed"
 msgstr "Analysis failed"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:59
 msgid "Missing theme"
 msgstr "Missing theme"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:60
 msgid "No publication to analyze"
 msgstr "No publication to analyze"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:61
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex unreachable"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:63
 msgid "Report not found"
 msgstr "Report not found"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:64
 msgid "Not allowed on this report"
 msgstr "Not allowed on this report"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:65
 msgid "Invalid report definition"
 msgstr "Invalid report definition"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:66
 msgid "Report changed since it was loaded"
 msgstr "Report changed since it was loaded"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:67
 msgid "Invalid report share"
 msgstr "Invalid report share"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:68
 msgid "Invalid report generation"
 msgstr "Invalid report generation"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:69
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Read-only instance: reports are kept in the browser"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:70
 msgid "Invalid AI task"
 msgstr "Invalid AI task"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:71
 msgid "PDF archiving is not configured on this instance"
 msgstr "PDF archiving is not configured on this instance"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:72
 msgid "Invalid PDF"
 msgstr "Invalid PDF"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:73
 msgid "Generation not found"
 msgstr "Generation not found"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:74
 msgid "PDF not archived"
 msgstr "PDF not archived"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:76
 msgid "Invalid record key"
 msgstr "Invalid record key"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:77
 msgid "Career path not computed yet for this record"
 msgstr "Career path not computed yet for this record"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:78
 msgid "Grist unreachable"
 msgstr "Grist unreachable"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:79
 msgid "No Annuaire record for this key"
 msgstr "No Annuaire record for this key"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:80
 msgid "Refresh outside your scope"
 msgstr "Refresh outside your scope"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:81
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Too many refreshes in progress, retry in a minute"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:82
 msgid "Career-path computation failed"
 msgstr "Career-path computation failed"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:83
 msgid "No usable identifier for this record"
 msgstr "No usable identifier for this record"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:84
 msgid "Unknown suggestion"
 msgstr "Unknown suggestion"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:86
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:87
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:88
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:89
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:90
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:91
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:92
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:93
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:95
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:96
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:97
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:98
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:99
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:100
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:101
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:102
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:104
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:105
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:106
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:107
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:108
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:109
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:110
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:111
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:112
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:113
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:114
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:115
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:116
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:117
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:118
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:119
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:120
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:121
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:123
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:124
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:125
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:126
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:127
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:128
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:129
 msgid "No alignment running"
 msgstr "No alignment running"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:130
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:132
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:133
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:134
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:135
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:137
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:139
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:140
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:141
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:142
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:144
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:145
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:146
 msgid "Load failed"
 msgstr "Load failed"
 
+#. placeholder {0}: resp.status
+#: lib/directoryApi.ts:13
+msgid "Directory unavailable ({resource}, HTTP {0})."
+msgstr "Directory unavailable ({resource}, HTTP {0})."
+
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:667
+#: lib/gristService.ts:669
 msgid "Error creating the affiliation columns: {0}"
 msgstr "Error creating the affiliation columns: {0}"
 
-#: lib/gristService.ts:791
-#: lib/gristService.ts:2607
-#: lib/gristService.ts:3319
-#: lib/gristService.ts:3929
+#: lib/gristService.ts:764
+#: lib/gristService.ts:2031
+#: lib/gristService.ts:2743
+#: lib/gristService.ts:3353
 msgid "Grist error (table list)"
 msgstr "Grist error (table list)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:798
+#: lib/gristService.ts:771
 msgid "Error creating table {MERGE_LOG_TABLE}: {0}"
 msgstr "Error creating table {MERGE_LOG_TABLE}: {0}"
 
-#: lib/gristService.ts:1432
+#: lib/gristService.ts:1180
 msgid "Invalid entity code “{code}”: letters, digits, “-”, “_” or “.” only"
 msgstr "Invalid entity code “{code}”: letters, digits, “-”, “_” or “.” only"
 
-#: lib/gristService.ts:1881
+#: lib/gristService.ts:1305
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "Invalid Grist ID (gristRowId missing)"
 
-#: lib/gristService.ts:1893
+#: lib/gristService.ts:1317
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 
-#: lib/gristService.ts:1895
+#: lib/gristService.ts:1319
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1967
+#: lib/gristService.ts:1391
 msgid "Grist error (writing the secondary affiliations): {0}"
 msgstr "Grist error (writing the secondary affiliations): {0}"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:1988
+#: lib/gristService.ts:1412
 msgid "Grist error (creating the secondary affiliations): {0}"
 msgstr "Grist error (creating the secondary affiliations): {0}"
 
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2000
-#: lib/gristService.ts:2588
+#: lib/gristService.ts:1424
+#: lib/gristService.ts:2012
 msgid "Grist error (merge log): {0}"
 msgstr "Grist error (merge log): {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2004
+#: lib/gristService.ts:1428
 msgid "Grist error (deleting the removed affiliations): {0}"
 msgstr "Grist error (deleting the removed affiliations): {0}"
 
-#: lib/gristService.ts:2030
+#: lib/gristService.ts:1454
 msgid "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2051
+#: lib/gristService.ts:1475
 msgid "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2164
+#: lib/gristService.ts:1588
 msgid "The acronym / short name is required"
 msgstr "The acronym / short name is required"
 
-#: lib/gristService.ts:2167
+#: lib/gristService.ts:1591
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "A team must be included in a lab (Memberships tab)"
 
 #. placeholder {0}: dup.acronym
 #. placeholder {1}: level === StructureLevel.EQUIPE ? t` in ${parent}` : ''
-#: lib/gristService.ts:2173
+#: lib/gristService.ts:1597
 msgid "A structure “{0}” already exists{1}"
 msgstr "A structure “{0}” already exists{1}"
 
-#: lib/gristService.ts:2173
+#: lib/gristService.ts:1597
 msgid " in {parent}"
 msgstr " in {parent}"
 
-#: lib/gristService.ts:2183
+#: lib/gristService.ts:1607
 msgid "local_id “{localId}” already used"
 msgstr "local_id “{localId}” already used"
 
 #. placeholder {0}: await resp.text()
-#: lib/gristService.ts:2216
+#: lib/gristService.ts:1640
 msgid "Error creating the Grist structure: {0}"
 msgstr "Error creating the Grist structure: {0}"
 
-#: lib/gristService.ts:2224
+#: lib/gristService.ts:1648
 msgid "Invalid ID"
 msgstr "Invalid ID"
 
-#: lib/gristService.ts:2460
+#: lib/gristService.ts:1884
 msgid "Qualification: primary row required"
 msgstr "Qualification: primary row required"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2502
+#: lib/gristService.ts:1926
 msgid "Grist error (de-qualification): {0}"
 msgstr "Grist error (de-qualification): {0}"
 
-#: lib/gristService.ts:2535
+#: lib/gristService.ts:1959
 msgid "Invalid LDAP uid: {toUid}"
 msgstr "Invalid LDAP uid: {toUid}"
 
-#: lib/gristService.ts:2537
+#: lib/gristService.ts:1961
 msgid "The uid {toUid} already has a directory record: merge the two records instead"
 msgstr "The uid {toUid} already has a directory record: merge the two records instead"
 
 #. placeholder {0}: fromUid || '—'
-#: lib/gristService.ts:2540
+#: lib/gristService.ts:1964
 msgid "Record not found in Grist (uid {0})"
 msgstr "Record not found in Grist (uid {0})"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2550
+#: lib/gristService.ts:1974
 msgid "Grist error (uid change): {0}"
 msgstr "Grist error (uid change): {0}"
 
-#: lib/gristService.ts:2571
+#: lib/gristService.ts:1995
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
-#: lib/gristService.ts:2575
+#: lib/gristService.ts:1999
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Merge: one of the rows no longer exists in Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2595
+#: lib/gristService.ts:2019
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Grist error (writing the kept row, log #{logId}): {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2600
+#: lib/gristService.ts:2024
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Grist error (deleting the absorbed row, log #{logId}): {0}"
 
-#: lib/gristService.ts:2611
-#: lib/gristService.ts:2633
+#: lib/gristService.ts:2035
+#: lib/gristService.ts:2057
 msgid "Grist error (merge log)"
 msgstr "Grist error (merge log)"
 
-#: lib/gristService.ts:2635
+#: lib/gristService.ts:2059
 msgid "Merge #{logId} not found"
 msgstr "Merge #{logId} not found"
 
-#: lib/gristService.ts:2636
+#: lib/gristService.ts:2060
 msgid "Merge #{logId} already restored"
 msgstr "Merge #{logId} already restored"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2646
+#: lib/gristService.ts:2070
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Grist error (re-creating the row): {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2656
+#: lib/gristService.ts:2080
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2664
+#: lib/gristService.ts:2088
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 
-#: lib/gristService.ts:2677
-#: lib/gristService.ts:3249
-#: lib/gristService.ts:3717
-#: lib/gristService.ts:3794
+#: lib/gristService.ts:2101
+#: lib/gristService.ts:2673
+#: lib/gristService.ts:3141
+#: lib/gristService.ts:3218
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Grist error (reading the Annuaire before writing)"
 
-#: lib/gristService.ts:3007
-#: lib/gristService.ts:3046
-#: lib/gristService.ts:3208
-#: lib/gristService.ts:3619
-#: lib/gristService.ts:3647
+#: lib/gristService.ts:2431
+#: lib/gristService.ts:2470
+#: lib/gristService.ts:2632
+#: lib/gristService.ts:3043
+#: lib/gristService.ts:3071
 msgid "Identifier mismatch"
 msgstr "Identifier mismatch"
 
-#: lib/gristService.ts:3025
+#: lib/gristService.ts:2449
 msgid "Record deleted"
 msgstr "Record deleted"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3025
+#: lib/gristService.ts:2449
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 
-#: lib/gristService.ts:3029
+#: lib/gristService.ts:2453
 msgid "Record unreadable"
 msgstr "Record unreadable"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3029
+#: lib/gristService.ts:2453
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 
-#: lib/gristService.ts:3312
+#: lib/gristService.ts:2736
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "The Grist review only applies to the “search for missing” mode"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3327
-#: lib/gristService.ts:3937
+#: lib/gristService.ts:2751
+#: lib/gristService.ts:3361
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 
-#: lib/gristService.ts:3503
-#: lib/gristService.ts:3510
-#: lib/gristService.ts:3612
-#: lib/gristService.ts:3634
+#: lib/gristService.ts:2927
+#: lib/gristService.ts:2934
+#: lib/gristService.ts:3036
+#: lib/gristService.ts:3058
 msgid "API unreachable during the run — rerun."
 msgstr "API unreachable during the run — rerun."
 
-#: lib/gristService.ts:3510
-#: lib/gristService.ts:3634
+#: lib/gristService.ts:2934
+#: lib/gristService.ts:3058
 msgid "Verification error"
 msgstr "Verification error"
 
-#: lib/gristService.ts:3513
-#: lib/gristService.ts:3642
+#: lib/gristService.ts:2937
+#: lib/gristService.ts:3066
 msgid "Name mismatch"
 msgstr "Name mismatch"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3513
+#: lib/gristService.ts:2937
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} “{1}” ≠ Annuaire “{displayName}”"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3514
+#: lib/gristService.ts:2938
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 
-#: lib/gristService.ts:3517
+#: lib/gristService.ts:2941
 msgid "{a} merged into {b}"
 msgstr "{a} merged into {b}"
 
-#: lib/gristService.ts:3518
+#: lib/gristService.ts:2942
 msgid "{a} gone"
 msgstr "{a} gone"
 
-#: lib/gristService.ts:3519
+#: lib/gristService.ts:2943
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = missing ORCID profile"
 
-#: lib/gristService.ts:3521
+#: lib/gristService.ts:2945
 msgid "List to fix (not written)"
 msgstr "List to fix (not written)"
 
-#: lib/gristService.ts:3521
+#: lib/gristService.ts:2945
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → rerun (direct write) or fix OpenAlex_ids"
 
-#: lib/gristService.ts:3625
+#: lib/gristService.ts:3049
 msgid "Unknown ORCID"
 msgstr "Unknown ORCID"
 
-#: lib/gristService.ts:3625
+#: lib/gristService.ts:3049
 msgid "Unknown Scopus Author ID"
 msgstr "Unknown Scopus Author ID"
 
-#: lib/gristService.ts:3625
+#: lib/gristService.ts:3049
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL unknown to HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3626
+#: lib/gristService.ts:3050
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0}: no profile — fix it in the Annuaire"
 
-#: lib/gristService.ts:3630
+#: lib/gristService.ts:3054
 msgid "Invalid ID_SCOPUS"
 msgstr "Invalid ID_SCOPUS"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3630
+#: lib/gristService.ts:3054
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 
-#: lib/gristService.ts:3631
+#: lib/gristService.ts:3055
 msgid "Invalid ORCID"
 msgstr "Invalid ORCID"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3631
+#: lib/gristService.ts:3055
 msgid "{0}: wrong format or check digit"
 msgstr "{0}: wrong format or check digit"
 
-#: lib/gristService.ts:3639
+#: lib/gristService.ts:3063
 msgid "Profile merged by Scopus"
 msgstr "Profile merged by Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3639
+#: lib/gristService.ts:3063
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3640
+#: lib/gristService.ts:3064
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — check the profile, flag it “Mixed identity” if needed"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3642
+#: lib/gristService.ts:3066
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3886
+#: lib/gristService.ts:3310
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} missing: run {1} first (the script creates it)."
 

@@ -42,6 +42,10 @@ export const API_ERRORS = [
   msg`VITE_GRIST_DOC_ID / GRIST_API_KEY not configured`,
   msg`GRIST_API_KEY not configured`,
   msg`GRIST_API_KEY not configured on Cloudflare`,
+  // directory domain API (/api/v1, lib/directory/api.ts)
+  msg`Unknown API route`,
+  msg`Directory storage unavailable`,
+  msg`API v1 not built`,
   msg`No OpenAlex identifier configured for this structure`,
   msg`No dashboard data for this structure`,
   // chat / newsletter / analysis

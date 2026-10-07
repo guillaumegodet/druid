@@ -2952,6 +2952,27 @@ const filterScopedRecords = (payload, { col, anchor, anchors }) => {
 };
 
 // ── Grist proxy ────────────────────────────────────────────────────────────
+// ── Directory domain API (/api/v1) ─────────────────────────────────────────
+// druid-internal docs/plan-migration-postgresql.md, lot 1: the front reads the people, structures and
+// institutions mapped and scoped by the server (lib/directory/*, Hono application shared with the
+// Cloudflare Functions) instead of the raw Grist rows. TypeScript bundled by `npm run build:server`
+// into server-api.cjs (Dockerfile). Behind the session guard and the anti-CSRF check above.
+let apiV1Handler = null;
+try {
+  apiV1Handler = require('./server-api.cjs').createApiV1Handler({
+    gristApiBase: GRIST_API_BASE,
+    gristDocId: process.env.VITE_GRIST_DOC_ID || '',
+    gristApiKey: GRIST_API_KEY,
+    appRoot: __dirname,
+  });
+} catch (err) {
+  console.error('[api/v1] server-api.cjs unavailable (run `npm run build:server`):', err.message);
+}
+app.all('/api/v1/*', (req, res, next) => {
+  if (!apiV1Handler) return res.status(503).json({ error: 'API v1 not built' });
+  apiV1Handler(req, res).catch(next);
+});
+
 app.all('/api/grist/*', gristProxyGuard, async (req, res) => {
   const gristPath = req.url.replace('/api/grist/', '');
   const targetUrl = `https://grist.numerique.gouv.fr/api/${gristPath}`;

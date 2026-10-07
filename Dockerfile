@@ -43,6 +43,8 @@ RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/scripts ./scripts
 COPY --from=build /app/server.cjs ./server.cjs
+# Domain API (/api/v1): lib/directory/* bundled by `npm run build:server`.
+COPY --from=build /app/server-api.cjs ./server-api.cjs
 # Build identity written by `npm run build` (version shown by /api/me and the top bar).
 COPY --from=build /app/build-info.json ./build-info.json
 # Help centre pages: source of the « Aide Druid » assistant (/api/help-chat, HELP_DOCS_DIR).
