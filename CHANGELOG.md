@@ -12,6 +12,49 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- Personnel : la **présence** (Présent, Départ, Parti), l'**employeur** et le **compte LDAP** de l'établissement
+  (actif, en fermeture, aucun) remplacent le statut Interne / Externe, qui mélangeait les trois. La présence suit
+  les dates de fin et les listes validées ; l'annuaire LDAP ne la détermine que pour le personnel de l'établissement
+  (employeur établissement ou non renseigné) ; « Départ » = compte en fermeture ou fin d'emploi dans les 3 mois.
+  Liste : colonne Présence avec la clé LDAP, filtres **Présence**, **Employeur** (Établissement / Autres employeurs /
+  Non renseigné / un employeur) et **Compte LDAP**, raccourci **Personnels internes** (présents et employés par
+  l'établissement) ; les anciens liens `?status=` sont traduits. Fiche : présence et compte LDAP dans l'en-tête.
+  Tableau de bord du personnel : répartition par présence et employeur.
+- Fiche chercheur : **n° agent** (identifiant RH, Mangue) en lecture seule, lu dans l'Annuaire
+  (`N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_`) ; la synchro LDAP le lit (`supannEmpId`) et la revue LDAP le propose
+  quand il manque, ou le signale « N° agent différent » (décoché par défaut).
+- Tâches : **passer une fiche `ext_` sur son uid LDAP** (n° agent = compte LDAP qu'aucune fiche ne porte), avec un
+  bouton dans le détail de la tâche et une tâche de suivi SoVisu+ (retirer les identifiants de l'ancienne personne) ;
+  **compte LDAP hébergé en fermeture** pour un employeur autre que l'établissement (départ probable à vérifier) ;
+  **employeur à renseigner** (créées par la migration 002). Le n° agent rejoint les identifiants partagés (doublons).
+- « Remplir depuis le LDAP » : l'employeur est déduit quand c'est sûr (personnel de l'établissement avec un corps,
+  comptes ouverts par l'outil CNRS), sinon un message demande de le choisir.
+- Centre d'aide (fr, en) : page « Statuts des personnes » réécrite pour les trois axes ; filtres, fiche, validation,
+  tâches, glossaire et Nouveautés mis à jour.
+
+### Modifié
+- Validation manuelle : elle porte sur la présence (`validated_status` = PRESENT / DEPART / PARTI) ; les valeurs
+  INTERNE et EXTERNE sont lues comme PRESENT. La revue LDAP ne propose plus d'aligner la validation d'une personne
+  employée ailleurs sur son compte hébergé.
+- Pastille « Validé — conflit » : elle compare des présences (Interne contre Externe n'est plus un conflit).
+
+### Corrigé
+- « Remplir depuis le LDAP » ouvert depuis l'onglet des arrivées LDAP : l'employeur restait vide (la recherche partait
+  avant le chargement de la liste des employeurs).
+- Liste du personnel : la pastille « Validé — conflit » et l'`eppn` étaient perdus au chargement (champs absents du
+  schéma de validation des données).
+- Instance sans cache LDAP : une fiche avec un vrai uid n'est plus classée « Parti » faute de le trouver dans le cache.
+
+### Migration
+- Après le déploiement : relancer la **synchro LDAP** (le cache doit porter le n° agent), puis **Lancer la
+  détection** des tâches (bascules `ext_` → uid, comptes hébergés en fermeture).
+- Puis seulement : `docker exec crisalid-druid-1 node scripts/migrations/002-validated-presence.cjs --apply`
+  (`validated_status` INTERNE / EXTERNE → PRESENT, sauvegarde JSON, tâches « employeur à renseigner » ; idempotente).
+  Une version antérieure de Druid lirait PRESENT comme une absence de validation. À Nantes : 5 343 valeurs, 355 tâches.
+- Déjà faits à Nantes le 2026-10-07 : n° agent rempli depuis le LDAP (1 267 fiches) et employeur déduit du LDAP
+  (668 fiches), par scripts hors dépôt.
+
 ## [1.5.0] — 2026-10-06
 
 ### Ajouté
