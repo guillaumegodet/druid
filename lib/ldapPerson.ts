@@ -9,6 +9,7 @@ import { ldapGradeFor } from './emeritus';
 import { HOME_EMPLOYER, isExternalEmployer } from './validation';
 import { translateApiError } from './apiErrors';
 import { normalizeHrId } from './hrId';
+import { hostingToolsOf, inferLdapEmployer, LdapEmployer } from './ldapEmployer';
 
 /** Entry returned by /api/ldap/person/:uid. */
 export interface LdapPerson {
@@ -30,6 +31,8 @@ export interface LdapPerson {
   dateFin: string;
   /** supannEmpId = HR staff number (Mangue), '' when absent (lib/hrId.ts). */
   empId?: string;
+  /** `{TOOL}…` values of supannRefId: hosting tool that opened the account (lib/ldapEmployer.ts). */
+  toolRefs?: string[];
   etablissementUai: string;
   population: string;
   /** supannEntiteAffectation: supannCodeEntite codes = local_id of the Grist Structures. */
@@ -73,6 +76,8 @@ export interface LdapPrefill {
   lab: string;
   /** Other labs found in the affectations (multi-affiliation: left to the user). */
   otherLabs: string[];
+  /** Employer deduced from the entry (lib/ldapEmployer.ts); null = undecided, the employer typed is kept. */
+  inferredEmployer: LdapEmployer;
 }
 
 /**
@@ -87,9 +92,21 @@ export const prefillFromLdap = (
   today: string = new Date().toISOString().slice(0, 10),
 ): LdapPrefill => {
   const lastName = person.lastName.toUpperCase();
-  const externalEmployer = !!person.etablissementUai && person.etablissementUai !== HOME_EMPLOYER.uai;
+  // Account of another institution's directory, or employer deduced from the hosting tool / corps /
+  // category (lib/ldapEmployer.ts): supannEtablissement alone is the home UAI for hosted staff too.
+  const otherInstitution = !!person.etablissementUai && person.etablissementUai !== HOME_EMPLOYER.uai;
+  const inferredEmployer: LdapEmployer = otherInstitution ? null
+    : inferLdapEmployer({ categorie: person.categorie, empCorps: person.empCorps, tools: hostingToolsOf(person.toolRefs || []) });
+  const externalEmployer = otherInstitution || inferredEmployer === 'CNRS';
   const homeEmployer = employerOptions.find((o) => o.trim() && !/^non renseign/i.test(o.trim()) && !isExternalEmployer(o));
-  const grade = ldapGradeFor(person.categorie, person.empCorps);
+  const cnrsEmployer = employerOptions.find((o) => o.trim().toUpperCase() === 'CNRS');
+  const deducedEmployer = inferredEmployer === 'home' ? homeEmployer : inferredEmployer === 'CNRS' ? cnrsEmployer : undefined;
+  // External employer: the LDAP category, corps and end date describe the hosted account, not the
+  // job — same rule as the directory sync (computeLdapDiff), the typed values are kept.
+  const grade = externalEmployer ? null : ldapGradeFor(person.categorie, person.empCorps);
+  const employer = deducedEmployer || researcher.employment.employer;
+  // Status as gristService computes it once saved: a known external employer (deduced or typed) ⇒ EXTERNE.
+  const externalStatus = externalEmployer || isExternalEmployer(employer);
 
   const next: Researcher = {
     ...researcher,
@@ -102,19 +119,19 @@ export const prefillFromLdap = (
     email: person.email || researcher.email,
     eppn: person.eppn || researcher.eppn,
     birthDate: isoBirthDate(person.birthDate) || researcher.birthDate,
-    status: person.etat ? (externalEmployer ? ResearcherStatus.EXTERNE : statusFromEtat(person.etat)) : researcher.status,
+    status: person.etat ? (externalStatus ? ResearcherStatus.EXTERNE : statusFromEtat(person.etat)) : researcher.status,
     employment: {
       ...researcher.employment,
-      employer: (!externalEmployer && person.etablissementUai && homeEmployer) || researcher.employment.employer,
+      employer,
       grade: grade || researcher.employment.grade,
-      contractType: person.categorie || researcher.employment.contractType,
-      endDate: person.dateFin || researcher.employment.endDate,
+      contractType: (!externalEmployer && person.categorie) || researcher.employment.contractType,
+      endDate: (!externalEmployer && person.dateFin) || researcher.employment.endDate,
     },
     ldapPrefill: { etat: person.etat, date: today },
   };
 
   const labs = labsFromAffectations(person, labIndex(structures));
-  return { researcher: next, lab: labs[0] || '', otherLabs: labs.slice(1) };
+  return { researcher: next, lab: labs[0] || '', otherLabs: labs.slice(1), inferredEmployer };
 };
 
 /** Labs = structures of level « Unité » by local_id (supannCodeEntite) → name as in the membership menu. */

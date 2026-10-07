@@ -14,7 +14,7 @@ const LDAP_BASE = 'ou=People,dc=univ-nantes,dc=fr';
  * before reaching the filter (no LDAP filter injection). */
 const UID_RE = /^[a-z0-9][a-z0-9._-]{0,63}$/i;
 const ATTRIBUTES = ['uid', 'sn', 'givenName', 'mail', 'supannCivilite', 'supannOIDCDateDeNaissance',
-  'eduPersonPrincipalName', 'dynaEtat', 'dynaCategorie', 'supannEmpCorps', 'supannEmpProfil', 'supannEmpId',
+  'eduPersonPrincipalName', 'dynaEtat', 'dynaCategorie', 'supannEmpCorps', 'supannEmpProfil', 'supannEmpId', 'supannRefId',
   'supannEtablissement', 'population', 'supannEntiteAffectation', 'supannEntiteAffectationPrincipale',
   'entiteAffectationLibelle', 'entiteAffectationPrincipaleLibelle'];
 
@@ -38,6 +38,9 @@ function toPerson(attrs) {
     empCorps: first('supannempcorps').replace(/^\{[^}]+\}/, ''),
     dateFin: extractDateFin(multi['supannempprofil'] || []),
     empId: first('supannempid'),
+    // Hosting tools only (« {TOOL}CNRS255 »): they tell who opened the account (lib/ldapEmployer.ts);
+    // the other references (HR, student numbers) are not passed on.
+    toolRefs: (multi['supannrefid'] || []).map(String).filter((v) => /^\{TOOL\}/i.test(v)),
     etablissementUai: first('supannetablissement').replace(/^\{[^}]+\}/, ''),
     population: first('population'),
     affectationCodes: (multi['supannentiteaffectation'] || []).map(String),
