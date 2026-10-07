@@ -4,6 +4,7 @@
 import { AuthorMeta, DashboardPublication } from './types';
 import { YearRange } from './overviewAggregates';
 import { TEAM_UNKNOWN } from './structureAggregates';
+import { countsForResearchers } from './editorialEntries';
 
 export interface NetworkNode {
   id: string;
@@ -41,7 +42,7 @@ export function aggregateNetwork(
   minPubs = 2,
 ): NetworkData {
   const inRange = pubs.filter(
-    (p) => typeof p.year === 'number' && p.year >= range.start && p.year <= range.end,
+    (p) => typeof p.year === 'number' && p.year >= range.start && p.year <= range.end && countsForResearchers(p),
   );
   const meta = new Map(authors.map((a) => [a.id, a]));
 

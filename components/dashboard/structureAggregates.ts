@@ -6,6 +6,7 @@
 
 import { AuthorMeta, DashboardPublication } from './types';
 import { CountItem, YearRange } from './overviewAggregates';
+import { countsForResearchers } from './editorialEntries';
 
 export const TEAM_UNKNOWN = 'Non identifié';
 export const TEAM_OTHER = 'Autres';
@@ -214,7 +215,7 @@ export function aggregateResearchers(
 ): ResearcherItem[] {
   const inRange = inRangePubs(pubs, range);
   const byId = new Map<number, number>();
-  for (const p of inRange) {
+  for (const p of inRange.filter(countsForResearchers)) {
     for (const id of p.authorIds) byId.set(id, (byId.get(id) ?? 0) + 1);
   }
   const meta = new Map(authors.map((a) => [a.id, a]));
@@ -273,7 +274,7 @@ export function aggregatePhd(
   const phdIds = new Set(authors.filter((a) => a.isPhd).map((a) => a.id));
   const meta = new Map(authors.map((a) => [a.id, a]));
   const byId = new Map<number, number>();
-  for (const p of inRange) {
+  for (const p of inRange.filter(countsForResearchers)) {
     for (const id of p.authorIds) {
       if (phdIds.has(id)) byId.set(id, (byId.get(id) ?? 0) + 1);
     }
