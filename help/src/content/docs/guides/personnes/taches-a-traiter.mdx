@@ -71,7 +71,8 @@ notice IdRef indique toujours l'affiliation… Ces tâches portent la mention **
 détection tourne chaque nuit ; **Lancer la détection** la relance à la demande.
 
 Une règle repère aussi les **fiches différentes qui portent le même identifiant** (ORCID,
-IdRef, IdHAL, Scopus) : SoVisu+ refuse la seconde fiche qui arrive avec un identifiant déjà
+IdRef, IdHAL, Scopus, ou le **n° agent**, qui relie une fiche `ext_…` à la fiche de son compte
+LDAP) : SoVisu+ refuse la seconde fiche qui arrive avec un identifiant déjà
 pris. Selon les noms, la tâche est de l'un de ces trois types :
 
 | Type | Ce qu'il faut faire |
@@ -79,6 +80,14 @@ pris. Selon les noms, la tâche est de l'un de ces trois types :
 | **Deux fiches pour la même personne** | Fusionner : le bouton **Ouvrir l'assistant de fusion** ouvre la paire ; on y choisit l'uid à garder. |
 | **Identifiants communs : même personne ou homonymes ?** | Noms partiellement différents, ou noms identiques mais deux IdRef (ou ORCID…) différents. Vérifier : même personne sous un autre nom (nom d'usage, faute de saisie) ⇒ fusionner ; parents ou homonymes ⇒ retirer l'identifiant de la mauvaise fiche. |
 | **Identifiant porté par deux personnes** | Retirer l'identifiant de la fiche qui ne le porte pas à juste titre. Quand l'IdHAL désigne l'une des deux personnes, la tâche est rattachée à l'autre fiche. |
+
+D'autres règles portent sur l'annuaire (voir [Statuts des personnes](/donnees/statuts-des-personnes/)) :
+
+| Type | Ce qu'il faut faire |
+|---|---|
+| **Compte LDAP trouvé par le n° agent : passer à l'uid LDAP** | La fiche est en `ext_…` (ou sans uid) alors que son n° agent est celui d'un compte LDAP qu'aucune fiche ne porte. Vérifiez les avertissements (uid qui ne ressemble pas au nom : n° agent sans doute erroné), puis **Passer à l'uid LDAP**. Pour une ancienne fiche `ext_…`, une tâche **SoVisu+ : retirer les identifiants de l'ancienne personne** est créée : sans cela, SoVisu+ refuse le nouvel uid. |
+| **Compte LDAP hébergé en fermeture : départ probable ?** | Personne employée par un autre organisme dont le compte hébergé ferme. Druid n'en déduit pas un départ : vérifiez auprès du laboratoire, puis saisissez les dates de fin (la tâche se ferme seule) ou abandonnez la tâche. |
+| **Employeur à renseigner** | Fiche validée « externe » avant octobre 2026 sans employeur : renseignez l'employeur (CNRS, Inserm, CHU…). |
 
 ## Ce qui se passe ensuite
 

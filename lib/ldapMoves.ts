@@ -5,7 +5,7 @@
  * Arrivals = accounts created since the date (or pre-created) without a record; departures = records
  * whose account entered a grace period, a lock or inactivity since the date, not already « Parti ».
  */
-import { Researcher, ResearcherStatus, Structure } from '../types';
+import { Researcher, Presence, Structure } from '../types';
 import { translateApiError } from './apiErrors';
 import { labIndex, labsFromAffectations } from './ldapPerson';
 
@@ -92,7 +92,7 @@ export const buildDepartures = (moves: LdapMovePerson[], researchers: Researcher
   const out: LdapDeparture[] = [];
   for (const p of moves) {
     const researcher = byUid.get(uidKey(p.uid));
-    if (!researcher || researcher.status === ResearcherStatus.PARTI || !p.account?.start) continue;
+    if (!researcher || researcher.presence === Presence.PARTI || !p.account?.start) continue;
     out.push({ person: p, researcher, since: p.account.start });
   }
   return out.sort((a, b) => b.since.localeCompare(a.since) || a.researcher.displayName.localeCompare(b.researcher.displayName));

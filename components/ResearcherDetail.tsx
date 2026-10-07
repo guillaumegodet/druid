@@ -6,14 +6,15 @@ import { ExportService } from '../lib/exportService';
 import { canUseEstablishmentTools, getUserInfo, hasCapability } from '../lib/auth';
 import type { ValidationInfo, ValidationScope } from '../lib/validation';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { STATUS_LABELS, VALIDATION_SCOPE_LABELS } from '../lib/researcherLabels';
+import { PRESENCE_LABELS, VALIDATION_SCOPE_LABELS } from '../lib/researcherLabels';
 
 // Sub-components
 import { GeneralTab } from './researchers/GeneralTab';
 import { MediaPresenceSection } from './researchers/MediaPresenceSection';
 import { AffiliationHistorySection } from './researchers/AffiliationHistorySection';
 import { SuggestionsSection } from './researchers/SuggestionsSection';
-import { ValidationMark } from './researchers/StatusBadge';
+import { ValidationMark, LdapAccountMark } from './researchers/PresenceBadge';
+import { Presence } from '../lib/presence';
 import { HelpButton } from './HelpButton';
 import { VIEW_HELP } from '../lib/helpLinks';
 import { gristUiDocUrl } from '../lib/instanceRuntime';
@@ -109,7 +110,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
   // ─── Validation (manual validation of the record) ──────────────────────────
   const existingValidation = localResearcher.validation;
   const [validationOpen, setValidationOpen] = useState(false);
-  const [vStatus, setVStatus] = useState<ResearcherStatus>(existingValidation?.validatedStatus ?? localResearcher.status);
+  const [vStatus, setVStatus] = useState<Presence>(existingValidation?.validatedStatus ?? localResearcher.presence ?? Presence.PRESENT);
   const [vScope, setVScope] = useState<ValidationScope[]>(
     existingValidation?.validationScope?.length ? existingValidation.validationScope : ['statut', 'rattachement'],
   );
@@ -354,14 +355,14 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
               </span>
             )}
             <div className="absolute left-0 right-0 bottom-0 p-5">
-              {/* Internal/external status + validation: configurable per instance (HAS_STATUS_VALIDATION). */}
+              {/* Presence + LDAP account + validation: configurable per instance (HAS_STATUS_VALIDATION). */}
               {hasCapability('HAS_STATUS_VALIDATION') && (
                 <div className="flex flex-wrap items-center gap-2 mb-2.5">
-                  {researcher.status === ResearcherStatus.INTERNE && <span className={`${heroStatusPill} bg-[rgba(46,160,102,.85)]`}>● {t(STATUS_LABELS[researcher.status])}</span>}
-                  {researcher.status === ResearcherStatus.DEPART && <span className={`${heroStatusPill} bg-[rgba(214,69,69,.85)]`}>● {t(STATUS_LABELS[researcher.status])}</span>}
-                  {researcher.status === ResearcherStatus.PARTI && <span className={`${heroStatusPill} bg-[rgba(59,91,219,.85)]`}>● {t(STATUS_LABELS[researcher.status])}</span>}
-                  {researcher.status === ResearcherStatus.EXTERNE && <span className={`${heroStatusPill} bg-[rgba(224,158,42,.9)]`}>● {t(STATUS_LABELS[researcher.status])}</span>}
-                  <ValidationMark validation={researcher.validation} derivedStatus={researcher.derivedStatus} />
+                  {researcher.presence === Presence.PRESENT && <span className={`${heroStatusPill} bg-[rgba(46,160,102,.85)]`}>● {t(PRESENCE_LABELS[researcher.presence])}</span>}
+                  {researcher.presence === Presence.DEPART && <span className={`${heroStatusPill} bg-[rgba(214,69,69,.85)]`}>● {t(PRESENCE_LABELS[researcher.presence])}</span>}
+                  {researcher.presence === Presence.PARTI && <span className={`${heroStatusPill} bg-[rgba(59,91,219,.85)]`}>● {t(PRESENCE_LABELS[researcher.presence])}</span>}
+                  <LdapAccountMark state={researcher.ldapAccount} onDark />
+                  <ValidationMark validation={researcher.validation} derivedPresence={researcher.derivedPresence} />
                 </div>
               )}
               <div className="font-disp text-[22px] leading-tight font-bold text-white tracking-tight">
@@ -502,14 +503,14 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
 
               {/* Validated status */}
               <label className="block">
-                <span className="block text-xs text-muted-lighter dark:text-[#8f897c] mb-1"><Trans>Validated status</Trans></span>
+                <span className="block text-xs text-muted-lighter dark:text-[#8f897c] mb-1"><Trans>Validated presence</Trans></span>
                 <select
                   value={vStatus}
-                  onChange={(e) => setVStatus(e.target.value as ResearcherStatus)}
+                  onChange={(e) => setVStatus(e.target.value as Presence)}
                   className="input-soft"
                 >
-                  {Object.values(ResearcherStatus).map((s) => (
-                    <option key={s} value={s}>{t(STATUS_LABELS[s])}</option>
+                  {Object.values(Presence).map((s) => (
+                    <option key={s} value={s}>{t(PRESENCE_LABELS[s])}</option>
                   ))}
                 </select>
               </label>

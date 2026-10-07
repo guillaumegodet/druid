@@ -13,9 +13,9 @@ import QuiOu from '../../../../components/QuiOu.astro';
 	disponibilite="instances où les statuts et la validation manuelle sont activés"
 />
 
-Le statut d'une personne est calculé à partir de l'annuaire LDAP et des dates d'emploi, qui
+La présence d’une personne est calculée à partir de l'annuaire LDAP et des dates d'emploi, qui
 sont parfois en retard ou incomplets. Quand vous savez avec certitude qu'une personne est
-présente, partie ou extérieure, vous **validez sa fiche** : votre information l'emporte sur
+présente, en départ ou partie, vous **validez sa fiche** : votre information l'emporte sur
 le calcul pendant 18 mois.
 
 ## Avant de valider : corriger les données
@@ -23,25 +23,27 @@ le calcul pendant 18 mois.
 Beaucoup d'erreurs de statut viennent d'une donnée manquante. Vérifiez d'abord sur la fiche :
 
 - l'**établissement employeur** : un chercheur CNRS ou Inserm doit avoir son organisme
-  comme employeur pour être classé Externe ;
+  comme employeur, sinon son compte LDAP hébergé décide de sa présence et il apparaît dans
+  les **Personnels internes** ;
 - les **dates de fin** : une personne partie doit avoir une **fin d'emploi** et une **fin
   d'appartenance**. Le bouton **→ fin d'emploi** recopie l'une dans l'autre ;
 - le **laboratoire et l'équipe** dans la carte Appartenances, et le rattachement principal.
 
-Enregistrez. Si le statut calculé est alors le bon, une validation n'est utile que pour
+Enregistrez. Si la présence calculée est alors la bonne, une validation n'est utile que pour
 protéger la fiche des prochaines mises à jour de l'annuaire.
 
 ## Valider une fiche
 
 1. Ouvrez la fiche de la personne.
 2. Cliquez sur **Valider la fiche**.
-3. Choisissez le **Statut validé** : Interne, Départ, Parti ou Externe.
-4. Choisissez la **Portée** : le statut, le rattachement, ou les deux.
+3. Choisissez la **Présence validée** : Présent, Départ ou Parti. L'employeur ne se valide pas :
+   il se renseigne sur la fiche.
+4. Choisissez la **Portée** : le statut (la présence), le rattachement, ou les deux.
 5. Indiquez la **Source** : d'où vient votre information (par exemple « Enquête labo 2026,
    liste RH »). La date et votre identifiant sont ajoutés automatiquement.
 6. Cliquez sur **Valider**.
 
-La pastille **Validé** apparaît à côté du statut.
+La pastille **Validé** apparaît à côté de la présence.
 
 ### Revoir ou retirer une validation
 
@@ -50,7 +52,7 @@ dessus :
 
 - **Revalider** remet la date à aujourd'hui, par exemple après une nouvelle vérification
   d'une fiche **Périmée** ;
-- **Dévalider** retire la validation : le statut calculé s'applique de nouveau.
+- **Dévalider** retire la validation : la présence calculée s’applique de nouveau.
 
 ## Valider une liste en une fois
 
@@ -62,7 +64,8 @@ d'un coup.
    virgules, points-virgules ou tabulations) ou chargez un fichier CSV. Une liste de noms
    seuls, sans en-tête, fonctionne aussi.
 3. Renseignez la **Source (traçabilité)**, la **Date de validation**, la **Portée de la
-   validation** et le **Statut par défaut** (utilisé pour les lignes sans statut).
+   validation** et la **Présence par défaut** (utilisée pour les lignes sans statut ; une
+   colonne statut « interne » ou « externe » vaut « présent »).
 4. Cliquez sur **Analyser l'appariement**. Druid retrouve chaque ligne par uid, puis
    e-mail, puis nom, et affiche trois listes :
    - **Fiches qui seront validées** ;
@@ -87,7 +90,7 @@ Traitez ensuite les homonymes et les non-trouvés à la main, fiche par fiche.
 ## Limites connues
 
 - **Une fin d'emploi et une fin d'appartenance passées l'emportent sur la validation** : la
-  personne est alors Partie, même validée Interne (pastille **Validé — conflit**).
+  personne est alors Partie, même validée Présente (pastille **Validé — conflit**).
 - **L'import apparie par nom en dernier recours** : deux personnes au même nom sont
   classées en homonymes, jamais validées au hasard. Préférez des listes avec e-mail ou uid.
 - **La validation porte sur une fiche** : une personne qui a deux fiches (deux

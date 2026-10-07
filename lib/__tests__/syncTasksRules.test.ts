@@ -7,12 +7,12 @@ const { RULES, DEFAULT_RULES, openNantesAffiliations, nameMatch, sharedIdentifie
 
 const rec = (id: number, fields: Record<string, unknown>) => ({ id, key: (fields.uid_dyna as string) || `g${id}`, fields });
 const cand = (extra: Record<string, unknown>) => ({ nameMatch: 'exact', score: 'moyen', evidence: ['site (Nantes Université)'], ...extra });
-const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours', unknown>>) =>
-  ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, parcours: {}, ...over });
+const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours' | 'etablissements', unknown>>) =>
+  ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, parcours: {}, etablissements: {}, ...over });
 
 describe('scripts/sync_tasks.cjs rules (docs/plan-chantiers-taches.md, lot 5)', () => {
   it('default rules exclude the ABES ones (handled by the batch export)', () => {
-    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect']);
+    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect']);
     expect(Object.keys(RULES)).toContain('abes_orcid');
   });
 
@@ -67,7 +67,7 @@ describe('rule sources', () => {
   it('every rule declares the caches it reads (empty cache ⇒ rule skipped, no false auto-resolution)', () => {
     for (const [name, rule] of Object.entries(RULES) as [string, { sources: string[] }][]) {
       expect(rule.sources.length, name).toBeGreaterThan(0);
-      for (const s of rule.sources) expect(['orcid', 'hal', 'scopus', 'idref', 'ldap', 'annuaire', 'parcours']).toContain(s);
+      for (const s of rule.sources) expect(['orcid', 'hal', 'scopus', 'idref', 'ldap', 'annuaire', 'parcours', 'etablissements']).toContain(s);
     }
   });
 });
@@ -201,6 +201,23 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       const out = detect([rec(1, { uid_dyna: 'ext_martin-a', Nom: 'Martin', Prenom: 'Alice', [HR]: 333, DATE_DE_NAISSANCE_JJ_MM_AAAA: '1991-05-01' })]);
       expect(out[0].description).toContain('Attention : l’uid blanc-a ne ressemble pas au nom MARTIN Alice');
       expect(out[0].description).toContain('dates de naissance différentes (fiche 1991-05-01, LDAP 1990-05-01)');
+    });
+  });
+
+  describe('hebergement_fin — hosted LDAP account of another employer closing (D3)', () => {
+    const etablissements = { 1: { Employeur: 'NANTES UNIVERSITE', UAI: '0442953W' }, 2: { Employeur: 'CNRS', UAI: '0753639Y' }, 3: { Employeur: 'non renseigné' } };
+    const ldap = { 'a-x': { etat: 'D', dateFin: '2026-12-31' }, 'b-x': { etat: 'D' }, 'c-x': { etat: 'N' }, 'd-x': { etat: 'D' }, 'e-x': { etat: 'D' }, 'f-x': { etat: 'D' } };
+    it('flags the closing hosted accounts of another employer only', () => {
+      const out = RULES.hebergement_fin.detect(ctx({ ldap, etablissements, annuaire: [
+        rec(1, { uid_dyna: 'a-x', Nom: 'A', Employeur: 2 }),
+        rec(2, { uid_dyna: 'b-x', Nom: 'B', Employeur: 1 }),                                 // home employer: LDAP decides
+        rec(3, { uid_dyna: 'c-x', Nom: 'C', Employeur: 2 }),                                 // account active
+        rec(4, { uid_dyna: 'd-x', Nom: 'D', Employeur: 2, employment_end_date: '2026-12' }), // end entered
+        rec(5, { uid_dyna: 'e-x', Nom: 'E', Employeur: 3 }),                                 // employer not specified
+        rec(6, { uid_dyna: 'f-x', Nom: 'F', Employeur: 2, validated_status: 'PARTI' }),      // validated departure
+      ] }));
+      expect(out.map((d: { key: string }) => d.key)).toEqual(['a-x']);
+      expect(out[0].description).toContain('Employeur CNRS ; le compte LDAP hébergé a-x est en fermeture (état D, fin 2026-12-31)');
     });
   });
 

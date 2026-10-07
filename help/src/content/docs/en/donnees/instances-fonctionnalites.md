@@ -20,7 +20,7 @@ help, your instance probably does not have the feature, or your profile does not
 | Feature | What it brings | What is missing without it |
 |---|---|---|
 | **The institution's LDAP directory** | Statuses calculated from the state of accounts, synchronisation of grades and employment dates, **LDAP alignment** page, import of structures. | Statuses and employment data entered by hand; no LDAP tab. |
-| **Statuses and manual validation** | Internal/Leaving/Left/External statuses, validation badges, import of validated lists. | No Status column and no validation. |
+| **Statuses and manual validation** | Presence (Present/Leaving/Left), Internal staff shortcut, validation badges, import of validated lists. | No Presence column and no validation. |
 | **Rerunning identifier searches** | **Find missing**, **Search everywhere**, **Check existing ones** buttons on the alignment page. | Candidates are calculated by the technical team; the page still lets you validate them. |
 | **Enhanced IdRef alignment** | Choice between IdRef namesakes refined with the CRISalid graph. | Simple IdRef search, by name and dates. |
 | **ETL console** | Regenerating the dashboards from Druid, configuring structures, checking affiliations. | Dashboards regenerated outside Druid. |

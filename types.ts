@@ -35,6 +35,19 @@ export enum ResearcherStatus {
   EXTERNE = 'EXTERNE',   // No ID or not found in the directory
 }
 
+/** Presence in the unit — with the employer and the LDAP account, replaces ResearcherStatus
+ * (lib/presence.ts, docs/plan-statut-employeur-ldap.md). Also the values of `validated_status`. */
+export enum Presence {
+  PRESENT = 'PRESENT',
+  DEPART = 'DEPART',   // end announced: LDAP account closing, or employment end within DEPARTURE_NOTICE_MONTHS
+  PARTI = 'PARTI',
+}
+
+/** Institution LDAP account of a record: active, closing (dynaEtat D) or none. */
+export type LdapAccountState = 'active' | 'closing' | 'none';
+/** Employer axis: the home institution, another one, or not filled in. */
+export type EmployerKind = 'home' | 'external' | 'unknown';
+
 /** Represents a past or current link with a structure */
 export interface Affiliation {
   id?: string;
@@ -113,6 +126,13 @@ export interface Researcher {
   status: ResearcherStatus;
   /** Status derived from the sources (LDAP / dates), BEFORE the validation layer — used to flag a conflict. */
   derivedStatus?: ResearcherStatus;
+  /** Three axes replacing `status` (lib/presence.ts, docs/plan-statut-employeur-ldap.md). `status` is
+   * kept, computed from them, until every screen has moved. */
+  presence?: Presence;
+  /** Presence before the validation layer (conflict badge). */
+  derivedPresence?: Presence;
+  ldapAccount?: LdapAccountState;
+  employerKind?: EmployerKind;
   employment: Employment;
   affiliations: Affiliation[]; 
   

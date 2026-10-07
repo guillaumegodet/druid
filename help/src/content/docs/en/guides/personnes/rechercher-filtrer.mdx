@@ -1,6 +1,6 @@
 ---
 title: "Search and filter staff"
-description: "Find a person, filter the list by lab, status, grade or identifier, and switch to the charts view."
+description: "Find a person, filter the list by lab, presence, employer, grade or identifier, and switch to the charts view."
 sidebar:
   order: 1
 ---
@@ -26,9 +26,11 @@ The drop-down lists combine several values (multiple selection):
 
 | Filter | What it keeps |
 |---|---|
-| **Status** | Internal, Leaving, Left, External. |
+| **Internal staff** (button) | Shortcut: people who are **present** and **employed by the institution**. |
+| **Presence** | Present, Leaving (end announced), Left. |
+| **Employer** | **Home institution**, **Other employers**, **Not specified**, or a specific employer (CNRS, Inserm…). |
+| **LDAP account** (More filters) | Active account, account closing, no account. |
 | **Validation** | **Validated**, **Validated (expired)** (more than 18 months) or **Not validated** records. |
-| **Employer** | The employing institution. |
 | **Lab (primary affil.)** | The laboratory of the primary affiliation. |
 | **Grade / rank**, **Employment type** | From the Employment card of the record. |
 | **Cluster** | The cluster or faculty of affiliation. |
@@ -44,7 +46,7 @@ The number of records kept is shown next to the title.
 ## Switch to the charts view
 
 The **Charts** button replaces the table with charts calculated on the filtered list:
-breakdown by status, gender balance, age brackets, grades, employers, employment types,
+breakdown by presence and employer, gender balance, age brackets, grades, employers, employment types,
 breakdown by lab, HDR rate and **identifier coverage**. **List** goes back to the table.
 
 ## Act on a selection

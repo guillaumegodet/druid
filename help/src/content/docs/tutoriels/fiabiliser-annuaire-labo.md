@@ -17,14 +17,14 @@ sidebar:
 :::
 
 CRISalid moissonne les publications **des personnes que Druid lui transmet**, avec **leurs
-identifiants**. Une personne partie restée « Interne », une personne présente absente de
+identifiants**. Une personne partie restée « Présente », une personne présente absente de
 l'annuaire, un ORCID manquant : autant de publications perdues ou mal attribuées. Ce parcours
 enchaîne les guides dans le bon ordre.
 
 ## Étape 1 — Faire l'état des lieux
 
 1. Dans **Personnel**, filtrez sur le laboratoire (**Labo (affil. principale)**).
-2. Notez le nombre de fiches, puis passez en vue **Dataviz** : répartition par statut,
+2. Notez le nombre de fiches, puis passez en vue **Dataviz** : répartition par présence et employeur,
    couverture des identifiants. Gardez ces chiffres : ils serviront à mesurer le progrès.
 3. Filtrez **Validation › Non validé** : ce sont les fiches à traiter en priorité.
 
@@ -60,7 +60,7 @@ Comparez la liste du laboratoire à celle de Druid, personne par personne :
 |---|---|
 | Présente dans les deux, fiche correcte | Rien : elle sera validée à l'étape 5. |
 | Présente dans Druid, **partie** d'après le labo | Renseignez **fin d'appartenance** et **fin d'emploi** (bouton **→ fin d'emploi**). |
-| Présente dans Druid, **employée par un organisme** (CNRS, Inserm…) | Renseignez l'**Établissement employeur** : elle deviendra Externe. |
+| Présente dans Druid, **employée par un organisme** (CNRS, Inserm…) | Renseignez l'**Établissement employeur** : elle quitte les **Personnels internes** et son compte LDAP hébergé ne décide plus de sa présence. |
 | Mauvaise **équipe** ou mauvais **rattachement principal** | Corrigez la carte **Appartenances & historique**. |
 | Absente de Druid | Demandez la création de sa fiche (bouton **Nouveau**, administrateurs techniques). |
 

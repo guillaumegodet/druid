@@ -80,7 +80,7 @@ See [Enter imprecise employment dates](/en/guides/personnes/dates-imprecises/).
 
 - **The status**: a past employment end **and** a past membership end make the person
   **Left**, even if their record is validated (see
-  [Statuses of people](/en/donnees/statuts-des-personnes/#6-certain-departure)). For a person
+  [Statuses of people](/en/donnees/statuts-des-personnes/#1-certain-departure)). For a person
   without an account at the institution, the employment end alone is enough.
 - **The export to CRISalid**: the dates of the primary membership are passed on, which makes
   it possible to date the harvested publications.
@@ -95,7 +95,7 @@ Employment card stays as it is and, in the Memberships card:
 - the former laboratory gets a membership end of `2025-08` and becomes **former**;
 - the new laboratory, with a start of `2025-09`, becomes the **primary affiliation**.
 
-Her status remains **Internal**, since her employment continues.
+She remains **Present**, since her employment continues.
 
 ## Known limitations
 

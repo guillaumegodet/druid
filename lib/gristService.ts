@@ -1,13 +1,13 @@
 import { t } from '@lingui/core/macro';
-import { Researcher, ResearcherStatus, Affiliation, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
+import { Researcher, ResearcherStatus, Presence, Affiliation, Structure, Membership, MembershipType, MEMBERSHIP_TYPES, StructureLevel } from '../types';
 import { getPoleFromLab } from './mappings';
 import { hasCapability } from './auth';
 import { purgeStoredDirectory } from './directoryStorage';
 import { ResearcherListSchema, StructureListSchema } from './schemas';
 import { getGradeFromNcorps } from './gradeTypology';
 import { ldapGradeFor, resolveGrade, hasEmeritusTrace, isRetireeWithoutEmeritus, EmeritusSignals } from './emeritus';
-import { parseValidation, resolveStatus, validationToGristFields, ValidationInfo, isExternalEmployer } from './validation';
-import { normalizeFuzzyDate, isFuzzyDatePast, isDepartureCertain, fuzzyDateLowerBound, fuzzyDateUpperBound } from './dates';
+import { parseValidation, validationToGristFields, ValidationInfo, isExternalEmployer } from './validation';
+import { normalizeFuzzyDate, isFuzzyDatePast, fuzzyDateLowerBound, fuzzyDateUpperBound } from './dates';
 
 // --- LDAP sync: diff structures (Phase 1, read only) ---
 
@@ -25,6 +25,7 @@ import { gristDocUrl } from './instanceRuntime';
 import { FTE_COLUMNS, parseFteCell, fteGristFields } from './fte';
 import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson';
 import { HR_ID_COLUMN, normalizeHrId, hrIdCell, hrIdProposal } from './hrId';
+import { derivePresence, employerKindOf, ldapAccountOf, legacyStatus, presenceFromValidated, PresenceInput } from './presence';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
 
@@ -998,11 +999,6 @@ const FUZZY_DATE_COLS = ['employment_start_date', 'employment_end_date', AFFILIA
  * fuzzy date, `''` when empty or unreadable. */
 const fromGristFuzzyDate = (raw: any): string => normalizeFuzzyDate(raw) ?? fromGristDate(raw);
 
-/** Employment end strictly in the past (whole period elapsed for a fuzzy value: `2026` ends on
- * 2026-12-31). 0 / empty / unreadable → false. Calendar-day comparison (UTC), no time of day. */
-const isEmploymentEnded = (rawEnd: any, now: Date = new Date()): boolean =>
-  isFuzzyDatePast(fromGristFuzzyDate(rawEnd), now.toISOString().slice(0, 10));
-
 /** Encodes a Druid date (ISO YYYY-MM-DD, or legacy DD-MM-YYYY text) for a Grist Date column:
  * epoch seconds, the only valid representation whatever the column's `dateFormat`. Until
  * 2026-09-17 we wrote DD-MM-YYYY text: accepted by columns in DD-MM-YYYY format
@@ -1479,6 +1475,9 @@ export const GristService = {
       } catch (e) {
         console.warn('LDAP cache not found.');
       }
+      // No LDAP cache (instance without LDAP, test instance, sync never run): an uid missing from it
+      // proves nothing — presence then comes from the dates and validations only.
+      const ldapAvailable = Object.keys(ldapCache).length > 0;
 
       // 3. Fetch the institutions
       const institutionsResp = await fetch(`${gristDocUrl()}/tables/Etablissements/records`);
@@ -1509,38 +1508,17 @@ export const GristService = {
           ? (employerId === 0 ? '' : (institutionsMap[employerId] || `ID: ${employerId}`))
           : (employerId || '');
 
-        let finalStatus = ResearcherStatus.EXTERNE;
-        // External researchers now carry a fake uid `ext_<name>-<initial>`
-        // (persisted in uid_dyna + people.csv for harvesting). This uid matches
-        // no LDAP entry → classify them EXTERNE without the LDAP lookup, otherwise they
-        // would wrongly be flagged PARTI (else branch below).
-        const isExternalUid = typeof uid === 'string' && uid.startsWith('ext_');
-        // Known employer ≠ Nantes Université (INSERM, CNRS, Centrale…): EXTERNE even with a
-        // hosted LDAP account (dynaEtat N or D ignored); only a past Grist employment end means departure.
-        const externalEmployer = isExternalEmployer(
-          employerName, (typeof employerId === 'number') ? institutionsUaiMap[employerId] : '');
-        if (externalEmployer) {
-          finalStatus = isEmploymentEnded(fields['employment_end_date']) ? ResearcherStatus.PARTI : ResearcherStatus.EXTERNE;
-        } else if (uid && !isExternalUid) {
-          if (ldapCache[uid]) {
-            const ldapEntry = ldapCache[uid];
-            const ldapState = typeof ldapEntry === 'string' ? ldapEntry : ldapEntry.etat;
-            finalStatus = statusFromEtat(ldapState);
-          } else {
-            finalStatus = ResearcherStatus.PARTI;
-          }
-        } else if (isEmploymentEnded(fields['employment_end_date'])) {
-          // Externals (`ext_` uid or no uid, hence no LDAP state): a past EMPLOYMENT end date
-          // means departure (rule added on 2026-09-14). The lab/team membership dates
-          // (affiliation_*_date) play no part — they are incomplete in Grist.
-          finalStatus = ResearcherStatus.PARTI;
-        }
-        // Rule of 2026-09-22: employment end AND lab membership end both filled in and past ⇒ PARTI,
-        // above the LDAP state and above a validated status (lib/dates.ts::isDepartureCertain).
-        const departureCertain = isDepartureCertain(
-          fromGristFuzzyDate(fields['employment_end_date']), fromGristFuzzyDate(fields[AFFILIATION_END_COL]));
-        if (departureCertain) finalStatus = ResearcherStatus.PARTI;
-
+        // Three axes (lib/presence.ts, docs/plan-statut-employeur-ldap.md): employer, LDAP account and
+        // presence. The uid only says whether there is an LDAP account to read (`ext_` = none).
+        const employerUai = (typeof employerId === 'number') ? institutionsUaiMap[employerId] : '';
+        // Known employer ≠ Nantes Université (INSERM, CNRS, Centrale…): the LDAP account is a hosted one —
+        // its state, category and corps describe the account, not the job.
+        const externalEmployer = isExternalEmployer(employerName, employerUai);
+        const employerKind = employerKindOf(employerName, employerUai);
+        const ldapEntry = uid ? ldapCache[uid] : undefined;
+        const ldapEtat: string | undefined = ldapEntry === undefined ? undefined : (typeof ldapEntry === 'string' ? ldapEntry : ldapEntry.etat);
+        const hasRealUid = typeof uid === 'string' && !!uid && !uid.startsWith('ext_');
+        const ldapAccount = ldapAccountOf(uid, ldapEtat);
 
         const gristCiv = fields['Civilite'] || fields['Civilité'] || '';
         let ldapCiv = '';
@@ -1588,10 +1566,20 @@ export const GristService = {
           grade: baseGrade, typeEmploi: fields['TYPE_EMPLOI'], libTypeEmploi: fields['LIB_TYPE_EMPLOI'], ldapCategory,
         };
         const finalGrade = resolveGrade(baseGrade, emeritusSignals);
-        if (isRetireeWithoutEmeritus(emeritusSignals)) finalStatus = ResearcherStatus.PARTI;
 
-        // Reliability layer: takes precedence over the status derived from LDAP/dates.
+        // Reliability layer: a validation covering the status sets the presence (INTERNE / EXTERNE, written
+        // before 2026-10-07, read as PRESENT). `derivedPresence` = without it, to flag a conflict.
         const validation = parseValidation(fields, fromGristDate);
+        const presenceInput: PresenceInput = {
+          employer: employerKind, hasRealUid: hasRealUid && ldapAvailable, ldapEtat,
+          employmentEnd: fromGristFuzzyDate(fields['employment_end_date']),
+          membershipEnd: fromGristFuzzyDate(fields[AFFILIATION_END_COL]),
+          retireeWithoutEmeritus: isRetireeWithoutEmeritus(emeritusSignals),
+        };
+        const derivedPresence = derivePresence(presenceInput);
+        const validatedPresence = validation.validated && validation.validationScope.includes('statut')
+          ? presenceFromValidated(fields['validated_status']) : undefined;
+        const presence = derivePresence({ ...presenceInput, validated: validatedPresence });
 
         return {
           id: '',                 // filled after the map (real uid, otherwise ext_<name>-<initial>) — see assignPublicIds
@@ -1608,8 +1596,12 @@ export const GristService = {
           hrId: normalizeHrId(fields[HR_ID_COLUMN]),
           nationality: fields['Nationalite'] || '',
           birthDate: researcherBirthDate,
-          status: departureCertain ? ResearcherStatus.PARTI : resolveStatus(validation, finalStatus),
-          derivedStatus: finalStatus,
+          status: legacyStatus(presence, employerKind, ldapAccount),
+          derivedStatus: legacyStatus(derivedPresence, employerKind, ldapAccount),
+          presence,
+          derivedPresence,
+          ldapAccount,
+          employerKind,
           employment: {
             employer: employerName,
             institutionId: (typeof employerId === 'number') ? (institutionsUaiMap[employerId] || '') : '',
@@ -2385,12 +2377,13 @@ export const GristService = {
             after: STATUT_DYNA_MAP[String(e.etat).toUpperCase()] || String(e.etat),
           });
         }
-        // Manually validated status contradicted by LDAP (e.g. « INTERNE validé » from a lab
-        // website, but dynaEtat = D): the record displays the validated status, so the departure stays
-        // invisible until the validation is aligned. Proposed as a change to arbitrate (conflict).
+        // Manually validated presence contradicted by LDAP (e.g. « present » from a lab website, but
+        // dynaEtat = D): the record displays the validated presence, so the departure stays invisible
+        // until the validation is aligned. Proposed as a change to arbitrate (conflict). For another
+        // employer the account is a hosted one and says nothing about the presence (D3).
         const v = parseValidation(f, fromGristDate);
-        if (e.etat && v.validated && v.validationScope.includes('statut') && v.validatedStatus) {
-          const derived = externalEmployer ? ResearcherStatus.EXTERNE : statusFromEtat(e.etat);
+        if (e.etat && !externalEmployer && v.validated && v.validationScope.includes('statut') && v.validatedStatus) {
+          const derived = String(e.etat).trim().toUpperCase().startsWith('D') ? Presence.DEPART : Presence.PRESENT;
           if (v.validatedStatus !== derived) {
             changes.push({ field: 'validated_status', label: 'Statut validé', before: v.validatedStatus, after: derived });
           }

@@ -1,13 +1,13 @@
 import React, { useMemo, useState } from 'react';
 import { ShieldCheck, X, Upload, AlertTriangle, CheckCircle2, HelpCircle } from 'lucide-react';
-import { Researcher, ResearcherStatus } from '../../types';
+import { Researcher, Presence } from '../../types';
 import {
   ValidationScope,
   ValidationDiff,
   parseValidationList,
   computeValidationDiff,
 } from '../../lib/validation';
-import { STATUS_LABELS, VALIDATION_SCOPE_LABELS } from '../../lib/researcherLabels';
+import { PRESENCE_LABELS, VALIDATION_SCOPE_LABELS } from '../../lib/researcherLabels';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 
 interface ValidationImportReviewProps {
@@ -38,7 +38,7 @@ export const ValidationImportReview: React.FC<ValidationImportReviewProps> = ({
   const [source, setSource] = useState('');
   const [date, setDate] = useState(todayIso());
   const [scope, setScope] = useState<ValidationScope[]>(['statut', 'rattachement']);
-  const [defaultStatus, setDefaultStatus] = useState<ResearcherStatus>(ResearcherStatus.INTERNE);
+  const [defaultStatus, setDefaultStatus] = useState<Presence>(Presence.PRESENT);
   const [diff, setDiff] = useState<ValidationDiff | null>(null);
 
   const rows = useMemo(() => parseValidationList(raw), [raw]);
@@ -56,7 +56,7 @@ export const ValidationImportReview: React.FC<ValidationImportReviewProps> = ({
     setDiff(
       computeValidationDiff(
         researchers.map((r) => ({
-          id: r.id, uid: r.uid, email: r.email, displayName: r.displayName, status: r.status,
+          id: r.id, uid: r.uid, email: r.email, displayName: r.displayName, presence: r.presence,
         })),
         rows,
         { source: source.trim() || t`Verified list`, date, scope, defaultStatus },
@@ -122,15 +122,15 @@ export const ValidationImportReview: React.FC<ValidationImportReviewProps> = ({
                 />
               </div>
               <div>
-                <label className="section-label"><Trans>Default status</Trans></label>
+                <label className="section-label"><Trans>Default presence</Trans></label>
                 <select
                   value={defaultStatus}
-                  onChange={(e) => setDefaultStatus(e.target.value as ResearcherStatus)}
+                  onChange={(e) => setDefaultStatus(e.target.value as Presence)}
                   className="input-soft mt-1"
                 >
-                  {Object.values(ResearcherStatus).map((s) => <option key={s} value={s}>{t(STATUS_LABELS[s])}</option>)}
+                  {Object.values(Presence).map((s) => <option key={s} value={s}>{t(PRESENCE_LABELS[s])}</option>)}
                 </select>
-                <p className="text-[11.5px] text-muted-faint mt-1"><Trans>Used when the line does not specify a status.</Trans></p>
+                <p className="text-[11.5px] text-muted-faint mt-1"><Trans>Used when the line does not specify a status (present, leaving, left; internal and external read as present).</Trans></p>
               </div>
               <div>
                 <label className="section-label"><Trans>Validation scope</Trans></label>
@@ -175,9 +175,9 @@ export const ValidationImportReview: React.FC<ValidationImportReviewProps> = ({
                         <span className="font-disp font-semibold text-ink dark:text-[#f5f2ea]">{m.displayName}</span>
                         <span className="flex items-center gap-2 text-[12px]">
                           <span className="text-muted-faint">{m.matchedBy === 'uid' ? 'uid' : m.matchedBy === 'email' ? t`email` : t`name`}</span>
-                          {m.overrides
-                            ? <span className="font-semibold text-[#9a6a12] dark:text-[#f0c266]">{t(STATUS_LABELS[m.currentStatus])} → {t(STATUS_LABELS[m.newStatus])}</span>
-                            : <span className="font-semibold text-[#1f7a4d] dark:text-[#5fd39a]">{t(STATUS_LABELS[m.newStatus])}</span>}
+                          {m.overrides && m.currentStatus
+                            ? <span className="font-semibold text-[#9a6a12] dark:text-[#f0c266]">{t(PRESENCE_LABELS[m.currentStatus])} → {t(PRESENCE_LABELS[m.newStatus])}</span>
+                            : <span className="font-semibold text-[#1f7a4d] dark:text-[#5fd39a]">{t(PRESENCE_LABELS[m.newStatus])}</span>}
                         </span>
                       </div>
                     ))}

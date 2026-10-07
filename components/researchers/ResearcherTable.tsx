@@ -3,7 +3,7 @@ import { RefreshCw, MoreHorizontal, PlaneTakeoff } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Researcher } from '../../types';
 import { ResearcherIcons } from './ResearcherIcons';
-import { StatusBadge } from './StatusBadge';
+import { PresenceBadge } from './PresenceBadge';
 import { SortableHeader } from './SortableHeader';
 import { hasCapability } from '../../lib/auth';
 import type { SortKey, SortConfig } from '../../hooks/useResearcherFilters';
@@ -87,9 +87,9 @@ export const ResearcherTable: React.FC<ResearcherTableProps> = ({
             <SortableHeader label={t({ message: `Affiliation`, context: "membership" })} sortKey="structureName" sortConfig={sortConfig} onSort={onSort} />
             <SortableHeader label={t`Employer`} sortKey="employer" sortConfig={sortConfig} onSort={onSort} />
             <th className="px-5 py-4 text-left text-[11.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c] border-b border-ink/5 dark:border-white/5"><Trans>Identifiers</Trans></th>
-            {/* Internal/external status + validation: configurable per instance (HAS_STATUS_VALIDATION) —
-                irrelevant for an instance that only enters its internal staff (Centrale). */}
-            {hasCapability('HAS_STATUS_VALIDATION') && <SortableHeader label={t`Status`} sortKey="status" sortConfig={sortConfig} onSort={onSort} />}
+            {/* Presence + LDAP account + validation: configurable per instance (HAS_STATUS_VALIDATION) —
+                irrelevant for an instance that only enters its present staff (Centrale). */}
+            {hasCapability('HAS_STATUS_VALIDATION') && <SortableHeader label={t`Presence`} sortKey="status" sortConfig={sortConfig} onSort={onSort} />}
             <th className="relative px-5 py-4 border-b border-ink/5 dark:border-white/5" />
           </tr>
         </thead>
@@ -138,9 +138,13 @@ export const ResearcherTable: React.FC<ResearcherTableProps> = ({
                   <span className="text-[13px] text-muted-faint dark:text-[#8f897c]">—</span>
                 )}
               </td>
-              <td className="px-5 py-4 text-[13.5px] font-medium text-[#4b473e] dark:text-[#e7e2d6]">{person.employment.employer}</td>
+              <td className="px-5 py-4 text-[13.5px] font-medium text-[#4b473e] dark:text-[#e7e2d6]">
+                {person.employment.employer && !/^non renseign/i.test(person.employment.employer)
+                  ? person.employment.employer
+                  : <span className="text-muted-faint dark:text-[#8f897c] font-normal" title={t`Employer not specified`}>—</span>}
+              </td>
               <td className="px-5 py-4"><ResearcherIcons identifiers={person.identifiers} /></td>
-              {hasCapability('HAS_STATUS_VALIDATION') && <td className="px-5 py-4"><StatusBadge status={person.status} validation={person.validation} derivedStatus={person.derivedStatus} /></td>}
+              {hasCapability('HAS_STATUS_VALIDATION') && <td className="px-5 py-4"><PresenceBadge presence={person.presence} ldapAccount={person.ldapAccount} validation={person.validation} derivedPresence={person.derivedPresence} /></td>}
               <td className="px-5 py-4 text-right">
                 <button className="text-muted-faint hover:text-ink dark:text-[#8f897c] dark:hover:text-[#f5f2ea] transition-colors">
                   <MoreHorizontal className="w-5 h-5" />

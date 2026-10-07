@@ -1,4 +1,4 @@
-import { ResearcherStatus } from '../types';
+import { Presence } from '../types';
 
 /**
  * @file validation.ts
@@ -29,8 +29,9 @@ const SCOPE_VALUES: readonly ValidationScope[] = ['statut', 'rattachement'];
 export interface ValidationInfo {
   /** Has the row been manually validated? */
   validated: boolean;
-  /** Authoritative status when `scope` includes 'statut' (takes precedence over LDAP/dates). */
-  validatedStatus?: ResearcherStatus;
+  /** Authoritative presence when `scope` includes 'statut' (takes precedence over LDAP/dates).
+   * Grist `validated_status`: PRESENT / DEPART / PARTI; INTERNE and EXTERNE (before 2026-10-07) read as PRESENT. */
+  validatedStatus?: Presence;
   /** Validation date (YYYY-MM-DD) — drives staleness. */
   validationDate?: string;
   /** Source: « Liste Centrale 2026-06 », « Enquête LPPL »… (traceability). */
@@ -81,8 +82,8 @@ export const isExternalEmployer = (employerName: any, employerUai?: any): boolea
   return name !== normEmployer(HOME_EMPLOYER.name);
 };
 
-/** Default status set by a reliable list ("these people are present"). */
-export const DEFAULT_VALIDATED_STATUS = ResearcherStatus.INTERNE;
+/** Default presence set by a reliable list ("these people are present"). */
+export const DEFAULT_VALIDATED_STATUS = Presence.PRESENT;
 
 /**
  * Single definition of a "validated cell", shared by `validation.ts` and
@@ -95,13 +96,15 @@ export const isValidatedCell = (v: any): boolean =>
 
 const truthy = isValidatedCell;
 
-/** Normalizes a free-form string to a known ResearcherStatus (else undefined). */
-export const normStatus = (raw: any): ResearcherStatus | undefined => {
-  const s = String(raw ?? '').toUpperCase().trim();
-  if (s === 'INTERNE') return ResearcherStatus.INTERNE;
-  if (s === 'DEPART' || s === 'DÉPART') return ResearcherStatus.DEPART;
-  if (s === 'PARTI') return ResearcherStatus.PARTI;
-  if (s === 'EXTERNE') return ResearcherStatus.EXTERNE;
+/**
+ * Validated status cell or list value → presence (else undefined). PRESENT / DEPART / PARTI, plus the
+ * values written before the three axes (2026-10-07): INTERNE and EXTERNE both meant « present ».
+ */
+export const normStatus = (raw: any): Presence | undefined => {
+  const s = String(raw ?? '').trim().toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  if (s === 'PRESENT' || s === 'INTERNE' || s === 'EXTERNE') return Presence.PRESENT;
+  if (s === 'DEPART') return Presence.DEPART;
+  if (s === 'PARTI') return Presence.PARTI;
   return undefined;
 };
 
@@ -170,25 +173,6 @@ export const validationToGristFields = (
   };
 };
 
-/**
- * Final status = validation (when it covers the status) ON TOP of the derived one.
- * `derived` is the status computed as today (mapStatus LDAP/Grist):
- * the validation only replaces it when explicitly filled in.
- */
-export const resolveStatus = (
-  validation: ValidationInfo | undefined,
-  derived: ResearcherStatus,
-): ResearcherStatus => {
-  if (
-    validation?.validated &&
-    validation.validationScope.includes('statut') &&
-    validation.validatedStatus
-  ) {
-    return validation.validatedStatus;
-  }
-  return derived;
-};
-
 /** Is the affiliation (lab/team) locked by a validation? */
 export const isAffiliationValidated = (v?: ValidationInfo): boolean =>
   !!v?.validated && v.validationScope.includes('rattachement');
@@ -210,21 +194,6 @@ export const isValidationStale = (
   return now.getTime() > threshold.getTime();
 };
 
-/**
- * Conflict between a validation and the derived source: if the source (LDAP/dates)
- * changed AFTER the validation date and diverges from the validated status, the
- * row is flagged "to review" rather than hiding a real change indefinitely.
- * `sourceChangedAt` = known date of the last source change (optional).
- */
-export const hasValidationConflict = (
-  validation: ValidationInfo | undefined,
-  derived: ResearcherStatus,
-): boolean => {
-  if (!validation?.validated || !validation.validationScope.includes('statut')) return false;
-  if (!validation.validatedStatus) return false;
-  return validation.validatedStatus !== derived;
-};
-
 // ─── Bulk import of a reliable list ───────────────────────────────────────────
 
 /** A row read from a reliable list (pasted or imported CSV). */
@@ -233,7 +202,7 @@ export interface ValidationListRow {
   name?: string;
   email?: string;
   uid?: string;
-  status?: ResearcherStatus;
+  status?: Presence;
 }
 
 /** A list ↔ record match, ready to be applied. */
@@ -241,11 +210,11 @@ export interface ValidationMatch {
   researcherId: string;
   uid?: string;
   displayName: string;
-  /** Currently displayed status (before validation). */
-  currentStatus: ResearcherStatus;
-  /** Proposed validated status. */
-  newStatus: ResearcherStatus;
-  /** The validated status differs from the current one (info for the user). */
+  /** Currently displayed presence (before validation). */
+  currentStatus?: Presence;
+  /** Proposed validated presence. */
+  newStatus: Presence;
+  /** The validated presence differs from the current one (info for the user). */
   overrides: boolean;
   matchedBy: 'uid' | 'email' | 'name';
 }
@@ -318,10 +287,10 @@ export const computeValidationDiff = (
     uid?: string;
     email?: string;
     displayName: string;
-    status: ResearcherStatus;
+    presence?: Presence;
   }>,
   rows: ValidationListRow[],
-  opts: { source: string; date: string; scope: ValidationScope[]; defaultStatus?: ResearcherStatus },
+  opts: { source: string; date: string; scope: ValidationScope[]; defaultStatus?: Presence },
 ): ValidationDiff => {
   const byUid = new Map<string, string[]>();
   const byEmail = new Map<string, string[]>();
@@ -368,9 +337,9 @@ export const computeValidationDiff = (
       researcherId: id,
       uid: r.uid,
       displayName: r.displayName,
-      currentStatus: r.status,
+      currentStatus: r.presence,
       newStatus,
-      overrides: newStatus !== r.status,
+      overrides: newStatus !== r.presence,
       matchedBy,
     });
   }

@@ -9,6 +9,7 @@ import {
   MEMBERSHIP_TYPES,
   MembershipType
 } from '../types';
+import { Presence } from './presence';
 
 /**
  * @file schemas.ts
@@ -70,7 +71,7 @@ export const ResearcherIdentifiersSchema = z.object({
 
 export const ValidationInfoSchema = z.object({
   validated: z.boolean().default(false),
-  validatedStatus: z.nativeEnum(ResearcherStatus).optional(),
+  validatedStatus: z.nativeEnum(Presence).optional(),
   validationDate: z.string().optional(),
   validationSource: z.string().optional(),
   validationScope: z.array(z.enum(['statut', 'rattachement'])).default([]),
@@ -95,6 +96,14 @@ export const ResearcherSchema = z.object({
   secondaryEmail: z.string().email().or(z.literal('')).optional().nullable(),
   phone: z.string().optional().nullable(),
   status: z.nativeEnum(ResearcherStatus).default(ResearcherStatus.EXTERNE),
+  // Zod drops the keys it does not list: everything fetchResearchers computes must be declared here
+  // (derivedStatus and eppn were silently lost until 2026-10-07).
+  derivedStatus: z.nativeEnum(ResearcherStatus).optional(),
+  eppn: z.string().optional(),
+  presence: z.nativeEnum(Presence).optional(),
+  derivedPresence: z.nativeEnum(Presence).optional(),
+  ldapAccount: z.enum(['active', 'closing', 'none']).optional(),
+  employerKind: z.enum(['home', 'external', 'unknown']).optional(),
   employment: EmploymentSchema,
   affiliations: z.array(AffiliationSchema).default([]),
   groups: z.array(z.string()).default([]),

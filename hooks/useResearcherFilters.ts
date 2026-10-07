@@ -6,6 +6,9 @@ import { POLE_LAB_MAPPING, getPoleFromLab } from '../lib/mappings';
 import { useUrlState } from './useUrlState';
 import { fuzzyDateLowerBound, fuzzyDateUpperBound } from '../lib/dates';
 import { matchesMembershipFilter } from '../lib/membershipFilter';
+import {
+  INTERNAL_SHORTCUT, filtersFromLegacyStatus, matchesEmployerFilter, matchesLdapAccountFilter, matchesPresenceFilter, presenceRank,
+} from '../lib/presenceFilter';
 
 export type SortKey = 'displayName' | 'status' | 'employer' | 'structureName' | 'team';
 
@@ -49,7 +52,9 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
 
   const [viewMode, setViewMode] = useState<'list' | 'dashboard'>('list');
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatuses, setFilterStatuses] = useState<string[]>([]);
+  // Presence / employer / LDAP account axes (lib/presence.ts) — they replaced the « status » filter.
+  const [filterPresence, setFilterPresence] = useState<string[]>([]);
+  const [filterLdap, setFilterLdap] = useState<string[]>([]);
   const [filterValidation, setFilterValidation] = useState<string[]>([]);
   const [filterEmployers, setFilterEmployers] = useState<string[]>([]);
   const [filterLabs, setFilterLabs] = useState<string[]>([]);
@@ -67,10 +72,11 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
   const splitFilter = (v: string) => (v ? v.split(',').filter(Boolean) : []);
 
   const { setUrlState } = useUrlState(
-    { search: '', status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '', mode: 'list' },
+    { search: '', presence: '', ldap: '', status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '', mode: 'list' },
     (newState) => {
       if (newState.search !== undefined) setSearchTerm(newState.search || '');
-      if (newState.status !== undefined) setFilterStatuses(splitFilter(newState.status || ''));
+      if (newState.presence !== undefined) setFilterPresence(splitFilter(newState.presence || ''));
+      if (newState.ldap !== undefined) setFilterLdap(splitFilter(newState.ldap || ''));
       if (newState.validation !== undefined) setFilterValidation(splitFilter(newState.validation || ''));
       if (newState.employer !== undefined) setFilterEmployers(splitFilter(newState.employer || ''));
       if (newState.lab !== undefined) setFilterLabs(splitFilter(newState.lab || ''));
@@ -80,6 +86,12 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
       if (newState.pole !== undefined) setFilterPoles(splitFilter(newState.pole || ''));
       if (newState.parcours !== undefined) setFilterParcours(splitFilter(newState.parcours || ''));
       if (newState.mode !== undefined) setViewMode((newState.mode as 'list' | 'dashboard') || 'list');
+      // Links bookmarked before the three axes (?status=INTERNE…): translated, unless the new parameters are set.
+      if (newState.status) {
+        const legacy = filtersFromLegacyStatus(splitFilter(newState.status));
+        if (!newState.presence) setFilterPresence(legacy.presence);
+        if (!newState.employer && legacy.employer.length) setFilterEmployers(legacy.employer);
+      }
     }
   );
 
@@ -128,9 +140,9 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
       r.displayName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       primaryLab.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatuses.length === 0 || filterStatuses.includes(r.status);
+    const matchesPresence = matchesPresenceFilter(r, filterPresence) && matchesLdapAccountFilter(r, filterLdap);
     const matchesValidation = matchesValidationFilter(r);
-    const matchesEmployer = filterEmployers.length === 0 || filterEmployers.includes(r.employment.employer);
+    const matchesEmployer = matchesEmployerFilter(r, filterEmployers);
     const matchesLab = filterLabs.length === 0 || filterLabs.includes(primaryLab);
     const matchesMembership = matchesMembershipFilter(r, filterMemberships);
     const matchesGrade = filterGrades.length === 0 || filterGrades.includes(r.employment.grade || '');
@@ -149,9 +161,9 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
       (!idFilters.scopus || !!r.identifiers.scopusId);
     const key = affiliationHistoryKey(r);
     const matchesParcours = !parcoursSignals || matchesParcoursFilter(key ? parcoursSignals[key] : undefined, filterParcours);
-    return matchesSearch && matchesStatus && matchesValidation && matchesEmployer && matchesLab && matchesMembership && matchesGrade &&
+    return matchesSearch && matchesPresence && matchesValidation && matchesEmployer && matchesLab && matchesMembership && matchesGrade &&
       matchesContractType && matchesPole && matchesPeriod && matchesIds && matchesParcours;
-  }), [enrichedResearchers, searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterMemberships, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, idFilters, now, parcoursSignals, filterParcours]);
+  }), [enrichedResearchers, searchTerm, filterPresence, filterLdap, filterValidation, filterEmployers, filterLabs, filterMemberships, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, idFilters, now, parcoursSignals, filterParcours]);
 
   // Counter of the « Career path » filter options, over every record of the list (not the filtered ones).
   const parcoursCount = useMemo(
@@ -166,7 +178,10 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
       let bVal = '';
       switch (sortConfig.key) {
         case 'displayName': aVal = a.displayName; bVal = b.displayName; break;
-        case 'status': aVal = a.status; bVal = b.status; break;
+        case 'status': {
+          const diff = presenceRank(a.presence) - presenceRank(b.presence);
+          return sortConfig.direction === 'asc' ? diff : -diff;
+        }
         case 'employer': aVal = a.employment.employer; bVal = b.employment.employer; break;
         case 'structureName':
           aVal = a.affiliations.find(aff => aff.isPrimary)?.structureName || '';
@@ -191,7 +206,7 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterStatuses, filterValidation, filterEmployers, filterLabs, filterMemberships, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, filterParcours]);
+  }, [searchTerm, filterPresence, filterLdap, filterValidation, filterEmployers, filterLabs, filterMemberships, filterGrades, filterContractTypes, filterPoles, filterDateStart, filterDateEnd, filterParcours]);
 
   const handleSort = (key: SortKey) => {
     setSortConfig(prev => ({
@@ -201,9 +216,17 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
   };
 
   const updateSearch = (val: string) => { setSearchTerm(val); setUrlState({ search: val }); };
-  const updateStatuses = (vals: string[]) => { setFilterStatuses(vals); setUrlState({ status: vals.join(',') }); };
+  const updatePresence = (vals: string[]) => { setFilterPresence(vals); setUrlState({ presence: vals.join(','), status: '' }); };
+  const updateLdap = (vals: string[]) => { setFilterLdap(vals); setUrlState({ ldap: vals.join(',') }); };
   const updateValidation = (vals: string[]) => { setFilterValidation(vals); setUrlState({ validation: vals.join(',') }); };
-  const updateEmployers = (vals: string[]) => { setFilterEmployers(vals); setUrlState({ employer: vals.join(',') }); };
+  const updateEmployers = (vals: string[]) => { setFilterEmployers(vals); setUrlState({ employer: vals.join(','), status: '' }); };
+  /** « Internal staff » shortcut (D6): present + home employer, or cleared. */
+  const setInternalShortcut = (on: boolean) => {
+    const presence = on ? [...INTERNAL_SHORTCUT.presence] : [];
+    const employer = on ? [...INTERNAL_SHORTCUT.employer] : [];
+    setFilterPresence(presence); setFilterEmployers(employer);
+    setUrlState({ presence: presence.join(','), employer: employer.join(','), status: '' });
+  };
   const updateLabs = (vals: string[]) => { setFilterLabs(vals); setUrlState({ lab: vals.join(',') }); };
   const updateMemberships = (vals: string[]) => { setFilterMemberships(vals); setUrlState({ membership: vals.join(',') }); };
   const updateGrades = (vals: string[]) => { setFilterGrades(vals); setUrlState({ grade: vals.join(',') }); };
@@ -212,18 +235,20 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
   const updateParcours = (vals: string[]) => { setFilterParcours(vals); setUrlState({ parcours: vals.join(',') }); };
   /** « Clear all » of the filter bar: every filter except the search, in a single URL update. */
   const clearFilters = () => {
-    setFilterStatuses([]); setFilterValidation([]); setFilterEmployers([]); setFilterLabs([]);
+    setFilterPresence([]); setFilterLdap([]); setFilterValidation([]); setFilterEmployers([]); setFilterLabs([]);
     setFilterMemberships([]); setFilterGrades([]); setFilterContractTypes([]); setFilterPoles([]);
     setFilterParcours([]); setFilterDateStart(''); setFilterDateEnd('');
     setIdFilters({ orcid: false, hal: false, idref: false, scopus: false });
-    setUrlState({ status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '' });
+    setUrlState({ presence: '', ldap: '', status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '' });
   };
   const updateViewMode = (val: 'list' | 'dashboard') => { setViewMode(val); setUrlState({ mode: val }); };
 
   return {
     viewMode, updateViewMode,
     searchTerm, updateSearch,
-    filterStatuses, updateStatuses,
+    filterPresence, updatePresence,
+    filterLdap, updateLdap,
+    setInternalShortcut,
     filterValidation, updateValidation,
     filterEmployers, updateEmployers,
     filterLabs, updateLabs,

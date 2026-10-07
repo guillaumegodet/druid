@@ -32,6 +32,10 @@
  *                    an LDAP account no Annuaire record carries: switch the record to that uid
  *                    (docs/plan-statut-employeur-ldap.md, lot 2); key = `<current key>><LDAP uid>`.
  *                    When a record already carries that uid, annuaire_ids_partages proposes the merge.
+ *   hebergement_fin  record employed by another institution (CNRS, INSERM…) whose hosted LDAP account is
+ *                    closing (dynaEtat D): the presence does not follow a hosted account
+ *                    (docs/plan-statut-employeur-ldap.md, D3), a person checks; closed once an end
+ *                    date is entered or the account is active again.
  *   parcours_depart  probable departure of a record without end date, from the career-path job
  *                    (affiliation_history/_index.json of scripts/sync_affiliation_history.cjs): one task per
  *                    record, typed by the strongest signal — parcours_depart_confirme (several sources),
@@ -61,7 +65,7 @@ const schema = require('./lib/tasks_schema.cjs');
 const APPLY = common.hasFlag('apply');
 const AUTHOR = 'druid:regles';
 const PROGRESS_PATH = common.getArg('progress', 'tasks_detect_progress.json');
-const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect'];
+const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect'];
 const RULES_ARG = String(common.getArg('rules', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
@@ -298,6 +302,21 @@ function ldapUidSwitches(annuaire, ldap) {
   return out;
 }
 
+// ── Hosted account of another employer (D3) ─────────────────────────────────────
+/** Home institution, as lib/validation.ts HOME_EMPLOYER (this CommonJS script cannot import it). */
+const HOME_UAI = '0442953W';
+const HOME_NAME = 'NANTES UNIVERSITE';
+const normEmployer = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, ' ').trim();
+/** Employer filled in and other than the home institution (UAI first, else the label) — lib/validation.ts isExternalEmployer. */
+const isExternalEmployerRef = (ref, etablissements) => {
+  const e = (etablissements || {})[ref];
+  if (!e) return false;
+  const name = normEmployer(e.Employeur);
+  const uai = String(e.UAI || '').trim().toUpperCase();
+  if ((!name || name === 'NON RENSEIGNE') && !uai) return false;
+  return uai ? uai !== HOME_UAI : name !== HOME_NAME;
+};
+
 // ── Rules: detect(ctx) → [{ key, rec, description, lien, type? }] ─────────────────
 
 // ── Career path (docs/plan-parcours-affiliations.md, lot 4) ────────────────────────
@@ -477,6 +496,34 @@ const RULES = {
       }));
     },
   },
+  hebergement_fin: {
+    type: 'annuaire_hebergement_fin',
+    sources: ['ldap', 'etablissements'],
+    detect(ctx) {
+      const out = [];
+      for (const rec of ctx.annuaire) {
+        const f = rec.fields;
+        const uid = String(f.uid_dyna || '');
+        if (!uid || uid.startsWith('ext_') || !isExternalEmployerRef(f.Employeur, ctx.etablissements)) continue;
+        const l = ctx.ldap[uid];
+        if (!l || !String(l.etat || '').toUpperCase().startsWith('D')) continue;
+        // An end already entered (employment or membership) settles it; so does a validated departure.
+        if (f.employment_end_date || f.affiliation_end_date) continue;
+        if (/^(DEPART|PARTI)$/i.test(String(f.validated_status || '').trim())) continue;
+        const employer = ctx.etablissements[f.Employeur].Employeur;
+        out.push({
+          key: rec.key, rec,
+          description: [
+            `Employeur ${employer} ; le compte LDAP hébergé ${uid} est en fermeture (état D${l.dateFin ? `, fin ${l.dateFin}` : ''}).`,
+            'Druid n’en déduit pas un départ (fin de convention d’hébergement possible sans départ du labo).',
+            'À faire : vérifier auprès du labo ; départ ⇒ saisir la fin d’emploi ou d’appartenance (la tâche se ferme seule), sinon abandonner la tâche.',
+          ].join('\n'),
+          lien: '',
+        });
+      }
+      return out;
+    },
+  },
   parcours_depart: {
     type: 'parcours_depart_observe',
     types: ['parcours_depart_confirme', 'parcours_depart_declare', 'parcours_depart_observe'],
@@ -585,6 +632,10 @@ async function main() {
     scopus: loadJson('scopus_align_cache.json'),
     idref: loadJson('idref_align_cache.json'),
     ldap: loadJson('ldap_status_cache.json'),
+    // Employer table (hebergement_fin): unreadable ⇒ empty ⇒ the rule is skipped, its tasks left untouched.
+    etablissements: await common.gristGet(`/docs/${DOC}/tables/Etablissements/records`)
+      .then((d) => Object.fromEntries((d.records || []).map((r) => [r.id, r.fields])))
+      .catch((e) => { console.warn(`[tasks] Etablissements unreadable (${e.message})`); return {}; }),
     parcours: loadJson(PARCOURS_INDEX),
   };
   let existing = [];

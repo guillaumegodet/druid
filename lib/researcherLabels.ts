@@ -2,6 +2,7 @@ import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { ResearcherStatus, type MembershipType } from '../types';
 import type { ValidationScope } from './validation';
+import { Presence, type LdapAccountState } from './presence';
 
 /**
  * @file researcherLabels.ts
@@ -15,6 +16,20 @@ export const STATUS_LABELS: Record<ResearcherStatus, MessageDescriptor> = {
   [ResearcherStatus.DEPART]: msg`Leaving`,
   [ResearcherStatus.PARTI]: msg`Left`,
   [ResearcherStatus.EXTERNE]: msg`External`,
+};
+
+/** Presence in the unit (lib/presence.ts) — replaces the status. */
+export const PRESENCE_LABELS: Record<Presence, MessageDescriptor> = {
+  [Presence.PRESENT]: msg`Present`,
+  [Presence.DEPART]: msg`Leaving`,
+  [Presence.PARTI]: msg`Left`,
+};
+
+/** Institution LDAP account of the record (lib/presence.ts). */
+export const LDAP_ACCOUNT_LABELS: Record<LdapAccountState, MessageDescriptor> = {
+  active: msg`Active account`,
+  closing: msg`Account closing`,
+  none: msg`No account`,
 };
 
 export const VALIDATION_SCOPE_LABELS: Record<ValidationScope, MessageDescriptor> = {

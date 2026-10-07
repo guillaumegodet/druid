@@ -83,7 +83,7 @@ Voir [Saisir des dates d'emploi imprécises](/guides/personnes/dates-imprecises/
 
 - **Le statut** : une fin d'emploi **et** une fin d'appartenance passées font passer la
   personne en **Parti**, même si sa fiche est validée (voir
-  [Statuts des personnes](/donnees/statuts-des-personnes/#6-le-départ-certain)). Pour une
+  [Statuts des personnes](/donnees/statuts-des-personnes/#1-le-départ-certain)). Pour une
   personne sans compte dans l'établissement, la fin d'emploi seule suffit.
 - **L'export vers CRISalid** : les dates de l'appartenance principale sont transmises, ce
   qui permet de dater les publications moissonnées.
@@ -98,7 +98,7 @@ On garde sa carte Emploi telle quelle et, dans la carte Appartenances :
 - l'ancien laboratoire reçoit une fin d'appartenance `2025-08` et passe en **historique** ;
 - le nouveau laboratoire, avec un début `2025-09`, devient le **rattachement principal**.
 
-Son statut reste **Interne**, puisque son emploi continue.
+Elle reste **Présente**, puisque son emploi continue.
 
 ## Limites connues
 

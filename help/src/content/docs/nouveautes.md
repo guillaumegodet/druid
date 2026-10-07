@@ -21,6 +21,16 @@ n'existent que sur les instances qui en disposent (voir
 ### Personnes
 
 - **ETP (quotité) et ETP recherche** sur la fiche, carte « Emploi & contrat ».
+- **Fin d'« Interne / Externe »** : chaque fiche affiche désormais sa **présence** (Présent,
+  Départ, Parti), son **employeur** et son **compte LDAP**, trois informations indépendantes.
+  Nouveaux filtres **Présence**, **Employeur** (établissement, autres, non renseigné) et
+  **Compte LDAP**, raccourci **Personnels internes**. Les anciens liens filtrés sur un statut
+  restent valables. Voir [Statuts des personnes](/donnees/statuts-des-personnes/).
+- **N° agent** (identifiant RH) affiché sur la fiche, repris de l'annuaire LDAP.
+- **Employeur déduit du LDAP** à la création d'une fiche (« Remplir depuis le LDAP ») quand
+  c'est sûr : personnel de l'établissement, comptes CNRS.
+- Nouvelles **tâches** : passer une fiche `ext_…` sur son uid LDAP (repérée par le n° agent),
+  compte LDAP hébergé en fermeture, employeur à renseigner.
 
 ## Septembre 2026
 

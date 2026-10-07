@@ -24,8 +24,9 @@ you check a piece of information, correct it and validate the record.
 
 ## The header
 
-- **Name, photo and status** (Internal, Leaving, Left, External), with the validation badge
-  if the record has been validated: **Validated**, **Expired** or **Validated — conflict**.
+- **Name, photo and presence** (Present, Leaving, Left), the **LDAP** tag if the person has an
+  account in the institution's directory (“closing” if it is about to close), and the
+  validation badge if the record has been validated: **Validated**, **Expired** or **Validated — conflict**.
   Hovering over the badge shows the source and date of the validation.
 - **UID**: the person's identifier in the institution's directory (or `ext_…` for an
   external person), and the date of the last synchronisation.
@@ -71,7 +72,7 @@ regeneration.
   error of this kind, see [Where to fix what](/en/guides/corriger/ou-corriger-quoi/).
 - **A person can have several records** (one per laboratory). The record shows all their
   memberships, but validation and saving apply to the record that is open.
-- **The status cannot be edited directly**: it is calculated. To correct it, validate the
+- **The presence cannot be edited directly**: it is calculated. To correct it, validate the
   record or fill in the end dates (see
   [Correct a person's status or affiliation](/en/guides/personnes/fiabiliser-statut-rattachement/)).
 

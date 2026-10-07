@@ -13,9 +13,9 @@ import QuiOu from '../../../../../components/QuiOu.astro';
 	disponibilite="instances where statuses and manual validation are enabled"
 />
 
-A person's status is calculated from the LDAP directory and the employment dates, which are
-sometimes late or incomplete. When you know for sure that a person is present, has left or
-is external, you **validate their record**: your information prevails over the calculation
+A person's presence is calculated from the LDAP directory and the employment dates, which
+are sometimes late or incomplete. When you know for sure that a person is present, leaving
+or has left, you **validate their record**: your information prevails over the calculation
 for 18 months.
 
 ## Before validating: correct the data
@@ -23,25 +23,27 @@ for 18 months.
 Many status errors come from missing data. First check on the record:
 
 - the **employing institution**: a CNRS or Inserm researcher must have their organisation as
-  employer to be classified External;
+  employer, otherwise their hosted LDAP account decides their presence and they appear in
+  **Internal staff**;
 - the **end dates**: a person who has left must have an **employment end** and a
   **membership end**. The **→ employment end** button copies one into the other;
 - the **laboratory and team** in the Memberships card, and the primary affiliation.
 
-Save. If the calculated status is then correct, a validation is only useful to protect the
+Save. If the calculated presence is then correct, a validation is only useful to protect the
 record from the next directory updates.
 
 ## Validate a record
 
 1. Open the person's record.
 2. Click **Validate the record**.
-3. Choose the **Validated status**: Internal, Leaving, Left or External.
-4. Choose the **Scope**: the status, the affiliation, or both.
+3. Choose the **Validated presence**: Present, Leaving or Left. The employer is not
+   validated: it is filled in on the record.
+4. Choose the **Scope**: the status (the presence), the affiliation, or both.
 5. Enter the **Source**: where your information comes from (for example “Lab survey 2026,
    HR list”). The date and your identifier are added automatically.
 6. Click **Validate**.
 
-The **Validated** badge appears next to the status.
+The **Validated** badge appears next to the presence.
 
 ### Review or remove a validation
 
@@ -50,7 +52,7 @@ Click it:
 
 - **Revalidate** resets the date to today, for example after checking an **Expired** record
   again;
-- **Unvalidate** removes the validation: the calculated status applies again.
+- **Unvalidate** removes the validation: the calculated presence applies again.
 
 ## Validate a list in one go
 
@@ -61,7 +63,8 @@ When a laboratory sends the list of its members, you can validate all the record
    semicolons or tabs) or load a CSV file. A list of names only, without a header, also
    works.
 3. Fill in the **Source (traceability)**, the **Validation date**, the **Validation scope**
-   and the **Default status** (used for rows without a status).
+   and the **Default presence** (used for rows without a status; a status column saying
+   “internal” or “external” counts as “present”).
 4. Click **Analyse matching**. Druid finds each row by uid, then e-mail, then name, and
    shows three lists:
    - **Records that will be validated**;
@@ -85,7 +88,7 @@ Then handle the homonyms and the rows not found by hand, record by record.
 ## Known limitations
 
 - **A past employment end and a past membership end prevail over the validation**: the
-  person is then Left, even if validated as Internal (**Validated — conflict** badge).
+  person is then Left, even if validated as Present (**Validated — conflict** badge).
 - **The import matches by name as a last resort**: two people with the same name are
   classified as homonyms, never validated at random. Prefer lists with e-mail or uid.
 - **A validation applies to one record**: a person with two records (two laboratories) must
