@@ -937,6 +937,7 @@ function App() {
               onNewTask: () => setTaskForm({ researcher: null }),
               onOpenResearcher: openTaskResearcher,
               onMerge: (rowIds) => setMergeRowIds(rowIds),
+              onUidSwitched: afterMergeChange,
             }}
           />
         );

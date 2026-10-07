@@ -12,7 +12,7 @@ const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idr
 
 describe('scripts/sync_tasks.cjs rules (docs/plan-chantiers-taches.md, lot 5)', () => {
   it('default rules exclude the ABES ones (handled by the batch export)', () => {
-    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect']);
+    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect']);
     expect(Object.keys(RULES)).toContain('abes_orcid');
   });
 
@@ -156,6 +156,52 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       p(3, 'faure-a', 'FAURE', 'Alain', { ORCID: '0000-0001-0000-0002' }),
     ]);
     expect(out[0].description).toContain('ORCID 0000-0001-0000-0002 (faure-a, roux-m)');
+  });
+
+  describe('uid_ldap_disponible — ext_ record whose staff number is an LDAP account (docs/plan-statut-employeur-ldap.md, lot 2)', () => {
+    const HR = 'N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_';
+    const ldap = {
+      'leroux-c': { etat: 'N', categorie: 'CNRS-INSERM', empId: '12345', birthDate: '1980-01-15' },
+      'noel-b': { etat: 'N', categorie: 'TITULAIRE', empId: '222' },
+      'blanc-a': { etat: 'D', categorie: 'CDD UNIVERSITE', empId: '333', birthDate: '1990-05-01' },
+      'vidal-p': { etat: 'N', categorie: 'TITULAIRE', empId: '444' },
+    };
+    const detect = (annuaire: unknown[]) => RULES.uid_ldap_disponible.detect(ctx({ annuaire, ldap }));
+
+    it('proposes the LDAP uid for an ext_ record or a record without uid, once per person', () => {
+      const out = detect([
+        rec(1, { uid_dyna: 'ext_leroux-c', Nom: 'Leroux', Prenom: 'Camille', [HR]: '012345.0', DATE_DE_NAISSANCE_JJ_MM_AAAA: 316742400 }),
+        rec(2, { uid_dyna: 'ext_leroux-c', Nom: 'Leroux', Prenom: 'Camille', [HR]: 12345, LABO: 'CEISAM' }),
+        rec(3, { uid_dyna: '', Nom: 'Noel', Prenom: 'Bruno', [HR]: 222 }),
+        rec(4, { uid_dyna: 'ext_vidal-p', Nom: 'Vidal', Prenom: 'Paul', [HR]: 444 }),
+        rec(5, { uid_dyna: 'vidal-p', Nom: 'Vidal', Prenom: 'Paul' }),   // uid already carried: merge rule instead
+        rec(6, { uid_dyna: 'ext_x', Nom: 'X', Prenom: 'Y', [HR]: 999 }),   // no LDAP account
+        rec(7, { uid_dyna: 'ext_z', Nom: 'Z', Prenom: 'Y', [HR]: 0 }),
+      ]);
+      expect(out.map((d: { key: string }) => d.key)).toEqual(['ext_leroux-c>leroux-c', 'g3>noel-b']);
+      expect(out[0].description).toContain('Le n° agent 12345 de cette fiche (ext_leroux-c) est celui du compte LDAP leroux-c (état N, CNRS-INSERM)');
+      expect(out[0].description).toContain('SoVisu+ connaît cette personne sous ext_leroux-c');
+      expect(out[0].description).not.toContain('Attention');
+      expect(out[1].description).not.toContain('SoVisu+');
+    });
+
+    it('accepts compound and usage-prefixed names', () => {
+      const ldap2 = { 'gaugler-mh': { etat: 'N', empId: '1' }, 'bruneau-patitucci-m': { etat: 'N', empId: '2' }, 'elmahjoub-s-1': { etat: 'N', empId: '3' }, 'Perrigaud-k': { etat: 'N', empId: '4' } };
+      const out = RULES.uid_ldap_disponible.detect(ctx({ ldap: ldap2, annuaire: [
+        rec(1, { uid_dyna: 'ext_a', Nom: 'Vuillet-Gaugler', Prenom: 'M', [HR]: 1 }),
+        rec(2, { uid_dyna: 'ext_b', Nom: 'Patitucci', Prenom: 'M', [HR]: 2 }),
+        rec(3, { uid_dyna: 'ext_c', Nom: 'Mahjoub', Prenom: 'S', [HR]: 3 }),
+        rec(4, { uid_dyna: 'ext_d', Nom: 'Perrigaud', Prenom: 'K', [HR]: 4 }),
+      ] }));
+      expect(out).toHaveLength(4);
+      expect(out.filter((d: { description: string }) => d.description.includes('Attention'))).toEqual([]);
+    });
+
+    it('warns when the uid does not look like the name, with the birth dates as a hint', () => {
+      const out = detect([rec(1, { uid_dyna: 'ext_martin-a', Nom: 'Martin', Prenom: 'Alice', [HR]: 333, DATE_DE_NAISSANCE_JJ_MM_AAAA: '1991-05-01' })]);
+      expect(out[0].description).toContain('Attention : l’uid blanc-a ne ressemble pas au nom MARTIN Alice');
+      expect(out[0].description).toContain('dates de naissance différentes (fiche 1991-05-01, LDAP 1990-05-01)');
+    });
   });
 
   describe('career path rules (docs/plan-parcours-affiliations.md, lot 4)', () => {

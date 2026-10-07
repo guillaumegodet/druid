@@ -2531,6 +2531,33 @@ export const GristService = {
     return records.map((r: any) => ({ rowId: r.id, fields: r.fields }));
   },
 
+  /**
+   * Moves a record to its LDAP uid (`annuaire_uid_ldap` task, docs/plan-statut-employeur-ldap.md,
+   * lot 2): every row of `fromUid` (or the single row `rowId` of a record without uid) gets
+   * `uid_dyna = toUid`, with a dated line in Commentaires keeping the former uid. Refused when a row
+   * already carries `toUid` — that case is a merge.
+   */
+  switchAnnuaireUid: async (args: { fromUid: string; rowId?: number; toUid: string; author: string }): Promise<{ updated: number }> => {
+    const { fromUid, rowId, toUid, author } = args;
+    if (!toUid || toUid.startsWith('ext_')) throw new Error(t`Invalid LDAP uid: ${toUid}`);
+    if ((await GristService.fetchAnnuaireRowsByUid(toUid)).length) {
+      throw new Error(t`The uid ${toUid} already has a directory record: merge the two records instead`);
+    }
+    const rows = fromUid ? await GristService.fetchAnnuaireRowsByUid(fromUid) : rowId ? await GristService.fetchAnnuaireRows([rowId]) : [];
+    if (!rows.length) throw new Error(t`Record not found in Grist (uid ${fromUid || '—'})`);
+    const today = new Date().toISOString().slice(0, 10);
+    const note = `[${today}] uid ${fromUid || '(vide)'} → ${toUid} (n° agent = compte LDAP), par ${author}`;
+    const records = rows.map((r) => {
+      const com = String(r.fields['Commentaires'] || '').trimEnd();
+      return { id: r.rowId, fields: { uid_dyna: toUid, Commentaires: com ? `${com}\n${note}` : note } };
+    });
+    const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
+      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ records }),
+    });
+    if (!pr.ok) throw new Error(t`Grist error (uid change): ${await pr.text()}`);
+    return { updated: records.length };
+  },
+
   /** Institution labels (rowId → name) to display the Employeur column (Ref). */
   fetchInstitutionLabels: async (): Promise<Record<number, string>> => {
     const out: Record<number, string> = {};
