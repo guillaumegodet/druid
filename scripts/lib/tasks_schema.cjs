@@ -74,6 +74,10 @@ const TASK_TYPES = {
   parcours_depart_observe: { base: 'Annuaire', canal: 'interne', email: false },
   parcours_statut_incoherent: { base: 'Annuaire', canal: 'interne', email: false },
   parcours_identifiant_suspect: { base: 'Annuaire', canal: 'interne', email: false },
+  // ext_ record of a person who has an LDAP account (docs/plan-statut-employeur-ldap.md, lot 2), and the
+  // SoVisu+ follow-up once the record has switched to the LDAP uid.
+  annuaire_uid_ldap: { base: 'Annuaire', canal: 'interne', email: false },
+  sovisu_ancienne_personne: { base: 'Annuaire', canal: 'interne', email: false },
   autre: { base: 'Autre', canal: 'interne', email: false },
 };
 
@@ -119,6 +123,8 @@ const TITLES_FR = {
   parcours_depart_observe: 'Départ probable d’après les publications : vérifier',
   parcours_statut_incoherent: 'Fiche close mais activité locale récente : vérifier la date de fin',
   parcours_identifiant_suspect: 'Identifiants jamais affiliés à l’établissement : homonyme ?',
+  annuaire_uid_ldap: 'Compte LDAP trouvé par le n° agent : passer la fiche sur l’uid LDAP',
+  sovisu_ancienne_personne: 'SoVisu+ : retirer les identifiants de l’ancienne personne (uid changé)',
   autre: 'Autre',
 };
 

@@ -63,6 +63,8 @@ export const TASK_TYPES = {
   parcours_depart_observe: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — probable departure from the publications` },
   parcours_statut_incoherent: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — ended record, recent local activity` },
   parcours_identifiant_suspect: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — identifiers never affiliated to the institution` },
+  annuaire_uid_ldap: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — LDAP account found by the staff number: switch to the LDAP uid` },
+  sovisu_ancienne_personne: { base: 'Annuaire', canal: 'interne', email: false, label: msg`SoVisu+ — remove the identifiers of the former person (uid changed)` },
   autre: { base: 'Autre', canal: 'interne', email: false, label: msg`Other` },
 } as const satisfies Record<string, TaskTypeMeta>;
 
@@ -139,6 +141,18 @@ export const sharedIdTaskUids = (task: Pick<Task, 'type' | 'cle'>): string[] => 
   if (!task.cle.startsWith(prefix)) return [];
   const uids = task.cle.slice(prefix.length).split('+').filter(Boolean);
   return uids.length > 1 ? uids : [];
+};
+
+/** Separator of the key of an `annuaire_uid_ldap` task: `annuaire_uid_ldap:<current key>><LDAP uid>`. */
+export const UID_SWITCH_SEPARATOR = '>';
+
+/** Current key (ext_ uid, or g<row> for a record without uid) and LDAP uid of an `annuaire_uid_ldap`
+ * task, read from its key (scripts/sync_tasks.cjs); null for any other task. */
+export const uidSwitchOf = (task: Pick<Task, 'type' | 'cle'>): { from: string; to: string } | null => {
+  const prefix = 'annuaire_uid_ldap:';
+  if (task.type !== 'annuaire_uid_ldap' || !task.cle.startsWith(prefix)) return null;
+  const [from, to, ...rest] = task.cle.slice(prefix.length).split(UID_SWITCH_SEPARATOR);
+  return from && to && !rest.length ? { from, to } : null;
 };
 
 /** Pairs of Annuaire rows (Grist row ids) the merge assistant can open for a task, resolved

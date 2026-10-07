@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createRequire } from 'node:module';
 import { abesTaskTypes, type AbesRow } from '../abesExport';
-import { TASK_TYPES, TASK_TYPE_IDS, TRANSITIONS, TASK_STATUSES, TASK_BASES, CANAL_LABELS, EVENT_ACTION_LABELS, nextStatuses, taskKey, countOpenTasks, sharedIdTaskUids, mergePairsOf, type Task } from '../tasks';
+import { TASK_TYPES, TASK_TYPE_IDS, TRANSITIONS, TASK_STATUSES, TASK_BASES, CANAL_LABELS, EVENT_ACTION_LABELS, nextStatuses, taskKey, countOpenTasks, sharedIdTaskUids, mergePairsOf, uidSwitchOf, type Task } from '../tasks';
 
 // The server validates with the CommonJS schema; the UI labels with the TS twin.
 const schema = createRequire(import.meta.url)('../../scripts/lib/tasks_schema.cjs');
@@ -134,5 +134,17 @@ describe('abesTaskTypes', () => {
     const row = { orcid_action: 'AJOUT', idhal_action: 'OK', etab_action: '', etab2_action: '', labo_action: 'MAJ_DATES', labo2_action: '', note_340_action: '' } as unknown as AbesRow;
     expect(abesTaskTypes(row)).toEqual(['idref_ajouter_orcid', 'idref_corriger_affiliation', 'idref_corriger_dates']);
     for (const ty of abesTaskTypes(row)) expect(TASK_TYPE_IDS).toContain(ty);
+  });
+});
+
+describe('uidSwitchOf (annuaire_uid_ldap tasks)', () => {
+  it('reads the current key and the LDAP uid from the task key', () => {
+    expect(uidSwitchOf({ type: 'annuaire_uid_ldap', cle: 'annuaire_uid_ldap:ext_dupont-j>dupont-j' })).toEqual({ from: 'ext_dupont-j', to: 'dupont-j' });
+    expect(uidSwitchOf({ type: 'annuaire_uid_ldap', cle: 'annuaire_uid_ldap:g42>martin-c' })).toEqual({ from: 'g42', to: 'martin-c' });
+  });
+  it('null for other tasks and malformed keys', () => {
+    expect(uidSwitchOf({ type: 'annuaire_doublon', cle: 'annuaire_doublon:a+b' })).toBeNull();
+    expect(uidSwitchOf({ type: 'annuaire_uid_ldap', cle: 'annuaire_uid_ldap:ext_x' })).toBeNull();
+    expect(uidSwitchOf({ type: 'annuaire_uid_ldap', cle: '' })).toBeNull();
   });
 });
