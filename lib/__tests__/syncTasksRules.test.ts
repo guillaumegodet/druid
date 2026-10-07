@@ -124,6 +124,23 @@ describe('annuaire_ids_partages — records with different uid sharing an export
     expect(out[1].description).not.toContain('Attention');
   });
 
+  it('the HR staff number links an ext_ record to the LDAP uid record; two numbers on namesakes are a warning', () => {
+    const out = detect([
+      p(1, 'leroux-c', 'LEROUX', 'Camille', { N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 12345 }),
+      p(2, 'ext_leroux-c', 'Leroux', 'Camille', { N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: '012345.0' }),
+      p(3, 'noel-b', 'NOEL', 'Bruno', { N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 222, ORCID: '0000-0001-0000-0005' }),
+      p(4, 'ext_noel-b', 'Noel', 'Bruno', { N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 333, ORCID: '0000-0001-0000-0005' }),
+      p(5, 'vide-a', 'VIDE', 'Anne', { N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 0 }),
+      p(6, 'vide-b', 'VIDE', 'Anne', { N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 0 }),   // empty Numeric cells: no link
+    ]);
+    expect(out.map((d: { type: string; key: string }) => `${d.type}:${d.key}`)).toEqual([
+      'annuaire_doublon:ext_leroux-c+leroux-c',
+      'annuaire_doublon_a_verifier:ext_noel-b+noel-b',
+    ]);
+    expect(out[0].description).toContain('N° agent 12345');
+    expect(out[1].description).toContain('ont des N° agent différents');
+  });
+
   it('connected groups: A–B by ORCID and B–C by IdRef make one group, typed by its least similar pair', () => {
     const groups = sharedIdentifierGroups([
       p(1, 'roux-m', 'ROUX', 'Marc', { ORCID: '0000-0001-0000-0002', IdRef: '987654321' }),

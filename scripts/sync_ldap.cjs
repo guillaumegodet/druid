@@ -14,7 +14,7 @@ async function syncAllStatuses() {
             const opts = {
                 filter: '(&(objectClass=supannPerson)(population=PERSONNEL))',
                 scope: 'sub',
-                attributes: ['uid', 'dynaEtat', 'dynaCategorie', 'supannEmpCorps', 'supannCivilite', 'supannOIDCDateDeNaissance', 'eduPersonPrincipalName', 'supannEmpProfil'],
+                attributes: ['uid', 'dynaEtat', 'dynaCategorie', 'supannEmpCorps', 'supannCivilite', 'supannOIDCDateDeNaissance', 'eduPersonPrincipalName', 'supannEmpProfil', 'supannEmpId'],
             };
 
             const results = {};
@@ -45,6 +45,8 @@ async function syncAllStatuses() {
                     // « [datefin=AAAAMMJJhhmmssZ] ». A single date is kept: the latest one, and
                     // only if ALL profiles have one (otherwise an open-ended contract is ongoing).
                     const dateFin = extractDateFin(multi['supannempprofil'] || []);
+                    // HR staff number (Mangue) — the stable key between HR lists and the Annuaire (lib/hrId.ts).
+                    const empId = String(p['supannempid'] || '').trim();
 
                     if (uid) {
                         results[uid] = {
@@ -55,6 +57,7 @@ async function syncAllStatuses() {
                           birthDate: birthDate || '',
                           eppn: eppn,
                           dateFin: dateFin,
+                          empId: empId,
                         };
                         stats[etat] = (stats[etat] || 0) + 1;
                     }

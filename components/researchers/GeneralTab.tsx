@@ -233,6 +233,13 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               />
             </div>
             )}
+            {/* HR staff number (lib/hrId.ts): filled by the LDAP sync or the HR list imports, never typed. */}
+            {researcher.hrId && (
+            <div>
+              <label className={fieldLabel} title={t`HR staff number (Mangue), from LDAP or the HR lists — read-only`}><Trans>Staff number</Trans></label>
+              <input type="text" value={researcher.hrId} readOnly className="input-soft font-mono opacity-60" />
+            </div>
+            )}
          </div>
        </div>
 

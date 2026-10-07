@@ -34,8 +34,9 @@ export const LdapVerifyPanel: React.FC<Props> = ({ diff, progress, applying = fa
   const orphelins = diff?.orphelins ?? [];
   // On load, records in validation conflict are NOT checked: data made reliable
   // by hand must not be overwritten by LDAP without arbitration. « Tout cocher », on the other
-  // hand, covers ALL records, validated ones included (user request 2026-09-09).
-  const defaultSelectable = aMettreAJour.filter((r) => !r.validationConflict).map((r) => r.id);
+  // hand, covers ALL records, validated ones included (user request 2026-09-09). Same for a record
+  // holding another HR staff number than LDAP (two people mixed up, or a wrong uid).
+  const defaultSelectable = aMettreAJour.filter((r) => !r.validationConflict && !r.hrIdConflict).map((r) => r.id);
   const allIds = aMettreAJour.map((r) => r.id);
   const [selected, setSelected] = useState<Set<string>>(() => new Set(defaultSelectable));
   // `diff` can be replaced without unmounting (e.g. after a duplicate qualification): the rows
@@ -53,6 +54,7 @@ export const LdapVerifyPanel: React.FC<Props> = ({ diff, progress, applying = fa
   }, [diff]);
   const allSelected = allIds.length > 0 && allIds.every((id) => selected.has(id));
   const conflictCount = aMettreAJour.filter((r) => r.validationConflict).length;
+  const hrIdConflictCount = aMettreAJour.filter((r) => r.hrIdConflict).length;
   const toggle = (id: string) => setSelected((prev) => { const next = new Set(prev); next.has(id) ? next.delete(id) : next.add(id); return next; });
   const toggleAll = () => setSelected(allSelected ? new Set() : new Set(allIds));
   const running = !!progress?.running;
@@ -80,6 +82,12 @@ export const LdapVerifyPanel: React.FC<Props> = ({ diff, progress, applying = fa
             <Plural value={conflictCount} one="# record has a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting." other="# records have a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting." />
           </div>
         )}
+        {hrIdConflictCount > 0 && (
+          <div className="flex items-center gap-3 px-4 py-3 rounded-card bg-[rgba(224,158,42,.18)] dark:bg-[rgba(224,158,42,.14)] border border-[rgba(224,158,42,.45)] text-[13px] font-semibold text-[#9a6a12] dark:text-[#f0c266]">
+            <ShieldAlert className="w-4 h-4 shrink-0" />
+            <Plural value={hrIdConflictCount} one="# record holds another HR staff number than LDAP (two people mixed up, or a wrong uid?) — unchecked by default." other="# records hold another HR staff number than LDAP (two people mixed up, or a wrong uid?) — unchecked by default." />
+          </div>
+        )}
 
         <section>
           <div className="flex items-center justify-between pb-2 mb-3 border-b border-ink/5 dark:border-white/5">
@@ -100,7 +108,7 @@ export const LdapVerifyPanel: React.FC<Props> = ({ diff, progress, applying = fa
             <div className="space-y-3 max-w-5xl">
               {aMettreAJour.map((r) => (
                 <div key={r.id} className={`rounded-card p-4 transition-colors ${
-                  r.validationConflict
+                  r.validationConflict || r.hrIdConflict
                     ? 'bg-[rgba(224,158,42,.18)] dark:bg-[rgba(224,158,42,.1)] border border-[rgba(224,158,42,.45)]'
                     : selected.has(r.id)
                       ? 'bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white/70 dark:border-white/10 shadow-soft'
@@ -118,6 +126,10 @@ export const LdapVerifyPanel: React.FC<Props> = ({ diff, progress, applying = fa
                     {r.validationConflict ? (
                       <span title={t`Manually validated status — LDAP contradicts it. Unchecked by default: decide before overwriting.`} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[rgba(224,158,42,.25)] text-[#9a6a12] dark:bg-[rgba(224,158,42,.22)] dark:text-[#f0c266] text-[11px] font-semibold">
                         <ShieldAlert className="w-3 h-3" /> <Trans>Validated — conflict</Trans>
+                      </span>
+                    ) : r.hrIdConflict ? (
+                      <span title={t`The record holds another HR staff number than LDAP. Unchecked by default: check that the uid is the right person before overwriting.`} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[rgba(224,158,42,.25)] text-[#9a6a12] dark:bg-[rgba(224,158,42,.22)] dark:text-[#f0c266] text-[11px] font-semibold">
+                        <ShieldAlert className="w-3 h-3" /> <Trans>Different staff number</Trans>
                       </span>
                     ) : r.validated ? (
                       <span title={t`Manually validated record`} className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[rgba(46,160,102,.16)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.22)] dark:text-[#5fd39a] text-[11px] font-semibold">

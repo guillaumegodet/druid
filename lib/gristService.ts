@@ -24,6 +24,7 @@ import { withDerivedParents } from './structureHierarchy';
 import { gristDocUrl } from './instanceRuntime';
 import { FTE_COLUMNS, parseFteCell, fteGristFields } from './fte';
 import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson';
+import { HR_ID_COLUMN, normalizeHrId, hrIdCell, hrIdProposal } from './hrId';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
 
@@ -45,7 +46,9 @@ export interface LdapDiff {
   /** Existing records (uid_dyna match) where ≥1 LDAP-authoritative field differs.
    * `validated`: the record carries a manual validation; `validationConflict`:
    * an LDAP change contradicts the validated status → to arbitrate, not to overwrite. */
-  aMettreAJour: { id: string; uid: string; displayName: string; labo?: string; changes: LdapFieldChange[]; validated?: boolean; validationConflict?: boolean }[];
+  aMettreAJour: { id: string; uid: string; displayName: string; labo?: string; changes: LdapFieldChange[]; validated?: boolean; validationConflict?: boolean;
+    /** The record holds another HR staff number than LDAP: unchecked by default (two people mixed up, or a wrong uid). */
+    hrIdConflict?: boolean }[];
   /** Same uid_dyna on ≥2 Annuaire rows. `kind` classifies the group (see docs/archive/plan-fusion-doublons.md):
    * - same_labo  : every row carries the same LABO → probable duplicate, to merge;
    * - parking    : one row sits in a parking LABO (`zzz`, empty) → to absorb into the lab row;
@@ -1039,6 +1042,18 @@ async function fteCellFields(values: { fte?: number | null; researchFte?: number
   }
 }
 
+/** HR staff number cell, only when the Annuaire has the column (instances without HR data do not). */
+async function hrIdCellFields(hrId?: string): Promise<Record<string, number>> {
+  const cell = hrIdCell(hrId || '');
+  if (cell === null) return {};
+  try {
+    return (await fetchAnnuaireColumnsInternal()).some((c) => c.id === HR_ID_COLUMN) ? { [HR_ID_COLUMN]: cell } : {};
+  } catch (e) {
+    console.warn('[gristService] Annuaire columns unavailable, HR staff number not written:', e);
+    return {};
+  }
+}
+
 // --- Helpers for the Structures V2 table format (= structures.csv of the directory bridge) ---
 
 /**
@@ -1590,6 +1605,7 @@ export const GristService = {
           annuaireUrl: fields['annuaire_url'] || '',
           email: fields['Email'] || '',
           eppn: ldapEppn,
+          hrId: normalizeHrId(fields[HR_ID_COLUMN]),
           nationality: fields['Nationalite'] || '',
           birthDate: researcherBirthDate,
           status: departureCertain ? ResearcherStatus.PARTI : resolveStatus(validation, finalStatus),
@@ -1850,6 +1866,7 @@ export const GristService = {
         'statut_dyna': STATUT_DYNA_MAP[researcher.ldapPrefill.etat.toUpperCase()] || researcher.ldapPrefill.etat || null,
         'Data_source': 'LDAP',
         'LDAP_derniere_maj': researcher.ldapPrefill.date,
+        ...(await hrIdCellFields(researcher.hrId)),
       } : {}),
     };
 
@@ -2354,6 +2371,9 @@ export const GristService = {
         // Employment end: « [datefin=…] » of supannEmpProfil (`dateFin` cache, YYYY-MM-DD). Added on
         // 2026-09-15: before, an LDAP departure never surfaced the date in employment_end_date.
         if (!externalEmployer) push('employment_end_date', "Fin d'emploi", fromGristFuzzyDate(f['employment_end_date']), e.dateFin || '');
+        // HR staff number (supannEmpId, lib/hrId.ts): for hosted accounts too — it identifies the person, not the job.
+        const hrId = hrIdProposal(f[HR_ID_COLUMN], e.empId);
+        if (hrId) changes.push({ field: HR_ID_COLUMN, label: 'N° agent', before: hrId.before, after: hrId.after });
         // Status: Grist stores a label ("NORMAL"), LDAP a code ("N") → compare on the code,
         // and propose the mapped label as the target value. (statut_dyna made editable on the Grist side.)
         const statutCode = (v: any) => (v ?? '').toString().trim().toUpperCase().charAt(0);
@@ -2385,6 +2405,7 @@ export const GristService = {
             id: `G-${rec.id}`, uid, displayName: nameOf(f), changes,
             labo: recs.length > 1 ? String(f['LABO'] || '').trim() : undefined,
             validated: v.validated, validationConflict,
+            hrIdConflict: hrId?.kind === 'conflict',
           });
         }
       }
@@ -2653,6 +2674,8 @@ export const GristService = {
         } else if (c.field === 'DATE_DE_NAISSANCE_JJ_MM_AAAA') {
           const ep = toGristEpoch(c.after);
           if (ep !== null) fields[c.field] = ep; // Date column = epoch seconds
+        } else if (c.field === HR_ID_COLUMN) {
+          fields[c.field] = hrIdCell(c.after);   // Numeric column
         } else if (c.field === 'validated_status') {
           // Explicit arbitration (record checked despite the conflict): the validated status follows LDAP,
           // the validation is re-dated; original source and author kept (traceability).

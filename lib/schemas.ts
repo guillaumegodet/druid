@@ -80,6 +80,7 @@ export const ValidationInfoSchema = z.object({
 export const ResearcherSchema = z.object({
   id: z.string(),
   uid: z.string().optional().nullable(),
+  hrId: z.string().optional().nullable(),
   gristRowId: z.number().optional(),
   civility: z.string().default(''),
   lastName: z.string().default(''),

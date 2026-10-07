@@ -8,6 +8,7 @@ import { ResearcherStatus, Researcher, Structure, StructureLevel } from '../type
 import { ldapGradeFor } from './emeritus';
 import { HOME_EMPLOYER, isExternalEmployer } from './validation';
 import { translateApiError } from './apiErrors';
+import { normalizeHrId } from './hrId';
 
 /** Entry returned by /api/ldap/person/:uid. */
 export interface LdapPerson {
@@ -27,6 +28,8 @@ export interface LdapPerson {
   empCorps: string;
   /** Latest « [datefin=…] » of supannEmpProfil (YYYY-MM-DD), '' for an open-ended contract. */
   dateFin: string;
+  /** supannEmpId = HR staff number (Mangue), '' when absent (lib/hrId.ts). */
+  empId?: string;
   etablissementUai: string;
   population: string;
   /** supannEntiteAffectation: supannCodeEntite codes = local_id of the Grist Structures. */
@@ -91,6 +94,7 @@ export const prefillFromLdap = (
   const next: Researcher = {
     ...researcher,
     uid: person.uid,
+    hrId: normalizeHrId(person.empId) || researcher.hrId,
     lastName: lastName || researcher.lastName,
     firstName: person.firstName || researcher.firstName,
     displayName: `${lastName} ${person.firstName}`.trim() || researcher.displayName,

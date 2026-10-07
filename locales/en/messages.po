@@ -4023,7 +4023,7 @@ msgstr "Under review"
 
 #: components/dashboard/NewsletterPanel.tsx:49
 #: components/researchers/FilterPanel.tsx:134
-#: components/researchers/LdapVerifyPanel.tsx:124
+#: components/researchers/LdapVerifyPanel.tsx:136
 #: components/researchers/StatusBadge.tsx:80
 msgid "Validated"
 msgstr "Validated"
@@ -4499,7 +4499,7 @@ msgstr "Lab"
 #: components/dashboard/PublicationsListTab.tsx:349
 #: components/researchers/FilterPanel.tsx:155
 #: components/researchers/FilterPanel.tsx:288
-#: components/researchers/GeneralTab.tsx:269
+#: components/researchers/GeneralTab.tsx:276
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Employment type"
@@ -4870,7 +4870,7 @@ msgstr "Population"
 
 #: components/dashboard/StaffSection.tsx:295
 #: components/dashboard/StaffSection.tsx:311
-#: components/researchers/GeneralTab.tsx:316
+#: components/researchers/GeneralTab.tsx:323
 msgid "Research FTE"
 msgstr "Research FTE"
 
@@ -7728,8 +7728,8 @@ msgid "Save to Grist"
 msgstr "Save to Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3460
-#: lib/gristService.ts:3569
+#: lib/gristService.ts:3483
+#: lib/gristService.ts:3592
 msgid "Search error"
 msgstr "Search error"
 
@@ -9080,7 +9080,7 @@ msgid "Open the record (Grist row {0}) — source: {1}"
 msgstr "Open the record (Grist row {0}) — source: {1}"
 
 #: components/researchers/DuplicatesPage.tsx:191
-#: components/researchers/LdapVerifyPanel.tsx:123
+#: components/researchers/LdapVerifyPanel.tsx:135
 msgid "Manually validated record"
 msgstr "Manually validated record"
 
@@ -9121,7 +9121,7 @@ msgid "Requalify"
 msgstr "Requalify"
 
 #: components/researchers/DuplicatesPage.tsx:272
-#: components/researchers/LdapVerifyPanel.tsx:162
+#: components/researchers/LdapVerifyPanel.tsx:174
 #: components/researchers/UnifiedAlignPage.tsx:749
 msgid "Generated on {generatedAt}"
 msgstr "Generated on {generatedAt}"
@@ -9161,7 +9161,7 @@ msgstr "Validation"
 
 #: components/researchers/FilterPanel.tsx:156
 #: components/researchers/FilterPanel.tsx:278
-#: components/researchers/GeneralTab.tsx:351
+#: components/researchers/GeneralTab.tsx:358
 msgid "Cluster"
 msgstr "Cluster"
 
@@ -9291,81 +9291,89 @@ msgstr "Date of birth"
 msgid "UID (Dyna)"
 msgstr "UID (Dyna)"
 
-#: components/researchers/GeneralTab.tsx:241
+#: components/researchers/GeneralTab.tsx:239
+msgid "HR staff number (Mangue), from LDAP or the HR lists — read-only"
+msgstr "HR staff number (Mangue), from LDAP or the HR lists — read-only"
+
+#: components/researchers/GeneralTab.tsx:239
+msgid "Staff number"
+msgstr "Staff number"
+
+#: components/researchers/GeneralTab.tsx:248
 msgid "Employment & contract"
 msgstr "Employment & contract"
 
-#: components/researchers/GeneralTab.tsx:244
+#: components/researchers/GeneralTab.tsx:251
 msgid "Employing institution"
 msgstr "Employing institution"
 
-#: components/researchers/GeneralTab.tsx:250
+#: components/researchers/GeneralTab.tsx:257
 msgid "— None —"
 msgstr "— None —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:252
+#: components/researchers/GeneralTab.tsx:259
 msgid "{0} (not in list)"
 msgstr "{0} (not in list)"
 
-#: components/researchers/GeneralTab.tsx:260
+#: components/researchers/GeneralTab.tsx:267
 msgid "Grade / Rank"
 msgstr "Grade / Rank"
 
-#: components/researchers/GeneralTab.tsx:276
+#: components/researchers/GeneralTab.tsx:283
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Undefined —"
 
-#: components/researchers/GeneralTab.tsx:301
+#: components/researchers/GeneralTab.tsx:308
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Employment start"
 
-#: components/researchers/GeneralTab.tsx:301
+#: components/researchers/GeneralTab.tsx:308
 msgid "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 
-#: components/researchers/GeneralTab.tsx:305
+#: components/researchers/GeneralTab.tsx:312
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Employment end"
 
-#: components/researchers/GeneralTab.tsx:305
+#: components/researchers/GeneralTab.tsx:312
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 
-#: components/researchers/GeneralTab.tsx:312
+#: components/researchers/GeneralTab.tsx:319
 msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 msgstr "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 
-#: components/researchers/GeneralTab.tsx:312
+#: components/researchers/GeneralTab.tsx:319
 msgid "FTE (working time)"
 msgstr "FTE (working time)"
 
-#: components/researchers/GeneralTab.tsx:316
+#: components/researchers/GeneralTab.tsx:323
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 
-#: components/researchers/GeneralTab.tsx:330
+#: components/researchers/GeneralTab.tsx:337
 msgid "Accredited to supervise research (HDR)"
 msgstr "Accredited to supervise research (HDR)"
 
-#: components/researchers/GeneralTab.tsx:335
+#: components/researchers/GeneralTab.tsx:342
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "HDR year"
 
-#: components/researchers/GeneralTab.tsx:355
+#: components/researchers/GeneralTab.tsx:362
 msgid "Faculty"
 msgstr "Faculty"
 
-#: components/researchers/GeneralTab.tsx:359
+#: components/researchers/GeneralTab.tsx:366
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "Doctoral school"
 
-#: components/researchers/GeneralTab.tsx:363
+#: components/researchers/GeneralTab.tsx:370
 msgid "Location (site)"
 msgstr "Location (site)"
 
@@ -9831,76 +9839,88 @@ msgstr "Enter the directory identifier, then fill the record from LDAP: name, ti
 
 #. placeholder {0}: progress?.done ?? 0
 #. placeholder {1}: progress?.total ?? '?'
-#: components/researchers/LdapVerifyPanel.tsx:65
+#: components/researchers/LdapVerifyPanel.tsx:67
 msgid "LDAP sync in progress… {0}/{1}"
 msgstr "LDAP sync in progress… {0}/{1}"
 
-#: components/researchers/LdapVerifyPanel.tsx:65
+#: components/researchers/LdapVerifyPanel.tsx:67
 msgid "Loading the LDAP comparison…"
 msgstr "Loading the LDAP comparison…"
 
-#: components/researchers/LdapVerifyPanel.tsx:75
+#: components/researchers/LdapVerifyPanel.tsx:77
 msgid "Only the checked records under “To update” will be written to Grist. No record is created (update only)."
 msgstr "Only the checked records under “To update” will be written to Grist. No record is created (update only)."
 
-#: components/researchers/LdapVerifyPanel.tsx:80
+#: components/researchers/LdapVerifyPanel.tsx:82
 msgid "{conflictCount, plural, one {# record has a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting.} other {# records have a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting.}}"
 msgstr "{conflictCount, plural, one {# record has a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting.} other {# records have a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting.}}"
 
+#: components/researchers/LdapVerifyPanel.tsx:88
+msgid "{hrIdConflictCount, plural, one {# record holds another HR staff number than LDAP (two people mixed up, or a wrong uid?) — unchecked by default.} other {# records hold another HR staff number than LDAP (two people mixed up, or a wrong uid?) — unchecked by default.}}"
+msgstr "{hrIdConflictCount, plural, one {# record holds another HR staff number than LDAP (two people mixed up, or a wrong uid?) — unchecked by default.} other {# records hold another HR staff number than LDAP (two people mixed up, or a wrong uid?) — unchecked by default.}}"
+
 #. placeholder {0}: aMettreAJour.length
 #. placeholder {0}: diff.aMettreAJour.length
-#: components/researchers/LdapVerifyPanel.tsx:88
+#: components/researchers/LdapVerifyPanel.tsx:96
 #: components/structures/StructuresLdapReview.tsx:64
 msgid "To update ({0})"
 msgstr "To update ({0})"
 
-#: components/researchers/LdapVerifyPanel.tsx:93
+#: components/researchers/LdapVerifyPanel.tsx:101
 #: components/structures/StructuresLdapReview.tsx:67
 #: components/structures/StructuresLdapReview.tsx:103
 msgid "Uncheck all"
 msgstr "Uncheck all"
 
-#: components/researchers/LdapVerifyPanel.tsx:93
+#: components/researchers/LdapVerifyPanel.tsx:101
 #: components/structures/StructuresLdapReview.tsx:67
 #: components/structures/StructuresLdapReview.tsx:103
 msgid "Check all"
 msgstr "Check all"
 
-#: components/researchers/LdapVerifyPanel.tsx:98
+#: components/researchers/LdapVerifyPanel.tsx:106
 msgid "No record to update."
 msgstr "No record to update."
 
-#: components/researchers/LdapVerifyPanel.tsx:110
+#: components/researchers/LdapVerifyPanel.tsx:118
 msgid "Include / exclude"
 msgstr "Include / exclude"
 
-#: components/researchers/LdapVerifyPanel.tsx:115
+#: components/researchers/LdapVerifyPanel.tsx:123
 msgid "Person present on several directory rows: row for this lab"
 msgstr "Person present on several directory rows: row for this lab"
 
-#: components/researchers/LdapVerifyPanel.tsx:119
+#: components/researchers/LdapVerifyPanel.tsx:127
 msgid "Manually validated status — LDAP contradicts it. Unchecked by default: decide before overwriting."
 msgstr "Manually validated status — LDAP contradicts it. Unchecked by default: decide before overwriting."
 
-#: components/researchers/LdapVerifyPanel.tsx:120
+#: components/researchers/LdapVerifyPanel.tsx:128
 #: components/researchers/StatusBadge.tsx:80
 msgid "Validated — conflict"
 msgstr "Validated — conflict"
 
+#: components/researchers/LdapVerifyPanel.tsx:131
+msgid "The record holds another HR staff number than LDAP. Unchecked by default: check that the uid is the right person before overwriting."
+msgstr "The record holds another HR staff number than LDAP. Unchecked by default: check that the uid is the right person before overwriting."
+
+#: components/researchers/LdapVerifyPanel.tsx:132
+msgid "Different staff number"
+msgstr "Different staff number"
+
 #. placeholder {0}: orphelins.length
-#: components/researchers/LdapVerifyPanel.tsx:145
+#: components/researchers/LdapVerifyPanel.tsx:157
 msgid "Orphans — record without LDAP uid ({0})"
 msgstr "Orphans — record without LDAP uid ({0})"
 
-#: components/researchers/LdapVerifyPanel.tsx:146
+#: components/researchers/LdapVerifyPanel.tsx:158
 msgid "The uid of these records no longer exists in LDAP: probable departure, to check on the record (status, end of employment)."
 msgstr "The uid of these records no longer exists in LDAP: probable departure, to check on the record (status, end of employment)."
 
-#: components/researchers/LdapVerifyPanel.tsx:148
+#: components/researchers/LdapVerifyPanel.tsx:160
 msgid "No orphan."
 msgstr "No orphan."
 
-#: components/researchers/LdapVerifyPanel.tsx:166
+#: components/researchers/LdapVerifyPanel.tsx:178
 #: components/researchers/UnifiedAlignPage.tsx:753
 #: components/structures/StructuresLdapReview.tsx:134
 msgid "Writing…"
@@ -9908,7 +9928,7 @@ msgstr "Writing…"
 
 #. placeholder {0}: selected.size
 #. placeholder {0}: updates.length
-#: components/researchers/LdapVerifyPanel.tsx:166
+#: components/researchers/LdapVerifyPanel.tsx:178
 #: components/researchers/UnifiedAlignPage.tsx:753
 msgid "Apply ({0})"
 msgstr "Apply ({0})"
@@ -11443,8 +11463,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Namesake with no affiliation evidence"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3471
-#: lib/gristService.ts:3597
+#: lib/gristService.ts:3494
+#: lib/gristService.ts:3620
 msgid "Suspected mixed identity"
 msgstr "Suspected mixed identity"
 
@@ -12343,307 +12363,307 @@ msgid "Load failed"
 msgstr "Load failed"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:663
+#: lib/gristService.ts:666
 msgid "Error creating the affiliation columns: {0}"
 msgstr "Error creating the affiliation columns: {0}"
 
-#: lib/gristService.ts:787
-#: lib/gristService.ts:2566
-#: lib/gristService.ts:3276
-#: lib/gristService.ts:3886
+#: lib/gristService.ts:790
+#: lib/gristService.ts:2587
+#: lib/gristService.ts:3299
+#: lib/gristService.ts:3909
 msgid "Grist error (table list)"
 msgstr "Grist error (table list)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:794
+#: lib/gristService.ts:797
 msgid "Error creating table {MERGE_LOG_TABLE}: {0}"
 msgstr "Error creating table {MERGE_LOG_TABLE}: {0}"
 
-#: lib/gristService.ts:1421
+#: lib/gristService.ts:1436
 msgid "Invalid entity code “{code}”: letters, digits, “-”, “_” or “.” only"
 msgstr "Invalid entity code “{code}”: letters, digits, “-”, “_” or “.” only"
 
-#: lib/gristService.ts:1872
+#: lib/gristService.ts:1889
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "Invalid Grist ID (gristRowId missing)"
 
-#: lib/gristService.ts:1884
+#: lib/gristService.ts:1901
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 
-#: lib/gristService.ts:1886
+#: lib/gristService.ts:1903
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1958
+#: lib/gristService.ts:1975
 msgid "Grist error (writing the secondary affiliations): {0}"
 msgstr "Grist error (writing the secondary affiliations): {0}"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:1979
+#: lib/gristService.ts:1996
 msgid "Grist error (creating the secondary affiliations): {0}"
 msgstr "Grist error (creating the secondary affiliations): {0}"
 
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:1991
-#: lib/gristService.ts:2547
+#: lib/gristService.ts:2008
+#: lib/gristService.ts:2568
 msgid "Grist error (merge log): {0}"
 msgstr "Grist error (merge log): {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:1995
+#: lib/gristService.ts:2012
 msgid "Grist error (deleting the removed affiliations): {0}"
 msgstr "Grist error (deleting the removed affiliations): {0}"
 
-#: lib/gristService.ts:2021
+#: lib/gristService.ts:2038
 msgid "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2042
+#: lib/gristService.ts:2059
 msgid "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:2155
+#: lib/gristService.ts:2172
 msgid "The acronym / short name is required"
 msgstr "The acronym / short name is required"
 
-#: lib/gristService.ts:2158
+#: lib/gristService.ts:2175
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "A team must be included in a lab (Memberships tab)"
 
 #. placeholder {0}: dup.acronym
 #. placeholder {1}: level === StructureLevel.EQUIPE ? t` in ${parent}` : ''
-#: lib/gristService.ts:2164
+#: lib/gristService.ts:2181
 msgid "A structure “{0}” already exists{1}"
 msgstr "A structure “{0}” already exists{1}"
 
-#: lib/gristService.ts:2164
+#: lib/gristService.ts:2181
 msgid " in {parent}"
 msgstr " in {parent}"
 
-#: lib/gristService.ts:2174
+#: lib/gristService.ts:2191
 msgid "local_id “{localId}” already used"
 msgstr "local_id “{localId}” already used"
 
 #. placeholder {0}: await resp.text()
-#: lib/gristService.ts:2207
+#: lib/gristService.ts:2224
 msgid "Error creating the Grist structure: {0}"
 msgstr "Error creating the Grist structure: {0}"
 
-#: lib/gristService.ts:2215
+#: lib/gristService.ts:2232
 msgid "Invalid ID"
 msgstr "Invalid ID"
 
-#: lib/gristService.ts:2446
+#: lib/gristService.ts:2467
 msgid "Qualification: primary row required"
 msgstr "Qualification: primary row required"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2488
+#: lib/gristService.ts:2509
 msgid "Grist error (de-qualification): {0}"
 msgstr "Grist error (de-qualification): {0}"
 
-#: lib/gristService.ts:2530
+#: lib/gristService.ts:2551
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
-#: lib/gristService.ts:2534
+#: lib/gristService.ts:2555
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Merge: one of the rows no longer exists in Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2554
+#: lib/gristService.ts:2575
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Grist error (writing the kept row, log #{logId}): {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2559
+#: lib/gristService.ts:2580
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Grist error (deleting the absorbed row, log #{logId}): {0}"
 
-#: lib/gristService.ts:2570
-#: lib/gristService.ts:2592
+#: lib/gristService.ts:2591
+#: lib/gristService.ts:2613
 msgid "Grist error (merge log)"
 msgstr "Grist error (merge log)"
 
-#: lib/gristService.ts:2594
+#: lib/gristService.ts:2615
 msgid "Merge #{logId} not found"
 msgstr "Merge #{logId} not found"
 
-#: lib/gristService.ts:2595
+#: lib/gristService.ts:2616
 msgid "Merge #{logId} already restored"
 msgstr "Merge #{logId} already restored"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2605
+#: lib/gristService.ts:2626
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Grist error (re-creating the row): {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2615
+#: lib/gristService.ts:2636
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2623
+#: lib/gristService.ts:2644
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 
-#: lib/gristService.ts:2636
-#: lib/gristService.ts:3206
-#: lib/gristService.ts:3674
-#: lib/gristService.ts:3751
+#: lib/gristService.ts:2657
+#: lib/gristService.ts:3229
+#: lib/gristService.ts:3697
+#: lib/gristService.ts:3774
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Grist error (reading the Annuaire before writing)"
 
-#: lib/gristService.ts:2964
-#: lib/gristService.ts:3003
-#: lib/gristService.ts:3165
-#: lib/gristService.ts:3576
-#: lib/gristService.ts:3604
+#: lib/gristService.ts:2987
+#: lib/gristService.ts:3026
+#: lib/gristService.ts:3188
+#: lib/gristService.ts:3599
+#: lib/gristService.ts:3627
 msgid "Identifier mismatch"
 msgstr "Identifier mismatch"
 
-#: lib/gristService.ts:2982
+#: lib/gristService.ts:3005
 msgid "Record deleted"
 msgstr "Record deleted"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2982
+#: lib/gristService.ts:3005
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 
-#: lib/gristService.ts:2986
+#: lib/gristService.ts:3009
 msgid "Record unreadable"
 msgstr "Record unreadable"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2986
+#: lib/gristService.ts:3009
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 
-#: lib/gristService.ts:3269
+#: lib/gristService.ts:3292
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "The Grist review only applies to the “search for missing” mode"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3284
-#: lib/gristService.ts:3894
+#: lib/gristService.ts:3307
+#: lib/gristService.ts:3917
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 
-#: lib/gristService.ts:3460
-#: lib/gristService.ts:3467
-#: lib/gristService.ts:3569
-#: lib/gristService.ts:3591
+#: lib/gristService.ts:3483
+#: lib/gristService.ts:3490
+#: lib/gristService.ts:3592
+#: lib/gristService.ts:3614
 msgid "API unreachable during the run — rerun."
 msgstr "API unreachable during the run — rerun."
 
-#: lib/gristService.ts:3467
-#: lib/gristService.ts:3591
+#: lib/gristService.ts:3490
+#: lib/gristService.ts:3614
 msgid "Verification error"
 msgstr "Verification error"
 
-#: lib/gristService.ts:3470
-#: lib/gristService.ts:3599
+#: lib/gristService.ts:3493
+#: lib/gristService.ts:3622
 msgid "Name mismatch"
 msgstr "Name mismatch"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3470
+#: lib/gristService.ts:3493
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} “{1}” ≠ Annuaire “{displayName}”"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3471
+#: lib/gristService.ts:3494
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 
-#: lib/gristService.ts:3474
+#: lib/gristService.ts:3497
 msgid "{a} merged into {b}"
 msgstr "{a} merged into {b}"
 
-#: lib/gristService.ts:3475
+#: lib/gristService.ts:3498
 msgid "{a} gone"
 msgstr "{a} gone"
 
-#: lib/gristService.ts:3476
+#: lib/gristService.ts:3499
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = missing ORCID profile"
 
-#: lib/gristService.ts:3478
+#: lib/gristService.ts:3501
 msgid "List to fix (not written)"
 msgstr "List to fix (not written)"
 
-#: lib/gristService.ts:3478
+#: lib/gristService.ts:3501
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → rerun (direct write) or fix OpenAlex_ids"
 
-#: lib/gristService.ts:3582
+#: lib/gristService.ts:3605
 msgid "Unknown ORCID"
 msgstr "Unknown ORCID"
 
-#: lib/gristService.ts:3582
+#: lib/gristService.ts:3605
 msgid "Unknown Scopus Author ID"
 msgstr "Unknown Scopus Author ID"
 
-#: lib/gristService.ts:3582
+#: lib/gristService.ts:3605
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL unknown to HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3583
+#: lib/gristService.ts:3606
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0}: no profile — fix it in the Annuaire"
 
-#: lib/gristService.ts:3587
+#: lib/gristService.ts:3610
 msgid "Invalid ID_SCOPUS"
 msgstr "Invalid ID_SCOPUS"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3587
+#: lib/gristService.ts:3610
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 
-#: lib/gristService.ts:3588
+#: lib/gristService.ts:3611
 msgid "Invalid ORCID"
 msgstr "Invalid ORCID"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3588
+#: lib/gristService.ts:3611
 msgid "{0}: wrong format or check digit"
 msgstr "{0}: wrong format or check digit"
 
-#: lib/gristService.ts:3596
+#: lib/gristService.ts:3619
 msgid "Profile merged by Scopus"
 msgstr "Profile merged by Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3596
+#: lib/gristService.ts:3619
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3597
+#: lib/gristService.ts:3620
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — check the profile, flag it “Mixed identity” if needed"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3599
+#: lib/gristService.ts:3622
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3843
+#: lib/gristService.ts:3866
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} missing: run {1} first (the script creates it)."
 
