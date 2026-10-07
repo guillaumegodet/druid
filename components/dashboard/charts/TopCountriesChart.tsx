@@ -15,10 +15,15 @@ import { CountryItem } from '../internationalAggregates';
  * Top partner countries — horizontal bars, single hue (the length carries
  * the value; the mockup re-colored by value, which was redundant).
  */
-export const TopCountriesChart: React.FC<{ data: CountryItem[]; top?: number }> = ({
-  data,
-  top = 20,
-}) => {
+export const TopCountriesChart: React.FC<{
+  data: CountryItem[];
+  top?: number;
+  /** ISO-2 code drawn in the accent color (« Pays » sub-tab: rank of the selected country). */
+  highlight?: string;
+  title?: string;
+  exportName?: string;
+  height?: number;
+}> = ({ data, top = 20, highlight, title, exportName = 'top-pays', height = 460 }) => {
   const t = useVizTheme();
   const { t: tr, i18n } = useLingui();
 
@@ -37,20 +42,22 @@ export const TopCountriesChart: React.FC<{ data: CountryItem[]; top?: number }> 
       series: [
         {
           type: 'bar',
-          data: sorted.map((d) => d.count),
+          data: sorted.map((d) =>
+            highlight && d.iso2 === highlight ? { value: d.count, itemStyle: { color: t.series[4] } } : d.count,
+          ),
           itemStyle: { color: t.series[3], borderRadius: [0, 4, 4, 0] },
           label: { show: true, position: 'right', fontSize: 10, color: t.inkSecondary },
         },
       ],
     };
-  }, [data, top, t, tr, i18n.locale]);
+  }, [data, top, highlight, t, tr, i18n.locale]);
 
   return (
     <EChartCard
-      title={tr`Top partner countries`}
+      title={title ?? tr`Top partner countries`}
       option={option}
-      exportName="top-pays"
-      height={460}
+      exportName={exportName}
+      height={height}
     />
   );
 };

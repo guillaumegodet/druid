@@ -21,6 +21,7 @@ import {
   Network,
   Landmark,
   Library,
+  ArrowLeftRight,
 } from 'lucide-react';
 import { OverviewKpis, YearRange } from './overviewAggregates';
 import { ImpactKpis } from './impactAggregates';
@@ -105,6 +106,9 @@ const KPI_STYLES: Record<string, { Icon: React.FC<{ className?: string }>; slot:
   large: { Icon: Network, slot: 7 },
   'fwci-median': { Icon: Gauge, slot: 6 },
   'top10-share': { Icon: Award, slot: 5 },
+  // Collaboration with a country (countryKpis.ts)
+  'intl-share': { Icon: Globe2, slot: 5 },
+  bilateral: { Icon: ArrowLeftRight, slot: 6 },
   // Funding and journals (themeKpis.ts)
   funded: { Icon: Landmark, slot: 0 },
   funders: { Icon: Building2, slot: 3 },

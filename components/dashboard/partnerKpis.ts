@@ -197,7 +197,11 @@ export function partnerKpiItems(dataset: DashboardDataset, range: YearRange, ctx
 
 /** Impact of the co-publications compared with the comparable reference. */
 export function partnerImpactItems(dataset: DashboardDataset, range: YearRange, ctx: PartnerKpiContext): KpiItem[] {
-  const c = compareImpact(dataset.publications, ctx.source?.publications ?? [], range, ctx.filters.maxAuthors);
+  return impactComparisonItems(compareImpact(dataset.publications, ctx.source?.publications ?? [], range, ctx.filters.maxAuthors));
+}
+
+/** Key figures of an impact comparison (partner and country collaborations). */
+export function impactComparisonItems(c: ImpactComparison): KpiItem[] {
   const two = (x: number | null) => (x == null ? '—' : x.toLocaleString(numberLocale(), { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
   const share = (x: number | null) => (x == null ? '—' : `${Math.round(x * 100)} %`);
   const ref = (text: string) => i18n._(msg`reference: ${text}`);
