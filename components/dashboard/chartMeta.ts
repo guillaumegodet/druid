@@ -38,7 +38,9 @@ export type DatasetFeature =
    * Not a dataset property: the block filters name a group of at least 2 partner institutions
    * (partnerKeys) — the per-university breakdown needs it (scopeFeatures).
    */
-  | 'partnerGroup';
+  | 'partnerGroup'
+  /** Not a dataset property: the block filters name a partner country (pays-* charts, scopeFeatures). */
+  | 'country';
 
 /**
  * Parameter of a chart: an integer between `min` and `max`, or one of `values`.
@@ -79,6 +81,11 @@ const FOREIGN_SUBSET: (keyof PubFilters)[] = [
 ];
 const CHARTE_PARAMS: ChartParamDef[] = [{ key: 'thresholdPct', min: 0, max: 100, default: 75 }];
 const LEVEL_PARAM: ChartParamDef = { key: 'level', values: ['subfield', 'topic'], default: 'subfield' };
+/** Hospitals and institutes folded under their university (pays-* institution charts). */
+const GROUP_PARAM: ChartParamDef = { key: 'group', values: ['separate', 'grouped'], default: 'separate' };
+const country = (extra: Partial<ChartMeta> = {}): ChartMeta => ({
+  tab: 'collaborations', requires: ['country'], ...extra,
+});
 const charte = (extra: Partial<ChartMeta> = {}): ChartMeta => ({
   tab: 'charte', requires: ['charte'], params: CHARTE_PARAMS, ...extra,
 });
@@ -127,6 +134,22 @@ export const CHART_META: Record<string, ChartMeta> = {
   // université » template): the institutions are read from the block filters (partnerKeys).
   'partner-breakdown-top': { tab: 'collaborations', requires: ['partnerGroup'] },
   'partner-breakdown-evolution': { tab: 'collaborations', requires: ['partnerGroup'] },
+  // One partner country (« By country » sub-tab, docs/plan-collaboration-pays.md lot 5): the country
+  // is read from the block filters.
+  'pays-evolution': country(),
+  'pays-rang': country(),
+  'pays-carte': country(),
+  'pays-etablissements': country({ params: [GROUP_PARAM] }),
+  'pays-labos': country({ requires: ['country', 'labs'] }),
+  'pays-chercheurs': country({ nominative: true, trivialUnder: ['authorId'] }),
+  'pays-matrice': country({ requires: ['country', 'labs'], params: [GROUP_PARAM] }),
+  'pays-domaines': country({ trivialUnder: ['domain'] }),
+  'pays-sous-disciplines': country({ trivialUnder: ['subfield'] }),
+  'pays-specialisation': country({ trivialUnder: ['subfield', 'domain'] }),
+  'pays-financeurs': country({ trivialUnder: ['funder'] }),
+  'pays-bilateral': country(),
+  'pays-pays-tiers': country(),
+  'pays-langues': country({ trivialUnder: ['language'] }),
   'collab-national-top': { tab: 'collaborations' },
   'collab-national-evolution': { tab: 'collaborations' },
   'carte-france': { tab: 'collaborations' },
@@ -210,10 +233,12 @@ export function datasetFeatures(dataset: DashboardDataset): Set<DatasetFeature> 
   return out;
 }
 
-/** Dataset features plus those given by the block filters (partnerGroup). */
+/** Dataset features plus those given by the block filters (partnerGroup, country). */
 export function scopeFeatures(features: Set<DatasetFeature>, filters: PubFilters): Set<DatasetFeature> {
-  if ((filters.partnerKeys?.length ?? 0) < 2) return features;
-  return new Set([...features, 'partnerGroup' as const]);
+  const out = new Set(features);
+  if ((filters.partnerKeys?.length ?? 0) >= 2) out.add('partnerGroup');
+  if (filters.country) out.add('country');
+  return out;
 }
 
 /** Features a chart needs and the dataset lacks (empty = available). */

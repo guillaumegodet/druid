@@ -197,6 +197,7 @@ export const ReportEditor: React.FC<{
         range: rb.scope!.range,
         params: rb.params,
         filters: rb.scope!.filters,
+        source: rb.source,
       }));
     const batches: RenderItem[][] = [];
     for (let i = 0; i < items.length; i += PDF_BATCH) batches.push(items.slice(i, i + PDF_BATCH));

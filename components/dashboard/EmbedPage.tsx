@@ -40,13 +40,15 @@ export const EmbedPage: React.FC = () => {
   const effectifs = params.get('perimetre') === 'effectifs';
   const filterState = useMemo(() => parseEmbedFilters(params.get('f'), { isPublic: true }), [params]);
   const chartParams = useMemo(() => parseEmbedParams(params.get('p'), chartId), [params, chartId]);
+  // Whole corpus of the scope, before the filters (pays-* charts: rank, share, impact reference).
+  const source = useMemo(
+    () => (rawData ? restrictDataset(rawData, { perimetre: effectifs ? 'effectifs' : 'affiliation' }) : rawData),
+    [rawData, effectifs],
+  );
   const data = useMemo(() => {
-    if (!rawData || filterState.error) return rawData;
-    return restrictDataset(rawData, {
-      perimetre: effectifs ? 'effectifs' : 'affiliation',
-      filters: filterState.filters,
-    });
-  }, [rawData, effectifs, filterState]);
+    if (!source || filterState.error) return source;
+    return restrictDataset(source, { filters: filterState.filters });
+  }, [source, filterState]);
 
   // Active filters, printed under the chart: a filtered chart must not pass for the whole corpus.
   const filterCaption = useMemo(() => {
@@ -96,7 +98,7 @@ export const EmbedPage: React.FC = () => {
     );
   } else if (data) {
     const { Chart } = def;
-    body = <Chart dataset={data} range={range} params={chartParams} filters={filterState.filters} />;
+    body = <Chart dataset={data} range={range} params={chartParams} filters={filterState.filters} source={source} />;
   }
 
   return (

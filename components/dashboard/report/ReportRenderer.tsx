@@ -29,8 +29,10 @@ export interface RenderItem {
   dataset: DashboardDataset;
   range: YearRange;
   params?: ChartParams;
-  /** Filters the dataset was restricted with (charts reading the partner group). */
+  /** Filters the dataset was restricted with (charts reading the partner group or the country). */
   filters?: PubFilters;
+  /** Whole corpus of the block scope before the filters (pays-* charts, EmbedChartProps.source). */
+  source?: DashboardDataset | null;
 }
 
 export interface CapturedChart {
@@ -184,7 +186,7 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({ items, onDone })
               return (
                 <div key={it.key} style={{ width: CHART_WIDTH, marginBottom: 16 }}>
                   <ItemCapture itemKey={it.key} parent={capture}>
-                    <Chart dataset={it.dataset} range={it.range} params={it.params} filters={it.filters} />
+                    <Chart dataset={it.dataset} range={it.range} params={it.params} filters={it.filters} source={it.source} />
                   </ItemCapture>
                 </div>
               );

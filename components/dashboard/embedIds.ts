@@ -21,6 +21,10 @@ export const EMBEDDABLE_IDS = new Set<string>([
   'collab-national-top', 'collab-national-evolution',
   // Collaborations — per-university breakdown of a partner group (report blocks)
   'partner-breakdown-top', 'partner-breakdown-evolution',
+  // Collaborations — one partner country (« By country » sub-tab, country filter)
+  'pays-evolution', 'pays-rang', 'pays-carte', 'pays-etablissements', 'pays-labos', 'pays-chercheurs',
+  'pays-matrice', 'pays-domaines', 'pays-sous-disciplines', 'pays-specialisation', 'pays-financeurs',
+  'pays-bilateral', 'pays-pays-tiers', 'pays-langues',
   // Impact
   'quartiles-scimago', 'top-par-annee', 'distribution-fwci',
   'impact-fwci-sous-structure', 'impact-top-sous-structure', 'impact-fwci-equipe',
@@ -53,7 +57,9 @@ export const EMBEDDABLE_IDS = new Set<string>([
  * Key-figure rows a report `kpis` block can show (kpiItems.ts, KPI_SETS).
  * ⚠️ Keep in sync with the keys of KPI_SETS.
  */
-export const KPI_SET_IDS = new Set<string>(['overview', 'impact', 'partner', 'partner-impact', 'funding', 'journals']);
+export const KPI_SET_IDS = new Set<string>([
+  'overview', 'impact', 'partner', 'partner-impact', 'funding', 'journals', 'country', 'country-impact',
+]);
 
 /**
  * Tables a report `table` block can show (reportTables.ts, REPORT_TABLES).

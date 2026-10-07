@@ -10,6 +10,7 @@ import { aggregateImpact, type ImpactKpis } from './impactAggregates';
 import { aggregateOverview, CONFERENCE_LABEL, type OverviewKpis, type YearRange } from './overviewAggregates';
 import { partnerImpactItems, partnerKpiItems, type PartnerKpiContext } from './partnerKpis';
 import { fundingKpiItems, journalsKpiItems } from './themeKpis';
+import { countryImpactSetItems, countryKpiSetItems } from './countryKpis';
 import type { PubFilters } from './publicationFilters';
 import type { DashboardDataset } from './types';
 
@@ -149,5 +150,14 @@ export const KPI_SETS: Record<string, KpiSet> = {
   journals: {
     label: msg`Key figures — journals`,
     items: (dataset, range) => journalsKpiItems(dataset, range),
+  },
+  // Collaboration with a country: the country comes from the block filters (countryKpis.ts).
+  country: {
+    label: msg`Key figures — collaboration with a country`,
+    items: (dataset, range, ctx) => countryKpiSetItems(dataset, range, ctx ?? noContext),
+  },
+  'country-impact': {
+    label: msg`Key figures — impact of the collaboration with a country`,
+    items: (dataset, range, ctx) => countryImpactSetItems(dataset, range, ctx ?? noContext),
   },
 };

@@ -9,16 +9,14 @@ import { countryImpactItems, countryKpiItems } from './countryKpis';
 import { aggregateImpact } from './impactAggregates';
 import { LARGE_COLLAB_AUTHORS } from './partnerKpis';
 import { KpiGrid } from './KpiCards';
-import { CountryTrendChart } from './charts/CountryTrendChart';
-import { TopCountriesChart } from './charts/TopCountriesChart';
-import { RankBarChart, TeamDonutChart } from './charts/TeamCharts';
+import { ChartStateContext, type ChartState } from './EChartCard';
 import { FwciHistogramChart } from './charts/FwciHistogramChart';
 import { QuartileChart } from './charts/QuartileChart';
-import { MatrixHeatmapChart } from './charts/MatrixHeatmapChart';
-import { CountryMapChart } from './charts/CountryMapChart';
-import { SpecializationChart } from './charts/SpecializationChart';
-import { CountryFundersChart } from './charts/CountryFundersChart';
-import { LanguageDonutChart } from './charts/LanguageDonutChart';
+import {
+  CountryBilateral, CountryDomains, CountryEvolution, CountryFunders, CountryInstitutions, CountryLanguages,
+  CountryMap, CountryMatrix, CountryRank, CountryResearchers, CountrySpecialization, CountrySubfields,
+  CountryThirdCountries, CountryUnits, type CountryChartProps,
+} from './CountryCharts';
 import { numberLocale } from '../../lib/i18n';
 
 // URL parameters of the sub-tab (shareable link, docs/plan-collaboration-pays.md § 2).
@@ -105,15 +103,13 @@ export const CountrySection: React.FC<{
   const listFilters: PubFilters = { country: cc, ...(maxAuthors ? { maxAuthors } : {}) };
   const open = onOpenList ? (extra: PubFilters = {}) => onOpenList({ ...listFilters, ...extra }) : undefined;
   const country = focus.label;
-  const unitsTitle = focus.units.kind === 'teams' ? t`Teams involved` : t`Labs involved`;
   const hasAuthorCount = dataset.publications.some((p) => typeof p.authorCount === 'number');
   const hasParents = focus.pubs.some((p) => p.partnerInstitutions.some((o) => o.cc === cc && o.parent));
   const inOptions = options.some((o) => o.cc === cc);
-  // Filter of a unit (lab / team) in the publication list, when the export has one.
-  const unitFilter = (unit: string): PubFilters | null =>
-    focus.units.filterKey === 'team' ? { team: unit }
-      : focus.units.filterKey === 'sousStructure' ? { sousStructure: unit }
-        : null;
+  const chartProps: CountryChartProps = { focus, countryNames: dataset.countryNames, groupAffiliates, open };
+  // « Add to a report »: the country and options go with the chart; impact without large collaborations (D2).
+  const chartState: ChartState = { filters: listFilters, params: groupAffiliates ? { group: 'grouped' } : {} };
+  const impactState: ChartState = { filters: { country: cc, maxAuthors: LARGE_COLLAB_AUTHORS } };
 
   return (
     <div className="flex flex-col gap-4">
@@ -172,7 +168,7 @@ export const CountrySection: React.FC<{
           <Trans>No co-publication with {country} over the period.</Trans>
         </div>
       ) : (
-        <>
+        <ChartStateContext.Provider value={chartState}>
           <KpiGrid
             items={countryKpiItems(focus, listFilters)}
             className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3"
@@ -180,132 +176,33 @@ export const CountrySection: React.FC<{
           />
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <CountryTrendChart data={focus.byYear} country={country} />
-            <TopCountriesChart
-              data={focus.topCountries.map((c) => ({
-                iso2: c.cc,
-                fr: c.label,
-                echarts: dataset.countryNames[c.cc]?.echarts ?? '',
-                eu: dataset.countryNames[c.cc]?.eu ?? false,
-                count: c.count,
-              }))}
-              top={focus.topCountries.length}
-              highlight={cc}
-              title={t`Rank of ${country} among the partner countries`}
-              exportName="pays-rang"
-              height={Math.max(280, focus.topCountries.length * 24 + 40)}
-            />
+            <CountryEvolution {...chartProps} />
+            <CountryRank {...chartProps} />
           </div>
 
           <h3 className={sectionTitle}><Trans>Institutions of {country}</Trans></h3>
           <div className={`grid grid-cols-1 ${focus.bounds ? 'xl:grid-cols-2' : ''} gap-4`}>
-            {focus.bounds && (
-              <CountryMapChart
-                points={focus.mapPoints}
-                bounds={focus.bounds}
-                country={country}
-                polygon={dataset.countryNames[cc]?.echarts ?? ''}
-                onSelect={open ? (partnerInstitution) => open({ partnerInstitution }) : undefined}
-              />
-            )}
-            <RankBarChart
-              title={t`Partner institutions in ${country}`}
-              subtitle={groupAffiliates ? t`Hospitals and institutes counted with their university` : undefined}
-              exportName="pays-etablissements"
-              data={focus.institutions.map((i) => ({
-                label: i.name,
-                count: i.count,
-                teams: i.affiliates.length
-                  ? [t`with ${i.affiliates.slice(0, 3).join(', ')}${i.affiliates.length > 3 ? '…' : ''}`]
-                  : i.city ? [i.city] : [],
-              }))}
-              colorSlot={3}
-              height={Math.max(280, focus.institutions.length * 26 + 60)}
-              onItemClick={
-                open
-                  ? (name) => {
-                      const inst = focus.institutions.find((i) => i.name === name);
-                      if (inst) open({ partnerKeys: inst.partnerKeys });
-                    }
-                  : undefined
-              }
-            />
+            <CountryMap {...chartProps} />
+            <CountryInstitutions {...chartProps} />
           </div>
 
           <h3 className={sectionTitle}><Trans>Labs and researchers involved</Trans></h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {focus.units.kind && (
-              <RankBarChart
-                title={unitsTitle}
-                subtitle={t`A co-publication counts for each lab of its authors`}
-                exportName="pays-labos"
-                data={focus.units.top.map((u) => ({ label: u.key, count: u.count, teams: [] }))}
-                colorSlot={2}
-                height={Math.max(280, focus.units.top.length * 26 + 60)}
-                onItemClick={open && focus.units.filterKey ? (unit) => open(unitFilter(unit) ?? {}) : undefined}
-              />
-            )}
-            <RankBarChart
-              title={t`Researchers involved`}
-              exportName="pays-chercheurs"
-              // The label already carries the labs (« Name (LAB) »).
-              data={focus.researchers.top.map((r) => ({ ...r, teams: [] }))}
-              colorSlot={1}
-              height={Math.max(280, focus.researchers.top.length * 26 + 60)}
-              onItemSelect={open ? (item) => item.id != null && open({ authorId: item.id }) : undefined}
-            />
+            <CountryUnits {...chartProps} />
+            <CountryResearchers {...chartProps} />
           </div>
-
-          {focus.matrix.cells.length > 0 && (
-            <MatrixHeatmapChart
-              title={t`Who works with whom`}
-              subtitle={
-                focus.units.kind === 'teams'
-                  ? t`Co-publications between the main teams and the main institutions of ${country}`
-                  : t`Co-publications between the main labs and the main institutions of ${country}`
-              }
-              exportName="pays-matrice"
-              rows={focus.matrix.units}
-              cols={focus.matrix.institutions}
-              cells={focus.matrix.cells}
-              onCellClick={
-                open
-                  ? (x, y) => {
-                      const inst = focus.institutions[x];
-                      if (inst) open({ partnerKeys: inst.partnerKeys, ...(unitFilter(focus.matrix.units[y]) ?? {}) });
-                    }
-                  : undefined
-              }
-            />
-          )}
+          <CountryMatrix {...chartProps} />
 
           <h3 className={sectionTitle}><Trans>Themes</Trans></h3>
           <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
             <div className="lg:col-span-2">
-              <TeamDonutChart
-                title={t`Domains of the co-publications`}
-                exportName="pays-domaines"
-                data={focus.domains.map((d) => ({ name: d.key, value: d.count }))}
-                onSelect={open ? (domain) => open({ domain }) : undefined}
-              />
+              <CountryDomains {...chartProps} />
             </div>
             <div className="lg:col-span-3">
-              <RankBarChart
-                title={t`Main subfields`}
-                exportName="pays-sous-disciplines"
-                data={focus.topSubfields.map((s) => ({ label: s.key, count: s.count, teams: [] }))}
-                colorSlot={5}
-                height={Math.max(320, focus.topSubfields.length * 26 + 60)}
-                onItemClick={open ? (subfield) => open({ subfield }) : undefined}
-              />
+              <CountrySubfields {...chartProps} />
             </div>
           </div>
-          <SpecializationChart
-            data={focus.specialization}
-            country={country}
-            minCount={focus.specializationMin}
-            onSelect={open ? (subfield) => open({ subfield }) : undefined}
-          />
+          <CountrySpecialization {...chartProps} />
 
           <h3 className={sectionTitle}><Trans>Impact</Trans></h3>
           <p className={note}>
@@ -314,10 +211,12 @@ export const CountrySection: React.FC<{
             </Trans>
           </p>
           <KpiGrid items={countryImpactItems(focus)} className="grid grid-cols-1 sm:grid-cols-3 gap-3" />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <FwciHistogramChart data={impact.fwciHistogram} />
-            <QuartileChart data={impact.quartiles} onSelect={open ? (quartile) => open({ quartile }) : undefined} />
-          </div>
+          <ChartStateContext.Provider value={impactState}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <FwciHistogramChart data={impact.fwciHistogram} />
+              <QuartileChart data={impact.quartiles} onSelect={open ? (quartile) => open({ quartile }) : undefined} />
+            </div>
+          </ChartStateContext.Provider>
 
           <h3 className={sectionTitle}><Trans>Funding</Trans></h3>
           <p className={note}>
@@ -325,43 +224,15 @@ export const CountrySection: React.FC<{
               {fmt(focus.funded)} co-publications acknowledge at least one funder ({pctOf(focus.funded)}): {fmt(focus.funderOrigins.country)} a funder of {country}, {fmt(focus.funderOrigins.europe)} a European one, {fmt(focus.funderOrigins.france)} a French one.
             </Trans>
           </p>
-          <CountryFundersChart
-            data={focus.funders}
-            country={country}
-            onSelect={open ? (funder) => open({ funder }) : undefined}
-          />
+          <CountryFunders {...chartProps} />
 
           <h3 className={sectionTitle}><Trans>Other countries and languages</Trans></h3>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            <TeamDonutChart
-              title={t`Bilateral or with other countries`}
-              exportName="pays-bilateral"
-              data={[
-                { name: t`${country} only`, value: focus.bilateral },
-                { name: t`With other foreign countries`, value: focus.multilateral },
-              ]}
-            />
-            <TopCountriesChart
-              data={focus.thirdCountries.map((c) => ({
-                iso2: c.cc,
-                fr: c.label,
-                echarts: dataset.countryNames[c.cc]?.echarts ?? '',
-                eu: dataset.countryNames[c.cc]?.eu ?? false,
-                count: c.count,
-              }))}
-              top={focus.thirdCountries.length}
-              title={t`Other countries of the multilateral co-publications`}
-              exportName="pays-pays-tiers"
-              height={320}
-            />
-            <LanguageDonutChart
-              data={focus.languages}
-              title={t`Languages of the co-publications`}
-              exportName="pays-langues"
-              onSelect={open ? (language) => open({ language }) : undefined}
-            />
+            <CountryBilateral {...chartProps} />
+            <CountryThirdCountries {...chartProps} />
+            <CountryLanguages {...chartProps} />
           </div>
-        </>
+        </ChartStateContext.Provider>
       )}
     </div>
   );
