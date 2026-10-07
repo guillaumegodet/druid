@@ -17,6 +17,7 @@ import { msg } from '@lingui/core/macro';
 import { accessLabel, AXE_OTHER, charterCompliant } from './phase4Aggregates';
 import { comboLabelOf } from './sourcesAggregates';
 import { buildPartnerCatalog, partnerKey } from './collabAggregates';
+import { hasCountry } from './countryAggregates';
 import { FUNDER_CATEGORY_LABELS, funderCategory, fundersOf, hasFunding } from './fundersAggregates';
 
 /** Effective strategic axis of a publication (1st axis if multiple, « Autre » otherwise). */
@@ -209,7 +210,8 @@ export function matchesFilters(
   }
   if (f.hasPhd && !p.hasPhd) return false;
   if (f.collabType && !p.collabTypes.includes(f.collabType)) return false;
-  if (f.country && !p.countries.includes(f.country)) return false;
+  // Countries of the partner institutions count too (exports predating 2026-10-07 missed some).
+  if (f.country && !hasCountry(p, f.country)) return false;
   if (f.nantesPartner && !p.nantesPartners.includes(f.nantesPartner)) return false;
   if (f.nationalPartner && !p.nationalPartners.some((n) => n.name === f.nationalPartner))
     return false;

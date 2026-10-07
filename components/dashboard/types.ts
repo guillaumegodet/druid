@@ -53,6 +53,13 @@ export interface DashboardPublication {
     lon: number | null;
     /** Missing from exports predating 2026-09-03 (backfill in progress). */
     ror?: string | null;
+    /** Province / state (OpenAlex geo.region), only when known — exports since 2026-10-07. */
+    region?: string;
+    /**
+     * Parent university of a hospital or institute (never set on a university), only when
+     * known — exports since 2026-10-07 (docs/plan-collaboration-pays.md, lot 1 a).
+     */
+    parent?: { ror: string | null; name: string };
   }[];
   sjrQuartile: string | null;
   /** FNEGE 2025 rank of the journal (1*, 1, 2, 3, 4, EM) — management sciences; missing from exports predating 2026-07-09. */
@@ -129,7 +136,13 @@ export interface DashboardPublication {
    * projects). ⚠️ A funder on a publication = the publication *acknowledges* it — it means neither "paid
    * Nantes" nor "a Nantes researcher holds the grant". Declarative view, not an accounting one.
    */
-  funders?: { id: string | null; name: string; ror: string | null }[];
+  funders?: {
+    id: string | null;
+    name: string;
+    ror: string | null;
+    /** Country of the funder (OpenAlex funders), only when known — exports since 2026-10-07. */
+    cc?: string;
+  }[];
   /**
    * Projects / grants attached to the publication. `projectId` = funding code
    * (OpenAlex funder_award_id, e.g. « ANR-16-IDEX-0007 », or HAL ANR/European reference).
