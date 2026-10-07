@@ -15,6 +15,7 @@ import { translateApiError } from '../../../lib/apiErrors';
 import { numberLocale } from '../../../lib/i18n';
 import { buildPartnerCatalog, researcherLabel, unitsOfDataset } from '../collabAggregates';
 import { KPI_SETS, type KpiItem } from '../kpiItems';
+import { countryLabel } from '../labels';
 import { halfTrend, median } from '../partnerKpis';
 import type { DashboardDataset, DashboardPublication } from '../types';
 import type { ReportDefinition } from './definition';
@@ -62,12 +63,16 @@ const inRange = (d: DashboardDataset, r: { start: number; end: number }) =>
 function labels(rb: ResolvedBlock) {
   const ds = rb.dataset!;
   const keys = rb.scope?.filters.partnerKeys ?? [];
+  const country = rb.scope?.filters.country;
   const names = keys.length && rb.source
     ? new Map(buildPartnerCatalog(rb.source.publications).map((c) => [c.key, c.name]))
     : new Map<string, string>();
   return {
     structureLabel: ds.name && ds.name !== ds.lab ? `${ds.lab} — ${ds.name}` : ds.lab,
-    partnerLabel: keys.map((k) => names.get(k) ?? k.replace(/^(international|national):/, '')).join(', '),
+    // Partner institutions, else the partner country (« Collaboration with a country » template).
+    partnerLabel: keys.length
+      ? keys.map((k) => names.get(k) ?? k.replace(/^(international|national):/, '')).join(', ')
+      : country ? countryLabel(country, ds.countryNames) : '',
   };
 }
 
@@ -161,7 +166,7 @@ export async function generateDomainsText(
 
 /** Key figures handed to the executive summary: the collaboration sets, else overview + impact. */
 /** Key-figure sets computed on the block scope with its large-collaboration exclusion (D2). */
-const IMPACT_SETS = new Set(['impact', 'partner-impact']);
+const IMPACT_SETS = new Set(['impact', 'partner-impact', 'country-impact']);
 
 /**
  * Key figures handed to the executive summary: the key-figure sets the report itself shows (its
@@ -182,7 +187,8 @@ function keyFigures(rb: ResolvedBlock, def: ReportDefinition): KpiItem[] {
   const reportSets = [...new Set(def.blocks.flatMap((b) => (b.kind === 'kpis' && !b.hidden ? [b.setId] : [])))];
   const sets = reportSets.length
     ? reportSets
-    : filters.partnerKeys?.length ? ['partner', 'partner-impact'] : ['overview', 'impact'];
+    : filters.partnerKeys?.length ? ['partner', 'partner-impact']
+      : filters.country ? ['country', 'country-impact'] : ['overview', 'impact'];
   const items = sets.flatMap((id) =>
     IMPACT_SETS.has(id)
       ? KPI_SETS[id].items(ds, range, ctx)
@@ -208,7 +214,7 @@ export async function generateExecutiveText(
   onProgress: (p: AiProgress) => void = () => {},
 ): Promise<AiResult> {
   const { structureLabel, partnerLabel } = labels(rb);
-  const collaboration = (rb.scope?.filters.partnerKeys?.length ?? 0) > 0;
+  const collaboration = (rb.scope?.filters.partnerKeys?.length ?? 0) > 0 || !!rb.scope?.filters.country;
   const domains = def.blocks.find((b) => b.kind === 'ai' && b.task === 'domains' && b.text?.trim());
   onProgress({ done: 0, total: 1 });
   const r = await callAi<{ summary: string; keyPoints: string[]; leads: string[] }>({

@@ -106,6 +106,12 @@ import {
 import { axisColorOf } from './AxesTab';
 import { ApcByLaboChart, aggregateDealByLabo } from './ApcTab';
 import { enumParam, intParam, type ChartParams } from './chartMeta';
+import { countryFocusOfScope } from './countryKpis';
+import {
+  CountryBilateral, CountryDomains, CountryEvolution, CountryFunders, CountryInstitutions, CountryLanguages,
+  CountryMap, CountryMatrix, CountryRank, CountryResearchers, CountrySpecialization, CountrySubfields,
+  CountryThirdCountries, CountryUnits, type CountryChartProps,
+} from './CountryCharts';
 import type { TeamRadarLevel } from './structureAggregates';
 
 export interface EmbedChartProps {
@@ -118,9 +124,15 @@ export interface EmbedChartProps {
   params?: ChartParams;
   /**
    * Filters the dataset was restricted with (already applied): only read by the charts that
-   * need the partner group itself (partner-breakdown-*).
+   * need the partner group itself (partner-breakdown-*) or the country (pays-*).
    */
   filters?: PubFilters;
+  /**
+   * Whole corpus of the scope, before the filters (report blocks, /embed) — the pays-* charts need
+   * it for the rank of the country, its share of the international co-publications and the impact
+   * reference. Missing: the restricted dataset stands in for it.
+   */
+  source?: DashboardDataset | null;
 }
 
 /** Charter threshold as a fraction (tab default: 75 %). */
@@ -241,7 +253,46 @@ const useLabRanking = ({ dataset, range }: EmbedChartProps) =>
       .slice(0, 25);
   }, [dataset, range]);
 
+/**
+ * Chart of the « By country » sub-tab (docs/plan-collaboration-pays.md, lot 5): the country comes from
+ * the `country` filter, the « group affiliates » option from the `group` parameter.
+ */
+const countryEntry = (label: MessageDescriptor, C: React.FC<CountryChartProps>): Entry => ({
+  label,
+  Chart: (p) => {
+    const grouped = enumParam(p.params, 'group') === 'grouped';
+    const focus = useMemo(
+      () => countryFocusOfScope(p.dataset, p.range, p.filters, p.source, grouped),
+      [p.dataset, p.range, p.filters, p.source, grouped],
+    );
+    if (!focus) {
+      return (
+        <div className="glass-card p-6 text-sm text-muted-light dark:text-[#8f897c]">
+          {i18n._(msg`Choose a partner country in the filters.`)}
+        </div>
+      );
+    }
+    return <C focus={focus} countryNames={p.dataset.countryNames} groupAffiliates={grouped} />;
+  },
+});
+
 export const EMBED_CHARTS: Record<string, Entry> = {
+  // ── Collaborations — one partner country (country filter)
+  'pays-evolution': countryEntry(msg`Co-publications with the country per year`, CountryEvolution),
+  'pays-rang': countryEntry(msg`Rank of the country among the partner countries`, CountryRank),
+  'pays-carte': countryEntry(msg`Map of the partner institutions in the country`, CountryMap),
+  'pays-etablissements': countryEntry(msg`Partner institutions in the country`, CountryInstitutions),
+  'pays-labos': countryEntry(msg`Labs involved with the country`, CountryUnits),
+  'pays-chercheurs': countryEntry(msg`Researchers involved with the country`, CountryResearchers),
+  'pays-matrice': countryEntry(msg`Labs × institutions of the country`, CountryMatrix),
+  'pays-domaines': countryEntry(msg`Domains of the co-publications with the country`, CountryDomains),
+  'pays-sous-disciplines': countryEntry(msg`Main subfields of the co-publications with the country`, CountrySubfields),
+  'pays-specialisation': countryEntry(msg`Specialization of the co-publications with the country`, CountrySpecialization),
+  'pays-financeurs': countryEntry(msg`Main funders of the co-publications with the country`, CountryFunders),
+  'pays-bilateral': countryEntry(msg`Bilateral co-publications with the country`, CountryBilateral),
+  'pays-pays-tiers': countryEntry(msg`Other countries of the co-publications with the country`, CountryThirdCountries),
+  'pays-langues': countryEntry(msg`Languages of the co-publications with the country`, CountryLanguages),
+
   // ── Overview
   'publications-par-annee': {
     label: msg`Publications per year`,

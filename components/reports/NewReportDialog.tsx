@@ -254,7 +254,7 @@ export const NewReportDialog: React.FC<{
             <div className={row}>
               <span className={label}><Trans>Country</Trans></span>
               <select className={selectCls} value={country} onChange={(e) => setCountry(e.target.value)} disabled={!dataset}>
-                <option value="">{t`All partner countries`}</option>
+                <option value="">{t`Choose a country`}</option>
                 {countries.map((cc) => <option key={cc} value={cc}>{countryName(cc)}</option>)}
               </select>
             </div>
@@ -312,7 +312,11 @@ export const NewReportDialog: React.FC<{
           <button
             type="button"
             onClick={() => void create()}
-            disabled={saving || waitingData || !name.trim() || !slug || (template.params.includes('partners') && partners.length === 0)}
+            disabled={
+              saving || waitingData || !name.trim() || !slug
+              || (template.params.includes('partners') && partners.length === 0)
+              || (template.params.includes('country') && !country)
+            }
             className="btn-pill-dark h-9 px-4 text-[13px] disabled:opacity-40"
           >
             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : null}

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { parseReportDefinition, type ReportBlock } from '../../components/dashboard/report/definition';
 import { resolveReport } from '../../components/dashboard/report/resolveReport';
+import { KPI_SETS } from '../../components/dashboard/kpiItems';
 import {
   DEFAULT_PERIOD,
   instantiateReportTemplate,
@@ -60,21 +61,53 @@ describe('report templates', () => {
     def.blocks.forEach((b, i) => { if (b.kind === 'section') expect(def.blocks[i + 1]?.kind).not.toBe('section'); });
   });
 
-  it('international collaborations: optional partner country, international-only themes and impact', () => {
+  it('international collaborations: every partner country, international-only themes and impact', () => {
     const t = templateById('international')!;
-    const all = t.build(input, { dataset: LAB, hiddenTabs: [] });
+    expect(t.params).not.toContain('country');
+    const all = t.build({ ...input, country: 'CA' }, { dataset: LAB, hiddenTabs: [] });
+    // One country is the « country » template: the international one ignores it.
     expect(all.context.filters).toEqual({});
     expect(charts(all.blocks)).toContain('zone-ue');
+    const r = resolveReport(all, { lab: LAB }, new Date('2026-09-28T12:00:00Z'));
+    const fwci = r.blocks.find((b) => b.block.kind === 'chart' && b.block.chartId === 'distribution-fwci')!;
+    expect(fwci.scope?.filters).toEqual({ international: true });
+    expect(fwci.dataset?.publications).toHaveLength(4);
+  });
 
+  it('collaboration with a country: charts about that country only, impact without large collaborations', () => {
+    const t = templateById('country')!;
+    expect(t.params).toContain('country');
     const ca = t.build({ ...input, country: 'ca' }, { dataset: LAB, hiddenTabs: [] });
     expect(ca.context.filters).toEqual({ country: 'CA' });
     expect(ca.templateParams).toEqual({ country: 'CA' });
-    // Charts degenerate under a country filter are left out.
-    expect(charts(ca.blocks)).not.toContain('zone-ue');
+    expect(ca.footerNote).toBeTruthy();
+    const ids = charts(ca.blocks);
+    expect(ids).toEqual(expect.arrayContaining(['pays-evolution', 'pays-rang', 'pays-etablissements', 'pays-specialisation', 'pays-financeurs']));
+    // No chart about all the partner countries, no lab chart without labs (lab dashboard: teams).
+    expect(ids.filter((id) => ['carte-monde', 'top-pays', 'zone-ue', 'evolution-pays'].includes(id))).toEqual([]);
+    expect(ca.blocks.filter((b) => b.kind === 'kpis').map((b) => (b as { setId: string }).setId)).toEqual(['country', 'country-impact']);
+    // The texts carry no figure: they would go stale with the data.
+    const texts = ca.blocks.filter((b) => b.kind === 'text').map((b) => (b as { markdown: string }).markdown).join(' ');
+    expect(texts).not.toMatch(/\d{3,}/);
+
     const r = resolveReport(ca, { lab: LAB }, new Date('2026-09-28T12:00:00Z'));
     const fwci = r.blocks.find((b) => b.block.kind === 'chart' && b.block.chartId === 'distribution-fwci')!;
-    expect(fwci.scope?.filters).toEqual({ country: 'CA', international: true });
-    expect(fwci.dataset?.publications).toHaveLength(3);
+    expect(fwci.scope?.filters).toEqual({ country: 'CA', maxAuthors: 50 });
+    const rank = r.blocks.find((b) => b.block.kind === 'chart' && b.block.chartId === 'pays-rang')!;
+    expect(rank.status).toBe('ok');
+    // The chart gets the whole corpus too (rank, share of the international co-publications).
+    expect(rank.dataset?.publications).toHaveLength(3);
+    expect(rank.source?.publications).toHaveLength(4);
+
+    // Key figures of the block: rank and share read on the whole corpus, not on the 3 co-publications.
+    const kb = r.blocks.find((b) => b.block.kind === 'kpis' && b.block.setId === 'country')!;
+    const items = KPI_SETS.country.items(kb.dataset!, kb.scope!.range, { source: kb.source, filters: kb.scope!.filters });
+    const value = (key: string) => items.find((i) => i.key === key)?.value;
+    expect([value('copubs'), value('intl-share'), value('rank')]).toEqual(['3', '75 %', '1']);
+    expect(KPI_SETS['country-impact'].items(kb.dataset!, kb.scope!.range, { source: kb.source, filters: kb.scope!.filters }))
+      .toHaveLength(3);
+    // Without a country in the filters, the sets stay empty instead of failing.
+    expect(KPI_SETS.country.items(LAB, kb.scope!.range, { source: LAB, filters: {} })).toEqual([]);
   });
 
   it('lists partner countries by frequency', () => {
@@ -83,7 +116,7 @@ describe('report templates', () => {
   });
 
   it('instantiates an instance template on another structure and period', () => {
-    const source = templateById('international')!.build({ ...input, country: 'CA' }, { dataset: LAB, hiddenTabs: [] });
+    const source = templateById('country')!.build({ ...input, country: 'CA' }, { dataset: LAB, hiddenTabs: [] });
     const def = instantiateReportTemplate(source, 12, { ...input, name: 'Copy', slug: 'other', period: { kind: 'fixed', start: 2020, end: 2022 } });
     expect(parseReportDefinition(def).ok).toBe(true);
     expect(def).toMatchObject({ name: 'Copy', templateId: 'report:12', context: { slug: 'other', filters: { country: 'CA' } } });

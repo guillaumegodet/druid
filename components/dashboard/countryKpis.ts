@@ -5,10 +5,13 @@
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { numberLocale } from '../../lib/i18n';
-import type { CountryFocus } from './countryAggregates';
+import { aggregateCountryFocus, type CountryFocus } from './countryAggregates';
 import type { KpiItem } from './kpiItems';
-import { impactComparisonItems, LARGE_COLLAB_AUTHORS } from './partnerKpis';
+import type { YearRange } from './overviewAggregates';
+import { impactComparisonItems, LARGE_COLLAB_AUTHORS, type PartnerKpiContext } from './partnerKpis';
 import type { PubFilters } from './publicationFilters';
+import { restrictDataset } from './report/restrictDataset';
+import type { DashboardDataset } from './types';
 
 const fmt = (n: number) => n.toLocaleString(numberLocale());
 const pct = (n: number, d: number) => (d > 0 ? `${Math.round((n / d) * 100)} %` : '—');
@@ -75,3 +78,36 @@ export function countryKpiItems(f: CountryFocus, listFilters: PubFilters = { cou
 
 /** Impact of the co-publications vs the other international co-publications of the same subfields. */
 export const countryImpactItems = (f: CountryFocus): KpiItem[] => impactComparisonItems(f.impact);
+
+/**
+ * Country focus of a report block or an /embed chart (docs/plan-collaboration-pays.md, lot 5): the
+ * country comes from the `country` filter; rank, share of the international co-publications and
+ * impact reference need the corpus WITHOUT that filter (`source`, the block scope with no filter),
+ * restricted by the other filters. `maxAuthors` becomes the « exclude large collaborations » option.
+ * Null without a country filter.
+ */
+export function countryFocusOfScope(
+  dataset: DashboardDataset,
+  range: YearRange,
+  filters: PubFilters | undefined,
+  source?: DashboardDataset | null,
+  groupAffiliates = false,
+): CountryFocus | null {
+  const cc = filters?.country;
+  if (!cc) return null;
+  const { country: _country, maxAuthors, ...others } = filters;
+  const whole = restrictDataset(source ?? dataset, { filters: others });
+  return aggregateCountryFocus(whole, range, cc, { maxAuthors, groupAffiliates });
+}
+
+/** `country` key-figure set of the reports (KPI_SETS). */
+export function countryKpiSetItems(dataset: DashboardDataset, range: YearRange, ctx: PartnerKpiContext): KpiItem[] {
+  const f = countryFocusOfScope(dataset, range, ctx.filters, ctx.source);
+  return f ? countryKpiItems(f) : [];
+}
+
+/** `country-impact` key-figure set of the reports (KPI_SETS). */
+export function countryImpactSetItems(dataset: DashboardDataset, range: YearRange, ctx: PartnerKpiContext): KpiItem[] {
+  const f = countryFocusOfScope(dataset, range, ctx.filters, ctx.source);
+  return f ? countryImpactItems(f) : [];
+}

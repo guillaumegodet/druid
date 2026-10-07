@@ -1,5 +1,5 @@
 // Report templates (docs/plan-mes-rapports.md § 5): a template turns a few parameters (structure,
-// period, scope, sometimes a country) into a full report definition — « two clicks » from the
+// period, scope, sometimes a country or partners) into a full report definition — « two clicks » from the
 // creation dialog. The result is an ordinary report: every block stays editable. The template
 // id and parameters are kept in the definition (information only, no live link).
 
@@ -7,6 +7,8 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { datasetFeatures, missingFeatures, scopeFeatures, trivialFiltersOf } from '../chartMeta';
 import { buildPartnerCatalog } from '../collabAggregates';
+import { foreignCountriesOf } from '../countryAggregates';
+import { countryLabel } from '../labels';
 import { LARGE_COLLAB_AUTHORS } from '../partnerKpis';
 import type { PubFilters } from '../publicationFilters';
 import { visibleTabKeys } from '../tabAvailability';
@@ -22,7 +24,7 @@ export interface TemplateInput {
   slug: string;
   period: ReportPeriod;
   perimetre: 'affiliation' | 'effectifs';
-  /** ISO-2 partner country (international collaborations), empty = all countries. */
+  /** ISO-2 partner country (« Collaboration with a country » template). */
   country?: string;
   /** Partner institutions (catalog keys: ROR, else `<scope>:<name>`) — collaboration template. */
   partners?: string[];
@@ -120,20 +122,18 @@ const structureReport: ReportTemplate = {
 
 /**
  * « Collaborations internationales »: weight and evolution of international co-publications,
- * partner countries and institutions, themes and impact of those co-publications — optionally
- * restricted to one partner country.
+ * partner countries and institutions, themes and impact of those co-publications. One country is
+ * the « Collaboration with a country » template (its charts are about that country only).
  */
 const internationalReport: ReportTemplate = {
   id: 'international',
   label: msg`International collaborations`,
-  description: msg`Share and evolution of international co-publications, partner countries and institutions, themes and impact — optionally for one country.`,
-  params: ['structure', 'period', 'perimetre', 'country'],
+  description: msg`Share and evolution of international co-publications, partner countries and institutions, themes and impact.`,
+  params: ['structure', 'period', 'perimetre'],
   needsDataset: true,
   build(input, env) {
-    const country = input.country?.trim().toUpperCase() || undefined;
-    // Report filters: the partner country if any. The themes and impact sections are further
-    // restricted to international co-publications (block filters added to the report ones).
-    const filters: PubFilters = country ? { country } : {};
+    // Themes and impact sections are restricted to international co-publications (block filters).
+    const filters: PubFilters = {};
     const intlOnly = { filters: { international: true } };
     const pick = (ids: string[]) => usable(ids, env, filters).map(chart);
     const intlBlock = (b: ReportBlock): ReportBlock =>
@@ -151,9 +151,73 @@ const internationalReport: ReportTemplate = {
       intlBlock(kpis('impact')),
       ...pick(['distribution-fwci', 'top-par-annee', 'quartiles-scimago', 'acces-ouvert']).map(intlBlock),
     ];
-    // Drop the sections left empty by the filters or the structure.
-    const kept = blocks.filter((b, i) => b.kind !== 'section' || (blocks[i + 1] && blocks[i + 1].kind !== 'section'));
-    return base(internationalReport, input, filters, kept, country ? { country } : {});
+    return base(internationalReport, input, filters, withoutEmptySections(blocks));
+  },
+};
+
+/**
+ * « Collaboration avec un pays » (docs/plan-collaboration-pays.md § 3): the report scope is the
+ * co-publications with one partner country (country filter) and its charts are about that country
+ * only — its institutions, the internal labs and researchers involved, themes, impact, funders. Large
+ * collaborations count in the volumes but are left out of the impact blocks; no figure is written
+ * in the texts (they are recomputed with the data).
+ */
+const countryReport: ReportTemplate = {
+  id: 'country',
+  label: msg`Collaboration with a country`,
+  description: msg`Co-publications with one partner country: key figures and rank, institutions and map, labs and researchers involved, who works with whom, themes and specialization, impact, funders, list of publications.`,
+  params: ['structure', 'period', 'perimetre', 'country'],
+  needsDataset: true,
+  build(input, env) {
+    const cc = input.country?.trim().toUpperCase() || '';
+    const filters: PubFilters = cc ? { country: cc } : {};
+    const countryName = env.dataset ? countryLabel(cc, env.dataset.countryNames) : cc;
+    const lab = env.dataset?.lab ?? input.slug;
+    // Impact blocks and AI texts: large collaborations left out (their filter adds to the country one).
+    const noLarge = (b: ReportBlock): ReportBlock =>
+      b.kind === 'chart' || b.kind === 'kpis' || b.kind === 'ai'
+        ? { ...b, override: { filters: { maxAuthors: LARGE_COLLAB_AUTHORS } } }
+        : b;
+    const ai = (task: 'executive' | 'domains'): ReportBlock => noLarge({ id: newBlockId(), kind: 'ai', task });
+    const pick = (ids: string[]) => usable(ids, env, filters).map(chart);
+    const blocks: ReportBlock[] = [
+      text([
+        i18n._(msg`Co-publications of ${lab} with ${countryName}.`),
+        '',
+        `- ${i18n._(msg`A publication is a co-publication with ${countryName} when one of its authors is affiliated with an institution of that country.`)}`,
+        `- ${i18n._(msg`Publications with more than ${LARGE_COLLAB_AUTHORS} authors (large consortia) are counted in the volumes but left out of the impact indicators and charts.`)}`,
+        `- ${i18n._(msg`The impact reference is the other international co-publications of ${lab} in the same subfields, weighted like the co-publications with ${countryName}.`)}`,
+        `- ${i18n._(msg`Funders are those the publications acknowledge: they say neither who paid the research nor who holds the grant.`)}`,
+      ].join('\n')),
+      section(msg`Summary`),
+      ai('executive'),
+      section(msg`Key figures`),
+      kpis('country'),
+      kpis('country-impact'),
+      section(msg`Dynamics and rank`),
+      ...pick(['pays-evolution', 'pays-rang']),
+      section(msg`Partner institutions`),
+      ...pick(['pays-carte', 'pays-etablissements']),
+      section(msg`People and labs involved`),
+      ...pick(['pays-labos', 'pays-chercheurs', 'pays-matrice']),
+      section(msg`Themes`),
+      ...pick(['pays-domaines', 'pays-sous-disciplines', 'pays-specialisation']),
+      section(msg`Analysis by major theme`),
+      ai('domains'),
+      section(msg`Impact`),
+      ...pick(['distribution-fwci', 'quartiles-scimago']).map(noLarge),
+      section(msg`Funding`),
+      ...pick(['pays-financeurs']),
+      section(msg`Other countries and languages`),
+      ...pick(['pays-bilateral', 'pays-pays-tiers', 'pays-langues']),
+      section(msg`Annex`),
+      { id: newBlockId(), kind: 'table', tableId: 'publications' },
+    ];
+    return {
+      ...base(countryReport, input, filters, withoutEmptySections(blocks), cc ? { country: cc } : {}),
+      description: i18n._(msg`Co-publications of ${lab} with ${countryName}.`),
+      footerNote: i18n._(msg`Internal working document`),
+    };
   },
 };
 
@@ -309,7 +373,7 @@ const journalsReport: ReportTemplate = {
 };
 
 export const REPORT_TEMPLATES: ReportTemplate[] = [
-  partnerReport, structureReport, internationalReport, fundingReport, journalsReport, blank,
+  partnerReport, countryReport, structureReport, internationalReport, fundingReport, journalsReport, blank,
 ];
 
 /** Publishers of a dataset, most frequent first (publisher parameter). */
@@ -322,11 +386,11 @@ export function datasetPublishers(dataset: DashboardDataset | null, limit = 60):
 
 export const templateById = (id: string): ReportTemplate | undefined => REPORT_TEMPLATES.find((t) => t.id === id);
 
-/** Partner countries of a dataset, most frequent first (country parameter). */
+/** Foreign partner countries of a dataset, most frequent first (country parameter). */
 export function partnerCountries(dataset: DashboardDataset | null): string[] {
   if (!dataset) return [];
   const counts = new Map<string, number>();
-  for (const p of dataset.publications) for (const cc of new Set(p.countries)) counts.set(cc, (counts.get(cc) ?? 0) + 1);
+  for (const p of dataset.publications) for (const cc of foreignCountriesOf(p)) counts.set(cc, (counts.get(cc) ?? 0) + 1);
   return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([cc]) => cc);
 }
 

@@ -149,7 +149,7 @@ const BlockBody: React.FC<{ rb: ResolvedBlock }> = ({ rb }) => {
           <AlertTriangle className="w-3.5 h-3.5" /> <Trans>This chart says little under the current filters.</Trans>
         </p>
       )}
-      <entry.Chart dataset={rb.dataset} range={rb.scope.range} params={rb.params} filters={rb.scope.filters} />
+      <entry.Chart dataset={rb.dataset} range={rb.scope.range} params={rb.params} filters={rb.scope.filters} source={rb.source} />
       {b.note?.trim() && <p className="text-sm text-ink dark:text-[#e8e4d8] px-1 whitespace-pre-line">{b.note}</p>}
     </div>
   );
