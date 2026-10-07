@@ -12,6 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.7.1] — 2026-10-07
+
+### Modifié
+- Rapports : la note méthodologique décrit les sources réellement fusionnées par druid-biblio (graphe CRISalid,
+  BSO, OpenAlex, HAL), le dédoublonnage, la portée du périmètre « Affiliation » (les publications remontées par
+  CRISalid peuvent précéder l'arrivée du chercheur), les indicateurs qui n'existent que pour les notices connues
+  d'OpenAlex et l'origine du statut d'accès ouvert ; les lignes « Source » des rapports et des graphiques intégrés
+  citent les quatre sources.
+- Dépendances : `fast-xml-parser` 5 (synchronisation IdRef, analyse des notices inchangée), `http-proxy-middleware`
+  4, `lucide-react` ; centre d'aide : `@astrojs/starlight`.
+
 ## [1.7.0] — 2026-10-07
 
 ### Ajouté
