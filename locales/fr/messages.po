@@ -191,12 +191,12 @@ msgstr "Erreur de requalification"
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Ligne Grist {gristRowId} introuvable dans le périmètre chargé"
 
-#: App.tsx:948
+#: App.tsx:949
 msgid "Loading dashboard…"
 msgstr "Chargement du tableau de bord…"
 
-#: App.tsx:966
-#: App.tsx:978
+#: App.tsx:967
+#: App.tsx:979
 #: components/dashboard/EmbedPage.tsx:88
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:326
@@ -206,24 +206,24 @@ msgstr "Chargement du tableau de bord…"
 #: components/reports/ReportsPage.tsx:134
 #: components/researchers/AffiliationHistorySection.tsx:211
 #: components/researchers/MergeLogPanel.tsx:64
-#: components/researchers/TasksPage.tsx:343
+#: components/researchers/TasksPage.tsx:388
 msgid "Loading…"
 msgstr "Chargement…"
 
-#: App.tsx:987
+#: App.tsx:988
 msgid "View not found"
 msgstr "Vue introuvable"
 
-#: App.tsx:1011
+#: App.tsx:1012
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Votre compte a un droit « labo », mais aucune fiche de l'Annuaire ne porte votre identifiant avec un laboratoire en cours — contactez un administrateur pour faire mettre à jour votre fiche."
 
-#: App.tsx:1015
+#: App.tsx:1016
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "Aucun périmètre ne vous a été attribué dans Druid pour l'instant — contactez un administrateur pour qu'il vous rattache à une structure (groupe Keycloak <0>labo_viewer</0> ou <1>dashboard_viewer</1> sous votre labo)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1056
+#: App.tsx:1057
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Alignement unifié : {0} référentiel(s) en cours"
 
@@ -406,7 +406,7 @@ msgid "Stop the answer"
 msgstr "Interrompre la réponse"
 
 #: components/ChatWidget.tsx:497
-#: components/researchers/TasksPage.tsx:357
+#: components/researchers/TasksPage.tsx:402
 msgid "Send"
 msgstr "Envoyer"
 
@@ -633,9 +633,9 @@ msgid "The group will be kept as soon as it has at least one member."
 msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 
 #: components/GroupList.tsx:168
-#: components/ResearcherDetail.tsx:300
-#: components/ResearcherDetail.tsx:466
-#: components/ResearcherDetail.tsx:569
+#: components/ResearcherDetail.tsx:308
+#: components/ResearcherDetail.tsx:474
+#: components/ResearcherDetail.tsx:577
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
 #: components/reports/NewReportDialog.tsx:311
@@ -648,7 +648,8 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/researchers/MergeResearchersModal.tsx:291
 #: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
-#: components/researchers/TasksPage.tsx:318
+#: components/researchers/TasksPage.tsx:342
+#: components/researchers/TasksPage.tsx:363
 #: components/structures/StructuresLdapReview.tsx:131
 msgid "Cancel"
 msgstr "Annuler"
@@ -820,184 +821,188 @@ msgid "Manual validation (Druid)"
 msgstr "Validation manuelle (Druid)"
 
 #. placeholder {0}: next.displayName
-#: components/ResearcherDetail.tsx:196
+#: components/ResearcherDetail.tsx:200
 msgid "Filled from LDAP: {0}."
 msgstr "Rempli depuis le LDAP : {0}."
 
-#: components/ResearcherDetail.tsx:204
+#: components/ResearcherDetail.tsx:203
+msgid "Employer not deducible from LDAP (hosted account, ambiguous corps): choose it under Employment & contract."
+msgstr "Employeur non déductible du LDAP (compte hébergé, corps ambigu) : choisissez-le dans « Emploi & contrat »."
+
+#: components/ResearcherDetail.tsx:212
 msgid "Lab: {lab}."
 msgstr "Labo : {lab}."
 
 #. placeholder {0}: otherLabs.join(', ')
-#: components/ResearcherDetail.tsx:206
+#: components/ResearcherDetail.tsx:214
 msgid "Other labs in LDAP: {0} — add them as memberships if relevant."
 msgstr "Autres labos dans le LDAP : {0} — à ajouter en appartenances si pertinent."
 
-#: components/ResearcherDetail.tsx:208
+#: components/ResearcherDetail.tsx:216
 #: components/researchers/AlignLaunchModal.tsx:153
 msgid "none"
 msgstr "aucune"
 
-#: components/ResearcherDetail.tsx:209
+#: components/ResearcherDetail.tsx:217
 msgid "No known lab among the LDAP affectations (principal: {affectation}): choose it in Memberships."
 msgstr "Aucun labo connu parmi les affectations LDAP (principale : {affectation}) : choisissez-le dans Appartenances."
 
-#: components/ResearcherDetail.tsx:215
+#: components/ResearcherDetail.tsx:223
 msgid "This uid already has a directory record ({labs}): check it before creating a duplicate."
 msgstr "Cet uid a déjà une fiche dans l'annuaire ({labs}) : vérifiez-la avant de créer un doublon."
 
-#: components/ResearcherDetail.tsx:240
+#: components/ResearcherDetail.tsx:248
 msgid "Back to the list"
 msgstr "Retour à la liste"
 
-#: components/ResearcherDetail.tsx:246
+#: components/ResearcherDetail.tsx:254
 #: components/Sidebar.tsx:158
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "Personnel"
 
-#: components/ResearcherDetail.tsx:258
+#: components/ResearcherDetail.tsx:266
 #: components/researchers/DuplicatesPage.tsx:142
 msgid "Directory"
 msgstr "Annuaire"
 
-#: components/ResearcherDetail.tsx:268
+#: components/ResearcherDetail.tsx:276
 msgid "Open the Grist document (Annuaire table)"
 msgstr "Ouvrir le document Grist (table Annuaire)"
 
-#: components/ResearcherDetail.tsx:277
+#: components/ResearcherDetail.tsx:285
 msgid "Validated record — click to review / unvalidate"
 msgstr "Fiche fiabilisée — cliquer pour revoir / dévalider"
 
-#: components/ResearcherDetail.tsx:277
+#: components/ResearcherDetail.tsx:285
 msgid "Validate this record"
 msgstr "Fiabiliser cette fiche"
 
-#: components/ResearcherDetail.tsx:280
+#: components/ResearcherDetail.tsx:288
 msgid "Validated record"
 msgstr "Fiche validée"
 
-#: components/ResearcherDetail.tsx:280
-#: components/ResearcherDetail.tsx:485
+#: components/ResearcherDetail.tsx:288
+#: components/ResearcherDetail.tsx:493
 msgid "Validate the record"
 msgstr "Valider la fiche"
 
-#: components/ResearcherDetail.tsx:286
+#: components/ResearcherDetail.tsx:294
 msgid "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 msgstr "Créer une tâche à réaliser hors Druid pour ce chercheur (IdRef, ORCID, HAL…)"
 
-#: components/ResearcherDetail.tsx:289
+#: components/ResearcherDetail.tsx:297
 msgid "Report a correction"
 msgstr "Signaler une correction"
 
-#: components/ResearcherDetail.tsx:297
+#: components/ResearcherDetail.tsx:305
 msgid "Export PDF"
 msgstr "Export PDF"
 
-#: components/ResearcherDetail.tsx:305
+#: components/ResearcherDetail.tsx:313
 #: components/StructureDetail.tsx:139
 #: components/dashboard/NewsletterPanel.tsx:400
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
 
-#: components/ResearcherDetail.tsx:305
+#: components/ResearcherDetail.tsx:313
 msgid "Create the record"
 msgstr "Créer la fiche"
 
-#: components/ResearcherDetail.tsx:337
-#: components/ResearcherDetail.tsx:338
+#: components/ResearcherDetail.tsx:345
+#: components/ResearcherDetail.tsx:346
 msgid "Edit photo (URL)"
 msgstr "Modifier la photo (URL)"
 
-#: components/ResearcherDetail.tsx:345
+#: components/ResearcherDetail.tsx:353
 msgid "Photo unavailable"
 msgstr "Photo inaccessible"
 
 #. placeholder {0}: researcher.uid || t`not provided`
 #. placeholder {1}: researcher.lastSync
-#: components/ResearcherDetail.tsx:363
+#: components/ResearcherDetail.tsx:371
 msgid "UID: {0} · Last sync: {1}"
 msgstr "UID : {0} · Dernière synchro : {1}"
 
-#: components/ResearcherDetail.tsx:363
+#: components/ResearcherDetail.tsx:371
 msgid "not provided"
 msgstr "non renseigné"
 
-#: components/ResearcherDetail.tsx:417
+#: components/ResearcherDetail.tsx:425
 msgid "Profile photo"
 msgstr "Photo de profil"
 
-#: components/ResearcherDetail.tsx:432
+#: components/ResearcherDetail.tsx:440
 msgid "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 msgstr "Indiquez l'adresse (http/https) d'une image publique : page du labo, annuaire, HAL… Laissez vide pour revenir aux initiales."
 
-#: components/ResearcherDetail.tsx:437
+#: components/ResearcherDetail.tsx:445
 msgid "Photo URL"
 msgstr "URL de la photo"
 
-#: components/ResearcherDetail.tsx:448
+#: components/ResearcherDetail.tsx:456
 msgid "The URL must start with http:// or https://."
 msgstr "L'URL doit commencer par http:// ou https://."
 
-#: components/ResearcherDetail.tsx:452
+#: components/ResearcherDetail.tsx:460
 msgid "The change will be written to Grist (photo_url column) when you click “Save”."
 msgstr "La modification sera écrite dans Grist (colonne photo_url) au clic sur « Enregistrer »."
 
-#: components/ResearcherDetail.tsx:462
+#: components/ResearcherDetail.tsx:470
 msgid "Remove photo"
 msgstr "Retirer la photo"
 
-#: components/ResearcherDetail.tsx:468
+#: components/ResearcherDetail.tsx:476
 msgid "Apply"
 msgstr "Appliquer"
 
-#: components/ResearcherDetail.tsx:497
+#: components/ResearcherDetail.tsx:505
 msgid "Validated status"
 msgstr "Statut validé"
 
-#: components/ResearcherDetail.tsx:511
+#: components/ResearcherDetail.tsx:519
 #: components/dashboard/MediaSourcesAdmin.tsx:217
 msgid "Scope"
 msgstr "Portée"
 
-#: components/ResearcherDetail.tsx:524
+#: components/ResearcherDetail.tsx:532
 #: components/researchers/AlignLaunchModal.tsx:128
 msgid "Source"
 msgstr "Source"
 
-#: components/ResearcherDetail.tsx:529
+#: components/ResearcherDetail.tsx:537
 msgid "E.g. 2026 lab survey, HR list…"
 msgstr "Ex. Enquête labo 2026, liste RH…"
 
-#: components/ResearcherDetail.tsx:537
+#: components/ResearcherDetail.tsx:545
 msgid "Date (auto)"
 msgstr "Date (auto)"
 
-#: components/ResearcherDetail.tsx:541
+#: components/ResearcherDetail.tsx:549
 msgid "Validated by (auto)"
 msgstr "Validé par (auto)"
 
 #. placeholder {0}: existingValidation.validationDate
 #. placeholder {1}: existingValidation.validatedBy
-#: components/ResearcherDetail.tsx:549
+#: components/ResearcherDetail.tsx:557
 msgid "Already validated on {0} by {1}."
 msgstr "Déjà validée le {0} par {1}."
 
 #. placeholder {0}: existingValidation.validationDate
-#: components/ResearcherDetail.tsx:550
+#: components/ResearcherDetail.tsx:558
 msgid "Already validated on {0}."
 msgstr "Déjà validée le {0}."
 
-#: components/ResearcherDetail.tsx:561
+#: components/ResearcherDetail.tsx:569
 msgid "Unvalidate"
 msgstr "Dévalider"
 
-#: components/ResearcherDetail.tsx:577
+#: components/ResearcherDetail.tsx:585
 msgid "Revalidate"
 msgstr "Revalider"
 
-#: components/ResearcherDetail.tsx:577
+#: components/ResearcherDetail.tsx:585
 #: components/dashboard/MediaMentionsPanel.tsx:317
 #: components/dashboard/NewsletterPanel.tsx:437
 #: components/researchers/GroupModal.tsx:65
@@ -1130,7 +1135,7 @@ msgstr "Tutelles"
 #: components/researchers/ListHeader.tsx:48
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
 #: components/researchers/ResearcherTable.tsx:92
-#: components/researchers/TasksPage.tsx:173
+#: components/researchers/TasksPage.tsx:176
 msgid "Status"
 msgstr "Statut"
 
@@ -1195,7 +1200,7 @@ msgid "All levels"
 msgstr "Tous niveaux"
 
 #: components/StructureList.tsx:377
-#: components/researchers/TasksPage.tsx:112
+#: components/researchers/TasksPage.tsx:115
 msgid "All statuses"
 msgstr "Tous statuts"
 
@@ -3301,7 +3306,7 @@ msgstr "Audition"
 #: components/dashboard/NewsTab.tsx:116
 #: components/dashboard/NewsTab.tsx:126
 #: components/dashboard/fundersAggregates.ts:42
-#: lib/tasks.ts:66
+#: lib/tasks.ts:68
 msgid "Other"
 msgstr "Autre"
 
@@ -3345,7 +3350,7 @@ msgstr "rejeter."
 #: components/dashboard/MediaMentionsPanel.tsx:258
 #: components/dashboard/MediaMentionsPanel.tsx:555
 #: components/reports/ReportEditor.tsx:713
-#: components/researchers/TasksPage.tsx:188
+#: components/researchers/TasksPage.tsx:191
 msgid "auto"
 msgstr "auto"
 
@@ -3521,7 +3526,7 @@ msgstr "Sources moissonnées ({0})"
 #: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/LdapMovesPanel.tsx:124
 #: components/researchers/OpenAlexAffiliationsPage.tsx:80
-#: components/researchers/TasksPage.tsx:129
+#: components/researchers/TasksPage.tsx:132
 msgid "Refresh"
 msgstr "Actualiser"
 
@@ -3956,12 +3961,12 @@ msgid "Link"
 msgstr "Lien"
 
 #: components/dashboard/NewsTab.tsx:735
-#: components/researchers/TasksPage.tsx:111
+#: components/researchers/TasksPage.tsx:114
 msgid "Open"
 msgstr "Ouvert"
 
 #: components/dashboard/NewsTab.tsx:735
-#: components/researchers/TasksPage.tsx:158
+#: components/researchers/TasksPage.tsx:161
 msgid "Closed"
 msgstr "Fermé"
 
@@ -4146,7 +4151,7 @@ msgid "Discard"
 msgstr "Écarter"
 
 #: components/dashboard/NewsletterPanel.tsx:454
-#: components/researchers/TasksPage.tsx:268
+#: components/researchers/TasksPage.tsx:274
 msgid "Reopen"
 msgstr "Rouvrir"
 
@@ -7639,13 +7644,13 @@ msgid "Suspicious"
 msgstr "Suspectes"
 
 #: components/etl/EtlMaintenancePanels.tsx:152
-#: lib/tasks.ts:85
+#: lib/tasks.ts:87
 msgid "In progress"
 msgstr "En cours"
 
 #: components/etl/EtlMaintenancePanels.tsx:153
 #: components/reports/ReportEditor.tsx:322
-#: components/researchers/TasksPage.tsx:341
+#: components/researchers/TasksPage.tsx:386
 msgid "History"
 msgstr "Historique"
 
@@ -7728,8 +7733,8 @@ msgid "Save to Grist"
 msgstr "Enregistrer dans Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:3483
-#: lib/gristService.ts:3592
+#: lib/gristService.ts:3510
+#: lib/gristService.ts:3619
 msgid "Search error"
 msgstr "Erreur de recherche"
 
@@ -8517,7 +8522,7 @@ msgid "Person"
 msgstr "Personne"
 
 #: components/researchers/AbesExportModal.tsx:231
-#: lib/tasks.ts:108
+#: lib/tasks.ts:110
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -9093,7 +9098,7 @@ msgid "Qualify"
 msgstr "Qualifier"
 
 #: components/researchers/DuplicatesPage.tsx:209
-#: components/researchers/TasksPage.tsx:298
+#: components/researchers/TasksPage.tsx:330
 msgid "Open the merge assistant"
 msgstr "Ouvrir l'assistant de fusion"
 
@@ -10290,7 +10295,7 @@ msgid "Process in the ETL console"
 msgstr "Traiter dans la console ETL"
 
 #: components/researchers/OpenAlexAffiliationsPage.tsx:79
-#: components/researchers/TasksPage.tsx:128
+#: components/researchers/TasksPage.tsx:131
 msgid "Re-reads the Grist table"
 msgstr "Relit la table Grist"
 
@@ -10615,27 +10620,27 @@ msgid "{hidden} more suggestions will show once these are done."
 msgstr "{hidden} autres suggestions apparaîtront une fois celles-ci traitées."
 
 #: components/researchers/SuggestionsSection.tsx:211
-#: components/researchers/TasksPage.tsx:403
+#: components/researchers/TasksPage.tsx:448
 msgid "Subject"
 msgstr "Objet"
 
 #: components/researchers/SuggestionsSection.tsx:214
-#: components/researchers/TasksPage.tsx:390
+#: components/researchers/TasksPage.tsx:435
 msgid "Subject:"
 msgstr "Objet :"
 
 #: components/researchers/SuggestionsSection.tsx:215
-#: components/researchers/TasksPage.tsx:407
+#: components/researchers/TasksPage.tsx:452
 msgid "Copy the email"
 msgstr "Copier l’email"
 
 #: components/researchers/SuggestionsSection.tsx:218
-#: components/researchers/TasksPage.tsx:411
+#: components/researchers/TasksPage.tsx:456
 msgid "Open in the mail client"
 msgstr "Ouvrir dans la messagerie"
 
 #: components/researchers/SuggestionsSection.tsx:219
-#: components/researchers/TasksPage.tsx:397
+#: components/researchers/TasksPage.tsx:442
 msgid "no email in the Directory"
 msgstr "pas d’email dans l’Annuaire"
 
@@ -10644,7 +10649,7 @@ msgid "Error creating the task"
 msgstr "Erreur lors de la création de la tâche"
 
 #: components/researchers/TaskForm.tsx:85
-#: components/researchers/TasksPage.tsx:136
+#: components/researchers/TasksPage.tsx:139
 msgid "New task"
 msgstr "Nouvelle tâche"
 
@@ -10653,7 +10658,7 @@ msgid "Something to do outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR)"
 msgstr "Quelque chose à faire hors Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, RH)"
 
 #: components/researchers/TaskForm.tsx:101
-#: components/researchers/TasksPage.tsx:170
+#: components/researchers/TasksPage.tsx:173
 msgid "Researcher"
 msgstr "Chercheur"
 
@@ -10666,7 +10671,7 @@ msgid "No record selected — the task will be created without a researcher link
 msgstr "Aucune fiche sélectionnée — la tâche sera créée sans lien avec un chercheur (badge « à compléter »)."
 
 #: components/researchers/TaskForm.tsx:131
-#: components/researchers/TasksPage.tsx:172
+#: components/researchers/TasksPage.tsx:175
 msgid "Channel"
 msgstr "Canal"
 
@@ -10695,39 +10700,39 @@ msgid "Create the task"
 msgstr "Créer la tâche"
 
 #. placeholder {0}: trig.status
-#: components/researchers/TasksPage.tsx:66
+#: components/researchers/TasksPage.tsx:69
 msgid "Detection trigger failed: {0}"
 msgstr "Échec du lancement de la détection : {0}"
 
-#: components/researchers/TasksPage.tsx:79
+#: components/researchers/TasksPage.tsx:82
 msgid "Error during the detection"
 msgstr "Erreur pendant la détection"
 
-#: components/researchers/TasksPage.tsx:116
+#: components/researchers/TasksPage.tsx:119
 msgid "All bases"
 msgstr "Toutes les bases"
 
-#: components/researchers/TasksPage.tsx:120
+#: components/researchers/TasksPage.tsx:123
 msgid "All channels"
 msgstr "Tous les canaux"
 
-#: components/researchers/TasksPage.tsx:124
+#: components/researchers/TasksPage.tsx:127
 msgid "Mine"
 msgstr "Les miennes"
 
-#: components/researchers/TasksPage.tsx:126
+#: components/researchers/TasksPage.tsx:129
 msgid "Search (title, name, lab…)"
 msgstr "Rechercher (titre, nom, labo…)"
 
-#: components/researchers/TasksPage.tsx:131
+#: components/researchers/TasksPage.tsx:134
 msgid "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
 msgstr "Exécute les règles de détection (deux profils ORCID / IdHAL / Scopus, départs LDAP avec affiliation IdRef ouverte) à partir des caches d’alignement ; les situations disparues depuis le dernier passage sont clôturées automatiquement"
 
-#: components/researchers/TasksPage.tsx:133
+#: components/researchers/TasksPage.tsx:136
 msgid "Detecting…"
 msgstr "Détection…"
 
-#: components/researchers/TasksPage.tsx:133
+#: components/researchers/TasksPage.tsx:136
 msgid "Run detection"
 msgstr "Lancer la détection"
 
@@ -10735,152 +10740,168 @@ msgstr "Lancer la détection"
 #. placeholder {1}: detect?.verified ?? 0
 #. placeholder {2}: detect?.resolved ?? 0
 #. placeholder {3}: detect?.reopened ?? 0
-#: components/researchers/TasksPage.tsx:141
+#: components/researchers/TasksPage.tsx:144
 msgid "Detection done: {0} created, {1} verified, {2} resolved automatically, {3} reopened"
 msgstr "Détection terminée : {0} créée(s), {1} vérifiée(s), {2} résolue(s) automatiquement, {3} réouverte(s)"
 
-#: components/researchers/TasksPage.tsx:150
+#: components/researchers/TasksPage.tsx:153
 msgid "Loading the tasks…"
 msgstr "Chargement des tâches…"
 
-#: components/researchers/TasksPage.tsx:162
+#: components/researchers/TasksPage.tsx:165
 msgid "No task matches these filters."
 msgstr "Aucune tâche ne correspond à ces filtres."
 
-#: components/researchers/TasksPage.tsx:169
+#: components/researchers/TasksPage.tsx:172
 msgid "Task"
 msgstr "Tâche"
 
-#: components/researchers/TasksPage.tsx:171
+#: components/researchers/TasksPage.tsx:174
 msgid "Base"
 msgstr "Base"
 
-#: components/researchers/TasksPage.tsx:174
+#: components/researchers/TasksPage.tsx:177
 msgid "Assigned"
 msgstr "Assigné"
 
-#: components/researchers/TasksPage.tsx:175
-#: lib/tasks.ts:99
+#: components/researchers/TasksPage.tsx:178
+#: lib/tasks.ts:101
 msgid "Created"
 msgstr "Créée"
 
-#: components/researchers/TasksPage.tsx:188
+#: components/researchers/TasksPage.tsx:191
 msgid "Generated by a detection rule — closed automatically when the situation disappears"
 msgstr "Générée par une règle de détection — clôturée automatiquement quand la situation disparaît"
 
-#: components/researchers/TasksPage.tsx:197
+#: components/researchers/TasksPage.tsx:200
 msgid "No Directory record linked: link it from the Grist table"
 msgstr "Aucune fiche de l’Annuaire rattachée : à rattacher depuis la table Grist"
 
-#: components/researchers/TasksPage.tsx:198
+#: components/researchers/TasksPage.tsx:201
 msgid "To complete"
 msgstr "À compléter"
 
-#: components/researchers/TasksPage.tsx:223
+#: components/researchers/TasksPage.tsx:227
 msgid "Directory not loaded yet: researcher links open once the list is available."
 msgstr "Annuaire pas encore chargé : les liens vers les fiches s’ouvriront quand la liste sera disponible."
 
-#: components/researchers/TasksPage.tsx:260
+#: components/researchers/TasksPage.tsx:266
 msgid "Action failed"
 msgstr "Action impossible"
 
-#: components/researchers/TasksPage.tsx:264
+#: components/researchers/TasksPage.tsx:270
 msgid "Take over"
 msgstr "Prendre en charge"
 
-#: components/researchers/TasksPage.tsx:264
+#: components/researchers/TasksPage.tsx:270
 msgid "Resume"
 msgstr "Reprendre"
 
-#: components/researchers/TasksPage.tsx:265
-#: lib/tasks.ts:102
+#: components/researchers/TasksPage.tsx:271
+#: lib/tasks.ts:104
 msgid "Put on hold"
 msgstr "Mettre en attente"
 
-#: components/researchers/TasksPage.tsx:266
+#: components/researchers/TasksPage.tsx:272
 msgid "Mark as done"
 msgstr "Marquer fait"
 
-#: components/researchers/TasksPage.tsx:267
+#: components/researchers/TasksPage.tsx:273
 msgid "Drop"
 msgstr "Abandonner"
 
-#: components/researchers/TasksPage.tsx:268
+#: components/researchers/TasksPage.tsx:274
 msgid "Back to “to do”"
 msgstr "Remettre « à faire »"
 
-#: components/researchers/TasksPage.tsx:282
+#: components/researchers/TasksPage.tsx:309
 msgid "Created by"
 msgstr "Créée par"
 
-#: components/researchers/TasksPage.tsx:283
+#: components/researchers/TasksPage.tsx:310
 msgid "Taken over by"
 msgstr "Prise en charge par"
 
-#: components/researchers/TasksPage.tsx:284
+#: components/researchers/TasksPage.tsx:311
 msgid "Closed by"
 msgstr "Clôturée par"
 
-#: components/researchers/TasksPage.tsx:286
+#: components/researchers/TasksPage.tsx:313
 msgid "Verified"
 msgstr "Vérifiée"
 
-#: components/researchers/TasksPage.tsx:289
+#: components/researchers/TasksPage.tsx:316
 msgid "Waiting for:"
 msgstr "En attente de :"
 
-#: components/researchers/TasksPage.tsx:290
+#: components/researchers/TasksPage.tsx:317
 msgid "Resolution:"
 msgstr "Résolution :"
 
-#: components/researchers/TasksPage.tsx:293
+#: components/researchers/TasksPage.tsx:320
 msgid "Open the link"
 msgstr "Ouvrir le lien"
 
-#: components/researchers/TasksPage.tsx:297
+#: components/researchers/TasksPage.tsx:324
+msgid "Switch to the LDAP uid"
+msgstr "Passer à l’uid LDAP"
+
+#: components/researchers/TasksPage.tsx:329
 msgid "The task closes itself at the next detection, once the records are merged"
 msgstr "La tâche se ferme d’elle-même à la prochaine détection, une fois les fiches fusionnées"
 
 #. placeholder {0}: p.uids[0]
 #. placeholder {1}: p.uids[1]
-#: components/researchers/TasksPage.tsx:298
+#: components/researchers/TasksPage.tsx:330
 msgid "Merge {0} + {1}"
 msgstr "Fusionner {0} + {1}"
 
-#: components/researchers/TasksPage.tsx:314
+#: components/researchers/TasksPage.tsx:338
+msgid "Every row of the record moves from <0>{switchFrom}</0> to <1>{switchTo}</1>. Check the warnings above first."
+msgstr "Toutes les lignes de la fiche passent de <0>{switchFrom}</0> à <1>{switchTo}</1>. Vérifiez d’abord les avertissements ci-dessus."
+
+#: components/researchers/TasksPage.tsx:339
+msgid "A follow-up task is created to remove the identifiers of the former person in SoVisu+."
+msgstr "Une tâche de suivi est créée pour retirer les identifiants de l’ancienne personne dans SoVisu+."
+
+#: components/researchers/TasksPage.tsx:343
+msgid "Switch to {switchTo}"
+msgstr "Passer à {switchTo}"
+
+#: components/researchers/TasksPage.tsx:359
 msgid "Waiting for what? (researcher's answer, ABES batch, external support…)"
 msgstr "En attente de quoi ? (réponse du chercheur, lot ABES, support externe…)"
 
-#: components/researchers/TasksPage.tsx:314
+#: components/researchers/TasksPage.tsx:359
 msgid "Resolution (optional)"
 msgstr "Résolution (facultatif)"
 
-#: components/researchers/TasksPage.tsx:324
+#: components/researchers/TasksPage.tsx:369
 msgid "Assign to (username)"
 msgstr "Assigner à (identifiant)"
 
-#: components/researchers/TasksPage.tsx:325
+#: components/researchers/TasksPage.tsx:370
 msgid "Reassign"
 msgstr "Réassigner"
 
-#: components/researchers/TasksPage.tsx:326
+#: components/researchers/TasksPage.tsx:371
 msgid "Assign to me"
 msgstr "Me l’assigner"
 
-#: components/researchers/TasksPage.tsx:333
+#: components/researchers/TasksPage.tsx:378
 msgid "Email sent to the researcher"
 msgstr "Email envoyé au chercheur"
 
-#: components/researchers/TasksPage.tsx:355
+#: components/researchers/TasksPage.tsx:400
 msgid "Add a comment…"
 msgstr "Ajouter un commentaire…"
 
-#: components/researchers/TasksPage.tsx:396
-#: lib/tasks.ts:78
+#: components/researchers/TasksPage.tsx:441
+#: lib/tasks.ts:80
 msgid "Email to the researcher"
 msgstr "Email au chercheur"
 
-#: components/researchers/TasksPage.tsx:416
+#: components/researchers/TasksPage.tsx:461
 msgid "Mark as sent (task on hold)"
 msgstr "Marquer envoyé (tâche en attente)"
 
@@ -11463,8 +11484,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Homonyme sans preuve d'affiliation"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:3494
-#: lib/gristService.ts:3620
+#: lib/gristService.ts:3521
+#: lib/gristService.ts:3647
 msgid "Suspected mixed identity"
 msgstr "Identité mêlée suspectée"
 
@@ -12368,9 +12389,9 @@ msgid "Error creating the affiliation columns: {0}"
 msgstr "Erreur création colonnes de rattachement : {0}"
 
 #: lib/gristService.ts:790
-#: lib/gristService.ts:2587
-#: lib/gristService.ts:3299
-#: lib/gristService.ts:3909
+#: lib/gristService.ts:2614
+#: lib/gristService.ts:3326
+#: lib/gristService.ts:3936
 msgid "Grist error (table list)"
 msgstr "Erreur Grist (liste des tables)"
 
@@ -12408,7 +12429,7 @@ msgstr "Erreur Grist (création des appartenances secondaires) : {0}"
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
 #: lib/gristService.ts:2008
-#: lib/gristService.ts:2568
+#: lib/gristService.ts:2595
 msgid "Grist error (merge log): {0}"
 msgstr "Erreur Grist (journal des fusions) : {0}"
 
@@ -12465,205 +12486,223 @@ msgstr "Qualification : ligne principale requise"
 msgid "Grist error (de-qualification): {0}"
 msgstr "Erreur Grist (dé-qualification) : {0}"
 
-#: lib/gristService.ts:2551
+#: lib/gristService.ts:2542
+msgid "Invalid LDAP uid: {toUid}"
+msgstr "Uid LDAP invalide : {toUid}"
+
+#: lib/gristService.ts:2544
+msgid "The uid {toUid} already has a directory record: merge the two records instead"
+msgstr "L’uid {toUid} a déjà une fiche dans l’annuaire : fusionnez plutôt les deux fiches"
+
+#. placeholder {0}: fromUid || '—'
+#: lib/gristService.ts:2547
+msgid "Record not found in Grist (uid {0})"
+msgstr "Fiche introuvable dans Grist (uid {0})"
+
+#. placeholder {0}: await pr.text()
+#: lib/gristService.ts:2557
+msgid "Grist error (uid change): {0}"
+msgstr "Erreur Grist (changement d’uid) : {0}"
+
+#: lib/gristService.ts:2578
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/gristService.ts:2555
+#: lib/gristService.ts:2582
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2575
+#: lib/gristService.ts:2602
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Erreur Grist (écriture ligne conservée, journal #{logId}) : {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2580
+#: lib/gristService.ts:2607
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Erreur Grist (suppression ligne absorbée, journal #{logId}) : {0}"
 
-#: lib/gristService.ts:2591
-#: lib/gristService.ts:2613
+#: lib/gristService.ts:2618
+#: lib/gristService.ts:2640
 msgid "Grist error (merge log)"
 msgstr "Erreur Grist (journal des fusions)"
 
-#: lib/gristService.ts:2615
+#: lib/gristService.ts:2642
 msgid "Merge #{logId} not found"
 msgstr "Fusion #{logId} introuvable"
 
-#: lib/gristService.ts:2616
+#: lib/gristService.ts:2643
 msgid "Merge #{logId} already restored"
 msgstr "Fusion #{logId} déjà restaurée"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2626
+#: lib/gristService.ts:2653
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Erreur Grist (recréation de la ligne) : {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2636
+#: lib/gristService.ts:2663
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Ligne recréée (#{restoredRowId}) mais journal des fusions non mis à jour : {0} — ne pas relancer la restauration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2644
+#: lib/gristService.ts:2671
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Ligne recréée (#{restoredRowId}) mais ligne conservée #{0} non rétablie : {1}"
 
-#: lib/gristService.ts:2657
-#: lib/gristService.ts:3229
-#: lib/gristService.ts:3697
-#: lib/gristService.ts:3774
+#: lib/gristService.ts:2684
+#: lib/gristService.ts:3256
+#: lib/gristService.ts:3724
+#: lib/gristService.ts:3801
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Erreur Grist (lecture Annuaire avant écriture)"
 
-#: lib/gristService.ts:2987
-#: lib/gristService.ts:3026
-#: lib/gristService.ts:3188
-#: lib/gristService.ts:3599
-#: lib/gristService.ts:3627
+#: lib/gristService.ts:3014
+#: lib/gristService.ts:3053
+#: lib/gristService.ts:3215
+#: lib/gristService.ts:3626
+#: lib/gristService.ts:3654
 msgid "Identifier mismatch"
 msgstr "Divergence identifiant"
 
-#: lib/gristService.ts:3005
+#: lib/gristService.ts:3032
 msgid "Record deleted"
 msgstr "Notice supprimée"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3005
+#: lib/gristService.ts:3032
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0} : la notice n'existe plus sur IdRef (404) — corriger ou retirer l'IdRef de l'Annuaire"
 
-#: lib/gristService.ts:3009
+#: lib/gristService.ts:3036
 msgid "Record unreadable"
 msgstr "Notice illisible"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:3009
+#: lib/gristService.ts:3036
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0} : notice IdRef inaccessible (erreur réseau ou IdRef indisponible lors du run — relancer)"
 
-#: lib/gristService.ts:3292
+#: lib/gristService.ts:3319
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "La revue Grist ne concerne que le mode « recherche des manquants »"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:3307
-#: lib/gristService.ts:3917
+#: lib/gristService.ts:3334
+#: lib/gristService.ts:3944
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Erreur création table {IDREF_REVIEW_TABLE} : {0}"
 
-#: lib/gristService.ts:3483
-#: lib/gristService.ts:3490
-#: lib/gristService.ts:3592
-#: lib/gristService.ts:3614
+#: lib/gristService.ts:3510
+#: lib/gristService.ts:3517
+#: lib/gristService.ts:3619
+#: lib/gristService.ts:3641
 msgid "API unreachable during the run — rerun."
 msgstr "API injoignable lors du run — relancer."
 
-#: lib/gristService.ts:3490
-#: lib/gristService.ts:3614
+#: lib/gristService.ts:3517
+#: lib/gristService.ts:3641
 msgid "Verification error"
 msgstr "Erreur de vérification"
 
-#: lib/gristService.ts:3493
-#: lib/gristService.ts:3622
+#: lib/gristService.ts:3520
+#: lib/gristService.ts:3649
 msgid "Name mismatch"
 msgstr "Nom divergent"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:3493
+#: lib/gristService.ts:3520
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} « {1} » ≠ Annuaire « {displayName} »"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:3494
+#: lib/gristService.ts:3521
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} « {1} » : {2} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#: lib/gristService.ts:3497
+#: lib/gristService.ts:3524
 msgid "{a} merged into {b}"
 msgstr "{a} fusionné dans {b}"
 
-#: lib/gristService.ts:3498
+#: lib/gristService.ts:3525
 msgid "{a} gone"
 msgstr "{a} disparu"
 
-#: lib/gristService.ts:3499
+#: lib/gristService.ts:3526
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = profil ORCID manquant"
 
-#: lib/gristService.ts:3501
+#: lib/gristService.ts:3528
 msgid "List to fix (not written)"
 msgstr "Liste à corriger (non écrite)"
 
-#: lib/gristService.ts:3501
+#: lib/gristService.ts:3528
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → relancer le run (écriture directe) ou corriger OpenAlex_ids"
 
-#: lib/gristService.ts:3605
+#: lib/gristService.ts:3632
 msgid "Unknown ORCID"
 msgstr "ORCID inconnu"
 
-#: lib/gristService.ts:3605
+#: lib/gristService.ts:3632
 msgid "Unknown Scopus Author ID"
 msgstr "Scopus Author ID inconnu"
 
-#: lib/gristService.ts:3605
+#: lib/gristService.ts:3632
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL inconnu de HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3606
+#: lib/gristService.ts:3633
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 
-#: lib/gristService.ts:3610
+#: lib/gristService.ts:3637
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3610
+#: lib/gristService.ts:3637
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
 
-#: lib/gristService.ts:3611
+#: lib/gristService.ts:3638
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3611
+#: lib/gristService.ts:3638
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
 
-#: lib/gristService.ts:3619
+#: lib/gristService.ts:3646
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3619
+#: lib/gristService.ts:3646
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3620
+#: lib/gristService.ts:3647
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3622
+#: lib/gristService.ts:3649
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire « {displayName} » ≠ profil « {0} »{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3866
+#: lib/gristService.ts:3893
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} absente : lancez d'abord un run {1} (elle est créée par le script)."
 
@@ -12947,77 +12986,85 @@ msgstr "Parcours — fiche close, activité locale récente"
 msgid "Career path — identifiers never affiliated to the institution"
 msgstr "Parcours — identifiants jamais affiliés à l’établissement"
 
-#: lib/tasks.ts:76
+#: lib/tasks.ts:66
+msgid "Directory — LDAP account found by the staff number: switch to the LDAP uid"
+msgstr "Annuaire — compte LDAP trouvé par le n° agent : passer à l’uid LDAP"
+
+#: lib/tasks.ts:67
+msgid "SoVisu+ — remove the identifiers of the former person (uid changed)"
+msgstr "SoVisu+ — retirer les identifiants de l’ancienne personne (uid changé)"
+
+#: lib/tasks.ts:78
 msgid "Authorities correspondent (IdRef)"
 msgstr "Correspondante autorités (IdRef)"
 
-#: lib/tasks.ts:77
+#: lib/tasks.ts:79
 msgid "ABES batch (export)"
 msgstr "Lot ABES (export)"
 
-#: lib/tasks.ts:79
+#: lib/tasks.ts:81
 msgid "External support (provider)"
 msgstr "Support externe (fournisseur)"
 
-#: lib/tasks.ts:80
+#: lib/tasks.ts:82
 msgid "Internal (Druid)"
 msgstr "Interne (Druid)"
 
-#: lib/tasks.ts:84
+#: lib/tasks.ts:86
 msgid "To do"
 msgstr "À faire"
 
-#: lib/tasks.ts:86
+#: lib/tasks.ts:88
 msgid "Waiting"
 msgstr "En attente"
 
-#: lib/tasks.ts:87
-#: lib/tasks.ts:103
+#: lib/tasks.ts:89
+#: lib/tasks.ts:105
 msgid "Done"
 msgstr "Fait"
 
-#: lib/tasks.ts:88
-#: lib/tasks.ts:104
+#: lib/tasks.ts:90
+#: lib/tasks.ts:106
 msgid "Dropped"
 msgstr "Abandonnée"
 
-#: lib/tasks.ts:89
+#: lib/tasks.ts:91
 msgid "Resolved (verified)"
 msgstr "Résolue (vérifiée)"
 
-#: lib/tasks.ts:93
+#: lib/tasks.ts:95
 msgid "Low"
 msgstr "Basse"
 
-#: lib/tasks.ts:94
+#: lib/tasks.ts:96
 msgid "Normal"
 msgstr "Normale"
 
-#: lib/tasks.ts:95
+#: lib/tasks.ts:97
 msgid "High"
 msgstr "Haute"
 
-#: lib/tasks.ts:100
+#: lib/tasks.ts:102
 msgid "Taken over"
 msgstr "Prise en charge"
 
-#: lib/tasks.ts:101
+#: lib/tasks.ts:103
 msgid "Email prepared"
 msgstr "Email préparé"
 
-#: lib/tasks.ts:105
+#: lib/tasks.ts:107
 msgid "Reopened"
 msgstr "Réouverte"
 
-#: lib/tasks.ts:106
+#: lib/tasks.ts:108
 msgid "Reassigned"
 msgstr "Réassignée"
 
-#: lib/tasks.ts:107
+#: lib/tasks.ts:109
 msgid "Edited"
 msgstr "Modifiée"
 
-#: lib/tasks.ts:109
+#: lib/tasks.ts:111
 msgid "Resolved automatically"
 msgstr "Résolue automatiquement"
 

@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, RotateCw, Plus, ExternalLink, User, ChevronDown, ChevronRight, MessageSquare, AlertTriangle, Mail, Copy, Check, Radar, GitMerge } from 'lucide-react';
+import { RefreshCw, RotateCw, Plus, ExternalLink, User, ChevronDown, ChevronRight, MessageSquare, AlertTriangle, Mail, Copy, Check, Radar, GitMerge, ArrowRightLeft } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { Researcher } from '../../types';
 import {
   TASK_TYPES, TASK_BASES, CANAL_LABELS, STATUS_LABELS, PRIORITY_LABELS, EVENT_ACTION_LABELS, TASK_STATUSES,
-  isTaskType, isOpenStatus, nextStatuses, mergePairsOf, TasksApi,
+  isTaskType, isOpenStatus, nextStatuses, mergePairsOf, uidSwitchOf, TasksApi,
   type Task, type TaskEvent, type TaskStatus, type TaskCanal, type TaskBase, type TaskEventAction,
 } from '../../lib/tasks';
 import type { TasksState } from '../../hooks/useTasks';
@@ -15,6 +15,7 @@ import { buildTaskEmail, hasTaskEmail, mailtoUrl } from '../../lib/taskEmailTemp
 import { copyToClipboard } from '../../lib/clipboard';
 import { getUserInfo } from '../../lib/auth';
 import { StatCard, PixelBtn } from './alignAtoms';
+import { GristService } from '../../lib/gristService';
 
 interface Props {
   state: TasksState;
@@ -26,6 +27,8 @@ interface Props {
   onOpenResearcher: (task: Task) => void;
   /** Opens the merge assistant on two Annuaire rows (« shared identifiers » tasks). */
   onMerge?: (rowIds: [number, number]) => void;
+  /** Called once a record has switched to its LDAP uid (reload of the researchers). */
+  onUidSwitched?: () => void;
 }
 
 type StatusFilter = 'open' | 'all' | TaskStatus;
@@ -44,9 +47,9 @@ const fmtDate = (iso: string): string => (iso ? new Date(iso).toLocaleString(num
 /** « À traiter › Tâches » tab (docs/plan-chantiers-taches.md, lot 2): filters, table, inline detail
  * with the event log and the workflow actions. Statuses come from lib/tasks (same table as the
  * server: a forbidden transition is refused there too). */
-export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge }) => {
+export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge, onUidSwitched }) => {
   const { t, i18n } = useLingui();
-  const { tasks, loading, error, reload, transition, patch } = state;
+  const { tasks, loading, error, reload, transition, patch, create } = state;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
   const [baseFilter, setBaseFilter] = useState<'' | TaskBase>('');
   const [canalFilter, setCanalFilter] = useState<'' | TaskCanal>('');
@@ -210,7 +213,8 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
                           <tr className="border-t border-ink/5 dark:border-white/5 bg-white/50 dark:bg-white/[.03]">
                             <td colSpan={8} className="px-4 py-4">
                               <TaskDetail task={x} me={me} researcher={resolveResearcher(x)} onTransition={transition} onPatch={patch}
-                                mergePairs={onMerge ? mergePairsOf(x, rowIdOfUid) : []} onMerge={onMerge} />
+                                mergePairs={onMerge ? mergePairsOf(x, rowIdOfUid) : []} onMerge={onMerge}
+                                onCreate={create} onUidSwitched={onUidSwitched} />
                             </td>
                           </tr>
                         )}
@@ -240,7 +244,9 @@ const TaskDetail: React.FC<{
   /** Record pairs of a « shared identifiers » task the merge assistant can open. */
   mergePairs: { uids: [string, string]; rowIds: [number, number] }[];
   onMerge?: (rowIds: [number, number]) => void;
-}> = ({ task, me, researcher, onTransition, onPatch, mergePairs, onMerge }) => {
+  onCreate: TasksState['create'];
+  onUidSwitched?: () => void;
+}> = ({ task, me, researcher, onTransition, onPatch, mergePairs, onMerge, onCreate, onUidSwitched }) => {
   const { t, i18n } = useLingui();
   const [events, setEvents] = useState<TaskEvent[] | null>(null);
   const [pending, setPending] = useState<PendingAction>(null);
@@ -269,6 +275,27 @@ const TaskDetail: React.FC<{
     return i18n._(STATUS_LABELS[s]);
   };
   const needsText = (s: TaskStatus) => s === 'en_attente' || s === 'fait' || s === 'abandonnee';
+  // « Switch to the LDAP uid » (annuaire_uid_ldap, docs/plan-statut-employeur-ldap.md, lot 2): rewrites
+  // uid_dyna on every row of the record, opens the SoVisu+ follow-up when the former uid was exported
+  // (ext_…), then closes the task.
+  const uidSwitch = isOpenStatus(task.statut) ? uidSwitchOf(task) : null;
+  const switchFrom = task.uid_dyna || '—';
+  const switchTo = uidSwitch?.to ?? '';
+  const [confirmSwitch, setConfirmSwitch] = useState(false);
+  const switchUid = (to: string) => run(async () => {
+    const from = task.uid_dyna;
+    await GristService.switchAnnuaireUid({ fromUid: from, rowId: task.chercheur || undefined, toUid: to, author: me });
+    if (from.startsWith('ext_')) {
+      await onCreate({
+        type: 'sovisu_ancienne_personne', chercheurRowId: task.chercheur || undefined, uid_dyna: to, nom: task.nom, labo: task.labo,
+        description: `La fiche est passée de ${from} à ${to} (tâche #${task.id}). SoVisu+ connaît encore la personne ${from} avec ses identifiants (ORCID, IdRef, IdHAL, Scopus) : `
+          + `les lui retirer dans SoVisu+ (comme après une fusion), sinon ${to} est refusée (« Conflicting identifiers »). SoVisu+ ne supprime jamais une personne.`,
+      });
+    }
+    await onTransition(task.id, 'fait', { resolution: `uid ${from || '(vide)'} → ${to}` });
+    setConfirmSwitch(false);
+    onUidSwitched?.();
+  });
   const confirmPending = () => {
     if (!pending) return;
     const extra = pending.statut === 'en_attente' ? { motif: text.trim() } : { resolution: text.trim() };
@@ -292,6 +319,11 @@ const TaskDetail: React.FC<{
           {task.lien && (
             <a href={task.lien} target="_blank" rel="noopener noreferrer" className="btn-pill h-8 text-[12px]"><ExternalLink className="w-3.5 h-3.5" /> <Trans>Open the link</Trans></a>
           )}
+          {uidSwitch && !confirmSwitch && (
+            <button type="button" onClick={() => setConfirmSwitch(true)} disabled={busy} className="btn-pill h-8 text-[12px]">
+              <ArrowRightLeft className="w-3.5 h-3.5" /> <Trans>Switch to the LDAP uid</Trans>
+            </button>
+          )}
           {onMerge && mergePairs.map((p) => (
             <button key={p.uids.join('+')} type="button" onClick={() => onMerge(p.rowIds)} className="btn-pill h-8 text-[12px]"
               title={t`The task closes itself at the next detection, once the records are merged`}>
@@ -299,6 +331,19 @@ const TaskDetail: React.FC<{
             </button>
           ))}
         </div>
+
+        {uidSwitch && confirmSwitch && (
+          <div className="flex flex-col gap-2 rounded-2xl border border-ink/10 dark:border-white/10 p-3 bg-white/60 dark:bg-white/5">
+            <p className="text-[12px] text-ink dark:text-[#f5f2ea]">
+              <Trans>Every row of the record moves from <b className="font-mono">{switchFrom}</b> to <b className="font-mono">{switchTo}</b>. Check the warnings above first.</Trans>
+              {task.uid_dyna.startsWith('ext_') && <> <Trans>A follow-up task is created to remove the identifiers of the former person in SoVisu+.</Trans></>}
+            </p>
+            <div className="flex gap-2 justify-end">
+              <button className="btn-pill h-8 text-[12px]" onClick={() => setConfirmSwitch(false)} disabled={busy}><Trans>Cancel</Trans></button>
+              <button className="btn-pill-dark h-8 text-[12px]" onClick={() => switchUid(switchTo)} disabled={busy}><Trans>Switch to {switchTo}</Trans></button>
+            </div>
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-ink/5 dark:border-white/5">
           {nextStatuses(task.statut).map((s) => (

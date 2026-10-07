@@ -103,6 +103,30 @@ describe('prefillFromLdap', () => {
     expect(r.employment.employer).toBe('');
   });
 
+  it('CNRS account (hosting tool + CNRS-INSERM): CNRS employer, external, hosted-account fields not taken', () => {
+    const p = person({ categorie: 'CNRS-INSERM', empCorps: '275', dateFin: '2027-12-31', toolRefs: ['{TOOL}CNRS255'] });
+    const { researcher: r, inferredEmployer } = prefillFromLdap(blank(), p, structures, employers);
+    expect(inferredEmployer).toBe('CNRS');
+    expect(r.status).toBe(ResearcherStatus.EXTERNE);
+    expect(r.employment).toMatchObject({ employer: 'CNRS', grade: '', contractType: '', endDate: '' });
+  });
+
+  it('hosted account of an unknown employer: employer left to the user, status follows it', () => {
+    const p = person({ categorie: 'PERSONNEL STRUCTURE PARTENAIRE', empCorps: '', toolRefs: ['{TOOL}HBRG12'] });
+    const typed = { ...blank(), employment: { ...blank().employment, employer: 'INSERM' } };
+    const { researcher: r, inferredEmployer } = prefillFromLdap(typed, p, structures, employers);
+    expect(inferredEmployer).toBeNull();
+    expect(r.employment.employer).toBe('INSERM');
+    expect(r.status).toBe(ResearcherStatus.EXTERNE);
+    expect(prefillFromLdap(blank(), p, structures, employers).researcher.status).toBe(ResearcherStatus.INTERNE);
+  });
+
+  it('ambiguous corps (PU-PH): employer not guessed', () => {
+    const { researcher: r, inferredEmployer } = prefillFromLdap(blank(), person({ empCorps: '324' }), structures, employers);
+    expect(inferredEmployer).toBeNull();
+    expect(r.employment.employer).toBe('');
+  });
+
   it('maps a departure state', () => {
     expect(prefillFromLdap(blank(), person({ etat: 'D' }), structures, employers).researcher.status).toBe(ResearcherStatus.DEPART);
   });

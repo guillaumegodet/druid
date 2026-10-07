@@ -28,6 +28,10 @@
  *                    annuaire_doublon_a_verifier (usage name, relatives, or same names with two different
  *                    IdRef / ORCID: namesakes?), annuaire_identifiant_partage
  *                    (two people: fix the identifier); key = the sorted uids joined by « + »
+ *   uid_ldap_disponible  ext_ record (or record without uid) whose HR staff number is the supannEmpId of
+ *                    an LDAP account no Annuaire record carries: switch the record to that uid
+ *                    (docs/plan-statut-employeur-ldap.md, lot 2); key = `<current key>><LDAP uid>`.
+ *                    When a record already carries that uid, annuaire_ids_partages proposes the merge.
  *   parcours_depart  probable departure of a record without end date, from the career-path job
  *                    (affiliation_history/_index.json of scripts/sync_affiliation_history.cjs): one task per
  *                    record, typed by the strongest signal — parcours_depart_confirme (several sources),
@@ -57,7 +61,7 @@ const schema = require('./lib/tasks_schema.cjs');
 const APPLY = common.hasFlag('apply');
 const AUTHOR = 'druid:regles';
 const PROGRESS_PATH = common.getArg('progress', 'tasks_detect_progress.json');
-const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect'];
+const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect'];
 const RULES_ARG = String(common.getArg('rules', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
@@ -233,6 +237,67 @@ const SHARED_ID_ACTIONS = {
   distinct: 'À faire : retirer l’identifiant de la fiche qui ne le porte pas à juste titre (vérifier sur le lien du profil).',
 };
 
+// ── LDAP uid of an ext_ record (docs/plan-statut-employeur-ldap.md, lot 2) ─────────
+const HR_ID_COL = 'N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_';
+/** HR staff number: digits without leading zeros nor « .0 » ('' when empty, 0 or not a number) — lib/hrId.ts. */
+const normHrId = (v) => {
+  const s = String(v == null || v === false ? '' : v).trim().replace(/^\{[^}]*\}/, '').replace(/\.0+$/, '');
+  return /^\d+$/.test(s) ? s.replace(/^0+/, '') : '';
+};
+/** Grist date cell (epoch seconds, or text) → YYYY-MM-DD ('' when unreadable). */
+const isoDay = (v) => {
+  if (typeof v === 'number' && v) return new Date(v * 1000).toISOString().slice(0, 10);
+  const s = String(v || '').trim();
+  const m = s.match(/^(\d{4})-?(\d{2})-?(\d{2})/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : '';
+};
+/** Does the uid look like the record's last name? Any word of the uid (« dupont-j », « martin-dupont-j »,
+ * « eldupont-j ») against the whole name or one of its words (« Martin-Dupont », « Le Goff »). */
+const uidMatchesName = (uid, f) => {
+  const parts = String(uid).toLowerCase().split('-').filter((p) => /^[a-z]{2,}$/.test(p));
+  const words = nameTokens(f.Nom);
+  const names = [words.join(''), ...words];
+  const close = (p, n) => p === n || (p.length >= 3 && n.length >= 3 && (n.startsWith(p) || p.startsWith(n) || p.endsWith(n)));
+  return parts.some((p) => names.some((n) => close(p, n)));
+};
+
+/**
+ * Records that should carry an LDAP uid: `ext_` or empty uid, an HR staff number equal to the
+ * supannEmpId of exactly one LDAP account, and no Annuaire record on that uid yet. Warnings (uid
+ * unlike the name, then different birth dates) point to a wrong staff number rather than to the person.
+ */
+function ldapUidSwitches(annuaire, ldap) {
+  const byHrId = new Map();
+  for (const [uid, e] of Object.entries(ldap || {})) {
+    const n = normHrId(e && e.empId);
+    if (n) byHrId.set(n, [...(byHrId.get(n) || []), uid]);
+  }
+  const carried = new Set(annuaire.map((r) => r.fields.uid_dyna).filter(Boolean));
+  const out = [];
+  const seen = new Set();
+  for (const rec of annuaire) {
+    const f = rec.fields;
+    const uid = String(f.uid_dyna || '');
+    if ((uid && !uid.startsWith('ext_')) || seen.has(rec.key)) continue;
+    const hrId = normHrId(f[HR_ID_COL]);
+    const targets = hrId ? byHrId.get(hrId) || [] : [];
+    if (targets.length !== 1 || carried.has(targets[0])) continue;
+    seen.add(rec.key);
+    const to = targets[0];
+    const e = ldap[to];
+    // The uid unlike the name is the signal of a wrong staff number; the birth dates of the ext_
+    // records are unreliable (shifted between people in old HR exports), so they only back it up.
+    const warnings = [];
+    if (!uidMatchesName(to, f)) {
+      warnings.push(`l’uid ${to} ne ressemble pas au nom ${nameOf(f)} (nom d’usage, ou n° agent erroné ?)`);
+      const [gristBirth, ldapBirth] = [isoDay(f.DATE_DE_NAISSANCE_JJ_MM_AAAA), isoDay(e.birthDate)];
+      if (gristBirth && ldapBirth && gristBirth !== ldapBirth) warnings.push(`dates de naissance différentes (fiche ${gristBirth}, LDAP ${ldapBirth}) : n° agent probablement erroné`);
+    }
+    out.push({ rec, to, hrId, etat: e.etat || '', categorie: e.categorie || '', warnings });
+  }
+  return out;
+}
+
 // ── Rules: detect(ctx) → [{ key, rec, description, lien, type? }] ─────────────────
 
 // ── Career path (docs/plan-parcours-affiliations.md, lot 4) ────────────────────────
@@ -392,6 +457,24 @@ const RULES = {
           lien: (g.shared.find((s) => s.url) || {}).url || '',
         };
       });
+    },
+  },
+  uid_ldap_disponible: {
+    type: 'annuaire_uid_ldap',
+    sources: ['ldap'],
+    detect(ctx) {
+      return ldapUidSwitches(ctx.annuaire, ctx.ldap).map((s) => ({
+        key: `${s.rec.key}>${s.to}`,
+        rec: s.rec,
+        description: [
+          `Le n° agent ${s.hrId} de cette fiche (${s.rec.fields.uid_dyna || 'sans uid'}) est celui du compte LDAP ${s.to}`
+            + ` (état ${s.etat || '?'}${s.categorie ? `, ${s.categorie}` : ''}), qu’aucune fiche ne porte.`,
+          ...s.warnings.map((w) => `Attention : ${w}.`),
+          'À faire : bouton « Passer à l’uid LDAP » (toutes les lignes de la fiche). La synchronisation LDAP s’applique ensuite à la fiche.',
+          ...(s.rec.fields.uid_dyna ? [`SoVisu+ connaît cette personne sous ${s.rec.fields.uid_dyna} : une tâche de suivi est créée pour retirer ses identifiants de l’ancienne personne, sinon SoVisu+ refuse ${s.to} (« Conflicting identifiers »).`] : []),
+        ].join('\n'),
+        lien: '',
+      }));
     },
   },
   parcours_depart: {
@@ -604,7 +687,7 @@ async function main() {
   writeProgress({ running: false, total: rules.length, done, ...stats, startedAt: nowIso, finishedAt: new Date().toISOString() });
 }
 
-module.exports = { RULES, DEFAULT_RULES, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups };
+module.exports = { RULES, DEFAULT_RULES, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
 
 if (require.main === module) {
   main().catch((e) => {
