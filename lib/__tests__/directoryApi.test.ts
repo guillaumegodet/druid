@@ -5,6 +5,8 @@ import { createDirectoryApi } from '../directory/api';
 import { createGristDirectoryRepository, DirectoryRepository, GristReader } from '../directory/repository';
 import type { GristRecord } from '../directory/gristMapping';
 import { scopeOfSession } from '../../server/apiV1';
+import { createGristPublicationsStore, PublicationsStore } from '../publications/store';
+import { AXES_GRIST } from '../publications/axes';
 
 const annuaireRow = (id: number, fields: Record<string, any>): GristRecord => ({
   id,
@@ -31,11 +33,13 @@ const fakeReader = (tables: Record<string, GristRecord[]>, updatedAt = { value: 
   const reader: GristReader & { calls: string[] } = {
     calls: [],
     docUpdatedAt: async () => updatedAt.value,
-    records: async (table) => {
+    records: async (table, filter) => {
       reader.calls.push(table);
       if (!tables[table]) throw new Error(`Grist HTTP 404 on /tables/${table}/records`);
-      return tables[table];
+      if (!filter) return tables[table];
+      return tables[table].filter((r) => Object.entries(filter).every(([col, values]) => values.includes(r.fields[col])));
     },
+    tableIds: async () => Object.keys(tables),
   };
   return reader;
 };
@@ -111,14 +115,72 @@ describe('createGristDirectoryRepository', () => {
   });
 });
 
+describe('createGristDirectoryRepository — merges and ABES fingerprints', () => {
+  const mergeRow = (id: number, date: string): GristRecord => ({ id, fields: { uid_dyna: `u${id}`, Nom: 'X', date, kept_rowid: 1, dropped_rowid: 2 } });
+
+  it('lists the merge log, most recent first, and nothing before the first merge', async () => {
+    const withLog = createGristDirectoryRepository({
+      grist: fakeReader({ Fusions_log: [mergeRow(1, '2026-09-01'), mergeRow(2, '2026-10-01'), mergeRow(3, '2026-09-15')] }),
+    });
+    expect((await withLog.merges(2)).items.map((m) => m.id)).toEqual([2, 3]);
+    const withoutLog = createGristDirectoryRepository({ grist: fakeReader({ Annuaire: ANNUAIRE }) });
+    expect((await withoutLog.merges(50)).items).toEqual([]);
+  });
+
+  it('returns the ABES fingerprints of the rows of the scope only', async () => {
+    const rows = [
+      annuaireRow(1, { uid_dyna: 'durand-a', LABO: 'LAB-A', ABES_export_hash: 'h1', ABES_export_date: '2026-09-11' }),
+      annuaireRow(2, { LABO: 'LAB²B', ABES_export_hash: 'h2' }),
+      annuaireRow(3, { uid_dyna: 'martin-b', LABO: 'LAB-A' }),
+    ];
+    const repo = createGristDirectoryRepository({ grist: fakeReader({ Annuaire: rows }) });
+    expect((await repo.abesExports(ALL)).items).toEqual([
+      { key: 'durand-a', hash: 'h1', date: '2026-09-11' },
+      { key: 'g2', hash: 'h2', date: '' },
+    ]);
+    expect((await repo.abesExports({ all: false, labAnchors: ['laba'] })).items.map((m) => m.key)).toEqual(['durand-a']);
+  });
+});
+
+describe('createGristPublicationsStore (D10)', () => {
+  const axes = AXES_GRIST['ec-nantes'];
+  const newsletterRow = (id: number, slug: string, date: string): GristRecord =>
+    ({ id, fields: { slug, titre: `T${id}`, date_publication: date, statut: id === 1 ? '' : 'valide' } });
+
+  it('reads the news items of one structure, most recent first', async () => {
+    const main = fakeReader({ Newsletter: [newsletterRow(1, 'laba', '2026-09-01'), newsletterRow(2, 'laba', '2026-10-01'), newsletterRow(3, 'lab2b', '2026-10-02')] });
+    const store = createGristPublicationsStore({ main, readerFor: () => null });
+    const items = await store.newsletter('laba');
+    expect(items.map((i) => [i.id, i.statut])).toEqual([[2, 'valide'], [1, 'genere']]);
+  });
+
+  it('reads the axis corrections from the side document, only when the instance may read it', async () => {
+    const side = fakeReader({ [axes.table]: [
+      { id: 5, fields: { doi: '10.1/ABC', Titre: 'Un titre', [axes.field]: 'Axe 1' } },
+      { id: 6, fields: { doi: '10.1/def', Titre: 'Autre', [axes.field]: '' } },
+    ] });
+    const allowed = createGristPublicationsStore({ main: fakeReader({}), readerFor: (doc) => (doc === axes.docId ? side : null) });
+    expect(await allowed.axisCorrections('ec-nantes')).toEqual([{ gristId: 5, doi: '10.1/ABC', title: 'Un titre', axe: 'Axe 1' }]);
+    expect(await allowed.axisCorrections('laba')).toBeNull();
+    const refused = createGristPublicationsStore({ main: fakeReader({}), readerFor: () => null });
+    await expect(refused.axisCorrections('ec-nantes')).rejects.toThrow('Document not readable');
+  });
+});
+
 describe('createDirectoryApi', () => {
-  const stubRepository = (): DirectoryRepository & { people: ReturnType<typeof vi.fn> } => ({
+  const stubRepository = (): DirectoryRepository & { people: ReturnType<typeof vi.fn>; merges: ReturnType<typeof vi.fn> } => ({
     people: vi.fn(async () => ({ items: [{ id: 'durand-a' } as any], updatedAt: 'v1' })),
     structures: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
     institutions: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
+    merges: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
+    abesExports: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
+  });
+  const stubPublications = (): PublicationsStore & { newsletter: ReturnType<typeof vi.fn> } => ({
+    newsletter: vi.fn(async () => []),
+    axisCorrections: vi.fn(async (slug: string) => (slug === 'ec-nantes' ? [] : null)),
   });
   const call = (path: string, bindings: any, method = 'GET') =>
-    createDirectoryApi().fetch(new Request(`http://druid.test${path}`, { method }), bindings);
+    createDirectoryApi().fetch(new Request(`http://druid.test${path}`, { method }), { publications: stubPublications(), ...bindings });
 
   it('refuses a request without an authenticated user', async () => {
     const resp = await call('/api/v1/people', { repository: stubRepository(), scope: null });
@@ -148,6 +210,49 @@ describe('createDirectoryApi', () => {
     spy.mockRestore();
     expect(resp.status).toBe(502);
     expect(await resp.json()).toEqual({ error: 'Directory storage unavailable' });
+  });
+});
+
+describe('createDirectoryApi — institution tools and publications', () => {
+  const LAB = { all: false, labAnchors: ['laba'] };
+  const repository = () => ({
+    people: vi.fn(), structures: vi.fn(), institutions: vi.fn(),
+    merges: vi.fn(async (limit: number) => ({ items: [], updatedAt: String(limit) })),
+    abesExports: vi.fn(async () => ({ items: [{ key: 'durand-a', hash: 'h', date: '' }], updatedAt: 'v1' })),
+  });
+  const call = async (path: string, scope: any, publications?: Partial<PublicationsStore>) => {
+    const resp = await createDirectoryApi().fetch(new Request(`http://druid.test${path}`), {
+      repository: repository() as any,
+      publications: { newsletter: async () => [], axisCorrections: async (s: string) => (s === 'ec-nantes' ? [] : null), ...publications } as any,
+      scope,
+    });
+    return { status: resp.status, body: await resp.json() };
+  };
+
+  it('keeps the merge log to the institution right and bounds the limit', async () => {
+    expect((await call('/api/v1/merges', LAB)).status).toBe(403);
+    expect((await call('/api/v1/merges', ALL)).body.updatedAt).toBe('50');
+    expect((await call('/api/v1/merges?limit=100000', ALL)).body.updatedAt).toBe('500');
+    expect((await call('/api/v1/merges?limit=abc', ALL)).body.updatedAt).toBe('50');
+  });
+
+  it('serves the ABES fingerprints to every right (scoped by the repository)', async () => {
+    expect((await call('/api/v1/abes-exports', LAB)).body.items).toHaveLength(1);
+  });
+
+  it('serves the newsletter and the axis corrections of the user\'s structures only', async () => {
+    expect((await call('/api/v1/newsletter', ALL)).status).toBe(400);
+    expect((await call('/api/v1/newsletter?slug=LAB-A', LAB)).status).toBe(200);
+    expect((await call('/api/v1/newsletter?slug=lab2b', LAB)).status).toBe(403);
+    expect((await call('/api/v1/axis-corrections/ec-nantes', LAB)).status).toBe(403);
+    expect((await call('/api/v1/axis-corrections/ec-nantes', ALL)).status).toBe(200);
+    expect((await call('/api/v1/axis-corrections/laba', ALL)).status).toBe(404);
+  });
+
+  it('answers 403 when the instance may not read the side document', async () => {
+    const refused = createGristPublicationsStore({ main: fakeReader({}), readerFor: () => null });
+    const resp = await call('/api/v1/axis-corrections/ec-nantes', ALL, { axisCorrections: refused.axisCorrections });
+    expect(resp).toEqual({ status: 403, body: { error: 'Forbidden' } });
   });
 });
 

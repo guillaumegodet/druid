@@ -2793,7 +2793,7 @@ const GRIST_ALLOWED_DOCS = new Set(
 );
 const GRIST_PATH_RE = /^docs\/([A-Za-z0-9_-]+)(?:\/(tables)(?:\/([A-Za-z0-9_]+)(?:\/(records|columns|data\/delete))?)?)?$/;
 // Side-doc tables writable (records, PATCH/POST) by the lab right of the given
-// slug — mirror of components/dashboard/AxesTab.tsx AXES_GRIST.
+// slug — mirror of lib/publications/axes.ts AXES_GRIST.
 const GRIST_LAB_TABLES_EXTRA = {
   '5aREUrB1kuFAcVY4GTUDfA/Publications_centrale_axes_strategiques2': 'ec-nantes',
 };
@@ -2963,6 +2963,7 @@ try {
     gristApiBase: GRIST_API_BASE,
     gristDocId: process.env.VITE_GRIST_DOC_ID || '',
     gristApiKey: GRIST_API_KEY,
+    gristExtraDocIds: String(process.env.GRIST_EXTRA_DOC_IDS || '').split(',').map((s) => s.trim()).filter(Boolean),
     appRoot: __dirname,
   });
 } catch (err) {

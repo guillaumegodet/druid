@@ -10,11 +10,12 @@
 // through Cloudflare Access reads the whole directory, as it did through the proxy.
 import { createDirectoryApi } from '../../../lib/directory/api.ts';
 import { createGristDirectoryRepository, createGristReader } from '../../../lib/directory/repository.ts';
+import { createGristPublicationsStore } from '../../../lib/publications/store.ts';
 import { instanceOf, secretOf } from '../../_lib/instance.js';
 
 const api = createDirectoryApi();
-// One repository (and its caches) per instance and document, for the lifetime of the isolate.
-const repositories = new Map();
+// One set of stores (and their caches) per instance and document, for the lifetime of the isolate.
+const stores = new Map();
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
@@ -25,17 +26,20 @@ export async function onRequest(context) {
   if (!apiKey && !instance.readOnly) return json(500, { error: 'GRIST_API_KEY not configured on Cloudflare' });
 
   const key = `${instance.slug}|${instance.grist.apiBase}|${instance.grist.docId}`;
-  let repository = repositories.get(key);
-  if (!repository) {
-    repository = createGristDirectoryRepository({
-      grist: createGristReader({
-        apiBase: instance.grist.apiBase,
-        docId: instance.grist.docId,
-        apiKey: apiKey || undefined,
-        userAgent: `Druid-CRISalid-${instance.slug}/1.0`,
-      }),
+  let store = stores.get(key);
+  if (!store) {
+    const main = createGristReader({
+      apiBase: instance.grist.apiBase,
+      docId: instance.grist.docId,
+      apiKey: apiKey || undefined,
+      userAgent: `Druid-CRISalid-${instance.slug}/1.0`,
     });
-    repositories.set(key, repository);
+    store = {
+      repository: createGristDirectoryRepository({ grist: main }),
+      // Only the instance document, as the /api/grist proxy (no side document on Cloudflare).
+      publications: createGristPublicationsStore({ main, readerFor: (docId) => (docId === instance.grist.docId ? main : null) }),
+    };
+    stores.set(key, store);
   }
-  return api.fetch(context.request, { repository, scope: { all: true, labAnchors: [] } });
+  return api.fetch(context.request, { ...store, scope: { all: true, labAnchors: [] } });
 }

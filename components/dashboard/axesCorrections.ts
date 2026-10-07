@@ -10,14 +10,11 @@
 
 import { axeOfPub } from './publicationFilters';
 import type { DashboardDataset, DashboardPublication } from './types';
+import { AXES_GRIST, axisCorrectionRows, AxisCorrectionRow } from '../../lib/publications/axes';
+import { DirectoryApi } from '../../lib/directoryApi';
 
-export const AXES_GRIST: Record<string, { docId: string; table: string; field: string }> = {
-  'ec-nantes': {
-    docId: '5aREUrB1kuFAcVY4GTUDfA',
-    table: 'Publications_centrale_axes_strategiques2',
-    field: 'Axe_Retenu',
-  },
-};
+// Configuration and row mapping live in lib/publications/axes.ts (shared with the API, migration plan lot 1 b).
+export { AXES_GRIST };
 
 /** Title normalization for matching (same rule as the study). */
 export function normTitle(s: string | null): string {
@@ -42,23 +39,26 @@ export interface AxisCorrectionIndex {
 
 export const EMPTY_AXIS_INDEX: AxisCorrectionIndex = { byDoi: new Map(), byTitle: new Map() };
 
+/** Builds the index from the corrections (DOI in lowercase, normalized title). */
+export function indexAxisCorrections(rows: AxisCorrectionRow[]): AxisCorrectionIndex {
+  const byDoi = new Map<string, AxisCorrection>();
+  const byTitle = new Map<string, AxisCorrection>();
+  for (const row of rows) {
+    const c = { gristId: row.gristId, axe: row.axe };
+    const doi = row.doi.trim().toLowerCase();
+    if (doi) byDoi.set(doi, c);
+    const nt = normTitle(row.title);
+    if (nt) byTitle.set(nt, c);
+  }
+  return { byDoi, byTitle };
+}
+
 /** Builds the index from the Grist records (rows without a corrected axis are ignored). */
 export function buildAxisCorrectionIndex(
   records: { id: number; fields: Record<string, unknown> }[],
   field: string,
 ): AxisCorrectionIndex {
-  const byDoi = new Map<string, AxisCorrection>();
-  const byTitle = new Map<string, AxisCorrection>();
-  for (const rec of records) {
-    const axe = String(rec.fields[field] ?? '').trim();
-    if (!axe) continue;
-    const c = { gristId: rec.id, axe };
-    const doi = String(rec.fields.doi ?? '').trim().toLowerCase();
-    if (doi) byDoi.set(doi, c);
-    const nt = normTitle(String(rec.fields.Titre ?? ''));
-    if (nt) byTitle.set(nt, c);
-  }
-  return { byDoi, byTitle };
+  return indexAxisCorrections(axisCorrectionRows(records, field));
 }
 
 export function findAxisCorrection(
@@ -94,12 +94,9 @@ export function applyAxisCorrections(
   return changed ? { ...dataset, publications } : dataset;
 }
 
-/** Loads the corrections of a structure (null when the structure has no correction table). */
+/** Loads the corrections of a structure (null when the structure has no correction table), through the
+ * domain API (/api/v1/axis-corrections, scoped to the user's structures). */
 export async function fetchAxisCorrections(slug: string): Promise<AxisCorrectionIndex | null> {
-  const cfg = AXES_GRIST[slug];
-  if (!cfg) return null;
-  const r = await fetch(`/api/grist/docs/${cfg.docId}/tables/${cfg.table}/records`);
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  const j = (await r.json()) as { records?: { id: number; fields: Record<string, unknown> }[] };
-  return buildAxisCorrectionIndex(j.records ?? [], cfg.field);
+  if (!AXES_GRIST[slug]) return null;
+  return indexAxisCorrections(await DirectoryApi.axisCorrections(slug));
 }

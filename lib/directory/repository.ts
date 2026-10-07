@@ -5,7 +5,11 @@
 // the same interface and be checked against the same contract tests.
 import type { Researcher, Structure } from '../../types';
 import { normalizeAcronym } from '../normalize';
-import { GristRecord, Institution, mapAnnuaireRecords, mapInstitutionRecords, mapStructureRecords } from './gristMapping';
+import { MERGE_LOG_TABLE } from '../mergeLog';
+import {
+  AbesExportMark, GristRecord, Institution, MergeLogEntry, mapAbesExportMarks, mapAnnuaireRecords, mapInstitutionRecords,
+  mapMergeLogRecords, mapStructureRecords,
+} from './gristMapping';
 
 /**
  * What the caller may read. `all`: institution right (every lab). Otherwise `labAnchors` = the
@@ -30,13 +34,20 @@ export interface DirectoryRepository {
   structures(): Promise<Versioned<Structure>>;
   /** Employing institutions. */
   institutions(): Promise<Versioned<Institution>>;
+  /** Merge log, most recent first (empty when the log table does not exist yet). Institution tool: not scoped. */
+  merges(limit: number): Promise<Versioned<MergeLogEntry>>;
+  /** Fingerprints of the records already exported to ABES, on the rows of the scope. */
+  abesExports(scope: DirectoryScope): Promise<Versioned<AbesExportMark>>;
 }
 
 /** Minimal Grist REST client (the server holds the API key). */
 export interface GristReader {
   /** Modification date of the document (ISO), '' when unknown. */
   docUpdatedAt(): Promise<string>;
-  records(table: string): Promise<GristRecord[]>;
+  /** Rows of a table; `filter` = Grist filter (column → accepted values). */
+  records(table: string, filter?: Record<string, unknown[]>): Promise<GristRecord[]>;
+  /** Identifiers of the document's tables. */
+  tableIds(): Promise<string[]>;
 }
 
 export interface GristReaderOptions {
@@ -61,7 +72,11 @@ export const createGristReader = ({ apiBase, docId, apiKey, userAgent, fetch: fe
   };
   return {
     docUpdatedAt: async () => String((await get(docUrl))?.updatedAt || ''),
-    records: async (table) => (await get(`${docUrl}/tables/${encodeURIComponent(table)}/records`))?.records ?? [],
+    records: async (table, filter) => {
+      const query = filter ? `?filter=${encodeURIComponent(JSON.stringify(filter))}` : '';
+      return (await get(`${docUrl}/tables/${encodeURIComponent(table)}/records${query}`))?.records ?? [];
+    },
+    tableIds: async () => ((await get(`${docUrl}/tables`))?.tables ?? []).map((t: { id: string }) => t.id),
   };
 };
 
@@ -129,6 +144,17 @@ export const createGristDirectoryRepository = ({ grist, loadLdapCache }: GristDi
     async institutions() {
       const updatedAt = await grist.docUpdatedAt();
       return { items: mapInstitutionRecords(await rowsOf('Etablissements', updatedAt)), updatedAt };
+    },
+    async merges(limit) {
+      const updatedAt = await grist.docUpdatedAt();
+      if (!(await grist.tableIds()).includes(MERGE_LOG_TABLE)) return { items: [], updatedAt };
+      return { items: mapMergeLogRecords(await rowsOf(MERGE_LOG_TABLE, updatedAt), limit), updatedAt };
+    },
+    async abesExports(scope) {
+      const updatedAt = await grist.docUpdatedAt();
+      const annuaire = await rowsOf('Annuaire', updatedAt);
+      const rows = scope.all ? annuaire : annuaire.filter(rowInScope(new Set(scope.labAnchors)));
+      return { items: mapAbesExportMarks(rows), updatedAt };
     },
   };
 };

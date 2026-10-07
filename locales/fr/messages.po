@@ -199,7 +199,7 @@ msgstr "Chargement du tableau de bord…"
 #: App.tsx:979
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
-#: components/dashboard/NewsletterPanel.tsx:326
+#: components/dashboard/NewsletterPanel.tsx:290
 #: components/etl/EtlConsolePage.tsx:457
 #: components/reports/HistoryDialog.tsx:78
 #: components/reports/ReportEditor.tsx:265
@@ -915,7 +915,7 @@ msgstr "Export PDF"
 
 #: components/ResearcherDetail.tsx:314
 #: components/StructureDetail.tsx:139
-#: components/dashboard/NewsletterPanel.tsx:400
+#: components/dashboard/NewsletterPanel.tsx:364
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
@@ -1018,7 +1018,7 @@ msgstr "Revalider"
 
 #: components/ResearcherDetail.tsx:586
 #: components/dashboard/MediaMentionsPanel.tsx:317
-#: components/dashboard/NewsletterPanel.tsx:437
+#: components/dashboard/NewsletterPanel.tsx:401
 #: components/researchers/GroupModal.tsx:65
 msgid "Validate"
 msgstr "Valider"
@@ -2895,7 +2895,7 @@ msgstr "À propos de « {title} »"
 #: components/dashboard/EChartCard.tsx:353
 #: components/dashboard/NetworkTab.tsx:356
 #: components/dashboard/NewsTab.tsx:815
-#: components/dashboard/NewsletterPanel.tsx:484
+#: components/dashboard/NewsletterPanel.tsx:448
 #: components/dashboard/PublicationsListModal.tsx:67
 #: components/dashboard/report/ReportWizard.tsx:261
 #: components/reports/AddToReportDialog.tsx:122
@@ -4202,172 +4202,172 @@ msgstr "Générer une autre proposition"
 msgid "Regenerate"
 msgstr "Régénérer"
 
-#: components/dashboard/NewsletterPanel.tsx:47
+#: components/dashboard/NewsletterPanel.tsx:31
 #: components/reports/HistoryDialog.tsx:103
 msgid "Generated"
 msgstr "Généré"
 
-#: components/dashboard/NewsletterPanel.tsx:48
+#: components/dashboard/NewsletterPanel.tsx:32
 msgid "Under review"
 msgstr "En validation"
 
-#: components/dashboard/NewsletterPanel.tsx:49
+#: components/dashboard/NewsletterPanel.tsx:33
 #: components/researchers/FilterPanel.tsx:143
 #: components/researchers/LdapVerifyPanel.tsx:136
 #: components/researchers/PresenceBadge.tsx:97
 msgid "Validated"
 msgstr "Validé"
 
-#: components/dashboard/NewsletterPanel.tsx:50
+#: components/dashboard/NewsletterPanel.tsx:34
 msgid "Discarded"
 msgstr "Écarté"
 
-#: components/dashboard/NewsletterPanel.tsx:51
+#: components/dashboard/NewsletterPanel.tsx:35
 msgid "Published"
 msgstr "Publié"
 
-#: components/dashboard/NewsletterPanel.tsx:122
+#: components/dashboard/NewsletterPanel.tsx:84
 msgid "Could not load"
 msgstr "Chargement impossible"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:159
+#: components/dashboard/NewsletterPanel.tsx:121
 msgid "Could not write to Grist: {0}"
 msgstr "Écriture Grist impossible : {0}"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:185
+#: components/dashboard/NewsletterPanel.tsx:147
 msgid "Generation: {0}"
 msgstr "Génération : {0}"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:249
+#: components/dashboard/NewsletterPanel.tsx:213
 msgid "Recipients: {0}"
 msgstr "Destinataires : {0}"
 
-#: components/dashboard/NewsletterPanel.tsx:261
+#: components/dashboard/NewsletterPanel.tsx:225
 msgid "Back to the watch"
 msgstr "Retour à la veille"
 
-#: components/dashboard/NewsletterPanel.tsx:266
+#: components/dashboard/NewsletterPanel.tsx:230
 msgid "Public newsletter — {structName}"
 msgstr "Newsletter grand public — {structName}"
 
-#: components/dashboard/NewsletterPanel.tsx:269
+#: components/dashboard/NewsletterPanel.tsx:233
 msgid "Briefs generated from the last 30 days' articles, validated by the researchers, then distributed."
 msgstr "Brèves générées depuis les articles des 30 derniers jours, validées par les chercheurs puis diffusées."
 
-#: components/dashboard/NewsletterPanel.tsx:278
+#: components/dashboard/NewsletterPanel.tsx:242
 msgid "Newsletter issue (month)"
 msgstr "Numéro (mois) de la newsletter"
 
-#: components/dashboard/NewsletterPanel.tsx:284
+#: components/dashboard/NewsletterPanel.tsx:248
 msgid "Target length of the generated brief (only affects new briefs)"
 msgstr "Longueur cible de la brève générée (n'affecte que les nouvelles brèves)"
 
-#: components/dashboard/NewsletterPanel.tsx:286
+#: components/dashboard/NewsletterPanel.tsx:250
 msgid "Length: {chars} chars"
 msgstr "Longueur : {chars} car."
 
-#: components/dashboard/NewsletterPanel.tsx:303
+#: components/dashboard/NewsletterPanel.tsx:267
 msgid "Generates a public brief (LLM) for each new OpenAlex article ≤ 30 days old"
 msgstr "Génère une brève grand public (LLM) pour chaque nouvel article OpenAlex ≤ 30 jours"
 
 #. placeholder {0}: generating.done
 #. placeholder {1}: generating.remaining
-#: components/dashboard/NewsletterPanel.tsx:306
+#: components/dashboard/NewsletterPanel.tsx:270
 msgid "{0} brief(s)… ({1} remaining)"
 msgstr "{0} brève(s)… ({1} restantes)"
 
-#: components/dashboard/NewsletterPanel.tsx:307
+#: components/dashboard/NewsletterPanel.tsx:271
 msgid "Generate briefs"
 msgstr "Générer les brèves"
 
-#: components/dashboard/NewsletterPanel.tsx:314
+#: components/dashboard/NewsletterPanel.tsx:278
 msgid "Newsletter preview (validated briefs)"
 msgstr "Aperçu de la newsletter (brèves validées)"
 
-#: components/dashboard/NewsletterPanel.tsx:314
+#: components/dashboard/NewsletterPanel.tsx:278
 msgid "No validated brief for this issue"
 msgstr "Aucune brève validée pour ce numéro"
 
 #. placeholder {0}: valides.length
-#: components/dashboard/NewsletterPanel.tsx:316
+#: components/dashboard/NewsletterPanel.tsx:280
 msgid "Preview ({0})"
 msgstr "Aperçu ({0})"
 
-#: components/dashboard/NewsletterPanel.tsx:329
+#: components/dashboard/NewsletterPanel.tsx:293
 msgid "No brief for issue {numero}. Click “Generate briefs” to popularise the articles published in the last 30 days."
 msgstr "Aucune brève pour le numéro {numero}. Cliquez sur « Générer les brèves » pour vulgariser les articles parus ces 30 derniers jours."
 
-#: components/dashboard/NewsletterPanel.tsx:377
+#: components/dashboard/NewsletterPanel.tsx:341
 msgid "Hook (emoji + question or concrete sentence)"
 msgstr "Accroche (emoji + question ou phrase concrète)"
 
-#: components/dashboard/NewsletterPanel.tsx:384
+#: components/dashboard/NewsletterPanel.tsx:348
 msgid "Public brief (2-3 sentences)"
 msgstr "Brève grand public (2-3 phrases)"
 
 #. placeholder {0}: item.titre
-#: components/dashboard/NewsletterPanel.tsx:388
+#: components/dashboard/NewsletterPanel.tsx:352
 msgid "Original title: {0}"
 msgstr "Titre original : {0}"
 
-#: components/dashboard/NewsletterPanel.tsx:411
+#: components/dashboard/NewsletterPanel.tsx:375
 msgid "Open the mail client and mark this item as “sent”?"
 msgstr "Ouvrir le client mail et marquer cette brève comme « envoyée » ?"
 
 #. placeholder {0}: item.chercheur_nom || item.chercheur_email
-#: components/dashboard/NewsletterPanel.tsx:416
+#: components/dashboard/NewsletterPanel.tsx:380
 msgid "Request validation from {0}"
 msgstr "Demander la validation à {0}"
 
 #. placeholder {0}: item.chercheur_nom || item.chercheur_email
-#: components/dashboard/NewsletterPanel.tsx:418
+#: components/dashboard/NewsletterPanel.tsx:382
 msgid "Request validation ({0})"
 msgstr "Demander validation ({0})"
 
-#: components/dashboard/NewsletterPanel.tsx:422
+#: components/dashboard/NewsletterPanel.tsx:386
 msgid "No researcher matched in the directory"
 msgstr "Aucun chercheur apparié dans l'annuaire"
 
-#: components/dashboard/NewsletterPanel.tsx:446
+#: components/dashboard/NewsletterPanel.tsx:410
 msgid "Discard"
 msgstr "Écarter"
 
-#: components/dashboard/NewsletterPanel.tsx:454
+#: components/dashboard/NewsletterPanel.tsx:418
 #: components/researchers/TasksPage.tsx:274
 msgid "Reopen"
 msgstr "Rouvrir"
 
-#: components/dashboard/NewsletterPanel.tsx:471
+#: components/dashboard/NewsletterPanel.tsx:435
 #: components/dashboard/report/ReportWizard.tsx:52
 #: components/dashboard/report/ReportWizard.tsx:505
 msgid "Preview"
 msgstr "Aperçu"
 
 #. placeholder {0}: valides.length
-#: components/dashboard/NewsletterPanel.tsx:471
+#: components/dashboard/NewsletterPanel.tsx:435
 msgid "{0, plural, one {# validated brief} other {# validated briefs}}"
 msgstr "{0, plural, one {# brève validée} other {# brèves validées}}"
 
-#: components/dashboard/NewsletterPanel.tsx:475
+#: components/dashboard/NewsletterPanel.tsx:439
 msgid "Download the HTML"
 msgstr "Télécharger le HTML"
 
-#: components/dashboard/NewsletterPanel.tsx:478
+#: components/dashboard/NewsletterPanel.tsx:442
 msgid "Recipients copied ✓"
 msgstr "Destinataires copiés ✓"
 
-#: components/dashboard/NewsletterPanel.tsx:478
+#: components/dashboard/NewsletterPanel.tsx:442
 msgid "Copy recipients"
 msgstr "Copier les destinataires"
 
-#: components/dashboard/NewsletterPanel.tsx:481
+#: components/dashboard/NewsletterPanel.tsx:445
 msgid "Mark as published"
 msgstr "Marquer publiée"
 
-#: components/dashboard/NewsletterPanel.tsx:488
+#: components/dashboard/NewsletterPanel.tsx:452
 msgid "Newsletter preview"
 msgstr "Aperçu newsletter"
 
@@ -8092,8 +8092,8 @@ msgid "Save to Grist"
 msgstr "Enregistrer dans Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:2927
-#: lib/gristService.ts:3036
+#: lib/gristService.ts:2873
+#: lib/gristService.ts:2982
 msgid "Search error"
 msgstr "Erreur de recherche"
 
@@ -11883,8 +11883,8 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Homonyme sans preuve d'affiliation"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:2938
-#: lib/gristService.ts:3064
+#: lib/gristService.ts:2884
+#: lib/gristService.ts:3010
 msgid "Suspected mixed identity"
 msgstr "Identité mêlée suspectée"
 
@@ -12795,330 +12795,328 @@ msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:13
+#: lib/directoryApi.ts:16
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Annuaire indisponible ({resource}, HTTP {0})."
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:669
+#: lib/gristService.ts:656
 msgid "Error creating the affiliation columns: {0}"
 msgstr "Erreur création colonnes de rattachement : {0}"
 
-#: lib/gristService.ts:764
-#: lib/gristService.ts:2031
-#: lib/gristService.ts:2743
-#: lib/gristService.ts:3353
+#: lib/gristService.ts:751
+#: lib/gristService.ts:2689
+#: lib/gristService.ts:3299
 msgid "Grist error (table list)"
 msgstr "Erreur Grist (liste des tables)"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:771
+#: lib/gristService.ts:758
 msgid "Error creating table {MERGE_LOG_TABLE}: {0}"
 msgstr "Erreur de création de la table {MERGE_LOG_TABLE} : {0}"
 
-#: lib/gristService.ts:1180
+#: lib/gristService.ts:1167
 msgid "Invalid entity code “{code}”: letters, digits, “-”, “_” or “.” only"
 msgstr "Code entité « {code} » invalide : lettres, chiffres, « - », « _ » ou « . » uniquement"
 
-#: lib/gristService.ts:1305
+#: lib/gristService.ts:1276
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/gristService.ts:1317
+#: lib/gristService.ts:1288
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/gristService.ts:1319
+#: lib/gristService.ts:1290
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1391
+#: lib/gristService.ts:1362
 msgid "Grist error (writing the secondary affiliations): {0}"
 msgstr "Erreur Grist (écriture des appartenances secondaires) : {0}"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:1412
+#: lib/gristService.ts:1383
 msgid "Grist error (creating the secondary affiliations): {0}"
 msgstr "Erreur Grist (création des appartenances secondaires) : {0}"
 
 #. placeholder {0}: await logResp.text()
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:1424
-#: lib/gristService.ts:2012
+#: lib/gristService.ts:1395
+#: lib/gristService.ts:1975
 msgid "Grist error (merge log): {0}"
 msgstr "Erreur Grist (journal des fusions) : {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:1428
+#: lib/gristService.ts:1399
 msgid "Grist error (deleting the removed affiliations): {0}"
 msgstr "Erreur Grist (suppression des appartenances retirées) : {0}"
 
-#: lib/gristService.ts:1454
+#: lib/gristService.ts:1425
 msgid "Error saving the groups — does the `groupes` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne `groupes` existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:1475
+#: lib/gristService.ts:1446
 msgid "Error saving the author ID — does the `openalex_author_id` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne `openalex_author_id` existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/gristService.ts:1588
+#: lib/gristService.ts:1551
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/gristService.ts:1591
+#: lib/gristService.ts:1554
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
 #. placeholder {0}: dup.acronym
 #. placeholder {1}: level === StructureLevel.EQUIPE ? t` in ${parent}` : ''
-#: lib/gristService.ts:1597
+#: lib/gristService.ts:1560
 msgid "A structure “{0}” already exists{1}"
 msgstr "Une structure « {0} » existe déjà{1}"
 
-#: lib/gristService.ts:1597
+#: lib/gristService.ts:1560
 msgid " in {parent}"
 msgstr " dans {parent}"
 
-#: lib/gristService.ts:1607
+#: lib/gristService.ts:1570
 msgid "local_id “{localId}” already used"
 msgstr "local_id « {localId} » déjà utilisé"
 
 #. placeholder {0}: await resp.text()
-#: lib/gristService.ts:1640
+#: lib/gristService.ts:1603
 msgid "Error creating the Grist structure: {0}"
 msgstr "Erreur création Structure Grist : {0}"
 
-#: lib/gristService.ts:1648
+#: lib/gristService.ts:1611
 msgid "Invalid ID"
 msgstr "ID invalide"
 
-#: lib/gristService.ts:1884
+#: lib/gristService.ts:1847
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1926
+#: lib/gristService.ts:1889
 msgid "Grist error (de-qualification): {0}"
 msgstr "Erreur Grist (dé-qualification) : {0}"
 
-#: lib/gristService.ts:1959
+#: lib/gristService.ts:1922
 msgid "Invalid LDAP uid: {toUid}"
 msgstr "Uid LDAP invalide : {toUid}"
 
-#: lib/gristService.ts:1961
+#: lib/gristService.ts:1924
 msgid "The uid {toUid} already has a directory record: merge the two records instead"
 msgstr "L’uid {toUid} a déjà une fiche dans l’annuaire : fusionnez plutôt les deux fiches"
 
 #. placeholder {0}: fromUid || '—'
-#: lib/gristService.ts:1964
+#: lib/gristService.ts:1927
 msgid "Record not found in Grist (uid {0})"
 msgstr "Fiche introuvable dans Grist (uid {0})"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:1974
+#: lib/gristService.ts:1937
 msgid "Grist error (uid change): {0}"
 msgstr "Erreur Grist (changement d’uid) : {0}"
 
-#: lib/gristService.ts:1995
+#: lib/gristService.ts:1958
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/gristService.ts:1999
+#: lib/gristService.ts:1962
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
 #. placeholder {0}: await pr.text()
-#: lib/gristService.ts:2019
+#: lib/gristService.ts:1982
 msgid "Grist error (writing the kept row, log #{logId}): {0}"
 msgstr "Erreur Grist (écriture ligne conservée, journal #{logId}) : {0}"
 
 #. placeholder {0}: await dr.text()
-#: lib/gristService.ts:2024
+#: lib/gristService.ts:1987
 msgid "Grist error (deleting the absorbed row, log #{logId}): {0}"
 msgstr "Erreur Grist (suppression ligne absorbée, journal #{logId}) : {0}"
 
-#: lib/gristService.ts:2035
-#: lib/gristService.ts:2057
+#: lib/gristService.ts:2003
 msgid "Grist error (merge log)"
 msgstr "Erreur Grist (journal des fusions)"
 
-#: lib/gristService.ts:2059
+#: lib/gristService.ts:2005
 msgid "Merge #{logId} not found"
 msgstr "Fusion #{logId} introuvable"
 
-#: lib/gristService.ts:2060
+#: lib/gristService.ts:2006
 msgid "Merge #{logId} already restored"
 msgstr "Fusion #{logId} déjà restaurée"
 
 #. placeholder {0}: await cr.text()
-#: lib/gristService.ts:2070
+#: lib/gristService.ts:2016
 msgid "Grist error (re-creating the row): {0}"
 msgstr "Erreur Grist (recréation de la ligne) : {0}"
 
 #. placeholder {0}: await lr.text()
-#: lib/gristService.ts:2080
+#: lib/gristService.ts:2026
 msgid "Row re-created (#{restoredRowId}) but merge log not updated: {0} — do not restart the restoration"
 msgstr "Ligne recréée (#{restoredRowId}) mais journal des fusions non mis à jour : {0} — ne pas relancer la restauration"
 
 #. placeholder {0}: rec.fields.kept_rowid
 #. placeholder {1}: await pr.text()
-#: lib/gristService.ts:2088
+#: lib/gristService.ts:2034
 msgid "Row re-created (#{restoredRowId}) but kept row #{0} not restored: {1}"
 msgstr "Ligne recréée (#{restoredRowId}) mais ligne conservée #{0} non rétablie : {1}"
 
-#: lib/gristService.ts:2101
-#: lib/gristService.ts:2673
-#: lib/gristService.ts:3141
-#: lib/gristService.ts:3218
+#: lib/gristService.ts:2047
+#: lib/gristService.ts:2619
+#: lib/gristService.ts:3087
+#: lib/gristService.ts:3164
 msgid "Grist error (reading the Annuaire before writing)"
 msgstr "Erreur Grist (lecture Annuaire avant écriture)"
 
-#: lib/gristService.ts:2431
-#: lib/gristService.ts:2470
-#: lib/gristService.ts:2632
-#: lib/gristService.ts:3043
-#: lib/gristService.ts:3071
+#: lib/gristService.ts:2377
+#: lib/gristService.ts:2416
+#: lib/gristService.ts:2578
+#: lib/gristService.ts:2989
+#: lib/gristService.ts:3017
 msgid "Identifier mismatch"
 msgstr "Divergence identifiant"
 
-#: lib/gristService.ts:2449
+#: lib/gristService.ts:2395
 msgid "Record deleted"
 msgstr "Notice supprimée"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2449
+#: lib/gristService.ts:2395
 msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
 msgstr "PPN {0} : la notice n'existe plus sur IdRef (404) — corriger ou retirer l'IdRef de l'Annuaire"
 
-#: lib/gristService.ts:2453
+#: lib/gristService.ts:2399
 msgid "Record unreadable"
 msgstr "Notice illisible"
 
 #. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:2453
+#: lib/gristService.ts:2399
 msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
 msgstr "PPN {0} : notice IdRef inaccessible (erreur réseau ou IdRef indisponible lors du run — relancer)"
 
-#: lib/gristService.ts:2736
+#: lib/gristService.ts:2682
 msgid "The Grist review only applies to the “search for missing” mode"
 msgstr "La revue Grist ne concerne que le mode « recherche des manquants »"
 
 #. placeholder {0}: await r.text()
-#: lib/gristService.ts:2751
-#: lib/gristService.ts:3361
+#: lib/gristService.ts:2697
+#: lib/gristService.ts:3307
 msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
 msgstr "Erreur création table {IDREF_REVIEW_TABLE} : {0}"
 
-#: lib/gristService.ts:2927
-#: lib/gristService.ts:2934
-#: lib/gristService.ts:3036
-#: lib/gristService.ts:3058
+#: lib/gristService.ts:2873
+#: lib/gristService.ts:2880
+#: lib/gristService.ts:2982
+#: lib/gristService.ts:3004
 msgid "API unreachable during the run — rerun."
 msgstr "API injoignable lors du run — relancer."
 
-#: lib/gristService.ts:2934
-#: lib/gristService.ts:3058
+#: lib/gristService.ts:2880
+#: lib/gristService.ts:3004
 msgid "Verification error"
 msgstr "Erreur de vérification"
 
-#: lib/gristService.ts:2937
-#: lib/gristService.ts:3066
+#: lib/gristService.ts:2883
+#: lib/gristService.ts:3012
 msgid "Name mismatch"
 msgstr "Nom divergent"
 
 #. placeholder {0}: r.id
 #. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:2937
+#: lib/gristService.ts:2883
 msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
 msgstr "{0} « {1} » ≠ Annuaire « {displayName} »"
 
 #. placeholder {0}: sus.id
 #. placeholder {1}: sus.fullName || '?'
 #. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:2938
+#: lib/gristService.ts:2884
 msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} « {1} » : {2} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#: lib/gristService.ts:2941
+#: lib/gristService.ts:2887
 msgid "{a} merged into {b}"
 msgstr "{a} fusionné dans {b}"
 
-#: lib/gristService.ts:2942
+#: lib/gristService.ts:2888
 msgid "{a} gone"
 msgstr "{a} disparu"
 
-#: lib/gristService.ts:2943
+#: lib/gristService.ts:2889
 msgid "{a} = missing ORCID profile"
 msgstr "{a} = profil ORCID manquant"
 
-#: lib/gristService.ts:2945
+#: lib/gristService.ts:2891
 msgid "List to fix (not written)"
 msgstr "Liste à corriger (non écrite)"
 
-#: lib/gristService.ts:2945
+#: lib/gristService.ts:2891
 msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
 msgstr "{detail} → relancer le run (écriture directe) ou corriger OpenAlex_ids"
 
-#: lib/gristService.ts:3049
+#: lib/gristService.ts:2995
 msgid "Unknown ORCID"
 msgstr "ORCID inconnu"
 
-#: lib/gristService.ts:3049
+#: lib/gristService.ts:2995
 msgid "Unknown Scopus Author ID"
 msgstr "Scopus Author ID inconnu"
 
-#: lib/gristService.ts:3049
+#: lib/gristService.ts:2995
 msgid "IdHAL unknown to HAL"
 msgstr "IdHAL inconnu de HAL"
 
 #. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:3050
+#: lib/gristService.ts:2996
 msgid "{0}: no profile — fix it in the Annuaire"
 msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 
-#: lib/gristService.ts:3054
+#: lib/gristService.ts:3000
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
 #. placeholder {0}: entry.scopus
-#: lib/gristService.ts:3054
+#: lib/gristService.ts:3000
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
 
-#: lib/gristService.ts:3055
+#: lib/gristService.ts:3001
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
 #. placeholder {0}: entry.orcid
-#: lib/gristService.ts:3055
+#: lib/gristService.ts:3001
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
 
-#: lib/gristService.ts:3063
+#: lib/gristService.ts:3009
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
 #. placeholder {0}: entry.scopus
 #. placeholder {1}: entry.merged
-#: lib/gristService.ts:3063
+#: lib/gristService.ts:3009
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
 
 #. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:3064
+#: lib/gristService.ts:3010
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
 #. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:3066
+#: lib/gristService.ts:3012
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
 msgstr "Annuaire « {displayName} » ≠ profil « {0} »{1}"
 
 #. placeholder {0}: meta.table
 #. placeholder {1}: meta.label
-#: lib/gristService.ts:3310
+#: lib/gristService.ts:3256
 msgid "Table {0} missing: run {1} first (the script creates it)."
 msgstr "Table {0} absente : lancez d'abord un run {1} (elle est créée par le script)."
 
