@@ -22,7 +22,8 @@ import type { DashboardDataset, DashboardPublication } from './types';
 export const LARGE_COLLAB_AUTHORS = 50;
 /** Reference publications needed for a subfield to enter the comparable reference. */
 const MIN_REFERENCE = 5;
-const OPEN = new Set(['diamond', 'gold', 'green', 'hybrid', 'bronze']);
+/** Open access statuses (OpenAlex oa_status), shared with the country focus. */
+export const OPEN_STATUSES = new Set(['diamond', 'gold', 'green', 'hybrid', 'bronze']);
 
 const fmt = (n: number) => n.toLocaleString(numberLocale());
 const pct = (n: number, d: number) => (d > 0 ? Math.round((n / d) * 100) : null);
@@ -177,7 +178,7 @@ export function partnerKpiItems(dataset: DashboardDataset, range: YearRange, ctx
     });
   }
 
-  const open = pubs.filter((p) => OPEN.has(p.oaStatus ?? '')).length;
+  const open = pubs.filter((p) => OPEN_STATUSES.has(p.oaStatus ?? '')).length;
   const openPct = pct(open, n);
   if (openPct != null) items.push({ key: 'open', label: i18n._(msg`Open access`), value: `${openPct} %`, hint: `${fmt(open)} / ${fmt(n)}` });
 
