@@ -1439,7 +1439,7 @@ msgstr "Total actually paid"
 
 #: components/dashboard/ApcTab.tsx:442
 #: components/dashboard/PublicationsListTab.tsx:403
-#: components/dashboard/publicationFilters.ts:258
+#: components/dashboard/publicationFilters.ts:260
 msgid "APC paid"
 msgstr "APC paid"
 
@@ -2573,145 +2573,238 @@ msgstr "Corpus compliance"
 msgid "Compliance by team unavailable: no team with at least 3 analysable publications (staff not matched?)."
 msgstr "Compliance by team unavailable: no team with at least 3 analysable publications (staff not matched?)."
 
-#: components/dashboard/CollaborationsTab.tsx:47
-#: components/dashboard/CollaborationsTab.tsx:289
+#: components/dashboard/CollaborationsTab.tsx:48
+#: components/dashboard/CollaborationsTab.tsx:307
 #: components/dashboard/charts/IntlVsNationalChart.tsx:35
 #: components/dashboard/kpiItems.ts:37
 msgctxt "feminine plural"
 msgid "International"
 msgstr "International"
 
-#: components/dashboard/CollaborationsTab.tsx:48
+#: components/dashboard/CollaborationsTab.tsx:49
 msgid "National (outside NU)"
 msgstr "National (outside NU)"
 
-#: components/dashboard/CollaborationsTab.tsx:49
+#: components/dashboard/CollaborationsTab.tsx:50
 msgid "Other Nantes Université lab"
 msgstr "Other Nantes Université lab"
 
-#: components/dashboard/CollaborationsTab.tsx:50
+#: components/dashboard/CollaborationsTab.tsx:51
 msgid "Between labs of the structure"
 msgstr "Between labs of the structure"
 
-#: components/dashboard/CollaborationsTab.tsx:51
+#: components/dashboard/CollaborationsTab.tsx:52
 msgid "No collaboration"
 msgstr "No collaboration"
 
-#: components/dashboard/CollaborationsTab.tsx:92
+#: components/dashboard/CollaborationsTab.tsx:93
 #: components/dashboard/embedRegistry.tsx:785
 msgid "Evolution of collaboration types"
 msgstr "Evolution of collaboration types"
 
-#: components/dashboard/CollaborationsTab.tsx:109
+#: components/dashboard/CollaborationsTab.tsx:110
 #: components/dashboard/embedRegistry.tsx:775
 msgid "Collaboration types"
 msgstr "Collaboration types"
 
-#: components/dashboard/CollaborationsTab.tsx:130
+#: components/dashboard/CollaborationsTab.tsx:131
 #: components/dashboard/PartnerBilanSection.tsx:412
 msgid "Domains of co-publications"
 msgstr "Domains of co-publications"
 
-#: components/dashboard/CollaborationsTab.tsx:147
+#: components/dashboard/CollaborationsTab.tsx:148
 #: components/dashboard/PartnerBilanSection.tsx:432
 msgid "Subfields of co-publications"
 msgstr "Subfields of co-publications"
 
-#: components/dashboard/CollaborationsTab.tsx:167
+#: components/dashboard/CollaborationsTab.tsx:168
 msgid "Collaboration topics by lab"
 msgstr "Collaboration topics by lab"
 
-#: components/dashboard/CollaborationsTab.tsx:168
+#: components/dashboard/CollaborationsTab.tsx:169
 msgid "Width ∝ shared co-publications (top OpenAlex subfields)"
 msgstr "Width ∝ shared co-publications (top OpenAlex subfields)"
 
-#: components/dashboard/CollaborationsTab.tsx:190
+#: components/dashboard/CollaborationsTab.tsx:191
 msgid "No publication concerned over the period."
 msgstr "No publication concerned over the period."
 
-#: components/dashboard/CollaborationsTab.tsx:204
+#: components/dashboard/CollaborationsTab.tsx:205
 msgid "Most co-signing {labWord}"
 msgstr "Most co-signing {labWord}"
 
-#: components/dashboard/CollaborationsTab.tsx:213
-#: components/dashboard/CollaborationsTab.tsx:388
+#: components/dashboard/CollaborationsTab.tsx:214
+#: components/dashboard/CollaborationsTab.tsx:407
 #: components/dashboard/PartnerBilanSection.tsx:423
 msgid "Yearly evolution"
 msgstr "Yearly evolution"
 
-#: components/dashboard/CollaborationsTab.tsx:285
+#: components/dashboard/CollaborationsTab.tsx:303
 msgid "Typology"
 msgstr "Typology"
 
-#: components/dashboard/CollaborationsTab.tsx:286
+#: components/dashboard/CollaborationsTab.tsx:304
 msgid "Within the structure"
 msgstr "Within the structure"
 
-#: components/dashboard/CollaborationsTab.tsx:287
+#: components/dashboard/CollaborationsTab.tsx:305
 msgid "Nantes Université"
 msgstr "Nantes Université"
 
-#: components/dashboard/CollaborationsTab.tsx:288
+#: components/dashboard/CollaborationsTab.tsx:306
 #: components/dashboard/charts/IntlVsNationalChart.tsx:28
 msgid "National"
 msgstr "National"
 
-#: components/dashboard/CollaborationsTab.tsx:290
+#: components/dashboard/CollaborationsTab.tsx:308
+msgid "By country"
+msgstr "By country"
+
+#: components/dashboard/CollaborationsTab.tsx:309
 #: components/dashboard/PartnerInstitutionPicker.tsx:39
 #: components/dashboard/report/templates.ts:146
 msgid "Partner institutions"
 msgstr "Partner institutions"
 
-#: components/dashboard/CollaborationsTab.tsx:314
+#: components/dashboard/CollaborationsTab.tsx:333
 msgid "The collaboration typology is not filled in for this corpus (run <0>scripts/backfill_collaborations.py</0>)."
 msgstr "The collaboration typology is not filled in for this corpus (run <0>scripts/backfill_collaborations.py</0>)."
 
 #. placeholder {0}: typology.typed.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:321
+#: components/dashboard/CollaborationsTab.tsx:340
 msgid "Broadest category per publication · {0} typed publications"
 msgstr "Broadest category per publication · {0} typed publications"
 
 #. placeholder {0}: dataset.lab
-#: components/dashboard/CollaborationsTab.tsx:335
+#: components/dashboard/CollaborationsTab.tsx:354
 msgid "Co-publications between {0} labs (≥ 2 internal sub-structures signing)"
 msgstr "Co-publications between {0} labs (≥ 2 internal sub-structures signing)"
 
-#: components/dashboard/CollaborationsTab.tsx:336
+#: components/dashboard/CollaborationsTab.tsx:355
 msgid "internal co-publications"
 msgstr "internal co-publications"
 
-#: components/dashboard/CollaborationsTab.tsx:338
-#: components/dashboard/CollaborationsTab.tsx:350
+#: components/dashboard/CollaborationsTab.tsx:357
+#: components/dashboard/CollaborationsTab.tsx:369
 #: components/dashboard/report/reportTables.ts:49
 msgid "Labs"
 msgstr "Labs"
 
-#: components/dashboard/CollaborationsTab.tsx:347
+#: components/dashboard/CollaborationsTab.tsx:366
 msgid "Co-publications with other Nantes Université labs (outside the current structure)"
 msgstr "Co-publications with other Nantes Université labs (outside the current structure)"
 
-#: components/dashboard/CollaborationsTab.tsx:348
+#: components/dashboard/CollaborationsTab.tsx:367
 msgid "publications with ≥ 1 other NU lab"
 msgstr "publications with ≥ 1 other NU lab"
 
 #. placeholder {0}: nantesProvenance.graphOnly.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:357
+#: components/dashboard/CollaborationsTab.tsx:376
 msgid "Including {0} publications found only through the co-authors' lab memberships in the CRISalid graph (for instance clinicians who sign « CHU Nantes » without their lab)."
 msgstr "Including {0} publications found only through the co-authors' lab memberships in the CRISalid graph (for instance clinicians who sign « CHU Nantes » without their lab)."
 
-#: components/dashboard/CollaborationsTab.tsx:367
+#: components/dashboard/CollaborationsTab.tsx:386
 msgid "No national partners identified (run <0>scripts/backfill_collaborations.py</0>)."
 msgstr "No national partners identified (run <0>scripts/backfill_collaborations.py</0>)."
 
 #. placeholder {0}: national.total.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:372
+#: components/dashboard/CollaborationsTab.tsx:391
 msgid "Co-signing French institutions (outside Nantes Université) — <0>{0}</0> publications with ≥ 1 national partner."
 msgstr "Co-signing French institutions (outside Nantes Université) — <0>{0}</0> publications with ≥ 1 national partner."
 
-#: components/dashboard/CollaborationsTab.tsx:379
+#: components/dashboard/CollaborationsTab.tsx:398
 #: components/dashboard/embedRegistry.tsx:894
 msgid "Most co-signing institutions"
 msgstr "Most co-signing institutions"
+
+#: components/dashboard/CountrySection.tsx:93
+msgid "No international co-publication over the period."
+msgstr "No international co-publication over the period."
+
+#: components/dashboard/CountrySection.tsx:102
+#: components/dashboard/countryKpis.ts:59
+#: components/dashboard/embedRegistry.tsx:931
+#: components/dashboard/embedRegistry.tsx:936
+#: components/dashboard/partnerKpis.ts:175
+msgid "Labs involved"
+msgstr "Labs involved"
+
+#: components/dashboard/CountrySection.tsx:102
+#: components/dashboard/countryKpis.ts:59
+#: components/dashboard/partnerKpis.ts:175
+msgid "Teams involved"
+msgstr "Teams involved"
+
+#: components/dashboard/CountrySection.tsx:112
+#: components/dashboard/PublicationsListTab.tsx:361
+msgid "Partner country"
+msgstr "Partner country"
+
+#: components/dashboard/CountrySection.tsx:134
+msgid "Exclude large collaborations (> {LARGE_COLLAB_AUTHORS} authors)"
+msgstr "Exclude large collaborations (> {LARGE_COLLAB_AUTHORS} authors)"
+
+#: components/dashboard/CountrySection.tsx:145
+msgid "Group hospitals and institutes with their university"
+msgstr "Group hospitals and institutes with their university"
+
+#. placeholder {0}: bilan.total.toLocaleString(numberLocale())
+#. placeholder {0}: fmt(current.total)
+#. placeholder {0}: fmt(focus.total)
+#: components/dashboard/CountrySection.tsx:154
+#: components/dashboard/PartnerBilanSection.tsx:273
+#: components/dashboard/PartnerBilanSection.tsx:404
+#: components/dashboard/PartnerBreakdownSection.tsx:183
+msgid "View the {0} publications"
+msgstr "View the {0} publications"
+
+#: components/dashboard/CountrySection.tsx:161
+msgid "No co-publication with {country} over the period."
+msgstr "No co-publication with {country} over the period."
+
+#: components/dashboard/CountrySection.tsx:183
+msgid "Rank of {country} among the partner countries"
+msgstr "Rank of {country} among the partner countries"
+
+#: components/dashboard/CountrySection.tsx:189
+msgid "Institutions of {country}"
+msgstr "Institutions of {country}"
+
+#: components/dashboard/CountrySection.tsx:191
+msgid "Partner institutions in {country}"
+msgstr "Partner institutions in {country}"
+
+#: components/dashboard/CountrySection.tsx:192
+msgid "Hospitals and institutes counted with their university"
+msgstr "Hospitals and institutes counted with their university"
+
+#. placeholder {0}: i.affiliates.slice(0, 3).join(', ')
+#. placeholder {1}: i.affiliates.length > 3 ? '…' : ''
+#: components/dashboard/CountrySection.tsx:198
+msgid "with {0}{1}"
+msgstr "with {0}{1}"
+
+#: components/dashboard/CountrySection.tsx:213
+msgid "Labs and researchers involved"
+msgstr "Labs and researchers involved"
+
+#: components/dashboard/CountrySection.tsx:218
+msgid "A co-publication counts for each lab of its authors"
+msgstr "A co-publication counts for each lab of its authors"
+
+#: components/dashboard/CountrySection.tsx:226
+#: components/dashboard/countryKpis.ts:55
+#: components/dashboard/partnerKpis.ts:167
+msgid "Researchers involved"
+msgstr "Researchers involved"
+
+#: components/dashboard/CountrySection.tsx:236
+msgid "Impact"
+msgstr "Impact"
+
+#: components/dashboard/CountrySection.tsx:238
+msgid "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out. The reference is the other international co-publications of the structure in the same subfields, weighted like the co-publications with {country}."
+msgstr "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out. The reference is the other international co-publications of the structure in the same subfields, weighted like the co-publications with {country}."
 
 #: components/dashboard/EChartCard.tsx:282
 msgid "About “{title}”"
@@ -3895,8 +3988,9 @@ msgstr "1 active filter"
 #: components/dashboard/PublicationsListTab.tsx:296
 #: components/dashboard/benchmarkAggregates.ts:280
 #: components/dashboard/charts/OpenAccessDonutChart.tsx:55
+#: components/dashboard/countryKpis.ts:65
 #: components/dashboard/embedRegistry.tsx:259
-#: components/dashboard/partnerKpis.ts:182
+#: components/dashboard/partnerKpis.ts:183
 #: components/dashboard/themeKpis.ts:98
 msgid "Open access"
 msgstr "Open access"
@@ -4282,15 +4376,6 @@ msgstr "No publication matches these subjects over the displayed period."
 msgid "{0, plural, one {# matching publication} other {# matching publications}}"
 msgstr "{0, plural, one {# matching publication} other {# matching publications}}"
 
-#. placeholder {0}: bilan.total.toLocaleString(numberLocale())
-#. placeholder {0}: fmt(current.total)
-#. placeholder {0}: themeBilan.total.toLocaleString(numberLocale())
-#: components/dashboard/PartnerBilanSection.tsx:273
-#: components/dashboard/PartnerBilanSection.tsx:404
-#: components/dashboard/PartnerBreakdownSection.tsx:183
-msgid "View the {0} publications"
-msgstr "View the {0} publications"
-
 #: components/dashboard/PartnerBilanSection.tsx:281
 msgid "Domains (selected subject)"
 msgstr "Domains (selected subject)"
@@ -4523,10 +4608,6 @@ msgstr "Employment type"
 msgid "Collaboration"
 msgstr "Collaboration"
 
-#: components/dashboard/PublicationsListTab.tsx:361
-msgid "Partner country"
-msgstr "Partner country"
-
 #: components/dashboard/PublicationsListTab.tsx:367
 msgid "Domain"
 msgstr "Domain"
@@ -4545,22 +4626,22 @@ msgid "Sources (provenance)"
 msgstr "Sources (provenance)"
 
 #: components/dashboard/PublicationsListTab.tsx:393
-#: components/dashboard/publicationFilters.ts:256
+#: components/dashboard/publicationFilters.ts:258
 msgid "PhD student involved"
 msgstr "PhD student involved"
 
 #: components/dashboard/PublicationsListTab.tsx:398
-#: components/dashboard/publicationFilters.ts:257
+#: components/dashboard/publicationFilters.ts:259
 msgid "International collaboration"
 msgstr "International collaboration"
 
 #: components/dashboard/PublicationsListTab.tsx:408
-#: components/dashboard/publicationFilters.ts:259
+#: components/dashboard/publicationFilters.ts:261
 msgid "Top 10% citations"
 msgstr "Top 10% citations"
 
 #: components/dashboard/PublicationsListTab.tsx:413
-#: components/dashboard/publicationFilters.ts:260
+#: components/dashboard/publicationFilters.ts:262
 msgid "Top 1% citations"
 msgstr "Top 1% citations"
 
@@ -5243,6 +5324,21 @@ msgstr "Shared publications per year, for the main countries (excluding France)"
 msgid "Partner countries by year"
 msgstr "Partner countries by year"
 
+#: components/dashboard/charts/CountryTrendChart.tsx:49
+#: components/dashboard/countryKpis.ts:19
+#: components/dashboard/partnerKpis.ts:137
+msgid "Co-publications"
+msgstr "Co-publications"
+
+#: components/dashboard/charts/CountryTrendChart.tsx:56
+#: components/dashboard/countryKpis.ts:24
+msgid "Share of the international co-publications"
+msgstr "Share of the international co-publications"
+
+#: components/dashboard/charts/CountryTrendChart.tsx:73
+msgid "Co-publications with {country} per year"
+msgstr "Co-publications with {country} per year"
+
 #: components/dashboard/charts/EuByYearChart.tsx:35
 #: components/dashboard/charts/EuZoneChart.tsx:23
 msgid "European Union"
@@ -5462,7 +5558,7 @@ msgstr "Top 1% / 10% publications"
 msgid "Most cited publications in their field (OpenAlex)"
 msgstr "Most cited publications in their field (OpenAlex)"
 
-#: components/dashboard/charts/TopCountriesChart.tsx:50
+#: components/dashboard/charts/TopCountriesChart.tsx:57
 #: components/dashboard/embedRegistry.tsx:286
 msgid "Top partner countries"
 msgstr "Top partner countries"
@@ -5516,6 +5612,48 @@ msgstr "Number of co-signed publications by country (France excluded)"
 #: components/dashboard/embedRegistry.tsx:247
 msgid "Publications per year"
 msgstr "Publications per year"
+
+#: components/dashboard/countryKpis.ts:32
+msgid "Rank among the partner countries"
+msgstr "Rank among the partner countries"
+
+#. placeholder {0}: fmt(f.rank.of)
+#: components/dashboard/countryKpis.ts:34
+msgid "of {0} countries"
+msgstr "of {0} countries"
+
+#: components/dashboard/countryKpis.ts:42
+#: components/dashboard/partnerKpis.ts:145
+msgid "Trend"
+msgstr "Trend"
+
+#: components/dashboard/countryKpis.ts:50
+msgid "Bilateral co-publications"
+msgstr "Bilateral co-publications"
+
+#. placeholder {0}: fmt(f.bilateral)
+#: components/dashboard/countryKpis.ts:52
+msgid "{0} without another foreign country"
+msgstr "{0} without another foreign country"
+
+#. placeholder {0}: fmt(f.units.without)
+#. placeholder {0}: fmt(withoutLab)
+#: components/dashboard/countryKpis.ts:61
+#: components/dashboard/partnerKpis.ts:177
+msgid "{0} publications without identified lab"
+msgstr "{0} publications without identified lab"
+
+#: components/dashboard/countryKpis.ts:68
+#: components/dashboard/partnerKpis.ts:190
+msgid "Large collaborations"
+msgstr "Large collaborations"
+
+#. placeholder {0}: fmt(f.large)
+#. placeholder {0}: fmt(large)
+#: components/dashboard/countryKpis.ts:70
+#: components/dashboard/partnerKpis.ts:192
+msgid "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
+msgstr "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
 
 #: components/dashboard/embedRegistry.tsx:239
 msgid "No lab identified"
@@ -5640,12 +5778,6 @@ msgstr "Most co-signing French institutions"
 msgid "A publication co-signed by several of them counts for each"
 msgstr "A publication co-signed by several of them counts for each"
 
-#: components/dashboard/embedRegistry.tsx:931
-#: components/dashboard/embedRegistry.tsx:936
-#: components/dashboard/partnerKpis.ts:174
-msgid "Labs involved"
-msgstr "Labs involved"
-
 #: components/dashboard/embedRegistry.tsx:937
 msgid "Publications per member lab (a co-signed publication counts for each lab)"
 msgstr "Publications per member lab (a co-signed publication counts for each lab)"
@@ -5718,7 +5850,7 @@ msgid "staff not matched"
 msgstr "staff not matched"
 
 #: components/dashboard/kpiItems.ts:91
-#: components/dashboard/partnerKpis.ts:218
+#: components/dashboard/partnerKpis.ts:223
 msgid "Known FWCI"
 msgstr "Known FWCI"
 
@@ -5865,78 +5997,48 @@ msgstr "Outreach"
 msgid "Institutional"
 msgstr "Institutional"
 
-#: components/dashboard/partnerKpis.ts:136
-msgid "Co-publications"
-msgstr "Co-publications"
-
-#: components/dashboard/partnerKpis.ts:144
-msgid "Trend"
-msgstr "Trend"
-
 #. placeholder {0}: fmt(rank.of)
-#: components/dashboard/partnerKpis.ts:155
+#: components/dashboard/partnerKpis.ts:156
 msgid "of {0} foreign partners"
 msgstr "of {0} foreign partners"
 
 #. placeholder {0}: fmt(rank.of)
-#: components/dashboard/partnerKpis.ts:156
+#: components/dashboard/partnerKpis.ts:157
 msgid "of {0} French partners"
 msgstr "of {0} French partners"
 
 #. placeholder {0}: rank.name
-#: components/dashboard/partnerKpis.ts:159
+#: components/dashboard/partnerKpis.ts:160
 msgid "Rank of {0}"
 msgstr "Rank of {0}"
 
-#: components/dashboard/partnerKpis.ts:159
+#: components/dashboard/partnerKpis.ts:160
 msgid "Partner rank"
 msgstr "Partner rank"
 
 #. placeholder {0}: rank.countryRank
-#: components/dashboard/partnerKpis.ts:161
+#: components/dashboard/partnerKpis.ts:162
 msgid "{0} in {country}"
 msgstr "{0} in {country}"
 
-#: components/dashboard/partnerKpis.ts:166
-msgid "Researchers involved"
-msgstr "Researchers involved"
-
-#: components/dashboard/partnerKpis.ts:174
-msgid "Teams involved"
-msgstr "Teams involved"
-
-#. placeholder {0}: fmt(withoutLab)
-#: components/dashboard/partnerKpis.ts:176
-msgid "{0} publications without identified lab"
-msgstr "{0} publications without identified lab"
-
-#: components/dashboard/partnerKpis.ts:189
-msgid "Large collaborations"
-msgstr "Large collaborations"
-
-#. placeholder {0}: fmt(large)
-#: components/dashboard/partnerKpis.ts:191
-msgid "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
-msgstr "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
-
-#: components/dashboard/partnerKpis.ts:202
+#: components/dashboard/partnerKpis.ts:207
 msgid "reference: {text}"
 msgstr "reference: {text}"
 
-#: components/dashboard/partnerKpis.ts:206
+#: components/dashboard/partnerKpis.ts:211
 msgid "Median FWCI"
 msgstr "Median FWCI"
 
-#: components/dashboard/partnerKpis.ts:212
+#: components/dashboard/partnerKpis.ts:217
 msgid "Top 10% share"
 msgstr "Top 10% share"
 
 #. placeholder {0}: Math.round(c.coverage * 100)
-#: components/dashboard/partnerKpis.ts:221
+#: components/dashboard/partnerKpis.ts:226
 msgid "{0}% compared with the reference"
 msgstr "{0}% compared with the reference"
 
-#: components/dashboard/partnerKpis.ts:222
+#: components/dashboard/partnerKpis.ts:227
 msgid "reference too thin"
 msgstr "reference too thin"
 
@@ -5949,7 +6051,7 @@ msgid "Archives (former subscription)"
 msgstr "Archives (former subscription)"
 
 #: components/dashboard/phase4Aggregates.ts:27
-#: components/dashboard/publicationFilters.ts:255
+#: components/dashboard/publicationFilters.ts:257
 #: components/dashboard/themeKpis.ts:103
 msgid "National licence (ISTEX)"
 msgstr "National licence (ISTEX)"
@@ -5970,161 +6072,161 @@ msgstr "Closed access, unavailable at NU"
 msgid "Access not determined"
 msgstr "Access not determined"
 
-#: components/dashboard/publicationFilters.ts:261
+#: components/dashboard/publicationFilters.ts:263
 msgid "Signature compliant with the charter"
 msgstr "Signature compliant with the charter"
 
-#: components/dashboard/publicationFilters.ts:262
+#: components/dashboard/publicationFilters.ts:264
 msgid "Acknowledges a funder"
 msgstr "Acknowledges a funder"
 
 #. placeholder {0}: f.year
-#: components/dashboard/publicationFilters.ts:277
+#: components/dashboard/publicationFilters.ts:279
 msgid "Year: {0}"
 msgstr "Year: {0}"
 
 #. placeholder {0}: f.pubType
-#: components/dashboard/publicationFilters.ts:278
+#: components/dashboard/publicationFilters.ts:280
 msgid "Type: {0}"
 msgstr "Type: {0}"
 
 #. placeholder {0}: oaLabel(f.oaStatus)
-#: components/dashboard/publicationFilters.ts:279
+#: components/dashboard/publicationFilters.ts:281
 msgid "Open access: {0}"
 msgstr "Open access: {0}"
 
 #. placeholder {0}: languageLabel(f.language)
-#: components/dashboard/publicationFilters.ts:280
+#: components/dashboard/publicationFilters.ts:282
 msgid "Language: {0}"
 msgstr "Language: {0}"
 
 #. placeholder {0}: f.journal
-#: components/dashboard/publicationFilters.ts:281
+#: components/dashboard/publicationFilters.ts:283
 msgid "Journal: {0}"
 msgstr "Journal: {0}"
 
 #. placeholder {0}: f.publisher
-#: components/dashboard/publicationFilters.ts:282
+#: components/dashboard/publicationFilters.ts:284
 msgid "Publisher: {0}"
 msgstr "Publisher: {0}"
 
 #. placeholder {0}: f.quartile
-#: components/dashboard/publicationFilters.ts:283
+#: components/dashboard/publicationFilters.ts:285
 msgid "Quartile: {0}"
 msgstr "Quartile: {0}"
 
 #. placeholder {0}: accessLabel(f.journalAccess)
-#: components/dashboard/publicationFilters.ts:284
+#: components/dashboard/publicationFilters.ts:286
 msgid "NU access: {0}"
 msgstr "NU access: {0}"
 
 #. placeholder {0}: f.team
-#: components/dashboard/publicationFilters.ts:285
+#: components/dashboard/publicationFilters.ts:287
 msgid "Team: {0}"
 msgstr "Team: {0}"
 
 #. placeholder {0}: f.sousStructure
-#: components/dashboard/publicationFilters.ts:286
+#: components/dashboard/publicationFilters.ts:288
 msgid "Lab: {0}"
 msgstr "Lab: {0}"
 
 #. placeholder {0}: f.memberType
-#: components/dashboard/publicationFilters.ts:287
+#: components/dashboard/publicationFilters.ts:289
 msgid "Employment type: {0}"
 msgstr "Employment type: {0}"
 
-#: components/dashboard/publicationFilters.ts:290
+#: components/dashboard/publicationFilters.ts:292
 msgid "Author: {author}"
 msgstr "Author: {author}"
 
-#: components/dashboard/publicationFilters.ts:293
+#: components/dashboard/publicationFilters.ts:295
 msgid "Selected researchers"
 msgstr "Selected researchers"
 
 #. placeholder {0}: f.collabType
-#: components/dashboard/publicationFilters.ts:295
+#: components/dashboard/publicationFilters.ts:297
 msgid "Collaboration: {0}"
 msgstr "Collaboration: {0}"
 
 #. placeholder {0}: ctx.countryLabel(f.country)
-#: components/dashboard/publicationFilters.ts:296
+#: components/dashboard/publicationFilters.ts:298
 msgid "Country: {0}"
 msgstr "Country: {0}"
 
 #. placeholder {0}: f.nantesPartner
-#: components/dashboard/publicationFilters.ts:297
+#: components/dashboard/publicationFilters.ts:299
 msgid "NU lab: {0}"
 msgstr "NU lab: {0}"
 
 #. placeholder {0}: f.nationalPartner
-#: components/dashboard/publicationFilters.ts:298
+#: components/dashboard/publicationFilters.ts:300
 msgid "National partner: {0}"
 msgstr "National partner: {0}"
 
 #. placeholder {0}: f.partnerInstitution
-#: components/dashboard/publicationFilters.ts:300
+#: components/dashboard/publicationFilters.ts:302
 msgid "Partner: {0}"
 msgstr "Partner: {0}"
 
 #. placeholder {0}: names[0]
-#: components/dashboard/publicationFilters.ts:306
+#: components/dashboard/publicationFilters.ts:308
 msgid "Partner institution: {0}"
 msgstr "Partner institution: {0}"
 
-#: components/dashboard/publicationFilters.ts:306
+#: components/dashboard/publicationFilters.ts:308
 msgid "Partner institutions: {joined}"
 msgstr "Partner institutions: {joined}"
 
 #. placeholder {0}: f.domain
-#: components/dashboard/publicationFilters.ts:309
+#: components/dashboard/publicationFilters.ts:311
 msgid "Domain: {0}"
 msgstr "Domain: {0}"
 
 #. placeholder {0}: f.subfield
-#: components/dashboard/publicationFilters.ts:310
+#: components/dashboard/publicationFilters.ts:312
 msgid "Subfield: {0}"
 msgstr "Subfield: {0}"
 
 #. placeholder {0}: f.topic
-#: components/dashboard/publicationFilters.ts:311
+#: components/dashboard/publicationFilters.ts:313
 msgid "Topic: {0}"
 msgstr "Topic: {0}"
 
 #. placeholder {0}: f.themeKeys[0]
-#: components/dashboard/publicationFilters.ts:316
+#: components/dashboard/publicationFilters.ts:318
 msgid "Subject: {0}"
 msgstr "Subject: {0}"
 
-#: components/dashboard/publicationFilters.ts:316
+#: components/dashboard/publicationFilters.ts:318
 msgid "Subjects: {joined}"
 msgstr "Subjects: {joined}"
 
 #. placeholder {0}: f.theme
-#: components/dashboard/publicationFilters.ts:319
+#: components/dashboard/publicationFilters.ts:321
 msgid "Axis: {0}"
 msgstr "Axis: {0}"
 
 #. placeholder {0}: f.axe
-#: components/dashboard/publicationFilters.ts:320
+#: components/dashboard/publicationFilters.ts:322
 msgid "Strategic axis: {0}"
 msgstr "Strategic axis: {0}"
 
 #. placeholder {0}: f.sourceCombo
-#: components/dashboard/publicationFilters.ts:321
+#: components/dashboard/publicationFilters.ts:323
 msgid "Sources: {0}"
 msgstr "Sources: {0}"
 
 #. placeholder {0}: f.maxAuthors
-#: components/dashboard/publicationFilters.ts:322
+#: components/dashboard/publicationFilters.ts:324
 msgid "Excluding large collaborations (≤ {0} authors)"
 msgstr "Excluding large collaborations (≤ {0} authors)"
 
-#: components/dashboard/publicationFilters.ts:325
+#: components/dashboard/publicationFilters.ts:327
 msgid "Funders: {category}"
 msgstr "Funders: {category}"
 
 #. placeholder {0}: f.funder
-#: components/dashboard/publicationFilters.ts:327
+#: components/dashboard/publicationFilters.ts:329
 msgid "Funder: {0}"
 msgstr "Funder: {0}"
 
