@@ -1,6 +1,7 @@
 import { normalizeAcronym } from './normalize';
 import { purgeStoredDirectory } from './directoryStorage';
 import { installReadOnlyFetchGuard } from './readOnly';
+import { installSessionExpiryGuard } from './sessionGuard';
 import { gristPublicBaseUrl, setInstanceInfo, type InstanceInfo } from './instanceRuntime';
 
 /** Scope resolved server-side from the `groups` claim of the Keycloak token
@@ -76,6 +77,8 @@ interface UserInfo {
   instance?: InstanceInfo;
   /** Deployment environment (server DRUID_ENV): `production`, `test`… Absent on Cloudflare = production. */
   environment?: string;
+  /** `session` when the server authenticates by session cookie (server.cjs); absent on Cloudflare. */
+  auth?: 'session';
 }
 
 const EMPTY_ACCESS: DruidAccess = { isSuperAdmin: false, isMediaAdmin: false, isLabViewer: false, annuaireLabs: [], allowedSlugs: [] };
@@ -133,6 +136,8 @@ export const initKeycloak = (onAuthenticated: () => void): void => {
         setInstanceInfo(data.instance);
         // Read-only instance: reject every write before it leaves the browser (lib/readOnly.ts).
         if (data.capabilities?.READ_ONLY) installReadOnlyFetchGuard(gristPublicBaseUrl());
+        // Server session lost (deployment, expiry): every /api/… 401 sends the tab back to the login.
+        if (data.auth === 'session') installSessionExpiryGuard(redirectToLogin);
         onAuthenticated();
       }
     })
