@@ -152,6 +152,8 @@ describe('createGristPublicationsStore (D10)', () => {
     const store = createGristPublicationsStore({ main, readerFor: () => null });
     const items = await store.newsletter('laba');
     expect(items.map((i) => [i.id, i.statut])).toEqual([[2, 'valide'], [1, 'genere']]);
+    const withoutTable = createGristPublicationsStore({ main: fakeReader({ Annuaire: [] }), readerFor: () => null });
+    expect(await withoutTable.newsletter('laba')).toEqual([]);
   });
 
   it('reads the axis corrections from the side document, only when the instance may read it', async () => {

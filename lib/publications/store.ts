@@ -7,7 +7,8 @@ import { mapNewsletterRecords, NewsletterItem } from './newsletter';
 import { AXES_GRIST, AxisCorrectionRow, axisCorrectionRows } from './axes';
 
 export interface PublicationsStore {
-  /** News items of a structure (`slug` column of the Newsletter table), most recent first. */
+  /** News items of a structure (`slug` column of the Newsletter table), most recent first; none on an
+   * instance whose document has no Newsletter table (created by scripts/add_newsletter_table.cjs). */
   newsletter(slug: string): Promise<NewsletterItem[]>;
   /** Axis corrections of a structure; null when the structure has none (AXES_GRIST). */
   axisCorrections(slug: string): Promise<AxisCorrectionRow[] | null>;
@@ -25,6 +26,7 @@ export interface GristPublicationsStoreOptions {
 
 export const createGristPublicationsStore = ({ main, readerFor }: GristPublicationsStoreOptions): PublicationsStore => ({
   async newsletter(slug) {
+    if (!(await main.tableIds()).includes('Newsletter')) return [];
     return mapNewsletterRecords(await main.records('Newsletter', { slug: [slug] }));
   },
   async axisCorrections(slug) {
