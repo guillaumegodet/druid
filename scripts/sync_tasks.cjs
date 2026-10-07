@@ -94,12 +94,14 @@ const openNantesAffiliations = (notice) => (notice.affiliations || []).filter((a
 
 /** Identifiers exported to SoVisu+ in people.csv (server.cjs buildPeopleCsv) — SoVisu+ refuses
  * a person whose identifier already belongs to another person (« Conflicting identifiers »).
- * OpenAlex_ids is left out: cdb / the IKG ignore it. */
+ * OpenAlex_ids is left out: cdb / the IKG ignore it. The HR staff number (lib/hrId.ts) is not
+ * exported but is the surest sign of one person on two records (ext_ record + LDAP uid record). */
 const SHARED_ID_COLUMNS = [
   { col: 'ORCID', label: 'ORCID', norm: (v) => normOrcid(v), valid: (v) => /^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(v), url: (v) => `https://orcid.org/${v}` },
   { col: 'IdRef', label: 'IdRef', norm: (v) => String(v).trim().toUpperCase(), valid: (v) => /^\d{8}[\dX]$/.test(v), url: (v) => idrefUrl(v) },
   { col: 'IdHAL', label: 'IdHAL', norm: (v) => normId(v), valid: (v) => /^[a-z0-9][a-z0-9._-]+$/.test(v), url: (v) => `https://cv.hal.science/${v}` },
   { col: 'IdHAL_i', label: 'IdHAL numérique', norm: (v) => String(v).trim(), valid: (v) => /^[1-9]\d*$/.test(v), url: () => '' },
+  { col: 'N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_', label: 'N° agent', norm: (v) => String(v).trim().replace(/\.0+$/, '').replace(/^0+/, ''), valid: (v) => /^[1-9]\d*$/.test(v), url: () => '' },
   { col: 'ID_SCOPUS', label: 'Scopus', norm: (v) => String(v).trim(), valid: (v) => /^[1-9]\d{5,}$/.test(v), url: (v) => `https://www.scopus.com/authid/detail.uri?authorId=${v}` },
 ];
 /** Values of one identifier column (a cell may carry several, pipe- or comma-separated). */
