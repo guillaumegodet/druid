@@ -74,7 +74,7 @@ export async function composeReportPdf(
     description: definition.description || undefined,
     rows,
     generatedAt: new Date(),
-    sourceLine: i18n._(msg`Source: Druid / druid-biblio (OpenAlex, French Open Science Monitor). Document generated automatically from the bibliometric dashboard — the “interactive version” links open each chart with the same filters.`),
+    sourceLine: i18n._(msg`Source: Druid / druid-biblio (CRISalid, OpenAlex, HAL, French Open Science Monitor). Document generated automatically from the bibliometric dashboard — the “interactive version” links open each chart with the same filters.`),
   });
 
   pdf.sectionTitle(i18n._(msg`Methodological note`));
