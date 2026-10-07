@@ -191,10 +191,18 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
   const handleLdapLookup = async (uid: string): Promise<LdapLookupOutcome> => {
     setAutoLookup(false); // a remount of the tab must not fill the record again over the user's edits
     const person = await fetchLdapPerson(uid);
-    const { researcher: next, lab, otherLabs } = prefillFromLdap(localResearcher, person, structures, employerOptions);
+    // The automatic lookup (record opened from the LDAP arrivals) runs on mount, before the employer
+    // list has loaded: read it here rather than from the state, or the employer stays empty.
+    const options = employerOptions.length ? employerOptions
+      : await GristService.fetchInstitutions().then((etabs) => etabs.map((e) => e.name)).catch(() => []);
+    const { researcher: next, lab, otherLabs, inferredEmployer } = prefillFromLdap(localResearcher, person, structures, options);
     setLocalResearcher(next);
     const lines = [t`Filled from LDAP: ${next.displayName}.`];
     let tone: LdapLookupOutcome['tone'] = 'ok';
+    if (!inferredEmployer && !next.employment.employer) {
+      lines.push(t`Employer not deducible from LDAP (hosted account, ambiguous corps): choose it under Employment & contract.`);
+      tone = 'warn';
+    }
     if (lab) {
       // Only an empty membership is filled: a lab chosen by hand is kept.
       if (!affiliations.some((a) => a.structureName)) {

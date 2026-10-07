@@ -633,9 +633,9 @@ msgid "The group will be kept as soon as it has at least one member."
 msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 
 #: components/GroupList.tsx:168
-#: components/ResearcherDetail.tsx:300
-#: components/ResearcherDetail.tsx:466
-#: components/ResearcherDetail.tsx:569
+#: components/ResearcherDetail.tsx:308
+#: components/ResearcherDetail.tsx:474
+#: components/ResearcherDetail.tsx:577
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
 #: components/reports/NewReportDialog.tsx:311
@@ -820,184 +820,188 @@ msgid "Manual validation (Druid)"
 msgstr "Validation manuelle (Druid)"
 
 #. placeholder {0}: next.displayName
-#: components/ResearcherDetail.tsx:196
+#: components/ResearcherDetail.tsx:200
 msgid "Filled from LDAP: {0}."
 msgstr "Rempli depuis le LDAP : {0}."
 
-#: components/ResearcherDetail.tsx:204
+#: components/ResearcherDetail.tsx:203
+msgid "Employer not deducible from LDAP (hosted account, ambiguous corps): choose it under Employment & contract."
+msgstr "Employeur non déductible du LDAP (compte hébergé, corps ambigu) : choisissez-le dans « Emploi & contrat »."
+
+#: components/ResearcherDetail.tsx:212
 msgid "Lab: {lab}."
 msgstr "Labo : {lab}."
 
 #. placeholder {0}: otherLabs.join(', ')
-#: components/ResearcherDetail.tsx:206
+#: components/ResearcherDetail.tsx:214
 msgid "Other labs in LDAP: {0} — add them as memberships if relevant."
 msgstr "Autres labos dans le LDAP : {0} — à ajouter en appartenances si pertinent."
 
-#: components/ResearcherDetail.tsx:208
+#: components/ResearcherDetail.tsx:216
 #: components/researchers/AlignLaunchModal.tsx:153
 msgid "none"
 msgstr "aucune"
 
-#: components/ResearcherDetail.tsx:209
+#: components/ResearcherDetail.tsx:217
 msgid "No known lab among the LDAP affectations (principal: {affectation}): choose it in Memberships."
 msgstr "Aucun labo connu parmi les affectations LDAP (principale : {affectation}) : choisissez-le dans Appartenances."
 
-#: components/ResearcherDetail.tsx:215
+#: components/ResearcherDetail.tsx:223
 msgid "This uid already has a directory record ({labs}): check it before creating a duplicate."
 msgstr "Cet uid a déjà une fiche dans l'annuaire ({labs}) : vérifiez-la avant de créer un doublon."
 
-#: components/ResearcherDetail.tsx:240
+#: components/ResearcherDetail.tsx:248
 msgid "Back to the list"
 msgstr "Retour à la liste"
 
-#: components/ResearcherDetail.tsx:246
+#: components/ResearcherDetail.tsx:254
 #: components/Sidebar.tsx:158
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "Personnel"
 
-#: components/ResearcherDetail.tsx:258
+#: components/ResearcherDetail.tsx:266
 #: components/researchers/DuplicatesPage.tsx:142
 msgid "Directory"
 msgstr "Annuaire"
 
-#: components/ResearcherDetail.tsx:268
+#: components/ResearcherDetail.tsx:276
 msgid "Open the Grist document (Annuaire table)"
 msgstr "Ouvrir le document Grist (table Annuaire)"
 
-#: components/ResearcherDetail.tsx:277
+#: components/ResearcherDetail.tsx:285
 msgid "Validated record — click to review / unvalidate"
 msgstr "Fiche fiabilisée — cliquer pour revoir / dévalider"
 
-#: components/ResearcherDetail.tsx:277
+#: components/ResearcherDetail.tsx:285
 msgid "Validate this record"
 msgstr "Fiabiliser cette fiche"
 
-#: components/ResearcherDetail.tsx:280
+#: components/ResearcherDetail.tsx:288
 msgid "Validated record"
 msgstr "Fiche validée"
 
-#: components/ResearcherDetail.tsx:280
-#: components/ResearcherDetail.tsx:485
+#: components/ResearcherDetail.tsx:288
+#: components/ResearcherDetail.tsx:493
 msgid "Validate the record"
 msgstr "Valider la fiche"
 
-#: components/ResearcherDetail.tsx:286
+#: components/ResearcherDetail.tsx:294
 msgid "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 msgstr "Créer une tâche à réaliser hors Druid pour ce chercheur (IdRef, ORCID, HAL…)"
 
-#: components/ResearcherDetail.tsx:289
+#: components/ResearcherDetail.tsx:297
 msgid "Report a correction"
 msgstr "Signaler une correction"
 
-#: components/ResearcherDetail.tsx:297
+#: components/ResearcherDetail.tsx:305
 msgid "Export PDF"
 msgstr "Export PDF"
 
-#: components/ResearcherDetail.tsx:305
+#: components/ResearcherDetail.tsx:313
 #: components/StructureDetail.tsx:139
 #: components/dashboard/NewsletterPanel.tsx:400
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
 
-#: components/ResearcherDetail.tsx:305
+#: components/ResearcherDetail.tsx:313
 msgid "Create the record"
 msgstr "Créer la fiche"
 
-#: components/ResearcherDetail.tsx:337
-#: components/ResearcherDetail.tsx:338
+#: components/ResearcherDetail.tsx:345
+#: components/ResearcherDetail.tsx:346
 msgid "Edit photo (URL)"
 msgstr "Modifier la photo (URL)"
 
-#: components/ResearcherDetail.tsx:345
+#: components/ResearcherDetail.tsx:353
 msgid "Photo unavailable"
 msgstr "Photo inaccessible"
 
 #. placeholder {0}: researcher.uid || t`not provided`
 #. placeholder {1}: researcher.lastSync
-#: components/ResearcherDetail.tsx:363
+#: components/ResearcherDetail.tsx:371
 msgid "UID: {0} · Last sync: {1}"
 msgstr "UID : {0} · Dernière synchro : {1}"
 
-#: components/ResearcherDetail.tsx:363
+#: components/ResearcherDetail.tsx:371
 msgid "not provided"
 msgstr "non renseigné"
 
-#: components/ResearcherDetail.tsx:417
+#: components/ResearcherDetail.tsx:425
 msgid "Profile photo"
 msgstr "Photo de profil"
 
-#: components/ResearcherDetail.tsx:432
+#: components/ResearcherDetail.tsx:440
 msgid "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 msgstr "Indiquez l'adresse (http/https) d'une image publique : page du labo, annuaire, HAL… Laissez vide pour revenir aux initiales."
 
-#: components/ResearcherDetail.tsx:437
+#: components/ResearcherDetail.tsx:445
 msgid "Photo URL"
 msgstr "URL de la photo"
 
-#: components/ResearcherDetail.tsx:448
+#: components/ResearcherDetail.tsx:456
 msgid "The URL must start with http:// or https://."
 msgstr "L'URL doit commencer par http:// ou https://."
 
-#: components/ResearcherDetail.tsx:452
+#: components/ResearcherDetail.tsx:460
 msgid "The change will be written to Grist (photo_url column) when you click “Save”."
 msgstr "La modification sera écrite dans Grist (colonne photo_url) au clic sur « Enregistrer »."
 
-#: components/ResearcherDetail.tsx:462
+#: components/ResearcherDetail.tsx:470
 msgid "Remove photo"
 msgstr "Retirer la photo"
 
-#: components/ResearcherDetail.tsx:468
+#: components/ResearcherDetail.tsx:476
 msgid "Apply"
 msgstr "Appliquer"
 
-#: components/ResearcherDetail.tsx:497
+#: components/ResearcherDetail.tsx:505
 msgid "Validated status"
 msgstr "Statut validé"
 
-#: components/ResearcherDetail.tsx:511
+#: components/ResearcherDetail.tsx:519
 #: components/dashboard/MediaSourcesAdmin.tsx:217
 msgid "Scope"
 msgstr "Portée"
 
-#: components/ResearcherDetail.tsx:524
+#: components/ResearcherDetail.tsx:532
 #: components/researchers/AlignLaunchModal.tsx:128
 msgid "Source"
 msgstr "Source"
 
-#: components/ResearcherDetail.tsx:529
+#: components/ResearcherDetail.tsx:537
 msgid "E.g. 2026 lab survey, HR list…"
 msgstr "Ex. Enquête labo 2026, liste RH…"
 
-#: components/ResearcherDetail.tsx:537
+#: components/ResearcherDetail.tsx:545
 msgid "Date (auto)"
 msgstr "Date (auto)"
 
-#: components/ResearcherDetail.tsx:541
+#: components/ResearcherDetail.tsx:549
 msgid "Validated by (auto)"
 msgstr "Validé par (auto)"
 
 #. placeholder {0}: existingValidation.validationDate
 #. placeholder {1}: existingValidation.validatedBy
-#: components/ResearcherDetail.tsx:549
+#: components/ResearcherDetail.tsx:557
 msgid "Already validated on {0} by {1}."
 msgstr "Déjà validée le {0} par {1}."
 
 #. placeholder {0}: existingValidation.validationDate
-#: components/ResearcherDetail.tsx:550
+#: components/ResearcherDetail.tsx:558
 msgid "Already validated on {0}."
 msgstr "Déjà validée le {0}."
 
-#: components/ResearcherDetail.tsx:561
+#: components/ResearcherDetail.tsx:569
 msgid "Unvalidate"
 msgstr "Dévalider"
 
-#: components/ResearcherDetail.tsx:577
+#: components/ResearcherDetail.tsx:585
 msgid "Revalidate"
 msgstr "Revalider"
 
-#: components/ResearcherDetail.tsx:577
+#: components/ResearcherDetail.tsx:585
 #: components/dashboard/MediaMentionsPanel.tsx:317
 #: components/dashboard/NewsletterPanel.tsx:437
 #: components/researchers/GroupModal.tsx:65
