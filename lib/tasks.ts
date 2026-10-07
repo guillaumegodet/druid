@@ -65,6 +65,7 @@ export const TASK_TYPES = {
   parcours_identifiant_suspect: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Career path — identifiers never affiliated to the institution` },
   annuaire_uid_ldap: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — LDAP account found by the staff number: switch to the LDAP uid` },
   sovisu_ancienne_personne: { base: 'Annuaire', canal: 'interne', email: false, label: msg`SoVisu+ — remove the identifiers of the former person (uid changed)` },
+  annuaire_employeur_a_renseigner: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — employer to enter (record validated « external »)` },
   autre: { base: 'Autre', canal: 'interne', email: false, label: msg`Other` },
 } as const satisfies Record<string, TaskTypeMeta>;
 
