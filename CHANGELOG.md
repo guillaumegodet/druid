@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [1.6.1] — 2026-10-07
+
 ### Corrigé
 - Session perdue (redéploiement, expiration après 8 h) : les onglets ouverts reviennent à la connexion au premier
   appel refusé (401), au lieu d'afficher une erreur par écran (« Erreur Grist (Annuaire) » sur l'onglet Doublons).
