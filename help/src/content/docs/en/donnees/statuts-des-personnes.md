@@ -31,6 +31,16 @@ instance connected to an LDAP directory. See
 [Instances and features](/en/donnees/instances-fonctionnalites/).
 :::
 
+## Present, Leaving, Left: what each status means
+
+The **presence**, which stands in for the former status, takes three values:
+
+| Presence | Meaning |
+|---|---|
+| **Present** | Member of the unit. |
+| **Leaving** | Still there, but their departure is announced. |
+| **Left** | No longer there: contract end passed, account deleted, retirement… |
+
 ## The employer
 
 The employer comes from the record's **Employer** field, entered in Druid or taken from a

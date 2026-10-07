@@ -31,6 +31,16 @@ que sur une instance reliée à un annuaire LDAP. Voir
 [Instances et fonctionnalités](/donnees/instances-fonctionnalites/).
 :::
 
+## Présent, Départ, Parti : ce que veut dire chaque statut
+
+La **présence**, qui tient lieu de l'ancien statut, prend trois valeurs :
+
+| Présence | Signification |
+|---|---|
+| **Présent** | Membre de l'unité. |
+| **Départ** | Encore là, mais son départ est annoncé. |
+| **Parti** | N'est plus là : fin de contrat passée, compte supprimé, retraite… |
+
 ## L'employeur
 
 L'employeur vient du champ **Employeur** de la fiche, saisi dans Druid ou repris d'une liste
