@@ -1,6 +1,6 @@
 ---
 title: "Analyser les collaborations"
-description: "Lire les onglets de collaboration : typologie, nationales, internationales, établissements et alliances partenaires."
+description: "Lire les onglets de collaboration : typologie, nationales, internationales, par pays, établissements et alliances partenaires."
 sidebar:
   order: 3
 ---
@@ -25,12 +25,62 @@ d'universités. Il se lit sur la période et le périmètre choisis en haut du t
 | **(nom de votre établissement)** | Les autres laboratoires de l'établissement les plus cosignataires, et les thématiques partagées. |
 | **Nationales** | Les institutions françaises (hors établissement) les plus cosignataires. |
 | **Internationales** | Les pays et les organismes étrangers : carte, classement, évolution, flux. |
+| **Par pays** | La collaboration avec **un** pays partenaire : ses établissements, les labos et chercheurs impliqués, les thématiques, l'impact, les financeurs. |
 | **Institutions partenaires** | Le bilan des copublications avec une institution ou un groupe d'institutions choisi. |
 
 Les types de collaboration sont définis dans
 [Publications et attribution](/donnees/publications-attribution/#collaborations). Une
 publication peut en cumuler plusieurs ; la **Typologie** retient pour chacune la catégorie
 la plus large.
+
+## Faire le bilan avec un pays
+
+1. Ouvrez le sous-onglet **Par pays**.
+2. Choisissez le **Pays partenaire** : la liste va du pays qui compte le plus de
+   copublications sur la période à celui qui en compte le moins.
+3. Si besoin, cochez :
+   - **Exclure les grandes collaborations (> 50 auteurs)** pour écarter partout les
+     publications de grands consortiums ;
+   - **Regrouper hôpitaux et instituts avec leur université** pour compter, par exemple, un
+     institut de cardiologie avec l'université dont il dépend.
+4. Lisez les blocs, de haut en bas :
+   - **chiffres clés** : copublications, part des copublications internationales, rang du pays
+     parmi les pays partenaires, tendance, part de copublications **bilatérales** (sans autre
+     pays étranger), chercheurs et labos impliqués, accès ouvert, grandes collaborations ;
+   - **évolution** par année et **rang** du pays parmi les pays partenaires ;
+   - **établissements du pays** : carte, classement et, quand l'export les connaît,
+     répartition par **province, État ou région** ;
+   - **labos et chercheurs impliqués**, et **Qui travaille avec qui** : les principaux labos
+     croisés avec les principaux établissements du pays ;
+   - **thématiques** : domaines, sous-disciplines et **spécialisation** (voir plus bas) ;
+   - **impact**, comparé à une référence comparable ;
+   - **financements** : les financeurs remerciés, selon qu'ils sont du pays, européens,
+     français ou d'ailleurs ;
+   - **autres pays et langues** : part bilatérale, autres pays des copublications
+     multilatérales, langues.
+5. Cliquez sur un établissement, un chercheur, une case du tableau croisé, un financeur ou une
+   sous-discipline pour ouvrir les publications correspondantes ; **Voir les N publications**
+   ouvre toute la liste.
+
+Le lien de la page garde le pays et les options cochées : vous pouvez le partager tel quel.
+Chaque graphique peut aussi être **ajouté à un rapport** avec son pays ; pour un rapport
+complet, utilisez le modèle
+[Collaboration avec un pays](/guides/rapports/modeles/#collaboration-avec-un-pays).
+
+### Lire la spécialisation
+
+L'indice de **spécialisation** compare le poids d'une sous-discipline dans les copublications
+avec le pays à son poids dans **l'ensemble** des copublications internationales de la
+structure. Au-dessus de 1, la sous-discipline est plus présente avec ce pays qu'avec les
+autres ; en dessous, moins. Seules les sous-disciplines assez fréquentes sont retenues
+(20 copublications, 5 pour un petit corpus).
+
+### Lire l'impact
+
+L'impact des copublications (FWCI médian, part dans le top 10 %) est comparé aux **autres**
+copublications internationales de la structure dans les mêmes sous-disciplines, pondérées
+comme les copublications avec le pays. Les publications de plus de 50 auteurs en sont
+toujours écartées.
 
 ## Faire le bilan avec une institution ou une alliance
 
@@ -67,6 +117,13 @@ la liste.
 - **Les co-affiliations d'un même auteur** (un chercheur rattaché à l'université et au CNRS)
   ne sont pas comptées comme des collaborations.
 - **L'analyse thématique** est une aide : les sujets proposés sont à vérifier.
+- **Par pays** : une publication est rattachée au pays quand un de ses auteurs est affilié à un
+  établissement de ce pays. Les noms de provinces et de régions sont ceux d'OpenAlex, en
+  anglais. Pour l'export d'un établissement, cliquer sur un labo n'ouvre pas la liste (les labos
+  y sont portés par les auteurs, pas par les publications).
+- **Les financeurs sont ceux que les publications remercient** : ils ne disent ni qui a payé la
+  recherche ni qui porte le financement. La Commission européenne n'a pas de pays : elle est
+  classée « Europe ».
 
 ## Voir aussi
 

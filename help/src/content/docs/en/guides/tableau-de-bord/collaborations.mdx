@@ -1,6 +1,6 @@
 ---
 title: "Analyse collaborations"
-description: "Read the collaboration tabs: typology, national, international, partner institutions and alliances."
+description: "Read the collaboration tabs: typology, national, international, by country, partner institutions and alliances."
 sidebar:
   order: 3
 ---
@@ -25,11 +25,57 @@ the period and scope chosen at the top of the dashboard.
 | **(name of your institution)** | The institution's other laboratories that co-sign the most, and the shared topics. |
 | **National** | The French institutions (outside the institution) that co-sign the most. |
 | **International** | Foreign countries and organisations: map, ranking, trends, flows. |
+| **By country** | The collaboration with **one** partner country: its institutions, the labs and researchers involved, themes, impact, funders. |
 | **Partner institutions** | The review of co-publications with a chosen institution or group of institutions. |
 
 Collaboration types are defined in
 [Publications and attribution](/en/donnees/publications-attribution/#collaborations). A
 publication can combine several; the **Typology** keeps the broadest category for each.
+
+## Review collaborations with a country
+
+1. Open the **By country** sub-tab.
+2. Choose the **Partner country**: the list goes from the country with the most
+   co-publications over the period to the one with the fewest.
+3. If needed, tick:
+   - **Exclude large collaborations (> 50 authors)** to leave out large consortia everywhere;
+   - **Group hospitals and institutes with their university** to count, for example, a heart
+     institute with the university it depends on.
+4. Read the blocks, from top to bottom:
+   - **key figures**: co-publications, share of the international co-publications, rank of the
+     country among the partner countries, trend, share of **bilateral** co-publications (no
+     other foreign country), researchers and labs involved, open access, large collaborations;
+   - **yearly trend** and **rank** of the country among the partner countries;
+   - **institutions of the country**: map, ranking and, when the export knows them, breakdown
+     by **province, state or region**;
+   - **labs and researchers involved**, and **Who works with whom**: the main labs crossed with
+     the main institutions of the country;
+   - **themes**: fields, subfields and **specialization** (see below);
+   - **impact**, compared with a comparable reference;
+   - **funding**: the funders acknowledged, depending on whether they are from the country,
+     European, French or elsewhere;
+   - **other countries and languages**: bilateral share, other countries of the multilateral
+     co-publications, languages.
+5. Click an institution, a researcher, a cell of the cross table, a funder or a subfield to open
+   the matching publications; **View the N publications** opens the whole list.
+
+The page link keeps the country and the ticked options: you can share it as is. Each chart can
+also be **added to a report** with its country; for a full report, use the
+[Collaboration with a country](/en/guides/rapports/modeles/#collaboration-with-a-country)
+template.
+
+### Reading the specialization
+
+The **specialization** index compares the weight of a subfield in the co-publications with the
+country with its weight in **all** the international co-publications of the structure. Above 1,
+the subfield is more present with this country than with the others; below 1, less. Only
+frequent enough subfields are kept (20 co-publications, 5 for a small corpus).
+
+### Reading the impact
+
+The impact of the co-publications (median FWCI, top 10% share) is compared with the **other**
+international co-publications of the structure in the same subfields, weighted like the
+co-publications with the country. Publications with more than 50 authors are always left out.
 
 ## Review collaborations with an institution or an alliance
 
@@ -66,6 +112,12 @@ publications opened in the list.
 - **Co-affiliations of the same author** (a researcher attached to both the university and
   the CNRS) are not counted as collaborations.
 - **Thematic analysis** is an aid: the suggested subjects need checking.
+- **By country**: a publication belongs to the country when one of its authors is affiliated
+  with an institution of that country. Province and region names are OpenAlex's, in English. For
+  an institution export, clicking a lab does not open the list (labs are carried by the
+  authors there, not by the publications).
+- **Funders are those the publications acknowledge**: they say neither who paid the research
+  nor who holds the grant. The European Commission has no country: it is classed « Europe ».
 
 ## See also
 

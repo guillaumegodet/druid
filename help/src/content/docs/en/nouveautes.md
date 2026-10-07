@@ -12,10 +12,24 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
 
 ### Dashboard
 
+- **Collaborations › By country**: the review of the collaborations with one partner country —
+  key figures and rank, trend, institutions of the country on a map and by province or region,
+  labs and researchers involved, « who works with whom », themes and specialization, impact,
+  funders. See
+  [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/#review-collaborations-with-a-country).
+- **More complete publication countries**: the countries of the co-signing institutions now
+  count; the international figures rise.
 - **Richer Researchers tab**: population filter (membership, category, presence),
   headcount, research FTE, **publication rate per research FTE and per age bracket**, age
   pyramid, publications per member, table exportable as CSV. See
   [Read the staff and the publication rate per FTE](/en/guides/tableau-de-bord/chercheurs-effectifs/).
+
+### Reports
+
+- **New « Collaboration with a country » template**: the full review of a collaboration with one
+  country, with no figure written in the texts. The **International collaborations** template
+  now covers every country. See
+  [Report templates](/en/guides/rapports/modeles/#collaboration-with-a-country).
 
 ### People
 
