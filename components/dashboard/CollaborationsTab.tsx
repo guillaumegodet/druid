@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { DashboardDataset } from './types';
 import { YearRange } from './overviewAggregates';
 import {
@@ -12,6 +12,7 @@ import {
 } from './collabAggregates';
 import { InternationalTab } from './InternationalTab';
 import { PartnerBilanSection } from './PartnerBilanSection';
+import { CountrySection } from './CountrySection';
 import { PubFilters } from './publicationFilters';
 import { TeamDonutChart, RankBarChart } from './charts/TeamCharts';
 import { YearlyEvolutionChart } from './charts/YearlyEvolutionChart';
@@ -236,7 +237,20 @@ const InternalCollabSection: React.FC<{
   );
 };
 
-type SubTab = 'typology' | 'structure' | 'nantes' | 'national' | 'international' | 'partners';
+type SubTab = 'typology' | 'structure' | 'nantes' | 'national' | 'international' | 'country' | 'partners';
+const SUB_TABS: SubTab[] = ['typology', 'structure', 'nantes', 'national', 'international', 'country', 'partners'];
+
+/** Sub-tab of the shareable link (`?sub=`, docs/plan-collaboration-pays.md § 2). */
+const readSubTab = (): SubTab => {
+  const v = new URLSearchParams(window.location.search).get('sub');
+  return SUB_TABS.includes(v as SubTab) ? (v as SubTab) : 'typology';
+};
+const writeSubTab = (sub: SubTab | null) => {
+  const p = new URLSearchParams(window.location.search);
+  if (sub && sub !== 'typology') p.set('sub', sub);
+  else p.delete('sub');
+  window.history.replaceState(window.history.state, '', `${window.location.pathname}?${p.toString()}`);
+};
 
 /**
  * « Collaborations » tab — full port of the Streamlit _tab_collaborations,
@@ -252,7 +266,11 @@ export const CollaborationsTab: React.FC<{
   const { t: tr } = useLingui();
   const { publications } = dataset;
   const composite = useMemo(() => hasSubStructures(publications), [publications]);
-  const [sub, setSub] = useState<SubTab>('typology');
+  const [sub, setSub] = useState<SubTab>(readSubTab);
+  useEffect(() => writeSubTab(sub), [sub]);
+  // A shared link may point to « Within the structure » on a structure without sub-structures.
+  useEffect(() => { if (sub === 'structure' && !composite) setSub('typology'); }, [sub, composite]);
+  useEffect(() => () => writeSubTab(null), []);
 
   const typology = useMemo(
     () => aggregateCollabTypology(publications, range),
@@ -287,6 +305,7 @@ export const CollaborationsTab: React.FC<{
     { key: 'nantes', label: tr`Nantes Université` },
     { key: 'national', label: tr`National` },
     { key: 'international', label: tr({ message: `International`, context: "feminine plural" }) },
+    { key: 'country', label: tr`By country` },
     { key: 'partners', label: tr`Partner institutions` },
   ];
 
@@ -396,6 +415,8 @@ export const CollaborationsTab: React.FC<{
       )}
 
       {sub === 'international' && <InternationalTab dataset={dataset} range={range} />}
+
+      {sub === 'country' && <CountrySection dataset={dataset} range={range} onOpenList={onOpenList} />}
 
       {sub === 'partners' && (
         <PartnerBilanSection dataset={dataset} range={range} onOpenList={onOpenList} />

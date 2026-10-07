@@ -117,6 +117,11 @@ describe('aggregateCountryFocus', () => {
     const g = aggregateCountryFocus(DS, RANGE, 'CA', { groupAffiliates: true });
     expect(g.institutions.map((i) => `${i.name}:${i.count}`)).toEqual(['Univ Alpha:3', 'Univ Beta:2']);
     expect(g.institutions[0]).toMatchObject({ key: '0aaaaaaa1', affiliates: ['Alpha Hospital'], city: 'Montréal' });
+    expect(g.institutions[0].partnerKeys.sort()).toEqual(['0aaaaaaa1', '0aaaaaaa2']);
+    // The keys open the same publications in the list.
+    const ctx = buildFilterContext(DS);
+    const listed = PUBS.filter((p) => matchesFilters(p, { country: 'CA', partnerKeys: g.institutions[0].partnerKeys }, ctx));
+    expect(titles(listed.filter((p) => (p.year as number) >= 2021))).toEqual(['P1', 'P2', 'P4']);
   });
 
   it('counts the regions and maps the institutions', () => {

@@ -8,7 +8,7 @@
 // predating 2026-10-07 missed the country of an institution on 11 % of the international
 // co-publications (§ 4.1 of the plan; fixed in druid-biblio, kept here as a safety net).
 
-import { researcherLabel, unitsOfDataset } from './collabAggregates';
+import { partnerKey, researcherLabel, unitsOfDataset } from './collabAggregates';
 import { countryLabel } from './labels';
 import type { CountItem, YearRange } from './overviewAggregates';
 import { compareImpact, halfTrend, LARGE_COLLAB_AUTHORS, OPEN_STATUSES, type ImpactComparison } from './partnerKpis';
@@ -72,6 +72,8 @@ export interface CountryInstitution {
   count: number;
   /** Institutions folded under this one (« Regrouper les affiliés »), itself excluded. */
   affiliates: string[];
+  /** Keys of the `partnerKeys` filter (publication list) covering the institution and its affiliates. */
+  partnerKeys: string[];
 }
 
 export interface CountryMapPoint {
@@ -294,10 +296,13 @@ export function aggregateCountryFocus(
           region: o.region ?? null,
           count: 0,
           affiliates: [],
+          partnerKeys: [],
         };
         instCount.set(k.key, entry);
       }
       if (k.name !== o.name && !entry.affiliates.includes(o.name)) entry.affiliates.push(o.name);
+      const filterKey = partnerKey(o, 'international');
+      if (!entry.partnerKeys.includes(filterKey)) entry.partnerKeys.push(filterKey);
       if (!keys.has(k.key)) {
         keys.add(k.key);
         entry.count += 1;
