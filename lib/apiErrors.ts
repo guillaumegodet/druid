@@ -45,7 +45,7 @@ export const API_ERRORS = [
   // directory domain API (/api/v1, lib/directory/api.ts)
   msg`Unknown API route`,
   msg`Directory storage unavailable`,
-  msg`API v1 not built`,
+  msg`API v1 unavailable`,
   msg`No OpenAlex identifier configured for this structure`,
   msg`No dashboard data for this structure`,
   // chat / newsletter / analysis

@@ -2967,10 +2967,11 @@ try {
     appRoot: __dirname,
   });
 } catch (err) {
-  console.error('[api/v1] server-api.cjs unavailable (run `npm run build:server`):', err.message);
+  // Bundle missing (run `npm run build:server`) or configuration error (no Grist document).
+  console.error('[api/v1] unavailable:', err.message);
 }
 app.all('/api/v1/*', (req, res, next) => {
-  if (!apiV1Handler) return res.status(503).json({ error: 'API v1 not built' });
+  if (!apiV1Handler) return res.status(503).json({ error: 'API v1 unavailable' });
   apiV1Handler(req, res).catch(next);
 });
 

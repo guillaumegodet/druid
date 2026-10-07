@@ -119,10 +119,12 @@ describe('createGristDirectoryRepository — merges and ABES fingerprints', () =
   const mergeRow = (id: number, date: string): GristRecord => ({ id, fields: { uid_dyna: `u${id}`, Nom: 'X', date, kept_rowid: 1, dropped_rowid: 2 } });
 
   it('lists the merge log, most recent first, and nothing before the first merge', async () => {
-    const withLog = createGristDirectoryRepository({
-      grist: fakeReader({ Fusions_log: [mergeRow(1, '2026-09-01'), mergeRow(2, '2026-10-01'), mergeRow(3, '2026-09-15')] }),
-    });
+    const log = [mergeRow(1, '2026-09-01'), mergeRow(2, '2026-10-01'), mergeRow(3, '2026-09-15')];
+    const withLog = createGristDirectoryRepository({ grist: fakeReader({ Fusions_log: log }) });
     expect((await withLog.merges(2)).items.map((m) => m.id)).toEqual([2, 3]);
+    // A merge written while the document date has not moved yet still shows up (no table cache).
+    log.push(mergeRow(4, '2026-10-08'));
+    expect((await withLog.merges(1)).items.map((m) => m.id)).toEqual([4]);
     const withoutLog = createGristDirectoryRepository({ grist: fakeReader({ Annuaire: ANNUAIRE }) });
     expect((await withoutLog.merges(50)).items).toEqual([]);
   });
@@ -242,11 +244,12 @@ describe('createDirectoryApi — institution tools and publications', () => {
     expect((await call('/api/v1/abes-exports', LAB)).body.items).toHaveLength(1);
   });
 
-  it('serves the newsletter and the axis corrections of the user\'s structures only', async () => {
+  it('serves the newsletter of the user\'s structures only, the axis corrections to every user', async () => {
     expect((await call('/api/v1/newsletter', ALL)).status).toBe(400);
     expect((await call('/api/v1/newsletter?slug=LAB-A', LAB)).status).toBe(200);
     expect((await call('/api/v1/newsletter?slug=lab2b', LAB)).status).toBe(403);
-    expect((await call('/api/v1/axis-corrections/ec-nantes', LAB)).status).toBe(403);
+    // A report on ec-nantes shared with a lab right shows the corrected axes (no personal data in them).
+    expect((await call('/api/v1/axis-corrections/ec-nantes', LAB)).status).toBe(200);
     expect((await call('/api/v1/axis-corrections/ec-nantes', ALL)).status).toBe(200);
     expect((await call('/api/v1/axis-corrections/laba', ALL)).status).toBe(404);
   });

@@ -89,6 +89,7 @@ const toWebRequest = (req: NodeRequest): Request => {
 
 /** Express handler of `/api/v1/*`. */
 export const createApiV1Handler = (options: ApiV1Options) => {
+  if (!options.gristDocId) throw new Error('VITE_GRIST_DOC_ID is not set: no directory document to serve');
   const api = createDirectoryApi();
   const readers = new Map<string, GristReader>();
   const allowedDocs = new Set([options.gristDocId, ...(options.gristExtraDocIds || [])].filter(Boolean));

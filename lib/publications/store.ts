@@ -26,8 +26,14 @@ export interface GristPublicationsStoreOptions {
 
 export const createGristPublicationsStore = ({ main, readerFor }: GristPublicationsStoreOptions): PublicationsStore => ({
   async newsletter(slug) {
-    if (!(await main.tableIds()).includes('Newsletter')) return [];
-    return mapNewsletterRecords(await main.records('Newsletter', { slug: [slug] }));
+    // Both requests at once: the records read fails (404) when the table does not exist.
+    const [tableIds, rows] = await Promise.all([
+      main.tableIds(),
+      main.records('Newsletter', { slug: [slug] }).catch((err: unknown) => err as Error),
+    ]);
+    if (!tableIds.includes('Newsletter')) return [];
+    if (rows instanceof Error) throw rows;
+    return mapNewsletterRecords(rows);
   },
   async axisCorrections(slug) {
     const cfg = AXES_GRIST[slug];

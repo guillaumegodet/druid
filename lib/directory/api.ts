@@ -11,7 +11,7 @@
 //   GET /api/v1/abes-exports             → { items: AbesExportMark[], updatedAt } (rows of the user's labs)
 //   GET /api/v1/merges?limit=50          → { items: MergeLogEntry[], updatedAt } (institution right only)
 //   GET /api/v1/newsletter?slug=<slug>   → { items: NewsletterItem[] }         (structures of the user)
-//   GET /api/v1/axis-corrections/<slug>  → { items: AxisCorrectionRow[] }      (structures of the user)
+//   GET /api/v1/axis-corrections/<slug>  → { items: AxisCorrectionRow[] }      (every authenticated user)
 import { Hono } from 'hono';
 import { normalizeAcronym } from '../normalize';
 import type { DirectoryRepository, DirectoryScope } from './repository';
@@ -61,9 +61,10 @@ export const createDirectoryApi = (): Hono<Env> => {
     return c.json({ items: await c.env.publications.newsletter(slug) }, 200, NO_STORE);
   });
 
+  // Classification of publications, no personal data: readable by every authenticated user, as through the
+  // proxy — a report shared with a lab right must show the same axes as the Axes tab (ec-nantes dashboard).
   app.get('/axis-corrections/:slug', async (c) => {
     const slug = c.req.param('slug');
-    if (!scopeAllowsSlug(c.env.scope!, slug)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
     const items = await c.env.publications.axisCorrections(slug);
     if (items === null) return c.json({ error: 'Not found' }, 404, NO_STORE);
     return c.json({ items }, 200, NO_STORE);

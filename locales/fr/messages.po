@@ -12443,8 +12443,8 @@ msgid "Directory storage unavailable"
 msgstr "Stockage de l'annuaire indisponible"
 
 #: lib/apiErrors.ts:48
-msgid "API v1 not built"
-msgstr "API v1 non construite sur ce serveur"
+msgid "API v1 unavailable"
+msgstr "API v1 indisponible sur ce serveur"
 
 #: lib/apiErrors.ts:49
 msgid "No OpenAlex identifier configured for this structure"

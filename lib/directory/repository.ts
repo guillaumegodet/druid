@@ -145,10 +145,18 @@ export const createGristDirectoryRepository = ({ grist, loadLdapCache }: GristDi
       const updatedAt = await grist.docUpdatedAt();
       return { items: mapInstitutionRecords(await rowsOf('Etablissements', updatedAt)), updatedAt };
     },
+    // Read on every call, outside the table cache: the history must show a merge right after it is written
+    // (even before the document date moves), and the log rows carry whole record snapshots (dropped_json…)
+    // that the mapped entries do not need — nothing worth keeping in memory.
     async merges(limit) {
-      const updatedAt = await grist.docUpdatedAt();
-      if (!(await grist.tableIds()).includes(MERGE_LOG_TABLE)) return { items: [], updatedAt };
-      return { items: mapMergeLogRecords(await rowsOf(MERGE_LOG_TABLE, updatedAt), limit), updatedAt };
+      const [updatedAt, tableIds, rows] = await Promise.all([
+        grist.docUpdatedAt(),
+        grist.tableIds(),
+        grist.records(MERGE_LOG_TABLE).catch((err: unknown) => err as Error),
+      ]);
+      if (!tableIds.includes(MERGE_LOG_TABLE)) return { items: [], updatedAt };
+      if (rows instanceof Error) throw rows;
+      return { items: mapMergeLogRecords(rows, limit), updatedAt };
     },
     async abesExports(scope) {
       const updatedAt = await grist.docUpdatedAt();
