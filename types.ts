@@ -26,6 +26,7 @@ export enum ViewState {
 // Reliability layer (manually validated status/affiliation).
 // Type-only import → erased at compile time, no runtime cycle.
 import type { ValidationInfo } from './lib/validation';
+import type { Presence, LdapAccountState, EmployerKind } from './lib/presence';
 
 /** Administrative statuses of a research staff member */
 export enum ResearcherStatus {
@@ -113,6 +114,13 @@ export interface Researcher {
   status: ResearcherStatus;
   /** Status derived from the sources (LDAP / dates), BEFORE the validation layer — used to flag a conflict. */
   derivedStatus?: ResearcherStatus;
+  /** Three axes replacing `status` (lib/presence.ts, docs/plan-statut-employeur-ldap.md). `status` is
+   * kept, computed from them, until every screen has moved. */
+  presence?: Presence;
+  /** Presence before the validation layer (conflict badge). */
+  derivedPresence?: Presence;
+  ldapAccount?: LdapAccountState;
+  employerKind?: EmployerKind;
   employment: Employment;
   affiliations: Affiliation[]; 
   
