@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createRequire } from 'node:module';
 import { buildArrivals, buildDepartures, defaultSince, LdapMovePerson } from '../ldapMoves';
-import { Researcher, ResearcherStatus, Structure, StructureLevel } from '../../types';
+import { Researcher, ResearcherStatus, Presence, Structure, StructureLevel } from '../../types';
 
 // ldap_common.cjs exits the process without the LDAP_* variables: dummy values, nothing is contacted.
 process.env.LDAP_URL = process.env.LDAP_URL || 'ldaps://ldap.example.org';
@@ -29,6 +29,7 @@ const move = (over: Partial<LdapMovePerson> = {}): LdapMovePerson => ({
 const researcher = (uid: string, status = ResearcherStatus.INTERNE): Researcher => ({
   id: uid,
   uid,
+  presence: status === ResearcherStatus.PARTI ? Presence.PARTI : status === ResearcherStatus.DEPART ? Presence.DEPART : Presence.PRESENT,
   lastName: uid.toUpperCase(),
   firstName: '',
   displayName: uid.toUpperCase(),

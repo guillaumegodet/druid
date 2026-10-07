@@ -81,6 +81,8 @@ const TASK_TYPES = {
   // Record validated « EXTERNE » without an employer: once validated_status holds the presence (D4),
   // the « not the institution » information only survives if the employer is entered.
   annuaire_employeur_a_renseigner: { base: 'Annuaire', canal: 'interne', email: false },
+  // Hosted LDAP account of another employer closing (D3): the presence does not follow it, a person checks.
+  annuaire_hebergement_fin: { base: 'Annuaire', canal: 'interne', email: false },
   autre: { base: 'Autre', canal: 'interne', email: false },
 };
 
@@ -129,6 +131,7 @@ const TITLES_FR = {
   annuaire_uid_ldap: 'Compte LDAP trouvé par le n° agent : passer la fiche sur l’uid LDAP',
   sovisu_ancienne_personne: 'SoVisu+ : retirer les identifiants de l’ancienne personne (uid changé)',
   annuaire_employeur_a_renseigner: 'Employeur à renseigner (fiche validée « externe »)',
+  annuaire_hebergement_fin: 'Compte LDAP hébergé en fermeture : départ probable ?',
   autre: 'Autre',
 };
 

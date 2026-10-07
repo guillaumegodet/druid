@@ -4,7 +4,8 @@
  * by uid (GET /api/ldap/person/:uid, scripts/lib/ldap_person.cjs) and maps it onto the new
  * record — same LDAP → Druid conventions as the directory sync (civility, grade, status).
  */
-import { ResearcherStatus, Researcher, Structure, StructureLevel } from '../types';
+import { ResearcherStatus, Researcher, Structure, StructureLevel, Presence } from '../types';
+import { employerKindOf, ldapAccountOf } from './presence';
 import { ldapGradeFor } from './emeritus';
 import { HOME_EMPLOYER, isExternalEmployer } from './validation';
 import { translateApiError } from './apiErrors';
@@ -120,6 +121,10 @@ export const prefillFromLdap = (
     eppn: person.eppn || researcher.eppn,
     birthDate: isoBirthDate(person.birthDate) || researcher.birthDate,
     status: person.etat ? (externalStatus ? ResearcherStatus.EXTERNE : statusFromEtat(person.etat)) : researcher.status,
+    // Three axes (lib/presence.ts) as fetchResearchers will compute them once saved.
+    presence: !externalStatus && /^D/i.test(person.etat) ? Presence.DEPART : Presence.PRESENT,
+    ldapAccount: ldapAccountOf(person.uid, person.etat || undefined),
+    employerKind: employerKindOf(employer),
     employment: {
       ...researcher.employment,
       employer,

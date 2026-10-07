@@ -6,7 +6,7 @@ import { ExportService } from '../lib/exportService';
 import { canUseEstablishmentTools, getUserInfo, hasCapability } from '../lib/auth';
 import type { ValidationInfo, ValidationScope } from '../lib/validation';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { PRESENCE_LABELS, STATUS_LABELS, VALIDATION_SCOPE_LABELS } from '../lib/researcherLabels';
+import { PRESENCE_LABELS, VALIDATION_SCOPE_LABELS } from '../lib/researcherLabels';
 
 // Sub-components
 import { GeneralTab } from './researchers/GeneralTab';
