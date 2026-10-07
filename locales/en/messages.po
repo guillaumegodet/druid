@@ -445,7 +445,7 @@ msgid "APC monitoring"
 msgstr "APC monitoring"
 
 #: components/DashboardPage.tsx:85
-#: components/dashboard/CountrySection.tsx:310
+#: components/dashboard/CountrySection.tsx:322
 #: components/dashboard/report/reportCatalog.ts:77
 msgid "Funding"
 msgstr "Funding"
@@ -2718,11 +2718,11 @@ msgstr "Co-signing French institutions (outside Nantes Université) — <0>{0}</
 msgid "Most co-signing institutions"
 msgstr "Most co-signing institutions"
 
-#: components/dashboard/CountrySection.tsx:97
+#: components/dashboard/CountrySection.tsx:98
 msgid "No international co-publication over the period."
 msgstr "No international co-publication over the period."
 
-#: components/dashboard/CountrySection.tsx:107
+#: components/dashboard/CountrySection.tsx:108
 #: components/dashboard/countryKpis.ts:59
 #: components/dashboard/embedRegistry.tsx:931
 #: components/dashboard/embedRegistry.tsx:936
@@ -2730,106 +2730,106 @@ msgstr "No international co-publication over the period."
 msgid "Labs involved"
 msgstr "Labs involved"
 
-#: components/dashboard/CountrySection.tsx:107
+#: components/dashboard/CountrySection.tsx:108
 #: components/dashboard/countryKpis.ts:59
 #: components/dashboard/partnerKpis.ts:175
 msgid "Teams involved"
 msgstr "Teams involved"
 
-#: components/dashboard/CountrySection.tsx:122
+#: components/dashboard/CountrySection.tsx:123
 #: components/dashboard/PublicationsListTab.tsx:361
 msgid "Partner country"
 msgstr "Partner country"
 
-#: components/dashboard/CountrySection.tsx:144
+#: components/dashboard/CountrySection.tsx:145
 msgid "Exclude large collaborations (> {LARGE_COLLAB_AUTHORS} authors)"
 msgstr "Exclude large collaborations (> {LARGE_COLLAB_AUTHORS} authors)"
 
-#: components/dashboard/CountrySection.tsx:155
+#: components/dashboard/CountrySection.tsx:156
 msgid "Group hospitals and institutes with their university"
 msgstr "Group hospitals and institutes with their university"
 
 #. placeholder {0}: bilan.total.toLocaleString(numberLocale())
 #. placeholder {0}: fmt(current.total)
 #. placeholder {0}: fmt(focus.total)
-#: components/dashboard/CountrySection.tsx:164
+#: components/dashboard/CountrySection.tsx:165
 #: components/dashboard/PartnerBilanSection.tsx:273
 #: components/dashboard/PartnerBilanSection.tsx:404
 #: components/dashboard/PartnerBreakdownSection.tsx:183
 msgid "View the {0} publications"
 msgstr "View the {0} publications"
 
-#: components/dashboard/CountrySection.tsx:171
+#: components/dashboard/CountrySection.tsx:172
 msgid "No co-publication with {country} over the period."
 msgstr "No co-publication with {country} over the period."
 
-#: components/dashboard/CountrySection.tsx:193
+#: components/dashboard/CountrySection.tsx:194
 msgid "Rank of {country} among the partner countries"
 msgstr "Rank of {country} among the partner countries"
 
-#: components/dashboard/CountrySection.tsx:199
+#: components/dashboard/CountrySection.tsx:200
 msgid "Institutions of {country}"
 msgstr "Institutions of {country}"
 
-#: components/dashboard/CountrySection.tsx:201
+#: components/dashboard/CountrySection.tsx:212
 msgid "Partner institutions in {country}"
 msgstr "Partner institutions in {country}"
 
-#: components/dashboard/CountrySection.tsx:202
+#: components/dashboard/CountrySection.tsx:213
 msgid "Hospitals and institutes counted with their university"
 msgstr "Hospitals and institutes counted with their university"
 
 #. placeholder {0}: i.affiliates.slice(0, 3).join(', ')
 #. placeholder {1}: i.affiliates.length > 3 ? '…' : ''
-#: components/dashboard/CountrySection.tsx:208
+#: components/dashboard/CountrySection.tsx:219
 msgid "with {0}{1}"
 msgstr "with {0}{1}"
 
-#: components/dashboard/CountrySection.tsx:223
+#: components/dashboard/CountrySection.tsx:235
 msgid "Labs and researchers involved"
 msgstr "Labs and researchers involved"
 
-#: components/dashboard/CountrySection.tsx:228
+#: components/dashboard/CountrySection.tsx:240
 msgid "A co-publication counts for each lab of its authors"
 msgstr "A co-publication counts for each lab of its authors"
 
-#: components/dashboard/CountrySection.tsx:237
+#: components/dashboard/CountrySection.tsx:249
 #: components/dashboard/countryKpis.ts:55
 #: components/dashboard/partnerKpis.ts:167
 msgid "Researchers involved"
 msgstr "Researchers involved"
 
-#: components/dashboard/CountrySection.tsx:249
+#: components/dashboard/CountrySection.tsx:261
 msgid "Who works with whom"
 msgstr "Who works with whom"
 
-#: components/dashboard/CountrySection.tsx:252
+#: components/dashboard/CountrySection.tsx:264
 msgid "Co-publications between the main teams and the main institutions of {country}"
 msgstr "Co-publications between the main teams and the main institutions of {country}"
 
-#: components/dashboard/CountrySection.tsx:253
+#: components/dashboard/CountrySection.tsx:265
 msgid "Co-publications between the main labs and the main institutions of {country}"
 msgstr "Co-publications between the main labs and the main institutions of {country}"
 
-#: components/dashboard/CountrySection.tsx:270
+#: components/dashboard/CountrySection.tsx:282
 msgid "Themes"
 msgstr "Themes"
 
-#: components/dashboard/CountrySection.tsx:274
+#: components/dashboard/CountrySection.tsx:286
 msgid "Domains of the co-publications"
 msgstr "Domains of the co-publications"
 
-#: components/dashboard/CountrySection.tsx:282
+#: components/dashboard/CountrySection.tsx:294
 #: components/dashboard/embedRegistry.tsx:536
 #: components/dashboard/embedRegistry.tsx:541
 msgid "Main subfields"
 msgstr "Main subfields"
 
-#: components/dashboard/CountrySection.tsx:298
+#: components/dashboard/CountrySection.tsx:310
 msgid "Impact"
 msgstr "Impact"
 
-#: components/dashboard/CountrySection.tsx:300
+#: components/dashboard/CountrySection.tsx:312
 msgid "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out. The reference is the other international co-publications of the structure in the same subfields, weighted like the co-publications with {country}."
 msgstr "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out. The reference is the other international co-publications of the structure in the same subfields, weighted like the co-publications with {country}."
 
@@ -2838,31 +2838,31 @@ msgstr "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out.
 #. placeholder {2}: fmt(focus.funderOrigins.country)
 #. placeholder {3}: fmt(focus.funderOrigins.europe)
 #. placeholder {4}: fmt(focus.funderOrigins.france)
-#: components/dashboard/CountrySection.tsx:312
+#: components/dashboard/CountrySection.tsx:324
 msgid "{0} co-publications acknowledge at least one funder ({1}): {2} a funder of {country}, {3} a European one, {4} a French one."
 msgstr "{0} co-publications acknowledge at least one funder ({1}): {2} a funder of {country}, {3} a European one, {4} a French one."
 
-#: components/dashboard/CountrySection.tsx:322
+#: components/dashboard/CountrySection.tsx:334
 msgid "Other countries and languages"
 msgstr "Other countries and languages"
 
-#: components/dashboard/CountrySection.tsx:325
+#: components/dashboard/CountrySection.tsx:337
 msgid "Bilateral or with other countries"
 msgstr "Bilateral or with other countries"
 
-#: components/dashboard/CountrySection.tsx:328
+#: components/dashboard/CountrySection.tsx:340
 msgid "{country} only"
 msgstr "{country} only"
 
-#: components/dashboard/CountrySection.tsx:329
+#: components/dashboard/CountrySection.tsx:341
 msgid "With other foreign countries"
 msgstr "With other foreign countries"
 
-#: components/dashboard/CountrySection.tsx:341
+#: components/dashboard/CountrySection.tsx:353
 msgid "Other countries of the multilateral co-publications"
 msgstr "Other countries of the multilateral co-publications"
 
-#: components/dashboard/CountrySection.tsx:347
+#: components/dashboard/CountrySection.tsx:359
 msgid "Languages of the co-publications"
 msgstr "Languages of the co-publications"
 
@@ -5413,6 +5413,19 @@ msgstr "No funder acknowledged by these co-publications."
 msgid "Partner countries by year"
 msgstr "Partner countries by year"
 
+#: components/dashboard/charts/CountryMapChart.tsx:79
+#: components/dashboard/charts/FranceMapChart.tsx:71
+msgid "Loading the map…"
+msgstr "Loading the map…"
+
+#: components/dashboard/charts/CountryMapChart.tsx:87
+msgid "Map of the partner institutions in {country}"
+msgstr "Map of the partner institutions in {country}"
+
+#: components/dashboard/charts/CountryMapChart.tsx:88
+msgid "Dot size ∝ number of co-publications · drag and zoom to explore"
+msgstr "Dot size ∝ number of co-publications · drag and zoom to explore"
+
 #: components/dashboard/charts/CountryTrendChart.tsx:49
 #: components/dashboard/countryKpis.ts:19
 #: components/dashboard/partnerKpis.ts:137
@@ -5472,10 +5485,6 @@ msgstr "Partnership flow map"
 #: components/dashboard/charts/FlowMapChart.tsx:99
 msgid "Arcs towards the cities of geolocated foreign partner organisations"
 msgstr "Arcs towards the cities of geolocated foreign partner organisations"
-
-#: components/dashboard/charts/FranceMapChart.tsx:71
-msgid "Loading the map…"
-msgstr "Loading the map…"
 
 #: components/dashboard/charts/FranceMapChart.tsx:78
 #: components/dashboard/embedRegistry.tsx:855

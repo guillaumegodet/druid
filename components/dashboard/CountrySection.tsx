@@ -15,6 +15,7 @@ import { RankBarChart, TeamDonutChart } from './charts/TeamCharts';
 import { FwciHistogramChart } from './charts/FwciHistogramChart';
 import { QuartileChart } from './charts/QuartileChart';
 import { MatrixHeatmapChart } from './charts/MatrixHeatmapChart';
+import { CountryMapChart } from './charts/CountryMapChart';
 import { SpecializationChart } from './charts/SpecializationChart';
 import { CountryFundersChart } from './charts/CountryFundersChart';
 import { LanguageDonutChart } from './charts/LanguageDonutChart';
@@ -197,28 +198,39 @@ export const CountrySection: React.FC<{
           </div>
 
           <h3 className={sectionTitle}><Trans>Institutions of {country}</Trans></h3>
-          <RankBarChart
-            title={t`Partner institutions in ${country}`}
-            subtitle={groupAffiliates ? t`Hospitals and institutes counted with their university` : undefined}
-            exportName="pays-etablissements"
-            data={focus.institutions.map((i) => ({
-              label: i.name,
-              count: i.count,
-              teams: i.affiliates.length
-                ? [t`with ${i.affiliates.slice(0, 3).join(', ')}${i.affiliates.length > 3 ? '…' : ''}`]
-                : i.city ? [i.city] : [],
-            }))}
-            colorSlot={3}
-            height={Math.max(280, focus.institutions.length * 26 + 60)}
-            onItemClick={
-              open
-                ? (name) => {
-                    const inst = focus.institutions.find((i) => i.name === name);
-                    if (inst) open({ partnerKeys: inst.partnerKeys });
-                  }
-                : undefined
-            }
-          />
+          <div className={`grid grid-cols-1 ${focus.bounds ? 'xl:grid-cols-2' : ''} gap-4`}>
+            {focus.bounds && (
+              <CountryMapChart
+                points={focus.mapPoints}
+                bounds={focus.bounds}
+                country={country}
+                polygon={dataset.countryNames[cc]?.echarts ?? ''}
+                onSelect={open ? (partnerInstitution) => open({ partnerInstitution }) : undefined}
+              />
+            )}
+            <RankBarChart
+              title={t`Partner institutions in ${country}`}
+              subtitle={groupAffiliates ? t`Hospitals and institutes counted with their university` : undefined}
+              exportName="pays-etablissements"
+              data={focus.institutions.map((i) => ({
+                label: i.name,
+                count: i.count,
+                teams: i.affiliates.length
+                  ? [t`with ${i.affiliates.slice(0, 3).join(', ')}${i.affiliates.length > 3 ? '…' : ''}`]
+                  : i.city ? [i.city] : [],
+              }))}
+              colorSlot={3}
+              height={Math.max(280, focus.institutions.length * 26 + 60)}
+              onItemClick={
+                open
+                  ? (name) => {
+                      const inst = focus.institutions.find((i) => i.name === name);
+                      if (inst) open({ partnerKeys: inst.partnerKeys });
+                    }
+                  : undefined
+              }
+            />
+          </div>
 
           <h3 className={sectionTitle}><Trans>Labs and researchers involved</Trans></h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
