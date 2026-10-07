@@ -18,6 +18,7 @@
 import { fuzzyDateLowerBound, fuzzyDateUpperBound } from '../../lib/dates';
 import type { DashboardDataset, DashboardPublication, MemberMeta, StaffCategory } from './types';
 import type { YearRange } from './overviewAggregates';
+import { countsForResearchers } from './editorialEntries';
 
 // ── Population filter ─────────────────────────────────────────────────────────
 
@@ -235,7 +236,7 @@ export function publicationRateByAge(
   }
 
   pubs.forEach((p, idx) => {
-    if (p.year === null || p.year < range.start || p.year > range.end) return;
+    if (p.year === null || p.year < range.start || p.year > range.end || !countsForResearchers(p)) return;
     const ks = new Set<string>();
     for (const id of p.authorIds) {
       const k = bracketOfAuthor.get(id)?.get(p.year);
@@ -361,7 +362,7 @@ export function publicationsPerMember(
   }
   const counts = new Map<number, number>();
   for (const p of pubs) {
-    if (p.year === null || p.year < range.start || p.year > range.end) continue;
+    if (p.year === null || p.year < range.start || p.year > range.end || !countsForResearchers(p)) continue;
     for (const id of p.authorIds) {
       if (presentYears.get(id)?.has(p.year)) counts.set(id, (counts.get(id) ?? 0) + 1);
     }

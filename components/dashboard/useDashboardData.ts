@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { DashboardDataset } from './types';
 import { fetchDashboardData } from '../../lib/dashboardSource';
 import { apiErrorText } from '../../lib/apiErrors';
+import { neutralizeEditorialEntries } from './editorialEntries';
 
 interface State {
   data: DashboardDataset | null;
@@ -34,8 +35,10 @@ export async function loadDashboardDataset(slug: string, isPublic = false): Prom
     return cached;
   }
   const json = await fetchDashboardData<DashboardDataset>(slug, isPublic);
-  if (json) cacheSet(slug, json);
-  return json;
+  if (!json) return null;
+  const dataset = neutralizeEditorialEntries(json);
+  cacheSet(slug, dataset);
+  return dataset;
 }
 
 /**
@@ -69,8 +72,9 @@ export function useDashboardData(
           setState({ data: null, loading: false, error: 'no-data' });
           return;
         }
-        cacheSet(slug, json);
-        setState({ data: json, loading: false, error: null });
+        const dataset = neutralizeEditorialEntries(json);
+        cacheSet(slug, dataset);
+        setState({ data: dataset, loading: false, error: null });
       })
       .catch((err: Error) => {
         if (!cancelled) setState({ data: null, loading: false, error: apiErrorText(err) });

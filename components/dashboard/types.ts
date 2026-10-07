@@ -77,6 +77,12 @@ export interface DashboardPublication {
    * predating 2026-09-15.
    */
   authorCount?: number | null;
+  /**
+   * Encyclopedia entry signed by the editors of the work, not by its author (present only
+   * when true, exports since 2026-10-07): never a collaboration nor in the researcher
+   * rankings — see editorialEntries.ts.
+   */
+  isEditorialEntry?: boolean;
   // phase 5: Collaborations tab
   collabTypes: string[];
   sousStructures: string[];
