@@ -20,6 +20,7 @@ export const FEATURE_LABELS: Record<DatasetFeature, MessageDescriptor> = {
   charte: msg`needs signature charter scores`,
   partnerGroup: msg`needs at least 2 partner institutions in the report filters`,
   country: msg`needs a partner country in the report filters`,
+  regions: msg`needs the regions of the partner institutions (recent export)`,
   labs: msg`needs the labs of the publications`,
 };
 

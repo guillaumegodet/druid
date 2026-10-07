@@ -40,7 +40,9 @@ export type DatasetFeature =
    */
   | 'partnerGroup'
   /** Not a dataset property: the block filters name a partner country (pays-* charts, scopeFeatures). */
-  | 'country';
+  | 'country'
+  /** Regions (province, state) of the partner institutions — exports since 2026-10-07. */
+  | 'regions';
 
 /**
  * Parameter of a chart: an integer between `min` and `max`, or one of `values`.
@@ -140,6 +142,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   'pays-rang': country(),
   'pays-carte': country(),
   'pays-etablissements': country({ params: [GROUP_PARAM] }),
+  'pays-regions': country({ requires: ['country', 'regions'] }),
   'pays-labos': country({ requires: ['country', 'labs'] }),
   'pays-chercheurs': country({ nominative: true, trivialUnder: ['authorId'] }),
   'pays-matrice': country({ requires: ['country', 'labs'], params: [GROUP_PARAM] }),
@@ -230,6 +233,7 @@ export function datasetFeatures(dataset: DashboardDataset): Set<DatasetFeature> 
   if (pubs.some((p) => p.journalAccess != null)) out.add('journalAccess');
   if (pubs.some((p) => p.charte?.score != null)) out.add('charte');
   if (unitsOfDataset(dataset).kind === 'labs') out.add('labs');
+  if (pubs.some((p) => p.partnerInstitutions.some((o) => o.region))) out.add('regions');
   return out;
 }
 

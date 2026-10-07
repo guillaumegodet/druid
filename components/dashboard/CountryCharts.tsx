@@ -9,6 +9,7 @@ import { msg } from '@lingui/core/macro';
 import type { CountryFocus } from './countryAggregates';
 import type { PubFilters } from './publicationFilters';
 import type { CountryName } from './types';
+import { numberLocale } from '../../lib/i18n';
 import { CountryTrendChart } from './charts/CountryTrendChart';
 import { TopCountriesChart } from './charts/TopCountriesChart';
 import { RankBarChart, TeamDonutChart } from './charts/TeamCharts';
@@ -89,6 +90,25 @@ export const CountryInstitutions: React.FC<CountryChartProps> = ({ focus, groupA
     }
   />
 );
+
+/**
+ * Co-publications per province / state of the institutions of the country (lot 6). Region names as
+ * OpenAlex gives them (English); a co-publication counts once per region.
+ */
+export const CountryRegions: React.FC<CountryChartProps> = ({ focus }) => {
+  if (!focus.regions.length) return null;
+  const top = focus.regions.slice(0, 15);
+  return (
+    <RankBarChart
+      title={i18n._(msg`Co-publications by region of ${focus.label}`)}
+      subtitle={i18n._(msg`Province, state or region of the partner institutions — ${focus.withRegion.toLocaleString(numberLocale())} of ${focus.total.toLocaleString(numberLocale())} co-publications have an institution with a known region; one co-publication counts for each of its regions`)}
+      exportName="pays-regions"
+      data={top.map((r) => ({ label: r.key, count: r.count, teams: [] }))}
+      colorSlot={4}
+      height={Math.max(220, top.length * 26 + 60)}
+    />
+  );
+};
 
 export const CountryUnits: React.FC<CountryChartProps> = ({ focus, open }) =>
   focus.units.kind ? (
