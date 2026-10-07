@@ -7,8 +7,11 @@
 // document without key, as the /api/grist proxy does.
 //
 // Rights: the Cloudflare instances have no lab scope (see functions/api/me.js): every account that gets
-// through Cloudflare Access reads the whole directory, as it did through the proxy.
-import { createDirectoryApi } from '../../../lib/directory/api.ts';
+// through Cloudflare Access reads the whole directory, as it did through the proxy. Writes, as through the
+// proxy: refused on a read-only instance, and without a Cloudflare Access identity (unless
+// ALLOW_ANONYMOUS_WRITES=true locally). The audit of the writes goes to the Functions log.
+import { AUDIT_HEADER, createDirectoryApi } from '../../../lib/directory/api.ts';
+import { createGristDirectoryCommands } from '../../../lib/directory/commands.ts';
 import { createGristDirectoryRepository, createGristReader } from '../../../lib/directory/repository.ts';
 import { createGristPublicationsStore } from '../../../lib/publications/store.ts';
 import { instanceOf, secretOf } from '../../_lib/instance.js';
@@ -34,12 +37,26 @@ export async function onRequest(context) {
       apiKey: apiKey || undefined,
       userAgent: `Druid-CRISalid-${instance.slug}/1.0`,
     });
+    const repository = createGristDirectoryRepository({ grist: main });
     store = {
-      repository: createGristDirectoryRepository({ grist: main }),
+      repository,
+      commands: createGristDirectoryCommands({ grist: main, repository }),
       // Only the instance document, as the /api/grist proxy (no side document on Cloudflare).
       publications: createGristPublicationsStore({ main, readerFor: (docId) => (docId === instance.grist.docId ? main : null) }),
     };
     stores.set(key, store);
   }
-  return api.fetch(context.request, { ...store, scope: { all: true, labAnchors: [] } });
+  const identity = context.request.headers.get('Cf-Access-Authenticated-User-Email');
+  const allowAnonymousWrites = !instance.shared && context.env.ALLOW_ANONYMOUS_WRITES === 'true';
+  const writeRefusal = instance.readOnly
+    ? { status: 403, error: 'Read-only instance: writes are disabled' }
+    : (!identity && !allowAnonymousWrites ? { status: 403, error: 'Grist writes require an authenticated user (Cloudflare Access)' } : null);
+
+  const response = await api.fetch(context.request, { ...store, scope: { all: true, labAnchors: [] }, writeRefusal });
+  const audit = response.headers.get(AUDIT_HEADER);
+  if (!audit) return response;
+  console.log(JSON.stringify({ event: 'api.write', instance: instance.slug, user: identity, path: new URL(context.request.url).pathname, status: response.status, writes: JSON.parse(audit) }));
+  const headers = new Headers(response.headers);
+  headers.delete(AUDIT_HEADER);
+  return new Response(response.body, { status: response.status, headers });
 }

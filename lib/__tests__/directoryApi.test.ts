@@ -178,6 +178,8 @@ describe('createDirectoryApi', () => {
     institutions: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
     merges: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
     abesExports: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
+    labsOfUid: vi.fn(async () => []),
+    invalidate: vi.fn(),
   });
   const stubPublications = (): PublicationsStore & { newsletter: ReturnType<typeof vi.fn> } => ({
     newsletter: vi.fn(async () => []),

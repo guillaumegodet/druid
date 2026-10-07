@@ -38,6 +38,10 @@ export interface DirectoryRepository {
   merges(limit: number): Promise<Versioned<MergeLogEntry>>;
   /** Fingerprints of the records already exported to ABES, on the rows of the scope. */
   abesExports(scope: DirectoryScope): Promise<Versioned<AbesExportMark>>;
+  /** Labs (LABO) of the directory rows carrying this uid, within the scope — duplicate warning of the creation form. */
+  labsOfUid(uid: string, scope: DirectoryScope): Promise<string[]>;
+  /** Forgets the cached reads (called by the commands after a write). */
+  invalidate(): void;
 }
 
 /** Minimal Grist REST client (the server holds the API key). */
@@ -50,6 +54,20 @@ export interface GristReader {
   tableIds(): Promise<string[]>;
 }
 
+/** Grist REST client with the write operations used by the domain API commands (lib/directory/commands.ts). */
+export interface GristClient extends GristReader {
+  /** Columns of a table: id + Grist fields (label, type, isFormula…). */
+  columns(table: string): Promise<{ id: string; fields: Record<string, any> }[]>;
+  addColumns(table: string, columns: { id: string; fields: Record<string, any> }[]): Promise<void>;
+  addTables(tables: { id: string; columns: { id: string; fields: Record<string, any> }[] }[]): Promise<void>;
+  /** Creates rows, returns their ids. */
+  addRecords(table: string, records: { fields: Record<string, any> }[]): Promise<number[]>;
+  updateRecords(table: string, records: { id: number; fields: Record<string, any> }[]): Promise<void>;
+  deleteRecords(table: string, ids: number[]): Promise<void>;
+  /** Read-only SQL (Grist /sql endpoint, parameterized). */
+  sql(query: string, args: unknown[]): Promise<Record<string, any>[]>;
+}
+
 export interface GristReaderOptions {
   apiBase: string;
   docId: string;
@@ -59,17 +77,24 @@ export interface GristReaderOptions {
   fetch?: typeof fetch;
 }
 
-export const createGristReader = ({ apiBase, docId, apiKey, userAgent, fetch: fetchImpl }: GristReaderOptions): GristReader => {
+export const createGristReader = ({ apiBase, docId, apiKey, userAgent, fetch: fetchImpl }: GristReaderOptions): GristClient => {
   const doFetch = fetchImpl ?? fetch;
   const docUrl = `${apiBase.replace(/\/+$/, '')}/docs/${encodeURIComponent(docId)}`;
-  const get = async (url: string): Promise<any> => {
+  const call = async (url: string, method = 'GET', body?: unknown): Promise<any> => {
     const headers: Record<string, string> = { Accept: 'application/json' };
     if (apiKey) headers.Authorization = `Bearer ${apiKey}`;
     if (userAgent) headers['User-Agent'] = userAgent;
-    const resp = await doFetch(url, { headers });
-    if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} on ${url.slice(docUrl.length) || '/'}`);
-    return resp.json();
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    const resp = await doFetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
+    if (!resp.ok) {
+      const detail = (await resp.text().catch(() => '')).slice(0, 300);
+      throw new Error(`Grist HTTP ${resp.status} on ${method} ${url.slice(docUrl.length) || '/'}${detail ? `: ${detail}` : ''}`);
+    }
+    const text = await resp.text();
+    return text ? JSON.parse(text) : null;
   };
+  const get = (url: string) => call(url);
+  const tableUrl = (table: string) => `${docUrl}/tables/${encodeURIComponent(table)}`;
   return {
     docUpdatedAt: async () => String((await get(docUrl))?.updatedAt || ''),
     records: async (table, filter) => {
@@ -77,6 +102,15 @@ export const createGristReader = ({ apiBase, docId, apiKey, userAgent, fetch: fe
       return (await get(`${docUrl}/tables/${encodeURIComponent(table)}/records${query}`))?.records ?? [];
     },
     tableIds: async () => ((await get(`${docUrl}/tables`))?.tables ?? []).map((t: { id: string }) => t.id),
+    columns: async (table) => (await get(`${tableUrl(table)}/columns`))?.columns ?? [],
+    addColumns: async (table, columns) => { await call(`${tableUrl(table)}/columns`, 'POST', { columns }); },
+    addTables: async (tables) => { await call(`${docUrl}/tables`, 'POST', { tables }); },
+    addRecords: async (table, records) =>
+      ((await call(`${tableUrl(table)}/records`, 'POST', { records }))?.records ?? []).map((r: { id: number }) => r.id),
+    updateRecords: async (table, records) => { await call(`${tableUrl(table)}/records`, 'PATCH', { records }); },
+    deleteRecords: async (table, ids) => { await call(`${tableUrl(table)}/data/delete`, 'POST', ids); },
+    sql: async (query, args) => ((await call(`${docUrl}/sql`, 'POST', { sql: query, args }))?.records ?? [])
+      .map((r: { fields: Record<string, any> }) => r.fields),
   };
 };
 
@@ -157,6 +191,16 @@ export const createGristDirectoryRepository = ({ grist, loadLdapCache }: GristDi
       if (!tableIds.includes(MERGE_LOG_TABLE)) return { items: [], updatedAt };
       if (rows instanceof Error) throw rows;
       return { items: mapMergeLogRecords(rows, limit), updatedAt };
+    },
+    async labsOfUid(uid, scope) {
+      const rows = await grist.records('Annuaire', { uid_dyna: [uid] });
+      const kept = scope.all ? rows : rows.filter(rowInScope(new Set(scope.labAnchors)));
+      return kept.map((r) => String(r.fields?.LABO || '—'));
+    },
+    invalidate() {
+      tables.clear();
+      allPeople = null;
+      structuresCache = null;
     },
     async abesExports(scope) {
       const updatedAt = await grist.docUpdatedAt();

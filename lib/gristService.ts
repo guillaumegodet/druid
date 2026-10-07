@@ -1,11 +1,11 @@
 import { t } from '@lingui/core/macro';
-import { Researcher, ResearcherStatus, Presence, Affiliation, Structure, Membership, StructureLevel } from '../types';
+import { Researcher, ResearcherStatus, Presence, Structure, Membership, StructureLevel } from '../types';
 import { hasCapability } from './auth';
 import { purgeStoredDirectory } from './directoryStorage';
 import { getGradeFromNcorps } from './gradeTypology';
 import { ldapGradeFor, resolveGrade, hasEmeritusTrace, EmeritusSignals } from './emeritus';
-import { parseValidation, validationToGristFields, ValidationInfo, isExternalEmployer } from './validation';
-import { normalizeFuzzyDate, isFuzzyDatePast, fuzzyDateLowerBound, fuzzyDateUpperBound } from './dates';
+import { parseValidation, ValidationInfo, isExternalEmployer } from './validation';
+import { fuzzyDateLowerBound, fuzzyDateUpperBound } from './dates';
 
 // --- LDAP sync: diff structures (Phase 1, read only) ---
 
@@ -19,17 +19,22 @@ export interface LdapFieldChange {
 import { PARKING_LABOS, classifyDuplicate, LdapDuplicateKind } from './mergeProposal';
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from './mergeLog';
 import { gristDocUrl } from './instanceRuntime';
-import { fteGristFields } from './fte';
 import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson';
 import { HR_ID_COLUMN, hrIdCell, hrIdProposal } from './hrId';
 import { DirectoryApi } from './directoryApi';
 import {
-  RATTACHEMENT_COL, RattachementRole, Institution, MergeLogEntry, fromGristDate, fromGristFuzzyDate, AFFILIATION_START_COL,
-  AFFILIATION_END_COL, MEMBERSHIP_TYPE_COL, parseMultiLabel,
+  RATTACHEMENT_COL, RattachementRole, RATTACHEMENT_CHOICES, DUPLICATE_DECISION_COL, Institution, MergeLogEntry, fromGristDate,
+  fromGristFuzzyDate, AFFILIATION_END_COL, parseMultiLabel,
 } from './directory/gristMapping';
 // Moved to lib/directory/gristMapping.ts (migration plan, lot 1), re-exported for the existing importers.
 export { RATTACHEMENT_COL, groupQualifiedRows } from './directory/gristMapping';
 export type { RattachementRole, Institution, MergeLogEntry } from './directory/gristMapping';
+import {
+  toGristEpoch, AnnuaireColumnMeta, planAffiliationRows, FUZZY_DATE_COLS,
+} from './directory/annuaireWrite';
+// Moved to lib/directory/annuaireWrite.ts (migration plan, lot 2 a), re-exported for the existing importers.
+export { planAffiliationRows };
+export type { AnnuaireColumnMeta, AffiliationRowPlan } from './directory/annuaireWrite';
 export { PARKING_LABOS };
 export type { LdapDuplicateKind };
 
@@ -578,12 +583,6 @@ export function buildUnifiedUpdates(
   return [...byRow.values()];
 }
 
-/** Converts 'YYYY-MM-DD' to an epoch timestamp (seconds, midnight UTC) for Grist Date columns. */
-const toGristEpoch = (ymd: string): number | null => {
-  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(ymd || '');
-  if (!m) return null;
-  return Math.floor(Date.UTC(+m[1], +m[2] - 1, +m[3]) / 1000);
-};
 
 // Grist doc and API base come from /api/me at runtime (lib/instanceRuntime.ts): gristDocUrl().
 // The Grist API key never reaches the client: the /api/grist proxy (server.cjs, functions/) injects it.
@@ -634,13 +633,10 @@ async function patchAnnuaireInChunks(
 /** Grist table for the collaborative review of IdRef suggestions (created on the fly by pushIdrefReview). */
 const IDREF_REVIEW_TABLE = 'Alignement_IdRef';
 
-/** Metadata of an Annuaire column (for merging: never write a formula). */
-export interface AnnuaireColumnMeta { id: string; label: string; type: string; isFormula: boolean }
 
 
-/** Qualification columns for multi-affiliations (duplicate merge plan, lot 1). */
-export const DUPLICATE_DECISION_COL = 'doublon_decision';
-const RATTACHEMENT_CHOICES: RattachementRole[] = ['PRINCIPAL', 'SECONDAIRE', 'HISTORIQUE'];
+/** Qualification columns for multi-affiliations (duplicate merge plan, lot 1): lib/directory/gristMapping.ts. */
+export { DUPLICATE_DECISION_COL };
 
 /** Creates the `rattachement` (Choice) and `doublon_decision` (Text) columns if missing. Idempotent. */
 async function ensureAffiliationColumns(): Promise<void> {
@@ -658,63 +654,13 @@ async function ensureAffiliationColumns(): Promise<void> {
 }
 
 
-/** Row plan of a record's memberships, the write-side counterpart of `groupQualifiedRows`. */
-export interface AffiliationRowPlan {
-  /** Membership written on the record's own row (the PRINCIPAL one). */
-  primary: Affiliation | undefined;
-  /** `rattachement` of the record's row: PRINCIPAL when other rows exist, '' when the record is back to
-   * a single row after carrying several, undefined = column left untouched. */
-  mainRole: RattachementRole | '' | undefined;
-  /** Existing qualified rows rewritten with a non-primary membership. */
-  patches: { rowId: number; affiliation: Affiliation; role: RattachementRole }[];
-  /** Non-primary memberships without a row to reuse → new Annuaire rows. */
-  creates: { affiliation: Affiliation; role: RattachementRole }[];
-  /** Qualified rows whose membership was removed from the record. */
-  deletes: number[];
-}
 
-/**
- * Maps the memberships edited in a record onto Annuaire rows: the primary one on the record's row,
- * each other one on its own row (same uid_dyna), qualified HISTORIQUE when its end date is past,
- * SECONDAIRE otherwise. Rows are reused before any creation (a primary switch swaps the contents of
- * two rows instead of deleting + recreating), leftover qualified rows are deleted.
- * `qualifiedRowIds`: the person's other rows carrying a `rattachement` (excluding the record's row).
- */
-export function planAffiliationRows(
-  mainRowId: number, affiliations: Affiliation[], qualifiedRowIds: number[], todayIso: string,
-): AffiliationRowPlan {
-  const primary = affiliations.find((a) => a.isPrimary) ?? affiliations[0];
-  const others = affiliations.filter((a) => a !== primary);
-  const roleOf = (a: Affiliation): RattachementRole =>
-    isFuzzyDatePast(normalizeFuzzyDate(a.endDate) ?? '', todayIso) ? 'HISTORIQUE' : 'SECONDAIRE';
-  const pool = qualifiedRowIds.filter((id) => id !== mainRowId);
-  const patches: AffiliationRowPlan['patches'] = [];
-  const pending: Affiliation[] = [];
-  for (const a of others) {
-    const i = a.gristRowId ? pool.indexOf(a.gristRowId) : -1;
-    if (i >= 0) patches.push({ rowId: pool.splice(i, 1)[0], affiliation: a, role: roleOf(a) });
-    else pending.push(a);
-  }
-  const creates: AffiliationRowPlan['creates'] = [];
-  for (const a of pending) {
-    const rowId = pool.shift();
-    if (rowId !== undefined) patches.push({ rowId, affiliation: a, role: roleOf(a) });
-    else creates.push({ affiliation: a, role: roleOf(a) });
-  }
-  const mainRole = others.length > 0 ? 'PRINCIPAL' : qualifiedRowIds.length > 0 ? '' : undefined;
-  return { primary, mainRole, patches, creates, deletes: pool };
-}
 
 /** Cache of the Annuaire columns (rarely changes). */
 let _annuaireColumnsCache: AnnuaireColumnMeta[] | null = null;
 async function fetchAnnuaireColumnsInternal(): Promise<AnnuaireColumnMeta[]> {
   if (_annuaireColumnsCache) return _annuaireColumnsCache;
-  const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/columns`);
-  if (!resp.ok) throw new Error('Erreur Grist (colonnes Annuaire)');
-  const { columns } = await resp.json();
-  _annuaireColumnsCache = columns.map((c: any) => ({
-    id: c.id, label: c.fields?.label || c.id, type: c.fields?.type || 'Any', isFormula: !!c.fields?.isFormula,
-  }));
+  _annuaireColumnsCache = await DirectoryApi.annuaireColumns();
   return _annuaireColumnsCache!;
 }
 
@@ -802,22 +748,6 @@ async function fetchInstitutionsInternal(): Promise<Institution[]> {
   return institutionsCache;
 }
 
-/**
- * Grist `Employeur` field (Reference column → rowId of `Etablissements`) from the
- * displayed label. Empty → 0 (reference cleared). A label outside the list
- * (legacy data) or an unreachable table → column left untouched.
- */
-async function employerToGristFields(employer?: string): Promise<Record<string, number>> {
-  const name = (employer || '').trim();
-  if (!name) return { 'Employeur': 0 };
-  try {
-    const match = (await fetchInstitutionsInternal()).find((e) => e.name === name);
-    return match ? { 'Employeur': match.id } : {};
-  } catch {
-    return {};
-  }
-}
-
 // Cache of the directory and of the structures, in MEMORY only (plan-separation-test-prod-rssi.md, lot 7): it used
 // to be kept in localStorage, i.e. on the disk of every browser that ever opened Druid, after the logout and for the
 // other users of the same computer. It now lasts as long as the tab. One timestamp per cache: with a shared one, a
@@ -836,19 +766,8 @@ purgeStoredDirectory();
 /** Sentinel id of a structure being created (« Nouvelle structure » page). */
 export const NEW_STRUCTURE_ID = 'S-new';
 
-/** The four employment / membership date columns holding reduced-precision dates (lib/dates.ts):
- * `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. Text columns once scripts/migrate_fuzzy_dates.cjs has run on the
- * document; still Date (epoch) columns before that — both are read, the writer adapts (see
- * `fuzzyDateCellEncoder`). */
-const FUZZY_DATE_COLS = ['employment_start_date', 'employment_end_date', AFFILIATION_START_COL, AFFILIATION_END_COL] as const;
 
 
-/** Encodes a Druid date (ISO YYYY-MM-DD, or legacy DD-MM-YYYY text) for a Grist Date column:
- * epoch seconds, the only valid representation whatever the column's `dateFormat`. Until
- * 2026-09-17 we wrote DD-MM-YYYY text: accepted by columns in DD-MM-YYYY format
- * (birth, employment) but stored as an invalid cell in `validation_date` and
- * `affiliation_*_date` (default format) — review lot 2, finding 1. Empty / unreadable → null. */
-const toGristDateCell = (date: any): number | null => toGristEpoch(fromGristDate(date));
 
 /** Cell writer for the FUZZY_DATE_COLS, decided from the document's column types (cached
  * metadata): Text column → canonical fuzzy string; Date column (document not migrated yet) → epoch
@@ -869,29 +788,6 @@ async function fuzzyDateCellEncoder(): Promise<FuzzyDateEncoder> {
     if (textCols.has(col)) return d;
     return toGristEpoch(col.endsWith('_end_date') ? fuzzyDateUpperBound(d) : fuzzyDateLowerBound(d));
   };
-}
-
-/** FTE cells of an Annuaire write (lib/fte.ts): columns of the document only, null when empty.
- * Column list unavailable → nothing written (the rest of the record is still saved). */
-async function fteCellFields(values: { fte?: number | null; researchFte?: number | null }): Promise<Record<string, number | null>> {
-  try {
-    return fteGristFields(await fetchAnnuaireColumnsInternal(), values);
-  } catch (e) {
-    console.warn('[gristService] Annuaire columns unavailable, FTE not written:', e);
-    return {};
-  }
-}
-
-/** HR staff number cell, only when the Annuaire has the column (instances without HR data do not). */
-async function hrIdCellFields(hrId?: string): Promise<Record<string, number>> {
-  const cell = hrIdCell(hrId || '');
-  if (cell === null) return {};
-  try {
-    return (await fetchAnnuaireColumnsInternal()).some((c) => c.id === HR_ID_COLUMN) ? { [HR_ID_COLUMN]: cell } : {};
-  } catch (e) {
-    console.warn('[gristService] Annuaire columns unavailable, HR staff number not written:', e);
-    return {};
-  }
 }
 
 // --- Helpers for the Structures V2 table format (= structures.csv of the directory bridge) ---
@@ -1202,202 +1098,20 @@ export const GristService = {
   /** Employing institutions (record dropdown + name → rowId resolution). */
   fetchInstitutions: (): Promise<Institution[]> => fetchInstitutionsInternal(),
 
+  /** New record (domain API POST /api/v1/people: fields built and scope checked by the server). */
   createResearcher: async (researcher: Researcher): Promise<void> => {
-    const encodeDate = await fuzzyDateCellEncoder();
-    const fields = {
-      'Nom': researcher.lastName,
-      'Prenom': researcher.firstName,
-      'Civilite': researcher.civility,
-      'uid_dyna': researcher.uid,
-      'Email': researcher.email,
-      'Nationalite': researcher.nationality,
-      'DATE_DE_NAISSANCE_JJ_MM_AAAA': toGristDateCell(researcher.birthDate),
-      // Affiliations: LABO (text, acronym) + Employeur (Reference, resolved by label)
-      'LABO': researcher.affiliations[0]?.structureName || '',
-      ...(await employerToGristFields(researcher.employment.employer)),
-      'team': researcher.affiliations[0]?.team || '',
-      [AFFILIATION_START_COL]: encodeDate(AFFILIATION_START_COL, researcher.affiliations[0]?.startDate),
-      [AFFILIATION_END_COL]: encodeDate(AFFILIATION_END_COL, researcher.affiliations[0]?.endDate),
-      [MEMBERSHIP_TYPE_COL]: researcher.affiliations[0]?.membershipType || null,
-      'employment_start_date': encodeDate('employment_start_date', researcher.employment.startDate),
-      'employment_end_date': encodeDate('employment_end_date', researcher.employment.endDate),
-      'Corps_grade': researcher.employment.grade || null,
-      'TYPE_EMPLOI': researcher.employment.contractType || null,
-      ...(await fteCellFields(researcher.employment)),
-      'ORCID': researcher.identifiers.orcid,
-      'IdRef': researcher.identifiers.idref,
-      'IdHAL': researcher.identifiers.halId,
-      'IdHAL_i': researcher.identifiers.halIdNum?.replace(/\D/g, '') || null,
-      'ID_SCOPUS': researcher.identifiers.scopusId,
-      'photo_url': researcher.photoUrl?.trim() || null,
-      // Declared public social media accounts (tracked by media monitoring).
-      'Bluesky': researcher.socials?.bluesky || null,
-      'Mastodon': researcher.socials?.mastodon || null,
-      'YouTube': researcher.socials?.youtube || null,
-      'Podcast_flux': researcher.socials?.podcast || null,
-      'Blog': researcher.socials?.blog || null,
-      'LinkedIn': researcher.socials?.linkedin || null,
-      // Academic profiles & public CVs.
-      'CV_institutionnel': researcher.profiles?.cvInstitutionnel || null,
-      'CV_site_labo': researcher.profiles?.cvSiteLabo || null,
-      'CV_pdf_docx_': researcher.profiles?.cvPdf || null,
-      'CV_HAL': researcher.profiles?.cvHal || null,
-      'Academia': researcher.profiles?.academia || null,
-      'Researchgate': researcher.profiles?.researchgate || null,
-      'Profil_GS': researcher.profiles?.googleScholar || null,
-      'Site_web': researcher.profiles?.website || null,
-      // Reliability layer (validated status/affiliation).
-      ...validationToGristFields(researcher.validation, toGristDateCell),
-      // Record filled from LDAP (« Fill from LDAP »): same traceability as the directory sync.
-      ...(researcher.ldapPrefill ? {
-        'statut_dyna': STATUT_DYNA_MAP[researcher.ldapPrefill.etat.toUpperCase()] || researcher.ldapPrefill.etat || null,
-        'Data_source': 'LDAP',
-        'LDAP_derniere_maj': researcher.ldapPrefill.date,
-        ...(await hrIdCellFields(researcher.hrId)),
-      } : {}),
-    };
-
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify({ records: [{ fields }] })
-    });
-
-    if (!resp.ok) throw new Error('Erreur CREATE Grist');
+    await DirectoryApi.createPerson(researcher);
   },
 
+  /** Saves a record and its memberships (domain API PUT /api/v1/people/:recordId: one Annuaire row per
+   * membership, removed rows logged in Fusions_log — lib/directory/commands.ts). */
   updateResearcher: async (researcher: Researcher): Promise<void> => {
     // Grist writes go by row number (gristRowId); the public id (uid/ext_) does not allow it.
     // Fallback to the old `G-<rowId>` id format for caches possibly older than the uid pivot.
     const gristId = researcher.gristRowId
       ?? (researcher.id.startsWith('G-') ? parseInt(researcher.id.slice(2)) : NaN);
     if (!gristId || isNaN(gristId)) throw new Error(t`Invalid Grist ID (gristRowId missing)`);
-    const encodeDate = await fuzzyDateCellEncoder();
-
-    // One Annuaire row per membership (grouped back by groupQualifiedRows on read): before
-    // 2026-09-25 only affiliations[0] was written, every other membership entered was silently lost.
-    const uid = String(researcher.uid || '').trim();
-    const siblings = uid
-      ? (await GristService.fetchAnnuaireRowsByUid(uid)).filter((r) => r.rowId !== gristId)
-      : [];
-    const qualified = siblings.filter((r) => String(r.fields[RATTACHEMENT_COL] || '').trim()).map((r) => r.rowId);
-    const plan = planAffiliationRows(gristId, researcher.affiliations || [], qualified, new Date().toISOString().slice(0, 10));
-    if (plan.patches.length + plan.creates.length > 0) {
-      if (!uid) throw new Error(t`Several affiliations can only be saved for a person with a directory identifier (uid_dyna).`);
-      if (qualified.length < siblings.length) {
-        throw new Error(t`This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation.`);
-      }
-      await ensureAffiliationColumns();
-    }
-    const membershipFields = (a: Affiliation | undefined) => ({
-      'LABO': a?.structureName || '',
-      'team': a?.team || '',
-      [AFFILIATION_START_COL]: encodeDate(AFFILIATION_START_COL, a?.startDate),
-      [AFFILIATION_END_COL]: encodeDate(AFFILIATION_END_COL, a?.endDate),
-      [MEMBERSHIP_TYPE_COL]: a?.membershipType || null,
-    });
-
-    const fields = {
-      'Nom': researcher.lastName,
-      'Prenom': researcher.firstName,
-      'Civilite': researcher.civility,
-      'Email': researcher.email,
-      'Nationalite': researcher.nationality,
-      'DATE_DE_NAISSANCE_JJ_MM_AAAA': toGristDateCell(researcher.birthDate),
-      // Affiliations: LABO (text, acronym) + Employeur (Reference, resolved by label)
-      ...membershipFields(plan.primary),
-      ...(plan.mainRole !== undefined ? { [RATTACHEMENT_COL]: plan.mainRole || null } : {}),
-      ...(await employerToGristFields(researcher.employment.employer)),
-      'ORCID': researcher.identifiers.orcid || null,
-      'IdRef': researcher.identifiers.idref || null,
-      'IdHAL': researcher.identifiers.halId || null,
-      'IdHAL_i': researcher.identifiers.halIdNum?.replace(/\D/g, '') || null,   // entered in the record or by sync_hal (verify)
-      'ID_SCOPUS': researcher.identifiers.scopusId || null,
-      'photo_url': researcher.photoUrl?.trim() || null,   // editable from the record's tile
-      'employment_start_date': encodeDate('employment_start_date', researcher.employment.startDate),
-      'employment_end_date': encodeDate('employment_end_date', researcher.employment.endDate),
-      'Corps_grade': researcher.employment.grade || null,
-      'TYPE_EMPLOI': researcher.employment.contractType || null,
-      ...(await fteCellFields(researcher.employment)),
-      // Declared public social media accounts (tracked by media monitoring).
-      'Bluesky': researcher.socials?.bluesky || null,
-      'Mastodon': researcher.socials?.mastodon || null,
-      'YouTube': researcher.socials?.youtube || null,
-      'Podcast_flux': researcher.socials?.podcast || null,
-      'Blog': researcher.socials?.blog || null,
-      'LinkedIn': researcher.socials?.linkedin || null,
-      // Academic profiles & public CVs.
-      'CV_institutionnel': researcher.profiles?.cvInstitutionnel || null,
-      'CV_site_labo': researcher.profiles?.cvSiteLabo || null,
-      'CV_pdf_docx_': researcher.profiles?.cvPdf || null,
-      'CV_HAL': researcher.profiles?.cvHal || null,
-      'Academia': researcher.profiles?.academia || null,
-      'Researchgate': researcher.profiles?.researchgate || null,
-      'Profil_GS': researcher.profiles?.googleScholar || null,
-      'Site_web': researcher.profiles?.website || null,
-      // Reliability layer (validated status/affiliation).
-      ...validationToGristFields(researcher.validation, toGristDateCell),
-    };
-
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ records: [{ id: gristId, fields }] })
-    });
-
-    if (!resp.ok) throw new Error('Erreur UPDATE Grist');
-
-    const headers = { 'Content-Type': 'application/json' };
-    if (plan.patches.length > 0) {
-      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-        method: 'PATCH', headers,
-        body: JSON.stringify({ records: plan.patches.map((p) => ({
-          id: p.rowId, fields: { ...membershipFields(p.affiliation), [RATTACHEMENT_COL]: p.role },
-        })) }),
-      });
-      if (!pr.ok) throw new Error(t`Grist error (writing the secondary affiliations): ${await pr.text()}`);
-    }
-    if (plan.creates.length > 0) {
-      // Identity copied on creation only: an existing row (from a merge) keeps its own values.
-      const identity = {
-        'uid_dyna': uid,
-        'Nom': researcher.lastName,
-        'Prenom': researcher.firstName,
-        'Civilite': researcher.civility,
-        'Email': researcher.email,
-        'ORCID': researcher.identifiers.orcid || null,
-        'IdRef': researcher.identifiers.idref || null,
-        'IdHAL': researcher.identifiers.halId || null,
-        'ID_SCOPUS': researcher.identifiers.scopusId || null,
-      };
-      const cr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-        method: 'POST', headers,
-        body: JSON.stringify({ records: plan.creates.map((c) => ({
-          fields: { ...identity, ...membershipFields(c.affiliation), [RATTACHEMENT_COL]: c.role },
-        })) }),
-      });
-      if (!cr.ok) throw new Error(t`Grist error (creating the secondary affiliations): ${await cr.text()}`);
-    }
-    if (plan.deletes.length > 0) {
-      // Snapshot in Fusions_log before deleting (restorable like a merge).
-      await ensureMergeLogTable();
-      const keep = { rowId: gristId, fields: { uid_dyna: uid, Nom: researcher.lastName, Prenom: researcher.firstName } };
-      const logs = siblings.filter((r) => plan.deletes.includes(r.rowId)).map((drop) => ({
-        fields: buildMergeLogRow({ keep, drop, patch: {}, author: 'druid', note: 'affiliation removed from the record' }),
-      }));
-      const lr = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`, {
-        method: 'POST', headers, body: JSON.stringify({ records: logs }),
-      });
-      if (!lr.ok) throw new Error(t`Grist error (merge log): ${await lr.text()}`);
-      const dr = await fetch(`${gristDocUrl()}/tables/Annuaire/data/delete`, {
-        method: 'POST', headers, body: JSON.stringify(plan.deletes),
-      });
-      if (!dr.ok) throw new Error(t`Grist error (deleting the removed affiliations): ${await dr.text()}`);
-    }
+    await DirectoryApi.updatePerson(gristId, researcher);
   },
 
   /**
@@ -1408,23 +1122,9 @@ export const GristService = {
   updateResearcherGroups: async (
     entries: Array<{ gristRowId: number; groups: string[] }>,
   ): Promise<void> => {
-    const records = entries
-      .filter((e) => e.gristRowId && !Number.isNaN(e.gristRowId))
-      .map((e) => ({ id: e.gristRowId, fields: { groupes: e.groups.join('|') } }));
-    if (records.length === 0) return;
-
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ records }),
-    });
-    if (!resp.ok) {
-      throw new Error(
-        t`Error saving the groups — does the \`groupes\` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)`,
-      );
-    }
+    const valid = entries.filter((e) => e.gristRowId && !Number.isNaN(e.gristRowId));
+    if (valid.length === 0) return;
+    await DirectoryApi.setGroups(valid.map((e) => ({ recordId: e.gristRowId, groups: e.groups })));
   },
 
   /**
@@ -1432,20 +1132,7 @@ export const GristService = {
    * without ORCID, group dashboards). Single-column PATCH by gristRowId.
    */
   updateResearcherOpenalexId: async (gristRowId: number, openalexId: string): Promise<void> => {
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        records: [{ id: gristRowId, fields: { openalex_author_id: openalexId } }],
-      }),
-    });
-    if (!resp.ok) {
-      throw new Error(
-        t`Error saving the author ID — does the \`openalex_author_id\` column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)`,
-      );
-    }
+    await DirectoryApi.setOpenalexId(gristRowId, openalexId);
   },
 
   /**
@@ -1456,19 +1143,9 @@ export const GristService = {
   applyValidation: async (
     entries: Array<{ gristRowId: number; validation: ValidationInfo }>,
   ): Promise<void> => {
-    const records = entries
-      .filter((e) => e.gristRowId && !Number.isNaN(e.gristRowId))
-      .map((e) => ({ id: e.gristRowId, fields: validationToGristFields(e.validation, toGristDateCell) }));
-    if (records.length === 0) return;
-
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ records }),
-    });
-    if (!resp.ok) throw new Error('Erreur APPLY VALIDATION Grist');
+    const valid = entries.filter((e) => e.gristRowId && !Number.isNaN(e.gristRowId));
+    if (valid.length === 0) return;
+    await DirectoryApi.applyValidations(valid.map((e) => ({ recordId: e.gristRowId, validation: e.validation })));
   },
 
   /**
@@ -1484,17 +1161,9 @@ export const GristService = {
 
   /** Flags records as sent to ABES (fingerprint + date), by Grist row number. */
   markAbesSent: async (entries: Array<{ gristRowId: number; hash: string }>, date: string): Promise<number> => {
-    const records = entries
-      .filter((e) => e.gristRowId && !Number.isNaN(e.gristRowId))
-      .map((e) => ({ id: e.gristRowId, fields: { ABES_export_hash: e.hash, ABES_export_date: date } }));
-    for (let i = 0; i < records.length; i += 200) {
-      const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ records: records.slice(i, i + 200) }),
-      });
-      if (!resp.ok) throw new Error(`Erreur Grist (marquage ABES) : ${await resp.text()}`);
-    }
-    return records.length;
+    const valid = entries.filter((e) => e.gristRowId && !Number.isNaN(e.gristRowId));
+    if (valid.length === 0) return 0;
+    return DirectoryApi.markAbesSent(valid.map((e) => ({ recordId: e.gristRowId, hash: e.hash })), date);
   },
 
   /** Local id of a structure created from Druid when no entity code (supannCodeEntite) is entered: `T-<LABO>-<SIGLE>` for a

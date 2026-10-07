@@ -12,6 +12,7 @@ import { translateApiError } from './apiErrors';
 import { normalizeHrId } from './hrId';
 import { hostingToolsOf, inferLdapEmployer, LdapEmployer } from './ldapEmployer';
 import { normalizeCivility } from './civility';
+import { STATUT_DYNA_MAP } from './ldapCodes';
 
 /** Entry returned by /api/ldap/person/:uid. */
 export interface LdapPerson {
@@ -44,8 +45,7 @@ export interface LdapPerson {
   affectationPrincipaleLabel: string;
 }
 
-/** Mapping dynaEtat code (LDAP) -> statut_dyna label (Grist). */
-export const STATUT_DYNA_MAP: Record<string, string> = { N: 'NORMAL', D: 'DEPART', A: 'ANTICIPE' };
+export { STATUT_DYNA_MAP };
 
 /** Druid status derived from an LDAP dynaEtat code (N → `Interne`, D → `Départ`, other → `Externe`). */
 export const statusFromEtat = (etat: any): ResearcherStatus => {

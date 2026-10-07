@@ -7,9 +7,10 @@
 // Keycloak session into a DirectoryScope.
 import fs from 'node:fs';
 import path from 'node:path';
-import { createDirectoryApi } from '../lib/directory/api';
+import { AUDIT_HEADER, createDirectoryApi } from '../lib/directory/api';
+import { createGristDirectoryCommands } from '../lib/directory/commands';
 import {
-  createGristDirectoryRepository, createGristReader, DirectoryScope, GristReader, LdapCacheSnapshot,
+  createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient, LdapCacheSnapshot,
 } from '../lib/directory/repository';
 import { createGristPublicationsStore } from '../lib/publications/store';
 
@@ -25,6 +26,8 @@ interface NodeResponse {
   status(code: number): NodeResponse;
   setHeader(name: string, value: string): void;
   end(body?: Buffer): void;
+  /** Express: the audit of the writes goes to res.locals.apiAudit, read by the activity log of server.cjs. */
+  locals?: Record<string, unknown>;
 }
 
 export interface ApiV1Options {
@@ -91,9 +94,9 @@ const toWebRequest = (req: NodeRequest): Request => {
 export const createApiV1Handler = (options: ApiV1Options) => {
   if (!options.gristDocId) throw new Error('VITE_GRIST_DOC_ID is not set: no directory document to serve');
   const api = createDirectoryApi();
-  const readers = new Map<string, GristReader>();
+  const readers = new Map<string, GristClient>();
   const allowedDocs = new Set([options.gristDocId, ...(options.gristExtraDocIds || [])].filter(Boolean));
-  const readerFor = (docId: string): GristReader | null => {
+  const readerFor = (docId: string): GristClient | null => {
     if (!allowedDocs.has(docId)) return null;
     if (!readers.has(docId)) {
       readers.set(docId, createGristReader({
@@ -105,10 +108,17 @@ export const createApiV1Handler = (options: ApiV1Options) => {
   const main = readerFor(options.gristDocId)!;
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapCacheLoader(options.appRoot) });
   const publications = createGristPublicationsStore({ main, readerFor });
+  const commands = createGristDirectoryCommands({ grist: main, repository });
   return async (req: NodeRequest, res: NodeResponse): Promise<void> => {
-    const response = await api.fetch(toWebRequest(req), { repository, publications, scope: scopeOfSession(req) });
+    const response = await api.fetch(toWebRequest(req), {
+      repository, publications, commands, scope: scopeOfSession(req), writeRefusal: null,
+    });
     res.status(response.status);
-    response.headers.forEach((value, name) => res.setHeader(name, value));
+    const audit = response.headers.get(AUDIT_HEADER);
+    if (audit && res.locals) {
+      try { res.locals.apiAudit = JSON.parse(audit); } catch { /* malformed: not logged */ }
+    }
+    response.headers.forEach((value, name) => { if (name.toLowerCase() !== AUDIT_HEADER.toLowerCase()) res.setHeader(name, value); });
     res.end(Buffer.from(await response.arrayBuffer()));
   };
 };
