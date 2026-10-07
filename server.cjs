@@ -437,6 +437,8 @@ app.get('/api/me', (req, res) => {
     instance: INSTANCE_INFO,
     build: BUILD_INFO,
     environment: DRUID_ENV,
+    // Session-based authentication: the front sends the open tabs back to the login on a 401 (lib/sessionGuard.ts).
+    auth: 'session',
   });
 });
 

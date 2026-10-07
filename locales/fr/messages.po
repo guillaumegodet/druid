@@ -874,7 +874,7 @@ msgid "People"
 msgstr "Personnel"
 
 #: components/ResearcherDetail.tsx:267
-#: components/researchers/DuplicatesPage.tsx:142
+#: components/researchers/DuplicatesPage.tsx:145
 msgid "Directory"
 msgstr "Annuaire"
 
@@ -3531,8 +3531,8 @@ msgstr "Sources moissonnées ({0})"
 
 #: components/dashboard/MediaSourcesAdmin.tsx:197
 #: components/researchers/AffiliationHistorySection.tsx:204
-#: components/researchers/DuplicatesPage.tsx:115
-#: components/researchers/DuplicatesPage.tsx:128
+#: components/researchers/DuplicatesPage.tsx:118
+#: components/researchers/DuplicatesPage.tsx:131
 #: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/LdapMovesPanel.tsx:124
 #: components/researchers/OpenAlexAffiliationsPage.tsx:80
@@ -8929,7 +8929,7 @@ msgid "All records of the scope (full rerun)"
 msgstr "Toutes les fiches du périmètre (relance complète)"
 
 #: components/researchers/AlignLaunchModal.tsx:129
-#: components/researchers/DuplicatesPage.tsx:143
+#: components/researchers/DuplicatesPage.tsx:146
 #: components/researchers/ListHeader.tsx:121
 #: components/researchers/OpenAlexAffiliationsPage.tsx:93
 #: components/researchers/TodoPage.tsx:61
@@ -9046,70 +9046,77 @@ msgstr "Plusieurs labos"
 msgid "Multiple affiliation (concurrent or successive): to be qualified, not necessarily merged."
 msgstr "Multi-rattachement (concomitant ou successif) : à qualifier, pas forcément à fusionner."
 
-#: components/researchers/DuplicatesPage.tsx:114
-#: components/researchers/DuplicatesPage.tsx:127
+#: components/researchers/DuplicatesPage.tsx:115
+#: components/researchers/DuplicatesPage.tsx:276
+#: components/researchers/LdapVerifyPanel.tsx:174
+#: components/researchers/UnifiedAlignPage.tsx:749
+msgid "Generated on {generatedAt}"
+msgstr "Généré le {generatedAt}"
+
+#: components/researchers/DuplicatesPage.tsx:117
+#: components/researchers/DuplicatesPage.tsx:130
 msgid "Recomputes the groups from the Directory (no LDAP run)"
 msgstr "Recalcule les groupes depuis l'Annuaire (pas de run LDAP)"
 
-#: components/researchers/DuplicatesPage.tsx:123
+#: components/researchers/DuplicatesPage.tsx:126
 #: components/researchers/TodoPage.tsx:77
 msgid "Duplicates"
 msgstr "Doublons"
 
-#: components/researchers/DuplicatesPage.tsx:124
+#: components/researchers/DuplicatesPage.tsx:127
 #: components/researchers/TodoPage.tsx:64
 msgid "Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation"
 msgstr "Fiches partageant un même uid_dyna — fusionner, ou qualifier un multi-rattachement légitime"
 
-#: components/researchers/DuplicatesPage.tsx:137
+#: components/researchers/DuplicatesPage.tsx:140
 msgid "Looking for duplicates…"
 msgstr "Recherche des doublons…"
 
-#: components/researchers/DuplicatesPage.tsx:146
+#: components/researchers/DuplicatesPage.tsx:149
 msgid "Qualified multi-affiliations"
 msgstr "Multi-rattachements qualifiés"
 
 #. placeholder {0}: pending.length
-#: components/researchers/DuplicatesPage.tsx:150
+#: components/researchers/DuplicatesPage.tsx:153
 msgid "uid_dyna duplicates to handle ({0})"
 msgstr "Doublons uid_dyna à traiter ({0})"
 
-#: components/researchers/DuplicatesPage.tsx:152
+#: components/researchers/DuplicatesPage.tsx:155
 msgid "No duplicate detected."
 msgstr "Aucun doublon détecté."
 
-#: components/researchers/DuplicatesPage.tsx:157
+#: components/researchers/DuplicatesPage.tsx:160
 msgid "{newDuplicates, plural, one {# duplicate group has appeared since your last review.} other {# duplicate groups have appeared since your last review.}}"
 msgstr "{newDuplicates, plural, one {# groupe de doublons est apparu depuis votre dernière revue.} other {# groupes de doublons sont apparus depuis votre dernière revue.}}"
 
-#: components/researchers/DuplicatesPage.tsx:161
+#: components/researchers/DuplicatesPage.tsx:164
 msgid "Open the records to decide, or click “Merge”: the assistant compares both rows field by field, logs the operation and keeps it restorable. Legitimate multiple affiliations should not be merged."
 msgstr "Ouvrez les fiches pour arbitrer, ou lancez « Fusionner » : l'assistant compare les deux lignes champ par champ, journalise et reste restaurable. Les multi-rattachements légitimes ne sont pas à fusionner."
 
-#: components/researchers/DuplicatesPage.tsx:178
+#: components/researchers/DuplicatesPage.tsx:181
 msgid "new"
 msgstr "nouveau"
 
 #. placeholder {0}: row.gristRowId
 #. placeholder {1}: row.dataSource || '—'
-#: components/researchers/DuplicatesPage.tsx:186
+#: components/researchers/DuplicatesPage.tsx:189
 msgid "Open the record (Grist row {0}) — source: {1}"
 msgstr "Ouvrir la fiche (ligne Grist {0}) — source : {1}"
 
-#: components/researchers/DuplicatesPage.tsx:191
+#: components/researchers/DuplicatesPage.tsx:194
 #: components/researchers/LdapVerifyPanel.tsx:135
 msgid "Manually validated record"
 msgstr "Fiche validée manuellement"
 
-#: components/researchers/DuplicatesPage.tsx:199
+#: components/researchers/DuplicatesPage.tsx:202
 msgid "Declare a multiple affiliation (concurrent or successive) or mark “to review” — without merging"
 msgstr "Déclarer un multi-rattachement (concomitant ou successif) ou marquer « à revoir » — sans fusionner"
 
-#: components/researchers/DuplicatesPage.tsx:201
+#: components/researchers/DuplicatesPage.tsx:204
 msgid "Qualify"
 msgstr "Qualifier"
 
-#: components/researchers/DuplicatesPage.tsx:209
+#: components/researchers/DuplicatesPage.tsx:212
 #: components/researchers/TasksPage.tsx:330
 msgid "Open the merge assistant"
 msgstr "Ouvrir l'assistant de fusion"
@@ -9118,30 +9125,24 @@ msgstr "Ouvrir l'assistant de fusion"
 #. placeholder {1}: a.labo || '∅'
 #. placeholder {2}: b.name
 #. placeholder {3}: b.labo || '∅'
-#: components/researchers/DuplicatesPage.tsx:209
+#: components/researchers/DuplicatesPage.tsx:212
 msgid "Merge {0} ({1}) and {2} ({3})"
 msgstr "Fusionner {0} ({1}) et {2} ({3})"
 
-#: components/researchers/DuplicatesPage.tsx:213
+#: components/researchers/DuplicatesPage.tsx:216
 #: components/researchers/LdapCandidatesPage.tsx:223
 #: components/researchers/MergeResearchersModal.tsx:299
 msgid "Merge"
 msgstr "Fusionner"
 
 #. placeholder {0}: qualifiedGroups.length
-#: components/researchers/DuplicatesPage.tsx:237
+#: components/researchers/DuplicatesPage.tsx:240
 msgid "Qualified multiple affiliations ({0})"
 msgstr "Multi-rattachements qualifiés ({0})"
 
-#: components/researchers/DuplicatesPage.tsx:256
+#: components/researchers/DuplicatesPage.tsx:259
 msgid "Requalify"
 msgstr "Requalifier"
-
-#: components/researchers/DuplicatesPage.tsx:272
-#: components/researchers/LdapVerifyPanel.tsx:174
-#: components/researchers/UnifiedAlignPage.tsx:749
-msgid "Generated on {generatedAt}"
-msgstr "Généré le {generatedAt}"
 
 #: components/researchers/FilterPanel.tsx:140
 #: components/researchers/FilterPanel.tsx:153

@@ -12,6 +12,15 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- Session perdue (redéploiement, expiration après 8 h) : les onglets ouverts reviennent à la connexion au premier
+  appel refusé (401), au lieu d'afficher une erreur par écran (« Erreur Grist (Annuaire) » sur l'onglet Doublons).
+  Instances à session serveur seulement (`/api/me` renvoie `auth: 'session'`) ; rien ne change sur Cloudflare.
+
+### Modifié
+- À traiter › Doublons : même mise en page que les onglets Tâches et Conflits (barre d'outils avec la date de
+  génération, contenu pleine largeur, plus de pied de page).
+
 ## [1.6.0] — 2026-10-07
 
 ### Ajouté

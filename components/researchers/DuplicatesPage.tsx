@@ -108,9 +108,12 @@ export const DuplicatesPage: React.FC<Props> = ({ diff, loading = false, onRefre
 
   const { compact, onScrollCapture } = useCompactHeader();
   return (
-    <div className="flex flex-col h-full" onScrollCapture={embedded ? undefined : onScrollCapture}>
+    // Embedded in « À traiter »: same frame as the Tasks / Conflicts tabs (toolbar row, full-width content).
+    <div className={embedded ? 'flex-1 min-h-0 flex flex-col' : 'flex flex-col h-full'} onScrollCapture={embedded ? undefined : onScrollCapture}>
       {embedded ? (
-        <div className="px-4 md:px-7 pt-2 pb-3 flex justify-end">
+        <div className="px-4 md:px-7 pt-2 pb-3 flex flex-wrap items-center gap-2">
+          {diff && <span className="text-[12px] text-muted-faint">{t`Generated on ${generatedAt}`}</span>}
+          <div className="flex-1" />
           <PixelBtn onClick={() => { markSeen(); onRefresh(); }} disabled={loading} title={t`Recomputes the groups from the Directory (no LDAP run)`}>
             {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCw className="w-4 h-4" />} <Trans>Refresh</Trans>
           </PixelBtn>
@@ -130,7 +133,7 @@ export const DuplicatesPage: React.FC<Props> = ({ diff, loading = false, onRefre
         </header>
       )}
 
-      <div className="flex-1 overflow-auto px-4 md:px-7 py-4 space-y-8" data-page-scroll>
+      <div className={`flex-1 overflow-auto px-4 md:px-7 ${embedded ? 'pb-6 space-y-6' : 'py-4 space-y-8'}`} data-page-scroll>
         {!diff ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted-faint gap-3">
             <RefreshCw className="w-8 h-8 animate-spin" />
@@ -146,7 +149,7 @@ export const DuplicatesPage: React.FC<Props> = ({ diff, loading = false, onRefre
               <StatCard label={t`Qualified multi-affiliations`} value={diff.stats.qualified} />
             </div>
 
-            <section className="max-w-5xl">
+            <section>
               <SectionTitle icon={<Copy className="w-4 h-4" />}><Trans>uid_dyna duplicates to handle ({pending.length})</Trans></SectionTitle>
               {pending.length === 0 ? (
                 <p className="text-[13px] text-muted-faint"><Trans>No duplicate detected.</Trans></p>
@@ -230,7 +233,7 @@ export const DuplicatesPage: React.FC<Props> = ({ diff, loading = false, onRefre
             </section>
 
             {qualifiedGroups.length > 0 && (
-              <section className="max-w-5xl">
+              <section>
                 <button type="button" onClick={() => setShowQualified((v) => !v)} className="flex items-center gap-2 pb-2 mb-2 w-full border-b border-ink/5 dark:border-white/5 text-muted-lighter dark:text-[#8f897c]">
                   {showQualified ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                   <Users className="w-4 h-4" />
@@ -263,14 +266,16 @@ export const DuplicatesPage: React.FC<Props> = ({ diff, loading = false, onRefre
               </section>
             )}
 
-            <div className="max-w-5xl"><MergeLogPanel onRestored={onRestored} refreshKey={mergesRefreshKey} /></div>
+            <MergeLogPanel onRestored={onRestored} refreshKey={mergesRefreshKey} />
           </>
         )}
       </div>
 
-      <footer className="px-4 md:px-7 py-3 border-t border-ink/5 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl text-[12px] text-muted-faint">
-        {diff ? t`Generated on ${generatedAt}` : ''}
-      </footer>
+      {!embedded && (
+        <footer className="px-4 md:px-7 py-3 border-t border-ink/5 dark:border-white/5 bg-white/60 dark:bg-white/5 backdrop-blur-xl text-[12px] text-muted-faint">
+          {diff ? t`Generated on ${generatedAt}` : ''}
+        </footer>
+      )}
     </div>
   );
 };
