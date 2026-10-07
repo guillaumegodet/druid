@@ -110,7 +110,7 @@ import { countryFocusOfScope } from './countryKpis';
 import {
   CountryBilateral, CountryDomains, CountryEvolution, CountryFunders, CountryInstitutions, CountryLanguages,
   CountryMap, CountryMatrix, CountryRank, CountryResearchers, CountrySpecialization, CountrySubfields,
-  CountryThirdCountries, CountryUnits, type CountryChartProps,
+  CountryRegions, CountryThirdCountries, CountryUnits, type CountryChartProps,
 } from './CountryCharts';
 import type { TeamRadarLevel } from './structureAggregates';
 
@@ -282,6 +282,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
   'pays-rang': countryEntry(msg`Rank of the country among the partner countries`, CountryRank),
   'pays-carte': countryEntry(msg`Map of the partner institutions in the country`, CountryMap),
   'pays-etablissements': countryEntry(msg`Partner institutions in the country`, CountryInstitutions),
+  'pays-regions': countryEntry(msg`Co-publications by region of the country`, CountryRegions),
   'pays-labos': countryEntry(msg`Labs involved with the country`, CountryUnits),
   'pays-chercheurs': countryEntry(msg`Researchers involved with the country`, CountryResearchers),
   'pays-matrice': countryEntry(msg`Labs × institutions of the country`, CountryMatrix),

@@ -197,7 +197,7 @@ const countryReport: ReportTemplate = {
       section(msg`Dynamics and rank`),
       ...pick(['pays-evolution', 'pays-rang']),
       section(msg`Partner institutions`),
-      ...pick(['pays-carte', 'pays-etablissements']),
+      ...pick(['pays-carte', 'pays-etablissements', 'pays-regions']),
       section(msg`People and labs involved`),
       ...pick(['pays-labos', 'pays-chercheurs', 'pays-matrice']),
       section(msg`Themes`),

@@ -106,6 +106,17 @@ describe('report templates', () => {
     expect([value('copubs'), value('intl-share'), value('rank')]).toEqual(['3', '75 %', '1']);
     expect(KPI_SETS['country-impact'].items(kb.dataset!, kb.scope!.range, { source: kb.source, filters: kb.scope!.filters }))
       .toHaveLength(3);
+    // Regions: only with an export that knows them (exports since 2026-10-07).
+    expect(ids).not.toContain('pays-regions');
+    const withRegions = {
+      ...LAB,
+      publications: LAB.publications.map((p) => ({
+        ...p,
+        partnerInstitutions: [{ name: 'Univ Alpha', cc: 'CA', city: null, lat: null, lon: null, ror: '0aaaaaaa1', region: 'Quebec' }],
+      })),
+    } as DashboardDataset;
+    expect(charts(t.build({ ...input, country: 'CA' }, { dataset: withRegions, hiddenTabs: [] }).blocks)).toContain('pays-regions');
+
     // Without a country in the filters, the sets stay empty instead of failing.
     expect(KPI_SETS.country.items(LAB, kb.scope!.range, { source: LAB, filters: {} })).toEqual([]);
   });

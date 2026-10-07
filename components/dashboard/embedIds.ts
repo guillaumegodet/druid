@@ -22,7 +22,7 @@ export const EMBEDDABLE_IDS = new Set<string>([
   // Collaborations — per-university breakdown of a partner group (report blocks)
   'partner-breakdown-top', 'partner-breakdown-evolution',
   // Collaborations — one partner country (« By country » sub-tab, country filter)
-  'pays-evolution', 'pays-rang', 'pays-carte', 'pays-etablissements', 'pays-labos', 'pays-chercheurs',
+  'pays-evolution', 'pays-rang', 'pays-carte', 'pays-etablissements', 'pays-regions', 'pays-labos', 'pays-chercheurs',
   'pays-matrice', 'pays-domaines', 'pays-sous-disciplines', 'pays-specialisation', 'pays-financeurs',
   'pays-bilateral', 'pays-pays-tiers', 'pays-langues',
   // Impact

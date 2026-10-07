@@ -15,7 +15,7 @@ import { QuartileChart } from './charts/QuartileChart';
 import {
   CountryBilateral, CountryDomains, CountryEvolution, CountryFunders, CountryInstitutions, CountryLanguages,
   CountryMap, CountryMatrix, CountryRank, CountryResearchers, CountrySpecialization, CountrySubfields,
-  CountryThirdCountries, CountryUnits, type CountryChartProps,
+  CountryRegions, CountryThirdCountries, CountryUnits, type CountryChartProps,
 } from './CountryCharts';
 import { numberLocale } from '../../lib/i18n';
 
@@ -185,6 +185,7 @@ export const CountrySection: React.FC<{
             <CountryMap {...chartProps} />
             <CountryInstitutions {...chartProps} />
           </div>
+          <CountryRegions {...chartProps} />
 
           <h3 className={sectionTitle}><Trans>Labs and researchers involved</Trans></h3>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
