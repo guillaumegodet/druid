@@ -33,6 +33,8 @@ export interface WriteAudit {
 
 export interface CommandContext {
   scope: DirectoryScope;
+  /** Who writes (Keycloak user, Cloudflare Access e-mail, job name): the PostgreSQL audit log records it. */
+  actor?: string;
   /** Reported write (called once per Grist write). */
   audit: (entry: WriteAudit) => void;
 }

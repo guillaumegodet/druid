@@ -23,7 +23,7 @@ interface NodeRequest {
   originalUrl: string;
   headers: Record<string, string | string[] | undefined>;
   body?: unknown;
-  session?: { user?: { access?: { allSlugs?: boolean; labAnchors?: string[] } } };
+  session?: { user?: { preferred_username?: string; access?: { allSlugs?: boolean; labAnchors?: string[] } } };
 }
 interface NodeResponse {
   status(code: number): NodeResponse;
@@ -147,7 +147,9 @@ export type ServerStorage = ReturnType<typeof createServerStorage>;
 export const createApiV1Handler = (storage: ServerStorage) => {
   const api = createDirectoryApi();
   return async (req: NodeRequest, res: NodeResponse): Promise<void> => {
-    const response = await api.fetch(toWebRequest(req), { ...storage, scope: scopeOfSession(req), writeRefusal: null });
+    const response = await api.fetch(toWebRequest(req), {
+      ...storage, scope: scopeOfSession(req), actor: req.session?.user?.preferred_username, writeRefusal: null,
+    });
     res.status(response.status);
     const audit = response.headers.get(AUDIT_HEADER);
     if (audit && res.locals) {

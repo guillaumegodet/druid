@@ -44,7 +44,7 @@ export async function onRequest(context) {
     texts: tokenAlignTexts, hasQualinka: false, caches: { read: readAlignCache },
   });
 
-  const response = await api.fetch(context.request, { ...store, align, scope: { all: true, labAnchors: [] }, writeRefusal });
+  const response = await api.fetch(context.request, { ...store, align, scope: { all: true, labAnchors: [] }, actor: identity || undefined, writeRefusal });
   const audit = response.headers.get(AUDIT_HEADER);
   if (!audit) return response;
   console.log(JSON.stringify({ event: 'api.write', instance: instance.slug, user: identity, path: new URL(context.request.url).pathname, status: response.status, writes: JSON.parse(audit) }));
