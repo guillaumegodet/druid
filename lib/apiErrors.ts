@@ -47,6 +47,7 @@ export const API_ERRORS = [
   msg`Directory storage unavailable`,
   msg`API v1 unavailable`,
   msg`Grist proxy removed: use /api/v1`,
+  msg`Not available on the PostgreSQL storage yet`,
   msg`Invalid record`,
   msg`Replaced IdRef record not found`,
   msg`Review table missing, run the alignment script first`,

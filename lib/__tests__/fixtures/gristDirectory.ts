@@ -29,7 +29,7 @@ export const gristDirectoryFixture = (): GristDirectoryInput => ({
   ],
   Annuaire: [
     // Same person on two rows (uid in mixed case): row 101 is PRINCIPAL, row 102 carries other values.
-    row(101, { uid_dyna: 'Dupont-A', Nom: 'Dupont', Prenom: 'Alice', Civilite: 'Mme', LABO: 'LAB1', team: 'TEAMA|Free team',
+    row(101, { uid_dyna: 'dupont-a', Nom: 'Dupont', Prenom: 'Alice', Civilite: 'Mme', LABO: 'LAB1', team: 'TEAMA|Free team',
       rattachement: 'PRINCIPAL', Employeur: 1, IdRef: '000000019', ORCID: '0000-0001-0000-0001', OpenAlex_ids: 'A1|A2',
       ID_SCOPUS: 57193706000, N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 12345, validated: true, validated_status: 'INTERNE',
       validation_date: epoch('2026-09-01'), validation_scope: 'statut,rattachement', DATE_DE_NAISSANCE_JJ_MM_AAAA: epoch('1980-05-04'),
@@ -45,8 +45,8 @@ export const gristDirectoryFixture = (): GristDirectoryInput => ({
       N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: '#N/A', ANNEE_HDR: 'N/A', employment_end_date: '2026-02-30', validated_status: 'PARTI',
       IdRef: '000000019', HDR: 'Oui' }),
     row(104, { uid_dyna: 'ext_durand-c', Nom: 'Durand', Prenom: 'Chloé', Civilite: 'Dr', LABO: '', Employeur: 999, validated_status: 'NOPE',
-      N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 0, DATE_DE_NAISSANCE_JJ_MM_AAAA: 0, Employeur_extra: null }),
+      N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 0, DATE_DE_NAISSANCE_JJ_MM_AAAA: 0, ANNEE_HDR: '', Employeur_extra: null }),
     // TEAMA exists in LAB1 and LAB2: the team under the lab of the membership; FREE: no structure.
-    row(105, { uid_dyna: 'petit-d', Nom: 'Petit', LABO: 'LAB2', team: 'TEAMA' }),
+    row(105, { uid_dyna: 'Petit-D', Nom: 'Petit', LABO: 'LAB2', team: 'TEAMA', ANNEE_HDR: '' }),
   ],
 });

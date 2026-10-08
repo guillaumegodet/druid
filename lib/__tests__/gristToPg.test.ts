@@ -46,6 +46,14 @@ describe('Grist → PostgreSQL transformation', () => {
     expect(codes('column_unmapped')).toEqual([{ code: 'column_unmapped', table: 'Annuaire', rows: [101], columns: ['Mystery_column'] }]);
   });
 
+  it('uid: grouped regardless of case, kept with the case of the kept row', () => {
+    expect(rows.person.filter((p) => p.uid).map((p) => p.uid).sort()).toEqual(['Petit-D', 'dupont-a', 'ext_durand-c']);
+    const cased = transformDirectory({ Annuaire: [row(1, { uid_dyna: 'Ab-C', Nom: 'X', rattachement: 'PRINCIPAL' }), row(2, { uid_dyna: 'ab-c', Nom: 'X' })],
+      Structures: [], Etablissements: [], Corps_Categorie: [] });
+    expect(cased.rows.person.map((p) => p.uid)).toEqual(['Ab-C']);
+    expect(cased.rows.membership.map((m) => m.legacy_grist_id)).toEqual([1, 2]);
+  });
+
   it('kept row: PRINCIPAL, then latest validation, then latest LDAP update, then oldest', () => {
     expect(keptRow([row(2, { validated: true, validation_date: 10 }), row(1, { rattachement: 'PRINCIPAL' })]).id).toBe(1);
     expect(keptRow([row(1, { validated: true, validation_date: 10 }), row(2, { validated: true, validation_date: 20 })]).id).toBe(2);
@@ -57,7 +65,7 @@ describe('Grist → PostgreSQL transformation', () => {
   it('sentinels, typed text and unknown values: kept in extra, reported', () => {
     const b = person(null, 103);
     expect([b.civility, b.$employer, b.hr_id, b.hdr_year, b.employment_end, b.presence_status]).toEqual(['M', 2, null, null, null, 'PARTI']);
-    expect(b.extra).toEqual({ N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: '#N/A', ANNEE_HDR: 'N/A', employment_end_date: '2026-02-30' });
+    expect(b.extra).toEqual({ Employeur: 'cnrs', N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: '#N/A', ANNEE_HDR: 'N/A', employment_end_date: '2026-02-30' });
     const c = person('ext_durand-c');
     expect([c.civility, c.$employer, c.presence_status, c.hr_id]).toEqual([null, null, null, null]);
     expect(c.extra).toEqual({ Civilite: 'Dr', Employeur: 999, validated_status: 'NOPE' });

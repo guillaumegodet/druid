@@ -20,22 +20,34 @@ const chunks = <T>(rows: T[]): T[][] => {
   for (let i = 0; i < rows.length; i += CHUNK) out.push(rows.slice(i, i + CHUNK));
   return out;
 };
+/** Tables whose rows come from ONE Grist table: their id is the Grist row id (stable ids, migration 20261010090000). */
+const STABLE_ID_TABLES = new Set(['establishment', 'structure', 'membership', 'merge_log', 'task', 'task_event', 'report',
+  'report_share', 'report_generation', 'benchmark_peer_group']);
+/** Moves the sequence of a table with stable ids past the imported ids, so that new rows never collide. */
+const advanceSequence = (trx: Transaction<DB>, table: string) =>
+  sql`SELECT setval(pg_get_serial_sequence(${table}, 'id'), GREATEST((SELECT max(id) FROM ${sql.table(table)}), 0) + 1, false)`.execute(trx);
+
 /** Drops the `$…` reference keys of a transformed row. */
 const plain = <T extends Record<string, any>>(row: T): Record<string, any> =>
   Object.fromEntries(Object.entries(row).filter(([k]) => !k.startsWith('$')));
+/** Row of a stable-id table: its id is its Grist row id. */
+const withId = (row: Record<string, any>) => ({ id: row.legacy_grist_id, ...row });
 
 /** jsonb columns: written as JSON text (a value that is itself a string or a list must not be taken for an array). */
 const asJson = (v: unknown) => (v === undefined || v === null ? null : JSON.stringify(v));
 const insertAll = async (trx: Transaction<DB>, table: keyof DB, rows: Record<string, any>[]) => {
-  for (const part of chunks(rows)) await trx.insertInto(table as any).values(part as any).execute();
+  const stable = STABLE_ID_TABLES.has(table);
+  for (const part of chunks(rows)) await trx.insertInto(table as any).values((stable ? part.map(withId) : part) as any).execute();
+  if (stable) await advanceSequence(trx, table);
 };
 /** Inserts and returns legacy Grist id → new id. */
 const insertMapped = async (trx: Transaction<DB>, table: 'establishment' | 'structure' | 'membership' | 'task' | 'report', rows: Record<string, any>[]) => {
   const ids = new Map<number, string>();
   for (const part of chunks(rows)) {
-    const back = await trx.insertInto(table).values(part as any).returning(['id', 'legacy_grist_id']).execute();
+    const back = await trx.insertInto(table).values(part.map(withId) as any).returning(['id', 'legacy_grist_id']).execute();
     for (const r of back as { id: string; legacy_grist_id: number | null }[]) ids.set(r.legacy_grist_id!, r.id);
   }
+  await advanceSequence(trx, table);
   return ids;
 };
 

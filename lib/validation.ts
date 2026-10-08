@@ -129,17 +129,28 @@ export const parseValidation = (
   decodeDate: (raw: any) => string = (raw) => (raw ? String(raw) : ''),
 ): ValidationInfo => {
   const C = GRIST_VALIDATION_COLUMNS;
-  const validated = truthy(f[C.validated]);
-  let scope = parseValidationScope(f[C.validationScope]);
+  return validationInfo({
+    validated: truthy(f[C.validated]),
+    status: f[C.validatedStatus],
+    date: decodeDate(f[C.validationDate]),
+    source: f[C.validationSource],
+    scope: parseValidationScope(f[C.validationScope]),
+    by: f[C.validatedBy],
+  });
+};
+
+/** Validation layer from its decoded values, whatever the storage (Grist cells above, PostgreSQL columns). */
+export const validationInfo = (v: { validated: boolean; status: unknown; date: string; source: unknown; scope: ValidationScope[]; by: unknown }): ValidationInfo => {
+  let scope = v.scope;
   // Backward compatibility: a validated row without explicit scope covers both axes.
-  if (validated && scope.length === 0) scope = ['statut', 'rattachement'];
+  if (v.validated && scope.length === 0) scope = ['statut', 'rattachement'];
   return {
-    validated,
-    validatedStatus: normStatus(f[C.validatedStatus]),
-    validationDate: decodeDate(f[C.validationDate]) || undefined,
-    validationSource: f[C.validationSource] ? String(f[C.validationSource]) : undefined,
+    validated: v.validated,
+    validatedStatus: normStatus(v.status),
+    validationDate: v.date || undefined,
+    validationSource: v.source ? String(v.source) : undefined,
     validationScope: scope,
-    validatedBy: f[C.validatedBy] ? String(f[C.validatedBy]) : undefined,
+    validatedBy: v.by ? String(v.by) : undefined,
   };
 };
 

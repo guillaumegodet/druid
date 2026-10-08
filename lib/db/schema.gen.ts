@@ -58,7 +58,7 @@ export interface AuditLog {
 }
 
 export interface BenchmarkPeerGroup {
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   legacy_grist_id: number | null;
   name: string;
   owner: string;
@@ -69,7 +69,7 @@ export interface BenchmarkPeerGroup {
 export interface Establishment {
   created_at: Generated<Timestamp>;
   extra: Generated<Json>;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   idref: string | null;
   label: string | null;
   legacy_grist_id: number | null;
@@ -118,7 +118,7 @@ export interface Membership {
   created_at: Generated<Timestamp>;
   end_date: string | null;
   end_upper: ColumnType<string | null, never, never>;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   lab_label: string | null;
   legacy_grist_id: number | null;
   person_id: string;
@@ -141,7 +141,7 @@ export interface MergeLog {
   author: string | null;
   dropped_snapshot: Json;
   extra: Generated<Json>;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   kept_before: Generated<Json>;
   kept_patch: Generated<Json>;
   kept_person_id: string | null;
@@ -236,7 +236,7 @@ export interface Report {
   deleted_at: Timestamp | null;
   description: string | null;
   extra: Generated<Json>;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   legacy_grist_id: number | null;
   name: string;
   owner: string;
@@ -253,7 +253,7 @@ export interface ReportGeneration {
   extra: Generated<Json>;
   generated_at: Generated<Timestamp | null>;
   generated_by: string | null;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   legacy_grist_id: number | null;
   pdf_ref: string | null;
   publication_count: number | null;
@@ -265,7 +265,7 @@ export interface ReportShare {
   granted_at: Generated<Timestamp | null>;
   granted_by: string | null;
   grantee: string;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   legacy_grist_id: number | null;
   report_id: Int8;
   role: string;
@@ -276,7 +276,7 @@ export interface Structure {
   created_at: Generated<Timestamp>;
   establishment_id: Int8 | null;
   extra: Generated<Json>;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   idref: string | null;
   legacy_grist_id: number | null;
   level: string | null;
@@ -308,7 +308,7 @@ export interface Task {
   done_at: Timestamp | null;
   done_by: string | null;
   extra: Generated<Json>;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   key: string | null;
   lab: string | null;
   legacy_grist_id: number | null;
@@ -335,7 +335,7 @@ export interface TaskEvent {
   author: string | null;
   detail: string | null;
   extra: Generated<Json>;
-  id: ColumnType<string, never, never>;
+  id: Generated<Int8>;
   legacy_grist_id: number | null;
   task_id: Int8;
 }
