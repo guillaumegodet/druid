@@ -14,9 +14,10 @@ import { createPgDirectoryRepository } from '../directory/pg/repository';
 import { transformDirectory } from '../migration/gristToPg';
 import { transformWork } from '../migration/gristToPgWork';
 import { loadDirectory, loadWork } from '../migration/loadPg';
-import { gristDirectoryFixture } from './fixtures/gristDirectory';
+import { gristDirectoryFixture, row } from './fixtures/gristDirectory';
 import { gristWorkFixture } from './fixtures/gristWork';
 import { memoryGrist } from './fixtures/memoryGrist';
+import { buildMergeProposal, pickDefaultKeep, resolveMergeFields } from '../mergeProposal';
 
 const url = process.env.DATABASE_URL;
 const db = url ? createDb({ connectionString: url, max: 1 }) : null;
@@ -35,6 +36,21 @@ const differences = (a: unknown, b: unknown, path = ''): string[] => {
 };
 
 const ALL: DirectoryScope = { all: true, labAnchors: [] };
+
+/**
+ * Record fields compared between the stores: the representations PostgreSQL normalizes are brought to the same form
+ * (an empty text cell '' or null, a civility « Mme » / « M. », a legacy validated status, the Grist formula columns).
+ */
+const normalizedRows = (rows: { rowId: number; fields: Record<string, any> }[]) => rows.map((r) => ({
+  rowId: r.rowId,
+  fields: Object.fromEntries(Object.entries(r.fields)
+    .filter(([k]) => !['institution_identifier', 'Alignement_annuaire'].includes(k))
+    .map(([k, v]) => [k, k === 'Civilite' ? ({ MME: 'F', 'M.': 'M' } as Record<string, string>)[String(v).toUpperCase()] ?? v
+      : k === 'validated_status' && ['INTERNE', 'EXTERNE'].includes(String(v)) ? 'PRESENT'
+        : typeof v === 'string' ? v.trim() : v ?? ''])
+    .filter(([, v]) => v !== '' && v !== null && v !== 0 && v !== false)
+    .sort(([a], [b]) => a.localeCompare(b))),
+}));
 const ctxOf = (scope: DirectoryScope = ALL): CommandContext => ({ scope, actor: 'contract', audit: () => {} });
 const TODAY = () => '2026-10-09';
 interface Store { repo: DirectoryRepository; commands: DirectoryCommands }
@@ -90,6 +106,36 @@ const STEPS: [string, Step][] = [
     await s.commands.updateStructure(Number(id.slice(2)), { ...created, type: 'EA', officialName: 'Laboratoire renommé', rorId: '05abcde67' } as any, ctxOf());
     return id;
   }],
+  // ── Duplicates and merges (lot 6 c) ──
+  ['qualify concomitant, unqualify, qualify successive with an end, then « à revoir »', async (s) => [
+    await s.commands.qualifyDuplicates({ rowIds: [110, 111], principalRowId: 110, mode: 'concomitant', author: 'alice' }, ctxOf()),
+    await s.commands.unqualifyDuplicates([110, 111], ctxOf()),
+    await s.commands.qualifyDuplicates({ rowIds: [110, 111], principalRowId: 110, mode: 'successif', endDate: '2025-06', author: 'alice' }, ctxOf()),
+    await s.commands.qualifyDuplicates({ rowIds: [110, 111], mode: 'a_revoir', author: 'bob' }, ctxOf()),
+    await s.commands.qualifyDuplicates({ rowIds: [110, 111], mode: 'concomitant', author: 'bob' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+  ]],
+  ['uid switch: refused onto a uid in use, then done', async (s) => [
+    await s.commands.switchUid({ fromUid: 'ext_durand-c', toUid: 'dupont-a', author: 'alice' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+    await s.commands.switchUid({ fromUid: 'ext_durand-c', toUid: 'durand-c', author: 'alice' }, ctxOf()),
+    await s.commands.switchUid({ fromUid: 'nobody', toUid: 'nobody-2', author: 'alice' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+  ]],
+  ['merge the duplicate row as the assistant does (proposal → patch), then restore it', async (s) => {
+    await s.commands.unqualifyDuplicates([110, 111], ctxOf());
+    const rows = await s.repo.recordRows([110, 111], ALL);
+    const columns = await s.commands.annuaireColumns();
+    const { keep, drop } = pickDefaultKeep(rows[0], rows[1]);
+    const fields = resolveMergeFields(buildMergeProposal(keep, drop, columns as any), '2026-10-09');
+    const { logId } = await s.commands.mergeRows({ keepRowId: keep.rowId, dropRowId: drop.rowId, fields, author: 'alice', note: 'contrat' }, ctxOf());
+    const restored = await s.commands.restoreMerge(logId, ctxOf());
+    const again = await s.commands.restoreMerge(logId, ctxOf()).catch((e) => `${e.status} ${e.message}`);
+    return { keep: keep.rowId, drop: drop.rowId, patch: Object.keys(fields).sort(), logId, restored, again };
+  }],
+  ['merge two different people (the absorbed person goes), refusals', async (s) => [
+    await s.commands.mergeRows({ keepRowId: 104, dropRowId: 103, fields: { Email: 'merged@example.org' }, author: 'alice' }, ctxOf()),
+    await s.commands.mergeRows({ keepRowId: 104, dropRowId: 104, fields: {}, author: 'alice' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+    await s.commands.mergeRows({ keepRowId: 104, dropRowId: 9999, fields: {}, author: 'alice' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+    await s.commands.restoreMerge(9999, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+  ]],
   ['lab right: write inside its lab, refused outside', async (s, people) => {
     const r = people.find((p) => p.gristRowId === 105)!;
     const attempt = (p: Promise<unknown>) => p.then<string, string>(() => 'ok', (e) => `${e.status} ${e.message}`);
@@ -106,6 +152,11 @@ const STEPS: [string, Step][] = [
 describe.skipIf(!url)('DirectoryCommands contract: Grist = PostgreSQL', () => {
   it('the same commands leave the same directory', async () => {
     const dir = gristDirectoryFixture();
+    // A duplicate group of this test only: two rows of « twin-t » with the same personal fields (the realistic
+    // duplicate; rows whose personal fields diverge are one person in PostgreSQL — documented, not a contract case).
+    const twin = { uid_dyna: 'twin-t', Nom: 'Jumeau', Prenom: 'Tom', Civilite: 'M', Email: 't@example.org', Employeur: 1, Data_source: 'LDAP',
+      Commentaires: 'Ligne jumelle', ORCID: '0000-0005-0000-0009', employment_start_date: '2020', ANNEE_HDR: '' };
+    dir.Annuaire!.push(row(110, { ...twin, LABO: 'LAB1', team: '' }), row(111, { ...twin, LABO: 'zzz', team: '' }));
     const work = gristWorkFixture();
     const gristClient = memoryGrist({ Annuaire: dir.Annuaire!, Etablissements: dir.Etablissements!, Structures: dir.Structures!, Fusions_log: work.Fusions_log! });
     const gristRepo = createGristDirectoryRepository({ grist: gristClient });
@@ -115,6 +166,10 @@ describe.skipIf(!url)('DirectoryCommands contract: Grist = PostgreSQL', () => {
       structures: (await s.repo.structures()).items.filter((x) => !['S-13', 'S-14'].includes(x.id)), // rows the import leaves out
       merges: (await s.repo.merges(50)).items.map((m) => ({ ...m, date: m.date ? 'set' : '' })),
       abes: (await s.repo.abesExports(ALL)).items,
+      // The 101 / 102 group of the fixture has personal fields that diverge on purpose (one person in PostgreSQL).
+      duplicates: (await s.repo.duplicates(ALL)).doublonsUid.filter((g) => g.uid !== 'dupont-a'),
+      // Row 107 (a membership added to that group) is a second Grist row carrying a partial identity.
+      rows: normalizedRows(await s.repo.recordRows([103, 104, 105, 106, 110, 111, 112], ALL)),
     });
     const directory = transformDirectory(dir);
     const results: { step: string; grist: unknown; pg: unknown; differences: string[] }[] = [];
@@ -138,5 +193,31 @@ describe.skipIf(!url)('DirectoryCommands contract: Grist = PostgreSQL', () => {
 
     if (process.env.CONTRACT_DEBUG) for (const r of results) console.log(JSON.stringify({ step: r.step, grist: r.grist, pg: r.pg, differences: r.differences.length }));
     for (const r of results) expect({ step: r.step, result: r.pg, differences: r.differences }).toEqual({ step: r.step, result: r.grist, differences: [] });
+  });
+});
+
+describe.skipIf(!url)('PostgreSQL commands: what differs from Grist by design', () => {
+  it('a record created with a uid already in the directory is a new membership of that person', async () => {
+    const dir = gristDirectoryFixture();
+    const directory = transformDirectory(dir);
+    const got: Record<string, unknown> = {};
+    await expect(db!.transaction().execute(async (trx) => {
+      await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
+      await loadDirectory(trx, directory.rows, directory.report);
+      const repo = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository: repo, today: TODAY });
+      const { recordId } = await commands.createPerson({
+        uid: 'petit-d', lastName: 'Autre', firstName: 'Saisie', affiliations: [{ structureName: 'zzz', isPrimary: true }],
+        employment: {}, identifiers: {}, socials: {}, profiles: {}, validation: { validated: false, validationScope: [] },
+      } as any, ctxOf());
+      got.people = (await sql<{ uid: string; last_name: string; n: string }>`SELECT p.uid, p.last_name, count(m.id)::text AS n FROM person p
+        JOIN membership m ON m.person_id = p.id WHERE lower(p.uid) = 'petit-d' GROUP BY p.uid, p.last_name`.execute(trx)).rows;
+      got.group = (await repo.duplicates(ALL)).doublonsUid.find((g) => g.uid === 'Petit-D')?.rows.map((r) => [r.gristRowId, r.labo]);
+      got.recordId = recordId;
+      throw new Rollback();
+    })).rejects.toBeInstanceOf(Rollback);
+    // One person (its fields unchanged), two memberships: a duplicate group to qualify or merge on the Doublons page.
+    expect(got.people).toEqual([{ uid: 'Petit-D', last_name: 'Petit', n: '2' }]);
+    expect(got.group).toEqual([[105, 'LAB2'], [got.recordId, 'zzz']]);
   });
 });

@@ -116,6 +116,7 @@ export interface ImportRow {
 
 export interface Membership {
   created_at: Generated<Timestamp>;
+  duplicate_decision: string | null;
   end_date: string | null;
   end_upper: ColumnType<string | null, never, never>;
   id: Generated<Int8>;
