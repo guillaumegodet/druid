@@ -1,6 +1,7 @@
 // Run: docker run --rm -v "$PWD":/app -w /app node:20-slim node scripts/tests/functions-guards.mjs
-// Harness for the Pages Functions: Grist proxy guard (functions/api/grist/[[path]].js) and
-// shape of /api/me (functions/api/me.js). No network: the guards are called directly.
+// Harness for the Pages Functions: shape of /api/me (functions/api/me.js), instance registry and resolution,
+// Centrale-only routes. The domain API (functions/api/v1) imports TypeScript: tested by vitest
+// (lib/__tests__/functionsApiV1.test.ts), which took over the security cases of the former Grist proxy. No network: the guards are called directly.
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 
@@ -18,7 +19,6 @@ if (!fs.existsSync(GENERATED)) {
   process.exit(1);
 }
 
-const { gristGuard, onRequest: gristProxy } = await import('../../functions/api/grist/[[path]].js');
 const { buildUser, parseAdminEmails, capabilitiesFor, onRequest: me } = await import('../../functions/api/me.js');
 const { resolveInstance, resolveForHost, publicInstanceInfo, secretOf, secretSuffix, instanceEnv } = await import('../../functions/_lib/instance.js');
 const { onRequest: middleware } = await import('../../functions/api/_middleware.js');
@@ -35,47 +35,6 @@ const check = (label, got, want) => {
   console.log(`${ok ? 'OK ' : 'KO '} ${label}${ok ? '' : ` → ${JSON.stringify(got)} (attendu ${JSON.stringify(want)})`}`);
 };
 const DOC = 'docA';
-const guard = (method, path, opts = {}) => {
-  const r = gristGuard({
-    method, path, doc: DOC, hasIdentity: opts.identity ?? true,
-    allowAnonymousWrites: opts.anon ?? false, readOnly: opts.readOnly ?? false, tableIdOfBody: () => opts.tables ?? [],
-  });
-  return r ? r.status : 'RELAY';
-};
-
-check('GET racine doc', guard('GET', `docs/${DOC}`), 'RELAY');
-check('GET liste tables', guard('GET', `docs/${DOC}/tables`), 'RELAY');
-check('GET records', guard('GET', `docs/${DOC}/tables/Annuaire/records`), 'RELAY');
-check('GET table inconnue (lecture libre)', guard('GET', `docs/${DOC}/tables/Secret/records`), 'RELAY');
-check('GET autre doc', guard('GET', `docs/docZ/tables/Annuaire/records`), 403);
-check('GET orgs', guard('GET', 'orgs'), 403);
-check('GET sql', guard('GET', `docs/${DOC}/sql`), 403);
-check('POST sql', guard('POST', `docs/${DOC}/sql`), 403);
-check('GET attachments', guard('GET', `docs/${DOC}/attachments`), 403);
-check('DELETE doc', guard('DELETE', `docs/${DOC}`), 405);
-check('DELETE records', guard('DELETE', `docs/${DOC}/tables/Annuaire/records`), 405);
-check('PUT records', guard('PUT', `docs/${DOC}/tables/Annuaire/records`), 405);
-check('PATCH racine doc', guard('PATCH', `docs/${DOC}`), 403);
-check('PATCH Annuaire records', guard('PATCH', `docs/${DOC}/tables/Annuaire/records`), 'RELAY');
-check('POST Annuaire records', guard('POST', `docs/${DOC}/tables/Annuaire/records`), 'RELAY');
-check('POST data/delete', guard('POST', `docs/${DOC}/tables/Annuaire/data/delete`), 'RELAY');
-check('POST colonnes Annuaire', guard('POST', `docs/${DOC}/tables/Annuaire/columns`), 'RELAY');
-check('PATCH table (definition)', guard('PATCH', `docs/${DOC}/tables/Annuaire`), 403);
-check('PATCH unlisted table', guard('PATCH', `docs/${DOC}/tables/Secret/records`), 403);
-check('POST creation of a listed table', guard('POST', `docs/${DOC}/tables`, { tables: ['Fusions_log'] }), 'RELAY');
-check('POST creation of an unlisted table', guard('POST', `docs/${DOC}/tables`, { tables: ['Autre'] }), 403);
-check('POST table creation with empty body', guard('POST', `docs/${DOC}/tables`, { tables: [] }), 403);
-check('PATCH without Access identity', guard('PATCH', `docs/${DOC}/tables/Annuaire/records`, { identity: false }), 403);
-check('PATCH without identity, local dev', guard('PATCH', `docs/${DOC}/tables/Annuaire/records`, { identity: false, anon: true }), 'RELAY');
-check('GET without identity', guard('GET', `docs/${DOC}/tables/Annuaire/records`, { identity: false }), 'RELAY');
-// Read-only instance (public demo): reads relayed, every write refused before anything else
-check('read-only: GET records', guard('GET', `docs/${DOC}/tables/Annuaire/records`, { identity: false, readOnly: true }), 'RELAY');
-check('read-only: PATCH with Access identity', guard('PATCH', `docs/${DOC}/tables/Annuaire/records`, { readOnly: true }), 403);
-check('read-only: overrides ALLOW_ANONYMOUS_WRITES', guard('POST', `docs/${DOC}/tables/Annuaire/records`, { identity: false, anon: true, readOnly: true }), 403);
-check('read-only: table creation', guard('POST', `docs/${DOC}/tables`, { tables: ['Fusions_log'], readOnly: true }), 403);
-check('read-only: other doc still 403', guard('GET', `docs/docZ/tables/Annuaire/records`, { readOnly: true }), 403);
-check('doc not configured', gristGuard({ method: 'GET', path: `docs/${DOC}`, doc: '', hasIdentity: true, allowAnonymousWrites: false, tableIdOfBody: () => [] })?.status, 403);
-
 // /api/me
 const admins = parseAdminEmails(' A@example.org, b@example.org ,, ');
 check('parseAdminEmails', admins, ['a@example.org', 'b@example.org']);
@@ -192,22 +151,6 @@ check('/api/me demo: instance block from the variables', [meAnon.body.instance.g
 const meCentrale = await asJson(await me({ request: req('/api/me', { headers: { 'Cf-Access-Authenticated-User-Email': 'a@x.fr' } }), env: { ADMIN_EMAILS: 'a@x.fr' } }));
 check('/api/me Centrale unchanged: admin', [meCentrale.body.roles, meCentrale.body.capabilities.READ_ONLY], [['user', 'admin'], false]);
 
-const proxy = (method, path, env, body) => gristProxy({
-  request: req(`/api/grist/${path}?limit=1`, { method, body }), env, params: { path: path.split('/') },
-});
-upstream = null;
-let r = await proxy('GET', `docs/${DOC}/tables/Annuaire/records`, DEMO_ENV);
-check('proxy demo without key: GET relayed without Authorization', [r.status, upstream?.init.headers.Authorization, upstream?.url.endsWith('?limit=1')], [200, undefined, true]);
-check('proxy demo: User-Agent names the instance', upstream?.init.headers['User-Agent'], 'Druid-CRISalid-demo/1.0');
-upstream = null;
-r = await proxy('PATCH', `docs/${DOC}/tables/Annuaire/records`, DEMO_ENV, '{"records":[]}');
-check('proxy demo: PATCH refused, nothing sent upstream', [r.status, upstream], [403, null]);
-r = await proxy('GET', `docs/${DOC}/tables/Annuaire/records`, { VITE_GRIST_DOC_ID: DOC });
-check('proxy Centrale without key: still a configuration error', r.status, 500);
-upstream = null;
-r = await proxy('GET', `docs/${DOC}/tables/Annuaire/records`, { VITE_GRIST_DOC_ID: DOC, GRIST_API_KEY: 'k' });
-check('proxy Centrale with key: Authorization sent', upstream?.init.headers.Authorization, 'Bearer k');
-
 // Shared deployment: the middleware hands the host's instance to the handlers (context.data)
 {
   let nextCalled = false;
@@ -220,26 +163,9 @@ const sharedCall = (handler, host, path, instance, env, init = {}, params = {}) 
 const ecoleShared = resolveInstance({}, privReg, { shared: true });
 const meD2 = await asJson(await sharedCall(me, 'demo-2.example.org', '/api/me', d2, { ADMIN_EMAILS: 'a@x.fr' }));
 check('shared /api/me: instance block of the host', [meD2.body.instance.slug, meD2.body.instance.gristDocId, meD2.body.capabilities.READ_ONLY], ['demo-2', 'docDemo20002', true]);
-const gp = (instance, method, path, env, init = {}) => sharedCall(gristProxy, 'h.example.org', `/api/grist/${path}`, instance, env,
-  { method, ...init }, { path: path.split('/') });
-upstream = null;
-r = await gp(d2, 'GET', 'docs/eXbcyqzLmE1tsRo12WjGyY/tables/Annuaire/records', { GRIST_API_KEY: 'common' });
-check('shared proxy: the doc of another instance is refused', [r.status, upstream], [403, null]);
-r = await gp(d2, 'GET', 'docs/docDemo20002/tables/Annuaire/records', { GRIST_API_KEY: 'common' });
-check('shared proxy: own public doc read without the common key', [r.status, upstream?.init.headers.Authorization, upstream?.init.headers['User-Agent']],
-  [200, undefined, 'Druid-CRISalid-demo-2/1.0']);
-const accessId = { 'Cf-Access-Authenticated-User-Email': 'a@example.org' };
-r = await gp(ecoleShared, 'PATCH', 'docs/docEcole0001/tables/Annuaire/records', { GRIST_API_KEY: 'common' }, { headers: accessId, body: '{"records":[]}' });
-check('shared proxy: writable instance without its own key → configuration error', r.status, 500);
-upstream = null;
-r = await gp(ecoleShared, 'PATCH', 'docs/docEcole0001/tables/Annuaire/records', { GRIST_API_KEY: 'common', GRIST_API_KEY__ECOLE: 'ke' }, { headers: accessId, body: '{"records":[]}' });
-check('shared proxy: own key sent', [r.status, upstream?.init.headers.Authorization], [200, 'Bearer ke']);
-r = await gp(ecoleShared, 'PATCH', 'docs/docEcole0001/tables/Annuaire/records', { GRIST_API_KEY__ECOLE: 'ke', ALLOW_ANONYMOUS_WRITES: 'true' }, { body: '{"records":[]}' });
-check('shared proxy: ALLOW_ANONYMOUS_WRITES ignored', r.status, 403);
-
 // Centrale-only routes answer 404 on another instance (no upstream call)
 upstream = null;
-r = await news({ request: req('/api/news/udemo'), params: { slug: 'udemo' }, env: DEMO_ENV });
+let r = await news({ request: req('/api/news/udemo'), params: { slug: 'udemo' }, env: DEMO_ENV });
 check('news on demo: 404', [r.status, upstream], [404, null]);
 r = await newsletterGenerate({ request: req('/api/newsletter/generate', { method: 'POST', body: '{}' }), env: DEMO_ENV });
 check('newsletter/generate on demo: 404', r.status, 404);

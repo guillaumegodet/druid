@@ -2,7 +2,7 @@ import { normalizeAcronym } from './normalize';
 import { purgeStoredDirectory } from './directoryStorage';
 import { installReadOnlyFetchGuard } from './readOnly';
 import { installSessionExpiryGuard } from './sessionGuard';
-import { gristPublicBaseUrl, setInstanceInfo, type InstanceInfo } from './instanceRuntime';
+import { setInstanceInfo, type InstanceInfo } from './instanceRuntime';
 
 /** Scope resolved server-side from the `groups` claim of the Keycloak token
  * (group tree institution > lab > role, see server.cjs parseDruidAccess)
@@ -135,7 +135,7 @@ export const initKeycloak = (onAuthenticated: () => void): void => {
         _userInfo = data;
         setInstanceInfo(data.instance);
         // Read-only instance: reject every write before it leaves the browser (lib/readOnly.ts).
-        if (data.capabilities?.READ_ONLY) installReadOnlyFetchGuard(gristPublicBaseUrl());
+        if (data.capabilities?.READ_ONLY) installReadOnlyFetchGuard();
         // Server session lost (deployment, expiry): every /api/… 401 sends the tab back to the login.
         if (data.auth === 'session') installSessionExpiryGuard(redirectToLogin);
         onAuthenticated();

@@ -4,7 +4,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { app, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun } =
+const { app, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun, pickKeys } =
   require(path.join(__dirname, '../../server.cjs'));
 
 let ko = 0;
@@ -27,9 +27,9 @@ const csrf = (method, p, headers = {}) => new Promise((resolve) => {
   check('GET same-site trigger (subdomain)', await csrf('GET', '/api/sync-ldap-trigger', { 'sec-fetch-site': 'same-site' }), 403);
   check('POST /api cross-site', await csrf('POST', '/api/sync-sovisuplus', { 'sec-fetch-site': 'cross-site' }), 403);
   check('POST /api without headers (curl)', await csrf('POST', '/api/sync-sovisuplus', {}), 'NEXT');
-  check('POST /api Origin = host (vieux navigateur)', await csrf('POST', '/api/grist/x', { origin: 'http://druid.local', host: 'druid.local' }), 'NEXT');
-  check('POST /api Origin ≠ host', await csrf('POST', '/api/grist/x', { origin: 'http://evil.example', host: 'druid.local' }), 403);
-  check('POST /api invalid Origin', await csrf('POST', '/api/grist/x', { origin: 'null', host: 'druid.local' }), 403);
+  check('POST /api Origin = host (vieux navigateur)', await csrf('POST', '/api/v1/x', { origin: 'http://druid.local', host: 'druid.local' }), 'NEXT');
+  check('POST /api Origin ≠ host', await csrf('POST', '/api/v1/x', { origin: 'http://evil.example', host: 'druid.local' }), 403);
+  check('POST /api invalid Origin', await csrf('POST', '/api/v1/x', { origin: 'null', host: 'druid.local' }), 403);
   check('GET page SPA cross-site (lien externe)', await csrf('GET', '/structures', { 'sec-fetch-site': 'cross-site' }), 'NEXT');
   check('GET /api/public cross-site', await csrf('GET', '/api/public/photo', { 'sec-fetch-site': 'cross-site' }), 'NEXT');
 
@@ -112,6 +112,9 @@ const csrf = (method, p, headers = {}) => new Promise((resolve) => {
   check('csvEscape LF', csvEscape('a\nb'), '"a\nb"');
   check('csvEscape CR seul', csvEscape('a\rb'), '"a\rb"');
   check('csvEscape CRLF', csvEscape('a\r\nb'), '"a\r\nb"');
+
+  // ── LDAP cache of a lab right: restricted to the uids of its labs (formerly in grist-proxy-guard.cjs) ──
+  check('LDAP cache restricted to the uids', pickKeys({ a: 1, b: 2, c: 3 }, new Set(['a', 'c'])), { a: 1, c: 3 });
 
   console.log(ko ? `\n${ko} KO` : '\nAll OK');
   process.exit(ko ? 1 : 0);

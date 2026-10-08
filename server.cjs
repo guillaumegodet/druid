@@ -29,7 +29,7 @@ const ADMINS_ONLY = DRUID_ENV !== 'production';
 
 // Access and audit logs (scripts/lib/activity_log.cjs, plan-separation-test-prod-rssi.md lot 6): JSON lines in
 // DRUID_LOG_DIR (mounted outside the container, rotated by the host), stdout without it.
-const { createActivityLog, gristWriteSummary, auditEventOf, isQuietPath } = require('./scripts/lib/activity_log.cjs');
+const { createActivityLog, auditEventOf, isQuietPath } = require('./scripts/lib/activity_log.cjs');
 const activity = createActivityLog({ dir: process.env.DRUID_LOG_DIR || '', environment: DRUID_ENV });
 // Client address behind the gateway: X-Forwarded-For is only believed from the proxies listed in TRUST_PROXY
 // (the gateway network, e.g. 192.168.64.0/20) — otherwise req.ip is the direct peer.
@@ -105,8 +105,8 @@ const CAPABILITIES = {
 
 // Instance settings sent to the front by /api/me (lib/instanceRuntime.ts,
 // docs/plan-architecture-multi-instances.md lot 6 a) — same shape as
-// functions/_lib/instance.js::publicInstanceInfo. The browser always reads Grist through the
-// /api/grist proxy of this server (no public base).
+// functions/_lib/instance.js::publicInstanceInfo. The browser never talks to Grist: it reads and writes
+// through the domain API (/api/v1).
 const INSTANCE_INFO = {
   slug: process.env.DRUID_INSTANCE || 'nantes',
   label: process.env.INSTANCE_LABEL || 'Nantes Université',
@@ -283,9 +283,7 @@ app.use((req, res, next) => {
         bytes: Number(res.get('Content-Length')) || undefined });
     }
     const event = auditEventOf({ method: req.method, path: req.path, status: res.statusCode, signedIn: !!user });
-    if (event === 'grist.write') {
-      activity.audit(event, { ...base, ...gristWriteSummary(req.method, req.path.replace('/api/grist/', ''), req.body) });
-    } else if (event === 'api.write' && res.locals.apiAudit) {
+    if (event === 'api.write' && res.locals.apiAudit) {
       // Domain API (/api/v1): the Grist writes the command made (table, kind, rows, fields) — lib/directory/api.ts.
       activity.audit(event, { ...base, writes: res.locals.apiAudit });
     } else if (event) {
@@ -2766,195 +2764,6 @@ app.get('/api/structures-hierarchy.html', (req, res) => {
   }
 });
 
-// ── Grist proxy: server-side scope ─────────────────────────────────────────
-// The proxy relays with the server key (full rights on the document). Without
-// a guard, any logged-in user — i.e. the whole university since the implicit
-// lab right (parseDruidAccess) — could read, write or delete any table,
-// or even other documents of the key (server.cjs review of
-// 2026-09-16, point 1). Rules:
-//  - path: docs/<allowed doc>[/tables[/<table>[/records|/columns|/data/delete]]]
-//    (docs = VITE_GRIST_DOC_ID + GRIST_EXTRA_DOC_IDS, e.g. the curation doc of the
-//    AxesTab axes); the doc root is only relayed for GET (updatedAt, see
-//    gristService.getDocUpdatedAt); everything else (orgs, workspaces,
-//    attachments, sql…) is refused;
-//  - GET: any logged-in user (status quo — the frontend reads the full Annuaire
-//    and filters by scope client-side, see lib/auth.canSeeStructure);
-//  - structural writes (POST /tables, /columns), tables without a scope
-//    column (Alignement_*, Fusions_log, Etablissements…) and side docs:
-//    institution right (access.allSlugs);
-//  - record writes with a lab right: Annuaire (LABO),
-//    Structures (short_labels) and Newsletter (slug) only, and every targeted
-//    row must belong to a lab within the scope — sent values checked in
-//    the body, existing rows re-read via Grist's SQL endpoint;
-//    plus Fusions_log (log without a scope column: the Annuaire rows touched
-//    by a merge are, themselves, checked) and the axes curation tables
-//    (GRIST_LAB_TABLES_EXTRA, mirror of AxesTab.AXES_GRIST).
-const GRIST_ALLOWED_DOCS = new Set(
-  [process.env.VITE_GRIST_DOC_ID, ...String(process.env.GRIST_EXTRA_DOC_IDS || '').split(',')]
-    .map((s) => String(s || '').trim())
-    .filter(Boolean),
-);
-const GRIST_PATH_RE = /^docs\/([A-Za-z0-9_-]+)(?:\/(tables)(?:\/([A-Za-z0-9_]+)(?:\/(records|columns|data\/delete))?)?)?$/;
-// Side-doc tables writable (records, PATCH/POST) by the lab right of the given
-// slug — mirror of lib/publications/axes.ts AXES_GRIST.
-const GRIST_LAB_TABLES_EXTRA = {
-  '5aREUrB1kuFAcVY4GTUDfA/Publications_centrale_axes_strategiques2': 'ec-nantes',
-};
-// Main-doc tables without a scope column but open to record writes
-// for the lab right (merge / restore log).
-const GRIST_LAB_TABLES_LOG = new Set(['Fusions_log']);
-// Main-doc tables a lab right may READ (plan-separation-test-prod-rssi.md, lot 7): the directory, filtered on the
-// labs of the user (GRIST_LAB_READ_FILTER), and organisational tables without personal data. Every other table
-// (tasks, alignment reviews, arbitrations…) belongs to the institution tools and is refused.
-const GRIST_LAB_READABLE_TABLES = new Set(['Annuaire', 'Structures', 'Etablissements', 'Newsletter', 'Fusions_log']);
-// Tables whose rows are filtered in the proxy response, on the column of GRIST_LAB_SCOPE.
-const GRIST_LAB_READ_FILTER = new Set(['Annuaire']);
-// « LS2N[fr]|LS2N[en] » → « LS2N » (same rule as gristService.parseMultiLabel, fr preferred).
-const multiLabelValue = (raw) => {
-  const parts = String(raw || '').split('|').map((p) => p.trim()).filter(Boolean).map((p) => {
-    const m = p.match(/^(.*?)\s*\[([a-zA-Z]{2})\]\s*$/);
-    return m ? { value: m[1].trim(), lang: m[2].toLowerCase() } : { value: p, lang: '' };
-  });
-  return (parts.find((p) => p.lang === 'fr') || parts[0] || { value: '' }).value;
-};
-// Tables writable with a lab right: scope column + normalization to an
-// anchor comparable to access.labAnchors (see canAccessSlug).
-const GRIST_LAB_SCOPE = {
-  Annuaire: { col: 'LABO', anchor: (v) => normalizeAcronym(String(v || '')) },
-  Structures: { col: 'short_labels', anchor: (v) => normalizeAcronym(multiLabelValue(v)) },
-  Newsletter: { col: 'slug', anchor: (v) => normalizeAcronym(String(v || '')) },
-};
-// Scope column value of the existing rows (in batches of 500: SQLite
-// variable limit). Table/column names come from GRIST_LAB_SCOPE.
-const gristScopeOfRows = async (doc, table, col, ids) => {
-  const out = new Map();
-  for (let i = 0; i < ids.length; i += 500) {
-    const chunk = ids.slice(i, i + 500);
-    const r = await fetch(`${GRIST_API_BASE}/docs/${doc}/sql`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        sql: `SELECT id, "${col}" AS v FROM "${table}" WHERE id IN (${chunk.map(() => '?').join(',')})`,
-        args: chunk,
-      }),
-    });
-    if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
-    for (const row of (await r.json()).records || []) out.set(row.fields.id, row.fields.v);
-  }
-  return out;
-};
-/**
- * Authorization decision of the Grist proxy — pure (no direct access to req/res/fetch: the
- * existing rows are read through the injected `fetchRowScopes`). Returns
- * `{ ok: true }` (relay) or `{ ok: false, status, error }`. Extracted from the old
- * Express middleware `gristProxyGuard` (lot 2 of the multi-instance architecture plan,
- * docs/plan-architecture-multi-instances.md) to take the same shape as `gristGuard`
- * in the Centrale repo (functions/api/grist/[[path]].js): raw data in, decision
- * out, testable without Express mocks. The policy itself (per-lab scoping, row by
- * row) remains specific to Nantes — Centrale has no lab scope to check, see
- * docs/archive/lot0-inventaire-derive-2026-09-18.md.
- */
-const gristProxyDecision = async ({ method, path, access, body, fetchRowScopes }) => {
-  const m = GRIST_PATH_RE.exec(String(path || '').split('?')[0]);
-  if (!m || !GRIST_ALLOWED_DOCS.has(m[1])) {
-    return { ok: false, status: 403, error: 'Grist path not allowed by the proxy' };
-  }
-  const [, doc, tablesSeg, table, sub] = m;
-  if (method === 'GET') {
-    // Institution right, document metadata, list of tables, side documents: as before.
-    if (access?.allSlugs || !tablesSeg || !table || doc !== process.env.VITE_GRIST_DOC_ID) return { ok: true };
-    if (!GRIST_LAB_READABLE_TABLES.has(table)) {
-      return { ok: false, status: 403, error: 'Grist reads outside the lab scope' };
-    }
-    return GRIST_LAB_READ_FILTER.has(table) && sub === 'records'
-      ? { ok: true, filter: { col: GRIST_LAB_SCOPE[table].col, anchor: GRIST_LAB_SCOPE[table].anchor, anchors: access?.labAnchors || [] } }
-      : { ok: true };
-  }
-  if (!tablesSeg) return { ok: false, status: 403, error: 'Writing to the document root is refused' };
-  if (!['POST', 'PATCH', 'DELETE'].includes(method)) {
-    return { ok: false, status: 405, error: `Method not relayed: ${method}` };
-  }
-  if (access?.allSlugs) return { ok: true };
-  const anchors = access?.labAnchors || [];
-  const mainDoc = doc === process.env.VITE_GRIST_DOC_ID;
-  if (anchors.length > 0 && mainDoc && sub === 'records' && GRIST_LAB_TABLES_LOG.has(table) && method !== 'DELETE') {
-    return { ok: true };
-  }
-  const extraSlug = GRIST_LAB_TABLES_EXTRA[`${doc}/${table}`];
-  if (extraSlug && sub === 'records' && method !== 'DELETE') {
-    if (anchors.includes(normalizeAcronym(extraSlug))) return { ok: true };
-    return { ok: false, status: 403, error: `Write outside scope: ${extraSlug}` };
-  }
-  const scope = mainDoc && (sub === 'records' || sub === 'data/delete') ? GRIST_LAB_SCOPE[table] : null;
-  if (!scope || anchors.length === 0) {
-    return { ok: false, status: 403, error: 'Grist writes require the institution right' };
-  }
-  try {
-    const ids = [];
-    const sent = [];
-    if (sub === 'data/delete') {
-      if (!Array.isArray(body)) return { ok: false, status: 400, error: 'List of identifiers expected' };
-      ids.push(...body);
-    } else {
-      const records = body?.records;
-      if (!Array.isArray(records) || records.length === 0) {
-        return { ok: false, status: 400, error: 'Body with a records array expected' };
-      }
-      for (const rec of records) {
-        const fields = rec?.fields;
-        if (method === 'POST' && (!fields || fields[scope.col] === undefined)) {
-          return { ok: false, status: 403, error: `Creation outside scope: column ${scope.col} missing` };
-        }
-        if (method === 'PATCH') {
-          if (rec?.id === undefined) return { ok: false, status: 400, error: 'Missing id for PATCH' };
-          ids.push(rec.id);
-        }
-        if (fields && fields[scope.col] !== undefined) sent.push(fields[scope.col]);
-      }
-    }
-    if (!ids.every((id) => Number.isInteger(id) && id > 0)) {
-      return { ok: false, status: 400, error: 'Invalid Grist identifiers' };
-    }
-    if (sent.some((v) => !anchors.includes(scope.anchor(v)))) {
-      return { ok: false, status: 403, error: `Write outside scope: ${scope.col}` };
-    }
-    if (ids.length) {
-      const current = await fetchRowScopes(doc, table, scope.col, ids);
-      if (ids.some((id) => !current.has(id) || !anchors.includes(scope.anchor(current.get(id))))) {
-        return { ok: false, status: 403, error: `Rows outside scope or unknown: ${table}` };
-      }
-    }
-    return { ok: true };
-  } catch (err) {
-    console.error('[Proxy Grist] scope check error:', err);
-    return { ok: false, status: 502, error: `Scope check failed: ${err.message}` };
-  }
-};
-
-// Thin Express middleware around the pure decision above: translates req/res, injects
-// the real read of Grist rows (gristScopeOfRows, the guard's only I/O).
-const gristProxyGuard = async (req, res, next) => {
-  const decision = await gristProxyDecision({
-    method: req.method,
-    path: req.url.replace('/api/grist/', ''),
-    access: req.session.user?.access,
-    body: req.body,
-    fetchRowScopes: gristScopeOfRows,
-  });
-  if (decision.ok) {
-    res.locals.gristReadFilter = decision.filter || null;
-    return next();
-  }
-  res.status(decision.status).json({ error: decision.error });
-};
-
-/** Records of a Grist /records response kept for a lab right: those whose scope column is one of its labs. Pure. */
-const filterScopedRecords = (payload, { col, anchor, anchors }) => {
-  const records = Array.isArray(payload?.records) ? payload.records : [];
-  return { ...payload, records: records.filter((r) => anchors.includes(anchor(r?.fields?.[col]))) };
-};
-
-// ── Grist proxy ────────────────────────────────────────────────────────────
 // ── Directory domain API (/api/v1) ─────────────────────────────────────────
 // druid-internal docs/plan-migration-postgresql.md, lot 1: the front reads the people, structures and
 // institutions mapped and scoped by the server (lib/directory/*, Hono application shared with the
@@ -2980,39 +2789,9 @@ app.all('/api/v1/*', (req, res, next) => {
   apiV1Handler(req, res).catch(next);
 });
 
-app.all('/api/grist/*', gristProxyGuard, async (req, res) => {
-  const gristPath = req.url.replace('/api/grist/', '');
-  const targetUrl = `https://grist.numerique.gouv.fr/api/${gristPath}`;
-  const apiKey = GRIST_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
-
-  try {
-    const options = {
-      method: req.method,
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'User-Agent': 'Druid-CRISalid/1.0',
-      },
-    };
-    if (['POST', 'PATCH', 'PUT'].includes(req.method)) {
-      options.body = JSON.stringify(req.body);
-    }
-    const response = await fetch(targetUrl, options);
-    let responseText = await response.text();
-    if (!response.ok) console.error(`[Proxy Grist Error Body]: ${responseText}`);
-    // Lab right: only the rows of its labs leave the server (the client-side filter of useDruidData is a
-    // display convenience, not a protection).
-    if (response.ok && res.locals.gristReadFilter) {
-      responseText = JSON.stringify(filterScopedRecords(JSON.parse(responseText), res.locals.gristReadFilter));
-    }
-    res.status(response.status).set('Content-Type', 'application/json').send(responseText);
-  } catch (err) {
-    console.error('[Proxy Error]', err);
-    res.status(500).json({ error: err.message });
-  }
-});
+// The Grist proxy of the browser is closed (druid-internal docs/plan-migration-postgresql.md, lot 2 g): every read and
+// write goes through the domain API above. An explicit answer, so that a stale client never gets the SPA page instead.
+app.all('/api/grist/*', (req, res) => res.status(410).json({ error: 'Grist proxy removed: use /api/v1' }));
 
 // ── LDAP sync ──────────────────────────────────────────────────────────────
 // Lot 2 (docs/plan-architecture-multi-instances.md): formerly execSync (blocking —
@@ -3612,7 +3391,7 @@ const labUidsOf = async (anchors) => {
     if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
     labUidsCache = { at: Date.now(), rows: ((await r.json()).records || []).map((x) => x.fields) };
   }
-  const anchorOf = GRIST_LAB_SCOPE.Annuaire.anchor;
+  const anchorOf = (v) => normalizeAcronym(String(v || ''));   // lab of an Annuaire row (LABO), as the API scope
   return new Set(labUidsCache.rows.filter((x) => x.uid && anchors.includes(anchorOf(x.labo))).map((x) => String(x.uid)));
 };
 /** Entries of an object keyed by uid, restricted to the given uids. Pure. */
@@ -3681,6 +3460,6 @@ if (require.main === module) {
 }
 
 module.exports = {
-  app, activity, restrictToAdmins, gristProxyGuard, filterScopedRecords, pickKeys, gristProxyDecision, rejectCrossSite, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
+  app, activity, restrictToAdmins, pickKeys, rejectCrossSite, canAccessSlug, safeReturnTo, csvEscape, runningProgress, settleProgress, startBackgroundRun,
   buildPeopleCsv, buildStructuresCsv, gristCell, countCsvRecords, normalizeFuzzyDate, fuzzyDateBound, isFuzzyDatePast,
 };
