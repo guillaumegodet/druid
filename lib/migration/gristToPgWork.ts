@@ -87,6 +87,8 @@ const PRIORITIES = ['basse', 'normale', 'haute'];
 
 const isEmpty = (v: unknown) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
 const text = (v: unknown): string | null => (isEmpty(v) ? null : String(v).trim());
+/** Free text (a note) kept as typed, the spaces around included. */
+const freeText = (v: unknown): string | null => (isEmpty(v) ? null : String(v));
 const isTechnical = (c: string) => c === 'manualSort' || c.startsWith('gristHelper_');
 
 export const transformWork = (input: GristWorkInput, directory: DirectoryRows): { rows: WorkRows; issues: Issue[]; source: Record<string, number> } => {
@@ -233,7 +235,7 @@ export const transformWork = (input: GristWorkInput, directory: DirectoryRows): 
       }
       alignment_candidate.push({
         legacy_grist_id: r.id, person_id: personId, source: src, candidate_id: candidateId,
-        score: typeof f.Score === 'number' ? f.Score : null, payload, decision: text(f.Decision) ?? 'À traiter', note: text(f.Note),
+        score: typeof f.Score === 'number' ? f.Score : null, payload, decision: text(f.Decision) ?? 'À traiter', note: freeText(f.Note),
         pushed_on: day(payload, table, r.id, 'Pousse_le', f.Pousse_le), applied: f.Applique === true,
         applied_on: day(payload, table, r.id, 'Date_application', f.Date_application),
       });
