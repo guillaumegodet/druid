@@ -7,24 +7,14 @@
     "columns": {
       "alignment_candidate.id": "ColumnType<string, never, never>",
       "audit_log.id": "ColumnType<string, never, never>",
-      "benchmark_peer_group.id": "ColumnType<string, never, never>",
-      "establishment.id": "ColumnType<string, never, never>",
       "import_batch.id": "ColumnType<string, never, never>",
       "import_row.id": "ColumnType<string, never, never>",
       "membership.end_upper": "ColumnType<string | null, never, never>",
-      "membership.id": "ColumnType<string, never, never>",
       "membership.start_lower": "ColumnType<string | null, never, never>",
-      "merge_log.id": "ColumnType<string, never, never>",
       "person.employment_end_upper": "ColumnType<string | null, never, never>",
       "person.employment_start_lower": "ColumnType<string | null, never, never>",
       "person_identifier.id": "ColumnType<string, never, never>",
-      "person_link.id": "ColumnType<string, never, never>",
-      "report.id": "ColumnType<string, never, never>",
-      "report_generation.id": "ColumnType<string, never, never>",
-      "report_share.id": "ColumnType<string, never, never>",
-      "structure.id": "ColumnType<string, never, never>",
-      "task.id": "ColumnType<string, never, never>",
-      "task_event.id": "ColumnType<string, never, never>"
+      "person_link.id": "ColumnType<string, never, never>"
     }
   }
 }

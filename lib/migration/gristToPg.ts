@@ -75,13 +75,15 @@ export const ISSUE_EXPLANATIONS = {
   date_invalid: 'Date (naissance, validation, synchronisation) illisible : gardée dans extra, la colonne normalisée reste vide.',
   civility_normalized: 'Civilité « M. » / « Mme » / « Madame »… ramenée à M / F.',
   presence_status_legacy: 'Statut validé INTERNE / EXTERNE (avant 2026-10-07) ramené à PRESENT, comme lib/validation.ts.',
-  employer_resolved_by_label: 'Employeur saisi en texte au lieu d’une référence : rapproché par libellé d’Etablissements.',
+  employer_resolved_by_label: 'Employeur saisi en texte au lieu d’une référence : rapproché par libellé d’Etablissements (libellé saisi gardé dans extra).',
   employer_unresolved: 'Employeur inconnu (référence ou libellé sans établissement) : employeur vide, valeur gardée dans extra.',
   employer_duplicate_row: 'Référence vers une ligne Etablissements en double : rattachée à la première ligne du même nom.',
   lab_unresolved: 'LABO sans structure de même acronyme : appartenance sans structure, libellé gardé (lab_label).',
   lab_parking: 'LABO de rangement (zzz ou vide) : appartenance sans structure.',
   team_unresolved: 'Équipe sans structure de même acronyme (ou plusieurs, aucune sous le labo de l’appartenance) : libellé gardé (team_labels), pas de lien membership_team.',
   link_split: 'Cellule de profil web contenant plusieurs URL : une ligne person_link par URL.',
+  identifier_trimmed: 'Identifiant entouré d’espaces dans Grist : importé sans ces espaces.',
+  cell_kept_for_record: 'Liens ou identifiants OpenAlex réunis sur plusieurs lignes (ou découpés) : liste complète en base, cellule de la ligne retenue gardée dans extra pour l’affichage de la fiche.',
   column_unmapped: 'Colonne de l’Annuaire inconnue de l’import : gardée dans extra (à classer).',
   establishment_duplicate_name: 'Etablissements : nom en double, première ligne gardée, les références des autres lignes y sont rattachées.',
   establishment_duplicate_uai: 'Etablissements : UAI en double, gardée sur la première ligne seulement (copie dans extra).',
@@ -147,7 +149,10 @@ const ROLES = ['PRINCIPAL', 'SECONDAIRE', 'HISTORIQUE'];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────────────────────────────────────────
 const isEmpty = (v: unknown) => v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
-const text = (v: unknown): string | null => (isEmpty(v) ? null : String(v).trim());
+/** Text cell as stored (the application shows it as it is: no trimming), null when empty or blank. */
+const text = (v: unknown): string | null => (isEmpty(v) ? null : String(v));
+/** Identifier / code: trimmed. */
+const code = (v: unknown): string | null => (isEmpty(v) ? null : String(v).trim());
 const splitList = (v: unknown, sep: RegExp): string[] =>
   isEmpty(v) ? [] : String(v).split(sep).map((s) => s.trim()).filter(Boolean);
 const unique = <T>(values: T[]): T[] => [...new Set(values)];
@@ -219,10 +224,10 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
     establishmentOf.set(r.id, r.id);
     const extra: Record<string, unknown> = {};
     if (!isEmpty(f.commentaire)) extra.commentaire = f.commentaire;
-    let uai = text(f.UAI);
+    let uai = code(f.UAI);
     if (uai && uaiSeen.has(uai.toUpperCase())) { extra.UAI = uai; uai = null; issue('establishment_duplicate_uai', 'Etablissements', [r.id]); }
     if (uai) uaiSeen.add(uai.toUpperCase());
-    establishment.push({ legacy_grist_id: r.id, name, label: text(f.Libelle), uai, ror: text(f.ROR), idref: text(f.idref), extra });
+    establishment.push({ legacy_grist_id: r.id, name, label: text(f.Libelle), uai, ror: code(f.ROR), idref: code(f.idref), extra });
   }
 
   // Corps / grade reference (columns A-D unnamed: code = A, label = B, category = C, the whole row in extra).
@@ -230,11 +235,11 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
   const codes = new Set<string>();
   for (const r of [...(input.Corps_Categorie || [])].sort((a, b) => a.id - b.id)) {
     const f = r.fields || {};
-    const code = text(f.A);
-    if (!code) { issue('corps_without_code', 'Corps_Categorie', [r.id]); continue; }
-    if (codes.has(code)) { issue('corps_duplicate_code', 'Corps_Categorie', [r.id]); continue; }
-    codes.add(code);
-    ref_corps_grade.push({ code, label: text(f.B), category: text(f.C), extra: { ...f } });
+    const corps = code(f.A);
+    if (!corps) { issue('corps_without_code', 'Corps_Categorie', [r.id]); continue; }
+    if (codes.has(corps)) { issue('corps_duplicate_code', 'Corps_Categorie', [r.id]); continue; }
+    codes.add(corps);
+    ref_corps_grade.push({ code: corps, label: text(f.B), category: text(f.C), extra: { ...f } });
   }
 
   // Structures: labels, level and parent as the application derives them (mapStructureRecords); raw row in extra.
@@ -246,7 +251,7 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
   const candidates = new Map<string, number[]>(); // every structure of an acronym (teams of the same name in two labs)
   for (const r of structureRecords) {
     const f = r.fields || {};
-    const localId = text(f.local_id);
+    const localId = code(f.local_id);
     if (!localId) { issue('structure_without_local_id', 'Structures', [r.id]); continue; }
     if (localIds.has(localId)) { issue('structure_duplicate_local_id', 'Structures', [r.id]); continue; }
     localIds.add(localId);
@@ -263,8 +268,8 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
     const { local_id: _localId, ...extra } = f;
     structure.push({
       legacy_grist_id: r.id, local_id: localId, acronym, name: text(s?.officialName), type: text(f.type),
-      level: text(s?.level), nature: text(s?.nature), ror: text(f.ror), rnsr: text(f.nns), idref: text(f.idref),
-      url: text(f.url), extra, $parent: null,
+      level: text(s?.level), nature: text(s?.nature), ror: code(f.ror), rnsr: code(f.nns), idref: code(f.idref),
+      url: code(f.url), extra, $parent: null,
     });
   }
   for (const row of structure) {
@@ -364,7 +369,8 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
       else { employer = target; if (target !== emp) issue('employer_duplicate_row', 'Annuaire', [kept.id]); }
     } else if (!isEmpty(emp)) {
       const target = establishmentByName.get(String(emp).trim().toLowerCase());
-      if (target !== undefined) { employer = target; issue('employer_resolved_by_label', 'Annuaire', [kept.id]); }
+      // Resolved, and the typed label kept: the application shows it today (lib/directory/pg reads it back).
+      if (target !== undefined) { employer = target; extra.Employeur = emp; issue('employer_resolved_by_label', 'Annuaire', [kept.id]); }
       else keepRaw('Employeur', emp, 'employer_unresolved');
     }
     // Validated presence.
@@ -386,8 +392,9 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
     const sources = unique(rows.flatMap((r) => splitList(r.fields?.Data_source, /[|,]/)));
 
     person.push({
-      id, legacy_grist_id: kept.id, uid: key.startsWith('u:') ? key.slice(2) : null,
-      last_name: String(f.Nom ?? '').trim(), first_name: text(f.Prenom), civility, email: text(f.Email),
+      // Grouped regardless of case, kept with its case (upper-case LDAP uids are public ids as they are).
+      id, legacy_grist_id: kept.id, uid: key.startsWith('u:') ? String(f.uid_dyna).trim() : null,
+      last_name: String(f.Nom ?? ''), first_name: text(f.Prenom), civility, email: text(f.Email),
       nationality: text(f.Nationalite), birth_date: birth, corps_grade: text(f.Corps_grade), employment_type: text(f.TYPE_EMPLOI),
       employment_type_label: text(f.LIB_TYPE_EMPLOI), hdr: text(f.HDR), hdr_year: hdrYear, doctoral_school: text(f.ED_de_rattachement),
       employment_start: fuzzy('employment_start_date'), employment_end: fuzzy('employment_end_date'),
@@ -415,6 +422,7 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
         }
         const values = col === 'OpenAlex_ids' ? splitList(raw, /[|,;\s]+/)
           : [typeof raw === 'number' ? String(Math.round(raw)) : String(raw).trim()];
+        if (fromKept && typeof raw === 'string' && col !== 'OpenAlex_ids' && raw !== raw.trim()) issue('identifier_trimmed', 'Annuaire', [r.id], [col]);
         values.forEach((value, i) => {
           const k = `${scheme}|${value}`;
           if (seen.has(k)) return;
@@ -426,6 +434,13 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
       }
     }
     person_identifier.push(...identifierRows);
+    // The record shows the kept row's cell; when the person's list (all its rows) reads differently, that cell is kept.
+    const keptCell = (col: string) => (isEmpty(f[col]) ? '' : String(f[col]));
+    const openalexList = identifierRows.filter((i) => i.scheme === 'openalex' && i.source === 'grist:OpenAlex_ids').map((i) => i.value).join('|');
+    if (openalexList !== keptCell('OpenAlex_ids')) {
+      extra.OpenAlex_ids = keptCell('OpenAlex_ids');
+      issue('cell_kept_for_record', 'Annuaire', [kept.id], ['OpenAlex_ids']);
+    }
     if (scopusAbsent) {
       person_identifier_check.push({ person_id: id, scheme: 'scopus', result: 'absent' });
       issue('scopus_absent', 'Annuaire', [kept.id]);
@@ -442,6 +457,13 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
         links.add(`${kind}|${url}`);
         person_link.push({ person_id: id, kind, url });
       }
+    }
+
+    for (const col of LINK_COLUMNS) {
+      const kind = col.toLowerCase().replace(/_+$/, '');
+      const list = person_link.filter((l) => l.person_id === id && l.kind === kind).map((l) => l.url).join('; ');
+      const cell = isEmpty(f[col]) ? '' : String(f[col]);
+      if (list !== cell) { extra[col] = cell; issue('cell_kept_for_record', 'Annuaire', [kept.id], [col]); }
     }
 
     // Sync traces of the kept row.

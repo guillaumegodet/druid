@@ -45,12 +45,11 @@ describe.skipIf(!url)('PostgreSQL schema v1', () => {
     });
   });
 
-  it('checks: lower-case uid, civility F/M, presence status', async () => {
+  it('checks: uid unique regardless of case, civility F/M, presence status', async () => {
     await inRollback(async (trx) => {
-      await fails(trx, /check constraint/, () => person(trx, { uid: 'Lovelace-A' }));
       await fails(trx, /check constraint/, () => person(trx, { civility: 'Mme' }));
       await fails(trx, /check constraint/, () => person(trx, { presence_status: 'INTERNE' }));
-      await person(trx, { uid: 'lovelace-a', civility: 'F', presence_status: 'PRESENT' });
+      await person(trx, { uid: 'Lovelace-A', civility: 'F', presence_status: 'PRESENT' });
       await fails(trx, /duplicate key/, () => person(trx, { uid: 'lovelace-a' }));
     });
   });

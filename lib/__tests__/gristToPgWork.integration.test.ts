@@ -39,6 +39,14 @@ describe.skipIf(!url)('Grist → PostgreSQL load of the work tables', () => {
       got.shares = await trx.selectFrom('report_share as s').innerJoin('report as r', 'r.id', 's.report_id').select(['r.legacy_grist_id', 's.grantee']).execute();
       got.generations = await trx.selectFrom('report_generation as g').innerJoin('report as r', 'r.id', 'g.report_id')
         .select(['r.legacy_grist_id', 'g.ai_texts', 'g.definition_snapshot']).execute();
+      // Stable ids: a row from ONE Grist table keeps its Grist row id; the sequences continue after them.
+      got.stable = (await sql<{ t: string; ok: boolean }>`
+        SELECT 'membership' AS t, bool_and(id = legacy_grist_id) AS ok FROM membership UNION ALL
+        SELECT 'structure', bool_and(id = legacy_grist_id) FROM structure UNION ALL
+        SELECT 'task', bool_and(id = legacy_grist_id) FROM task UNION ALL
+        SELECT 'report', bool_and(id = legacy_grist_id) FROM report UNION ALL
+        SELECT 'merge_log', bool_and(id = legacy_grist_id) FROM merge_log`.execute(trx)).rows;
+      got.next = (await trx.insertInto('task').values({ type: 'autre', title: 'new' } as any).returning('id').executeTakeFirstOrThrow()).id;
       got.disabled = (await sql<{ n: string }>`SELECT count(*)::text AS n FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid
         WHERE NOT t.tgisinternal AND t.tgenabled = 'D' AND c.relname = ANY(${[...WORK_TABLES_PG]})`.execute(trx)).rows[0].n;
       throw new Rollback();
@@ -58,5 +66,7 @@ describe.skipIf(!url)('Grist → PostgreSQL load of the work tables', () => {
     expect(got.shares).toEqual([{ legacy_grist_id: 60, grantee: 'bob' }]);
     expect(got.generations).toEqual([{ legacy_grist_id: 60, ai_texts: null, definition_snapshot: { schemaVersion: 1 } }]);
     expect(got.disabled).toBe('0');
+    expect(got.stable).toEqual(['membership', 'structure', 'task', 'report', 'merge_log'].map((t) => ({ t, ok: true })));
+    expect(got.next).toBe('5'); // after the imported tasks 1-4
   });
 });
