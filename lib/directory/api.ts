@@ -66,6 +66,8 @@ export interface DirectoryApiBindings {
   ldap?: LdapCommands;
   /** null = no authenticated user. */
   scope: DirectoryScope | null;
+  /** Authenticated user, recorded as the author of the writes (PostgreSQL audit log). */
+  actor?: string;
   /** Why this instance refuses every write (read-only demo, no Cloudflare Access identity), null = allowed. */
   writeRefusal?: { status: 403; error: string } | null;
 }
@@ -222,7 +224,7 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (audit.length) c.res.headers.set(AUDIT_HEADER, JSON.stringify(audit));
   });
   const ctxOf = (c: { env: DirectoryApiBindings; get: (k: 'audit') => WriteAudit[] }): CommandContext =>
-    ({ scope: c.env.scope!, audit: (entry) => c.get('audit').push(entry) });
+    ({ scope: c.env.scope!, actor: c.env.actor, audit: (entry) => c.get('audit').push(entry) });
   /** Parsed JSON body, or null when it does not match the schema. */
   const bodyOf = async <T>(c: { req: { json: () => Promise<unknown> } }, schema: z.ZodType<T>): Promise<T | null> => {
     const parsed = schema.safeParse(await c.req.json().catch(() => undefined));
