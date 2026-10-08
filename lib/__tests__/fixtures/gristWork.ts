@@ -12,7 +12,7 @@ export const gristWorkFixture = (): GristWorkInput => ({
       fait_le: 'hier', Champ_inconnu: 'x' }),
     row(3, { cle: 'annuaire_ids_partages:dupont-a', type: 'annuaire_ids_partages', titre: 'Doublon de clé', chercheur: 999, statut: 'bizarre',
       priorite: 'urgente', cree_le: '2026-10-03T09:00:00.000Z' }),
-    row(4, { cle: 'x:petit-d', type: 'autre', titre: 'Par uid', uid_dyna: 'petit-d', statut: 'fait', cree_le: '2026-10-04T09:00:00.000Z' }),
+    row(4, { cle: 'x:petit-d', type: 'autre', titre: 'Uid sans fiche', uid_dyna: 'petit-d', statut: 'fait', cree_le: '2026-10-04T09:00:00.000Z' }),
   ],
   Taches_evenements: [
     row(10, { tache: 1, date: '2026-10-01T05:00:00.000Z', auteur: 'job', action: 'creation', detail: 'Détectée' }),

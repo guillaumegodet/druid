@@ -47,7 +47,7 @@ describe.skipIf(!url)('Grist → PostgreSQL load of the work tables', () => {
     expect(got.counts).toEqual({ task: 4, task_event: 2, merge_log: 2, alignment_candidate: 4, import_batch: 1, import_row: 2, report: 2,
       report_share: 1, report_generation: 1, benchmark_peer_group: 1 });
     expect(got.events).toEqual([{ legacy_grist_id: 10, task: 1 }, { legacy_grist_id: 11, task: 2 }]);
-    expect((got.taskPeople as any[]).map((t) => [t.legacy_grist_id, t.uid, t.status])).toEqual([[1, 'dupont-a', 'a_faire'], [2, null, 'a_faire'], [3, null, 'a_faire'], [4, 'petit-d', 'fait']]);
+    expect((got.taskPeople as any[]).map((t) => [t.legacy_grist_id, t.uid, t.status])).toEqual([[1, 'dupont-a', 'a_faire'], [2, null, 'a_faire'], [3, null, 'a_faire'], [4, null, 'fait']]);
     expect((got.taskPeople as any[])[2].extra).toEqual({ cle: 'annuaire_ids_partages:dupont-a', chercheur: 999, statut: 'bizarre', priorite: 'urgente' });
     expect((got.merge as any[]).map((m) => [m.dropped_snapshot, m.kept_patch, m.merged_at === null, m.extra])).toEqual([
       [{ Nom: 'Dupont', LABO: 'LAB1' }, { Email: 'a@x' }, false, { Nom: 'Dupont' }], [{}, {}, true, { dropped_json: '{oops', date: 'not a date' }],

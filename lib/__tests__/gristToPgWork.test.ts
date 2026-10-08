@@ -13,12 +13,12 @@ describe('Grist → PostgreSQL transformation of the work tables', () => {
   const alice = personUuid('u:dupont-a');
   const bob = directory.rows.person.find((p) => p.legacy_grist_id === 103)!.id;
 
-  it('tasks: person by row then uid, defaults of an empty status, unknown values kept, duplicated keys', () => {
+  it('tasks: person by the chercheur reference only, defaults of an empty status, unknown values kept, duplicated keys', () => {
     expect(rows.task.map((t) => [t.legacy_grist_id, t.key, t.person_id, t.status, t.priority])).toEqual([
       [1, 'annuaire_ids_partages:dupont-a', alice, 'a_faire', 'normale'],
       [2, null, null, 'a_faire', 'normale'],
       [3, null, null, 'a_faire', 'normale'],
-      [4, 'x:petit-d', personUuid('u:petit-d'), 'fait', 'normale'],
+      [4, 'x:petit-d', null, 'fait', 'normale'], // uid only: no record, as in the application
     ]);
     expect(rows.task[1].extra).toEqual({ Champ_inconnu: 'x', fait_le: 'hier' });
     expect(rows.task[2].extra).toEqual({ cle: 'annuaire_ids_partages:dupont-a', chercheur: 999, statut: 'bizarre', priorite: 'urgente' });

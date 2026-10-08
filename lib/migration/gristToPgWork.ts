@@ -158,9 +158,10 @@ export const transformWork = (input: GristWorkInput, directory: DirectoryRows): 
     let key = text(f.cle);
     if (key && keys.has(key)) { extra.cle = key; key = null; issue('work_duplicate', 'Taches', [r.id], ['cle']); }
     if (key) keys.add(key);
-    let personId = personOf(f.chercheur);
+    // The record of a task is its `chercheur` reference only (a task without it is shown « without record » today);
+    // its uid stays in task.uid.
+    const personId = personOf(f.chercheur);
     if (!personId && typeof f.chercheur === 'number' && f.chercheur > 0) { extra.chercheur = f.chercheur; issue('work_person_unresolved', 'Taches', [r.id], ['chercheur']); }
-    if (!personId && !isEmpty(f.uid_dyna)) personId = personOfKey(f.uid_dyna);
     let status = text(f.statut) ?? 'a_faire'; // an empty status typed in Grist reads as « à faire » (tasks_schema.statusOf)
     if (!TASK_STATUSES.includes(status)) { extra.statut = f.statut; issue('work_value_kept_in_extra', 'Taches', [r.id], ['statut']); status = 'a_faire'; }
     let priority = text(f.priorite) ?? 'normale';
