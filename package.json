@@ -20,7 +20,7 @@
     "db:migrate": "dbmate --migrations-dir db/migrations --no-dump-schema up",
     "db:rollback": "dbmate --migrations-dir db/migrations --no-dump-schema rollback",
     "db:types": "kysely-codegen",
-    "test:db": "vitest run lib/__tests__/*.integration.test.ts",
+    "test:db": "vitest run --no-file-parallelism lib/__tests__/*.integration.test.ts",
     "migrate:grist-to-pg": "npm run -s build:migrate && node scripts/.build/migrate_grist_to_pg.cjs",
     "build:migrate": "mkdir -p scripts/.build && esbuild scripts/migrate_grist_to_pg.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/migrate_grist_to_pg.cjs --log-level=warning"
   },

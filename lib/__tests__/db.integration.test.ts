@@ -2,18 +2,25 @@
 // database: reduced-precision dates, triggers, audit log, rights of the application role, conflict view. Needs
 // DATABASE_URL_APP (role druid_app, db/roles.sql): run by the « database » CI job and `npm run test:db`; skipped
 // otherwise. Each case runs in a transaction rolled back at the end: nothing is left in the database.
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { sql, Transaction } from 'kysely';
 import { createDb, withActor, type DB } from '../db/client';
 
 const url = process.env.DATABASE_URL_APP;
 const db = url ? createDb({ connectionString: url, max: 2 }) : null;
 afterAll(async () => { await db?.destroy(); });
+// A test may wait for the lock of another file (see pg_advisory_xact_lock below), and the import takes a few seconds.
+vi.setConfig({ testTimeout: 30000 });
 
 class Rollback extends Error {}
 /** Runs `fn` as `actor` and rolls everything back (rows and audit entries). */
 const inRollback = async (fn: (trx: Transaction<DB>) => Promise<void>, actor = 'test:db') => {
-  await expect(withActor(db!, actor, async (trx) => { await fn(trx); throw new Rollback(); })).rejects.toBeInstanceOf(Rollback);
+  await expect(withActor(db!, actor, async (trx) => {
+    // Integration test files may run in parallel: one database transaction at a time (the import empties tables).
+    await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
+    await fn(trx);
+    throw new Rollback();
+  })).rejects.toBeInstanceOf(Rollback);
 };
 /** Expects the statement to fail with a PostgreSQL error matching `pattern`, inside a savepoint. */
 const fails = async (trx: Transaction<DB>, pattern: RegExp, fn: () => Promise<unknown>) => {

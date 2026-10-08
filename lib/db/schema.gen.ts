@@ -59,10 +59,11 @@ export interface AuditLog {
 
 export interface BenchmarkPeerGroup {
   id: ColumnType<string, never, never>;
+  legacy_grist_id: number | null;
   name: string;
   owner: string;
   rors: Generated<string[]>;
-  updated_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp | null>;
 }
 
 export interface Establishment {
@@ -97,6 +98,7 @@ export interface ImportRow {
   batch_id: Int8;
   choice: string | null;
   current_value: string | null;
+  extra: Generated<Json>;
   family: string | null;
   field: string;
   id: ColumnType<string, never, never>;
@@ -138,6 +140,7 @@ export interface MembershipTeam {
 export interface MergeLog {
   author: string | null;
   dropped_snapshot: Json;
+  extra: Generated<Json>;
   id: ColumnType<string, never, never>;
   kept_before: Generated<Json>;
   kept_patch: Generated<Json>;
@@ -146,7 +149,7 @@ export interface MergeLog {
   legacy_grist_id: number | null;
   legacy_kept_rowid: number | null;
   legacy_restored_rowid: number | null;
-  merged_at: Generated<Timestamp>;
+  merged_at: Generated<Timestamp | null>;
   note: string | null;
   restored: Generated<boolean>;
   restored_person_id: string | null;
@@ -228,17 +231,18 @@ export interface RefCorpsGrade {
 }
 
 export interface Report {
-  created_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp | null>;
   definition: Json;
   deleted_at: Timestamp | null;
   description: string | null;
+  extra: Generated<Json>;
   id: ColumnType<string, never, never>;
   legacy_grist_id: number | null;
   name: string;
   owner: string;
   published_template: Generated<boolean>;
   template_id: string | null;
-  updated_at: Generated<Timestamp>;
+  updated_at: Generated<Timestamp | null>;
   visibility: Generated<string>;
 }
 
@@ -246,9 +250,11 @@ export interface ReportGeneration {
   ai_texts: Json | null;
   data_date: string | null;
   definition_snapshot: Json | null;
-  generated_at: Generated<Timestamp>;
+  extra: Generated<Json>;
+  generated_at: Generated<Timestamp | null>;
   generated_by: string | null;
   id: ColumnType<string, never, never>;
+  legacy_grist_id: number | null;
   pdf_ref: string | null;
   publication_count: number | null;
   report_id: Int8;
@@ -256,10 +262,11 @@ export interface ReportGeneration {
 }
 
 export interface ReportShare {
-  granted_at: Generated<Timestamp>;
+  granted_at: Generated<Timestamp | null>;
   granted_by: string | null;
   grantee: string;
   id: ColumnType<string, never, never>;
+  legacy_grist_id: number | null;
   report_id: Int8;
   role: string;
 }
@@ -295,11 +302,12 @@ export interface Task {
   assignee: string | null;
   base: string | null;
   channel: string | null;
-  created_at: Generated<Timestamp>;
+  created_at: Generated<Timestamp | null>;
   created_by: string | null;
   description: string | null;
   done_at: Timestamp | null;
   done_by: string | null;
+  extra: Generated<Json>;
   id: ColumnType<string, never, never>;
   key: string | null;
   lab: string | null;
@@ -323,10 +331,12 @@ export interface Task {
 
 export interface TaskEvent {
   action: string;
-  at: Generated<Timestamp>;
+  at: Generated<Timestamp | null>;
   author: string | null;
   detail: string | null;
+  extra: Generated<Json>;
   id: ColumnType<string, never, never>;
+  legacy_grist_id: number | null;
   task_id: Int8;
 }
 
