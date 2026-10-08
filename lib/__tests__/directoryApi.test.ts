@@ -179,6 +179,8 @@ describe('createDirectoryApi', () => {
     merges: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
     abesExports: vi.fn(async () => ({ items: [], updatedAt: 'v1' })),
     labsOfUid: vi.fn(async () => []),
+    duplicates: vi.fn(),
+    recordRows: vi.fn(async () => []),
     invalidate: vi.fn(),
   });
   const stubPublications = (): PublicationsStore & { newsletter: ReturnType<typeof vi.fn> } => ({

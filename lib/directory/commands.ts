@@ -16,7 +16,9 @@ import {
   AnnuaireColumnMeta, AnnuaireWriteContext, fuzzyDateEncoderFor, membershipFieldsOf, planAffiliationRows,
   researcherCreateFields, researcherUpdateFields, secondaryRowIdentity, toGristDateCell,
 } from './annuaireWrite';
-import { DUPLICATE_DECISION_COL, RATTACHEMENT_CHOICES, RATTACHEMENT_COL, mapInstitutionRecords, parseMultiLabel } from './gristMapping';
+import {
+  AFFILIATION_END_COL, DUPLICATE_DECISION_COL, RATTACHEMENT_CHOICES, RATTACHEMENT_COL, mapInstitutionRecords, parseMultiLabel,
+} from './gristMapping';
 import { structureCreateFields, structureUpdateFields } from './structureWrite';
 import type { DirectoryRepository, DirectoryScope, GristClient } from './repository';
 
@@ -45,6 +47,14 @@ export interface DirectoryCommands {
   /** New structure (lot 2 b); returns its Druid id `S-<rowId>`. */
   createStructure(structure: Structure, ctx: CommandContext): Promise<{ id: string }>;
   updateStructure(recordId: number, structure: Structure, ctx: CommandContext): Promise<void>;
+  // ── Duplicates and merges (lot 2 c) ──
+  qualifyDuplicates(args: { rowIds: number[]; principalRowId?: number; mode: 'concomitant' | 'successif' | 'a_revoir'; endDate?: string; author: string },
+    ctx: CommandContext): Promise<{ updated: number }>;
+  unqualifyDuplicates(rowIds: number[], ctx: CommandContext): Promise<{ updated: number }>;
+  switchUid(args: { fromUid: string; rowId?: number; toUid: string; author: string }, ctx: CommandContext): Promise<{ updated: number }>;
+  mergeRows(args: { keepRowId: number; dropRowId: number; fields: Record<string, any>; author: string; note?: string },
+    ctx: CommandContext): Promise<{ logId: number }>;
+  restoreMerge(logId: number, ctx: CommandContext): Promise<{ restoredRowId: number }>;
   /** Columns of the Annuaire (the record form shows the FTE fields only when they exist). */
   annuaireColumns(): Promise<AnnuaireColumnMeta[]>;
 }
@@ -167,8 +177,148 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
     }
   };
 
+  /** Annuaire rows by id, limited to the scope (a lab right never saw the other rows through the proxy). */
+  const rowsInScope = async (scope: DirectoryScope, filter: Record<string, unknown[]>) => {
+    const anchors = anchorsOf(scope);
+    return (await grist.records(ANNUAIRE, filter))
+      .filter((r) => scope.all || anchors.has(normalizeAcronym(String(r.fields?.LABO || ''))))
+      .map((r) => ({ rowId: r.id, fields: r.fields }));
+  };
+  const writableColumns = async () => new Set((await annuaireColumns()).filter((c) => !c.isFormula).map((c) => c.id));
+  /** Runs a Grist write whose failure must name what was already done (merge, restoration). */
+  const step = async (fn: () => Promise<unknown>, message: string): Promise<void> => {
+    try {
+      await fn();
+    } catch (err) {
+      console.error('[api/v1]', message, (err as Error).message);
+      throw new ApiError(502, message);
+    }
+  };
+
   return {
     annuaireColumns,
+
+    /**
+     * Qualifies a group of rows sharing a uid (duplicate merge plan, lot 1): `concomitant` → the chosen row
+     * PRINCIPAL, the others SECONDAIRE; `successif` → the others HISTORIQUE (+ `affiliation_end_date` when
+     * given and empty); `a_revoir` → no role, « A_REVOIR » decision. Trace: `doublon_decision` = « <MODE> <date> <author> ».
+     */
+    qualifyDuplicates: ({ rowIds, principalRowId, mode, endDate, author }, ctx) => writing(async () => {
+      if (mode !== 'a_revoir' && (principalRowId === undefined || !rowIds.includes(principalRowId))) {
+        throw new ApiError(400, 'Qualification: primary row required');
+      }
+      if (!rowIds.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      await ensureAffiliationColumns(ctx);
+      const encodeDate = fuzzyDateEncoderFor(await annuaireColumns().catch(() => null));
+      const decision = `${mode === 'a_revoir' ? 'A_REVOIR' : mode === 'concomitant' ? 'CONCOMITANT' : 'SUCCESSIF'} ${todayIso()} ${author}`;
+      const rows = await rowsInScope(ctx.scope, { id: rowIds });
+      const records = rows.map((r) => {
+        const fields: Record<string, any> = { [DUPLICATE_DECISION_COL]: decision };
+        if (mode === 'a_revoir') {
+          fields[RATTACHEMENT_COL] = null;
+        } else if (r.rowId === principalRowId) {
+          fields[RATTACHEMENT_COL] = 'PRINCIPAL';
+        } else {
+          fields[RATTACHEMENT_COL] = mode === 'concomitant' ? 'SECONDAIRE' : 'HISTORIQUE';
+          // Successive affiliation: the end of the old row is a lab MEMBERSHIP end (affiliation_end_date).
+          if (mode === 'successif' && endDate && !r.fields[AFFILIATION_END_COL] && !r.fields['employment_end_date']) {
+            const cell = encodeDate(AFFILIATION_END_COL, endDate);
+            if (cell !== null) fields[AFFILIATION_END_COL] = cell;
+          }
+        }
+        return { id: r.rowId, fields };
+      });
+      // Different column signatures possible (affiliation_end_date) → one PATCH per row.
+      for (const rec of records) await update(ctx, ANNUAIRE, [rec]);
+      return { updated: records.length };
+    }),
+
+    /** Removes the qualification of a group (roles and decision cleared) → a pending duplicate again. */
+    unqualifyDuplicates: (rowIds, ctx) => writing(async () => {
+      await assertRowsInScope(ctx.scope, rowIds);
+      await ensureAffiliationColumns(ctx);
+      await update(ctx, ANNUAIRE, rowIds.map((id) => ({ id, fields: { [RATTACHEMENT_COL]: null, [DUPLICATE_DECISION_COL]: '' } })));
+      return { updated: rowIds.length };
+    }),
+
+    /**
+     * Moves a record to its LDAP uid (`annuaire_uid_ldap` task): every row of `fromUid` (or the single row
+     * `rowId` of a record without uid) gets `uid_dyna = toUid`, with a dated line in Commentaires keeping the
+     * former uid. Refused when a row already carries `toUid` — anywhere in the directory: that case is a merge.
+     */
+    switchUid: ({ fromUid, rowId, toUid, author }, ctx) => writing(async () => {
+      if (!toUid || toUid.startsWith('ext_')) throw new ApiError(400, `Invalid LDAP uid: ${toUid}`);
+      if ((await grist.records(ANNUAIRE, { uid_dyna: [toUid] })).length) {
+        throw new ApiError(409, `This uid already has a directory record, merge the two records instead: ${toUid}`);
+      }
+      const rows = fromUid ? await rowsInScope(ctx.scope, { uid_dyna: [fromUid] })
+        : rowId ? await rowsInScope(ctx.scope, { id: [rowId] }) : [];
+      if (!rows.length) throw new ApiError(404, `Record not found in Grist: uid ${fromUid || '—'}`);
+      const note = `[${todayIso()}] uid ${fromUid || '(vide)'} → ${toUid} (n° agent = compte LDAP), par ${author}`;
+      await update(ctx, ANNUAIRE, rows.map((r) => {
+        const com = String(r.fields['Commentaires'] || '').trimEnd();
+        return { id: r.rowId, fields: { uid_dyna: toUid, Commentaires: com ? `${com}\n${note}` : note } };
+      }));
+      return { updated: rows.length };
+    }),
+
+    /**
+     * Merges two Annuaire rows: logs (JSON snapshot of the deleted row + previous values of the fields
+     * written on the kept row), PATCHes the kept row, then deletes the other — the log exists before any
+     * destructive write. Formula columns are never written.
+     */
+    mergeRows: ({ keepRowId, dropRowId, fields, author, note = '' }, ctx) => writing(async () => {
+      if (keepRowId === dropRowId) throw new ApiError(400, 'Merge: both rows are identical');
+      if (![keepRowId, dropRowId].every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      const rows = await rowsInScope(ctx.scope, { id: [keepRowId, dropRowId] });
+      const keep = rows.find((r) => r.rowId === keepRowId);
+      const drop = rows.find((r) => r.rowId === dropRowId);
+      if (!keep || !drop) throw new ApiError(404, 'Merge: one of the rows no longer exists in Grist');
+      const writable = await writableColumns();
+      const patch: Record<string, any> = {};
+      for (const [k, v] of Object.entries(fields || {})) if (writable.has(k)) patch[k] = v;
+      if (patch['LABO'] !== undefined) assertLabsInScope(ctx.scope, [patch['LABO']]);
+      await ensureMergeLogTable(ctx);
+      const [logId] = await add(ctx, MERGE_LOG_TABLE, [{ fields: buildMergeLogRow({ keep, drop, patch, author, note }) }]);
+      if (Object.keys(patch).length > 0) {
+        await step(() => update(ctx, ANNUAIRE, [{ id: keepRowId, fields: patch }]), `Grist error (writing the kept row): merge log ${logId}`);
+      }
+      await step(() => remove(ctx, ANNUAIRE, [dropRowId]), `Grist error (deleting the absorbed row): merge log ${logId}`);
+      return { logId };
+    }),
+
+    /**
+     * Undoes a merge: recreates the absorbed row from its snapshot (new rowId — Druid URLs use the uid) and
+     * restores the previous values of the fields written on the kept row. The log is flagged as soon as the row
+     * is recreated, so that a later failure never leads to recreating it twice.
+     */
+    restoreMerge: (logId, ctx) => writing(async () => {
+      if (!isRowId(logId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      const tableIds = await grist.tableIds();
+      const rec = tableIds.includes(MERGE_LOG_TABLE) ? (await grist.records(MERGE_LOG_TABLE, { id: [logId] }))[0] : undefined;
+      if (!rec) throw new ApiError(404, `Merge not found: ${logId}`);
+      if (rec.fields.restaure) throw new ApiError(409, `Merge already restored: ${logId}`);
+      const writable = await writableColumns();
+      const dropped = JSON.parse(rec.fields.dropped_json || '{}');
+      const fields: Record<string, any> = {};
+      for (const [k, v] of Object.entries(dropped)) if (writable.has(k) && v !== null) fields[k] = v;
+      const before = JSON.parse(rec.fields.kept_before_json || '{}');
+      const keptRowId = Number(rec.fields.kept_rowid);
+      // Every check before the first write: recreated row and restored kept row within the scope.
+      assertLabsInScope(ctx.scope, [fields['LABO']]);
+      if (Object.keys(before).length > 0) {
+        await assertRowsInScope(ctx.scope, [keptRowId]);
+        if (before['LABO'] !== undefined) assertLabsInScope(ctx.scope, [before['LABO']]);
+      }
+      const [restoredRowId] = await add(ctx, ANNUAIRE, [{ fields }]);
+      await step(() => update(ctx, MERGE_LOG_TABLE, [{ id: logId, fields: { restaure: true, restored_rowid: restoredRowId } }]),
+        `Row re-created but merge log not updated, do not restart the restoration: row ${restoredRowId}`);
+      if (Object.keys(before).length > 0) {
+        await step(() => update(ctx, ANNUAIRE, [{ id: keptRowId, fields: before }]),
+          `Row re-created but kept row not restored: row ${restoredRowId}, kept row ${keptRowId}`);
+      }
+      return { restoredRowId };
+    }),
 
     createStructure: (structure, ctx) => writing(async () => {
       // Uniqueness checked against every structure of the document (the browser only knew the ones it could see).

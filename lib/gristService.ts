@@ -16,14 +16,17 @@ export interface LdapFieldChange {
   after: string;   // value coming from LDAP
 }
 
-import { PARKING_LABOS, classifyDuplicate, LdapDuplicateKind } from './mergeProposal';
-import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from './mergeLog';
+import { PARKING_LABOS, LdapDuplicateKind } from './mergeProposal';
 import { gristDocUrl } from './instanceRuntime';
 import { STATUT_DYNA_MAP, statusFromEtat, normalizeCivility } from './ldapPerson';
 import { HR_ID_COLUMN, hrIdCell, hrIdProposal } from './hrId';
 import { DirectoryApi } from './directoryApi';
+import { computeDuplicateGroups, DuplicateGroup, DuplicatesDiff } from './directory/duplicates';
+// Moved to lib/directory/duplicates.ts (migration plan, lot 2 c), re-exported for the existing importers.
+export { computeDuplicateGroups };
+export type { DuplicateGroup, DuplicatesDiff };
 import {
-  RATTACHEMENT_COL, RattachementRole, RATTACHEMENT_CHOICES, DUPLICATE_DECISION_COL, Institution, MergeLogEntry, fromGristDate,
+  RATTACHEMENT_COL, RattachementRole, DUPLICATE_DECISION_COL, Institution, MergeLogEntry, fromGristDate,
   fromGristFuzzyDate, AFFILIATION_END_COL, parseMultiLabel,
 } from './directory/gristMapping';
 // Moved to lib/directory/gristMapping.ts (migration plan, lot 1), re-exported for the existing importers.
@@ -67,66 +70,12 @@ export interface LdapDiff {
    * - parking    : one row sits in a parking LABO (`zzz`, empty) → to absorb into the lab row;
    * - multi_labo : different LABOs → multi-affiliation (concurrent or successive) to qualify.
    * `ids`/`names` kept for compatibility; `rows` carries the per-row detail. */
-  doublonsUid: {
-    uid: string; ids: string[]; names: string[];
-    kind: LdapDuplicateKind;
-    /** Qualified (lot 1): exactly one PRINCIPAL row and every other one SECONDAIRE/HISTORIQUE,
-     * or an « À revoir » decision recorded → leaves the list of duplicates to process. */
-    qualified: boolean;
-    decision: string;
-    rows: { id: string; gristRowId: number; name: string; labo: string; validated: boolean; dataSource: string; role: RattachementRole | ''; endDate: string }[];
-  }[];
+  doublonsUid: DuplicateGroup[];
   /** Grist record whose uid_dyna is missing from LDAP (probable departure).
    * `validated`: presence validated manually → do not conclude a departure without review. */
   orphelins: { id: string; uid: string; displayName: string; validated?: boolean }[];
   /** uids present in LDAP but missing from the Annuaire (creation in Phase 2) */
   ldapWithoutRecord: string[];
-}
-
-/** « Doublons » page: uid_dyna groups of the Annuaire, without LDAP (docs/archive/plan-reorganisation-sync-ldap.md, lot 3). */
-export interface DuplicatesDiff {
-  generatedAt: string;
-  stats: { gristTotal: number; pending: number; qualified: number; parKind: Record<LdapDuplicateKind, number> };
-  doublonsUid: LdapDiff['doublonsUid'];
-}
-
-/** Groups of Annuaire records sharing a uid_dyna (≥ 2 rows), classified (same_labo / parking /
- * multi_labo) and flagged `qualified` when the multi-affiliation is declared (exactly one
- * PRINCIPAL row, every other one SECONDAIRE/HISTORIQUE) or the decision is « A_REVOIR ». Pure
- * logic on raw Grist records — shared by computeLdapDiff and computeDuplicatesDiff. */
-export function computeDuplicateGroups(records: any[]): { doublonsUid: LdapDiff['doublonsUid']; duplicatesByKind: Record<LdapDuplicateKind, number> } {
-  const nameOf = (f: any) => `${(f['Nom'] || '').toUpperCase()} ${f['Prenom'] || ''}`.trim();
-  const byUid: Record<string, any[]> = {};
-  for (const rec of records) {
-    const uid = rec.fields['uid_dyna'];
-    if (uid) (byUid[uid] = byUid[uid] || []).push(rec);
-  }
-  const doublonsUid: LdapDiff['doublonsUid'] = [];
-  const duplicatesByKind: Record<LdapDuplicateKind, number> = { same_labo: 0, parking: 0, multi_labo: 0 };
-  for (const [uid, recs] of Object.entries(byUid)) {
-    if (recs.length < 2) continue;
-    const rows = recs.map((r) => {
-      const v = parseValidation(r.fields, fromGristDate);
-      return {
-        id: `G-${r.id}`, gristRowId: r.id, name: nameOf(r.fields),
-        labo: String(r.fields['LABO'] || '').trim(), validated: v.validated,
-        dataSource: String(r.fields['Data_source'] || ''),
-        role: ((String(r.fields[RATTACHEMENT_COL] || '').trim().toUpperCase() as RattachementRole) || '') as RattachementRole | '',
-        endDate: fromGristFuzzyDate(r.fields[AFFILIATION_END_COL]) || fromGristFuzzyDate(r.fields['employment_end_date']),
-      };
-    });
-    const kind = classifyDuplicate(rows.map((r) => r.labo));
-    const decision = String(recs.map((r) => r.fields[DUPLICATE_DECISION_COL] || '').find(Boolean) || '');
-    const qualified =
-      (rows.filter((r) => r.role === 'PRINCIPAL').length === 1 && rows.every((r) => !!r.role))
-      || decision.toUpperCase().startsWith('A_REVOIR');
-    if (!qualified) duplicatesByKind[kind]++;
-    doublonsUid.push({ uid, ids: rows.map((r) => r.id), names: rows.map((r) => r.name), kind, qualified, decision, rows });
-  }
-  // Probable duplicates first, then parking, then multi-affiliations; by name within each class
-  const kindOrder: Record<LdapDuplicateKind, number> = { same_labo: 0, parking: 1, multi_labo: 2 };
-  doublonsUid.sort((a, b) => kindOrder[a.kind] - kindOrder[b.kind] || a.names[0].localeCompare(b.names[0]));
-  return { doublonsUid, duplicatesByKind };
 }
 
 /** Diff structures LDAP (supannEntite) ↔ table Grist Structures. */
@@ -641,24 +590,6 @@ const IDREF_REVIEW_TABLE = 'Alignement_IdRef';
 /** Qualification columns for multi-affiliations (duplicate merge plan, lot 1): lib/directory/gristMapping.ts. */
 export { DUPLICATE_DECISION_COL };
 
-/** Creates the `rattachement` (Choice) and `doublon_decision` (Text) columns if missing. Idempotent. */
-async function ensureAffiliationColumns(): Promise<void> {
-  const cols = await fetchAnnuaireColumnsInternal();
-  const have = new Set(cols.map((c) => c.id));
-  const missing: any[] = [];
-  if (!have.has(RATTACHEMENT_COL)) missing.push({ id: RATTACHEMENT_COL, fields: { label: 'Rattachement (multi-lignes)', type: 'Choice', widgetOptions: JSON.stringify({ choices: RATTACHEMENT_CHOICES }) } });
-  if (!have.has(DUPLICATE_DECISION_COL)) missing.push({ id: DUPLICATE_DECISION_COL, fields: { label: 'Décision doublon', type: 'Text' } });
-  if (missing.length === 0) return;
-  const r = await fetch(`${gristDocUrl()}/tables/Annuaire/columns`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ columns: missing }),
-  });
-  if (!r.ok) throw new Error(t`Error creating the affiliation columns: ${await r.text()}`);
-  _annuaireColumnsCache = null;
-}
-
-
-
-
 /** Cache of the Annuaire columns (rarely changes). */
 let _annuaireColumnsCache: AnnuaireColumnMeta[] | null = null;
 async function fetchAnnuaireColumnsInternal(): Promise<AnnuaireColumnMeta[]> {
@@ -694,19 +625,6 @@ export function traceColumnsFor(cols: AnnuaireColumnMeta[], label: string, today
   if (cols.some((c) => c.id === `${label}_champs_modifies`)) out[`${label}_champs_modifies`] = modified.join('|');
   return out;
 }
-
-async function ensureMergeLogTable(): Promise<void> {
-  const tablesResp = await fetch(`${gristDocUrl()}/tables`);
-  if (!tablesResp.ok) throw new Error(t`Grist error (table list)`);
-  const { tables } = await tablesResp.json();
-  if (tables.some((t: any) => t.id === MERGE_LOG_TABLE)) return;
-  const r = await fetch(`${gristDocUrl()}/tables`, {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tables: [{ id: MERGE_LOG_TABLE, columns: buildMergeLogColumns() }] }),
-  });
-  if (!r.ok) throw new Error(t`Error creating table ${MERGE_LOG_TABLE}: ${await r.text()}`);
-}
-
 
 /** Group of a record on the alignment pages (IdRef / ORCID / HAL / OpenAlex): tabs
  * « Personnel » / « Doctorants » / « Sans obligation de recherche ». The last two are low priorities
@@ -1171,17 +1089,7 @@ export const GristService = {
    */
   /** « Doublons » page (docs/archive/plan-reorganisation-sync-ldap.md, lot 3): uid_dyna groups computed
    * on the Annuaire alone — no LDAP run needed, unlike computeLdapDiff. */
-  computeDuplicatesDiff: async (): Promise<DuplicatesDiff> => {
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records`);
-    if (!resp.ok) throw new Error('Erreur Grist (Annuaire)');
-    const { records } = await resp.json();
-    const { doublonsUid, duplicatesByKind } = computeDuplicateGroups(records);
-    return {
-      generatedAt: new Date().toISOString(),
-      stats: { gristTotal: records.length, pending: doublonsUid.filter((d) => !d.qualified).length, qualified: doublonsUid.filter((d) => d.qualified).length, parKind: duplicatesByKind },
-      doublonsUid,
-    };
-  },
+  computeDuplicatesDiff: (): Promise<DuplicatesDiff> => DirectoryApi.duplicates(),
 
   computeLdapDiff: async (): Promise<LdapDiff> => {
     // 1. LDAP cache (regenerated beforehand by /api/sync-ldap-trigger)
@@ -1350,68 +1258,18 @@ export const GristService = {
    * - `a_revoir`    : no role set, « A_REVOIR » decision stored to take the group out of the list.
    * Creates the columns on first use. Trace: `doublon_decision` = « <MODE> <date> <auteur> ».
    */
-  qualifyDoublon: async (args: {
+  qualifyDoublon: (args: {
     rowIds: number[]; principalRowId?: number; mode: 'concomitant' | 'successif' | 'a_revoir'; endDate?: string; author: string;
-  }): Promise<{ updated: number }> => {
-    const { rowIds, principalRowId, mode, endDate, author } = args;
-    if (mode !== 'a_revoir' && (principalRowId === undefined || !rowIds.includes(principalRowId))) {
-      throw new Error(t`Qualification: primary row required`);
-    }
-    await ensureAffiliationColumns();
-    const encodeDate = await fuzzyDateCellEncoder();
-    const today = new Date().toISOString().slice(0, 10);
-    const decision = `${mode === 'a_revoir' ? 'A_REVOIR' : mode === 'concomitant' ? 'CONCOMITANT' : 'SUCCESSIF'} ${today} ${author}`;
-    const rows = await GristService.fetchAnnuaireRows(rowIds);
-    const records = rows.map((r) => {
-      const fields: Record<string, any> = { [DUPLICATE_DECISION_COL]: decision };
-      if (mode === 'a_revoir') {
-        fields[RATTACHEMENT_COL] = null;
-      } else if (r.rowId === principalRowId) {
-        fields[RATTACHEMENT_COL] = 'PRINCIPAL';
-      } else {
-        fields[RATTACHEMENT_COL] = mode === 'concomitant' ? 'SECONDAIRE' : 'HISTORIQUE';
-        // Successive affiliation: the end of the old row is a lab MEMBERSHIP end
-        // (affiliation_end_date), not an employment end — before 2026-09-14 it was written to
-        // employment_end_date (fallback kept when reading).
-        if (mode === 'successif' && endDate && !r.fields[AFFILIATION_END_COL] && !r.fields['employment_end_date']) {
-          const cell = encodeDate(AFFILIATION_END_COL, endDate);
-          if (cell !== null) fields[AFFILIATION_END_COL] = cell;
-        }
-      }
-      return { id: r.rowId, fields };
-    });
-    // Different column signatures possible (employment_end_date) → one PATCH per row.
-    for (const rec of records) {
-      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ records: [rec] }),
-      });
-      if (!pr.ok) throw new Error(`Erreur Grist (qualification G-${rec.id}) : ${await pr.text()}`);
-    }
-    return { updated: records.length };
-  },
+  }): Promise<{ updated: number }> => DirectoryApi.qualifyDuplicates(args),
 
   /** Removes the qualification of a group (roles and decision cleared) → it becomes a pending duplicate again. */
-  unqualifyDoublon: async (rowIds: number[]): Promise<{ updated: number }> => {
-    await ensureAffiliationColumns();
-    const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records: rowIds.map((id) => ({ id, fields: { [RATTACHEMENT_COL]: null, [DUPLICATE_DECISION_COL]: '' } })) }),
-    });
-    if (!pr.ok) throw new Error(t`Grist error (de-qualification): ${await pr.text()}`);
-    return { updated: rowIds.length };
-  },
+  unqualifyDoublon: (rowIds: number[]): Promise<{ updated: number }> => DirectoryApi.unqualifyDuplicates(rowIds),
 
   /** Annuaire columns (label, type, formula) — for the merge assistant. */
   fetchAnnuaireColumns: (): Promise<AnnuaireColumnMeta[]> => fetchAnnuaireColumnsInternal(),
 
   /** Raw Annuaire rows (unconverted Grist values) for given rowIds. */
-  fetchAnnuaireRows: async (rowIds: number[]): Promise<{ rowId: number; fields: Record<string, any> }[]> => {
-    const filter = encodeURIComponent(JSON.stringify({ id: rowIds }));
-    const resp = await fetch(`${gristDocUrl()}/tables/Annuaire/records?filter=${filter}`);
-    if (!resp.ok) throw new Error('Erreur Grist (lecture Annuaire)');
-    const { records } = await resp.json();
-    return records.map((r: any) => ({ rowId: r.id, fields: r.fields }));
-  },
+  fetchAnnuaireRows: (rowIds: number[]): Promise<{ rowId: number; fields: Record<string, any> }[]> => DirectoryApi.recordRows(rowIds),
 
   /** Raw Annuaire rows of a person (every row sharing this uid_dyna). */
   fetchAnnuaireRowsByUid: async (uid: string): Promise<{ rowId: number; fields: Record<string, any> }[]> => {
@@ -1428,26 +1286,8 @@ export const GristService = {
    * `uid_dyna = toUid`, with a dated line in Commentaires keeping the former uid. Refused when a row
    * already carries `toUid` — that case is a merge.
    */
-  switchAnnuaireUid: async (args: { fromUid: string; rowId?: number; toUid: string; author: string }): Promise<{ updated: number }> => {
-    const { fromUid, rowId, toUid, author } = args;
-    if (!toUid || toUid.startsWith('ext_')) throw new Error(t`Invalid LDAP uid: ${toUid}`);
-    if ((await GristService.fetchAnnuaireRowsByUid(toUid)).length) {
-      throw new Error(t`The uid ${toUid} already has a directory record: merge the two records instead`);
-    }
-    const rows = fromUid ? await GristService.fetchAnnuaireRowsByUid(fromUid) : rowId ? await GristService.fetchAnnuaireRows([rowId]) : [];
-    if (!rows.length) throw new Error(t`Record not found in Grist (uid ${fromUid || '—'})`);
-    const today = new Date().toISOString().slice(0, 10);
-    const note = `[${today}] uid ${fromUid || '(vide)'} → ${toUid} (n° agent = compte LDAP), par ${author}`;
-    const records = rows.map((r) => {
-      const com = String(r.fields['Commentaires'] || '').trimEnd();
-      return { id: r.rowId, fields: { uid_dyna: toUid, Commentaires: com ? `${com}\n${note}` : note } };
-    });
-    const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ records }),
-    });
-    if (!pr.ok) throw new Error(t`Grist error (uid change): ${await pr.text()}`);
-    return { updated: records.length };
-  },
+  switchAnnuaireUid: (args: { fromUid: string; rowId?: number; toUid: string; author: string }): Promise<{ updated: number }> =>
+    DirectoryApi.switchUid(args),
 
   /** Institution labels (rowId → name) to display the Employeur column (Ref). */
   fetchInstitutionLabels: async (): Promise<Record<number, string>> => {
@@ -1462,42 +1302,9 @@ export const GristService = {
    * row, then deletes the other. Order chosen so that no data is lost
    * if a step fails: the log exists before any destructive write.
    */
-  mergeAnnuaireRows: async (args: {
+  mergeAnnuaireRows: (args: {
     keepRowId: number; dropRowId: number; fields: Record<string, any>; author: string; note?: string;
-  }): Promise<{ logId: number }> => {
-    const { keepRowId, dropRowId, fields, author, note = '' } = args;
-    if (keepRowId === dropRowId) throw new Error(t`Merge: both rows are identical`);
-    const rows = await GristService.fetchAnnuaireRows([keepRowId, dropRowId]);
-    const keep = rows.find((r) => r.rowId === keepRowId);
-    const drop = rows.find((r) => r.rowId === dropRowId);
-    if (!keep || !drop) throw new Error(t`Merge: one of the rows no longer exists in Grist`);
-
-    // Never write a formula column nor the technical columns.
-    const cols = await fetchAnnuaireColumnsInternal();
-    const writable = new Set(cols.filter((c) => !c.isFormula).map((c) => c.id));
-    const patch: Record<string, any> = {};
-    for (const [k, v] of Object.entries(fields)) if (writable.has(k)) patch[k] = v;
-    await ensureMergeLogTable();
-    const headers = { 'Content-Type': 'application/json' };
-    const logResp = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`, {
-      method: 'POST', headers,
-      body: JSON.stringify({ records: [{ fields: buildMergeLogRow({ keep, drop, patch, author, note }) }] }),
-    });
-    if (!logResp.ok) throw new Error(t`Grist error (merge log): ${await logResp.text()}`);
-    const logId: number = (await logResp.json()).records[0].id;
-
-    if (Object.keys(patch).length > 0) {
-      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-        method: 'PATCH', headers, body: JSON.stringify({ records: [{ id: keepRowId, fields: patch }] }),
-      });
-      if (!pr.ok) throw new Error(t`Grist error (writing the kept row, log #${logId}): ${await pr.text()}`);
-    }
-    const dr = await fetch(`${gristDocUrl()}/tables/Annuaire/data/delete`, {
-      method: 'POST', headers, body: JSON.stringify([dropRowId]),
-    });
-    if (!dr.ok) throw new Error(t`Grist error (deleting the absorbed row, log #${logId}): ${await dr.text()}`);
-    return { logId };
-  },
+  }): Promise<{ logId: number }> => DirectoryApi.mergeRows(args),
 
   /** Merge log, most recent first (domain API /api/v1/merges, institution right). */
   listMerges: (limit = 50): Promise<MergeLogEntry[]> => DirectoryApi.merges(limit),
@@ -1507,46 +1314,7 @@ export const GristService = {
    * the old one does not come back, Druid URLs use the uid) and restores the previous
    * values of the fields written on the kept row.
    */
-  restoreFusion: async (logId: number): Promise<{ restoredRowId: number }> => {
-    const headers = { 'Content-Type': 'application/json' };
-    const filter = encodeURIComponent(JSON.stringify({ id: [logId] }));
-    const resp = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records?filter=${filter}`);
-    if (!resp.ok) throw new Error(t`Grist error (merge log)`);
-    const rec = (await resp.json()).records[0];
-    if (!rec) throw new Error(t`Merge #${logId} not found`);
-    if (rec.fields.restaure) throw new Error(t`Merge #${logId} already restored`);
-
-    const cols = await fetchAnnuaireColumnsInternal();
-    const writable = new Set(cols.filter((c) => !c.isFormula).map((c) => c.id));
-    const dropped = JSON.parse(rec.fields.dropped_json || '{}');
-    const fields: Record<string, any> = {};
-    for (const [k, v] of Object.entries(dropped)) if (writable.has(k) && v !== null) fields[k] = v;
-    const cr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-      method: 'POST', headers, body: JSON.stringify({ records: [{ fields }] }),
-    });
-    if (!cr.ok) throw new Error(t`Grist error (re-creating the row): ${await cr.text()}`);
-    const restoredRowId: number = (await cr.json()).records[0].id;
-
-    // The log is flagged AS SOON AS the row is recreated (and its PATCH checked): otherwise a later
-    // failure left `restaure=false` and a second click recreated the row a second time (review lot 2,
-    // finding 6). The next steps raise an explicit error without undoing what is done.
-    const lr = await fetch(`${gristDocUrl()}/tables/${MERGE_LOG_TABLE}/records`, {
-      method: 'PATCH', headers, body: JSON.stringify({ records: [{ id: logId, fields: { restaure: true, restored_rowid: restoredRowId } }] }),
-    });
-    if (!lr.ok) {
-      throw new Error(t`Row re-created (#${restoredRowId}) but merge log not updated: ${await lr.text()} — do not restart the restoration`);
-    }
-    const before = JSON.parse(rec.fields.kept_before_json || '{}');
-    if (Object.keys(before).length > 0) {
-      const pr = await fetch(`${gristDocUrl()}/tables/Annuaire/records`, {
-        method: 'PATCH', headers, body: JSON.stringify({ records: [{ id: rec.fields.kept_rowid, fields: before }] }),
-      });
-      if (!pr.ok) {
-        throw new Error(t`Row re-created (#${restoredRowId}) but kept row #${rec.fields.kept_rowid} not restored: ${await pr.text()}`);
-      }
-    }
-    return { restoredRowId };
-  },
+  restoreFusion: (logId: number): Promise<{ restoredRowId: number }> => DirectoryApi.restoreMerge(logId),
 
   applyLdapUpdates: async (diff: LdapDiff, selectedIds: string[]): Promise<{ updated: number }> => {
     const selected = new Set(selectedIds);

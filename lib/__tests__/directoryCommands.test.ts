@@ -18,8 +18,12 @@ const fakeGrist = (initial: Record<string, GristRecord[]>, columns: string[] = [
     docUpdatedAt: async () => 'v1',
     tableIds: async () => Object.keys(tables),
     records: async (table, filter) => (tables[table] || []).filter((r) =>
-      !filter || Object.entries(filter).every(([col, values]) => values.includes(r.fields[col]))),
-    columns: async () => [...cols].map((id) => ({ id, fields: { label: id, type: id.endsWith('_date') ? 'Text' : 'Any' } })),
+      !filter || Object.entries(filter).every(([col, values]) => values.includes(col === 'id' ? r.id : r.fields[col]))),
+    // « f:<col> » declares a formula column.
+    columns: async () => [...cols].map((c) => {
+      const id = c.replace(/^f:/, '');
+      return { id, fields: { label: id, type: id.endsWith('_date') ? 'Text' : 'Any', isFormula: c.startsWith('f:') } };
+    }),
     addColumns: async (_t, list) => { for (const c of list) cols.add(c.id); writes.push(`columns ${list.map((c) => c.id).join(',')}`); },
     addTables: async (list) => { for (const t of list) tables[t.id] = []; writes.push(`table ${list.map((t) => t.id).join(',')}`); },
     addRecords: async (table, records) => {
@@ -249,5 +253,68 @@ describe('structures (lot 2 b)', () => {
       .rejects.toMatchObject({ status: 403, message: 'Write outside scope: short_labels' });
     await expect(commands.createStructure(team(), ctx(LAB_A))).rejects.toMatchObject({ status: 403 });
     expect(grist.writes).toEqual(['update Structures 7']);
+  });
+});
+
+describe('duplicates and merges (lot 2 c)', () => {
+  const COLS = ['LABO', 'Nom', 'Email', 'ORCID', 'uid_dyna', 'Commentaires', 'rattachement', 'doublon_decision', 'affiliation_end_date', 'f:Alignement_annuaire'];
+  const rows = (): GristRecord[] => [
+    { id: 1, fields: { uid_dyna: 'durand-a', Nom: 'Durand', LABO: 'LAB-A', Email: '', ORCID: '' } },
+    { id: 2, fields: { uid_dyna: 'durand-a', Nom: 'Durand', LABO: 'LAB-A', Email: 'alice@example.org', ORCID: '0000-0002-1825-0097' } },
+    { id: 3, fields: { uid_dyna: 'durand-a', Nom: 'Durand', LABO: 'LAB-B' } },
+    { id: 4, fields: { uid_dyna: 'ext_martin-b', Nom: 'Martin', LABO: 'LAB-A', Commentaires: 'ancien' } },
+  ];
+  const tables = () => ({ Annuaire: rows(), Etablissements: ETABLISSEMENTS });
+
+  it('lists the duplicate groups of the scope', async () => {
+    const { grist } = setup(tables(), COLS);
+    const repository = createGristDirectoryRepository({ grist });
+    const all = await repository.duplicates(ALL);
+    expect(all.doublonsUid.map((g) => [g.uid, g.ids.length, g.kind])).toEqual([['durand-a', 3, 'multi_labo']]);
+    const labA = await repository.duplicates(LAB_A);
+    expect(labA.doublonsUid.map((g) => [g.uid, g.ids.length, g.kind])).toEqual([['durand-a', 2, 'same_labo']]);
+    expect((await repository.recordRows([1, 3], LAB_A)).map((r) => r.rowId)).toEqual([1]);
+  });
+
+  it('qualifies a group (successive: HISTORIQUE + membership end) and removes the qualification', async () => {
+    const { grist, commands, ctx } = setup(tables(), COLS);
+    expect(await commands.qualifyDuplicates({ rowIds: [1, 3], principalRowId: 3, mode: 'successif', endDate: '2024-06', author: 'admin' }, ctx(ALL))).toEqual({ updated: 2 });
+    expect(grist.tables.Annuaire.find((r) => r.id === 1)!.fields).toMatchObject({ rattachement: 'HISTORIQUE', affiliation_end_date: '2024-06', doublon_decision: 'SUCCESSIF 2026-10-08 admin' });
+    expect(grist.tables.Annuaire.find((r) => r.id === 3)!.fields.rattachement).toBe('PRINCIPAL');
+    await expect(commands.qualifyDuplicates({ rowIds: [1, 3], mode: 'concomitant', author: 'admin' }, ctx(ALL))).rejects.toMatchObject({ status: 400 });
+    await commands.unqualifyDuplicates([1, 3], ctx(ALL));
+    expect(grist.tables.Annuaire.find((r) => r.id === 1)!.fields).toMatchObject({ rattachement: null, doublon_decision: '' });
+    await expect(commands.unqualifyDuplicates([1, 3], ctx(LAB_A))).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('moves a record to its LDAP uid, unless that uid already has a record anywhere', async () => {
+    const { grist, commands, ctx } = setup(tables(), COLS);
+    await expect(commands.switchUid({ fromUid: 'ext_martin-b', toUid: 'durand-a', author: 'admin' }, ctx(LAB_A))).rejects.toMatchObject({ status: 409 });
+    await expect(commands.switchUid({ fromUid: 'ext_martin-b', toUid: 'ext_x', author: 'admin' }, ctx(ALL))).rejects.toMatchObject({ status: 400 });
+    expect(await commands.switchUid({ fromUid: 'ext_martin-b', toUid: 'martin-b', author: 'admin' }, ctx(LAB_A))).toEqual({ updated: 1 });
+    expect(grist.tables.Annuaire.find((r) => r.id === 4)!.fields).toMatchObject({
+      uid_dyna: 'martin-b', Commentaires: 'ancien\n[2026-10-08] uid ext_martin-b → martin-b (n° agent = compte LDAP), par admin',
+    });
+  });
+
+  it('merges two rows: log first, then the kept row (never a formula column), then the deletion', async () => {
+    const { grist, commands, ctx } = setup(tables(), COLS);
+    const { logId } = await commands.mergeRows({ keepRowId: 1, dropRowId: 2, fields: { Email: 'alice@example.org', Alignement_annuaire: 'x' }, author: 'admin' }, ctx(LAB_A));
+    expect(grist.writes).toEqual(['table Fusions_log', `add Fusions_log ${logId}`, 'update Annuaire 1', 'delete Annuaire 2']);
+    expect(grist.tables.Annuaire.find((r) => r.id === 1)!.fields).toMatchObject({ Email: 'alice@example.org' });
+    expect(grist.tables.Annuaire.find((r) => r.id === 1)!.fields.Alignement_annuaire).toBeUndefined();
+    // A lab right cannot absorb a row of another lab (invisible to it, as through the proxy).
+    await expect(commands.mergeRows({ keepRowId: 1, dropRowId: 3, fields: {}, author: 'admin' }, ctx(LAB_A))).rejects.toMatchObject({ status: 404 });
+  });
+
+  it('restores a merge once: row recreated, log flagged, kept row restored', async () => {
+    const { grist, commands, ctx } = setup(tables(), COLS);
+    const { logId } = await commands.mergeRows({ keepRowId: 1, dropRowId: 2, fields: { Email: 'alice@example.org' }, author: 'admin' }, ctx(ALL));
+    const { restoredRowId } = await commands.restoreMerge(logId, ctx(ALL));
+    expect(grist.tables.Annuaire.find((r) => r.id === restoredRowId)!.fields).toMatchObject({ uid_dyna: 'durand-a', ORCID: '0000-0002-1825-0097' });
+    expect(grist.tables.Annuaire.find((r) => r.id === 1)!.fields.Email).toBe('');
+    expect(grist.tables.Fusions_log[0].fields).toMatchObject({ restaure: true, restored_rowid: restoredRowId });
+    await expect(commands.restoreMerge(logId, ctx(ALL))).rejects.toMatchObject({ status: 409 });
+    await expect(commands.restoreMerge(9999, ctx(ALL))).rejects.toMatchObject({ status: 404 });
   });
 });
