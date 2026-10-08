@@ -172,31 +172,32 @@ msgid "Error during the unified alignment"
 msgstr "Erreur lors de l'alignement unifié"
 
 #: App.tsx:747
+#: App.tsx:763
 msgid "Error writing (unified view)"
 msgstr "Erreur lors de l'écriture (vue unifiée)"
 
-#: App.tsx:781
+#: App.tsx:796
 msgid "Error rejecting the candidate"
 msgstr "Erreur lors du rejet du candidat"
 
-#: App.tsx:919
+#: App.tsx:935
 msgid "Qualification error"
 msgstr "Erreur de qualification"
 
-#: App.tsx:923
+#: App.tsx:939
 msgid "Requalification error"
 msgstr "Erreur de requalification"
 
-#: App.tsx:929
+#: App.tsx:945
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Ligne Grist {gristRowId} introuvable dans le périmètre chargé"
 
-#: App.tsx:949
+#: App.tsx:965
 msgid "Loading dashboard…"
 msgstr "Chargement du tableau de bord…"
 
-#: App.tsx:967
-#: App.tsx:979
+#: App.tsx:983
+#: App.tsx:995
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:290
@@ -210,20 +211,20 @@ msgstr "Chargement du tableau de bord…"
 msgid "Loading…"
 msgstr "Chargement…"
 
-#: App.tsx:988
+#: App.tsx:1004
 msgid "View not found"
 msgstr "Vue introuvable"
 
-#: App.tsx:1012
+#: App.tsx:1028
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Votre compte a un droit « labo », mais aucune fiche de l'Annuaire ne porte votre identifiant avec un laboratoire en cours — contactez un administrateur pour faire mettre à jour votre fiche."
 
-#: App.tsx:1016
+#: App.tsx:1032
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "Aucun périmètre ne vous a été attribué dans Druid pour l'instant — contactez un administrateur pour qu'il vous rattache à une structure (groupe Keycloak <0>labo_viewer</0> ou <1>dashboard_viewer</1> sous votre labo)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1057
+#: App.tsx:1073
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Alignement unifié : {0} référentiel(s) en cours"
 
@@ -1049,7 +1050,7 @@ msgstr "Outils d'alignement"
 
 #: components/Sidebar.tsx:110
 #: components/Sidebar.tsx:168
-#: components/researchers/UnifiedAlignPage.tsx:556
+#: components/researchers/UnifiedAlignPage.tsx:564
 msgid "Researcher identifier alignment"
 msgstr "Alignement des identifiants chercheurs"
 
@@ -2905,7 +2906,7 @@ msgstr "À propos de « {title} »"
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
-#: components/researchers/UnifiedAlignPage.tsx:695
+#: components/researchers/UnifiedAlignPage.tsx:703
 msgid "Close"
 msgstr "Fermer"
 
@@ -4652,7 +4653,7 @@ msgstr "Filtres"
 
 #: components/dashboard/PublicationsListTab.tsx:263
 #: components/reports/ReportEditor.tsx:379
-#: components/researchers/UnifiedAlignPage.tsx:641
+#: components/researchers/UnifiedAlignPage.tsx:649
 msgid "Remove this filter"
 msgstr "Retirer ce filtre"
 
@@ -8092,8 +8093,7 @@ msgid "Save to Grist"
 msgstr "Enregistrer dans Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
-#: lib/gristService.ts:1644
-#: lib/gristService.ts:1753
+#: lib/alignTextsI18n.ts:12
 msgid "Search error"
 msgstr "Erreur de recherche"
 
@@ -8862,7 +8862,7 @@ msgid "rows to send"
 msgstr "lignes à envoyer"
 
 #: components/researchers/AbesExportModal.tsx:199
-#: components/researchers/UnifiedAlignPage.tsx:649
+#: components/researchers/UnifiedAlignPage.tsx:657
 msgid "conflicts"
 msgstr "conflits"
 
@@ -8884,7 +8884,7 @@ msgid "{0} records have an IdRef but their notice has not been re-read: run “A
 msgstr "{0} fiches ont un IdRef mais leur notice n'a pas été relue : lancez « Aligner IdRef → Vérifier les existants » puis rouvrez cet export."
 
 #: components/researchers/AbesExportModal.tsx:223
-#: components/researchers/UnifiedAlignPage.tsx:677
+#: components/researchers/UnifiedAlignPage.tsx:685
 msgid "Person"
 msgstr "Personne"
 
@@ -9404,7 +9404,7 @@ msgstr "Multi-rattachement (concomitant ou successif) : à qualifier, pas forcé
 #: components/researchers/DuplicatesPage.tsx:115
 #: components/researchers/DuplicatesPage.tsx:276
 #: components/researchers/LdapVerifyPanel.tsx:174
-#: components/researchers/UnifiedAlignPage.tsx:749
+#: components/researchers/UnifiedAlignPage.tsx:757
 msgid "Generated on {generatedAt}"
 msgstr "Généré le {generatedAt}"
 
@@ -10317,7 +10317,7 @@ msgid "No orphan."
 msgstr "Aucun orphelin."
 
 #: components/researchers/LdapVerifyPanel.tsx:178
-#: components/researchers/UnifiedAlignPage.tsx:753
+#: components/researchers/UnifiedAlignPage.tsx:761
 #: components/structures/StructuresLdapReview.tsx:134
 msgid "Writing…"
 msgstr "Écriture…"
@@ -10325,7 +10325,7 @@ msgstr "Écriture…"
 #. placeholder {0}: selected.size
 #. placeholder {0}: updates.length
 #: components/researchers/LdapVerifyPanel.tsx:178
-#: components/researchers/UnifiedAlignPage.tsx:753
+#: components/researchers/UnifiedAlignPage.tsx:761
 msgid "Apply ({0})"
 msgstr "Appliquer ({0})"
 
@@ -11489,200 +11489,200 @@ msgstr "Chercher cette fiche sur {0}"
 msgid "Search this record again on {0}"
 msgstr "Chercher de nouveau cette fiche sur {0}"
 
-#: components/researchers/UnifiedAlignPage.tsx:480
+#: components/researchers/UnifiedAlignPage.tsx:490
 msgid "{count} record(s) written to Grist."
 msgstr "{count} fiche(s) écrite(s) dans Grist."
 
 #. placeholder {0}: r.ppn
 #. placeholder {1}: r.newPpn
-#: components/researchers/UnifiedAlignPage.tsx:492
+#: components/researchers/UnifiedAlignPage.tsx:500
 msgid "IdRef updated in Grist: {0} → {1}."
 msgstr "IdRef mis à jour dans Grist : {0} → {1}."
 
-#: components/researchers/UnifiedAlignPage.tsx:495
-#: components/researchers/UnifiedAlignPage.tsx:506
+#: components/researchers/UnifiedAlignPage.tsx:503
+#: components/researchers/UnifiedAlignPage.tsx:514
 msgid "Some selections or decisions are not applied yet — rerunning will clear them. Continue?"
 msgstr "Des sélections ou arbitrages ne sont pas encore appliqués — relancer le run les effacera. Continuer ?"
 
 #. placeholder {0}: unifiedCandidateId(src, cand)
 #. placeholder {1}: row.displayName || row.uid
-#: components/researchers/UnifiedAlignPage.tsx:526
+#: components/researchers/UnifiedAlignPage.tsx:534
 msgid "Candidate {0} dismissed for {1} — it will not be suggested again."
 msgstr "Candidat {0} écarté pour {1} — il ne sera plus proposé."
 
 #. placeholder {0}: unifiedCandidateId(src, cand)
-#: components/researchers/UnifiedAlignPage.tsx:531
+#: components/researchers/UnifiedAlignPage.tsx:539
 msgid "Profile {0} flagged as “Mixed identity” — ticket opened in the review table."
 msgstr "Profil {0} marqué « Identité mêlée » — ticket ouvert dans la table de revue."
 
-#: components/researchers/UnifiedAlignPage.tsx:557
+#: components/researchers/UnifiedAlignPage.tsx:565
 msgid "IdRef · ORCID · HAL · OpenAlex · Scopus — one row per person, one column per identifier"
 msgstr "IdRef · ORCID · HAL · OpenAlex · Scopus — une ligne par personne, une colonne par identifiant"
 
-#: components/researchers/UnifiedAlignPage.tsx:571
+#: components/researchers/UnifiedAlignPage.tsx:579
 msgid "Restricts both the display AND the run to one structure"
 msgstr "Restreint l'affichage ET le run à une structure de recherche"
 
-#: components/researchers/UnifiedAlignPage.tsx:573
+#: components/researchers/UnifiedAlignPage.tsx:581
 msgid "All structures"
 msgstr "Toutes les structures"
 
 #. placeholder {0}: groupCounts.personnel
-#: components/researchers/UnifiedAlignPage.tsx:578
+#: components/researchers/UnifiedAlignPage.tsx:586
 msgid "Staff ({0})"
 msgstr "Personnel ({0})"
 
 #. placeholder {0}: groupCounts.doctorants
-#: components/researchers/UnifiedAlignPage.tsx:579
+#: components/researchers/UnifiedAlignPage.tsx:587
 msgid "PhD students ({0})"
 msgstr "Doctorants ({0})"
 
 #. placeholder {0}: groupCounts.hors_recherche
-#: components/researchers/UnifiedAlignPage.tsx:580
+#: components/researchers/UnifiedAlignPage.tsx:588
 msgid "No research duty ({0})"
 msgstr "Sans obligation de recherche ({0})"
 
-#: components/researchers/UnifiedAlignPage.tsx:581
+#: components/researchers/UnifiedAlignPage.tsx:589
 msgid "Permanent or non-permanent staff with no statutory research duty (LIB_TYPE_EMPLOI) — may hold researcher identifiers, but aligning them is a low priority, as for PhD students"
 msgstr "Personnel titulaire ou non titulaire n'ayant pas d'obligation statutaire de recherche (LIB_TYPE_EMPLOI) — peut avoir des identifiants chercheur, mais l'alignement est une priorité basse, comme pour les doctorants"
 
-#: components/researchers/UnifiedAlignPage.tsx:585
+#: components/researchers/UnifiedAlignPage.tsx:593
 msgid "Choose the sources, see the number of records and the cost, then start the search on the filtered lab and group"
 msgstr "Choisir les sources, voir le nombre de fiches et le coût, puis lancer la recherche sur le labo et le groupe filtrés"
 
-#: components/researchers/UnifiedAlignPage.tsx:587
+#: components/researchers/UnifiedAlignPage.tsx:595
 msgid "Search running…"
 msgstr "Recherche en cours…"
 
-#: components/researchers/UnifiedAlignPage.tsx:587
+#: components/researchers/UnifiedAlignPage.tsx:595
 msgid "Search everywhere…"
 msgstr "Rechercher partout…"
 
-#: components/researchers/UnifiedAlignPage.tsx:600
+#: components/researchers/UnifiedAlignPage.tsx:608
 msgid "error"
 msgstr "erreur"
 
 #. placeholder {0}: p.done ?? 0
 #. placeholder {1}: p.total ?? '?'
-#: components/researchers/UnifiedAlignPage.tsx:600
+#: components/researchers/UnifiedAlignPage.tsx:608
 msgid "stopped at {0}/{1}"
 msgstr "arrêté à {0}/{1}"
 
-#: components/researchers/UnifiedAlignPage.tsx:600
+#: components/researchers/UnifiedAlignPage.tsx:608
 msgid "done"
 msgstr "terminé"
 
 #. placeholder {0}: q.reset
-#: components/researchers/UnifiedAlignPage.tsx:602
+#: components/researchers/UnifiedAlignPage.tsx:610
 msgid "Remaining weekly quota of the Elsevier Author Search API (reset {0})"
 msgstr "Quota hebdomadaire restant de l’API Elsevier Author Search (remise à zéro le {0})"
 
 #. placeholder {0}: q.key
 #. placeholder {1}: q.remaining.toLocaleString(numberLocale())
-#: components/researchers/UnifiedAlignPage.tsx:603
+#: components/researchers/UnifiedAlignPage.tsx:611
 msgid "key {0}: {1} searches left"
 msgstr "clé {0} : {1} recherches restantes"
 
 #. placeholder {0}: q.remaining.toLocaleString(numberLocale())
-#: components/researchers/UnifiedAlignPage.tsx:603
+#: components/researchers/UnifiedAlignPage.tsx:611
 msgid "{0} searches left"
 msgstr "{0} recherches restantes"
 
-#: components/researchers/UnifiedAlignPage.tsx:609
+#: components/researchers/UnifiedAlignPage.tsx:617
 msgid "Stops this source: the records in progress finish, what was found is kept; the next run resumes with the records not searched yet"
 msgstr "Arrête cette source : les fiches en cours se terminent, ce qui a été trouvé est conservé ; la prochaine recherche reprend avec les fiches pas encore cherchées"
 
-#: components/researchers/UnifiedAlignPage.tsx:610
+#: components/researchers/UnifiedAlignPage.tsx:618
 msgid "Stopping…"
 msgstr "Arrêt en cours…"
 
-#: components/researchers/UnifiedAlignPage.tsx:610
+#: components/researchers/UnifiedAlignPage.tsx:618
 msgid "Stop"
 msgstr "Arrêter"
 
-#: components/researchers/UnifiedAlignPage.tsx:628
+#: components/researchers/UnifiedAlignPage.tsx:636
 msgid "Loading the unified view…"
 msgstr "Chargement de la vue unifiée…"
 
-#: components/researchers/UnifiedAlignPage.tsx:633
+#: components/researchers/UnifiedAlignPage.tsx:641
 msgid "Records to process"
 msgstr "Fiches à traiter"
 
-#: components/researchers/UnifiedAlignPage.tsx:635
+#: components/researchers/UnifiedAlignPage.tsx:643
 msgid "Candidates to check"
 msgstr "Candidats à cocher"
 
-#: components/researchers/UnifiedAlignPage.tsx:636
+#: components/researchers/UnifiedAlignPage.tsx:644
 msgid "Ambiguous"
 msgstr "Ambigus"
 
-#: components/researchers/UnifiedAlignPage.tsx:637
+#: components/researchers/UnifiedAlignPage.tsx:645
 msgid "Name mismatches / replaced entries"
 msgstr "Écarts de nom / notices remplacées"
 
-#: components/researchers/UnifiedAlignPage.tsx:638
+#: components/researchers/UnifiedAlignPage.tsx:646
 msgid "Conflicts"
 msgstr "Conflits"
 
-#: components/researchers/UnifiedAlignPage.tsx:641
+#: components/researchers/UnifiedAlignPage.tsx:649
 msgid "Show only this kind of work"
 msgstr "N'afficher que ce type de travail"
 
-#: components/researchers/UnifiedAlignPage.tsx:649
+#: components/researchers/UnifiedAlignPage.tsx:657
 msgid "Filtered view"
 msgstr "Vue filtrée"
 
-#: components/researchers/UnifiedAlignPage.tsx:649
+#: components/researchers/UnifiedAlignPage.tsx:657
 msgid "candidates to check"
 msgstr "candidats à vérifier"
 
-#: components/researchers/UnifiedAlignPage.tsx:649
+#: components/researchers/UnifiedAlignPage.tsx:657
 msgid "ambiguous"
 msgstr "ambigus"
 
-#: components/researchers/UnifiedAlignPage.tsx:649
+#: components/researchers/UnifiedAlignPage.tsx:657
 msgid "name mismatches / replaced entries"
 msgstr "noms divergents / notices remplacées"
 
-#: components/researchers/UnifiedAlignPage.tsx:650
+#: components/researchers/UnifiedAlignPage.tsx:658
 msgid "Reset"
 msgstr "Réinitialiser"
 
-#: components/researchers/UnifiedAlignPage.tsx:657
+#: components/researchers/UnifiedAlignPage.tsx:665
 msgid "Only empty cells are filled in; no existing value is overwritten (OpenAlex: checked profiles are added to the list, nothing is removed). Conflicts are listed for manual review."
 msgstr "Seules les cellules vides sont renseignées ; aucune valeur existante n'est écrasée (OpenAlex : les profils cochés sont ajoutés à la liste, rien n'est retiré). Les conflits sont listés pour revue manuelle."
 
-#: components/researchers/UnifiedAlignPage.tsx:663
+#: components/researchers/UnifiedAlignPage.tsx:671
 msgid "Uncheck all strong candidates"
 msgstr "Décocher tous les candidats forts"
 
-#: components/researchers/UnifiedAlignPage.tsx:663
+#: components/researchers/UnifiedAlignPage.tsx:671
 msgid "Check all strong candidates"
 msgstr "Cocher tous les candidats forts"
 
-#: components/researchers/UnifiedAlignPage.tsx:668
+#: components/researchers/UnifiedAlignPage.tsx:676
 msgid "No records to show for this filter."
 msgstr "Aucune fiche à afficher pour ce filtre."
 
-#: components/researchers/UnifiedAlignPage.tsx:679
+#: components/researchers/UnifiedAlignPage.tsx:687
 msgid "Remove the source filter"
 msgstr "Retirer le filtre de source"
 
 #. placeholder {0}: SOURCE_LABEL[s]
-#: components/researchers/UnifiedAlignPage.tsx:679
+#: components/researchers/UnifiedAlignPage.tsx:687
 msgid "Only records with something to do on {0}"
 msgstr "Seulement les fiches avec quelque chose à faire sur {0}"
 
-#: components/researchers/UnifiedAlignPage.tsx:695
+#: components/researchers/UnifiedAlignPage.tsx:703
 msgid "Open the detail"
 msgstr "Ouvrir le détail"
 
-#: components/researchers/UnifiedAlignPage.tsx:700
+#: components/researchers/UnifiedAlignPage.tsx:708
 #: components/researchers/alignAtoms.tsx:197
 msgid "Identifier already shared by the record and the profile — near certainty"
 msgstr "Identifiant déjà commun entre la fiche et le profil — quasi-certitude"
 
-#: components/researchers/UnifiedAlignPage.tsx:704
+#: components/researchers/UnifiedAlignPage.tsx:712
 msgid "Open the researcher record in a new tab"
 msgstr "Ouvrir la fiche du chercheur dans un nouvel onglet"
 
@@ -11883,8 +11883,7 @@ msgid "Namesake with no affiliation evidence"
 msgstr "Homonyme sans preuve d'affiliation"
 
 #: components/researchers/alignAtoms.tsx:207
-#: lib/gristService.ts:1655
-#: lib/gristService.ts:1781
+#: lib/alignTextsI18n.ts:17
 msgid "Suspected mixed identity"
 msgstr "Identité mêlée suspectée"
 
@@ -12358,6 +12357,129 @@ msgstr "Appliquer ({0} MAJ + {1} créa)"
 msgid "Unable to synchronize with Grist."
 msgstr "Impossible de se synchroniser avec Grist."
 
+#: lib/alignTextsI18n.ts:7
+msgid "Identifier mismatch"
+msgstr "Divergence identifiant"
+
+#: lib/alignTextsI18n.ts:8
+msgid "Record deleted"
+msgstr "Notice supprimée"
+
+#. placeholder {0}: ppn || '?'
+#: lib/alignTextsI18n.ts:9
+msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
+msgstr "PPN {0} : la notice n'existe plus sur IdRef (404) — corriger ou retirer l'IdRef de l'Annuaire"
+
+#: lib/alignTextsI18n.ts:10
+msgid "Record unreadable"
+msgstr "Notice illisible"
+
+#. placeholder {0}: ppn || '?'
+#: lib/alignTextsI18n.ts:11
+msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
+msgstr "PPN {0} : notice IdRef inaccessible (erreur réseau ou IdRef indisponible lors du run — relancer)"
+
+#: lib/alignTextsI18n.ts:13
+msgid "API unreachable during the run — rerun."
+msgstr "API injoignable lors du run — relancer."
+
+#: lib/alignTextsI18n.ts:14
+msgid "Verification error"
+msgstr "Erreur de vérification"
+
+#: lib/alignTextsI18n.ts:15
+msgid "Name mismatch"
+msgstr "Nom divergent"
+
+#. placeholder {0}: r.id
+#. placeholder {1}: r.fullName || '?'
+#: lib/alignTextsI18n.ts:16
+msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
+msgstr "{0} « {1} » ≠ Annuaire « {displayName} »"
+
+#. placeholder {0}: sus.id
+#. placeholder {1}: sus.fullName || '?'
+#. placeholder {2}: (sus.reasons || []).join(' ; ')
+#: lib/alignTextsI18n.ts:18
+msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
+msgstr "{0} « {1} » : {2} — vérifier le profil, le marquer « Identité mêlée » si besoin"
+
+#: lib/alignTextsI18n.ts:19
+msgid "{a} merged into {b}"
+msgstr "{a} fusionné dans {b}"
+
+#: lib/alignTextsI18n.ts:20
+msgid "{a} gone"
+msgstr "{a} disparu"
+
+#: lib/alignTextsI18n.ts:21
+msgid "{a} = missing ORCID profile"
+msgstr "{a} = profil ORCID manquant"
+
+#: lib/alignTextsI18n.ts:22
+msgid "List to fix (not written)"
+msgstr "Liste à corriger (non écrite)"
+
+#: lib/alignTextsI18n.ts:23
+msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
+msgstr "{detail} → relancer le run (écriture directe) ou corriger OpenAlex_ids"
+
+#: lib/alignTextsI18n.ts:24
+msgid "Unknown ORCID"
+msgstr "ORCID inconnu"
+
+#: lib/alignTextsI18n.ts:25
+msgid "Unknown Scopus Author ID"
+msgstr "Scopus Author ID inconnu"
+
+#: lib/alignTextsI18n.ts:26
+msgid "IdHAL unknown to HAL"
+msgstr "IdHAL inconnu de HAL"
+
+#. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
+#: lib/alignTextsI18n.ts:27
+msgid "{0}: no profile — fix it in the Annuaire"
+msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
+
+#: lib/alignTextsI18n.ts:28
+msgid "Invalid ID_SCOPUS"
+msgstr "ID_SCOPUS invalide"
+
+#. placeholder {0}: entry.scopus
+#: lib/alignTextsI18n.ts:29
+msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
+msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
+
+#: lib/alignTextsI18n.ts:30
+msgid "Invalid ORCID"
+msgstr "ORCID invalide"
+
+#. placeholder {0}: entry.orcid
+#: lib/alignTextsI18n.ts:31
+msgid "{0}: wrong format or check digit"
+msgstr "{0} : format ou clé de contrôle incorrects"
+
+#: lib/alignTextsI18n.ts:32
+msgid "Profile merged by Scopus"
+msgstr "Profil fusionné par Scopus"
+
+#. placeholder {0}: entry.scopus
+#. placeholder {1}: entry.merged
+#: lib/alignTextsI18n.ts:33
+msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
+msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
+
+#. placeholder {0}: cand.suspect!.join(' ; ')
+#: lib/alignTextsI18n.ts:34
+msgid "{0} — check the profile, flag it “Mixed identity” if needed"
+msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
+
+#. placeholder {0}: cand.fullName
+#. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
+#: lib/alignTextsI18n.ts:35
+msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
+msgstr "Annuaire « {displayName} » ≠ profil « {0} »{1}"
+
 #: lib/apiErrors.ts:25
 msgid "Unauthorized"
 msgstr "Non authentifié"
@@ -12451,615 +12573,464 @@ msgid "Invalid record"
 msgstr "Fiche invalide"
 
 #: lib/apiErrors.ts:50
+msgid "Replaced IdRef record not found"
+msgstr "Notice IdRef remplacée introuvable"
+
+#: lib/apiErrors.ts:51
+msgid "Review table missing, run the alignment script first"
+msgstr "Table de revue absente, lancez d'abord l'alignement de cette source"
+
+#: lib/apiErrors.ts:52
 msgid "Grist error (partial write)"
 msgstr "Erreur Grist (écriture partielle)"
 
-#: lib/apiErrors.ts:51
+#: lib/apiErrors.ts:53
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
-#: lib/apiErrors.ts:52
+#: lib/apiErrors.ts:54
 msgid "Invalid LDAP uid"
 msgstr "uid LDAP invalide"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:55
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "Cet uid a déjà une fiche dans l'annuaire, fusionnez plutôt les deux fiches"
 
-#: lib/apiErrors.ts:54
+#: lib/apiErrors.ts:56
 msgid "Record not found in Grist"
 msgstr "Fiche introuvable dans Grist"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:57
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:58
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:59
 msgid "Grist error (writing the kept row)"
 msgstr "Erreur Grist (écriture de la ligne conservée)"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:60
 msgid "Grist error (deleting the absorbed row)"
 msgstr "Erreur Grist (suppression de la ligne absorbée)"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:61
 msgid "Merge not found"
 msgstr "Fusion introuvable"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:62
 msgid "Merge already restored"
 msgstr "Fusion déjà restaurée"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:63
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Ligne recréée mais journal des fusions non mis à jour, ne relancez pas la restauration"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:64
 msgid "Row re-created but kept row not restored"
 msgstr "Ligne recréée mais ligne conservée non restaurée"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:65
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:66
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:67
 msgid "A structure with this acronym already exists"
 msgstr "Une structure porte déjà ce sigle"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:68
 msgid "local_id already used"
 msgstr "local_id déjà utilisé"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:69
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Code d'entité invalide (lettres, chiffres, « - », « _ » ou « . » seulement)"
 
-#: lib/apiErrors.ts:68
-#: lib/gristService.ts:821
+#: lib/apiErrors.ts:70
+#: lib/gristService.ts:137
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:71
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:72
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:73
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne « groupes » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:74
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne « openalex_author_id » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:75
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "Pas d'identifiant OpenAlex configuré pour cette structure"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:76
 msgid "No dashboard data for this structure"
 msgstr "Aucune donnée de tableau de bord pour cette structure"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:78
 msgid "messages[] required"
 msgstr "messages[] requis"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:79
 msgid "Assistant unavailable"
 msgstr "Assistant indisponible"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:80
 msgid "Help assistant not configured"
 msgstr "Assistant d'aide non configuré"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:81
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "La newsletter n'est disponible que pour les structures avec un identifiant OpenAlex (pas les groupes)"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:82
 msgid "Generation interrupted"
 msgstr "Génération interrompue"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:83
 msgid "Generation failed"
 msgstr "Échec de la génération"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:84
 msgid "Analysis failed"
 msgstr "Échec de l'analyse"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:85
 msgid "Missing theme"
 msgstr "Thématique manquante"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:86
 msgid "No publication to analyze"
 msgstr "Aucune publication à analyser"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:87
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex injoignable"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:89
 msgid "Report not found"
 msgstr "Rapport introuvable"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:90
 msgid "Not allowed on this report"
 msgstr "Action non autorisée sur ce rapport"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:91
 msgid "Invalid report definition"
 msgstr "Définition de rapport invalide"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:92
 msgid "Report changed since it was loaded"
 msgstr "Le rapport a été modifié depuis son chargement"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:93
 msgid "Invalid report share"
 msgstr "Partage de rapport invalide"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:94
 msgid "Invalid report generation"
 msgstr "Génération de rapport invalide"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:95
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Instance en lecture seule : les rapports sont conservés dans le navigateur"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:96
 msgid "Invalid AI task"
 msgstr "Tâche IA invalide"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:97
 msgid "PDF archiving is not configured on this instance"
 msgstr "L'archivage des PDF n'est pas configuré sur cette instance"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:98
 msgid "Invalid PDF"
 msgstr "PDF invalide"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:99
 msgid "Generation not found"
 msgstr "Génération introuvable"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:100
 msgid "PDF not archived"
 msgstr "PDF non archivé"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:102
 msgid "Invalid record key"
 msgstr "Clé de fiche invalide"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:103
 msgid "Career path not computed yet for this record"
 msgstr "Parcours pas encore calculé pour cette fiche"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:104
 msgid "Grist unreachable"
 msgstr "Grist injoignable"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:105
 msgid "No Annuaire record for this key"
 msgstr "Aucune fiche de l’Annuaire pour cette clé"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:106
 msgid "Refresh outside your scope"
 msgstr "Recalcul hors de votre périmètre"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:107
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Trop de recalculs en cours, réessayez dans une minute"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:108
 msgid "Career-path computation failed"
 msgstr "Le calcul du parcours a échoué"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:109
 msgid "No usable identifier for this record"
 msgstr "Aucun identifiant exploitable pour cette fiche"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:110
 msgid "Unknown suggestion"
 msgstr "Suggestion inconnue"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:112
 msgid "Task not found"
 msgstr "Tâche introuvable"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:113
 msgid "Unknown event action"
 msgstr "Action d’événement inconnue"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:114
 msgid "Empty comment"
 msgstr "Commentaire vide"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:115
 msgid "Nothing to update"
 msgstr "Rien à mettre à jour"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:116
 msgid "Unknown task type"
 msgstr "Type de tâche inconnu"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:117
 msgid "Unknown status"
 msgstr "Statut inconnu"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:118
 msgid "Transition not allowed"
 msgstr "Transition non autorisée"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:119
 msgid "Task detection already running"
 msgstr "Détection des tâches déjà en cours"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:121
 msgid "Name required"
 msgstr "Nom requis"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:122
 msgid "Empty list"
 msgstr "Liste vide"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:123
 msgid "List of identifiers expected"
 msgstr "Liste d'identifiants attendue"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:124
 msgid "Invalid mention identifier"
 msgstr "Identifiant de mention invalide"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:125
 msgid "Invalid source identifier"
 msgstr "Identifiant de source invalide"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:126
 msgid "researchers and structures arrays required"
 msgstr "Tableaux researchers et structures requis"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:127
 msgid "Keycloak admin API unreachable"
 msgstr "API d'administration Keycloak injoignable"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:128
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "API ETL (druid-etl-api) injoignable"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:130
 msgid "Grist path not allowed by the proxy"
 msgstr "Chemin Grist non autorisé par le proxy"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:131
 msgid "Writing to the document root is refused"
 msgstr "Écriture sur la racine du document refusée"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:132
 msgid "Writing to the table definition is refused"
 msgstr "Écriture sur la définition de la table refusée"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:133
 msgid "Method not relayed"
 msgstr "Méthode non relayée"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:134
 msgid "Method not relayed on /tables"
 msgstr "Méthode non relayée sur /tables"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:135
 msgid "Table creation not allowed"
 msgstr "Création de table non autorisée"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:136
 msgid "Table not writable through the proxy"
 msgstr "Table non modifiable via le proxy"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:137
 msgid "Write outside scope"
 msgstr "Écriture hors périmètre"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:138
 msgid "Creation outside scope"
 msgstr "Création hors périmètre"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:139
 msgid "Rows outside scope or unknown"
 msgstr "Ligne(s) hors périmètre ou inconnue(s)"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:140
 msgid "Scope check failed"
 msgstr "Vérification du périmètre impossible"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:141
 msgid "Grist writes require the institution right"
 msgstr "Écriture Grist réservée au droit établissement"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:142
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Écriture Grist réservée aux utilisateurs identifiés (Cloudflare Access)"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:143
 msgid "Read-only instance: writes are disabled"
 msgstr "Instance en lecture seule : les modifications sont désactivées"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:144
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter indisponible sur cette instance"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:145
 msgid "Missing id for PATCH"
 msgstr "id manquant pour PATCH"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:146
 msgid "Invalid Grist identifiers"
 msgstr "Identifiants Grist invalides"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:147
 msgid "Body with a records array expected"
 msgstr "Corps avec un tableau records attendu"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:149
 msgid "An LDAP synchronization is already running"
 msgstr "Une synchronisation LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:150
 msgid "An LDAP structures synchronization is already running"
 msgstr "Une synchronisation LDAP structures est déjà en cours"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:151
 msgid "An LDAP search is already running"
 msgstr "Une recherche LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:152
 msgid "An IdRef alignment is already running"
 msgstr "Un alignement IdRef est déjà en cours"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:153
 msgid "Alignment already running"
 msgstr "Un alignement est déjà en cours"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:154
 msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:155
 msgid "No alignment running"
 msgstr "Aucun alignement en cours"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:156
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:158
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:159
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:160
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:161
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:163
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:165
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:166
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:167
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:168
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:170
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:171
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:172
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:20
-#: lib/directoryApi.ts:29
-#: lib/directoryApi.ts:44
+#: lib/directoryApi.ts:21
+#: lib/directoryApi.ts:30
+#: lib/directoryApi.ts:45
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Annuaire indisponible ({resource}, HTTP {0})."
 
-#: lib/gristService.ts:923
+#: lib/gristService.ts:239
 msgid "Invalid ID"
 msgstr "ID invalide"
-
-#: lib/gristService.ts:1148
-#: lib/gristService.ts:1187
-#: lib/gristService.ts:1349
-#: lib/gristService.ts:1760
-#: lib/gristService.ts:1788
-msgid "Identifier mismatch"
-msgstr "Divergence identifiant"
-
-#: lib/gristService.ts:1166
-msgid "Record deleted"
-msgstr "Notice supprimée"
-
-#. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:1166
-msgid "PPN {0}: the record no longer exists on IdRef (404) — fix or remove the IdRef from the Annuaire"
-msgstr "PPN {0} : la notice n'existe plus sur IdRef (404) — corriger ou retirer l'IdRef de l'Annuaire"
-
-#: lib/gristService.ts:1170
-msgid "Record unreadable"
-msgstr "Notice illisible"
-
-#. placeholder {0}: ppn || '?'
-#: lib/gristService.ts:1170
-msgid "PPN {0}: IdRef record unreachable (network error or IdRef down during the run — rerun)"
-msgstr "PPN {0} : notice IdRef inaccessible (erreur réseau ou IdRef indisponible lors du run — relancer)"
-
-#: lib/gristService.ts:1390
-#: lib/gristService.ts:1858
-#: lib/gristService.ts:1935
-msgid "Grist error (reading the Annuaire before writing)"
-msgstr "Erreur Grist (lecture Annuaire avant écriture)"
-
-#: lib/gristService.ts:1453
-msgid "The Grist review only applies to the “search for missing” mode"
-msgstr "La revue Grist ne concerne que le mode « recherche des manquants »"
-
-#: lib/gristService.ts:1460
-#: lib/gristService.ts:2070
-msgid "Grist error (table list)"
-msgstr "Erreur Grist (liste des tables)"
-
-#. placeholder {0}: await r.text()
-#: lib/gristService.ts:1468
-#: lib/gristService.ts:2078
-msgid "Error creating table {IDREF_REVIEW_TABLE}: {0}"
-msgstr "Erreur création table {IDREF_REVIEW_TABLE} : {0}"
-
-#: lib/gristService.ts:1644
-#: lib/gristService.ts:1651
-#: lib/gristService.ts:1753
-#: lib/gristService.ts:1775
-msgid "API unreachable during the run — rerun."
-msgstr "API injoignable lors du run — relancer."
-
-#: lib/gristService.ts:1651
-#: lib/gristService.ts:1775
-msgid "Verification error"
-msgstr "Erreur de vérification"
-
-#: lib/gristService.ts:1654
-#: lib/gristService.ts:1783
-msgid "Name mismatch"
-msgstr "Nom divergent"
-
-#. placeholder {0}: r.id
-#. placeholder {1}: r.fullName || '?'
-#: lib/gristService.ts:1654
-msgid "{0} “{1}” ≠ Annuaire “{displayName}”"
-msgstr "{0} « {1} » ≠ Annuaire « {displayName} »"
-
-#. placeholder {0}: sus.id
-#. placeholder {1}: sus.fullName || '?'
-#. placeholder {2}: (sus.reasons || []).join(' ; ')
-#: lib/gristService.ts:1655
-msgid "{0} “{1}”: {2} — check the profile, flag it “Mixed identity” if needed"
-msgstr "{0} « {1} » : {2} — vérifier le profil, le marquer « Identité mêlée » si besoin"
-
-#: lib/gristService.ts:1658
-msgid "{a} merged into {b}"
-msgstr "{a} fusionné dans {b}"
-
-#: lib/gristService.ts:1659
-msgid "{a} gone"
-msgstr "{a} disparu"
-
-#: lib/gristService.ts:1660
-msgid "{a} = missing ORCID profile"
-msgstr "{a} = profil ORCID manquant"
-
-#: lib/gristService.ts:1662
-msgid "List to fix (not written)"
-msgstr "Liste à corriger (non écrite)"
-
-#: lib/gristService.ts:1662
-msgid "{detail} → rerun (direct write) or fix OpenAlex_ids"
-msgstr "{detail} → relancer le run (écriture directe) ou corriger OpenAlex_ids"
-
-#: lib/gristService.ts:1766
-msgid "Unknown ORCID"
-msgstr "ORCID inconnu"
-
-#: lib/gristService.ts:1766
-msgid "Unknown Scopus Author ID"
-msgstr "Scopus Author ID inconnu"
-
-#: lib/gristService.ts:1766
-msgid "IdHAL unknown to HAL"
-msgstr "IdHAL inconnu de HAL"
-
-#. placeholder {0}: entry.orcid || entry.idhal || entry.scopus || ''
-#: lib/gristService.ts:1767
-msgid "{0}: no profile — fix it in the Annuaire"
-msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
-
-#: lib/gristService.ts:1771
-msgid "Invalid ID_SCOPUS"
-msgstr "ID_SCOPUS invalide"
-
-#. placeholder {0}: entry.scopus
-#: lib/gristService.ts:1771
-msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
-msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
-
-#: lib/gristService.ts:1772
-msgid "Invalid ORCID"
-msgstr "ORCID invalide"
-
-#. placeholder {0}: entry.orcid
-#: lib/gristService.ts:1772
-msgid "{0}: wrong format or check digit"
-msgstr "{0} : format ou clé de contrôle incorrects"
-
-#: lib/gristService.ts:1780
-msgid "Profile merged by Scopus"
-msgstr "Profil fusionné par Scopus"
-
-#. placeholder {0}: entry.scopus
-#. placeholder {1}: entry.merged
-#: lib/gristService.ts:1780
-msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
-msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
-
-#. placeholder {0}: cand.suspect!.join(' ; ')
-#: lib/gristService.ts:1781
-msgid "{0} — check the profile, flag it “Mixed identity” if needed"
-msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
-
-#. placeholder {0}: cand.fullName
-#. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
-#: lib/gristService.ts:1783
-msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
-msgstr "Annuaire « {displayName} » ≠ profil « {0} »{1}"
-
-#. placeholder {0}: meta.table
-#. placeholder {1}: meta.label
-#: lib/gristService.ts:2027
-msgid "Table {0} missing: run {1} first (the script creates it)."
-msgstr "Table {0} absente : lancez d'abord un run {1} (elle est créée par le script)."
 
 #: lib/importConflicts.ts:67
 msgid "HDR"

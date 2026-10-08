@@ -47,6 +47,8 @@ export const API_ERRORS = [
   msg`Directory storage unavailable`,
   msg`API v1 unavailable`,
   msg`Invalid record`,
+  msg`Replaced IdRef record not found`,
+  msg`Review table missing, run the alignment script first`,
   msg`Grist error (partial write)`,
   msg`Qualification: primary row required`,
   msg`Invalid LDAP uid`,

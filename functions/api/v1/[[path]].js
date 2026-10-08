@@ -12,9 +12,12 @@
 // ALLOW_ANONYMOUS_WRITES=true locally). The audit of the writes goes to the Functions log.
 import { AUDIT_HEADER, createDirectoryApi } from '../../../lib/directory/api.ts';
 import { createGristDirectoryCommands } from '../../../lib/directory/commands.ts';
+import { createGristAlignCommands } from '../../../lib/directory/alignCommands.ts';
+import { tokenAlignTexts } from '../../../lib/directory/alignTexts.ts';
 import { createGristDirectoryRepository, createGristReader } from '../../../lib/directory/repository.ts';
 import { createGristPublicationsStore } from '../../../lib/publications/store.ts';
 import { instanceOf, secretOf } from '../../_lib/instance.js';
+import { instanceAssetPath } from '../../_lib/instanceAssets.js';
 
 const api = createDirectoryApi();
 // One set of stores (and their caches) per instance and document, for the lifetime of the isolate.
@@ -39,6 +42,7 @@ export async function onRequest(context) {
     });
     const repository = createGristDirectoryRepository({ grist: main });
     store = {
+      grist: main,
       repository,
       commands: createGristDirectoryCommands({ grist: main, repository }),
       // Only the instance document, as the /api/grist proxy (no side document on Cloudflare).
@@ -52,7 +56,22 @@ export async function onRequest(context) {
     ? { status: 403, error: 'Read-only instance: writes are disabled' }
     : (!identity && !allowAnonymousWrites ? { status: 403, error: 'Grist writes require an authenticated user (Cloudflare Access)' } : null);
 
-  const response = await api.fetch(context.request, { ...store, scope: { all: true, labAnchors: [] }, writeRefusal });
+  // Alignment caches: static files of the instance (public/ on a single-instance deployment, its own copy under
+  // /instance-assets/<slug>/ on a shared one), read through env.ASSETS — never through the public URL (Access).
+  const readAlignCache = async (name) => {
+    const url = new URL(context.request.url);
+    const target = instance.shared ? instanceAssetPath(instance.slug, `/${name}.json`) : `/${name}.json`;
+    if (!target || !context.env.ASSETS) return null;
+    const res = await context.env.ASSETS.fetch(new Request(new URL(target, url)));
+    if (!res.ok || (res.headers.get('Content-Type') || '').includes('text/html')) return null;
+    return res.json().catch(() => null);
+  };
+  const align = createGristAlignCommands({
+    grist: store.grist, repository: store.repository, annuaireColumns: store.commands.annuaireColumns,
+    texts: tokenAlignTexts, hasQualinka: false, caches: { read: readAlignCache },
+  });
+
+  const response = await api.fetch(context.request, { ...store, align, scope: { all: true, labAnchors: [] }, writeRefusal });
   const audit = response.headers.get(AUDIT_HEADER);
   if (!audit) return response;
   console.log(JSON.stringify({ event: 'api.write', instance: instance.slug, user: identity, path: new URL(context.request.url).pathname, status: response.status, writes: JSON.parse(audit) }));
