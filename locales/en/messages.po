@@ -8188,7 +8188,7 @@ msgstr "Harvesting in progress — {lastLog}"
 msgid "Harvesting in progress…"
 msgstr "Harvesting in progress…"
 
-#. placeholder {0}: translateApiError(status.error)
+#. placeholder {0}: translateApiError(status.error || '')
 #: components/groups/GroupDashboardSection.tsx:207
 msgid "ETL failed: {0}"
 msgstr "ETL failed: {0}"
@@ -12445,7 +12445,7 @@ msgstr "{0}: no profile — fix it in the Annuaire"
 msgid "Invalid ID_SCOPUS"
 msgstr "Invalid ID_SCOPUS"
 
-#. placeholder {0}: entry.scopus
+#. placeholder {0}: entry.scopus!
 #: lib/alignTextsI18n.ts:29
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
@@ -12454,7 +12454,7 @@ msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted 
 msgid "Invalid ORCID"
 msgstr "Invalid ORCID"
 
-#. placeholder {0}: entry.orcid
+#. placeholder {0}: entry.orcid!
 #: lib/alignTextsI18n.ts:31
 msgid "{0}: wrong format or check digit"
 msgstr "{0}: wrong format or check digit"
@@ -12463,8 +12463,8 @@ msgstr "{0}: wrong format or check digit"
 msgid "Profile merged by Scopus"
 msgstr "Profile merged by Scopus"
 
-#. placeholder {0}: entry.scopus
-#. placeholder {1}: entry.merged
+#. placeholder {0}: entry.scopus!
+#. placeholder {1}: entry.merged!
 #: lib/alignTextsI18n.ts:33
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
@@ -12474,7 +12474,7 @@ msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_S
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — check the profile, flag it “Mixed identity” if needed"
 
-#. placeholder {0}: cand.fullName
+#. placeholder {0}: cand.fullName!
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
 #: lib/alignTextsI18n.ts:35
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"

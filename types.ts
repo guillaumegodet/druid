@@ -90,7 +90,7 @@ export interface Employment {
 
 /** Nantes Université-specific information from Grist */
 export interface NURelated {
-  pole?: string;           // Affiliated pole
+  pole?: string | null;    // Affiliated pole
   composante?: string;     // Affiliated faculty (composante)
   location?: string;       // Main site
   doctoralSchool?: string; // Affiliated doctoral school (ED)

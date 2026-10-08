@@ -403,7 +403,7 @@ export function ldapCandidatePatches(entries: LdapResolved[], records: GristReco
     const setIfEmpty = (col: string, val: any) => {
       if (val && !String(cur[col] || '').trim()) fields[col] = val;
     };
-    setIfEmpty('Civilite', normalizeCivility(p.ldap.civilite));
+    setIfEmpty('Civilite', normalizeCivility(p.ldap.civilite || ''));
     // supannEmpCorps = BCN N_CORPS code (e.g. « 057 ») → mapped to a Druid grade (MCF/PR/TECH…),
     // transposed to an emeritus code when dynaCategorie says emeritus (see lib/emeritus.ts).
     const grade = ldapGradeFor(p.ldap.categorie, p.ldap.empCorps);

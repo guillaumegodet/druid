@@ -233,7 +233,7 @@ function App() {
   // Sync with the URL (on load and on the browser's back/forward: `urlVersion` then
   // re-runs the record selection below).
   const [urlVersion, setUrlVersion] = useState(0);
-  const { setUrlState } = useUrlState(
+  const { setUrlState } = useUrlState<{ page: string | null; id: string | null; tab: string | null }>(
     { page: ViewState.RESEARCHERS_LIST, id: null, tab: null },
     (newState) => {
       setUrlVersion((v) => v + 1);

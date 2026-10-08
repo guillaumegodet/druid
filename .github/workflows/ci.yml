@@ -79,6 +79,44 @@ jobs:
           DRUID_INSTANCE: demo
         run: npm run build
 
+  # PostgreSQL schema (druid-internal docs/plan-migration-postgresql.md, lot 4): roles, migrations up / down / up,
+  # Kysely types in step with the migrated schema, integration tests as the application role.
+  database:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: druid
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d druid"
+          --health-interval 5s --health-timeout 5s --health-retries 12
+    env:
+      DATABASE_URL: postgres://druid_owner:owner@localhost:5432/druid?sslmode=disable
+      DATABASE_URL_APP: postgres://druid_app:app@localhost:5432/druid?sslmode=disable
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Roles
+        env:
+          SUPERUSER_URL: postgres://postgres:postgres@localhost:5432/druid
+        run: |
+          psql "$SUPERUSER_URL" -v ON_ERROR_STOP=1 -q -f db/roles.sql
+          psql "$SUPERUSER_URL" -v ON_ERROR_STOP=1 -qc "ALTER ROLE druid_owner PASSWORD 'owner'; ALTER ROLE druid_app PASSWORD 'app'"
+      - name: Migrations (up, down, up)
+        run: npm run -s db:migrate && npm run -s db:rollback && npm run -s db:migrate
+      - name: Kysely types up to date (npm run db:types)
+        run: npx kysely-codegen --verify
+      - name: Integration tests
+        run: npm run -s test:db
+
   # Conventional Commits on the commits a pull request brings (CONTRIBUTING.md): they feed the CHANGELOG.
   commit-messages:
     if: github.event_name == 'pull_request'

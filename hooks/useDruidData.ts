@@ -66,7 +66,7 @@ export function useDruidData() {
       const visibleStructIds = new Set(visibleStructures.map((s) => s.id));
       const visibleResearchers = hasFullAccess()
         ? linkedResearchers
-        : linkedResearchers.filter((r) => r.affiliations.some((aff) => visibleStructIds.has(aff.structureId)));
+        : linkedResearchers.filter((r) => r.affiliations.some((aff) => aff.structureId != null && visibleStructIds.has(aff.structureId)));
 
       setResearchers(visibleResearchers);
       setStructures(visibleStructures);

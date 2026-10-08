@@ -204,7 +204,7 @@ export const GroupDashboardSection: React.FC<{
       )}
       {!running && status?.state === 'error' && (
         <p className="flex items-center gap-2 text-[13px] text-[#d64545]">
-          <AlertCircle className="w-4 h-4 shrink-0" /> <Trans>ETL failed: {translateApiError(status.error)}</Trans>
+          <AlertCircle className="w-4 h-4 shrink-0" /> <Trans>ETL failed: {translateApiError(status.error || '')}</Trans>
         </p>
       )}
       {!running && status?.state === 'done' && (

@@ -188,7 +188,7 @@ export const ResearchersTab: React.FC<{
     if (!filtered) return aggregateResearchers(publications, authors, range);
     const ids = new Set(staff.map((m) => m.authorId).filter((id): id is number => id != null));
     return aggregateResearchers(publications, authors, range, Number.MAX_SAFE_INTEGER)
-      .filter((d) => ids.has(d.id))
+      .filter((d) => d.id != null && ids.has(d.id))
       .slice(0, 20);
   }, [filtered, staff, publications, authors, range]);
 

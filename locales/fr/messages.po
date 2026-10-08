@@ -8188,7 +8188,7 @@ msgstr "Moissonnage en cours — {lastLog}"
 msgid "Harvesting in progress…"
 msgstr "Moissonnage en cours…"
 
-#. placeholder {0}: translateApiError(status.error)
+#. placeholder {0}: translateApiError(status.error || '')
 #: components/groups/GroupDashboardSection.tsx:207
 msgid "ETL failed: {0}"
 msgstr "Échec de l'ETL : {0}"
@@ -12445,7 +12445,7 @@ msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
-#. placeholder {0}: entry.scopus
+#. placeholder {0}: entry.scopus!
 #: lib/alignTextsI18n.ts:29
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
@@ -12454,7 +12454,7 @@ msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est ad
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
-#. placeholder {0}: entry.orcid
+#. placeholder {0}: entry.orcid!
 #: lib/alignTextsI18n.ts:31
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
@@ -12463,8 +12463,8 @@ msgstr "{0} : format ou clé de contrôle incorrects"
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
-#. placeholder {0}: entry.scopus
-#. placeholder {1}: entry.merged
+#. placeholder {0}: entry.scopus!
+#. placeholder {1}: entry.merged!
 #: lib/alignTextsI18n.ts:33
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
@@ -12474,7 +12474,7 @@ msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à j
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#. placeholder {0}: cand.fullName
+#. placeholder {0}: cand.fullName!
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
 #: lib/alignTextsI18n.ts:35
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
