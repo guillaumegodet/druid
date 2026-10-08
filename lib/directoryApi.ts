@@ -10,6 +10,7 @@ import type { LdapCandidatesDiff, LdapDiff, StructuresLdapDiff } from './directo
 import type { AlignCandidate, AlignMode, IdrefCandidate, ReviewDecision, UnifiedAlignDiff, UnifiedAlignSource, UnifiedArbitrateDecision } from './directory/alignments';
 import type { AbesExportMark, Institution, MergeLogEntry } from './directory/gristMapping';
 import type { NewsletterItem } from './publications/newsletter';
+import type { NewsletterEditableField } from './publications/store';
 import type { AxisCorrectionRow } from './publications/axes';
 
 export const DIRECTORY_API_BASE = '/api/v1';
@@ -103,6 +104,10 @@ export const DirectoryApi = {
     source: UnifiedAlignSource; row: { id: string; uid: string; displayName: string; labo?: string };
     candidate: AlignCandidate | IdrefCandidate; candidateCount: number; decision: ReviewDecision; note: string;
   }) => send<{ rejected: number; tableCreated: boolean }>('POST', 'alignments/reject', rejection),
+  updateNewsletterItem: (id: number, fields: Partial<Record<NewsletterEditableField, string>>) =>
+    send<{ ok: true }>('PATCH', `newsletter/${id}`, { fields }),
+  updateAxisCorrection: (slug: string, rowId: number, axe: string) =>
+    send<{ ok: true }>('PATCH', `axis-corrections/${encodeURIComponent(slug)}/${rowId}`, { axe }),
   createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
   updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
 };

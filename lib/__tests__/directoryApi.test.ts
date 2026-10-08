@@ -1,7 +1,7 @@
 // Directory domain API, read side (druid-internal docs/plan-migration-postgresql.md, lot 1): routes,
 // lab scope, Grist repository caching, Node session adapter. Fictitious data only.
 import { describe, it, expect, vi } from 'vitest';
-import { createDirectoryApi } from '../directory/api';
+import { createDirectoryApi, AUDIT_HEADER } from '../directory/api';
 import { createGristDirectoryRepository, DirectoryRepository, GristReader } from '../directory/repository';
 import type { GristRecord } from '../directory/gristMapping';
 import { scopeOfSession } from '../../server/apiV1';
@@ -151,10 +151,10 @@ describe('createGristPublicationsStore (D10)', () => {
 
   it('reads the news items of one structure, most recent first', async () => {
     const main = fakeReader({ Newsletter: [newsletterRow(1, 'laba', '2026-09-01'), newsletterRow(2, 'laba', '2026-10-01'), newsletterRow(3, 'lab2b', '2026-10-02')] });
-    const store = createGristPublicationsStore({ main, readerFor: () => null });
+    const store = createGristPublicationsStore({ main: main as any, readerFor: () => null });
     const items = await store.newsletter('laba');
     expect(items.map((i) => [i.id, i.statut])).toEqual([[2, 'valide'], [1, 'genere']]);
-    const withoutTable = createGristPublicationsStore({ main: fakeReader({ Annuaire: [] }), readerFor: () => null });
+    const withoutTable = createGristPublicationsStore({ main: fakeReader({ Annuaire: [] }) as any, readerFor: () => null });
     expect(await withoutTable.newsletter('laba')).toEqual([]);
   });
 
@@ -163,10 +163,10 @@ describe('createGristPublicationsStore (D10)', () => {
       { id: 5, fields: { doi: '10.1/ABC', Titre: 'Un titre', [axes.field]: 'Axe 1' } },
       { id: 6, fields: { doi: '10.1/def', Titre: 'Autre', [axes.field]: '' } },
     ] });
-    const allowed = createGristPublicationsStore({ main: fakeReader({}), readerFor: (doc) => (doc === axes.docId ? side : null) });
+    const allowed = createGristPublicationsStore({ main: fakeReader({}) as any, readerFor: (doc) => (doc === axes.docId ? side as any : null) });
     expect(await allowed.axisCorrections('ec-nantes')).toEqual([{ gristId: 5, doi: '10.1/ABC', title: 'Un titre', axe: 'Axe 1' }]);
     expect(await allowed.axisCorrections('laba')).toBeNull();
-    const refused = createGristPublicationsStore({ main: fakeReader({}), readerFor: () => null });
+    const refused = createGristPublicationsStore({ main: fakeReader({}) as any, readerFor: () => null });
     await expect(refused.axisCorrections('ec-nantes')).rejects.toThrow('Document not readable');
   });
 });
@@ -186,6 +186,9 @@ describe('createDirectoryApi', () => {
   const stubPublications = (): PublicationsStore & { newsletter: ReturnType<typeof vi.fn> } => ({
     newsletter: vi.fn(async () => []),
     axisCorrections: vi.fn(async (slug: string) => (slug === 'ec-nantes' ? [] : null)),
+    newsletterSlugOf: vi.fn(async () => null),
+    updateNewsletterItem: vi.fn(),
+    updateAxisCorrection: vi.fn(async () => ({ table: 't' })),
   });
   const call = (path: string, bindings: any, method = 'GET') =>
     createDirectoryApi().fetch(new Request(`http://druid.test${path}`, { method }), { publications: stubPublications(), ...bindings });
@@ -259,7 +262,7 @@ describe('createDirectoryApi — institution tools and publications', () => {
   });
 
   it('answers 403 when the instance may not read the side document', async () => {
-    const refused = createGristPublicationsStore({ main: fakeReader({}), readerFor: () => null });
+    const refused = createGristPublicationsStore({ main: fakeReader({}) as any, readerFor: () => null });
     const resp = await call('/api/v1/axis-corrections/ec-nantes', ALL, { axisCorrections: refused.axisCorrections });
     expect(resp).toEqual({ status: 403, body: { error: 'Forbidden' } });
   });
@@ -271,5 +274,48 @@ describe('scopeOfSession (server/apiV1.ts)', () => {
     expect(scopeOfSession({ session: {} })).toBeNull();
     expect(scopeOfSession({ session: { user: { access: { allSlugs: true, labAnchors: [] } } } })).toEqual({ all: true, labAnchors: [] });
     expect(scopeOfSession({ session: { user: { access: { allSlugs: false, labAnchors: ['laba'] } } } })).toEqual({ all: false, labAnchors: ['laba'] });
+  });
+});
+
+describe('publications writes (lot 2 f)', () => {
+  const LAB = { all: false, labAnchors: ['laba'] };
+  const make = () => {
+    const writes: string[] = [];
+    const client = (name: string, tables: Record<string, any[]>) => ({
+      docUpdatedAt: async () => 'v', tableIds: async () => Object.keys(tables),
+      records: async (t: string, f?: any) => (tables[t] || []).filter((r) => !f || f.id.includes(r.id)),
+      updateRecords: async (t: string, recs: any[]) => { writes.push(`${name}:${t}:${recs.map((r) => `${r.id}=${JSON.stringify(r.fields)}`)}`); },
+    }) as any;
+    const main = client('main', { Newsletter: [{ id: 3, fields: { slug: 'laba' } }, { id: 4, fields: { slug: 'lab2b' } }] });
+    const side = client('side', { [AXES_GRIST['ec-nantes'].table]: [] });
+    const publications = createGristPublicationsStore({ main, readerFor: (doc) => (doc === AXES_GRIST['ec-nantes'].docId ? side : null) });
+    const call = async (path: string, body: unknown, scope: any) => {
+      const resp = await createDirectoryApi().fetch(
+        new Request(`http://druid.test${path}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
+        { repository: {} as any, publications, commands: {} as any, scope, writeRefusal: null },
+      );
+      return { status: resp.status, audit: resp.headers.get(AUDIT_HEADER) };
+    };
+    return { call, writes };
+  };
+
+  it('writes the editorial fields of a news item of the user\'s structures only', async () => {
+    const { call, writes } = make();
+    const ok = await call('/api/v1/newsletter/3', { fields: { statut: 'valide', valide_par: 'someone@example.org' } }, LAB);
+    expect(ok.status).toBe(200);
+    expect(JSON.parse(ok.audit!)[0]).toMatchObject({ table: 'Newsletter', rows: [3], fields: ['statut', 'valide_par'] });
+    expect((await call('/api/v1/newsletter/4', { fields: { statut: 'valide' } }, LAB)).status).toBe(403);
+    expect((await call('/api/v1/newsletter/9', { fields: { statut: 'valide' } }, ALL)).status).toBe(404);
+    expect((await call('/api/v1/newsletter/3', { fields: { slug: 'lab2b' } }, ALL)).status).toBe(400);
+    expect((await call('/api/v1/newsletter/3', { fields: { statut: 'whatever' } }, ALL)).status).toBe(400);
+    expect(writes).toEqual(['main:Newsletter:3={"statut":"valide","valide_par":"someone@example.org"}']);
+  });
+
+  it('writes an axis correction with the structure\'s right, in the side document', async () => {
+    const { call, writes } = make();
+    expect((await call('/api/v1/axis-corrections/ec-nantes/12', { axe: 'Axe 2' }, LAB)).status).toBe(403);
+    expect((await call('/api/v1/axis-corrections/ec-nantes/12', { axe: 'Axe 2' }, { all: false, labAnchors: ['ecnantes'] })).status).toBe(200);
+    expect((await call('/api/v1/axis-corrections/laba/12', { axe: 'Axe 2' }, ALL)).status).toBe(404);
+    expect(writes).toEqual([`side:${AXES_GRIST['ec-nantes'].table}:12={"${AXES_GRIST['ec-nantes'].field}":"Axe 2"}`]);
   });
 });

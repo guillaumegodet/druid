@@ -20,6 +20,7 @@ import {
   type AxisCorrection,
   type AxisCorrectionIndex,
 } from './axesCorrections';
+import { DirectoryApi } from '../../lib/directoryApi';
 
 const PAGE_SIZE = 25;
 
@@ -85,12 +86,11 @@ function useAxesCorrections(slug: string, enabled: boolean) {
 
   const save = async (gristId: number, axe: string): Promise<string | null> => {
     if (!cfg) return 'not configured';
-    const res = await fetch(`/api/grist/docs/${cfg.docId}/tables/${cfg.table}/records`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records: [{ id: gristId, fields: { [cfg.field]: axe } }] }),
-    });
-    if (!res.ok) return `Grist error (${res.status})`;
+    try {
+      await DirectoryApi.updateAxisCorrection(slug, gristId, axe);   // domain API (lot 2 f), structure's right
+    } catch (e) {
+      return apiErrorText(e) || String(e);
+    }
     applyLocal(gristId, axe);
     return null;
   };

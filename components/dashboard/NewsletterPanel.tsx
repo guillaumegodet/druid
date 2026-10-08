@@ -8,9 +8,9 @@ import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { apiErrorText } from '../../lib/apiErrors';
-import { gristDocId } from '../../lib/instanceRuntime';
 import { DirectoryApi } from '../../lib/directoryApi';
 import type { NewsletterItem, NewsletterStatus } from '../../lib/publications/newsletter';
+import type { NewsletterEditableField } from '../../lib/publications/store';
 
 // Editorial workflow of the general-public newsletter: news items are generated
 // by /api/newsletter/generate (ILAAS LLM, OpenAlex articles ≤ 30 days) and
@@ -20,9 +20,8 @@ import type { NewsletterItem, NewsletterStatus } from '../../lib/publications/ne
 // newsletter (phase 1: HTML export + recipients to paste into the mailing
 // mail institutionnel).
 
-// Reads through the domain API (/api/v1/newsletter, people); writes still through the proxy (migration plan,
-// lot 2) — doc of the instance from /api/me (lib/instanceRuntime.ts).
-const GRIST = '/api/grist';
+// Reads and writes through the domain API (/api/v1/newsletter, people — druid-internal
+// docs/plan-migration-postgresql.md, lots 1 b and 2 f).
 
 type Statut = NewsletterStatus;
 type NlItem = NewsletterItem;
@@ -34,15 +33,6 @@ const STATUT_META: Record<Statut, { label: MessageDescriptor; cls: string }> = {
   rejete: { label: msg`Discarded`, cls: 'bg-rose-100 dark:bg-rose-500/20 text-rose-800 dark:text-rose-300' },
   publie: { label: msg`Published`, cls: 'bg-sky-100 dark:bg-sky-500/20 text-sky-800 dark:text-sky-300' },
 };
-
-async function gristFetch(path: string, init?: RequestInit): Promise<any> {
-  const r = await fetch(`${GRIST}/docs/${gristDocId()}/${path}`, {
-    ...init,
-    headers: { 'Content-Type': 'application/json', ...(init?.headers || {}) },
-  });
-  if (!r.ok) throw new Error(`Grist ${r.status}`);
-  return r.json();
-}
 
 export const NewsletterPanel: React.FC<{
   slug: string;
@@ -108,13 +98,10 @@ export const NewsletterPanel: React.FC<{
     [visible],
   );
 
-  const patchItem = async (id: number, fields: Record<string, string>) => {
+  const patchItem = async (id: number, fields: Partial<Record<NewsletterEditableField, string>>) => {
     setSavingId(id);
     try {
-      await gristFetch('tables/Newsletter/records', {
-        method: 'PATCH',
-        body: JSON.stringify({ records: [{ id, fields }] }),
-      });
+      await DirectoryApi.updateNewsletterItem(id, fields);
       setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...fields } as NlItem : i)));
       setError('');
     } catch (e: any) {
