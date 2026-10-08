@@ -154,6 +154,24 @@ function gristClient({ apiBase, doc, apiKey, fetchImpl = fetch, userAgent }) {
   };
 }
 
+/**
+ * Same interface over the storage client of the directory API (GristClient of lib/directory/repository.ts: server.cjs,
+ * druid-internal docs/plan-migration-postgresql.md, lot 3 c). `key` identifies the document (tables check cache).
+ */
+function storageClient(client, key) {
+  return {
+    key,
+    tables: async () => (await client.tableIds()).map((id) => ({ id })),
+    createTables: (tables) => client.addTables(tables),
+    records: (table, filter) => client.records(table, filter),
+    add: (table, rows) => client.addRecords(table, rows.map((fields) => ({ fields }))),
+    columns: (table) => client.columns(table),
+    addColumns: (table, columns) => client.addColumns(table, columns),
+    update: (table, rows) => client.updateRecords(table, rows),
+    remove: (table, ids) => client.deleteRecords(table, ids),
+  };
+}
+
 // Tables known to exist, per document (module state: one check per process / isolate).
 const readyDocs = new Map();
 function ensureTables(client) {
@@ -580,5 +598,5 @@ async function routeReports(store, user, { method, segments, body }) {
 module.exports = {
   REPORTS_TABLE, SHARES_TABLE, GENERATIONS_TABLE,
   REPORTS_COLUMNS, SHARES_COLUMNS, GENERATIONS_COLUMNS,
-  LIMITS, ReportsError, definitionProblem, gristClient, createReportsStore, routeReports,
+  LIMITS, ReportsError, definitionProblem, gristClient, storageClient, createReportsStore, routeReports,
 };

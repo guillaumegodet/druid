@@ -100,10 +100,12 @@ const toWebRequest = (req: NodeRequest): Request => {
   });
 };
 
-/** Express handler of `/api/v1/*`. */
-export const createApiV1Handler = (options: ApiV1Options) => {
+/**
+ * Directory storage of the server: Grist clients, repository, publications store and domain commands, created once and
+ * shared by `/api/v1` and the other routes of server.cjs (druid-internal docs/plan-migration-postgresql.md, lot 3 c).
+ */
+export const createServerStorage = (options: ApiV1Options) => {
   if (!options.gristDocId) throw new Error('VITE_GRIST_DOC_ID is not set: no directory document to serve');
-  const api = createDirectoryApi();
   const readers = new Map<string, GristClient>();
   const allowedDocs = new Set([options.gristDocId, ...(options.gristExtraDocIds || [])].filter(Boolean));
   const readerFor = (docId: string): GristClient | null => {
@@ -137,10 +139,15 @@ export const createApiV1Handler = (options: ApiV1Options) => {
       },
     },
   });
+  return { grist: main, repository, publications, commands, ldap, align };
+};
+export type ServerStorage = ReturnType<typeof createServerStorage>;
+
+/** Express handler of `/api/v1/*`. */
+export const createApiV1Handler = (storage: ServerStorage) => {
+  const api = createDirectoryApi();
   return async (req: NodeRequest, res: NodeResponse): Promise<void> => {
-    const response = await api.fetch(toWebRequest(req), {
-      repository, publications, commands, ldap, align, scope: scopeOfSession(req), writeRefusal: null,
-    });
+    const response = await api.fetch(toWebRequest(req), { ...storage, scope: scopeOfSession(req), writeRefusal: null });
     res.status(response.status);
     const audit = response.headers.get(AUDIT_HEADER);
     if (audit && res.locals) {

@@ -95,7 +95,9 @@ export const createGristReader = ({ apiBase, docId, apiKey, userAgent, fetch: fe
     const resp = await doFetch(url, { method, headers, body: body === undefined ? undefined : JSON.stringify(body) });
     if (!resp.ok) {
       const detail = (await resp.text().catch(() => '')).slice(0, 300);
-      throw new Error(`Grist HTTP ${resp.status} on ${method} ${url.slice(docUrl.length) || '/'}${detail ? `: ${detail}` : ''}`);
+      // `status` lets a caller tell a missing table (404) from a failure.
+      throw Object.assign(new Error(`Grist HTTP ${resp.status} on ${method} ${url.slice(docUrl.length) || '/'}${detail ? `: ${detail}` : ''}`),
+        { status: resp.status });
     }
     const text = await resp.text();
     return text ? JSON.parse(text) : null;
