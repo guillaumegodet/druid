@@ -15,13 +15,14 @@
 // Response: { created: NewsletterItem[], skipped: number, remaining: number }
 //
 // Environment variables:
-//   GRIST_API_KEY   (secret)   — already required by the Grist proxy
+//   GRIST_API_KEY   (secret)   — key of the directory storage (functions/_lib/storage.js)
 //   Grist doc and API base: grist of instance.json (functions/_lib/instance.js)
 //   ILAAS_API_KEY   (secret)   — ILAAS API key (https://llm.ilaas.fr)
 //   ILAAS_API_BASE  (var, opt) — default https://llm.ilaas.fr/v1
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 
 import { instanceEnv, instanceOf } from '../../_lib/instance.js'
+import { storageOf } from '../../_lib/storage.js'
 
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
@@ -182,22 +183,12 @@ export async function onRequestPost(context) {
   const limit = Math.min(6, Math.max(1, parseInt(body.limit, 10) || 4))
   const chars = Math.min(1000, Math.max(300, parseInt(body.chars, 10) || 300))
 
-  const { apiBase: gristBase, docId: doc } = instance.grist
-  const gristHeaders = {
-    Authorization: `Bearer ${env.GRIST_API_KEY}`,
-    'Content-Type': 'application/json',
-  }
+  // Storage client of the instance (functions/_lib/storage.js).
+  const { grist } = storageOf(context).store
 
   try {
     // 1. Briefs already in the table (any status) → a work_id is never regenerated.
-    const existingResp = await fetch(
-      `${gristBase}/docs/${doc}/tables/Newsletter/records?filter=${encodeURIComponent(JSON.stringify({ slug: [slug] }))}`,
-      { headers: gristHeaders },
-    )
-    if (!existingResp.ok) throw new Error(`Grist Newsletter HTTP ${existingResp.status}`)
-    const existing = new Set(
-      ((await existingResp.json()).records || []).map((r) => String(r.fields.work_id || '')),
-    )
+    const existing = new Set((await grist.records('Newsletter', { slug: [slug] })).map((r) => String(r.fields.work_id || '')))
 
     // 2. OpenAlex articles of the period (type article only).
     const from = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10)
@@ -216,14 +207,12 @@ export async function onRequestPost(context) {
     )
 
     // 3. Annuaire: normalized name → { nom, email } to associate the researcher.
-    const annuaireResp = await fetch(
-      `${gristBase}/docs/${doc}/tables/Annuaire/records`,
-      { headers: gristHeaders },
-    )
+    // An unreadable Annuaire leaves the briefs without researcher, as before.
+    const annuaireRows = await grist.records('Annuaire').catch(() => null)
     const labos = SLUG_LABOS[slug]
     const byName = new Map()
-    if (annuaireResp.ok) {
-      for (const r of (await annuaireResp.json()).records || []) {
+    if (annuaireRows) {
+      for (const r of annuaireRows) {
         const f = r.fields || {}
         if (labos && !labos.includes(String(f.LABO || '').toUpperCase())) continue
         const full = `${f.Prenom || ''} ${f.Nom || ''}`.trim()
@@ -306,14 +295,8 @@ export async function onRequestPost(context) {
         valide_par: '',
         commentaire: '',
       }
-      const add = await fetch(`${gristBase}/docs/${doc}/tables/Newsletter/records`, {
-        method: 'POST',
-        headers: gristHeaders,
-        body: JSON.stringify({ records: [{ fields }] }),
-      })
-      if (!add.ok) throw new Error(`Écriture Grist HTTP ${add.status}`)
-      const rec = (await add.json()).records?.[0]
-      created.push({ id: rec?.id ?? null, fields })
+      const [id] = await grist.addRecords('Newsletter', [{ fields }])
+      created.push({ id: id ?? null, fields })
     }
 
     return json({

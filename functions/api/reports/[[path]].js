@@ -1,6 +1,7 @@
 // Cloudflare Pages Function — « Mes rapports » API (docs/plan-mes-rapports.md, lots 2 and 9).
 // Equivalent of `app.all('/api/reports*')` in server.cjs: same routing, access control and Grist
-// storage, from the shared module scripts/lib/reports_store.cjs (bundled by esbuild).
+// storage, from the shared module scripts/lib/reports_store.cjs (bundled by esbuild), over the storage client of the
+// instance (functions/_lib/storage.js).
 //
 // Identity = Cloudflare Access (header Cf-Access-Authenticated-User-Email); without it the API
 // refuses (401), except locally with ALLOW_ANONYMOUS_WRITES=true (never on a shared deployment).
@@ -11,7 +12,7 @@
 // the instance slug (one bucket may serve a shared deployment). Without the binding, archiving is
 // off: the history keeps the metadata only.
 import reportsStore from '../../../scripts/lib/reports_store.cjs';
-import { instanceOf, secretOf } from '../../_lib/instance.js';
+import { storageOf } from '../../_lib/storage.js';
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), {
@@ -31,14 +32,13 @@ const r2Blobs = (bucket, prefix) => ({
 
 export async function onRequest(context) {
   const { request, env, params } = context;
-  const instance = instanceOf(context);
+  const { instance, apiKey, store: storage } = storageOf(context);
   if (instance.readOnly) return json(403, { error: 'Read-only instance: reports are kept in the browser' });
 
   const email = request.headers.get('Cf-Access-Authenticated-User-Email');
   const anonymousAllowed = !instance.shared && env.ALLOW_ANONYMOUS_WRITES === 'true';
   if (!email && !anonymousAllowed) return json(401, { error: 'Unauthorized' });
 
-  const apiKey = secretOf(env, instance, 'GRIST_API_KEY');
   if (!apiKey) return json(500, { error: 'GRIST_API_KEY not configured on Cloudflare' });
 
   let body;
@@ -57,12 +57,7 @@ export async function onRequest(context) {
     }
   }
   const store = reportsStore.createReportsStore(
-    reportsStore.gristClient({
-      apiBase: instance.grist.apiBase,
-      doc: instance.grist.docId,
-      apiKey,
-      userAgent: `Druid-CRISalid-${instance.slug}/1.0`,
-    }),
+    reportsStore.storageClient(storage.grist, `${instance.grist.apiBase}/${instance.grist.docId}`),
     { blobs: env.REPORT_PDFS ? r2Blobs(env.REPORT_PDFS, instance.slug) : null },
   );
   const user = {

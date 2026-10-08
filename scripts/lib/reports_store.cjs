@@ -122,41 +122,10 @@ function definitionProblem(def) {
 
 // ── Grist client ─────────────────────────────────────────────────────────────
 
-/** Minimal Grist REST client on one document. */
-function gristClient({ apiBase, doc, apiKey, fetchImpl = fetch, userAgent }) {
-  const headers = { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', Accept: 'application/json' };
-  if (userAgent) headers['User-Agent'] = userAgent;
-  const call = async (method, path, body) => {
-    const resp = await fetchImpl(`${apiBase}/docs/${doc}/${path}`, {
-      method,
-      headers,
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (${method} ${path.split('?')[0]})`);
-    const raw = await resp.text();
-    return raw ? JSON.parse(raw) : {};
-  };
-  return {
-    key: `${apiBase}/${doc}`,
-    tables: async () => (await call('GET', 'tables')).tables || [],
-    createTables: (tables) => call('POST', 'tables', { tables }),
-    records: async (table, filter) => {
-      const qs = filter ? `?filter=${encodeURIComponent(JSON.stringify(filter))}` : '';
-      return (await call('GET', `tables/${table}/records${qs}`)).records || [];
-    },
-    add: async (table, rows) =>
-      ((await call('POST', `tables/${table}/records`, { records: rows.map((fields) => ({ fields })) })).records || [])
-        .map((r) => r.id),
-    columns: async (table) => (await call('GET', `tables/${table}/columns`)).columns || [],
-    addColumns: (table, columns) => call('POST', `tables/${table}/columns`, { columns }),
-    update: (table, rows) => call('PATCH', `tables/${table}/records`, { records: rows }),
-    remove: (table, ids) => call('POST', `tables/${table}/data/delete`, ids),
-  };
-}
-
 /**
- * Same interface over the storage client of the directory API (GristClient of lib/directory/repository.ts: server.cjs,
- * druid-internal docs/plan-migration-postgresql.md, lot 3 c). `key` identifies the document (tables check cache).
+ * Grist access of the store over the storage client of the directory API (GristClient of lib/directory/repository.ts:
+ * server.cjs and functions/_lib/storage.js, druid-internal docs/plan-migration-postgresql.md, lot 3). `key` identifies
+ * the document (tables check cache).
  */
 function storageClient(client, key) {
   return {
@@ -201,7 +170,7 @@ function ensureTables(client) {
 // ── Store ────────────────────────────────────────────────────────────────────
 
 /**
- * @param client gristClient(...) (or a fake with the same methods, in tests)
+ * @param client storageClient(...) (or a fake with the same methods, in tests)
  * @param opts.now clock, injectable for tests
  * @param opts.blobs storage of the archived PDFs — { put(key, bytes), get(key) → bytes | null,
  *   remove(key) } — provided by each runtime (Nantes: a directory of the container volume;
@@ -598,5 +567,5 @@ async function routeReports(store, user, { method, segments, body }) {
 module.exports = {
   REPORTS_TABLE, SHARES_TABLE, GENERATIONS_TABLE,
   REPORTS_COLUMNS, SHARES_COLUMNS, GENERATIONS_COLUMNS,
-  LIMITS, ReportsError, definitionProblem, gristClient, storageClient, createReportsStore, routeReports,
+  LIMITS, ReportsError, definitionProblem, storageClient, createReportsStore, routeReports,
 };

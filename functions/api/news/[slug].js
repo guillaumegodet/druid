@@ -9,6 +9,7 @@
 // Druid groups on this instance. Cache: Cloudflare Cache API, 1 h.
 
 import { instanceEnv, instanceOf } from '../../_lib/instance.js'
+import { storageOf } from '../../_lib/storage.js'
 
 const NEWS_MAX_WORKS = 600
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
@@ -62,16 +63,11 @@ const normName = (s) =>
     .filter(Boolean)
     .join(' ')
 
-/** Grist Annuaire → Map normalized name → record (name, email, photo, url). */
-async function fetchEffectifs(env, slug, grist) {
+/** Grist Annuaire (storage client of the instance) → Map normalized name → record (name, email, photo, url). */
+async function fetchEffectifs(slug, grist) {
   const labos = SLUG_LABOS[slug]
-  const { apiBase: base, docId: doc } = grist
-  const r = await fetch(`${base}/docs/${doc}/tables/Annuaire/records`, {
-    headers: { Authorization: `Bearer ${env.GRIST_API_KEY}` },
-  })
-  if (!r.ok) throw new Error(`Grist Annuaire HTTP ${r.status}`)
   const byName = new Map()
-  for (const rec of (await r.json()).records || []) {
+  for (const rec of await grist.records('Annuaire')) {
     const f = rec.fields || {}
     if (labos && !labos.includes(String(f.LABO || '').toUpperCase())) continue
     const full = `${f.Prenom || ''} ${f.Nom || ''}`.trim()
@@ -214,7 +210,7 @@ export async function onRequestGet(context) {
     let byName = null
     if (env.GRIST_API_KEY) {
       try {
-        byName = await fetchEffectifs(env, slug, instance.grist)
+        byName = await fetchEffectifs(slug, storageOf(context).store.grist)
       } catch (e) {
         byName = null
       }
