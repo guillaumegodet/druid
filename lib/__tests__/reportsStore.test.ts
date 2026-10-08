@@ -14,7 +14,7 @@ const store = createRequire(import.meta.url)('../../scripts/lib/reports_store.cj
 type Row = { id: number; fields: Record<string, unknown> };
 let docSeq = 0;
 
-/** In-memory Grist with the methods of gristClient(). */
+/** In-memory Grist with the methods of storageClient(). */
 function fakeGrist(existing: Record<string, string[]> = {}) {
   const tables = new Map<string, Row[]>();
   const columns = new Map<string, string[]>();
@@ -301,60 +301,45 @@ describe('fsBlobs (Nantes PDF archive)', () => {
   });
 });
 
-describe('gristClient', () => {
-  it('calls the Grist REST API of one document with the key', async () => {
-    const seen: { url: string; init: RequestInit }[] = [];
-    const fetchImpl = async (url: string, init: RequestInit) => {
-      seen.push({ url, init });
-      return new Response(JSON.stringify({ records: [{ id: 3, fields: {} }] }), { status: 200 });
-    };
-    const c = store.gristClient({ apiBase: 'https://grist.example.org/api', doc: 'DOC', apiKey: 'k', fetchImpl });
-    await c.records('Rapports_partages', { grantee: ['bob'] });
-    expect(await c.add('Rapports', [{ name: 'x' }])).toEqual([3]);
-    await c.remove('Rapports_partages', [4]);
-    expect(seen.map((s) => `${s.init.method} ${decodeURIComponent(s.url)}`)).toEqual([
-      'GET https://grist.example.org/api/docs/DOC/tables/Rapports_partages/records?filter={"grantee":["bob"]}',
-      'POST https://grist.example.org/api/docs/DOC/tables/Rapports/records',
-      'POST https://grist.example.org/api/docs/DOC/tables/Rapports_partages/data/delete',
-    ]);
-    expect((seen[0].init.headers as Record<string, string>).Authorization).toBe('Bearer k');
-    expect(seen[1].init.body).toBe('{"records":[{"fields":{"name":"x"}}]}');
-  });
-});
-
-describe('storageClient (druid-internal docs/plan-migration-postgresql.md, lot 3 c)', () => {
-  it('sends the same requests as gristClient, through the client of the directory API', async () => {
-    const record = (seen: string[]) => async (url: string, init: RequestInit = {}) => {
-      seen.push(`${init.method || 'GET'} ${decodeURIComponent(url)} ${init.body ?? ''}`);
+describe('storageClient (druid-internal docs/plan-migration-postgresql.md, lot 3)', () => {
+  it('reaches the Grist REST API of one document through the client of the directory API', async () => {
+    const seen: string[] = [];
+    let auth = '';
+    const fetchImpl = async (url: string, init: RequestInit = {}) => {
+      seen.push(`${init.method || 'GET'} ${decodeURIComponent(url).replace('https://grist.example.org/api/docs/DOC', '')} ${init.body ?? ''}`.trim());
+      auth = (init.headers as Record<string, string>).Authorization;
       const path = new URL(url).pathname;
       const body = path.endsWith('/tables') ? { tables: [{ id: 'Rapports' }] }
         : path.endsWith('/columns') ? { columns: [{ id: 'name', fields: {} }] }
           : { records: [{ id: 3, fields: { name: 'x' } }] };
       return new Response(JSON.stringify(body), { status: 200 });
     };
-    const exercise = async (c: any) => [
-      await c.tables(),
-      await c.records('Rapports_partages', { grantee: ['bob'] }),
-      await c.add('Rapports', [{ name: 'x' }]),
-      await c.columns('Rapports'),
-      await c.addColumns('Rapports', [{ id: 'y', fields: { type: 'Text' } }]),
-      await c.createTables([{ id: 'T', columns: [] }]),
-      await c.update('Rapports', [{ id: 3, fields: { name: 'z' } }]),
-      await c.remove('Rapports_partages', [4]),
-    ];
-    const formerSeen: string[] = [];
-    const former = store.gristClient({ apiBase: 'https://grist.example.org/api', doc: 'DOC', apiKey: 'k', fetchImpl: record(formerSeen) });
-    const currentSeen: string[] = [];
     const { createGristReader } = await import('../directory/repository');
-    const current = store.storageClient(
-      createGristReader({ apiBase: 'https://grist.example.org/api', docId: 'DOC', apiKey: 'k', fetch: record(currentSeen) as typeof fetch }),
-      former.key,
+    const c = store.storageClient(
+      createGristReader({ apiBase: 'https://grist.example.org/api', docId: 'DOC', apiKey: 'k', fetch: fetchImpl as typeof fetch }),
+      'https://grist.example.org/api/DOC',
     );
-    const [a, b] = [await exercise(former), await exercise(current)];
-    expect(currentSeen).toEqual(formerSeen);
-    expect(current.key).toBe(former.key);
-    // Reads give the same values; the write results are not used by the store.
-    expect(b.slice(0, 4)).toEqual(a.slice(0, 4));
+    expect(c.key).toBe('https://grist.example.org/api/DOC');
+    expect(await c.tables()).toEqual([{ id: 'Rapports' }]);
+    expect(await c.records('Rapports_partages', { grantee: ['bob'] })).toEqual([{ id: 3, fields: { name: 'x' } }]);
+    expect(await c.add('Rapports', [{ name: 'x' }])).toEqual([3]);
+    expect(await c.columns('Rapports')).toEqual([{ id: 'name', fields: {} }]);
+    await c.addColumns('Rapports', [{ id: 'y', fields: { type: 'Text' } }]);
+    await c.createTables([{ id: 'T', columns: [] }]);
+    await c.update('Rapports', [{ id: 3, fields: { name: 'z' } }]);
+    await c.remove('Rapports_partages', [4]);
+    // The requests of the former reports_store.gristClient, one for one.
+    expect(seen).toEqual([
+      'GET /tables',
+      'GET /tables/Rapports_partages/records?filter={"grantee":["bob"]}',
+      'POST /tables/Rapports/records {"records":[{"fields":{"name":"x"}}]}',
+      'GET /tables/Rapports/columns',
+      'POST /tables/Rapports/columns {"columns":[{"id":"y","fields":{"type":"Text"}}]}',
+      'POST /tables {"tables":[{"id":"T","columns":[]}]}',
+      'PATCH /tables/Rapports/records {"records":[{"id":3,"fields":{"name":"z"}}]}',
+      'POST /tables/Rapports_partages/data/delete [4]',
+    ]);
+    expect(auth).toBe('Bearer k');
   });
 });
 

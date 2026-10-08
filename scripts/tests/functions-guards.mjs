@@ -1,7 +1,8 @@
 // Run: docker run --rm -v "$PWD":/app -w /app node:20-slim node scripts/tests/functions-guards.mjs
-// Harness for the Pages Functions: shape of /api/me (functions/api/me.js), instance registry and resolution,
-// Centrale-only routes. The domain API (functions/api/v1) imports TypeScript: tested by vitest
-// (lib/__tests__/functionsApiV1.test.ts), which took over the security cases of the former Grist proxy. No network: the guards are called directly.
+// Harness for the Pages Functions: shape of /api/me (functions/api/me.js), instance registry and resolution, per-instance
+// files. The Functions that reach the directory import TypeScript (functions/_lib/storage.js): tested by vitest —
+// lib/__tests__/functionsApiV1.test.ts (security cases of the former Grist proxy) and functionsCentrale.test.ts (news,
+// newsletter, reports). No network: the guards are called directly.
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 
@@ -22,9 +23,6 @@ if (!fs.existsSync(GENERATED)) {
 const { buildUser, parseAdminEmails, capabilitiesFor, onRequest: me } = await import('../../functions/api/me.js');
 const { resolveInstance, resolveForHost, publicInstanceInfo, secretOf, secretSuffix, instanceEnv } = await import('../../functions/_lib/instance.js');
 const { onRequest: middleware } = await import('../../functions/api/_middleware.js');
-const { onRequestGet: news } = await import('../../functions/api/news/[slug].js');
-const { onRequestPost: newsletterGenerate } = await import('../../functions/api/newsletter/generate.js');
-const { onRequestPost: newsletterPost } = await import('../../functions/api/newsletter/post.js');
 const { instanceAssetPath, serveInstanceAsset, denyDirectAccess } = await import('../../functions/_lib/instanceAssets.js');
 const { buildRegistry, parseInstanceConfig } = createRequire(import.meta.url)('../instances/instanceConfig.cjs');
 
@@ -136,9 +134,8 @@ check('single: own secret, then the plain one',
 const d2env = instanceEnv({ GRIST_API_KEY: 'common', ILAAS_API_KEY__DEMO_2: 'i2', ILAAS_MODEL: 'm' }, d2);
 check('instanceEnv on a shared deployment', [d2env.GRIST_API_KEY, d2env.ILAAS_API_KEY, d2env.ILAAS_MODEL], [undefined, 'i2', 'm']);
 
-// Handlers (no network: fetch is stubbed and records the upstream call)
-let upstream = null;
-globalThis.fetch = async (url, init) => { upstream = { url: String(url), init }; return new Response('{"records":[]}', { status: 200 }); };
+// Handlers (no network: fetch is stubbed)
+globalThis.fetch = async () => new Response('{"records":[]}', { status: 200 });
 const req = (url, init = {}) => new Request(`https://demo.example${url}`, init);
 const asJson = async (res) => ({ status: res.status, body: await res.json() });
 
@@ -163,14 +160,9 @@ const sharedCall = (handler, host, path, instance, env, init = {}, params = {}) 
 const ecoleShared = resolveInstance({}, privReg, { shared: true });
 const meD2 = await asJson(await sharedCall(me, 'demo-2.example.org', '/api/me', d2, { ADMIN_EMAILS: 'a@x.fr' }));
 check('shared /api/me: instance block of the host', [meD2.body.instance.slug, meD2.body.instance.gristDocId, meD2.body.capabilities.READ_ONLY], ['demo-2', 'docDemo20002', true]);
-// Centrale-only routes answer 404 on another instance (no upstream call)
-upstream = null;
-let r = await news({ request: req('/api/news/udemo'), params: { slug: 'udemo' }, env: DEMO_ENV });
-check('news on demo: 404', [r.status, upstream], [404, null]);
-r = await newsletterGenerate({ request: req('/api/newsletter/generate', { method: 'POST', body: '{}' }), env: DEMO_ENV });
-check('newsletter/generate on demo: 404', r.status, 404);
-r = await newsletterPost({ request: req('/api/newsletter/post', { method: 'POST', body: '{}' }), env: DEMO_ENV });
-check('newsletter/post on demo: 404', r.status, 404);
+// Centrale-only routes (news, newsletter) import the directory storage (TypeScript): tested by vitest
+// (lib/__tests__/functionsCentrale.test.ts).
+let r;
 
 // Per-instance files of a shared deployment (functions/_lib/instanceAssets.js, lot 6 D5)
 check('assets: dashboard file of the instance', instanceAssetPath('demo-2', '/dashboard-data/eidemo/dashboard.json.gz'),
