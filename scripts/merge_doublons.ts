@@ -2,8 +2,9 @@
  * Bulk processing of the `uid_dyna` duplicates of the Grist Annuaire
  * (docs/archive/plan-fusion-doublons.md, lot 3). DRY-RUN by default.
  *
- * Reuses the logic of the merge assistant (`lib/mergeProposal.ts`) and the
- * `Fusions_log` journal (`lib/mergeLog.ts`): same rules, same traceability, same restore.
+ * Reuses the logic of the merge assistant (`lib/mergeProposal.ts`) and the merge command of the domain API
+ * (`mergeRows`, lib/directory/commands.ts: `Fusions_log` journal, then PATCH, then delete): same rules, same
+ * traceability, same restore. Reads and writes go through the storage of the jobs (lib/directory/jobStorage.ts).
  *
  * Automatic scope: « même labo » groups (probable duplicate) and « parking » groups (`zzz`/empty
  * row absorbed into the lab row), when no value conflict remains other than
@@ -19,11 +20,8 @@ import {
   buildMergeProposal, pickDefaultKeep, resolveMergeFields, classifyDuplicate, autoMergeEligibility,
   MergeRow, MergeColumnMeta, LdapDuplicateKind,
 } from '../lib/mergeProposal';
-import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from '../lib/mergeLog';
+import { jobContext, jobStorageFromEnv } from '../lib/directory/jobStorage';
 
-const GRIST_BASE = 'https://grist.numerique.gouv.fr/api';
-const DOC = process.env.VITE_GRIST_DOC_ID;
-const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;
 const AUTHOR = process.env.MERGE_AUTHOR || 'merge_doublons (script)';
 
 const args = process.argv.slice(2);
@@ -33,15 +31,6 @@ const KIND = opt('--kind') as LdapDuplicateKind | undefined;
 const UID = opt('--uid');
 const LIMIT = Number(opt('--limit') || 0);
 const OUT = opt('--out') || 'scripts/.build/merge_doublons_plan.json';
-
-async function grist(path: string, init: RequestInit = {}): Promise<any> {
-  const r = await fetch(`${GRIST_BASE}/docs/${DOC}/${path}`, {
-    ...init, headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', ...(init.headers || {}) },
-  });
-  const text = await r.text();
-  if (!r.ok) throw new Error(`Grist ${init.method || 'GET'} ${path} → ${r.status} ${text.slice(0, 300)}`);
-  return text ? JSON.parse(text) : null;
-}
 
 interface PlanItem {
   uid: string; kind: LdapDuplicateKind; keepRowId: number; dropRowId: number;
@@ -53,13 +42,13 @@ interface PlanItem {
 const label = (r: MergeRow) => `${r.fields['Prenom'] || ''} ${r.fields['Nom'] || ''} (${r.fields['LABO'] || '∅'}${r.fields['validated'] ? ', validée' : ''}) G-${r.rowId}`;
 
 async function main() {
-  if (!DOC || !KEY) throw new Error('VITE_GRIST_DOC_ID / GRIST_API_KEY not configured');
-  const { columns: rawCols } = await grist('tables/Annuaire/columns');
+  const { grist, commands } = jobStorageFromEnv(process.env, 'Druid-CRISalid-merge_doublons/1.0');
+  const rawCols = await grist.columns('Annuaire');
   const columns: MergeColumnMeta[] = rawCols.map((c: any) => ({
     id: c.id, label: c.fields?.label || c.id, type: c.fields?.type || 'Any', isFormula: !!c.fields?.isFormula,
   }));
   const writable = new Set(columns.filter((c) => !c.isFormula).map((c) => c.id));
-  const { records } = await grist('tables/Annuaire/records');
+  const records = await grist.records('Annuaire');
 
   // Groups by uid_dyna (≥ 2 rows)
   const byUid = new Map<string, MergeRow[]>();
@@ -122,35 +111,24 @@ async function main() {
 
   if (!APPLY) { console.log('\n>>> DRY-RUN: rerun with --apply to merge the eligible groups.'); return; }
 
-  // ── Apply: journal → PATCH → delete, group by group (one failure does not stop the others)
-  const { tables } = await grist('tables');
-  if (!tables.some((t: any) => t.id === MERGE_LOG_TABLE)) {
-    await grist('tables', { method: 'POST', body: JSON.stringify({ tables: [{ id: MERGE_LOG_TABLE, columns: buildMergeLogColumns() }] }) });
-    console.log(`Table ${MERGE_LOG_TABLE} created.`);
-  }
+  // ── Apply: journal → PATCH → delete (mergeRows, which creates the journal table when missing), group by group
+  // (one failure does not stop the others).
+  const ctx = jobContext((w) => { if (w.kind === 'table') console.log(`Table ${w.table} created.`); });
   const todo = LIMIT > 0 ? eligible.slice(0, LIMIT) : eligible;
   let ok = 0, ko = 0;
   for (const p of todo) {
     try {
       // Fresh re-read: the row may have changed since the dry-run.
-      const { records: fresh } = await grist(`tables/Annuaire/records?filter=${encodeURIComponent(JSON.stringify({ id: [p.keepRowId, p.dropRowId] }))}`);
-      const keep = fresh.find((r: any) => r.id === p.keepRowId); const drop = fresh.find((r: any) => r.id === p.dropRowId);
+      const fresh = await grist.records('Annuaire', { id: [p.keepRowId, p.dropRowId] });
+      const keep = fresh.find((r) => r.id === p.keepRowId); const drop = fresh.find((r) => r.id === p.dropRowId);
       if (!keep || !drop) throw new Error('one of the rows no longer exists');
       const keepRow = { rowId: keep.id, fields: keep.fields }; const dropRow = { rowId: drop.id, fields: drop.fields };
       const proposal = buildMergeProposal(keepRow, dropRow, columns);
       const reasons = autoMergeEligibility(proposal, p.kind);
       if (reasons.length) throw new Error(`no longer eligible: ${reasons.join('; ')}`);
-      const patchAll = resolveMergeFields(proposal, new Date().toISOString().slice(0, 10));
-      const patch: Record<string, any> = {};
-      for (const [k, v] of Object.entries(patchAll)) if (writable.has(k)) patch[k] = v;
-      const log = await grist(`tables/${MERGE_LOG_TABLE}/records`, {
-        method: 'POST', body: JSON.stringify({ records: [{ fields: buildMergeLogRow({ keep: keepRow, drop: dropRow, patch, author: AUTHOR, note: `script lot 3 (${p.kind})` }) }] }),
-      });
-      const logId = log.records[0].id;
-      if (Object.keys(patch).length) {
-        await grist('tables/Annuaire/records', { method: 'PATCH', body: JSON.stringify({ records: [{ id: p.keepRowId, fields: patch }] }) });
-      }
-      await grist('tables/Annuaire/data/delete', { method: 'POST', body: JSON.stringify([p.dropRowId]) });
+      // mergeRows keeps the writable columns only, as the dry-run plan.
+      const fields = resolveMergeFields(proposal, new Date().toISOString().slice(0, 10));
+      const { logId } = await commands.mergeRows({ keepRowId: p.keepRowId, dropRowId: p.dropRowId, fields, author: AUTHOR, note: `script lot 3 (${p.kind})` }, ctx);
       ok++;
       console.log(`  ✓ ${p.uid} : G-${p.dropRowId} → G-${p.keepRowId} (journal #${logId})`);
     } catch (e: any) {
