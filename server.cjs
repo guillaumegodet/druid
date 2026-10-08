@@ -1984,142 +1984,23 @@ etlStructures.post('/:slug/corrections/:id', (req, res) => {
 });
 app.use('/api/etl/structures', etlStructures);
 
-// ── Saved Benchmark peer lists (Benchmark tab) ─────────────────────────────
-// Unlike the Euniwell group (a fixed institutional fact, hard-coded in
-// benchmarkAggregates.ts), a list here is a *personal* preference:
-// tied to the Keycloak profile (owner = req.session.user.preferred_username,
-// never to the request body — otherwise any caller could read/overwrite
-// someone else's lists) rather than to the browser's localStorage like
-// the rest of the tab (usePersistedState in BenchmarkTab.tsx). Grist table
-// BENCHMARK_PEER_GROUPS_TABLE, auto-provisioned on first use (same
-// principle as pushIdrefReview in lib/gristService.ts).
-const BENCHMARK_PEER_GROUPS_TABLE = 'BenchmarkPeerGroups';
-const ensureBenchmarkPeerGroupsTable = async (grist) => {
-  if ((await grist.tableIds()).includes(BENCHMARK_PEER_GROUPS_TABLE)) return;
-  await grist.addTables([{
-    id: BENCHMARK_PEER_GROUPS_TABLE,
-    columns: [
-      { id: 'owner', fields: { label: 'Propriétaire (Keycloak)', type: 'Text' } },
-      { id: 'name', fields: { label: 'Nom de la liste', type: 'Text' } },
-      { id: 'rors', fields: { label: 'ROR (JSON)', type: 'Text' } },
-      { id: 'updated_at', fields: { label: 'Mis à jour le', type: 'Text' } },
-    ],
-  }]);
-};
-
-app.get('/api/benchmark/peer-groups', async (req, res) => {
-  const doc = process.env.VITE_GRIST_DOC_ID;
-  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
-  try {
-    const grist = gristClient();
-    await ensureBenchmarkPeerGroupsTable(grist);
-    const owner = req.session.user.preferred_username;
-    const records = await grist.records(BENCHMARK_PEER_GROUPS_TABLE, { owner: [owner] });
-    res.json({
-      groups: records
-        .map((r) => {
-          let rors = [];
-          try { rors = JSON.parse(r.fields.rors || '[]'); } catch { /* corrupted list → ignored */ }
-          return { id: r.id, name: r.fields.name, rors, updatedAt: r.fields.updated_at || null };
-        })
-        .sort((a, b) => a.name.localeCompare(b.name, 'fr')),
-    });
-  } catch (e) {
-    res.status(502).json({ error: e.message });
-  }
-});
-
-app.post('/api/benchmark/peer-groups', async (req, res) => {
-  const doc = process.env.VITE_GRIST_DOC_ID;
-  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
-  const owner = req.session.user.preferred_username;
-  const name = String(req.body?.name || '').trim();
-  const rors = Array.isArray(req.body?.rors) ? req.body.rors.filter((r) => typeof r === 'string' && r) : [];
-  if (!name) return res.status(400).json({ error: 'Name required' });
-  if (rors.length === 0) return res.status(400).json({ error: 'Empty list' });
-  try {
-    const grist = gristClient();
-    await ensureBenchmarkPeerGroupsTable(grist);
-    // Saving again under a name already used by this same user updates the
-    // existing list rather than creating a second one with the same name.
-    const existing = await grist.records(BENCHMARK_PEER_GROUPS_TABLE, { owner: [owner], name: [name] });
-    const fields = { owner, name, rors: JSON.stringify(rors), updated_at: new Date().toISOString() };
-    let id;
-    if (existing.length > 0) {
-      id = existing[0].id;
-      await grist.updateRecords(BENCHMARK_PEER_GROUPS_TABLE, [{ id, fields }]);
-    } else {
-      [id = null] = await grist.addRecords(BENCHMARK_PEER_GROUPS_TABLE, [{ fields }]);
-    }
-    res.json({ id, name, rors });
-  } catch (e) {
-    res.status(502).json({ error: e.message });
-  }
-});
-
-app.delete('/api/benchmark/peer-groups/:id', async (req, res) => {
-  const doc = process.env.VITE_GRIST_DOC_ID;
-  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
-  const id = parseInt(req.params.id, 10);
-  if (!Number.isFinite(id)) return res.status(400).json({ error: 'Invalid id' });
-  try {
-    const grist = gristClient();
-    const owner = req.session.user.preferred_username;
-    // Checks ownership before deletion via the owner filter (already used above)
-    // rather than a filter on `id` — the Grist API only guarantees filter on
-    // columns, not on the row id. A Grist id is anyway a guessable sequential
-    // integer, not a secret: never trust the client-supplied id alone.
-    const rec = (await grist.records(BENCHMARK_PEER_GROUPS_TABLE, { owner: [owner] })).find((r) => r.id === id);
-    if (!rec) return res.status(404).json({ error: 'Not found' });
-    await grist.deleteRecords(BENCHMARK_PEER_GROUPS_TABLE, [id]);
-    res.json({ ok: true });
-  } catch (e) {
-    res.status(502).json({ error: e.message });
-  }
-});
-
-// ── « À traiter › Tâches »: tasks to carry out outside Druid ───────────────
-// docs/plan-chantiers-taches.md, lot 1. Grist tables `Taches` +
-// `Taches_evenements` (schema shared with the scripts in
-// scripts/lib/tasks_schema.cjs, auto-provisioned on first use). Admin-only
-// (decision of 2026-09-23, same scope as the « Doublons » page). The author of
-// every write is the Keycloak session, never the request body.
+// ── Work tables: tasks, import arbitrations, peer lists, reports ───────────
+// druid-internal docs/plan-migration-postgresql.md, lot 6 e: the « À traiter » routes go through the services of
+// scripts/lib/work_services.cjs, the peer lists and the reports through storage ports (Grist: work_grist.cjs;
+// PostgreSQL: lib/work/pg in server-api.cjs). Ports per request: the PostgreSQL writes are audited under the user.
+const workServices = require('./scripts/lib/work_services.cjs');
+const { gristWorkPorts } = require('./scripts/lib/work_grist.cjs');
 const tasksSchema = require('./scripts/lib/tasks_schema.cjs');
-const tasksDocId = () => process.env.VITE_GRIST_DOC_ID;
-let tasksTablesReady = false;
-const ensureTasksTablesOnce = async () => {
-  if (tasksTablesReady) return;
-  await tasksSchema.ensureTasksTablesWith(gristClient(), console.log);
-  tasksTablesReady = true;
-};
-const gristTasksGet = (table, filter) => gristClient().records(table, filter);
-/** POST → [{ id }] of the new rows; PATCH → []. */
-const gristTasksWrite = async (table, method, records) => {
-  if (method === 'POST') return (await gristClient().addRecords(table, records)).map((id) => ({ id }));
-  await gristClient().updateRecords(table, records);
-  return [];
-};
+const importConflicts = require('./scripts/lib/import_conflicts.cjs');
+const workPorts = () => gristWorkPorts(gristClient(), { key: `${GRIST_API_BASE}/${process.env.VITE_GRIST_DOC_ID}`, log: console.log });
 const taskAuthor = (req) => req.session.user.preferred_username || req.session.user.email || req.session.user.name || 'druid';
-/** Grist row → API shape (statut normalised: an empty status typed in Grist reads as `a_faire`). */
-const taskOut = (r) => ({ id: r.id, ...r.fields, statut: tasksSchema.statusOf(r.fields), chercheur: r.fields.chercheur || 0 });
-const taskEventOut = (r) => ({ id: r.id, tache: r.fields.tache, date: r.fields.date, auteur: r.fields.auteur, action: r.fields.action, detail: r.fields.detail || '' });
-const appendTaskEvent = (tache, ev) =>
-  gristTasksWrite(tasksSchema.EVENTS_TABLE, 'POST', [{ fields: { tache, ...ev } }]);
-const taskErrorStatus = (e) => (e instanceof tasksSchema.TaskInputError ? 400 : 502);
-/** Loads one task by id (the Grist filter works on columns only, so the id is checked locally). */
-const loadTask = async (id) => {
-  const rec = (await gristTasksGet(tasksSchema.TASKS_TABLE)).find((r) => r.id === id);
-  if (!rec) { const err = new Error('Task not found'); err.status = 404; throw err; }
-  return rec;
-};
+/** Task routes: the service of the request's ports; errors answered with their status (input → 400, storage → 502). */
 const withTasks = (handler) => async (req, res) => {
-  const doc = tasksDocId();
-  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+  if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    await ensureTasksTablesOnce();
-    await handler(req, res);
+    await handler(req, res, workServices.createTasksService(workPorts().tasks));
   } catch (e) {
-    res.status(e.status || taskErrorStatus(e)).json({ error: e.message });
+    res.status(workServices.workErrorStatus(e)).json({ error: e.message });
   }
 };
 const parseTaskId = (req, res) => {
@@ -2127,6 +2008,46 @@ const parseTaskId = (req, res) => {
   if (!Number.isFinite(id) || id <= 0) { res.status(400).json({ error: 'Invalid id' }); return null; }
   return id;
 };
+
+// Saved Benchmark peer lists (Benchmark tab). Unlike the Euniwell group (a fixed institutional fact, hard-coded in
+// benchmarkAggregates.ts), a list is a *personal* preference tied to the Keycloak profile (owner =
+// req.session.user.preferred_username, never the request body — otherwise any caller could read or overwrite
+// someone else's lists) rather than to the browser's localStorage like the rest of the tab.
+app.get('/api/benchmark/peer-groups', async (req, res) => {
+  if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+  try {
+    res.json({ groups: await workPorts().peerGroups.list(req.session.user.preferred_username) });
+  } catch (e) {
+    res.status(502).json({ error: e.message });
+  }
+});
+
+app.post('/api/benchmark/peer-groups', async (req, res) => {
+  if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+  const owner = req.session.user.preferred_username;
+  const name = String(req.body?.name || '').trim();
+  const rors = Array.isArray(req.body?.rors) ? req.body.rors.filter((r) => typeof r === 'string' && r) : [];
+  if (!name) return res.status(400).json({ error: 'Name required' });
+  if (rors.length === 0) return res.status(400).json({ error: 'Empty list' });
+  try {
+    const id = await workPorts().peerGroups.save(owner, name, rors);
+    res.json({ id, name, rors });
+  } catch (e) {
+    res.status(502).json({ error: e.message });
+  }
+});
+
+app.delete('/api/benchmark/peer-groups/:id', async (req, res) => {
+  if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isFinite(id)) return res.status(400).json({ error: 'Invalid id' });
+  try {
+    if (!(await workPorts().peerGroups.remove(req.session.user.preferred_username, id))) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(502).json({ error: e.message });
+  }
+});
 
 // ── « Mes rapports » (docs/plan-mes-rapports.md, lot 2) ──────────────────────
 // Reports, shares and generation history in the Rapports* tables of the Grist doc. Routing,
@@ -2148,7 +2069,7 @@ app.all(
     if (!GRIST_API_KEY) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
     const sessionUser = req.session.user;
     if (!sessionUser?.preferred_username) return res.status(401).json({ error: 'Unauthorized' });
-    const store = reportsStore.createReportsStore(reportsStore.storageClient(gristClient(), `${GRIST_API_BASE}/${doc}`), { blobs: reportBlobs });
+    const store = reportsStore.createReportsStore(workPorts().reports, { blobs: reportBlobs });
     const user = { id: sessionUser.preferred_username, isSuperAdmin: !!sessionUser.access?.isSuperAdmin };
     const out = await reportsStore.routeReports(store, user, {
       method: req.method,
@@ -2206,25 +2127,15 @@ app.get('/api/tasks/detect/progress', requireSuperAdmin, (req, res) => {
 // ABES export marked as sent (docs/plan-chantiers-taches.md, lot 6): closes the open `lot_abes`
 // tasks covered by the exported rows. Body { date, items: [{ rowId, uid, types }] } built by
 // AbesExportModal from lib/abesExport.ts abesTaskTypes; matching in tasks_schema.abesSentPatches.
-app.post('/api/tasks/abes-sent', requireSuperAdmin, withTasks(async (req, res) => {
-  const date = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body?.date || '')) ? req.body.date : new Date().toISOString().slice(0, 10);
-  const items = (Array.isArray(req.body?.items) ? req.body.items : []).slice(0, 20000).map((it) => ({
-    rowId: Number.isInteger(it?.rowId) ? it.rowId : 0,
-    uid: String(it?.uid || '').slice(0, 64),
-    types: (Array.isArray(it?.types) ? it.types : []).filter((x) => tasksSchema.TASK_TYPES[x]),
-  }));
-  const tasks = await gristTasksGet(tasksSchema.TASKS_TABLE);
-  const { patches, events } = tasksSchema.abesSentPatches(tasks, items, { author: taskAuthor(req), date });
-  for (let i = 0; i < patches.length; i += 100) await gristTasksWrite(tasksSchema.TASKS_TABLE, 'PATCH', patches.slice(i, i + 100));
-  for (let i = 0; i < events.length; i += 100) await gristTasksWrite(tasksSchema.EVENTS_TABLE, 'POST', events.slice(i, i + 100).map((fields) => ({ fields })));
-  res.json({ closed: patches.length });
+app.post('/api/tasks/abes-sent', requireSuperAdmin, withTasks(async (req, res, tasks) => {
+  res.json(await tasks.abesSent(req.body, taskAuthor(req)));
 }));
 
 // « À traiter › Affiliations OpenAlex » tab (lot 6): read-only view of the suspicious OpenAlex
 // affiliations detected by the ETL console (Grist table Corrections_affiliations_Openalex, edited
 // in Administration › ETL console). Missing table ⇒ empty list.
 app.get('/api/tasks/openalex-affiliations', requireSuperAdmin, async (req, res) => {
-  const doc = tasksDocId();
+  const doc = process.env.VITE_GRIST_DOC_ID;
   if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
     const rows = await gristClient().records('Corrections_affiliations_Openalex').catch((e) => {
@@ -2238,158 +2149,66 @@ app.get('/api/tasks/openalex-affiliations', requireSuperAdmin, async (req, res) 
   }
 });
 
-// « À traiter › Conflits annuaire <source> »: arbitration of the conflicts left by a directory
-// import (Grist tables `Arbitrage_*`, scripts/lib/import_conflicts.cjs). Admin-only, like the
-// other « À traiter » tabs; every choice is written with the author of the Keycloak session.
-const importConflicts = require('./scripts/lib/import_conflicts.cjs');
-/** Annuaire column types + label maps of its Ref columns (id ↔ label). */
-const loadAnnuaireMeta = async () => {
-  const columns = await gristClient().columns(importConflicts.ANNUAIRE);
-  const colTypes = new Map(columns.map((c) => [c.id, c.fields.type]));
-  const refLabels = new Map();
-  const refIds = new Map();
-  for (const c of columns) {
-    const target = String(c.fields.type).startsWith('Ref:') ? c.fields.type.slice(4) : '';
-    const labelCol = importConflicts.REF_LABEL_COLUMNS[target];
-    if (!labelCol) continue;
-    const rows = await gristTasksGet(target);
-    refLabels.set(c.id, new Map(rows.map((r) => [r.id, String(r.fields[labelCol] ?? '')])));
-    refIds.set(c.id, new Map(rows.map((r) => [String(r.fields[labelCol] ?? '').toUpperCase(), r.id])));
-  }
-  return { colTypes, refLabels, refIds };
-};
-const loadAnnuaireRecords = async (ids) => {
-  if (ids.length === 0) return new Map();
-  const rows = await gristTasksGet(importConflicts.ANNUAIRE, { id: [...new Set(ids)] });
-  return new Map(rows.map((r) => [r.id, r.fields]));
-};
-const listConflictTables = async () => (await gristClient().tableIds()).filter(importConflicts.isConflictTable);
-/** Resolves `:table` against the existing Arbitrage_* tables (never a free table name). */
-const conflictTableOf = async (req) => {
-  const table = String(req.params.table || '');
-  if (!importConflicts.isConflictTable(table) || !(await listConflictTables()).includes(table)) {
-    const err = new Error('Conflict table not found'); err.status = 404; throw err;
-  }
-  return table;
-};
+// « À traiter › Conflits annuaire <source> »: arbitration of the conflicts left by a directory import
+// (scripts/lib/import_conflicts.cjs). Admin-only, like the other « À traiter » tabs; every choice is written with the
+// author of the Keycloak session.
 const withConflicts = (handler) => async (req, res) => {
-  const doc = tasksDocId();
-  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
+  if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    await handler(req, res);
+    await handler(req, res, workServices.createConflictsService(workPorts().conflicts));
   } catch (e) {
-    res.status(e.status || (e instanceof importConflicts.ConflictInputError ? 400 : 502)).json({ error: e.message });
+    res.status(workServices.workErrorStatus(e)).json({ error: e.message });
   }
-};
-
-/** Open rows of a table that still need a decision (same list as the tab shows). */
-const actionableConflicts = async (table, meta) => {
-  const rows = (await gristTasksGet(table)).filter((r) => importConflicts.isOpen(r.fields));
-  const annuaire = await loadAnnuaireRecords(rows.map((r) => r.fields[importConflicts.COL.record]));
-  return importConflicts.openConflicts(rows, { ...meta, annuaire });
 };
 
 // Tables with their number of actionable conflicts (tab + counter; a settled table stays listed with 0).
-app.get('/api/import-conflicts', requireSuperAdmin, withConflicts(async (req, res) => {
-  const ids = await listConflictTables();
-  const meta = ids.length ? await loadAnnuaireMeta() : null;
-  const tables = [];
-  for (const id of ids) {
-    tables.push({ id, source: importConflicts.sourceLabel(id), open: (await actionableConflicts(id, meta)).length });
-  }
-  res.json({ tables });
+app.get('/api/import-conflicts', requireSuperAdmin, withConflicts(async (req, res, conflicts) => {
+  res.json({ tables: await conflicts.tables() });
 }));
 
-app.get('/api/import-conflicts/:table', requireSuperAdmin, withConflicts(async (req, res) => {
-  const table = await conflictTableOf(req);
-  const conflicts = await actionableConflicts(table, await loadAnnuaireMeta());
-  res.json({ source: importConflicts.sourceLabel(table), conflicts });
+app.get('/api/import-conflicts/:table', requireSuperAdmin, withConflicts(async (req, res, conflicts) => {
+  res.json(await conflicts.conflicts(req.params.table));
 }));
 
 // Body: { decisions: [{ id, choice: 'import'|'current'|'other', value? }] } (≤ 500 per call).
-app.post('/api/import-conflicts/:table/resolve', requireSuperAdmin, withConflicts(async (req, res) => {
-  const table = await conflictTableOf(req);
-  const decisions = Array.isArray(req.body?.decisions) ? req.body.decisions : [];
-  if (decisions.length === 0 || decisions.length > 500) throw new importConflicts.ConflictInputError('1 to 500 decisions expected');
-  const rows = (await gristTasksGet(table)).filter((r) => importConflicts.isOpen(r.fields));
-  const targeted = rows.filter((r) => decisions.some((d) => d?.id === r.id));
-  const meta = await loadAnnuaireMeta();
-  const annuaire = await loadAnnuaireRecords(targeted.map((r) => r.fields[importConflicts.COL.record]));
-  const { annuairePatches, rowPatches } = importConflicts.buildWrites(targeted, decisions, {
-    ...meta, annuaire, source: importConflicts.sourceLabel(table), author: taskAuthor(req), nowIso: new Date().toISOString(),
-  });
-  // Annuaire first: a failure leaves the conflicts open, never marked resolved without effect.
-  for (const group of importConflicts.groupBySameFields(annuairePatches)) {
-    await gristTasksWrite(importConflicts.ANNUAIRE, 'PATCH', group);
-  }
-  for (const group of importConflicts.groupBySameFields(rowPatches)) {
-    await gristTasksWrite(table, 'PATCH', group);
-  }
-  res.json({ resolved: rowPatches.length, updatedRecords: annuairePatches.length });
+app.post('/api/import-conflicts/:table/resolve', requireSuperAdmin, withConflicts(async (req, res, conflicts) => {
+  res.json(await conflicts.resolve(req.params.table, req.body?.decisions, taskAuthor(req)));
 }));
 
 // List (all statuses: the client filters, the table stays small).
-app.get('/api/tasks', requireSuperAdmin, withTasks(async (req, res) => {
-  const tasks = (await gristTasksGet(tasksSchema.TASKS_TABLE)).map(taskOut);
-  res.json({ tasks });
+app.get('/api/tasks', requireSuperAdmin, withTasks(async (req, res, tasks) => {
+  res.json({ tasks: await tasks.list() });
 }));
 
-app.get('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res) => {
+app.get('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res, tasks) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
-  const events = (await gristTasksGet(tasksSchema.EVENTS_TABLE, { tache: [id] }))
-    .map(taskEventOut)
-    .sort((a, b) => String(a.date).localeCompare(String(b.date)));
-  res.json({ events });
+  res.json({ events: await tasks.events(id) });
 }));
 
-app.post('/api/tasks', requireSuperAdmin, withTasks(async (req, res) => {
-  const author = taskAuthor(req);
-  const nowIso = new Date().toISOString();
-  const fields = tasksSchema.normalizeCreate(req.body, { author, nowIso });
-  const [added] = await gristTasksWrite(tasksSchema.TASKS_TABLE, 'POST', [{ fields }]);
-  await appendTaskEvent(added.id, { date: nowIso, auteur: author, action: 'creation', detail: fields.titre });
-  res.json({ task: taskOut({ id: added.id, fields }) });
+app.post('/api/tasks', requireSuperAdmin, withTasks(async (req, res, tasks) => {
+  res.json({ task: await tasks.create(req.body, taskAuthor(req)) });
 }));
 
 // Editable fields only (assignee, priorite, canal, description, titre, lien).
-app.patch('/api/tasks/:id', requireSuperAdmin, withTasks(async (req, res) => {
+app.patch('/api/tasks/:id', requireSuperAdmin, withTasks(async (req, res, tasks) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
-  const patch = tasksSchema.normalizePatch(req.body);
-  const rec = await loadTask(id);
-  await gristTasksWrite(tasksSchema.TASKS_TABLE, 'PATCH', [{ id, fields: patch }]);
-  const author = taskAuthor(req);
-  const action = 'assignee' in patch && Object.keys(patch).length === 1 ? 'reassignation' : 'modification';
-  const detail = action === 'reassignation' ? patch.assignee : Object.keys(patch).join(', ');
-  await appendTaskEvent(id, { date: new Date().toISOString(), auteur: author, action, detail });
-  res.json({ task: taskOut({ id, fields: { ...rec.fields, ...patch } }) });
+  res.json({ task: await tasks.patch(id, req.body, taskAuthor(req)) });
 }));
 
 // Workflow: { statut, motif?, resolution? } — transitions checked server-side.
-app.post('/api/tasks/:id/transition', requireSuperAdmin, withTasks(async (req, res) => {
+app.post('/api/tasks/:id/transition', requireSuperAdmin, withTasks(async (req, res, tasks) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
-  const rec = await loadTask(id);
-  const { patch, event } = tasksSchema.applyTransition(rec.fields, String(req.body?.statut || ''), {
-    author: taskAuthor(req), motif: req.body?.motif, resolution: req.body?.resolution,
-  });
-  await gristTasksWrite(tasksSchema.TASKS_TABLE, 'PATCH', [{ id, fields: patch }]);
-  await appendTaskEvent(id, event);
-  res.json({ task: taskOut({ id, fields: { ...rec.fields, ...patch } }) });
+  res.json({ task: await tasks.transition(id, req.body, taskAuthor(req)) });
 }));
 
 // Free events: comment, or « email prepared » (lot 3: copied / opened in the mail client).
-app.post('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res) => {
+app.post('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res, tasks) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
-  const action = String(req.body?.action || '');
-  if (!['commentaire', 'email_prepare'].includes(action)) return res.status(400).json({ error: 'Unknown event action' });
-  const detail = String(req.body?.detail || '').trim().slice(0, 4000);
-  if (action === 'commentaire' && !detail) return res.status(400).json({ error: 'Empty comment' });
-  await loadTask(id);
-  const [added] = await appendTaskEvent(id, { date: new Date().toISOString(), auteur: taskAuthor(req), action, detail });
-  res.json({ event: taskEventOut({ id: added.id, fields: { tache: id, date: new Date().toISOString(), auteur: taskAuthor(req), action, detail } }) });
+  res.json({ event: await tasks.addEvent(id, req.body, taskAuthor(req)) });
 }));
 
 // ── Media monitoring (media_watch): press/video/radio/podcast mentions ──────
@@ -2965,8 +2784,7 @@ app.get('/api/researchers/:key/suggestions', async (req, res) => {
   const ruleHit = (name) => { try { return RULES[name].detect(ctx)[0]?.description || null; } catch { return null; } };
   let tasks = [];
   try {
-    tasks = (await gristSqlRows(`SELECT id, cle, type, statut FROM "${tasksSchema.TASKS_TABLE}" WHERE "uid_dyna" = ?`, [key]))
-      .map((t) => ({ ...t, statut: tasksSchema.statusOf(t) }));
+    tasks = await workServices.createTasksService(workPorts().tasks).ofUid(key);
   } catch { /* no task table yet: nothing hidden */ }
   const { suggestions, hidden } = SUGG.computeSuggestions({
     record, entry: AH_STORE.readEntry(AFFILIATION_HISTORY_DIR, key), orcidEmpty,
@@ -2983,7 +2801,7 @@ app.get('/api/researchers/:key/suggestions', async (req, res) => {
 
 // « Create a task » (action: task) or « Hide » (action: dismiss, with a reason) — decision S2: both are
 // tasks keyed `suggestion:<id>:<key>`; a hidden suggestion is an « abandonnee » task with its reason.
-app.post('/api/researchers/:key/suggestions/:id/task', requireSuperAdmin, withTasks(async (req, res) => {
+app.post('/api/researchers/:key/suggestions/:id/task', requireSuperAdmin, withTasks(async (req, res, tasks) => {
   const key = String(req.params.key || '');
   const id = String(req.params.id || '');
   if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
@@ -3003,10 +2821,9 @@ app.post('/api/researchers/:key/suggestions/:id/task', requireSuperAdmin, withTa
   fields.cle = `suggestion:${id}:${key}`;
   const reason = String(req.body?.reason || '').trim().slice(0, 500);
   if (dismiss) Object.assign(fields, { statut: 'abandonnee', fait_par: author, fait_le: nowIso, resolution: reason || 'Suggestion masquée' });
-  const [added] = await gristTasksWrite(tasksSchema.TASKS_TABLE, 'POST', [{ fields }]);
-  await appendTaskEvent(added.id, { date: nowIso, auteur: author, action: 'creation', detail: `Suggestion « ${id} » de la fiche` });
-  if (dismiss) await appendTaskEvent(added.id, { date: nowIso, auteur: author, action: 'abandon', detail: reason || 'Suggestion masquée' });
-  res.json({ task: taskOut({ id: added.id, fields }) });
+  const events = [{ date: nowIso, auteur: author, action: 'creation', detail: `Suggestion « ${id} » de la fiche` }];
+  if (dismiss) events.push({ date: nowIso, auteur: author, action: 'abandon', detail: reason || 'Suggestion masquée' });
+  res.json({ task: await tasks.insert(fields, events) });
 }));
 
 // ── LDAP Structures sync ────────────────────────────────────────────────────
