@@ -29,6 +29,10 @@
 //   POST  /api/v1/people/uid-switch             { fromUid, rowId?, toUid, author }
 //   POST  /api/v1/merges                        { keepRowId, dropRowId, fields, author, note? } → 201 { logId }
 //   POST  /api/v1/merges/<logId>/restore        → { restoredRowId }
+// LDAP review (lot 2 d, Nantes only — no route without the `ldap` binding; institution right):
+//   GET  /api/v1/ldap/diff | /ldap/candidates | /ldap/structures      diffs computed by the server
+//   POST /api/v1/ldap/updates { ids }   /ldap/departures { uid, date, accountLabel }
+//   POST /api/v1/ldap/candidates { entries: [{ gristRowId, uid }] }   /ldap/structures { updateIds, createKeys }
 // Reads of lot 2 c: GET /api/v1/duplicates (DuplicatesDiff, rows of the scope), GET /api/v1/people/rows?ids=1,2
 // (raw Annuaire rows of the scope, for the merge assistant).
 // Every write answer carries an `X-Druid-Audit` header (JSON list of the Grist writes) that the host moves to
@@ -39,6 +43,7 @@ import { normalizeAcronym } from '../normalize';
 import type { DirectoryRepository, DirectoryScope } from './repository';
 import { DocumentNotAllowedError, PublicationsStore } from '../publications/store';
 import type { CommandContext, DirectoryCommands, WriteAudit } from './commands';
+import type { LdapCommands } from './ldapCommands';
 import { ApiError } from './errors';
 
 export interface DirectoryApiBindings {
@@ -47,6 +52,8 @@ export interface DirectoryApiBindings {
   publications: PublicationsStore;
   /** Write commands; absent on a host without writes (tests of the read routes). */
   commands?: DirectoryCommands;
+  /** LDAP review commands; absent on an instance without LDAP (Cloudflare). */
+  ldap?: LdapCommands;
   /** null = no authenticated user. */
   scope: DirectoryScope | null;
   /** Why this instance refuses every write (read-only demo, no Cloudflare Access identity), null = allowed. */
@@ -76,6 +83,10 @@ const QualifyBody = z.object({
 const UnqualifyBody = z.object({ rowIds: RowIds });
 const UidSwitchBody = z.object({ fromUid: z.string(), rowId: RecordId.optional(), toUid: z.string(), author: z.string() });
 const MergeBody = z.object({ keepRowId: RecordId, dropRowId: RecordId, fields: z.record(z.string(), z.unknown()), author: z.string(), note: z.string().optional() });
+const LdapIdsBody = z.object({ ids: z.array(z.string()).max(20000) });
+const LdapDepartureBody = z.object({ uid: z.string().min(1), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), accountLabel: z.string() });
+const LdapCandidatesBody = z.object({ entries: z.array(z.object({ gristRowId: RecordId, uid: z.string().min(1) })).max(20000) });
+const LdapStructuresBody = z.object({ updateIds: z.array(z.string()), createKeys: z.array(z.string()) });
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
 const OpenalexBody = z.object({ openalexId: z.string() });
 const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
@@ -130,6 +141,24 @@ export const createDirectoryApi = (): Hono<Env> => {
   app.get('/people/columns', async (c) => {
     if (!c.env.commands) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
     return c.json({ items: await c.env.commands.annuaireColumns() }, 200, NO_STORE);
+  });
+  // LDAP review: institution tools (the caches hold the LDAP data of the whole university).
+  const ldapOf = (c: { env: DirectoryApiBindings }) => {
+    if (!c.env.ldap) return null;
+    if (!c.env.scope!.all) throw new ApiError(403, 'Forbidden');
+    return c.env.ldap;
+  };
+  app.get('/ldap/diff', async (c) => {
+    const ldap = ldapOf(c);
+    return ldap ? c.json(await ldap.diff(), 200, NO_STORE) : c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+  });
+  app.get('/ldap/candidates', async (c) => {
+    const ldap = ldapOf(c);
+    return ldap ? c.json(await ldap.candidatesDiff(), 200, NO_STORE) : c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+  });
+  app.get('/ldap/structures', async (c) => {
+    const ldap = ldapOf(c);
+    return ldap ? c.json(await ldap.structuresDiff(), 200, NO_STORE) : c.json({ error: 'Unknown API route' }, 404, NO_STORE);
   });
   app.get('/duplicates', async (c) => c.json(await c.env.repository.duplicates(c.env.scope!), 200, NO_STORE));
   app.get('/people/rows', async (c) => {
@@ -232,6 +261,34 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!logId) return c.json({ error: 'Invalid Grist identifiers' }, 400, NO_STORE);
     return c.json(await c.env.commands!.restoreMerge(logId, ctxOf(c)), 200, NO_STORE);
   });
+  writes.post('/ldap/updates', async (c) => {
+    const ldap = ldapOf(c);
+    const body = await bodyOf(c, LdapIdsBody);
+    if (!ldap) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await ldap.applyUpdates(body.ids, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/ldap/departures', async (c) => {
+    const ldap = ldapOf(c);
+    const body = await bodyOf(c, LdapDepartureBody);
+    if (!ldap) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await ldap.markDeparted(body.uid, body.date, body.accountLabel, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/ldap/candidates', async (c) => {
+    const ldap = ldapOf(c);
+    const body = await bodyOf(c, LdapCandidatesBody);
+    if (!ldap) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await ldap.applyCandidates(body.entries, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/ldap/structures', async (c) => {
+    const ldap = ldapOf(c);
+    const body = await bodyOf(c, LdapStructuresBody);
+    if (!ldap) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await ldap.applyStructures(body.updateIds, body.createKeys, ctxOf(c)), 200, NO_STORE);
+  });
   app.route('/', writes);
 
   app.notFound((c) => c.json({ error: 'Unknown API route' }, 404, NO_STORE));
@@ -239,7 +296,7 @@ export const createDirectoryApi = (): Hono<Env> => {
     // A command refused or failed after some writes: the audit of what was written still goes out.
     const audit = (c as any).get?.('audit') as WriteAudit[] | undefined;
     const headers: Record<string, string> = { ...NO_STORE, ...(audit?.length ? { [AUDIT_HEADER]: JSON.stringify(audit) } : {}) };
-    if (err instanceof ApiError) return c.json({ error: err.message }, err.status, headers);
+    if (err instanceof ApiError) return c.json({ ...err.details, error: err.message }, err.status, headers);
     if (err instanceof DocumentNotAllowedError) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
     console.error('[api/v1]', c.req.method, c.req.path, err);
     return c.json({ error: 'Directory storage unavailable' }, 502, headers);

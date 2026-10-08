@@ -2,6 +2,7 @@
 // lab scope checked before any write, memberships as Annuaire rows, merge log, audit, API routes. Fictitious data.
 import { describe, it, expect, vi } from 'vitest';
 import { createGristDirectoryCommands, WriteAudit } from '../directory/commands';
+import { createGristLdapCommands } from '../directory/ldapCommands';
 import { createDirectoryApi, AUDIT_HEADER } from '../directory/api';
 import { createGristDirectoryRepository, GristClient } from '../directory/repository';
 import type { GristRecord } from '../directory/gristMapping';
@@ -316,5 +317,79 @@ describe('duplicates and merges (lot 2 c)', () => {
     expect(grist.tables.Fusions_log[0].fields).toMatchObject({ restaure: true, restored_rowid: restoredRowId });
     await expect(commands.restoreMerge(logId, ctx(ALL))).rejects.toMatchObject({ status: 409 });
     await expect(commands.restoreMerge(9999, ctx(ALL))).rejects.toMatchObject({ status: 404 });
+  });
+});
+
+describe('LDAP review (lot 2 d)', () => {
+  const rows = (): GristRecord[] => [
+    { id: 1, fields: { uid_dyna: 'durand-a', Nom: 'Durand', Prenom: 'Alice', LABO: 'LAB-A', Civilite: 'F', Corps_grade: 'MCF', statut_dyna: 'NORMAL', Data_source: 'LAB', Commentaires: '' } },
+    { id: 2, fields: { uid_dyna: 'martin-b', Nom: 'Martin', Prenom: 'Bruno', LABO: 'LAB-A', Civilite: '', statut_dyna: 'NORMAL', employment_end_date: '' } },
+    { id: 3, fields: { uid_dyna: '', Nom: 'Petit', Prenom: 'Chloé', LABO: 'LAB-B' } },
+  ];
+  const status = { 'durand-a': { etat: 'N', civilite: 'Mme', categorie: 'TITULAIRE' }, 'martin-b': { etat: 'D', civilite: 'M.' }, 'leroy-d': { etat: 'N' } };
+  const candidates = { proposals: [{ gristRowId: 3, nom: 'Petit', prenom: 'Chloé', email: 'chloe@example.org', labo: 'LAB-B', ldap: { uid: 'petit-c', civilite: 'Mme' } }], ambiguous: [] };
+  const make = () => {
+    const grist = fakeGrist({ Annuaire: rows(), Etablissements: [], Structures: [{ id: 7, fields: { local_id: '1001', short_labels: 'LAB-A[fr]', type: 'UR' } }] },
+      ['LABO', 'employment_end_date', 'affiliation_end_date']);
+    const repository = createGristDirectoryRepository({ grist });
+    const ldap = createGristLdapCommands({
+      grist, repository, annuaireColumns: async () => [{ id: 'employment_end_date', label: '', type: 'Text', isFormula: false }],
+      ldap: { status: async () => ({ data: status, version: '1' }), candidates: async () => candidates, structures: async () => ({ x: { code: '1001', type: 'UMR', ouLeaf: 'Laboratoire A LAB-A' }, y: { code: '1002', type: 'ER', ouLeaf: 'Equipe NOUVELLE' } }) },
+      today: () => '2026-10-08',
+    });
+    const audit: WriteAudit[] = [];
+    return { grist, ldap, ctx: (scope: any) => ({ scope, audit: (e: WriteAudit) => audit.push(e) }) };
+  };
+
+  it('computes the diff and applies only the checked ids, with cells recomputed by the server', async () => {
+    const { grist, ldap, ctx } = make();
+    const diff = await ldap.diff();
+    expect(diff.aMettreAJour.map((e) => [e.id, e.changes.map((c) => c.field)])).toEqual([
+      ['G-1', ['TYPE_EMPLOI']], ['G-2', ['Civilite', 'statut_dyna']],
+    ]);
+    expect(diff.orphelins).toEqual([]);
+    expect(diff.ldapWithoutRecord).toEqual(['leroy-d']);
+    expect(await ldap.applyUpdates(['G-2'], ctx(ALL))).toEqual({ updated: 1 });
+    expect(grist.tables.Annuaire[1].fields).toMatchObject({ Civilite: 'M', statut_dyna: 'DEPART', Data_source: 'LDAP', LDAP_derniere_maj: '2026-10-08' });
+    expect(grist.tables.Annuaire[0].fields.TYPE_EMPLOI).toBeUndefined();
+    await expect(ldap.applyUpdates(['G-1'], ctx(LAB_A))).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('attaches only the entries backed by the candidates cache', async () => {
+    const { grist, ldap, ctx } = make();
+    expect((await ldap.candidatesDiff()).proposals.map((p) => p.gristRowId)).toEqual([3]);
+    const res = await ldap.applyCandidates([{ gristRowId: 3, uid: 'petit-c' }, { gristRowId: 3, uid: 'someone-else' }, { gristRowId: 2, uid: 'x' }], ctx(ALL));
+    expect(res).toMatchObject({ updated: 1, unknown: 2 });
+    expect(grist.tables.Annuaire[2].fields).toMatchObject({ uid_dyna: 'petit-c', Civilite: 'F' });
+  });
+
+  it('marks a departure and applies the structure updates and creations', async () => {
+    const { grist, ldap, ctx } = make();
+    expect(await ldap.markDeparted('martin-b', '2026-09-30', 'compte fermé', ctx(ALL))).toEqual({ updated: 1 });
+    expect(grist.tables.Annuaire[1].fields).toMatchObject({ statut_dyna: 'DEPART', employment_end_date: '2026-09-30' });
+    const sdiff = await ldap.structuresDiff();
+    expect(sdiff.aMettreAJour.map((u) => u.id)).toEqual(['S-7']);
+    expect(sdiff.aCreer.map((c) => c.local_id)).toEqual(['1002']);
+    expect(await ldap.applyStructures(['S-7'], ['1002'], ctx(ALL))).toEqual({ updated: 1, created: 1 });
+    expect(grist.tables.Structures.find((r) => r.fields.local_id === '1002')!.fields).toMatchObject({ type: 'ER', LDAP_derniere_maj: '2026-10-08' });
+  });
+
+  it('reports the rows already written when a batch fails', async () => {
+    const { grist, ldap, ctx } = make();
+    grist.updateRecords = async () => { throw new Error('Grist HTTP 500'); };
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    await expect(ldap.applyUpdates(['G-1', 'G-2'], ctx(ALL))).rejects.toMatchObject({ status: 502, details: { updated: 0 } });
+    spy.mockRestore();
+  });
+
+  it('has no LDAP route on an instance without LDAP, and keeps them to the institution right', async () => {
+    const { ldap } = make();
+    const { commands, grist } = setup();
+    const repository = createGristDirectoryRepository({ grist });
+    const call = (scope: any, withLdap: boolean) => createDirectoryApi().fetch(new Request('http://druid.test/api/v1/ldap/diff'),
+      { repository, commands, publications: {} as any, scope, writeRefusal: null, ...(withLdap ? { ldap } : {}) });
+    expect((await call(ALL, false)).status).toBe(404);
+    expect((await call(LAB_A, true)).status).toBe(403);
+    expect((await call(ALL, true)).status).toBe(200);
   });
 });

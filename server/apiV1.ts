@@ -9,6 +9,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { AUDIT_HEADER, createDirectoryApi } from '../lib/directory/api';
 import { createGristDirectoryCommands } from '../lib/directory/commands';
+import { createGristLdapCommands } from '../lib/directory/ldapCommands';
 import {
   createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient, LdapCacheSnapshot,
 } from '../lib/directory/repository';
@@ -36,9 +37,11 @@ export interface ApiV1Options {
   gristApiKey: string;
   /** Other documents the instance may read (GRIST_EXTRA_DOC_IDS: axes curation of a structure). */
   gristExtraDocIds?: string[];
-  /** Folder holding ldap_status_cache.json (app root), dist/ being the fallback — same rule as the
-   * /ldap_status_cache.json route of server.cjs. */
+  /** Folder holding the caches of the sync scripts (ldap_status_cache.json…), dist/ being the fallback — same rule
+   * as the cache routes of server.cjs. */
   appRoot: string;
+  /** LDAP review routes (capability HAS_LDAP). */
+  hasLdap?: boolean;
 }
 
 /** Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. */
@@ -48,12 +51,12 @@ export const scopeOfSession = (req: Pick<NodeRequest, 'session'>): DirectoryScop
   return { all: !!access.allSlugs, labAnchors: Array.isArray(access.labAnchors) ? access.labAnchors : [] };
 };
 
-/** Reads ldap_status_cache.json again only when its modification time or size changed. */
-const ldapCacheLoader = (appRoot: string): (() => Promise<LdapCacheSnapshot>) => {
-  let last: LdapCacheSnapshot | null = null;
+/** Reads a JSON cache of the app root (dist/ being the fallback) again only when its modification time or size
+ * changed — same rule as the cache routes of server.cjs. Missing or empty file → `empty`. */
+const jsonFileLoader = <T>(appRoot: string, name: string, empty: T): (() => Promise<{ data: T; version: string }>) => {
+  let last: { data: T; version: string } | null = null;
   return async () => {
-    const candidates = [path.join(appRoot, 'ldap_status_cache.json'), path.join(appRoot, 'dist', 'ldap_status_cache.json')];
-    for (const file of candidates) {
+    for (const file of [path.join(appRoot, name), path.join(appRoot, 'dist', name)]) {
       let stat: fs.Stats;
       try { stat = fs.statSync(file); } catch { continue; }
       if (stat.size === 0) continue;
@@ -62,14 +65,14 @@ const ldapCacheLoader = (appRoot: string): (() => Promise<LdapCacheSnapshot>) =>
         try {
           last = { data: JSON.parse(fs.readFileSync(file, 'utf8')), version };
         } catch (err) {
-          // A cache being rewritten by the LDAP sync: keep the previous content rather than failing the API.
-          console.warn('[api/v1] unreadable LDAP cache, previous version kept:', (err as Error).message);
-          return last ?? { data: {}, version: '' };
+          // A cache being rewritten by a sync: keep the previous content rather than failing the API.
+          console.warn(`[api/v1] unreadable ${name}, previous version kept:`, (err as Error).message);
+          return last ?? { data: empty, version: '' };
         }
       }
       return last!;
     }
-    return { data: {}, version: '' };
+    return { data: empty, version: '' };
   };
 };
 
@@ -106,12 +109,19 @@ export const createApiV1Handler = (options: ApiV1Options) => {
     return readers.get(docId)!;
   };
   const main = readerFor(options.gristDocId)!;
-  const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapCacheLoader(options.appRoot) });
+  const ldapStatus = jsonFileLoader<Record<string, any>>(options.appRoot, 'ldap_status_cache.json', {});
+  const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
   const publications = createGristPublicationsStore({ main, readerFor });
   const commands = createGristDirectoryCommands({ grist: main, repository });
+  const ldapCandidates = jsonFileLoader<any>(options.appRoot, 'ldap_candidates_cache.json', { proposals: [], ambiguous: [] });
+  const ldapStructures = jsonFileLoader<Record<string, any>>(options.appRoot, 'structures_ldap_cache.json', {});
+  const ldap = options.hasLdap ? createGristLdapCommands({
+    grist: main, repository, annuaireColumns: commands.annuaireColumns,
+    ldap: { status: ldapStatus, candidates: async () => (await ldapCandidates()).data, structures: async () => (await ldapStructures()).data },
+  }) : undefined;
   return async (req: NodeRequest, res: NodeResponse): Promise<void> => {
     const response = await api.fetch(toWebRequest(req), {
-      repository, publications, commands, scope: scopeOfSession(req), writeRefusal: null,
+      repository, publications, commands, ldap, scope: scopeOfSession(req), writeRefusal: null,
     });
     res.status(response.status);
     const audit = response.headers.get(AUDIT_HEADER);
