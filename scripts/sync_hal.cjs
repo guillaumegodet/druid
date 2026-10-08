@@ -34,7 +34,7 @@
 const common = require('./lib/align_common.cjs');
 const {
   normalize, extractPpn, nameMatch, getUrl, runPool, makeStore, today,
-  gristGet, gristPatchGrouped, withTrace, loadRejected, pushReview, DOC, heterogeneousFirstNames,
+  gristPatchGrouped, withTrace, loadRejected, pushReview, DOC, heterogeneousFirstNames,
 } = common;
 const { selectTargets } = require('./lib/align_targets.cjs');
 

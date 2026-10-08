@@ -64,6 +64,8 @@ export interface GristClient extends GristReader {
   /** Columns of a table: id + Grist fields (label, type, isFormula…). */
   columns(table: string): Promise<{ id: string; fields: Record<string, any> }[]>;
   addColumns(table: string, columns: { id: string; fields: Record<string, any> }[]): Promise<void>;
+  /** Changes column settings (label, type, choices…). */
+  updateColumns(table: string, columns: { id: string; fields: Record<string, any> }[]): Promise<void>;
   addTables(tables: { id: string; columns: { id: string; fields: Record<string, any> }[] }[]): Promise<void>;
   /** Creates rows, returns their ids. */
   addRecords(table: string, records: { fields: Record<string, any> }[]): Promise<number[]>;
@@ -109,6 +111,7 @@ export const createGristReader = ({ apiBase, docId, apiKey, userAgent, fetch: fe
     tableIds: async () => ((await get(`${docUrl}/tables`))?.tables ?? []).map((t: { id: string }) => t.id),
     columns: async (table) => (await get(`${tableUrl(table)}/columns`))?.columns ?? [],
     addColumns: async (table, columns) => { await call(`${tableUrl(table)}/columns`, 'POST', { columns }); },
+    updateColumns: async (table, columns) => { await call(`${tableUrl(table)}/columns`, 'PATCH', { columns }); },
     addTables: async (tables) => { await call(`${docUrl}/tables`, 'POST', { tables }); },
     addRecords: async (table, records) =>
       ((await call(`${tableUrl(table)}/records`, 'POST', { records }))?.records ?? []).map((r: { id: number }) => r.id),

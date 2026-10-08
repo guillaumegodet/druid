@@ -18,9 +18,7 @@ const fs = require('fs');
 const { BIND_DN, BIND_PW, createLdapClient } = require('./lib/ldap_common.cjs');
 const LDAP_BASE = 'ou=People,dc=univ-nantes,dc=fr';
 
-const GRIST_BASE = 'https://grist.numerique.gouv.fr/api';
-const DOC = process.env.VITE_GRIST_DOC_ID;
-const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;
+const storage = require('./lib/storage.cjs');
 
 const CACHE_PATH = 'ldap_candidates_cache.json';
 const DIST_CACHE_PATH = 'dist/ldap_candidates_cache.json';
@@ -94,12 +92,8 @@ function buildLdapIndex() {
 }
 
 async function fetchAnnuaire() {
-  if (!DOC || !KEY) throw new Error('VITE_GRIST_DOC_ID / GRIST_API_KEY not configured');
-  const r = await fetch(`${GRIST_BASE}/docs/${DOC}/tables/Annuaire/records`, {
-    headers: { Authorization: `Bearer ${KEY}` },
-  });
-  if (!r.ok) throw new Error(`Grist Annuaire: ${r.status}`);
-  const { records } = await r.json();
+  // Storage client of the jobs (druid-internal docs/plan-migration-postgresql.md, lot 3).
+  const records = await storage.grist().records('Annuaire');
   return (records || []).map((rec) => ({ gristRowId: rec.id, f: rec.fields || {} }));
 }
 

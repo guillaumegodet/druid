@@ -44,7 +44,7 @@
  */
 const fs = require('fs');
 const common = require('./lib/align_common.cjs');   // shared foundation: HTTP/retry, pool, Grist, cache/progress, review
-const { getArg, hasFlag, getUrl, runPool, gristGet, gristWrite, normalize, extractPpn, makeStore } = common;
+const { getArg, hasFlag, getUrl, runPool, gristRecords, normalize, extractPpn, makeStore } = common;
 const { selectTargets } = require('./lib/align_targets.cjs');
 
 // fast-xml-parser is only required for the identifier enrichment (XML authority record).
@@ -107,7 +107,7 @@ function candidateDeathYear(death) {
 const WEIGHTS = { name: 0.40, source: 0.25, notes: 0.15, refs: 0.15, context: 0.05 };
 
 const QUALINKA = 'https://qualinka.idref.fr/data';
-const { GRIST_BASE, DOC, KEY } = common;
+const { DOC } = common;
 
 // Cache/progress: common foundation (align_common.cjs::makeStore) — progress path
 // overridable (--progress=) so that the Druid server reuses the file the UI
@@ -223,7 +223,7 @@ async function fetchPubTitles(uids) {
 async function fetchLaboDesc() {
   const map = {};
   try {
-    const { records } = await gristGet(`/docs/${DOC}/tables/Structures/records`);
+    const records = await gristRecords('Structures');
     for (const rec of records || []) {
       const f = rec.fields || {};
       const code = String(f.short_labels || '').replace(/\[.*?\]/g, '').trim();   // "CEISAM[fr]" → "CEISAM"

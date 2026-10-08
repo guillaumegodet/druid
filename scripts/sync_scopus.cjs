@@ -46,7 +46,7 @@ const common = require('./lib/align_common.cjs');
 const { createElsevierClient } = require('./lib/elsevier_client.cjs');
 const {
   normalize, extractOrcid, nameMatch, heterogeneousFirstNames, getUrl, runPool, makeStore, today,
-  gristGet, loadRejected, pushReview, ensureReviewTable, DOC,
+  gristRecords, loadRejected, pushReview, ensureReviewTable, DOC,
 } = common;
 const { selectTargets, scopusIdOf, scopusMarkedAbsent } = require('./lib/align_targets.cjs');
 
@@ -206,7 +206,7 @@ async function loadLabNames() {
   if (LAB_NAMES) return LAB_NAMES;
   LAB_NAMES = new Map();
   try {
-    const { records } = await gristGet(`/docs/${DOC}/tables/Structures/records`);
+    const records = await gristRecords('Structures');
     for (const r of records) {
       for (const short of stripLang(r.fields.short_labels)) {
         const key = normalize(short);

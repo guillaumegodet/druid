@@ -42,7 +42,7 @@
  */
 const fs = require('fs');
 const common = require('./lib/align_common.cjs');
-const { getArg, hasFlag, gristGet, DOC, runPool, extractOrcid, today } = common;
+const { getArg, hasFlag, gristRecords, DOC, runPool, extractOrcid, today } = common;
 const AH = require('./lib/affiliation_history.cjs');
 const SRC = require('./lib/affiliation_sources.cjs');
 const STORE = require('./lib/affiliation_history_store.cjs');
@@ -82,7 +82,7 @@ function loadConfig() {
 /** « Name[fr]|Other[en] » (V2 labels of the Structures table) → ['Name', 'Other']. */
 const labels = (v) => String(v || '').split('|').map((x) => x.replace(/\[[a-z]{2}\]\s*$/i, '').trim()).filter(Boolean);
 async function loadStructures() {
-  const { records } = await gristGet(`/docs/${DOC}/tables/Structures/records`);
+  const records = await gristRecords('Structures');
   return (records || []).map((r) => {
     const f = r.fields;
     return { ids: { rnsr: [f.nns].filter(Boolean), ror: [f.ror].filter(Boolean), scopus: [f.scopus].filter(Boolean).map(String) }, names: [...labels(f.short_labels), ...labels(f.long_labels)] };
@@ -94,7 +94,7 @@ async function loadStructures() {
 const dateText = (v) => (typeof v === 'number' && v ? new Date(v * 1000).toISOString().slice(0, 10) : String(v || '').trim());
 const splitIds = (v) => String(v || '').split(/[|,;\s]+/).map((s) => s.trim()).filter(Boolean);
 async function loadPeople() {
-  const { records } = await gristGet(`/docs/${DOC}/tables/Annuaire/records`);
+  const records = await gristRecords('Annuaire');
   const byKey = new Map();
   for (const rec of records || []) {
     const f = rec.fields;

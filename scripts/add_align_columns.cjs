@@ -44,15 +44,15 @@ const COLUMNS = [
 
 async function main() {
   console.log(`Grist : doc ${common.DOC} · table ${TABLE} · ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
-  const { columns } = await common.gristGet(`/docs/${common.DOC}/tables/${TABLE}/columns`);
+  const columns = await common.gristColumns(TABLE);
   const existing = new Set(columns.map((c) => c.id));
   const missing = COLUMNS.filter((c) => !existing.has(c.id));
   if (!missing.length) { console.log('✓ Every alignment column already exists. Nothing to do.'); return; }
   console.log(`Colonnes manquantes : ${missing.map((c) => c.id).join(', ')}`);
   if (!APPLY) { console.log('\n(DRY-RUN) Rerun with --apply to create these columns.'); return; }
-  await common.gristWrite('POST', `/docs/${common.DOC}/tables/${TABLE}/columns`, {
-    columns: missing.map((c) => ({ id: c.id, fields: { label: c.label, type: c.type } })),
-  });
+  await common.gristAddColumns(TABLE,
+    missing.map((c) => ({ id: c.id, fields: { label: c.label, type: c.type } })),
+  );
   console.log(`✓ ${missing.length} column(s) created in ${TABLE}.`);
 }
 

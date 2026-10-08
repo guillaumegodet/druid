@@ -42,7 +42,7 @@
 const common = require('./lib/align_common.cjs');
 const {
   normalize, nameMatch, extractOrcid, getUrl, runPool, makeStore, today,
-  gristGet, gristPatchGrouped, gristPatchRecords, withTrace, loadRejected, loadReviewDecisions, pushReview, DOC,
+  gristRecords, gristPatchGrouped, gristPatchRecords, withTrace, loadRejected, loadReviewDecisions, pushReview, DOC,
   heterogeneousFirstNames, DECISION_MIXED, DECISION_TODO,
 } = common;
 const { selectTargets, extractAId, parseIds } = require('./lib/align_targets.cjs');
@@ -287,7 +287,7 @@ const stripLang = (v) => String(v || '').split('|').map((x) => x.replace(/\[[a-z
 async function loadLabs() {
   const labs = new Map();
   try {
-    const { records } = await gristGet(`/docs/${DOC}/tables/Structures/records`);
+    const records = await gristRecords('Structures');
     for (const r of records || []) {
       const f = r.fields || {};
       const sigles = stripLang(f.short_labels);
