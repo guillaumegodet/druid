@@ -6,6 +6,7 @@
 import type { Researcher, Structure } from '../../types';
 import { normalizeAcronym } from '../normalize';
 import { MERGE_LOG_TABLE } from '../mergeLog';
+import { computeDuplicateGroups, DuplicatesDiff } from './duplicates';
 import {
   AbesExportMark, GristRecord, Institution, MergeLogEntry, mapAbesExportMarks, mapAnnuaireRecords, mapInstitutionRecords,
   mapMergeLogRecords, mapStructureRecords,
@@ -40,6 +41,10 @@ export interface DirectoryRepository {
   abesExports(scope: DirectoryScope): Promise<Versioned<AbesExportMark>>;
   /** Labs (LABO) of the directory rows carrying this uid, within the scope — duplicate warning of the creation form. */
   labsOfUid(uid: string, scope: DirectoryScope): Promise<string[]>;
+  /** Duplicate groups (rows sharing a uid_dyna) among the rows of the scope — « Doublons » page (lot 2 c). */
+  duplicates(scope: DirectoryScope): Promise<DuplicatesDiff>;
+  /** Raw Annuaire rows (Grist values) of the scope, read fresh — merge assistant (lot 2 c). */
+  recordRows(ids: number[], scope: DirectoryScope): Promise<{ rowId: number; fields: Record<string, any> }[]>;
   /** Forgets the cached reads (called by the commands after a write). */
   invalidate(): void;
 }
@@ -196,6 +201,23 @@ export const createGristDirectoryRepository = ({ grist, loadLdapCache }: GristDi
       const rows = await grist.records('Annuaire', { uid_dyna: [uid] });
       const kept = scope.all ? rows : rows.filter(rowInScope(new Set(scope.labAnchors)));
       return kept.map((r) => String(r.fields?.LABO || '—'));
+    },
+    async duplicates(scope) {
+      const updatedAt = await grist.docUpdatedAt();
+      const annuaire = await rowsOf('Annuaire', updatedAt);
+      const records = scope.all ? annuaire : annuaire.filter(rowInScope(new Set(scope.labAnchors)));
+      const { doublonsUid, duplicatesByKind } = computeDuplicateGroups(records);
+      return {
+        generatedAt: new Date().toISOString(),
+        stats: { gristTotal: records.length, pending: doublonsUid.filter((d) => !d.qualified).length, qualified: doublonsUid.filter((d) => d.qualified).length, parKind: duplicatesByKind },
+        doublonsUid,
+      };
+    },
+    async recordRows(ids, scope) {
+      if (ids.length === 0) return [];
+      const rows = await grist.records('Annuaire', { id: ids });
+      const kept = scope.all ? rows : rows.filter(rowInScope(new Set(scope.labAnchors)));
+      return kept.map((r) => ({ rowId: r.id, fields: r.fields }));
     },
     invalidate() {
       tables.clear();

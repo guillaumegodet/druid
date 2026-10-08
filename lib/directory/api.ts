@@ -24,6 +24,13 @@
 //   POST  /api/v1/abes-exports                  { entries: [{ recordId, hash }], date }  → { updated }
 //   POST  /api/v1/structures                    Structure             → 201 { id: 'S-<rowId>' }   (lot 2 b)
 //   PUT   /api/v1/structures/<recordId>         Structure             → { ok: true }
+//   POST  /api/v1/duplicates/qualification      { rowIds, principalRowId?, mode, endDate?, author }  (lot 2 c)
+//   POST  /api/v1/duplicates/unqualification    { rowIds }
+//   POST  /api/v1/people/uid-switch             { fromUid, rowId?, toUid, author }
+//   POST  /api/v1/merges                        { keepRowId, dropRowId, fields, author, note? } → 201 { logId }
+//   POST  /api/v1/merges/<logId>/restore        → { restoredRowId }
+// Reads of lot 2 c: GET /api/v1/duplicates (DuplicatesDiff, rows of the scope), GET /api/v1/people/rows?ids=1,2
+// (raw Annuaire rows of the scope, for the merge assistant).
 // Every write answer carries an `X-Druid-Audit` header (JSON list of the Grist writes) that the host moves to
 // its audit log and never forwards to the browser.
 import { Hono } from 'hono';
@@ -61,6 +68,14 @@ const ResearcherBody = z.object({
   identifiers: z.looseObject({}),
 }).loose();
 const StructureBody = z.looseObject({ acronym: z.string().optional(), level: z.union([z.string(), z.number()]).optional() });
+const RowIds = z.array(RecordId).min(1).max(500);
+const QualifyBody = z.object({
+  rowIds: RowIds, principalRowId: RecordId.optional(), mode: z.enum(['concomitant', 'successif', 'a_revoir']),
+  endDate: z.string().optional(), author: z.string(),
+});
+const UnqualifyBody = z.object({ rowIds: RowIds });
+const UidSwitchBody = z.object({ fromUid: z.string(), rowId: RecordId.optional(), toUid: z.string(), author: z.string() });
+const MergeBody = z.object({ keepRowId: RecordId, dropRowId: RecordId, fields: z.record(z.string(), z.unknown()), author: z.string(), note: z.string().optional() });
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
 const OpenalexBody = z.object({ openalexId: z.string() });
 const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
@@ -115,6 +130,12 @@ export const createDirectoryApi = (): Hono<Env> => {
   app.get('/people/columns', async (c) => {
     if (!c.env.commands) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
     return c.json({ items: await c.env.commands.annuaireColumns() }, 200, NO_STORE);
+  });
+  app.get('/duplicates', async (c) => c.json(await c.env.repository.duplicates(c.env.scope!), 200, NO_STORE));
+  app.get('/people/rows', async (c) => {
+    const ids = String(c.req.query('ids') || '').split(',').filter(Boolean).map(Number);
+    if (ids.length === 0 || ids.length > 500 || !ids.every((n) => Number.isInteger(n) && n > 0)) return c.json({ error: 'Invalid Grist identifiers' }, 400, NO_STORE);
+    return c.json({ items: await c.env.repository.recordRows(ids, c.env.scope!) }, 200, NO_STORE);
   });
   app.get('/people/uid/:uid/labs', async (c) =>
     c.json({ items: await c.env.repository.labsOfUid(c.req.param('uid'), c.env.scope!) }, 200, NO_STORE));
@@ -185,6 +206,31 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     await c.env.commands!.updateStructure(recordId, body as any, ctxOf(c));
     return c.json({ ok: true }, 200, NO_STORE);
+  });
+  writes.post('/duplicates/qualification', async (c) => {
+    const body = await bodyOf(c, QualifyBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.qualifyDuplicates(body, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/duplicates/unqualification', async (c) => {
+    const body = await bodyOf(c, UnqualifyBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.unqualifyDuplicates(body.rowIds, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/people/uid-switch', async (c) => {
+    const body = await bodyOf(c, UidSwitchBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.switchUid(body, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/merges', async (c) => {
+    const body = await bodyOf(c, MergeBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.mergeRows(body as any, ctxOf(c)), 201, NO_STORE);
+  });
+  writes.post('/merges/:logId/restore', async (c) => {
+    const logId = recordIdOf(c.req.param('logId'));
+    if (!logId) return c.json({ error: 'Invalid Grist identifiers' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.restoreMerge(logId, ctxOf(c)), 200, NO_STORE);
   });
   app.route('/', writes);
 

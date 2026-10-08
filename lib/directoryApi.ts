@@ -5,6 +5,7 @@ import { t } from '@lingui/core/macro';
 import type { Researcher, Structure } from '../types';
 import type { ValidationInfo } from './validation';
 import type { AnnuaireColumnMeta } from './directory/annuaireWrite';
+import type { DuplicatesDiff } from './directory/duplicates';
 import type { AbesExportMark, Institution, MergeLogEntry } from './directory/gristMapping';
 import type { NewsletterItem } from './publications/newsletter';
 import type { AxisCorrectionRow } from './publications/axes';
@@ -57,6 +58,22 @@ export const DirectoryApi = {
     send('POST', 'people/validations', { entries }),
   markAbesSent: async (entries: { recordId: number; hash: string }[], date: string): Promise<number> =>
     (await send<{ updated: number }>('POST', 'abes-exports', { entries, date })).updated,
+  duplicates: async (): Promise<DuplicatesDiff> => {
+    const resource = 'duplicates';
+    const resp = await fetch(`${DIRECTORY_API_BASE}/${resource}`, { headers: { Accept: 'application/json' } });
+    if (!resp.ok) throw new Error(t`Directory unavailable (${resource}, HTTP ${resp.status}).`);
+    return resp.json();
+  },
+  recordRows: (ids: number[]): Promise<{ rowId: number; fields: Record<string, any> }[]> =>
+    fetchItems(`people/rows?ids=${ids.join(',')}`),
+  qualifyDuplicates: (args: { rowIds: number[]; principalRowId?: number; mode: 'concomitant' | 'successif' | 'a_revoir'; endDate?: string; author: string }) =>
+    send<{ updated: number }>('POST', 'duplicates/qualification', args),
+  unqualifyDuplicates: (rowIds: number[]) => send<{ updated: number }>('POST', 'duplicates/unqualification', { rowIds }),
+  switchUid: (args: { fromUid: string; rowId?: number; toUid: string; author: string }) =>
+    send<{ updated: number }>('POST', 'people/uid-switch', args),
+  mergeRows: (args: { keepRowId: number; dropRowId: number; fields: Record<string, any>; author: string; note?: string }) =>
+    send<{ logId: number }>('POST', 'merges', args),
+  restoreMerge: (logId: number) => send<{ restoredRowId: number }>('POST', `merges/${logId}/restore`, {}),
   createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
   updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
 };
