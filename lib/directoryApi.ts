@@ -57,4 +57,6 @@ export const DirectoryApi = {
     send('POST', 'people/validations', { entries }),
   markAbesSent: async (entries: { recordId: number; hash: string }[], date: string): Promise<number> =>
     (await send<{ updated: number }>('POST', 'abes-exports', { entries, date })).updated,
+  createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
+  updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
 };
