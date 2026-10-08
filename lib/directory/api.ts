@@ -36,6 +36,8 @@
 // Alignments (lot 2 e, institution right): GET /api/v1/alignments/unified?mode=&sources= (texts as tokens, see
 // lib/directory/alignTexts.ts), POST /alignments/apply { mode, selected, chosen, decisions },
 // POST /alignments/redirection { rowId, ppn }, POST /alignments/reject { source, row, candidate, … }.
+// Publications (lot 2 f, D10 — tables kept in Grist): PATCH /api/v1/newsletter/<id> { fields } (news item of one of
+// the user's structures), PATCH /api/v1/axis-corrections/<slug>/<rowId> { axe } (structure of the user).
 // Reads of lot 2 c: GET /api/v1/duplicates (DuplicatesDiff, rows of the scope), GET /api/v1/people/rows?ids=1,2
 // (raw Annuaire rows of the scope, for the merge assistant).
 // Every write answer carries an `X-Druid-Audit` header (JSON list of the Grist writes) that the host moves to
@@ -45,6 +47,7 @@ import { z } from 'zod';
 import { normalizeAcronym } from '../normalize';
 import type { DirectoryRepository, DirectoryScope } from './repository';
 import { DocumentNotAllowedError, PublicationsStore } from '../publications/store';
+import { AXES_GRIST } from '../publications/axes';
 import type { CommandContext, DirectoryCommands, WriteAudit } from './commands';
 import type { LdapCommands } from './ldapCommands';
 import type { AlignCommands } from './alignCommands';
@@ -109,6 +112,14 @@ const AlignRejectBody = z.object({
   decision: z.enum(['Rejeté', 'Identité mêlée']),
   note: z.string().max(2000).default(''),
 });
+const NewsletterPatchBody = z.object({
+  fields: z.object({
+    statut: z.enum(['genere', 'envoye', 'valide', 'rejete', 'publie']).optional(),
+    accroche: z.string().max(5000).optional(), resume: z.string().max(20000).optional(),
+    valide_le: z.string().max(40).optional(), valide_par: z.string().max(200).optional(),
+  }).strict().refine((f) => Object.keys(f).length > 0),
+});
+const AxisPatchBody = z.object({ axe: z.string().max(500) });
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
 const OpenalexBody = z.object({ openalexId: z.string() });
 const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
@@ -336,6 +347,29 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!c.env.align) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
     if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     return c.json(await c.env.align.reject(body as any, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.patch('/newsletter/:id', async (c) => {
+    const id = recordIdOf(c.req.param('id'));
+    const body = await bodyOf(c, NewsletterPatchBody);
+    if (!id || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    const slug = await c.env.publications.newsletterSlugOf(id);
+    if (slug === null) return c.json({ error: 'Not found' }, 404, NO_STORE);
+    if (!scopeAllowsSlug(c.env.scope!, slug)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    await c.env.publications.updateNewsletterItem(id, body.fields);
+    c.get('audit').push({ table: 'Newsletter', kind: 'update', rows: [id], fields: Object.keys(body.fields), count: 1 });
+    return c.json({ ok: true }, 200, NO_STORE);
+  });
+  writes.patch('/axis-corrections/:slug/:rowId', async (c) => {
+    const slug = c.req.param('slug');
+    const rowId = recordIdOf(c.req.param('rowId'));
+    const body = await bodyOf(c, AxisPatchBody);
+    if (!rowId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    if (!AXES_GRIST[slug]) return c.json({ error: 'Not found' }, 404, NO_STORE);
+    // Writing a correction: the structure's own right (or the institution one), as through the proxy.
+    if (!scopeAllowsSlug(c.env.scope!, slug)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    const { table } = await c.env.publications.updateAxisCorrection(slug, rowId, body.axe);
+    c.get('audit').push({ table, kind: 'update', rows: [rowId], fields: [AXES_GRIST[slug].field], count: 1 });
+    return c.json({ ok: true }, 200, NO_STORE);
   });
   app.route('/', writes);
 

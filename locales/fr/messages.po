@@ -200,7 +200,7 @@ msgstr "Chargement du tableau de bord…"
 #: App.tsx:995
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
-#: components/dashboard/NewsletterPanel.tsx:290
+#: components/dashboard/NewsletterPanel.tsx:277
 #: components/etl/EtlConsolePage.tsx:457
 #: components/reports/HistoryDialog.tsx:78
 #: components/reports/ReportEditor.tsx:265
@@ -916,7 +916,7 @@ msgstr "Export PDF"
 
 #: components/ResearcherDetail.tsx:315
 #: components/StructureDetail.tsx:139
-#: components/dashboard/NewsletterPanel.tsx:364
+#: components/dashboard/NewsletterPanel.tsx:351
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
@@ -1019,7 +1019,7 @@ msgstr "Revalider"
 
 #: components/ResearcherDetail.tsx:587
 #: components/dashboard/MediaMentionsPanel.tsx:317
-#: components/dashboard/NewsletterPanel.tsx:401
+#: components/dashboard/NewsletterPanel.tsx:388
 #: components/researchers/GroupModal.tsx:65
 msgid "Validate"
 msgstr "Valider"
@@ -2896,7 +2896,7 @@ msgstr "À propos de « {title} »"
 #: components/dashboard/EChartCard.tsx:353
 #: components/dashboard/NetworkTab.tsx:356
 #: components/dashboard/NewsTab.tsx:815
-#: components/dashboard/NewsletterPanel.tsx:448
+#: components/dashboard/NewsletterPanel.tsx:435
 #: components/dashboard/PublicationsListModal.tsx:67
 #: components/dashboard/report/ReportWizard.tsx:261
 #: components/reports/AddToReportDialog.tsx:122
@@ -4203,172 +4203,172 @@ msgstr "Générer une autre proposition"
 msgid "Regenerate"
 msgstr "Régénérer"
 
-#: components/dashboard/NewsletterPanel.tsx:31
+#: components/dashboard/NewsletterPanel.tsx:30
 #: components/reports/HistoryDialog.tsx:103
 msgid "Generated"
 msgstr "Généré"
 
-#: components/dashboard/NewsletterPanel.tsx:32
+#: components/dashboard/NewsletterPanel.tsx:31
 msgid "Under review"
 msgstr "En validation"
 
-#: components/dashboard/NewsletterPanel.tsx:33
+#: components/dashboard/NewsletterPanel.tsx:32
 #: components/researchers/FilterPanel.tsx:143
 #: components/researchers/LdapVerifyPanel.tsx:136
 #: components/researchers/PresenceBadge.tsx:97
 msgid "Validated"
 msgstr "Validé"
 
-#: components/dashboard/NewsletterPanel.tsx:34
+#: components/dashboard/NewsletterPanel.tsx:33
 msgid "Discarded"
 msgstr "Écarté"
 
-#: components/dashboard/NewsletterPanel.tsx:35
+#: components/dashboard/NewsletterPanel.tsx:34
 msgid "Published"
 msgstr "Publié"
 
-#: components/dashboard/NewsletterPanel.tsx:84
+#: components/dashboard/NewsletterPanel.tsx:74
 msgid "Could not load"
 msgstr "Chargement impossible"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:121
+#: components/dashboard/NewsletterPanel.tsx:108
 msgid "Could not write to Grist: {0}"
 msgstr "Écriture Grist impossible : {0}"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:147
+#: components/dashboard/NewsletterPanel.tsx:134
 msgid "Generation: {0}"
 msgstr "Génération : {0}"
 
 #. placeholder {0}: apiErrorText(e)
-#: components/dashboard/NewsletterPanel.tsx:213
+#: components/dashboard/NewsletterPanel.tsx:200
 msgid "Recipients: {0}"
 msgstr "Destinataires : {0}"
 
-#: components/dashboard/NewsletterPanel.tsx:225
+#: components/dashboard/NewsletterPanel.tsx:212
 msgid "Back to the watch"
 msgstr "Retour à la veille"
 
-#: components/dashboard/NewsletterPanel.tsx:230
+#: components/dashboard/NewsletterPanel.tsx:217
 msgid "Public newsletter — {structName}"
 msgstr "Newsletter grand public — {structName}"
 
-#: components/dashboard/NewsletterPanel.tsx:233
+#: components/dashboard/NewsletterPanel.tsx:220
 msgid "Briefs generated from the last 30 days' articles, validated by the researchers, then distributed."
 msgstr "Brèves générées depuis les articles des 30 derniers jours, validées par les chercheurs puis diffusées."
 
-#: components/dashboard/NewsletterPanel.tsx:242
+#: components/dashboard/NewsletterPanel.tsx:229
 msgid "Newsletter issue (month)"
 msgstr "Numéro (mois) de la newsletter"
 
-#: components/dashboard/NewsletterPanel.tsx:248
+#: components/dashboard/NewsletterPanel.tsx:235
 msgid "Target length of the generated brief (only affects new briefs)"
 msgstr "Longueur cible de la brève générée (n'affecte que les nouvelles brèves)"
 
-#: components/dashboard/NewsletterPanel.tsx:250
+#: components/dashboard/NewsletterPanel.tsx:237
 msgid "Length: {chars} chars"
 msgstr "Longueur : {chars} car."
 
-#: components/dashboard/NewsletterPanel.tsx:267
+#: components/dashboard/NewsletterPanel.tsx:254
 msgid "Generates a public brief (LLM) for each new OpenAlex article ≤ 30 days old"
 msgstr "Génère une brève grand public (LLM) pour chaque nouvel article OpenAlex ≤ 30 jours"
 
 #. placeholder {0}: generating.done
 #. placeholder {1}: generating.remaining
-#: components/dashboard/NewsletterPanel.tsx:270
+#: components/dashboard/NewsletterPanel.tsx:257
 msgid "{0} brief(s)… ({1} remaining)"
 msgstr "{0} brève(s)… ({1} restantes)"
 
-#: components/dashboard/NewsletterPanel.tsx:271
+#: components/dashboard/NewsletterPanel.tsx:258
 msgid "Generate briefs"
 msgstr "Générer les brèves"
 
-#: components/dashboard/NewsletterPanel.tsx:278
+#: components/dashboard/NewsletterPanel.tsx:265
 msgid "Newsletter preview (validated briefs)"
 msgstr "Aperçu de la newsletter (brèves validées)"
 
-#: components/dashboard/NewsletterPanel.tsx:278
+#: components/dashboard/NewsletterPanel.tsx:265
 msgid "No validated brief for this issue"
 msgstr "Aucune brève validée pour ce numéro"
 
 #. placeholder {0}: valides.length
-#: components/dashboard/NewsletterPanel.tsx:280
+#: components/dashboard/NewsletterPanel.tsx:267
 msgid "Preview ({0})"
 msgstr "Aperçu ({0})"
 
-#: components/dashboard/NewsletterPanel.tsx:293
+#: components/dashboard/NewsletterPanel.tsx:280
 msgid "No brief for issue {numero}. Click “Generate briefs” to popularise the articles published in the last 30 days."
 msgstr "Aucune brève pour le numéro {numero}. Cliquez sur « Générer les brèves » pour vulgariser les articles parus ces 30 derniers jours."
 
-#: components/dashboard/NewsletterPanel.tsx:341
+#: components/dashboard/NewsletterPanel.tsx:328
 msgid "Hook (emoji + question or concrete sentence)"
 msgstr "Accroche (emoji + question ou phrase concrète)"
 
-#: components/dashboard/NewsletterPanel.tsx:348
+#: components/dashboard/NewsletterPanel.tsx:335
 msgid "Public brief (2-3 sentences)"
 msgstr "Brève grand public (2-3 phrases)"
 
 #. placeholder {0}: item.titre
-#: components/dashboard/NewsletterPanel.tsx:352
+#: components/dashboard/NewsletterPanel.tsx:339
 msgid "Original title: {0}"
 msgstr "Titre original : {0}"
 
-#: components/dashboard/NewsletterPanel.tsx:375
+#: components/dashboard/NewsletterPanel.tsx:362
 msgid "Open the mail client and mark this item as “sent”?"
 msgstr "Ouvrir le client mail et marquer cette brève comme « envoyée » ?"
 
 #. placeholder {0}: item.chercheur_nom || item.chercheur_email
-#: components/dashboard/NewsletterPanel.tsx:380
+#: components/dashboard/NewsletterPanel.tsx:367
 msgid "Request validation from {0}"
 msgstr "Demander la validation à {0}"
 
 #. placeholder {0}: item.chercheur_nom || item.chercheur_email
-#: components/dashboard/NewsletterPanel.tsx:382
+#: components/dashboard/NewsletterPanel.tsx:369
 msgid "Request validation ({0})"
 msgstr "Demander validation ({0})"
 
-#: components/dashboard/NewsletterPanel.tsx:386
+#: components/dashboard/NewsletterPanel.tsx:373
 msgid "No researcher matched in the directory"
 msgstr "Aucun chercheur apparié dans l'annuaire"
 
-#: components/dashboard/NewsletterPanel.tsx:410
+#: components/dashboard/NewsletterPanel.tsx:397
 msgid "Discard"
 msgstr "Écarter"
 
-#: components/dashboard/NewsletterPanel.tsx:418
+#: components/dashboard/NewsletterPanel.tsx:405
 #: components/researchers/TasksPage.tsx:274
 msgid "Reopen"
 msgstr "Rouvrir"
 
-#: components/dashboard/NewsletterPanel.tsx:435
+#: components/dashboard/NewsletterPanel.tsx:422
 #: components/dashboard/report/ReportWizard.tsx:52
 #: components/dashboard/report/ReportWizard.tsx:505
 msgid "Preview"
 msgstr "Aperçu"
 
 #. placeholder {0}: valides.length
-#: components/dashboard/NewsletterPanel.tsx:435
+#: components/dashboard/NewsletterPanel.tsx:422
 msgid "{0, plural, one {# validated brief} other {# validated briefs}}"
 msgstr "{0, plural, one {# brève validée} other {# brèves validées}}"
 
-#: components/dashboard/NewsletterPanel.tsx:439
+#: components/dashboard/NewsletterPanel.tsx:426
 msgid "Download the HTML"
 msgstr "Télécharger le HTML"
 
-#: components/dashboard/NewsletterPanel.tsx:442
+#: components/dashboard/NewsletterPanel.tsx:429
 msgid "Recipients copied ✓"
 msgstr "Destinataires copiés ✓"
 
-#: components/dashboard/NewsletterPanel.tsx:442
+#: components/dashboard/NewsletterPanel.tsx:429
 msgid "Copy recipients"
 msgstr "Copier les destinataires"
 
-#: components/dashboard/NewsletterPanel.tsx:445
+#: components/dashboard/NewsletterPanel.tsx:432
 msgid "Mark as published"
 msgstr "Marquer publiée"
 
-#: components/dashboard/NewsletterPanel.tsx:452
+#: components/dashboard/NewsletterPanel.tsx:439
 msgid "Newsletter preview"
 msgstr "Aperçu newsletter"
 
@@ -13022,9 +13022,9 @@ msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:21
-#: lib/directoryApi.ts:30
-#: lib/directoryApi.ts:45
+#: lib/directoryApi.ts:22
+#: lib/directoryApi.ts:31
+#: lib/directoryApi.ts:46
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Annuaire indisponible ({resource}, HTTP {0})."
 
