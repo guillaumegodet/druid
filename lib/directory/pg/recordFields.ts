@@ -121,6 +121,17 @@ export const loadPersonParts = async (trx: Transaction<DB> | any, personIds: str
   return out;
 };
 
+/** Memberships (all of them when omitted) → { id, fields } in the record fields of the API, in record id order. */
+export const readRecords = async (db: any, memberships?: any[]): Promise<{ id: number; fields: Record<string, any> }[]> => {
+  const rows = memberships ?? await db.selectFrom('membership').selectAll().orderBy('id').execute();
+  if (!rows.length) return [];
+  const personIds = [...new Set(rows.map((m: any) => m.person_id))] as string[];
+  const persons = memberships ? await db.selectFrom('person').selectAll().where('id', 'in', personIds).execute() : await db.selectFrom('person').selectAll().execute();
+  const parts = await loadPersonParts(db, personIds);
+  const personOf = new Map(persons.map((p: any) => [p.id, p]));
+  return rows.map((m: any) => ({ id: Number(m.id), fields: readRecordFields(personOf.get(m.person_id)!, m, parts.get(m.person_id)!) }));
+};
+
 /**
  * Writes record fields onto a person and one of its memberships (merge patch, restoration, qualification…): each
  * field goes to its column, identifier, link, sync trace or membership; a field without a normalized home goes to

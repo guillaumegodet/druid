@@ -20,11 +20,12 @@ import { normalizeHrId } from '../../hrId';
 import { parseFteCell, FTE_COLUMNS } from '../../fte';
 import { HR_ID_COLUMN } from '../../hrId';
 import { STATUT_DYNA_MAP } from '../../ldapCodes';
-import { fromGristDate, fromGristFuzzyDate, mapStructureRecords, parseMultiLabel } from '../gristMapping';
+import { fromGristDate, fromGristFuzzyDate, parseMultiLabel } from '../gristMapping';
 import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { buildMergeLogRow } from '../../mergeLog';
 import { OPENALEX_AUTHOR_SOURCE, loadPersonParts, readRecordFields, resolveStructures, writeRecordFields } from './recordFields';
+import { insertStructure, writeStructure } from './structures';
 import type { CommandContext, DirectoryCommands } from '../commands';
 import type { DirectoryRepository, DirectoryScope } from '../repository';
 
@@ -44,7 +45,7 @@ const MEMBERSHIP_FIELDS = ['LABO', 'team', 'affiliation_start_date', 'affiliatio
  * Fields of a record, under the ids the client knows (former Annuaire columns): `GET /people/columns` tells the record
  * form which optional fields the instance has (FTE, staff number) and the merge assistant which fields it may write.
  */
-const RECORD_FIELDS: AnnuaireColumnMeta[] = [
+export const RECORD_FIELDS: AnnuaireColumnMeta[] = [
   ...['uid_dyna', 'Nom', 'Prenom', 'Civilite', 'Email', 'Nationalite', 'Corps_grade', 'TYPE_EMPLOI', 'LIB_TYPE_EMPLOI', 'HDR', 'ANNEE_HDR',
     'ED_de_rattachement', 'statut_dyna', 'photo_url', 'annuaire_url', 'LABO', 'team', 'rattachement', 'membership_type', 'groupes',
     'ORCID', 'IdRef', 'IdRef_nom_valide', 'IdHAL', 'IdHAL_i', 'OpenAlex_ids', 'openalex_author_id', 'Bluesky', 'Mastodon', 'YouTube',
@@ -573,25 +574,6 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
     if (labels.some((v) => !anchors.has(normalizeAcronym(parseMultiLabel(v))))) throw new ApiError(403, 'Write outside scope: short_labels');
   }
-  async function structureColumns(trx: Transaction<DB>, id: number, fields: Record<string, any>) {
-    const [s] = mapStructureRecords([{ id, fields }]);
-    const parent = s?.parentStructure
-      ? await trx.selectFrom('structure').select('id').where(sql`lower(acronym)`, '=', String(s.parentStructure).toLowerCase()).orderBy('id').executeTakeFirst()
-      : undefined;
-    const { local_id: localId, ...extra } = fields;
-    return {
-      local_id: String(localId), acronym: orNull(s?.acronym), name: orNull(s?.officialName), type: orNull(fields.type),
-      level: orNull(s?.level), nature: orNull(s?.nature), ror: orNull(fields.ror), rnsr: orNull(fields.nns), idref: orNull(String(fields.idref ?? '').trim()),
-      url: orNull(fields.url), parent_id: parent && Number(parent.id) !== id ? parent.id : null, extra: JSON.stringify(extra) as any,
-    };
-  }
-  async function insertStructure(trx: Transaction<DB>, fields: Record<string, any>): Promise<number> {
-    const { id } = await trx.insertInto('structure').values({ local_id: String(fields.local_id), extra: '{}' as any }).returning('id').executeTakeFirstOrThrow();
-    await writeStructure(trx, Number(id), fields);
-    return Number(id);
-  }
-  async function writeStructure(trx: Transaction<DB>, id: number, fields: Record<string, any>) {
-    await trx.updateTable('structure').set(await structureColumns(trx, id, fields)).where('id', '=', String(id)).execute();
-  }
+
 };
 
