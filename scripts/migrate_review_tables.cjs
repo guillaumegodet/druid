@@ -16,7 +16,7 @@ const APPLY = common.hasFlag('apply');
 
 async function migrate(table) {
   let columns;
-  try { ({ columns } = await common.gristGet(`/docs/${common.DOC}/tables/${table}/columns`)); }
+  try { columns = await common.gristColumns(table); }
   catch (e) { console.log(`· ${table}: missing (created on the first run) — nothing to do`); return; }
   const byId = new Map(columns.map((c) => [c.id, c]));
   const wanted = common.reviewDecisionColumns(table);
@@ -33,8 +33,8 @@ async function migrate(table) {
   }
   console.log(`· ${table}: ${decisionPatch ? 'add the « Identité mêlée » choice' : 'Decision choices up to date'}; missing columns: ${toAdd.map((c) => c.id).join(', ') || 'none'}`);
   if (!APPLY || (!decisionPatch && !toAdd.length)) return;
-  if (decisionPatch) await common.gristWrite('PATCH', `/docs/${common.DOC}/tables/${table}/columns`, { columns: [decisionPatch] });
-  if (toAdd.length) await common.gristWrite('POST', `/docs/${common.DOC}/tables/${table}/columns`, { columns: toAdd });
+  if (decisionPatch) await common.gristUpdateColumns(table, [decisionPatch]);
+  if (toAdd.length) await common.gristAddColumns(table, toAdd);
   console.log(`  ✓ ${table} migrated`);
 }
 

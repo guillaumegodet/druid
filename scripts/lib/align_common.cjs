@@ -304,36 +304,31 @@ async function runPool(items, worker, concurrency, onTick, { stoppable = false }
 }
 
 // ── Grist ─────────────────────────────────────────────────────────────────────
-const GRIST_BASE = 'https://grist.numerique.gouv.fr/api';
+// Every read and write goes through the storage client of the jobs (scripts/lib/storage.cjs: the Grist client of
+// the domain API, druid-internal docs/plan-migration-postgresql.md, lot 3) — no direct call to the Grist API here.
+const storage = require('./storage.cjs');
 const DOC = process.env.VITE_GRIST_DOC_ID;
-const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;
 
-function assertGristConfig() {
-  if (!DOC || !KEY) throw new Error('VITE_GRIST_DOC_ID / GRIST_API_KEY not configured');
-}
-async function gristGet(path) {
-  assertGristConfig();
-  const r = await fetch(`${GRIST_BASE}${path}`, { headers: { Authorization: `Bearer ${KEY}` } });
-  if (!r.ok) throw new Error(`Grist GET ${path}: ${r.status} ${await r.text()}`);
-  return r.json();
-}
-async function gristWrite(method, path, body) {
-  assertGristConfig();
-  const r = await fetch(`${GRIST_BASE}${path}`, {
-    method, headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
-  });
-  if (!r.ok) throw new Error(`Grist ${method} ${path}: ${r.status} ${await r.text()}`);
-}
+/** The storage client (configuration checked on each use: VITE_GRIST_DOC_ID / GRIST_API_KEY). */
+const grist = () => storage.grist();
+
+/** Rows of a table; `filter` = Grist filter (column → accepted values). Missing table → error. */
+const gristRecords = (table, filter) => grist().records(table, filter);
+const gristTableIds = () => grist().tableIds();
+const gristColumns = (table) => grist().columns(table);
+const gristAddColumns = (table, columns) => grist().addColumns(table, columns);
+const gristUpdateColumns = (table, columns) => grist().updateColumns(table, columns);
+
 /** Writes in batches of 100 (practical limit of the Grist API). */
 async function gristCreateRecords(table, rows) {
+  const client = grist();
   for (let i = 0; i < rows.length; i += 100) {
-    await gristWrite('POST', `/docs/${DOC}/tables/${table}/records`, { records: rows.slice(i, i + 100).map((fields) => ({ fields })) });
+    await client.addRecords(table, rows.slice(i, i + 100).map((fields) => ({ fields })));
   }
 }
 async function gristPatchRecords(table, records) {
-  for (let i = 0; i < records.length; i += 100) {
-    await gristWrite('PATCH', `/docs/${DOC}/tables/${table}/records`, { records: records.slice(i, i + 100) });
-  }
+  const client = grist();
+  for (let i = 0; i < records.length; i += 100) await client.updateRecords(table, records.slice(i, i + 100));
 }
 /**
  * PATCH Annuaire in batches, grouped by column signature (same set of fields per
@@ -369,7 +364,7 @@ function withTrace(source, cur, fields, noteLabel = '') {
   return out;
 }
 async function gristDeleteRecords(table, ids) {
-  if (ids.length) await gristWrite('POST', `/docs/${DOC}/tables/${table}/data/delete`, ids);
+  if (ids.length) await grist().deleteRecords(table, ids);
 }
 
 /**
@@ -379,7 +374,7 @@ async function gristDeleteRecords(table, ids) {
  *    same convention as sync_idref_qualinka.cjs / GristService.computeIdrefAlignDiff).
  */
 async function fetchAnnuaire() {
-  const { records } = await gristGet(`/docs/${DOC}/tables/Annuaire/records`);
+  const records = await gristRecords('Annuaire');
   return (records || []).map((rec) => {
     const f = rec.fields;
     return {
@@ -478,7 +473,7 @@ function reviewDecisionColumns(table) {
 async function loadReviewDecisions(table, idColumn, normId = (v) => String(v || '').trim()) {
   const out = new Map();
   try {
-    const { records } = await gristGet(`/docs/${DOC}/tables/${table}/records`);
+    const records = await gristRecords(table);
     for (const r of records) {
       const decision = String(r.fields.Decision || '');
       if (!isDecided(decision)) continue;
@@ -517,9 +512,8 @@ async function loadRejected(table, idColumn, normId = (v) => String(v || '').tri
  * push mode is no longer run systematically since 2026-09-21).
  */
 async function ensureReviewTable(table, columns) {
-  const { tables } = await gristGet(`/docs/${DOC}/tables`);
-  if (tables.some((t) => t.id === table)) return false;
-  await gristWrite('POST', `/docs/${DOC}/tables`, { tables: [{ id: table, columns }] });
+  if ((await gristTableIds()).includes(table)) return false;
+  await grist().addTables([{ id: table, columns }]);
   return true;
 }
 
@@ -527,10 +521,7 @@ async function pushReview({ table, columns, desired, keyOf, targetField }) {
   const day = today();
   const tableCreated = await ensureReviewTable(table, columns);
 
-  const [{ records: revRecs }, { records: annRecs }] = await Promise.all([
-    gristGet(`/docs/${DOC}/tables/${table}/records`),
-    gristGet(`/docs/${DOC}/tables/Annuaire/records`),
-  ]);
+  const [revRecs, annRecs] = await Promise.all([gristRecords(table), gristRecords('Annuaire')]);
   const targetByUid = {};
   for (const rec of annRecs) {
     const u = rec.fields.uid_dyna;
@@ -610,7 +601,8 @@ module.exports = {
   getArg, hasFlag, commonOptions,
   stripAccents, normalize, extractPpn, extractOrcid, isValidOrcid, today, nameTokens, nameMatch, heterogeneousFirstNames,
   getUrl, runPool, proxyFor, isStopRequested, requestStop,
-  GRIST_BASE, DOC, KEY, gristGet, gristWrite, gristCreateRecords, gristPatchRecords, gristPatchGrouped, gristDeleteRecords, withTrace,
+  DOC, grist, gristRecords, gristTableIds, gristColumns, gristAddColumns, gristUpdateColumns,
+  gristCreateRecords, gristPatchRecords, gristPatchGrouped, gristDeleteRecords, withTrace,
   fetchAnnuaire, isDoctorantEmployment, isHorsRechercheEmployment, alignGroupOf, ALIGN_GROUPS, applyTargetFilters, loadRejected, loadReviewDecisions, ensureReviewTable, pushReview,
   DECISION_TODO, DECISION_MIXED, DECISIONS, DECISION_CHOICE_OPTIONS, isDecided, reviewDecisionColumns, melerFormula,
   makeStore,

@@ -33,7 +33,7 @@ const TRIGGER = { formula: 'None', isFormula: false, recalcWhen: 0 };
 
 async function main() {
   console.log(`Grist : doc ${common.DOC} · table ${TABLE} · ${APPLY ? 'APPLY' : 'DRY-RUN'}`);
-  const { columns } = await common.gristGet(`/docs/${common.DOC}/tables/${TABLE}/columns`);
+  const columns = await common.gristColumns(TABLE);
   const byId = new Map(columns.map((c) => [c.id, c]));
   const missing = COLUMNS.filter((c) => !byId.has(c.id));
   const noTrigger = COLUMNS.filter((c) => byId.has(c.id) && String(byId.get(c.id).fields.formula || '') !== 'None');
@@ -43,23 +43,19 @@ async function main() {
   if (!APPLY) { console.log('\n(DRY-RUN) Rerun with --apply.'); return; }
 
   if (missing.length) {
-    await common.gristWrite('POST', `/docs/${common.DOC}/tables/${TABLE}/columns`, {
-      columns: missing.map((c) => ({ id: c.id, fields: { label: c.label, type: 'Numeric', ...TRIGGER } })),
-    });
+    await common.gristAddColumns(TABLE,
+      missing.map((c) => ({ id: c.id, fields: { label: c.label, type: 'Numeric', ...TRIGGER } })),
+    );
     // The rows existing at creation time got the Numeric default 0: reset them to « not provided ».
-    const { records } = await common.gristGet(`/docs/${common.DOC}/tables/${TABLE}/records`);
+    const records = await common.gristRecords(TABLE);
     const empty = Object.fromEntries(missing.map((c) => [c.id, null]));
     for (let i = 0; i < records.length; i += BATCH) {
-      await common.gristWrite('PATCH', `/docs/${common.DOC}/tables/${TABLE}/records`, {
-        records: records.slice(i, i + BATCH).map((r) => ({ id: r.id, fields: empty })),
-      });
+      await common.gristPatchRecords(TABLE, records.slice(i, i + BATCH).map((r) => ({ id: r.id, fields: empty })));
     }
     console.log(`✓ ${missing.length} column(s) created, ${records.length} row(s) set to empty.`);
   }
   if (noTrigger.length) {
-    await common.gristWrite('PATCH', `/docs/${common.DOC}/tables/${TABLE}/columns`, {
-      columns: noTrigger.map((c) => ({ id: c.id, fields: TRIGGER })),
-    });
+    await common.gristUpdateColumns(TABLE, noTrigger.map((c) => ({ id: c.id, fields: TRIGGER })));
     console.log(`✓ Trigger formula set on ${noTrigger.map((c) => c.id).join(', ')} (values untouched).`);
   }
 }

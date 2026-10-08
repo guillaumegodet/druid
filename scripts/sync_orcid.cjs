@@ -34,7 +34,7 @@
 const common = require('./lib/align_common.cjs');
 const {
   normalize, stripAccents, extractOrcid, isValidOrcid, nameMatch, getUrl, runPool, makeStore, today,
-  gristGet, loadRejected, pushReview, DOC,
+  gristRecords, loadRejected, pushReview, DOC,
 } = common;
 const { selectTargets } = require('./lib/align_targets.cjs');
 const hal = require('./sync_hal.cjs');   // byIdhal (pass 0), extractIdhal
@@ -180,7 +180,7 @@ async function loadLabNames() {
   if (LAB_NAMES) return LAB_NAMES;
   LAB_NAMES = new Map();
   try {
-    const { records } = await gristGet(`/docs/${DOC}/tables/Structures/records`);
+    const records = await gristRecords('Structures');
     for (const r of records) {
       for (const short of stripLang(r.fields.short_labels)) {
         const key = normalize(short);

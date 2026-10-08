@@ -623,7 +623,7 @@ async function main() {
   writeProgress({ running: true, total: rules.length, done: 0, created: 0, verified: 0, resolved: 0, reopened: 0, startedAt: nowIso });
 
   if (APPLY) await schema.ensureTasksTables({ apiBase: 'https://grist.numerique.gouv.fr/api', doc: DOC, headers: { Authorization: `Bearer ${process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY}`, 'Content-Type': 'application/json' } });
-  const { records } = await common.gristGet(`/docs/${DOC}/tables/Annuaire/records`);
+  const records = await common.gristRecords('Annuaire');
   const annuaire = (records || []).map((r) => ({ id: r.id, key: r.fields.uid_dyna || `g${r.id}`, fields: r.fields }));
   const ctx = {
     annuaire,
@@ -633,13 +633,13 @@ async function main() {
     idref: loadJson('idref_align_cache.json'),
     ldap: loadJson('ldap_status_cache.json'),
     // Employer table (hebergement_fin): unreadable ⇒ empty ⇒ the rule is skipped, its tasks left untouched.
-    etablissements: await common.gristGet(`/docs/${DOC}/tables/Etablissements/records`)
-      .then((d) => Object.fromEntries((d.records || []).map((r) => [r.id, r.fields])))
+    etablissements: await common.gristRecords('Etablissements')
+      .then((records) => Object.fromEntries((records || []).map((r) => [r.id, r.fields])))
       .catch((e) => { console.warn(`[tasks] Etablissements unreadable (${e.message})`); return {}; }),
     parcours: loadJson(PARCOURS_INDEX),
   };
   let existing = [];
-  try { existing = (await common.gristGet(`/docs/${DOC}/tables/${schema.TASKS_TABLE}/records`)).records || []; }
+  try { existing = (await common.gristRecords(schema.TASKS_TABLE)) || []; }
   catch (e) { if (APPLY) throw e; console.log(`[tasks] table ${schema.TASKS_TABLE} unreadable (${e.message}) — dry-run continues with no existing task`); }
   const byKey = new Map(existing.filter((r) => r.fields.cle).map((r) => [r.fields.cle, r]));
   // Open tasks typed by hand (import, form) for the same type + person: the rule does not

@@ -20,7 +20,7 @@
 'use strict';
 const fs = require('fs');
 const common = require('./lib/align_common.cjs');
-const { getArg, hasFlag, extractOrcid, getUrl, gristGet, DOC, normalize } = common;
+const { getArg, hasFlag, extractOrcid, getUrl, gristRecords, DOC, normalize } = common;
 const oa = require('./sync_openalex.cjs');
 
 const YEARS = '2021-2025';
@@ -109,7 +109,7 @@ async function main() {
   };
   console.log(`[coverage] Annuaire: ${annuaire.length} records · ${ann.orcids.size} ORCID · ${ann.aids.size} A-ids OpenAlex · ${ann.idhalI.size} IdHAL_i`);
 
-  const { records } = await gristGet(`/docs/${DOC}/tables/Structures/records`);
+  const records = await gristRecords('Structures');
   const units = (records || []).map((r) => r.fields).filter((f) => f.generic_type === 'unit');
   const wanted = ALL ? null : new Set((LABOS.length ? LABOS : WITNESS).map(normalize));
   const labs = units

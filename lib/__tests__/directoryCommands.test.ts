@@ -26,6 +26,7 @@ const fakeGrist = (initial: Record<string, GristRecord[]>, columns: string[] = [
       return { id, fields: { label: id, type: id.endsWith('_date') ? 'Text' : 'Any', isFormula: c.startsWith('f:') } };
     }),
     addColumns: async (_t, list) => { for (const c of list) cols.add(c.id); writes.push(`columns ${list.map((c) => c.id).join(',')}`); },
+    updateColumns: async (_t, list) => { writes.push(`column-fields ${list.map((c) => c.id).join(',')}`); },
     addTables: async (list) => { for (const t of list) tables[t.id] = []; writes.push(`table ${list.map((t) => t.id).join(',')}`); },
     addRecords: async (table, records) => {
       const ids = records.map(() => nextId++);
