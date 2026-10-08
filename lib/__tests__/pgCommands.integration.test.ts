@@ -136,6 +136,9 @@ const STEPS: [string, Step][] = [
     await s.commands.mergeRows({ keepRowId: 104, dropRowId: 9999, fields: {}, author: 'alice' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
     await s.commands.restoreMerge(9999, ctxOf()).catch((e) => `${e.status} ${e.message}`),
   ]],
+  ['merge where the kept row takes the uid and the ORCID of the absorbed person', async (s) => [
+    await s.commands.mergeRows({ keepRowId: 105, dropRowId: 104, fields: { uid_dyna: 'durand-c', ORCID: '0000-0003-0000-0001' }, author: 'alice' }, ctxOf()),
+  ]],
   ['lab right: write inside its lab, refused outside', async (s, people) => {
     const r = people.find((p) => p.gristRowId === 105)!;
     const attempt = (p: Promise<unknown>) => p.then<string, string>(() => 'ok', (e) => `${e.status} ${e.message}`);

@@ -45,6 +45,7 @@ export const API_ERRORS = [
   // directory domain API (/api/v1, lib/directory/api.ts)
   msg`Unknown API route`,
   msg`Directory storage unavailable`,
+  msg`Another record already holds this value`,
   msg`API v1 unavailable`,
   msg`Grist proxy removed: use /api/v1`,
   msg`Not available on the PostgreSQL storage yet`,
