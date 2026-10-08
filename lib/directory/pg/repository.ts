@@ -5,11 +5,11 @@
 //
 // Version of the data = the last audit_log row: every write to an audited table adds one (deletes included), and the
 // import adds one too. The mapped lists are cached on it, as the Grist repository caches them on the document date.
-// `duplicates` and `recordRows` serve the merge assistant, which works on Grist cells: they come with its rewrite
-// (lot 6 c).
+// `duplicates` and `recordRows` speak the record fields of the API (lib/directory/pg/recordFields.ts).
 import { sql } from 'kysely';
 import type { Db } from '../../db/client';
-import { ApiError } from '../errors';
+import { computeDuplicateGroups } from '../duplicates';
+import { loadPersonParts, readRecordFields } from './recordFields';
 import type { Researcher, Structure } from '../../../types';
 import { normalizeAcronym } from '../../normalize';
 import { mapDirectoryRows } from '../people';
@@ -67,6 +67,18 @@ export const createPgDirectoryRepository = ({ db, loadLdapCache }: PgDirectoryRe
         }),
       })),
     };
+  };
+
+  /** Memberships → { id, fields } in the record fields of the API. */
+  const recordsOf = async (memberships: any[]) => {
+    if (!memberships.length) return [];
+    const personIds = [...new Set(memberships.map((m) => m.person_id))];
+    const [persons, parts] = await Promise.all([
+      db.selectFrom('person').selectAll().where('id', 'in', personIds).execute(),
+      loadPersonParts(db, personIds),
+    ]);
+    const personOf = new Map(persons.map((p) => [p.id, p]));
+    return memberships.map((m) => ({ id: Number(m.id), fields: readRecordFields(personOf.get(m.person_id)!, m, parts.get(m.person_id)!) }));
   };
 
   let rowsCache: { key: string; rows: Promise<Awaited<ReturnType<typeof loadRows>>> } | null = null;
@@ -155,11 +167,26 @@ export const createPgDirectoryRepository = ({ db, loadLdapCache }: PgDirectoryRe
       return rows.filter((r) => keep(r.lab_label)).map((r) => String(r.lab_label || '—'));
     },
 
-    async duplicates() {
-      throw new ApiError(501, 'Not available on the PostgreSQL storage yet');
+    async duplicates(scope) {
+      // A group = a person with several memberships (same uid on several rows): only those are read whole.
+      const keep = inScope(scope);
+      const memberships = (await db.selectFrom('membership').selectAll().orderBy('id').execute()).filter((m) => keep(m.lab_label));
+      const count = new Map<string, number>();
+      for (const m of memberships) count.set(m.person_id, (count.get(m.person_id) || 0) + 1);
+      const multi = memberships.filter((m) => count.get(m.person_id)! > 1);
+      const records = await recordsOf(multi);
+      const { doublonsUid, duplicatesByKind } = computeDuplicateGroups(records);
+      return {
+        generatedAt: new Date().toISOString(),
+        stats: { gristTotal: memberships.length, pending: doublonsUid.filter((d) => !d.qualified).length, qualified: doublonsUid.filter((d) => d.qualified).length, parKind: duplicatesByKind },
+        doublonsUid,
+      };
     },
-    async recordRows() {
-      throw new ApiError(501, 'Not available on the PostgreSQL storage yet');
+    async recordRows(ids, scope) {
+      if (ids.length === 0) return [];
+      const keep = inScope(scope);
+      const memberships = (await db.selectFrom('membership').selectAll().where('id', 'in', ids.map(String)).orderBy('id').execute()).filter((m) => keep(m.lab_label));
+      return (await recordsOf(memberships)).map((r) => ({ rowId: r.id, fields: r.fields }));
     },
 
     invalidate() {

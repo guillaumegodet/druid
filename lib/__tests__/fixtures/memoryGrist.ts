@@ -15,7 +15,9 @@ export const memoryGrist = (initial: Record<string, GristRecord[]>): GristClient
     'Podcast_flux', 'Blog', 'LinkedIn', 'CV_institutionnel', 'CV_site_labo', 'CV_pdf_docx_', 'CV_HAL', 'Academia', 'Researchgate', 'Profil_GS',
     'Site_web', 'validated', 'validated_status', 'validation_date', 'validation_source', 'validation_scope', 'validated_by', 'statut_dyna',
     'Data_source', 'LDAP_derniere_maj', 'groupes', 'ABES_export_hash', 'ABES_export_date', 'Commentaires', 'HDR', 'ANNEE_HDR'];
-  const nextId = (t: string) => Math.max(0, ...(tables[t] || []).map((r) => r.id)) + 1;
+  // Row ids never come back after a deletion (as PostgreSQL sequences): a monotonic counter per table.
+  const counters: Record<string, number> = {};
+  const nextId = (t: string) => (counters[t] = Math.max(counters[t] ?? 0, ...(tables[t] || []).map((r) => r.id)) + 1);
   return {
     docUpdatedAt: async () => String(Math.random()),
     tableIds: async () => Object.keys(tables),
@@ -28,7 +30,9 @@ export const memoryGrist = (initial: Record<string, GristRecord[]>): GristClient
     // A new Annuaire row gets the default of every column it does not set, as Grist does ('' / 0 / false / null).
     addRecords: async (t, records) => records.map((r) => {
       const id = nextId(t);
-      const defaults = t === 'Annuaire' ? Object.fromEntries(annuaireColumns.map((c) => [c, { Date: null, Numeric: 0, Bool: false }[typeOf(c)] ?? ''])) : {};
+      // The FTE columns have a « None » trigger formula (scripts/add_fte_columns.cjs): null, not 0, on a new row.
+      const defaults = t === 'Annuaire' ? Object.fromEntries(annuaireColumns.map((c) => [c,
+        c.startsWith('etp_') ? null : { Date: null, Numeric: 0, Bool: false }[typeOf(c)] ?? ''])) : {};
       (tables[t] ??= []).push({ id, fields: { ...defaults, Employeur: t === 'Annuaire' ? 0 : undefined, ...r.fields } });
       return id;
     }),

@@ -6,7 +6,8 @@
 //
 // The record's person fields live on `person` (one per person), its memberships on `membership` (one per lab); a value
 // the import kept in `extra` under a Grist column id (lib/migration/gristToPg.ts) is dropped as soon as the field is
-// written. Duplicates and merges (qualification, uid switch, merge, restoration) come with lot 6 c: 501 until then.
+// written. Duplicates and merges (lot 6 c) work on the record fields of the API (lib/directory/pg/recordFields.ts): the
+// merge assistant reads and patches them, the merge log keeps them as snapshots.
 import { sql, Transaction } from 'kysely';
 import type { Affiliation, Researcher } from '../../../types';
 import type { DB } from '../../db/schema.gen';
@@ -22,6 +23,8 @@ import { STATUT_DYNA_MAP } from '../../ldapCodes';
 import { fromGristDate, fromGristFuzzyDate, mapStructureRecords, parseMultiLabel } from '../gristMapping';
 import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
+import { buildMergeLogRow } from '../../mergeLog';
+import { OPENALEX_AUTHOR_SOURCE, loadPersonParts, readRecordFields, resolveStructures, writeRecordFields } from './recordFields';
 import type { CommandContext, DirectoryCommands } from '../commands';
 import type { DirectoryRepository, DirectoryScope } from '../repository';
 
@@ -33,8 +36,9 @@ export interface PgDirectoryCommandsOptions {
   today?: () => string;
 }
 
-/** Source of an OpenAlex author id typed in the record (the import uses the same tag: lib/directory/pg/directoryRows.ts). */
-export const OPENALEX_AUTHOR_SOURCE = 'grist:openalex_author_id';
+export { OPENALEX_AUTHOR_SOURCE };
+/** Record fields of a membership (as opposed to the person): what a restoration writes on a person that already exists. */
+const MEMBERSHIP_FIELDS = ['LABO', 'team', 'affiliation_start_date', 'affiliation_end_date', 'membership_type', 'rattachement', 'doublon_decision'];
 
 /**
  * Fields of a record, under the ids the client knows (former Annuaire columns): `GET /people/columns` tells the record
@@ -163,24 +167,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
   };
 
   // ── Structures of the lab and team labels (membership.structure_id, membership_team) ─────────────────────
-  const structureLinks = async (trx: Transaction<DB>, lab: string, teams: string[]) => {
-    const rows = await trx.selectFrom('structure').select(['id', 'acronym', 'parent_id']).orderBy('id').execute();
-    const byAcronym = new Map<string, typeof rows>();
-    for (const r of rows) {
-      const k = normalizeAcronym(String(r.acronym || ''));
-      if (!k) continue;
-      if (!byAcronym.has(k)) byAcronym.set(k, []);
-      byAcronym.get(k)!.push(r);
-    }
-    const labKey = normalizeAcronym(lab);
-    const structureId = lab && lab.toLowerCase() !== 'zzz' ? byAcronym.get(labKey)?.[0]?.id ?? null : null;
-    const teamIds = teams.map((t) => {
-      const all = byAcronym.get(normalizeAcronym(t)) || [];
-      const under = all.filter((s) => s.parent_id === structureId);
-      return all.length === 1 ? all[0].id : under.length === 1 ? under[0].id : null;
-    }).filter((id): id is string => id !== null && id !== structureId);
-    return { structureId, teamIds: [...new Set(teamIds)] };
-  };
+  const structureLinks = resolveStructures;
   const membershipValues = async (trx: Transaction<DB>, a: Affiliation | undefined) => {
     const lab = String(a?.structureName || '');
     const teams = String(a?.team || '').split('|').map((t) => t.trim()).filter(Boolean);
@@ -265,7 +252,6 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     }
   };
 
-  const notYet = async (): Promise<never> => { throw new ApiError(501, 'Not available on the PostgreSQL storage yet'); };
 
   return {
     annuaireColumns: async () => RECORD_FIELDS,
@@ -321,6 +307,11 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       assertLabsInScope(ctx.scope, [plan.primary?.structureName || '', ...plan.patches.map((p) => p.affiliation.structureName || ''),
         ...plan.creates.map((c) => c.affiliation.structureName || '')]);
 
+      // Record fields of the rows about to be deleted, read before any write (merge log snapshots).
+      const droppedRows = siblings.filter((m) => plan.deletes.includes(Number(m.id)));
+      const parts = droppedRows.length ? (await loadPersonParts(trx, [person.id])).get(person.id)! : null;
+      const droppedFields = droppedRows.map((m) => ({ rowId: Number(m.id), fields: readRecordFields(person, m, parts!) }));
+
       const { values, replaced, extra } = await personColumns(trx, researcher);
       const personExtra: Record<string, any> = { ...(person.extra as object) };
       for (const k of replaced) delete personExtra[k];
@@ -334,14 +325,11 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       const created: number[] = [];
       for (const c of plan.creates) created.push(await addMembership(trx, person.id, c.affiliation, c.role));
       if (plan.deletes.length > 0) {
-        // Snapshot in the merge log before deleting (restorable like a merge, lot 6 c).
-        const dropped = siblings.filter((m) => plan.deletes.includes(Number(m.id)));
-        await trx.insertInto('merge_log').values(dropped.map((m) => ({
-          uid: person.uid, kept_person_id: person.id, dropped_snapshot: JSON.stringify({ membership: m }) as any,
-          kept_before: '{}' as any, kept_patch: '{}' as any, author: 'druid', note: 'affiliation removed from the record',
-          extra: JSON.stringify({ Nom: `${researcher.lastName} ${researcher.firstName}`.trim() }) as any,
-          legacy_kept_rowid: recordId, legacy_dropped_rowid: Number(m.id),
-        }))).execute();
+        // Snapshot in the merge log before deleting (restorable like a merge).
+        const keep = { rowId: recordId, fields: { uid_dyna: person.uid ?? '', Nom: researcher.lastName, Prenom: researcher.firstName } };
+        for (const drop of droppedFields) {
+          await insertMergeLog(trx, buildMergeLogRow({ keep, drop, patch: {}, author: 'druid', note: 'affiliation removed from the record' }), person.id);
+        }
         await trx.deleteFrom('membership').where('id', 'in', plan.deletes.map(String)).execute();
       }
       await trx.updateTable('person').set({ extra: JSON.stringify(personExtra) as any }).where('id', '=', person.id).execute();
@@ -420,13 +408,163 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       ctx.audit({ table: 'Structures', kind: 'update', rows: [recordId], fields: Object.keys(fields), count: 1 });
     }),
 
-    // Duplicates and merges: lot 6 c.
-    qualifyDuplicates: notYet,
-    unqualifyDuplicates: notYet,
-    switchUid: notYet,
-    mergeRows: notYet,
-    restoreMerge: notYet,
+    /**
+     * Qualifies a group of rows sharing a uid: `concomitant` → the chosen row PRINCIPAL, the others SECONDAIRE;
+     * `successif` → the others HISTORIQUE (+ membership end when given and no end known); `a_revoir` → no role,
+     * « A_REVOIR » decision. Trace on each row: « <MODE> <date> <author> ». Rows outside the scope are left out.
+     */
+    qualifyDuplicates: ({ rowIds, principalRowId, mode, endDate, author }, ctx) => writing(ctx, async (trx) => {
+      if (mode !== 'a_revoir' && (principalRowId === undefined || !rowIds.includes(principalRowId))) {
+        throw new ApiError(400, 'Qualification: primary row required');
+      }
+      if (!rowIds.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      const decision = `${mode === 'a_revoir' ? 'A_REVOIR' : mode === 'concomitant' ? 'CONCOMITANT' : 'SUCCESSIF'} ${todayIso()} ${author}`;
+      const rows = await rowsInScope(trx, ctx.scope, rowIds);
+      for (const m of rows) {
+        const set: Record<string, any> = { duplicate_decision: decision };
+        if (mode === 'a_revoir') set.role = null;
+        else if (Number(m.id) === principalRowId) set.role = 'PRINCIPAL';
+        else {
+          set.role = mode === 'concomitant' ? 'SECONDAIRE' : 'HISTORIQUE';
+          // Successive affiliation: the end of the old row is a lab membership end.
+          if (mode === 'successif' && endDate) {
+            const person = await trx.selectFrom('person').select(['employment_end', 'extra']).where('id', '=', m.person_id).executeTakeFirstOrThrow();
+            const e = (person.extra || {}) as Record<string, any>;
+            const known = m.end_date || e[`affiliation_end_date@G-${m.id}`] || person.employment_end || e.employment_end_date;
+            const d = fuzzy(endDate);
+            if (!known && d) set.end_date = d;
+          }
+        }
+        await trx.updateTable('membership').set(set).where('id', '=', m.id).execute();
+      }
+      ctx.audit({ table: 'Annuaire', kind: 'update', rows: rows.map((m) => Number(m.id)), fields: ['rattachement', 'doublon_decision'], count: rows.length });
+      return { updated: rows.length };
+    }),
+
+    /** Removes the qualification of a group (roles and decision cleared) → a pending duplicate again. */
+    unqualifyDuplicates: (rowIds, ctx) => writing(ctx, async (trx) => {
+      await membershipsInScope(trx, ctx.scope, rowIds);
+      if (rowIds.length) await trx.updateTable('membership').set({ role: null, duplicate_decision: null }).where('id', 'in', rowIds.map(String)).execute();
+      ctx.audit({ table: 'Annuaire', kind: 'update', rows: rowIds, fields: ['rattachement', 'doublon_decision'], count: rowIds.length });
+      return { updated: rowIds.length };
+    }),
+
+    /**
+     * Moves a record to its LDAP uid (`annuaire_uid_ldap` task): the person of `fromUid` (or of the row `rowId` of a
+     * record without uid) gets `toUid`, with a dated line in its notes keeping the former uid. Refused when a person
+     * already carries `toUid`: that case is a merge.
+     */
+    switchUid: ({ fromUid, rowId, toUid, author }, ctx) => writing(ctx, async (trx) => {
+      if (!toUid || toUid.startsWith('ext_')) throw new ApiError(400, `Invalid LDAP uid: ${toUid}`);
+      if (await trx.selectFrom('person').select('id').where(sql`lower(uid)`, '=', toUid.toLowerCase()).executeTakeFirst()) {
+        throw new ApiError(409, `This uid already has a directory record, merge the two records instead: ${toUid}`);
+      }
+      const rows = fromUid
+        ? await rowsInScope(trx, ctx.scope, (await trx.selectFrom('membership as m').innerJoin('person as p', 'p.id', 'm.person_id')
+          .select('m.id').where('p.uid', '=', fromUid).execute()).map((r) => Number(r.id)))
+        : rowId ? await rowsInScope(trx, ctx.scope, [rowId]) : [];
+      if (!rows.length) throw new ApiError(404, `Record not found in Grist: uid ${fromUid || '—'}`);
+      const note = `[${todayIso()}] uid ${fromUid || '(vide)'} → ${toUid} (n° agent = compte LDAP), par ${author}`;
+      for (const personId of [...new Set(rows.map((m) => m.person_id))]) {
+        const p = await trx.selectFrom('person').select('note').where('id', '=', personId).executeTakeFirstOrThrow();
+        const com = String(p.note || '').trimEnd();
+        await trx.updateTable('person').set({ uid: toUid, note: com ? `${com}\n${note}` : note }).where('id', '=', personId).execute();
+      }
+      ctx.audit({ table: 'Annuaire', kind: 'update', rows: rows.map((m) => Number(m.id)), fields: ['uid_dyna', 'Commentaires'], count: rows.length });
+      return { updated: rows.length };
+    }),
+
+    /**
+     * Merges two directory rows: logs (record fields of the absorbed row + previous values of the fields written on
+     * the kept row), writes the patch on the kept row, then deletes the absorbed membership — and its person when it
+     * has no other membership. The log exists before any destructive write.
+     */
+    mergeRows: ({ keepRowId, dropRowId, fields, author, note = '' }, ctx) => writing(ctx, async (trx) => {
+      if (keepRowId === dropRowId) throw new ApiError(400, 'Merge: both rows are identical');
+      if (![keepRowId, dropRowId].every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      const rows = await rowsInScope(trx, ctx.scope, [keepRowId, dropRowId]);
+      const keepM = rows.find((m) => Number(m.id) === keepRowId);
+      const dropM = rows.find((m) => Number(m.id) === dropRowId);
+      if (!keepM || !dropM) throw new ApiError(404, 'Merge: one of the rows no longer exists in Grist');
+      const writable = new Set(RECORD_FIELDS.filter((c) => !c.isFormula).map((c) => c.id));
+      const patch: Record<string, any> = {};
+      for (const [k, v] of Object.entries(fields || {})) if (writable.has(k)) patch[k] = v;
+      if (patch['LABO'] !== undefined) assertLabsInScope(ctx.scope, [patch['LABO']]);
+      const [keep, drop] = await recordsOf(trx, [keepM, dropM]);
+      const logId = await insertMergeLog(trx, buildMergeLogRow({ keep, drop, patch, author, note }), keepM.person_id);
+      if (Object.keys(patch).length > 0) await writeRecordFields(trx, keepM.person_id, String(keepM.id), patch);
+      await trx.deleteFrom('membership').where('id', '=', dropM.id).execute();
+      if (dropM.person_id !== keepM.person_id) {
+        const left = await trx.selectFrom('membership').select('id').where('person_id', '=', dropM.person_id).executeTakeFirst();
+        if (!left) await trx.deleteFrom('person').where('id', '=', dropM.person_id).execute();
+      }
+      ctx.audit({ table: 'Annuaire', kind: 'delete', rows: [dropRowId], count: 1 });
+      return { logId };
+    }),
+
+    /**
+     * Undoes a merge: re-creates the absorbed row from its snapshot (a new membership — of the person of its uid when
+     * it still exists, otherwise of a new person) and restores the previous values of the fields written on the kept
+     * row. The log is flagged as soon as the row exists again.
+     */
+    restoreMerge: (logId, ctx) => writing(ctx, async (trx) => {
+      if (!isRowId(logId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      const log = await trx.selectFrom('merge_log').selectAll().where('id', '=', String(logId)).executeTakeFirst();
+      if (!log) throw new ApiError(404, `Merge not found: ${logId}`);
+      if (log.restored) throw new ApiError(409, `Merge already restored: ${logId}`);
+      const writable = new Set(RECORD_FIELDS.filter((c) => !c.isFormula).map((c) => c.id));
+      const fields: Record<string, any> = {};
+      for (const [k, v] of Object.entries((log.dropped_snapshot || {}) as Record<string, any>)) if (writable.has(k) && v !== null) fields[k] = v;
+      const before = (log.kept_before || {}) as Record<string, any>;
+      const keptRowId = Number(log.legacy_kept_rowid);
+      // Every check before the first write: re-created row and restored kept row within the scope.
+      assertLabsInScope(ctx.scope, [fields['LABO']]);
+      let kept: any;
+      if (Object.keys(before).length > 0) {
+        [kept] = await membershipsInScope(trx, ctx.scope, [keptRowId]);
+        if (before['LABO'] !== undefined) assertLabsInScope(ctx.scope, [before['LABO']]);
+      }
+      const uid = String(fields['uid_dyna'] || '').trim();
+      const existing = uid ? await trx.selectFrom('person').select('id').where(sql`lower(uid)`, '=', uid.toLowerCase()).executeTakeFirst() : undefined;
+      const personId = existing?.id
+        ?? (await trx.insertInto('person').values({ last_name: String(fields['Nom'] ?? '') }).returning('id').executeTakeFirstOrThrow()).id;
+      const { id: membershipId } = await trx.insertInto('membership').values({ person_id: personId }).returning('id').executeTakeFirstOrThrow();
+      // An existing person keeps its own fields: only the membership comes back.
+      const written = existing ? Object.fromEntries(Object.entries(fields).filter(([k]) => MEMBERSHIP_FIELDS.includes(k))) : fields;
+      await writeRecordFields(trx, personId, membershipId, written);
+      const restoredRowId = Number(membershipId);
+      await trx.updateTable('merge_log').set({ restored: true, restored_person_id: personId, legacy_restored_rowid: restoredRowId }).where('id', '=', String(logId)).execute();
+      if (kept) await writeRecordFields(trx, kept.person_id, String(kept.id), before);
+      ctx.audit({ table: 'Annuaire', kind: 'create', rows: [restoredRowId], count: 1 });
+      return { restoredRowId };
+    }),
   };
+
+  // ── Duplicates and merges ─────────────────────────────────────────────────────────────────────────────────
+  /** Memberships of the given ids that the scope sees (the others are left out, as the Grist commands do). */
+  async function rowsInScope(trx: Transaction<DB>, scope: DirectoryScope, ids: number[]) {
+    const unique = [...new Set(ids)];
+    if (!unique.length) return [];
+    const anchors = anchorsOf(scope);
+    return (await trx.selectFrom('membership').selectAll().where('id', 'in', unique.map(String)).orderBy('id').execute())
+      .filter((m) => scope.all || anchors.has(normalizeAcronym(String(m.lab_label || ''))));
+  }
+  /** Memberships → { rowId, fields } in the record fields of the API. */
+  async function recordsOf(trx: Transaction<DB>, memberships: any[]) {
+    const personIds = [...new Set(memberships.map((m) => m.person_id))];
+    const persons = new Map((await trx.selectFrom('person').selectAll().where('id', 'in', personIds).execute()).map((p) => [p.id, p]));
+    const parts = await loadPersonParts(trx, personIds);
+    return memberships.map((m) => ({ rowId: Number(m.id), fields: readRecordFields(persons.get(m.person_id)!, m, parts.get(m.person_id)!) }));
+  }
+  /** A row of buildMergeLogRow (lib/mergeLog.ts) → merge_log. */
+  async function insertMergeLog(trx: Transaction<DB>, row: Record<string, any>, keptPersonId: string): Promise<number> {
+    const { id } = await trx.insertInto('merge_log').values({
+      uid: row.uid_dyna || null, kept_person_id: keptPersonId, dropped_snapshot: row.dropped_json, kept_before: row.kept_before_json,
+      kept_patch: row.kept_patch_json, author: row.auteur, note: row.note || null, merged_at: row.date, restored: false,
+      legacy_kept_rowid: row.kept_rowid, legacy_dropped_rowid: row.dropped_rowid, extra: JSON.stringify({ Nom: row.Nom }),
+    } as any).returning('id').executeTakeFirstOrThrow();
+    return Number(id);
+  }
 
   // ── Structures (their V2 fields live in `extra`, the normalized columns are derived from them) ─────────────
   function assertStructureLabels(scope: DirectoryScope, labels: unknown[]): void {
