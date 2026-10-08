@@ -46,6 +46,12 @@ export const API_ERRORS = [
   msg`Unknown API route`,
   msg`Directory storage unavailable`,
   msg`API v1 unavailable`,
+  msg`Invalid record`,
+  msg`Invalid Grist ID (gristRowId missing)`,
+  msg`Several affiliations can only be saved for a person with a directory identifier (uid_dyna).`,
+  msg`This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation.`,
+  msg`Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)`,
+  msg`Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)`,
   msg`No OpenAlex identifier configured for this structure`,
   msg`No dashboard data for this structure`,
   // chat / newsletter / analysis

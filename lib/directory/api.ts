@@ -12,20 +12,59 @@
 //   GET /api/v1/merges?limit=50          → { items: MergeLogEntry[], updatedAt } (institution right only)
 //   GET /api/v1/newsletter?slug=<slug>   → { items: NewsletterItem[] }         (structures of the user)
 //   GET /api/v1/axis-corrections/<slug>  → { items: AxisCorrectionRow[] }      (every authenticated user)
+//   GET /api/v1/people/columns           → { items: AnnuaireColumnMeta[] }
+//   GET /api/v1/people/uid/<uid>/labs    → { items: string[] }                 (rows of the user's labs)
+//
+// Writes (lot 2 a, lib/directory/commands.ts — scope checked by the command):
+//   POST  /api/v1/people                        Researcher            → 201 { recordId }
+//   PUT   /api/v1/people/<recordId>             Researcher            → { ok: true }
+//   PATCH /api/v1/people/groups                 { entries: [{ recordId, groups }] }
+//   PATCH /api/v1/people/<recordId>/openalex-id { openalexId }
+//   POST  /api/v1/people/validations            { entries: [{ recordId, validation }] } → { updated }
+//   POST  /api/v1/abes-exports                  { entries: [{ recordId, hash }], date }  → { updated }
+// Every write answer carries an `X-Druid-Audit` header (JSON list of the Grist writes) that the host moves to
+// its audit log and never forwards to the browser.
 import { Hono } from 'hono';
+import { z } from 'zod';
 import { normalizeAcronym } from '../normalize';
 import type { DirectoryRepository, DirectoryScope } from './repository';
 import { DocumentNotAllowedError, PublicationsStore } from '../publications/store';
+import type { CommandContext, DirectoryCommands, WriteAudit } from './commands';
+import { ApiError } from './errors';
 
 export interface DirectoryApiBindings {
   repository: DirectoryRepository;
   /** Publications side (D10): tables that stay in Grist. */
   publications: PublicationsStore;
+  /** Write commands; absent on a host without writes (tests of the read routes). */
+  commands?: DirectoryCommands;
   /** null = no authenticated user. */
   scope: DirectoryScope | null;
+  /** Why this instance refuses every write (read-only demo, no Cloudflare Access identity), null = allowed. */
+  writeRefusal?: { status: 403; error: string } | null;
 }
 
-type Env = { Bindings: DirectoryApiBindings };
+type Env = { Bindings: DirectoryApiBindings; Variables: { audit: WriteAudit[] } };
+
+export const AUDIT_HEADER = 'X-Druid-Audit';
+
+// Request bodies: structure only (the record itself is the client's Researcher object, mapped field by field
+// by lib/directory/annuaireWrite.ts; unknown keys are kept).
+const RecordId = z.number().int().positive();
+const ResearcherBody = z.object({
+  lastName: z.string(),
+  firstName: z.string(),
+  affiliations: z.array(z.looseObject({})),
+  employment: z.looseObject({}),
+  identifiers: z.looseObject({}),
+}).loose();
+const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
+const OpenalexBody = z.object({ openalexId: z.string() });
+const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
+const AbesBody = z.object({
+  entries: z.array(z.object({ recordId: RecordId, hash: z.string().min(1) })),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+});
 
 const NO_STORE = { 'Cache-Control': 'no-store' };
 const MAX_MERGES = 500;
@@ -70,11 +109,79 @@ export const createDirectoryApi = (): Hono<Env> => {
     return c.json({ items }, 200, NO_STORE);
   });
 
+  app.get('/people/columns', async (c) => {
+    if (!c.env.commands) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    return c.json({ items: await c.env.commands.annuaireColumns() }, 200, NO_STORE);
+  });
+  app.get('/people/uid/:uid/labs', async (c) =>
+    c.json({ items: await c.env.repository.labsOfUid(c.req.param('uid'), c.env.scope!) }, 200, NO_STORE));
+
+  // ── Writes ──────────────────────────────────────────────────────────────
+  const writes = new Hono<Env>();
+  writes.use('*', async (c, next) => {
+    if (c.req.method === 'GET' || c.req.method === 'HEAD') return next();
+    if (c.env.writeRefusal) return c.json({ error: c.env.writeRefusal.error }, c.env.writeRefusal.status, NO_STORE);
+    if (!c.env.commands) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    c.set('audit', []);
+    await next();
+    const audit = c.get('audit');
+    if (audit.length) c.res.headers.set(AUDIT_HEADER, JSON.stringify(audit));
+  });
+  const ctxOf = (c: { env: DirectoryApiBindings; get: (k: 'audit') => WriteAudit[] }): CommandContext =>
+    ({ scope: c.env.scope!, audit: (entry) => c.get('audit').push(entry) });
+  /** Parsed JSON body, or null when it does not match the schema. */
+  const bodyOf = async <T>(c: { req: { json: () => Promise<unknown> } }, schema: z.ZodType<T>): Promise<T | null> => {
+    const parsed = schema.safeParse(await c.req.json().catch(() => undefined));
+    return parsed.success ? parsed.data : null;
+  };
+  const recordIdOf = (raw: string): number | null => (/^\d+$/.test(raw) && Number(raw) > 0 ? Number(raw) : null);
+
+  writes.post('/people', async (c) => {
+    const body = await bodyOf(c, ResearcherBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.createPerson(body as any, ctxOf(c)), 201, NO_STORE);
+  });
+  writes.patch('/people/groups', async (c) => {
+    const body = await bodyOf(c, GroupsBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    await c.env.commands!.setGroups(body.entries, ctxOf(c));
+    return c.json({ ok: true }, 200, NO_STORE);
+  });
+  writes.post('/people/validations', async (c) => {
+    const body = await bodyOf(c, ValidationsBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json({ updated: await c.env.commands!.applyValidations(body.entries as any, ctxOf(c)) }, 200, NO_STORE);
+  });
+  writes.put('/people/:recordId', async (c) => {
+    const recordId = recordIdOf(c.req.param('recordId'));
+    const body = await bodyOf(c, ResearcherBody);
+    if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    await c.env.commands!.updatePerson(recordId, body as any, ctxOf(c));
+    return c.json({ ok: true }, 200, NO_STORE);
+  });
+  writes.patch('/people/:recordId/openalex-id', async (c) => {
+    const recordId = recordIdOf(c.req.param('recordId'));
+    const body = await bodyOf(c, OpenalexBody);
+    if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    await c.env.commands!.setOpenalexId(recordId, body.openalexId, ctxOf(c));
+    return c.json({ ok: true }, 200, NO_STORE);
+  });
+  writes.post('/abes-exports', async (c) => {
+    const body = await bodyOf(c, AbesBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json({ updated: await c.env.commands!.markAbesSent(body.entries, body.date, ctxOf(c)) }, 200, NO_STORE);
+  });
+  app.route('/', writes);
+
   app.notFound((c) => c.json({ error: 'Unknown API route' }, 404, NO_STORE));
   app.onError((err, c) => {
+    // A command refused or failed after some writes: the audit of what was written still goes out.
+    const audit = (c as any).get?.('audit') as WriteAudit[] | undefined;
+    const headers: Record<string, string> = { ...NO_STORE, ...(audit?.length ? { [AUDIT_HEADER]: JSON.stringify(audit) } : {}) };
+    if (err instanceof ApiError) return c.json({ error: err.message }, err.status, headers);
     if (err instanceof DocumentNotAllowedError) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
     console.error('[api/v1]', c.req.method, c.req.path, err);
-    return c.json({ error: 'Directory storage unavailable' }, 502, NO_STORE);
+    return c.json({ error: 'Directory storage unavailable' }, 502, headers);
   });
   return app;
 };

@@ -19,7 +19,7 @@ function declared(): Set<string> {
 }
 
 /** Server error literals: fixed strings, and the head of `Head: ${detail}` templates. */
-function serverLiterals(): { file: string; text: string; raw: string }[] {
+function serverLiterals(): { file: string; text: string; raw: string; head?: string }[] {
   // server.cjs, functions/, and the shared modules they serve responses from.
   const files = [join(ROOT, 'server.cjs'), join(ROOT, 'scripts/lib/reports_store.cjs'), join(ROOT, 'scripts/lib/reports_ai.cjs')];
   const walk = (dir: string) => {
@@ -31,10 +31,16 @@ function serverLiterals(): { file: string; text: string; raw: string }[] {
   };
   walk(join(ROOT, 'functions'));
   walk(join(ROOT, 'lib/directory'));   // domain API (/api/v1), served by server.cjs and functions/
-  const out: { file: string; text: string; raw: string }[] = [];
+  const out: { file: string; text: string; raw: string; head?: string }[] = [];
   for (const file of files) {
     const src = readFileSync(file, 'utf8');
     for (const m of src.matchAll(/\berror: (['"])((?:\\.|(?!\1).)*)\1/g)) out.push({ file, text: m[2].replace(/\\(['"])/g, '$1'), raw: m[0] });
+    // Domain API commands (lib/directory/commands.ts): new ApiError(<status>, '…')
+    for (const m of src.matchAll(/\bnew ApiError\(\d+, (['"])((?:\\.|(?!\1).)*)\1/g)) {
+      // Translated whole, or by its head when it has the `Head: detail` shape (translateApiError).
+      const text = m[2].replace(/\\(['"])/g, '$1');
+      out.push({ file, text, raw: m[0], head: text.includes(': ') ? text.slice(0, text.indexOf(': ')) : undefined });
+    }
     for (const m of src.matchAll(/\berror: `([^`$]*)\$\{/g)) {
       // `Head: detail ${x}` → translated by head (see translateApiError)
       const head = m[1].includes(': ') ? m[1].slice(0, m[1].indexOf(': ')) : m[1].replace(/:\s*$/, '').trim();
@@ -51,7 +57,7 @@ describe('API error catalog', () => {
   it('declares every error literal of server.cjs, functions/ and the shared server modules', () => {
     const known = declared();
     const missing = serverLiterals()
-      .filter((l) => l.text && !IGNORED.has(l.text) && !known.has(l.text))
+      .filter((l) => l.text && !IGNORED.has(l.text) && !known.has(l.text) && !(l.head && known.has(l.head)))
       .map((l) => `${l.file.replace(ROOT + '/', '')}: ${l.raw}`);
     expect(missing, `Undeclared server error messages:\n${missing.join('\n')}`).toEqual([]);
   });

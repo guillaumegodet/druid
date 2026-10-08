@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Save, RefreshCw, FileDown, ExternalLink, Database, ShieldCheck, X, Pencil, ImageOff, ClipboardList } from 'lucide-react';
 import { Researcher, ResearcherStatus, Affiliation, Structure, StructureLevel, ViewState } from '../types';
 import { GristService } from '../lib/gristService';
+import { DirectoryApi } from '../lib/directoryApi';
 import { ExportService } from '../lib/exportService';
 import { canUseEstablishmentTools, getUserInfo, hasCapability } from '../lib/auth';
 import type { ValidationInfo, ValidationScope } from '../lib/validation';
@@ -218,9 +219,9 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
       lines.push(t`No known lab among the LDAP affectations (principal: ${affectation}): choose it in Memberships.`);
       tone = 'warn';
     }
-    const existing = await GristService.fetchAnnuaireRowsByUid(person.uid).catch(() => []);
-    if (existing.length) {
-      const labs = existing.map((r) => String(r.fields['LABO'] || '—')).join(', ');
+    const existingLabs = await DirectoryApi.labsOfUid(person.uid).catch(() => [] as string[]);
+    if (existingLabs.length) {
+      const labs = existingLabs.join(', ');
       lines.push(t`This uid already has a directory record (${labs}): check it before creating a duplicate.`);
       tone = 'warn';
     }

@@ -285,6 +285,9 @@ app.use((req, res, next) => {
     const event = auditEventOf({ method: req.method, path: req.path, status: res.statusCode, signedIn: !!user });
     if (event === 'grist.write') {
       activity.audit(event, { ...base, ...gristWriteSummary(req.method, req.path.replace('/api/grist/', ''), req.body) });
+    } else if (event === 'api.write' && res.locals.apiAudit) {
+      // Domain API (/api/v1): the Grist writes the command made (table, kind, rows, fields) — lib/directory/api.ts.
+      activity.audit(event, { ...base, writes: res.locals.apiAudit });
     } else if (event) {
       activity.audit(event, base);
     }

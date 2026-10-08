@@ -28,6 +28,10 @@ export const RATTACHEMENT_COL = 'rattachement';
 
 export type RattachementRole = 'PRINCIPAL' | 'SECONDAIRE' | 'HISTORIQUE';
 
+export const RATTACHEMENT_CHOICES: RattachementRole[] = ['PRINCIPAL', 'SECONDAIRE', 'HISTORIQUE'];
+
+export const DUPLICATE_DECISION_COL = 'doublon_decision';
+
 /**
  * Groups the QUALIFIED Annuaire rows of the same person (same uid_dyna, exactly one
  * `rattachement = PRINCIPAL` row) into a single Druid researcher carried by the principal row,
