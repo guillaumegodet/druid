@@ -47,6 +47,7 @@ export const API_ERRORS = [
   msg`Directory storage unavailable`,
   msg`API v1 unavailable`,
   msg`Invalid record`,
+  msg`Grist error (partial write)`,
   msg`Qualification: primary row required`,
   msg`Invalid LDAP uid`,
   msg`This uid already has a directory record, merge the two records instead`,

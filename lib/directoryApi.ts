@@ -6,6 +6,7 @@ import type { Researcher, Structure } from '../types';
 import type { ValidationInfo } from './validation';
 import type { AnnuaireColumnMeta } from './directory/annuaireWrite';
 import type { DuplicatesDiff } from './directory/duplicates';
+import type { LdapCandidatesDiff, LdapDiff, StructuresLdapDiff } from './directory/ldap';
 import type { AbesExportMark, Institution, MergeLogEntry } from './directory/gristMapping';
 import type { NewsletterItem } from './publications/newsletter';
 import type { AxisCorrectionRow } from './publications/axes';
@@ -21,6 +22,14 @@ async function fetchItems<T>(path: string): Promise<T[]> {
   return Array.isArray(body?.items) ? body.items : [];
 }
 
+/** `GET /api/v1/<path>` → the JSON answer as is. Throws on an HTTP error. */
+async function fetchJson<T>(path: string): Promise<T> {
+  const resp = await fetch(`${DIRECTORY_API_BASE}/${path}`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+  const resource = path.split(/[/?]/)[0];
+  if (!resp.ok) throw new Error(t`Directory unavailable (${resource}, HTTP ${resp.status}).`);
+  return resp.json();
+}
+
 /** Write request (JSON body); an error answer throws its `error` text, translated by apiErrorText. */
 async function send<T>(method: 'POST' | 'PUT' | 'PATCH', path: string, body: unknown): Promise<T> {
   const resp = await fetch(`${DIRECTORY_API_BASE}/${path}`, {
@@ -30,7 +39,11 @@ async function send<T>(method: 'POST' | 'PUT' | 'PATCH', path: string, body: unk
   });
   const payload = await resp.json().catch(() => null);
   const resource = path.split(/[/?]/)[0];
-  if (!resp.ok) throw new Error(payload?.error || t`Directory unavailable (${resource}, HTTP ${resp.status}).`);
+  if (!resp.ok) {
+    // Details of the answer (e.g. `updated`: rows already written when a batched write stopped) stay on the error.
+    const error = new Error(payload?.error || t`Directory unavailable (${resource}, HTTP ${resp.status}).`);
+    throw Object.assign(error, payload && typeof payload === 'object' ? { ...payload, message: error.message } : {});
+  }
   return payload as T;
 }
 
@@ -58,12 +71,7 @@ export const DirectoryApi = {
     send('POST', 'people/validations', { entries }),
   markAbesSent: async (entries: { recordId: number; hash: string }[], date: string): Promise<number> =>
     (await send<{ updated: number }>('POST', 'abes-exports', { entries, date })).updated,
-  duplicates: async (): Promise<DuplicatesDiff> => {
-    const resource = 'duplicates';
-    const resp = await fetch(`${DIRECTORY_API_BASE}/${resource}`, { headers: { Accept: 'application/json' } });
-    if (!resp.ok) throw new Error(t`Directory unavailable (${resource}, HTTP ${resp.status}).`);
-    return resp.json();
-  },
+  duplicates: (): Promise<DuplicatesDiff> => fetchJson('duplicates'),
   recordRows: (ids: number[]): Promise<{ rowId: number; fields: Record<string, any> }[]> =>
     fetchItems(`people/rows?ids=${ids.join(',')}`),
   qualifyDuplicates: (args: { rowIds: number[]; principalRowId?: number; mode: 'concomitant' | 'successif' | 'a_revoir'; endDate?: string; author: string }) =>
@@ -74,6 +82,17 @@ export const DirectoryApi = {
   mergeRows: (args: { keepRowId: number; dropRowId: number; fields: Record<string, any>; author: string; note?: string }) =>
     send<{ logId: number }>('POST', 'merges', args),
   restoreMerge: (logId: number) => send<{ restoredRowId: number }>('POST', `merges/${logId}/restore`, {}),
+  ldapDiff: (): Promise<LdapDiff> => fetchJson('ldap/diff'),
+  ldapCandidates: (): Promise<LdapCandidatesDiff> => fetchJson('ldap/candidates'),
+  ldapStructures: (): Promise<StructuresLdapDiff> => fetchJson('ldap/structures'),
+  applyLdapUpdates: (ids: string[]) => send<{ updated: number }>('POST', 'ldap/updates', { ids }),
+  markLdapDeparted: (uid: string, date: string, accountLabel: string) =>
+    send<{ updated: number }>('POST', 'ldap/departures', { uid, date, accountLabel }),
+  applyLdapCandidates: (entries: { gristRowId: number; uid: string }[]) =>
+    send<{ updated: number; skippedDuplicates: { gristRowId: number; uid: string; existingRowId: number }[]; unknown: number }>(
+      'POST', 'ldap/candidates', { entries }),
+  applyStructuresLdap: (updateIds: string[], createKeys: string[]) =>
+    send<{ updated: number; created: number }>('POST', 'ldap/structures', { updateIds, createKeys }),
   createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
   updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
 };
