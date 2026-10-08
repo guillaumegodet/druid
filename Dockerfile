@@ -49,6 +49,9 @@ COPY --from=build /app/server-api.cjs ./server-api.cjs
 COPY --from=build /app/build-info.json ./build-info.json
 # Help centre pages: source of the « Aide Druid » assistant (/api/help-chat, HELP_DOCS_DIR).
 COPY --from=build /app/help/src/content/docs ./help/src/content/docs
+# PostgreSQL migrations (druid-internal docs/plan-migration-postgresql.md, lot 4): shipped with the code they belong to,
+# run by `node_modules/.bin/dbmate --migrations-dir db/migrations up` (one-shot service before the application).
+COPY --from=build /app/db ./db
 
 EXPOSE 3000
 # Liveness: /api/health answers without session (node:20-slim has no curl).

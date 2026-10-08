@@ -25,6 +25,7 @@
   "dependencies": {
     "@lingui/core": "^5.9.5",
     "@lingui/react": "^5.9.5",
+    "dbmate": "^2.36.0",
     "dotenv": "^16.4.5",
     "echarts": "^6.0.0",
     "express": "^4.22.3",
@@ -54,7 +55,6 @@
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^5.0.0",
     "autoprefixer": "^10.6.1",
-    "dbmate": "^2.36.0",
     "kysely-codegen": "^0.20.0",
     "postcss": "^8.5.28",
     "tailwindcss": "^3.4.19",
