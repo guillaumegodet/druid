@@ -8,7 +8,7 @@ import type { DirectoryRows, Issue, IssueCode } from './gristToPg';
 
 export interface TaskRow {
   legacy_grist_id: number; key: string | null; type: string; base: string | null; channel: string | null; title: string;
-  description: string | null; person_id: string | null; uid: string | null; person_name: string | null; lab: string | null;
+  description: string | null; person_id: string | null; membership_id: number | null; uid: string | null; person_name: string | null; lab: string | null;
   link: string | null; status: string; assignee: string | null; priority: string; origin: string | null;
   created_by: string | null; created_at: string | null; taken_by: string | null; taken_at: string | null;
   waiting_reason: string | null; done_by: string | null; done_at: string | null; resolution: string | null;
@@ -27,7 +27,7 @@ export interface AlignmentRow {
 }
 export interface ImportBatchRow { legacy_table: string; source: string; label: string | null }
 export interface ImportRowRow {
-  legacy_grist_id: number; person_id: string | null; person_label: string | null; lab: string | null; family: string | null;
+  legacy_grist_id: number; person_id: string | null; membership_id: number | null; person_label: string | null; lab: string | null; family: string | null;
   field: string; current_value: string | null; imported_value: string | null; imported_json: unknown; remark: string | null;
   choice: string | null; other_value: string | null; resolved_at: string | null; resolved_by: string | null;
   extra: Record<string, unknown>; $batch: string;
@@ -107,6 +107,8 @@ export const transformWork = (input: GristWorkInput, directory: DirectoryRows): 
   const personOfRow = new Map(directory.membership.map((m) => [m.legacy_grist_id, m.person_id]));
   const personOfUid = new Map(directory.person.filter((p) => p.uid).map((p) => [p.uid!, p.id]));
   const personOf = (rowId: unknown): string | null => (typeof rowId === 'number' && rowId > 0 ? personOfRow.get(rowId) ?? null : null);
+  /** The membership of an Annuaire row (its id is the row id), when the row was imported. */
+  const membershipOf = (rowId: unknown): number | null => (personOf(rowId) ? rowId as number : null);
   const personOfKey = (uid: unknown): string | null => {
     const u = String(uid ?? '').trim().toLowerCase();
     const g = /^g(\d+)$/.exec(u);
@@ -170,7 +172,7 @@ export const transformWork = (input: GristWorkInput, directory: DirectoryRows): 
     if (!PRIORITIES.includes(priority)) { extra.priorite = f.priorite; issue('work_value_kept_in_extra', 'Taches', [r.id], ['priorite']); priority = 'normale'; }
     task.push({
       legacy_grist_id: r.id, key, type: text(f.type) ?? '', base: text(f.base), channel: text(f.canal), title: String(f.titre ?? '').trim(),
-      description: text(f.description), person_id: personId, uid: text(f.uid_dyna), person_name: text(f.nom), lab: text(f.labo),
+      description: text(f.description), person_id: personId, membership_id: membershipOf(f.chercheur), uid: text(f.uid_dyna), person_name: text(f.nom), lab: text(f.labo),
       link: text(f.lien), status, assignee: text(f.assignee), priority, origin: text(f.origine), created_by: text(f.cree_par),
       created_at: timestamp(extra, 'Taches', r.id, 'cree_le', f.cree_le), taken_by: text(f.pris_par),
       taken_at: timestamp(extra, 'Taches', r.id, 'pris_le', f.pris_le), waiting_reason: text(f.attente_motif), done_by: text(f.fait_par),
@@ -257,7 +259,7 @@ export const transformWork = (input: GristWorkInput, directory: DirectoryRows): 
       const personId = personOf(f.Fiche);
       if (!personId && !isEmpty(f.Fiche) && f.Fiche !== 0) { extra.Fiche = f.Fiche; issue('work_person_unresolved', table, [r.id], ['Fiche']); }
       import_row.push({
-        legacy_grist_id: r.id, person_id: personId, person_label: text(f.Personne), lab: text(f.Labo), family: text(f.Famille),
+        legacy_grist_id: r.id, person_id: personId, membership_id: membershipOf(f.Fiche), person_label: text(f.Personne), lab: text(f.Labo), family: text(f.Famille),
         field: String(f.Champ ?? '').trim(), current_value: text(f.Valeur_actuelle), imported_value: text(f.Valeur_importee),
         imported_json: json(extra, table, r.id, 'Valeur_importee_json', f.Valeur_importee_json), remark: text(f.Remarque),
         choice: text(f.Choix), other_value: text(f.Valeur_autre), resolved_at: timestamp(extra, table, r.id, 'Resolu_le', f.Resolu_le),

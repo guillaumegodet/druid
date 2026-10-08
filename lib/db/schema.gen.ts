@@ -106,6 +106,7 @@ export interface ImportRow {
   imported_value: string | null;
   lab: string | null;
   legacy_grist_id: number | null;
+  membership_id: Int8 | null;
   other_value: string | null;
   person_id: string | null;
   person_label: string | null;
@@ -314,6 +315,7 @@ export interface Task {
   lab: string | null;
   legacy_grist_id: number | null;
   link: string | null;
+  membership_id: Int8 | null;
   origin: string | null;
   person_id: string | null;
   person_name: string | null;
