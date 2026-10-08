@@ -2,6 +2,7 @@
 // writable tables, the column types of a migrated Annuaire, and Grist's defaults on a new row.
 import type { GristClient } from '../../directory/repository';
 import type { GristRecord } from '../../directory/gristMapping';
+import { parseGristSql } from '../../directory/pg/tableClient';
 
 /** In-memory Grist: the tables of the fixture, writable, with the column types of a migrated Annuaire. */
 export const memoryGrist = (initial: Record<string, GristRecord[]>): GristClient => {
@@ -39,17 +40,17 @@ export const memoryGrist = (initial: Record<string, GristRecord[]>): GristClient
     }),
     updateRecords: async (t, records) => { for (const r of records) Object.assign(tables[t].find((x) => x.id === r.id)!.fields, r.fields); },
     deleteRecords: async (t, ids) => { tables[t] = tables[t].filter((r) => !ids.includes(r.id)); },
+    // Grist's read-only SQL, for the queries the application sends (lib/directory/pg/tableClient.ts parseGristSql):
+    // raw cells, `*` = id and every column.
     sql: async (query, args) => {
-      // SELECT <columns> FROM "<table>" WHERE "<column>" = ? (tasks of a record).
-      const where = /^SELECT ([\w, ]+) FROM "(\w+)" WHERE "(\w+)" = \?$/.exec(query);
-      if (where) {
-        const cols = where[1].split(',').map((c) => c.trim());
-        return (tables[where[2]] || []).filter((r) => r.fields[where[3]] === args[0])
-          .map((r) => Object.fromEntries(cols.map((c) => [c, c === 'id' ? r.id : r.fields[c]])));
-      }
-      const t = /FROM (\w+)/.exec(query)![1];
-      const col = /SELECT id, (\w+) AS v/.exec(query)![1];
-      return (tables[t] || []).filter((r) => (args as number[]).includes(r.id)).map((r) => ({ id: r.id, v: r.fields[col] }));
+      const { columns, table, where } = parseGristSql(query);
+      const values = (args || []) as unknown[];
+      return (tables[table] || [])
+        .filter((r) => !where || values.slice(0, where.op === '=' ? 1 : values.length).includes(where.col === 'id' ? r.id : r.fields[where.col]))
+        .map((r) => {
+          const row: Record<string, any> = { id: r.id, ...r.fields };
+          return columns ? Object.fromEntries(columns.map(({ col, alias }) => [alias, row[col] ?? null])) : row;
+        });
     },
   };
 };

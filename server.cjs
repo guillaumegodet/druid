@@ -11,6 +11,11 @@ const storage = () => {
   return serverStorage;
 };
 const gristClient = () => storage().grist;
+// Tables of the directory read by the routes below (records of a key, labs, structures): the Grist document, or with
+// DRUID_STORAGE=postgres the migrated tables seen as that document (lot 6 f). The tables that are not migrated
+// (Newsletter, Corrections_affiliations_Openalex, publications) stay read through gristClient().
+const tables = () => storage().tables;
+const STORAGE_KIND = String(process.env.DRUID_STORAGE || 'grist').trim().toLowerCase();
 if (!GRIST_API_KEY) {
   console.error('[Druid] GRIST_API_KEY missing: set it in docker/druid/.env (no hard-coded fallback).');
 } else if (!process.env.GRIST_API_KEY) {
@@ -118,8 +123,10 @@ const CAPABILITIES = {
 const INSTANCE_INFO = {
   slug: process.env.DRUID_INSTANCE || 'nantes',
   label: process.env.INSTANCE_LABEL || 'Nantes Université',
-  gristDocId: process.env.VITE_GRIST_DOC_ID || '',
+  // No « open in Grist » link once the directory lives in PostgreSQL (the document is then an archive).
+  gristDocId: STORAGE_KIND === 'postgres' ? '' : process.env.VITE_GRIST_DOC_ID || '',
   gristPublicBaseUrl: null,
+  storage: STORAGE_KIND,
   gristUiUrl: (process.env.VITE_GRIST_UI_URL || 'https://grist.numerique.gouv.fr').replace(/\/+$/, ''),
 };
 
@@ -211,7 +218,7 @@ const resolveAnnuaireLabs = async (username) => {
   if (!doc || !GRIST_API_KEY || !username) return [];
   const todayIso = new Date().toISOString().slice(0, 10);
   const labs = new Set();
-  for (const r of await gristClient().records('Annuaire', { uid_dyna: [username] })) {
+  for (const r of await tables().records('Annuaire', { uid_dyna: [username] })) {
     const f = r.fields || {};
     const labo = String(f.LABO || '').trim();
     if (!labo || labo.toLowerCase() === 'zzz') continue;
@@ -1392,7 +1399,7 @@ const resolveAuthorMentions = async (authorNames) => {
   if (!doc || !gristKey) return [];
   try {
     const byName = new Map();
-    for (const r of await gristClient().records('Annuaire')) {
+    for (const r of await tables().records('Annuaire')) {
       const f = r.fields || {};
       const linkedin = String(f.LinkedIn || '').trim();
       if (!linkedin) continue;
@@ -1992,13 +1999,16 @@ const workServices = require('./scripts/lib/work_services.cjs');
 const { gristWorkPorts } = require('./scripts/lib/work_grist.cjs');
 const tasksSchema = require('./scripts/lib/tasks_schema.cjs');
 const importConflicts = require('./scripts/lib/import_conflicts.cjs');
-const workPorts = () => gristWorkPorts(gristClient(), { key: `${GRIST_API_BASE}/${process.env.VITE_GRIST_DOC_ID}`, log: console.log });
 const taskAuthor = (req) => req.session.user.preferred_username || req.session.user.email || req.session.user.name || 'druid';
+/** Ports of the request: PostgreSQL (writes audited under the user) or the Grist document. */
+const workPorts = (req) => (storage().workPorts
+  ? storage().workPorts(taskAuthor(req))
+  : gristWorkPorts(gristClient(), { key: `${GRIST_API_BASE}/${process.env.VITE_GRIST_DOC_ID}`, log: console.log }));
 /** Task routes: the service of the request's ports; errors answered with their status (input → 400, storage → 502). */
 const withTasks = (handler) => async (req, res) => {
   if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    await handler(req, res, workServices.createTasksService(workPorts().tasks));
+    await handler(req, res, workServices.createTasksService(workPorts(req).tasks));
   } catch (e) {
     res.status(workServices.workErrorStatus(e)).json({ error: e.message });
   }
@@ -2016,7 +2026,7 @@ const parseTaskId = (req, res) => {
 app.get('/api/benchmark/peer-groups', async (req, res) => {
   if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    res.json({ groups: await workPorts().peerGroups.list(req.session.user.preferred_username) });
+    res.json({ groups: await workPorts(req).peerGroups.list(req.session.user.preferred_username) });
   } catch (e) {
     res.status(502).json({ error: e.message });
   }
@@ -2030,7 +2040,7 @@ app.post('/api/benchmark/peer-groups', async (req, res) => {
   if (!name) return res.status(400).json({ error: 'Name required' });
   if (rors.length === 0) return res.status(400).json({ error: 'Empty list' });
   try {
-    const id = await workPorts().peerGroups.save(owner, name, rors);
+    const id = await workPorts(req).peerGroups.save(owner, name, rors);
     res.json({ id, name, rors });
   } catch (e) {
     res.status(502).json({ error: e.message });
@@ -2042,7 +2052,7 @@ app.delete('/api/benchmark/peer-groups/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!Number.isFinite(id)) return res.status(400).json({ error: 'Invalid id' });
   try {
-    if (!(await workPorts().peerGroups.remove(req.session.user.preferred_username, id))) return res.status(404).json({ error: 'Not found' });
+    if (!(await workPorts(req).peerGroups.remove(req.session.user.preferred_username, id))) return res.status(404).json({ error: 'Not found' });
     res.json({ ok: true });
   } catch (e) {
     res.status(502).json({ error: e.message });
@@ -2069,7 +2079,7 @@ app.all(
     if (!GRIST_API_KEY) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
     const sessionUser = req.session.user;
     if (!sessionUser?.preferred_username) return res.status(401).json({ error: 'Unauthorized' });
-    const store = reportsStore.createReportsStore(workPorts().reports, { blobs: reportBlobs });
+    const store = reportsStore.createReportsStore(workPorts(req).reports, { blobs: reportBlobs });
     const user = { id: sessionUser.preferred_username, isSuperAdmin: !!sessionUser.access?.isSuperAdmin };
     const out = await reportsStore.routeReports(store, user, {
       method: req.method,
@@ -2155,7 +2165,7 @@ app.get('/api/tasks/openalex-affiliations', requireSuperAdmin, async (req, res) 
 const withConflicts = (handler) => async (req, res) => {
   if (!process.env.VITE_GRIST_DOC_ID) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    await handler(req, res, workServices.createConflictsService(workPorts().conflicts));
+    await handler(req, res, workServices.createConflictsService(workPorts(req).conflicts));
   } catch (e) {
     res.status(workServices.workErrorStatus(e)).json({ error: e.message });
   }
@@ -2403,7 +2413,7 @@ app.post('/api/sync-structures-csv', requireEstablishmentScope, async (req, res)
     const DOC = process.env.VITE_GRIST_DOC_ID;
     const KEY = GRIST_API_KEY;
     if (!DOC || !KEY) throw new Error('VITE_GRIST_DOC_ID / GRIST_API_KEY non configurés');
-    const records = await gristClient().records('Structures');
+    const records = await tables().records('Structures');
     const { csv, count } = buildStructuresCsv(records);
     fs.writeFileSync(STRUCT_CSV_PATH, csv, 'utf8');
     console.log(`[cdb] structures.csv written: ${count} rows`);
@@ -2506,6 +2516,9 @@ try {
     gristDocId: process.env.VITE_GRIST_DOC_ID || '',
     gristApiKey: GRIST_API_KEY,
     gristExtraDocIds: String(process.env.GRIST_EXTRA_DOC_IDS || '').split(',').map((s) => s.trim()).filter(Boolean),
+    // Directory and work tables in PostgreSQL (druid-internal docs/plan-migration-postgresql.md, lot 6 f).
+    storage: apiV1.storageKindFromEnv(process.env),
+    databaseUrl: process.env.DRUID_DATABASE_URL || '',
     appRoot: __dirname,
     hasLdap: CAPABILITIES.HAS_LDAP,
     hasQualinka: CAPABILITIES.HAS_QUALINKA,
@@ -2617,8 +2630,8 @@ const ahRunInfo = () => {
 const annuaireLabosOf = async (key) => {
   const byRow = /^g(\d+)$/.exec(key);
   const rows = byRow
-    ? await gristClient().sql('SELECT "LABO" AS v FROM "Annuaire" WHERE id = ?', [Number(byRow[1])])
-    : await gristClient().sql('SELECT "LABO" AS v FROM "Annuaire" WHERE "uid_dyna" = ?', [key]);
+    ? await tables().sql('SELECT "LABO" AS v FROM "Annuaire" WHERE id = ?', [Number(byRow[1])])
+    : await tables().sql('SELECT "LABO" AS v FROM "Annuaire" WHERE "uid_dyna" = ?', [key]);
   return rows.map((row) => row.v || '');
 };
 /** Runs the job for ONE person (index merged on write, full-run progress untouched). */
@@ -2720,7 +2733,7 @@ const institutionForSuggestions = () => {
   suggestionInstitution = { name: INSTANCE_INFO.label, ror };
   return suggestionInstitution;
 };
-const gristSqlRows = (sql, args) => gristClient().sql(sql, args);
+const gristSqlRows = (sql, args) => tables().sql(sql, args);
 const annuaireRowsForKey = (key) => {
   const byRow = /^g(\d+)$/.exec(key);
   return byRow
@@ -2784,7 +2797,7 @@ app.get('/api/researchers/:key/suggestions', async (req, res) => {
   const ruleHit = (name) => { try { return RULES[name].detect(ctx)[0]?.description || null; } catch { return null; } };
   let tasks = [];
   try {
-    tasks = await workServices.createTasksService(workPorts().tasks).ofUid(key);
+    tasks = await workServices.createTasksService(workPorts(req).tasks).ofUid(key);
   } catch { /* no task table yet: nothing hidden */ }
   const { suggestions, hidden } = SUGG.computeSuggestions({
     record, entry: AH_STORE.readEntry(AFFILIATION_HISTORY_DIR, key), orcidEmpty,
@@ -3100,7 +3113,7 @@ let labUidsCache = { at: 0, rows: null };
 const labUidsOf = async (anchors) => {
   if (!anchors.length) return new Set();
   if (!labUidsCache.rows || Date.now() - labUidsCache.at > 5 * 60 * 1000) {
-    labUidsCache = { at: Date.now(), rows: await gristClient().sql('SELECT uid_dyna AS uid, LABO AS labo FROM Annuaire', []) };
+    labUidsCache = { at: Date.now(), rows: await tables().sql('SELECT uid_dyna AS uid, LABO AS labo FROM Annuaire', []) };
   }
   const anchorOf = (v) => normalizeAcronym(String(v || ''));   // lab of an Annuaire row (LABO), as the API scope
   return new Set(labUidsCache.rows.filter((x) => x.uid && anchors.includes(anchorOf(x.labo))).map((x) => String(x.uid)));

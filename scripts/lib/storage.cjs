@@ -17,14 +17,19 @@ const load = () => {
 };
 
 /**
- * Grist client configured from the environment. Built on each call (no state; the global fetch is read at that
- * moment): records(table, filter?), tableIds(), columns(table), addRecords, updateRecords, deleteRecords,
- * addColumns, updateColumns, addTables, sql.
+ * Tables of the directory, configured from the environment: the Grist client of the document, or with
+ * DRUID_STORAGE=postgres the migrated tables seen as that document (lot 6 f) — records(table, filter?), tableIds(),
+ * columns(table), addRecords, updateRecords, deleteRecords, addColumns, updateColumns, addTables, sql. Built on each
+ * call (the PostgreSQL pool is shared by the process; the global fetch is read at that moment).
  */
-const grist = (userAgent) => load().gristClientFromEnv(process.env, userAgent);
+const grist = (userAgent) => load().tablesFromEnv(process.env, userAgent);
+/** Storage of the directory: 'grist' or 'postgres'. */
+const kind = () => load().storageKindFromEnv(process.env);
+/** Closes the PostgreSQL pool (end of a job). */
+const close = () => load().closeDatabases();
 
 /** Client, repository and domain commands (lib/directory/jobStorage.ts), with the command context of a job. */
 const jobStorage = (userAgent) => load().jobStorageFromEnv(process.env, userAgent);
 const jobContext = (onWrite) => load().jobContext(onWrite);
 
-module.exports = { grist, jobStorage, jobContext };
+module.exports = { grist, kind, close, jobStorage, jobContext };

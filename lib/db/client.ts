@@ -17,11 +17,13 @@ export interface DbOptions {
   connectionString: string;
   /** Pool size: the database is small and shared with the jobs. */
   max?: number;
+  /** A job: its process may end while idle connections remain (they no longer keep it alive). */
+  allowExitOnIdle?: boolean;
 }
 
-export const createDb = ({ connectionString, max = 5 }: DbOptions): Db =>
+export const createDb = ({ connectionString, max = 5, allowExitOnIdle = false }: DbOptions): Db =>
   new Kysely<DB>({
-    dialect: new PostgresDialect({ pool: new pg.Pool({ connectionString, max, types: { getTypeParser: typeParser } }) }),
+    dialect: new PostgresDialect({ pool: new pg.Pool({ connectionString, max, allowExitOnIdle, types: { getTypeParser: typeParser } }) }),
   });
 
 /**

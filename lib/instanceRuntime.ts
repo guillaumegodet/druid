@@ -19,6 +19,8 @@ export interface InstanceInfo {
   gristPublicBaseUrl: string | null;
   /** Grist web interface hosting the doc (link « open in Grist »). */
   gristUiUrl: string;
+  /** Storage of the directory (server.cjs, DRUID_STORAGE): absent on Cloudflare (Grist). */
+  storage?: 'grist' | 'postgres';
 }
 
 const DEFAULT_GRIST_UI_URL = 'https://grist.numerique.gouv.fr';
