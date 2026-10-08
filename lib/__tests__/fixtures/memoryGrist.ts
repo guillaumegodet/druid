@@ -11,10 +11,11 @@ export const memoryGrist = (initial: Record<string, GristRecord[]>): GristClient
   const annuaireColumns = ['uid_dyna', 'Nom', 'Prenom', 'Civilite', 'Email', 'Nationalite', 'DATE_DE_NAISSANCE_JJ_MM_AAAA', 'LABO', 'team',
     'affiliation_start_date', 'affiliation_end_date', 'membership_type', 'rattachement', 'doublon_decision', 'Employeur', 'employment_start_date',
     'employment_end_date', 'Corps_grade', 'TYPE_EMPLOI', 'LIB_TYPE_EMPLOI', 'etp_quotite', 'etp_recherche', 'N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_',
-    'ORCID', 'IdRef', 'IdHAL', 'IdHAL_i', 'ID_SCOPUS', 'OpenAlex_ids', 'openalex_author_id', 'photo_url', 'Bluesky', 'Mastodon', 'YouTube',
+    'ORCID', 'IdRef', 'IdRef_nom_valide', 'IdHAL', 'IdHAL_i', 'ID_SCOPUS', 'OpenAlex_ids', 'openalex_author_id', 'photo_url', 'Bluesky', 'Mastodon', 'YouTube',
     'Podcast_flux', 'Blog', 'LinkedIn', 'CV_institutionnel', 'CV_site_labo', 'CV_pdf_docx_', 'CV_HAL', 'Academia', 'Researchgate', 'Profil_GS',
     'Site_web', 'validated', 'validated_status', 'validation_date', 'validation_source', 'validation_scope', 'validated_by', 'statut_dyna',
-    'Data_source', 'LDAP_derniere_maj', 'groupes', 'ABES_export_hash', 'ABES_export_date', 'Commentaires', 'HDR', 'ANNEE_HDR'];
+    'Data_source', 'LDAP_derniere_maj', 'groupes', 'ABES_export_hash', 'ABES_export_date', 'Commentaires', 'HDR', 'ANNEE_HDR',
+    'ED_de_rattachement', 'annuaire_url'];
   // Row ids never come back after a deletion (as PostgreSQL sequences): a monotonic counter per table.
   const counters: Record<string, number> = {};
   const nextId = (t: string) => (counters[t] = Math.max(counters[t] ?? 0, ...(tables[t] || []).map((r) => r.id)) + 1);

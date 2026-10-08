@@ -9,7 +9,7 @@
 import { sql } from 'kysely';
 import type { Db } from '../../db/client';
 import { computeDuplicateGroups } from '../duplicates';
-import { loadPersonParts, readRecordFields } from './recordFields';
+import { readRecords } from './recordFields';
 import type { Researcher, Structure } from '../../../types';
 import { normalizeAcronym } from '../../normalize';
 import { mapDirectoryRows } from '../people';
@@ -70,16 +70,7 @@ export const createPgDirectoryRepository = ({ db, loadLdapCache }: PgDirectoryRe
   };
 
   /** Memberships → { id, fields } in the record fields of the API. */
-  const recordsOf = async (memberships: any[]) => {
-    if (!memberships.length) return [];
-    const personIds = [...new Set(memberships.map((m) => m.person_id))];
-    const [persons, parts] = await Promise.all([
-      db.selectFrom('person').selectAll().where('id', 'in', personIds).execute(),
-      loadPersonParts(db, personIds),
-    ]);
-    const personOf = new Map(persons.map((p) => [p.id, p]));
-    return memberships.map((m) => ({ id: Number(m.id), fields: readRecordFields(personOf.get(m.person_id)!, m, parts.get(m.person_id)!) }));
-  };
+  const recordsOf = (memberships: any[]) => readRecords(db, memberships);
 
   let rowsCache: { key: string; rows: Promise<Awaited<ReturnType<typeof loadRows>>> } | null = null;
   const rowsAt = (key: string) => {
