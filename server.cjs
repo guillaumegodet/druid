@@ -3,6 +3,14 @@ const express = require('express');
 // Grist API key: server variable GRIST_API_KEY (no VITE_ prefix, which would
 // send it to the browser bundle). Deprecated fallback on the old name.
 const GRIST_API_KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY || '';
+// Directory storage shared by /api/v1 and the routes below (server/apiV1.ts createServerStorage, druid-internal
+// docs/plan-migration-postgresql.md, lot 3 c): set where /api/v1 is mounted. No route calls the Grist API itself.
+let serverStorage = null;
+const storage = () => {
+  if (!serverStorage) throw new Error('Directory storage unavailable (server-api.cjs, VITE_GRIST_DOC_ID)');
+  return serverStorage;
+};
+const gristClient = () => storage().grist;
 if (!GRIST_API_KEY) {
   console.error('[Druid] GRIST_API_KEY missing: set it in docker/druid/.env (no hard-coded fallback).');
 } else if (!process.env.GRIST_API_KEY) {
@@ -201,14 +209,9 @@ const isFuzzyDatePast = (raw, todayIso) => { const u = fuzzyDateBound(raw, 'end'
 const resolveAnnuaireLabs = async (username) => {
   const doc = process.env.VITE_GRIST_DOC_ID;
   if (!doc || !GRIST_API_KEY || !username) return [];
-  const filter = encodeURIComponent(JSON.stringify({ uid_dyna: [username] }));
-  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/Annuaire/records?filter=${filter}`, {
-    headers: { Authorization: `Bearer ${GRIST_API_KEY}` },
-  });
-  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status}`);
   const todayIso = new Date().toISOString().slice(0, 10);
   const labs = new Set();
-  for (const r of (await resp.json()).records || []) {
+  for (const r of await gristClient().records('Annuaire', { uid_dyna: [username] })) {
     const f = r.fields || {};
     const labo = String(f.LABO || '').trim();
     if (!labo || labo.toLowerCase() === 'zzz') continue;
@@ -1388,12 +1391,8 @@ const resolveAuthorMentions = async (authorNames) => {
   const gristKey = GRIST_API_KEY;
   if (!doc || !gristKey) return [];
   try {
-    const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/Annuaire/records`, {
-      headers: { Authorization: `Bearer ${gristKey}` },
-    });
-    if (!resp.ok) return [];
     const byName = new Map();
-    for (const r of (await resp.json()).records || []) {
+    for (const r of await gristClient().records('Annuaire')) {
       const f = r.fields || {};
       const linkedin = String(f.LinkedIn || '').trim();
       if (!linkedin) continue;
@@ -1476,18 +1475,11 @@ app.post('/api/newsletter/generate', async (req, res) => {
   const doc = process.env.VITE_GRIST_DOC_ID;
   const gristKey = GRIST_API_KEY;
   if (!doc || !gristKey) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID / GRIST_API_KEY not configured' });
-  const gristHeaders = { Authorization: `Bearer ${gristKey}`, 'Content-Type': 'application/json' };
 
   try {
+    const grist = gristClient();
     // 1. Briefs already in the table (any status) → a work_id is never regenerated.
-    const existingResp = await fetch(
-      `${GRIST_API_BASE}/docs/${doc}/tables/Newsletter/records?filter=${encodeURIComponent(JSON.stringify({ slug: [slug] }))}`,
-      { headers: gristHeaders },
-    );
-    if (!existingResp.ok) throw new Error(`Grist Newsletter HTTP ${existingResp.status}`);
-    const existing = new Set(
-      ((await existingResp.json()).records || []).map((r) => String(r.fields.work_id || '')),
-    );
+    const existing = new Set((await grist.records('Newsletter', { slug: [slug] })).map((r) => String(r.fields.work_id || '')));
 
     // 2. OpenAlex articles of the period (type article only).
     const from = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
@@ -1509,13 +1501,11 @@ app.post('/api/newsletter/generate', async (req, res) => {
     const labos = NEWS_INSTITUTION_SLUGS.has(slug) || !cfg.acronym
       ? null
       : [cfg.acronym.toUpperCase()];
-    const annuaireResp = await fetch(
-      `${GRIST_API_BASE}/docs/${doc}/tables/Annuaire/records`,
-      { headers: gristHeaders },
-    );
+    // An unreadable Annuaire leaves the briefs without researcher, as before.
+    const annuaireRows = await grist.records('Annuaire').catch(() => null);
     const byName = new Map();
-    if (annuaireResp.ok) {
-      for (const r of (await annuaireResp.json()).records || []) {
+    if (annuaireRows) {
+      for (const r of annuaireRows) {
         const f = r.fields || {};
         if (labos && !labos.includes(String(f.LABO || '').toUpperCase())) continue;
         const full = `${f.Prenom || ''} ${f.Nom || ''}`.trim();
@@ -1590,14 +1580,8 @@ app.post('/api/newsletter/generate', async (req, res) => {
         valide_par: '',
         commentaire: '',
       };
-      const add = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/Newsletter/records`, {
-        method: 'POST',
-        headers: gristHeaders,
-        body: JSON.stringify({ records: [{ fields }] }),
-      });
-      if (!add.ok) throw new Error(`Écriture Grist HTTP ${add.status}`);
-      const rec = (await add.json()).records?.[0];
-      created.push({ id: rec?.id ?? null, fields });
+      const [id] = await grist.addRecords('Newsletter', [{ fields }]);
+      created.push({ id: id ?? null, fields });
     }
 
     return res.json({ created, skipped: existing.size, remaining: works.length - created.length });
@@ -2010,48 +1994,27 @@ app.use('/api/etl/structures', etlStructures);
 // BENCHMARK_PEER_GROUPS_TABLE, auto-provisioned on first use (same
 // principle as pushIdrefReview in lib/gristService.ts).
 const BENCHMARK_PEER_GROUPS_TABLE = 'BenchmarkPeerGroups';
-const gristBenchmarkHeaders = () => {
-  const key = GRIST_API_KEY;
-  if (!key) throw new Error('GRIST_API_KEY non configurée');
-  return { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
-};
-const ensureBenchmarkPeerGroupsTable = async (doc, headers) => {
-  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables`, { headers });
-  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (liste des tables)`);
-  const { tables } = await resp.json();
-  if (tables.some((t) => t.id === BENCHMARK_PEER_GROUPS_TABLE)) return;
-  const create = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables`, {
-    method: 'POST',
-    headers,
-    body: JSON.stringify({
-      tables: [{
-        id: BENCHMARK_PEER_GROUPS_TABLE,
-        columns: [
-          { id: 'owner', fields: { label: 'Propriétaire (Keycloak)', type: 'Text' } },
-          { id: 'name', fields: { label: 'Nom de la liste', type: 'Text' } },
-          { id: 'rors', fields: { label: 'ROR (JSON)', type: 'Text' } },
-          { id: 'updated_at', fields: { label: 'Mis à jour le', type: 'Text' } },
-        ],
-      }],
-    }),
-  });
-  if (!create.ok) throw new Error(`Grist HTTP ${create.status} (création table)`);
+const ensureBenchmarkPeerGroupsTable = async (grist) => {
+  if ((await grist.tableIds()).includes(BENCHMARK_PEER_GROUPS_TABLE)) return;
+  await grist.addTables([{
+    id: BENCHMARK_PEER_GROUPS_TABLE,
+    columns: [
+      { id: 'owner', fields: { label: 'Propriétaire (Keycloak)', type: 'Text' } },
+      { id: 'name', fields: { label: 'Nom de la liste', type: 'Text' } },
+      { id: 'rors', fields: { label: 'ROR (JSON)', type: 'Text' } },
+      { id: 'updated_at', fields: { label: 'Mis à jour le', type: 'Text' } },
+    ],
+  }]);
 };
 
 app.get('/api/benchmark/peer-groups', async (req, res) => {
   const doc = process.env.VITE_GRIST_DOC_ID;
   if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    const headers = gristBenchmarkHeaders();
-    await ensureBenchmarkPeerGroupsTable(doc, headers);
+    const grist = gristClient();
+    await ensureBenchmarkPeerGroupsTable(grist);
     const owner = req.session.user.preferred_username;
-    const resp = await fetch(
-      `${GRIST_API_BASE}/docs/${doc}/tables/${BENCHMARK_PEER_GROUPS_TABLE}/records?filter=${
-        encodeURIComponent(JSON.stringify({ owner: [owner] }))}`,
-      { headers },
-    );
-    if (!resp.ok) throw new Error(`Grist HTTP ${resp.status}`);
-    const records = (await resp.json()).records || [];
+    const records = await grist.records(BENCHMARK_PEER_GROUPS_TABLE, { owner: [owner] });
     res.json({
       groups: records
         .map((r) => {
@@ -2075,35 +2038,18 @@ app.post('/api/benchmark/peer-groups', async (req, res) => {
   if (!name) return res.status(400).json({ error: 'Name required' });
   if (rors.length === 0) return res.status(400).json({ error: 'Empty list' });
   try {
-    const headers = gristBenchmarkHeaders();
-    await ensureBenchmarkPeerGroupsTable(doc, headers);
+    const grist = gristClient();
+    await ensureBenchmarkPeerGroupsTable(grist);
     // Saving again under a name already used by this same user updates the
     // existing list rather than creating a second one with the same name.
-    const existingResp = await fetch(
-      `${GRIST_API_BASE}/docs/${doc}/tables/${BENCHMARK_PEER_GROUPS_TABLE}/records?filter=${
-        encodeURIComponent(JSON.stringify({ owner: [owner], name: [name] }))}`,
-      { headers },
-    );
-    if (!existingResp.ok) throw new Error(`Grist HTTP ${existingResp.status}`);
-    const existing = (await existingResp.json()).records || [];
+    const existing = await grist.records(BENCHMARK_PEER_GROUPS_TABLE, { owner: [owner], name: [name] });
     const fields = { owner, name, rors: JSON.stringify(rors), updated_at: new Date().toISOString() };
     let id;
     if (existing.length > 0) {
       id = existing[0].id;
-      const upd = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/${BENCHMARK_PEER_GROUPS_TABLE}/records`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({ records: [{ id, fields }] }),
-      });
-      if (!upd.ok) throw new Error(`Grist HTTP ${upd.status}`);
+      await grist.updateRecords(BENCHMARK_PEER_GROUPS_TABLE, [{ id, fields }]);
     } else {
-      const add = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/${BENCHMARK_PEER_GROUPS_TABLE}/records`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ records: [{ fields }] }),
-      });
-      if (!add.ok) throw new Error(`Grist HTTP ${add.status}`);
-      id = (await add.json()).records?.[0]?.id ?? null;
+      [id = null] = await grist.addRecords(BENCHMARK_PEER_GROUPS_TABLE, [{ fields }]);
     }
     res.json({ id, name, rors });
   } catch (e) {
@@ -2117,26 +2063,15 @@ app.delete('/api/benchmark/peer-groups/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (!Number.isFinite(id)) return res.status(400).json({ error: 'Invalid id' });
   try {
-    const headers = gristBenchmarkHeaders();
+    const grist = gristClient();
     const owner = req.session.user.preferred_username;
     // Checks ownership before deletion via the owner filter (already used above)
     // rather than a filter on `id` — the Grist API only guarantees filter on
     // columns, not on the row id. A Grist id is anyway a guessable sequential
     // integer, not a secret: never trust the client-supplied id alone.
-    const getResp = await fetch(
-      `${GRIST_API_BASE}/docs/${doc}/tables/${BENCHMARK_PEER_GROUPS_TABLE}/records?filter=${
-        encodeURIComponent(JSON.stringify({ owner: [owner] }))}`,
-      { headers },
-    );
-    if (!getResp.ok) throw new Error(`Grist HTTP ${getResp.status}`);
-    const rec = ((await getResp.json()).records || []).find((r) => r.id === id);
+    const rec = (await grist.records(BENCHMARK_PEER_GROUPS_TABLE, { owner: [owner] })).find((r) => r.id === id);
     if (!rec) return res.status(404).json({ error: 'Not found' });
-    const del = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/${BENCHMARK_PEER_GROUPS_TABLE}/data/delete`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify([id]),
-    });
-    if (!del.ok) throw new Error(`Grist HTTP ${del.status}`);
+    await grist.deleteRecords(BENCHMARK_PEER_GROUPS_TABLE, [id]);
     res.json({ ok: true });
   } catch (e) {
     res.status(502).json({ error: e.message });
@@ -2151,41 +2086,29 @@ app.delete('/api/benchmark/peer-groups/:id', async (req, res) => {
 // every write is the Keycloak session, never the request body.
 const tasksSchema = require('./scripts/lib/tasks_schema.cjs');
 const tasksDocId = () => process.env.VITE_GRIST_DOC_ID;
-const gristTasksHeaders = () => {
-  if (!GRIST_API_KEY) throw new Error('GRIST_API_KEY not configured');
-  return { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' };
-};
 let tasksTablesReady = false;
-const ensureTasksTablesOnce = async (doc, headers) => {
+const ensureTasksTablesOnce = async () => {
   if (tasksTablesReady) return;
-  await tasksSchema.ensureTasksTables({ apiBase: GRIST_API_BASE, doc, headers, log: console.log });
+  await tasksSchema.ensureTasksTablesWith(gristClient(), console.log);
   tasksTablesReady = true;
 };
-const gristTasksGet = async (doc, headers, table, filter) => {
-  const qs = filter ? `?filter=${encodeURIComponent(JSON.stringify(filter))}` : '';
-  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/${table}/records${qs}`, { headers });
-  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (${table})`);
-  return (await resp.json()).records || [];
-};
-const gristTasksWrite = async (doc, headers, table, method, records) => {
-  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/${table}/records`, {
-    method, headers, body: JSON.stringify({ records }),
-  });
-  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (${table} ${method}): ${await resp.text()}`);
-  // A records PATCH answers `null` (only POST returns the new ids).
-  const data = await resp.json().catch(() => null);
-  return data?.records || [];
+const gristTasksGet = (table, filter) => gristClient().records(table, filter);
+/** POST → [{ id }] of the new rows; PATCH → []. */
+const gristTasksWrite = async (table, method, records) => {
+  if (method === 'POST') return (await gristClient().addRecords(table, records)).map((id) => ({ id }));
+  await gristClient().updateRecords(table, records);
+  return [];
 };
 const taskAuthor = (req) => req.session.user.preferred_username || req.session.user.email || req.session.user.name || 'druid';
 /** Grist row → API shape (statut normalised: an empty status typed in Grist reads as `a_faire`). */
 const taskOut = (r) => ({ id: r.id, ...r.fields, statut: tasksSchema.statusOf(r.fields), chercheur: r.fields.chercheur || 0 });
 const taskEventOut = (r) => ({ id: r.id, tache: r.fields.tache, date: r.fields.date, auteur: r.fields.auteur, action: r.fields.action, detail: r.fields.detail || '' });
-const appendTaskEvent = (doc, headers, tache, ev) =>
-  gristTasksWrite(doc, headers, tasksSchema.EVENTS_TABLE, 'POST', [{ fields: { tache, ...ev } }]);
+const appendTaskEvent = (tache, ev) =>
+  gristTasksWrite(tasksSchema.EVENTS_TABLE, 'POST', [{ fields: { tache, ...ev } }]);
 const taskErrorStatus = (e) => (e instanceof tasksSchema.TaskInputError ? 400 : 502);
 /** Loads one task by id (the Grist filter works on columns only, so the id is checked locally). */
-const loadTask = async (doc, headers, id) => {
-  const rec = (await gristTasksGet(doc, headers, tasksSchema.TASKS_TABLE)).find((r) => r.id === id);
+const loadTask = async (id) => {
+  const rec = (await gristTasksGet(tasksSchema.TASKS_TABLE)).find((r) => r.id === id);
   if (!rec) { const err = new Error('Task not found'); err.status = 404; throw err; }
   return rec;
 };
@@ -2193,9 +2116,8 @@ const withTasks = (handler) => async (req, res) => {
   const doc = tasksDocId();
   if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    const headers = gristTasksHeaders();
-    await ensureTasksTablesOnce(doc, headers);
-    await handler(req, res, { doc, headers });
+    await ensureTasksTablesOnce();
+    await handler(req, res);
   } catch (e) {
     res.status(e.status || taskErrorStatus(e)).json({ error: e.message });
   }
@@ -2226,10 +2148,7 @@ app.all(
     if (!GRIST_API_KEY) return res.status(500).json({ error: 'GRIST_API_KEY not configured' });
     const sessionUser = req.session.user;
     if (!sessionUser?.preferred_username) return res.status(401).json({ error: 'Unauthorized' });
-    const store = reportsStore.createReportsStore(
-      reportsStore.gristClient({ apiBase: GRIST_API_BASE, doc, apiKey: GRIST_API_KEY }),
-      { blobs: reportBlobs },
-    );
+    const store = reportsStore.createReportsStore(reportsStore.storageClient(gristClient(), `${GRIST_API_BASE}/${doc}`), { blobs: reportBlobs });
     const user = { id: sessionUser.preferred_username, isSuperAdmin: !!sessionUser.access?.isSuperAdmin };
     const out = await reportsStore.routeReports(store, user, {
       method: req.method,
@@ -2287,17 +2206,17 @@ app.get('/api/tasks/detect/progress', requireSuperAdmin, (req, res) => {
 // ABES export marked as sent (docs/plan-chantiers-taches.md, lot 6): closes the open `lot_abes`
 // tasks covered by the exported rows. Body { date, items: [{ rowId, uid, types }] } built by
 // AbesExportModal from lib/abesExport.ts abesTaskTypes; matching in tasks_schema.abesSentPatches.
-app.post('/api/tasks/abes-sent', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+app.post('/api/tasks/abes-sent', requireSuperAdmin, withTasks(async (req, res) => {
   const date = /^\d{4}-\d{2}-\d{2}$/.test(String(req.body?.date || '')) ? req.body.date : new Date().toISOString().slice(0, 10);
   const items = (Array.isArray(req.body?.items) ? req.body.items : []).slice(0, 20000).map((it) => ({
     rowId: Number.isInteger(it?.rowId) ? it.rowId : 0,
     uid: String(it?.uid || '').slice(0, 64),
     types: (Array.isArray(it?.types) ? it.types : []).filter((x) => tasksSchema.TASK_TYPES[x]),
   }));
-  const tasks = await gristTasksGet(doc, headers, tasksSchema.TASKS_TABLE);
+  const tasks = await gristTasksGet(tasksSchema.TASKS_TABLE);
   const { patches, events } = tasksSchema.abesSentPatches(tasks, items, { author: taskAuthor(req), date });
-  for (let i = 0; i < patches.length; i += 100) await gristTasksWrite(doc, headers, tasksSchema.TASKS_TABLE, 'PATCH', patches.slice(i, i + 100));
-  for (let i = 0; i < events.length; i += 100) await gristTasksWrite(doc, headers, tasksSchema.EVENTS_TABLE, 'POST', events.slice(i, i + 100).map((fields) => ({ fields })));
+  for (let i = 0; i < patches.length; i += 100) await gristTasksWrite(tasksSchema.TASKS_TABLE, 'PATCH', patches.slice(i, i + 100));
+  for (let i = 0; i < events.length; i += 100) await gristTasksWrite(tasksSchema.EVENTS_TABLE, 'POST', events.slice(i, i + 100).map((fields) => ({ fields })));
   res.json({ closed: patches.length });
 }));
 
@@ -2308,11 +2227,11 @@ app.get('/api/tasks/openalex-affiliations', requireSuperAdmin, async (req, res) 
   const doc = tasksDocId();
   if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    const headers = gristTasksHeaders();
-    const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/Corrections_affiliations_Openalex/records`, { headers });
-    if (resp.status === 404) return res.json({ corrections: [] });
-    if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (Corrections_affiliations_Openalex)`);
-    const corrections = ((await resp.json()).records || []).map((r) => ({ id: r.id, ...r.fields }));
+    const rows = await gristClient().records('Corrections_affiliations_Openalex').catch((e) => {
+      if (e.status === 404) return [];
+      throw e;
+    });
+    const corrections = rows.map((r) => ({ id: r.id, ...r.fields }));
     res.json({ corrections });
   } catch (e) {
     res.status(502).json({ error: e.message });
@@ -2324,10 +2243,8 @@ app.get('/api/tasks/openalex-affiliations', requireSuperAdmin, async (req, res) 
 // other « À traiter » tabs; every choice is written with the author of the Keycloak session.
 const importConflicts = require('./scripts/lib/import_conflicts.cjs');
 /** Annuaire column types + label maps of its Ref columns (id ↔ label). */
-const loadAnnuaireMeta = async (doc, headers) => {
-  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables/${importConflicts.ANNUAIRE}/columns`, { headers });
-  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (Annuaire columns)`);
-  const columns = (await resp.json()).columns || [];
+const loadAnnuaireMeta = async () => {
+  const columns = await gristClient().columns(importConflicts.ANNUAIRE);
   const colTypes = new Map(columns.map((c) => [c.id, c.fields.type]));
   const refLabels = new Map();
   const refIds = new Map();
@@ -2335,26 +2252,22 @@ const loadAnnuaireMeta = async (doc, headers) => {
     const target = String(c.fields.type).startsWith('Ref:') ? c.fields.type.slice(4) : '';
     const labelCol = importConflicts.REF_LABEL_COLUMNS[target];
     if (!labelCol) continue;
-    const rows = await gristTasksGet(doc, headers, target);
+    const rows = await gristTasksGet(target);
     refLabels.set(c.id, new Map(rows.map((r) => [r.id, String(r.fields[labelCol] ?? '')])));
     refIds.set(c.id, new Map(rows.map((r) => [String(r.fields[labelCol] ?? '').toUpperCase(), r.id])));
   }
   return { colTypes, refLabels, refIds };
 };
-const loadAnnuaireRecords = async (doc, headers, ids) => {
+const loadAnnuaireRecords = async (ids) => {
   if (ids.length === 0) return new Map();
-  const rows = await gristTasksGet(doc, headers, importConflicts.ANNUAIRE, { id: [...new Set(ids)] });
+  const rows = await gristTasksGet(importConflicts.ANNUAIRE, { id: [...new Set(ids)] });
   return new Map(rows.map((r) => [r.id, r.fields]));
 };
-const listConflictTables = async (doc, headers) => {
-  const resp = await fetch(`${GRIST_API_BASE}/docs/${doc}/tables`, { headers });
-  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (tables)`);
-  return ((await resp.json()).tables || []).map((t) => t.id).filter(importConflicts.isConflictTable);
-};
+const listConflictTables = async () => (await gristClient().tableIds()).filter(importConflicts.isConflictTable);
 /** Resolves `:table` against the existing Arbitrage_* tables (never a free table name). */
-const conflictTableOf = async (req, doc, headers) => {
+const conflictTableOf = async (req) => {
   const table = String(req.params.table || '');
-  if (!importConflicts.isConflictTable(table) || !(await listConflictTables(doc, headers)).includes(table)) {
+  if (!importConflicts.isConflictTable(table) || !(await listConflictTables()).includes(table)) {
     const err = new Error('Conflict table not found'); err.status = 404; throw err;
   }
   return table;
@@ -2363,119 +2276,119 @@ const withConflicts = (handler) => async (req, res) => {
   const doc = tasksDocId();
   if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
   try {
-    await handler(req, res, { doc, headers: gristTasksHeaders() });
+    await handler(req, res);
   } catch (e) {
     res.status(e.status || (e instanceof importConflicts.ConflictInputError ? 400 : 502)).json({ error: e.message });
   }
 };
 
 /** Open rows of a table that still need a decision (same list as the tab shows). */
-const actionableConflicts = async (doc, headers, table, meta) => {
-  const rows = (await gristTasksGet(doc, headers, table)).filter((r) => importConflicts.isOpen(r.fields));
-  const annuaire = await loadAnnuaireRecords(doc, headers, rows.map((r) => r.fields[importConflicts.COL.record]));
+const actionableConflicts = async (table, meta) => {
+  const rows = (await gristTasksGet(table)).filter((r) => importConflicts.isOpen(r.fields));
+  const annuaire = await loadAnnuaireRecords(rows.map((r) => r.fields[importConflicts.COL.record]));
   return importConflicts.openConflicts(rows, { ...meta, annuaire });
 };
 
 // Tables with their number of actionable conflicts (tab + counter; a settled table stays listed with 0).
-app.get('/api/import-conflicts', requireSuperAdmin, withConflicts(async (req, res, { doc, headers }) => {
-  const ids = await listConflictTables(doc, headers);
-  const meta = ids.length ? await loadAnnuaireMeta(doc, headers) : null;
+app.get('/api/import-conflicts', requireSuperAdmin, withConflicts(async (req, res) => {
+  const ids = await listConflictTables();
+  const meta = ids.length ? await loadAnnuaireMeta() : null;
   const tables = [];
   for (const id of ids) {
-    tables.push({ id, source: importConflicts.sourceLabel(id), open: (await actionableConflicts(doc, headers, id, meta)).length });
+    tables.push({ id, source: importConflicts.sourceLabel(id), open: (await actionableConflicts(id, meta)).length });
   }
   res.json({ tables });
 }));
 
-app.get('/api/import-conflicts/:table', requireSuperAdmin, withConflicts(async (req, res, { doc, headers }) => {
-  const table = await conflictTableOf(req, doc, headers);
-  const conflicts = await actionableConflicts(doc, headers, table, await loadAnnuaireMeta(doc, headers));
+app.get('/api/import-conflicts/:table', requireSuperAdmin, withConflicts(async (req, res) => {
+  const table = await conflictTableOf(req);
+  const conflicts = await actionableConflicts(table, await loadAnnuaireMeta());
   res.json({ source: importConflicts.sourceLabel(table), conflicts });
 }));
 
 // Body: { decisions: [{ id, choice: 'import'|'current'|'other', value? }] } (≤ 500 per call).
-app.post('/api/import-conflicts/:table/resolve', requireSuperAdmin, withConflicts(async (req, res, { doc, headers }) => {
-  const table = await conflictTableOf(req, doc, headers);
+app.post('/api/import-conflicts/:table/resolve', requireSuperAdmin, withConflicts(async (req, res) => {
+  const table = await conflictTableOf(req);
   const decisions = Array.isArray(req.body?.decisions) ? req.body.decisions : [];
   if (decisions.length === 0 || decisions.length > 500) throw new importConflicts.ConflictInputError('1 to 500 decisions expected');
-  const rows = (await gristTasksGet(doc, headers, table)).filter((r) => importConflicts.isOpen(r.fields));
+  const rows = (await gristTasksGet(table)).filter((r) => importConflicts.isOpen(r.fields));
   const targeted = rows.filter((r) => decisions.some((d) => d?.id === r.id));
-  const meta = await loadAnnuaireMeta(doc, headers);
-  const annuaire = await loadAnnuaireRecords(doc, headers, targeted.map((r) => r.fields[importConflicts.COL.record]));
+  const meta = await loadAnnuaireMeta();
+  const annuaire = await loadAnnuaireRecords(targeted.map((r) => r.fields[importConflicts.COL.record]));
   const { annuairePatches, rowPatches } = importConflicts.buildWrites(targeted, decisions, {
     ...meta, annuaire, source: importConflicts.sourceLabel(table), author: taskAuthor(req), nowIso: new Date().toISOString(),
   });
   // Annuaire first: a failure leaves the conflicts open, never marked resolved without effect.
   for (const group of importConflicts.groupBySameFields(annuairePatches)) {
-    await gristTasksWrite(doc, headers, importConflicts.ANNUAIRE, 'PATCH', group);
+    await gristTasksWrite(importConflicts.ANNUAIRE, 'PATCH', group);
   }
   for (const group of importConflicts.groupBySameFields(rowPatches)) {
-    await gristTasksWrite(doc, headers, table, 'PATCH', group);
+    await gristTasksWrite(table, 'PATCH', group);
   }
   res.json({ resolved: rowPatches.length, updatedRecords: annuairePatches.length });
 }));
 
 // List (all statuses: the client filters, the table stays small).
-app.get('/api/tasks', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
-  const tasks = (await gristTasksGet(doc, headers, tasksSchema.TASKS_TABLE)).map(taskOut);
+app.get('/api/tasks', requireSuperAdmin, withTasks(async (req, res) => {
+  const tasks = (await gristTasksGet(tasksSchema.TASKS_TABLE)).map(taskOut);
   res.json({ tasks });
 }));
 
-app.get('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+app.get('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
-  const events = (await gristTasksGet(doc, headers, tasksSchema.EVENTS_TABLE, { tache: [id] }))
+  const events = (await gristTasksGet(tasksSchema.EVENTS_TABLE, { tache: [id] }))
     .map(taskEventOut)
     .sort((a, b) => String(a.date).localeCompare(String(b.date)));
   res.json({ events });
 }));
 
-app.post('/api/tasks', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+app.post('/api/tasks', requireSuperAdmin, withTasks(async (req, res) => {
   const author = taskAuthor(req);
   const nowIso = new Date().toISOString();
   const fields = tasksSchema.normalizeCreate(req.body, { author, nowIso });
-  const [added] = await gristTasksWrite(doc, headers, tasksSchema.TASKS_TABLE, 'POST', [{ fields }]);
-  await appendTaskEvent(doc, headers, added.id, { date: nowIso, auteur: author, action: 'creation', detail: fields.titre });
+  const [added] = await gristTasksWrite(tasksSchema.TASKS_TABLE, 'POST', [{ fields }]);
+  await appendTaskEvent(added.id, { date: nowIso, auteur: author, action: 'creation', detail: fields.titre });
   res.json({ task: taskOut({ id: added.id, fields }) });
 }));
 
 // Editable fields only (assignee, priorite, canal, description, titre, lien).
-app.patch('/api/tasks/:id', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+app.patch('/api/tasks/:id', requireSuperAdmin, withTasks(async (req, res) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
   const patch = tasksSchema.normalizePatch(req.body);
-  const rec = await loadTask(doc, headers, id);
-  await gristTasksWrite(doc, headers, tasksSchema.TASKS_TABLE, 'PATCH', [{ id, fields: patch }]);
+  const rec = await loadTask(id);
+  await gristTasksWrite(tasksSchema.TASKS_TABLE, 'PATCH', [{ id, fields: patch }]);
   const author = taskAuthor(req);
   const action = 'assignee' in patch && Object.keys(patch).length === 1 ? 'reassignation' : 'modification';
   const detail = action === 'reassignation' ? patch.assignee : Object.keys(patch).join(', ');
-  await appendTaskEvent(doc, headers, id, { date: new Date().toISOString(), auteur: author, action, detail });
+  await appendTaskEvent(id, { date: new Date().toISOString(), auteur: author, action, detail });
   res.json({ task: taskOut({ id, fields: { ...rec.fields, ...patch } }) });
 }));
 
 // Workflow: { statut, motif?, resolution? } — transitions checked server-side.
-app.post('/api/tasks/:id/transition', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+app.post('/api/tasks/:id/transition', requireSuperAdmin, withTasks(async (req, res) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
-  const rec = await loadTask(doc, headers, id);
+  const rec = await loadTask(id);
   const { patch, event } = tasksSchema.applyTransition(rec.fields, String(req.body?.statut || ''), {
     author: taskAuthor(req), motif: req.body?.motif, resolution: req.body?.resolution,
   });
-  await gristTasksWrite(doc, headers, tasksSchema.TASKS_TABLE, 'PATCH', [{ id, fields: patch }]);
-  await appendTaskEvent(doc, headers, id, event);
+  await gristTasksWrite(tasksSchema.TASKS_TABLE, 'PATCH', [{ id, fields: patch }]);
+  await appendTaskEvent(id, event);
   res.json({ task: taskOut({ id, fields: { ...rec.fields, ...patch } }) });
 }));
 
 // Free events: comment, or « email prepared » (lot 3: copied / opened in the mail client).
-app.post('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+app.post('/api/tasks/:id/events', requireSuperAdmin, withTasks(async (req, res) => {
   const id = parseTaskId(req, res);
   if (id === null) return;
   const action = String(req.body?.action || '');
   if (!['commentaire', 'email_prepare'].includes(action)) return res.status(400).json({ error: 'Unknown event action' });
   const detail = String(req.body?.detail || '').trim().slice(0, 4000);
   if (action === 'commentaire' && !detail) return res.status(400).json({ error: 'Empty comment' });
-  await loadTask(doc, headers, id);
-  const [added] = await appendTaskEvent(doc, headers, id, { date: new Date().toISOString(), auteur: taskAuthor(req), action, detail });
+  await loadTask(id);
+  const [added] = await appendTaskEvent(id, { date: new Date().toISOString(), auteur: taskAuthor(req), action, detail });
   res.json({ event: taskEventOut({ id: added.id, fields: { tache: id, date: new Date().toISOString(), auteur: taskAuthor(req), action, detail } }) });
 }));
 
@@ -2671,10 +2584,7 @@ app.post('/api/sync-structures-csv', requireEstablishmentScope, async (req, res)
     const DOC = process.env.VITE_GRIST_DOC_ID;
     const KEY = GRIST_API_KEY;
     if (!DOC || !KEY) throw new Error('VITE_GRIST_DOC_ID / GRIST_API_KEY non configurés');
-    const gristUrl = `https://grist.numerique.gouv.fr/api/docs/${DOC}/tables/Structures/records`;
-    const gr = await fetch(gristUrl, { headers: { Authorization: `Bearer ${KEY}` } });
-    if (!gr.ok) throw new Error(`Grist ${gr.status}: ${await gr.text()}`);
-    const { records } = await gr.json();
+    const records = await gristClient().records('Structures');
     const { csv, count } = buildStructuresCsv(records);
     fs.writeFileSync(STRUCT_CSV_PATH, csv, 'utf8');
     console.log(`[cdb] structures.csv written: ${count} rows`);
@@ -2771,7 +2681,8 @@ app.get('/api/structures-hierarchy.html', (req, res) => {
 // into server-api.cjs (Dockerfile). Behind the session guard and the anti-CSRF check above.
 let apiV1Handler = null;
 try {
-  apiV1Handler = require('./server-api.cjs').createApiV1Handler({
+  const apiV1 = require('./server-api.cjs');
+  serverStorage = apiV1.createServerStorage({
     gristApiBase: GRIST_API_BASE,
     gristDocId: process.env.VITE_GRIST_DOC_ID || '',
     gristApiKey: GRIST_API_KEY,
@@ -2780,6 +2691,7 @@ try {
     hasLdap: CAPABILITIES.HAS_LDAP,
     hasQualinka: CAPABILITIES.HAS_QUALINKA,
   });
+  apiV1Handler = apiV1.createApiV1Handler(serverStorage);
 } catch (err) {
   // Bundle missing (run `npm run build:server`) or configuration error (no Grist document).
   console.error('[api/v1] unavailable:', err.message);
@@ -2885,15 +2797,10 @@ const ahRunInfo = () => {
 /** LABO values of the Annuaire rows of a person key (uid_dyna, or g<rowId> for records without uid). */
 const annuaireLabosOf = async (key) => {
   const byRow = /^g(\d+)$/.exec(key);
-  const r = await fetch(`${GRIST_API_BASE}/docs/${process.env.VITE_GRIST_DOC_ID}/sql`, {
-    method: 'POST',
-    headers: { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(byRow
-      ? { sql: 'SELECT "LABO" AS v FROM "Annuaire" WHERE id = ?', args: [Number(byRow[1])] }
-      : { sql: 'SELECT "LABO" AS v FROM "Annuaire" WHERE "uid_dyna" = ?', args: [key] }),
-  });
-  if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
-  return ((await r.json()).records || []).map((row) => row.fields.v || '');
+  const rows = byRow
+    ? await gristClient().sql('SELECT "LABO" AS v FROM "Annuaire" WHERE id = ?', [Number(byRow[1])])
+    : await gristClient().sql('SELECT "LABO" AS v FROM "Annuaire" WHERE "uid_dyna" = ?', [key]);
+  return rows.map((row) => row.v || '');
 };
 /** Runs the job for ONE person (index merged on write, full-run progress untouched). */
 const refreshAffiliationHistory = (key) => new Promise((resolve, reject) => {
@@ -2994,14 +2901,7 @@ const institutionForSuggestions = () => {
   suggestionInstitution = { name: INSTANCE_INFO.label, ror };
   return suggestionInstitution;
 };
-const gristSqlRows = async (sql, args) => {
-  const r = await fetch(`${GRIST_API_BASE}/docs/${process.env.VITE_GRIST_DOC_ID}/sql`, {
-    method: 'POST', headers: { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sql, args }),
-  });
-  if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
-  return ((await r.json()).records || []).map((x) => x.fields);
-};
+const gristSqlRows = (sql, args) => gristClient().sql(sql, args);
 const annuaireRowsForKey = (key) => {
   const byRow = /^g(\d+)$/.exec(key);
   return byRow
@@ -3083,7 +2983,7 @@ app.get('/api/researchers/:key/suggestions', async (req, res) => {
 
 // « Create a task » (action: task) or « Hide » (action: dismiss, with a reason) — decision S2: both are
 // tasks keyed `suggestion:<id>:<key>`; a hidden suggestion is an « abandonnee » task with its reason.
-app.post('/api/researchers/:key/suggestions/:id/task', requireSuperAdmin, withTasks(async (req, res, { doc, headers }) => {
+app.post('/api/researchers/:key/suggestions/:id/task', requireSuperAdmin, withTasks(async (req, res) => {
   const key = String(req.params.key || '');
   const id = String(req.params.id || '');
   if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
@@ -3103,9 +3003,9 @@ app.post('/api/researchers/:key/suggestions/:id/task', requireSuperAdmin, withTa
   fields.cle = `suggestion:${id}:${key}`;
   const reason = String(req.body?.reason || '').trim().slice(0, 500);
   if (dismiss) Object.assign(fields, { statut: 'abandonnee', fait_par: author, fait_le: nowIso, resolution: reason || 'Suggestion masquée' });
-  const [added] = await gristTasksWrite(doc, headers, tasksSchema.TASKS_TABLE, 'POST', [{ fields }]);
-  await appendTaskEvent(doc, headers, added.id, { date: nowIso, auteur: author, action: 'creation', detail: `Suggestion « ${id} » de la fiche` });
-  if (dismiss) await appendTaskEvent(doc, headers, added.id, { date: nowIso, auteur: author, action: 'abandon', detail: reason || 'Suggestion masquée' });
+  const [added] = await gristTasksWrite(tasksSchema.TASKS_TABLE, 'POST', [{ fields }]);
+  await appendTaskEvent(added.id, { date: nowIso, auteur: author, action: 'creation', detail: `Suggestion « ${id} » de la fiche` });
+  if (dismiss) await appendTaskEvent(added.id, { date: nowIso, auteur: author, action: 'abandon', detail: reason || 'Suggestion masquée' });
   res.json({ task: taskOut({ id: added.id, fields }) });
 }));
 
@@ -3383,13 +3283,7 @@ let labUidsCache = { at: 0, rows: null };
 const labUidsOf = async (anchors) => {
   if (!anchors.length) return new Set();
   if (!labUidsCache.rows || Date.now() - labUidsCache.at > 5 * 60 * 1000) {
-    const r = await fetch(`${GRIST_API_BASE}/docs/${process.env.VITE_GRIST_DOC_ID}/sql`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${GRIST_API_KEY}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sql: 'SELECT uid_dyna AS uid, LABO AS labo FROM Annuaire', args: [] }),
-    });
-    if (!r.ok) throw new Error(`Grist SQL HTTP ${r.status}`);
-    labUidsCache = { at: Date.now(), rows: ((await r.json()).records || []).map((x) => x.fields) };
+    labUidsCache = { at: Date.now(), rows: await gristClient().sql('SELECT uid_dyna AS uid, LABO AS labo FROM Annuaire', []) };
   }
   const anchorOf = (v) => normalizeAcronym(String(v || ''));   // lab of an Annuaire row (LABO), as the API scope
   return new Set(labUidsCache.rows.filter((x) => x.uid && anchors.includes(anchorOf(x.labo))).map((x) => String(x.uid)));

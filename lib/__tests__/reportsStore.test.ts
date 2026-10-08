@@ -322,6 +322,42 @@ describe('gristClient', () => {
   });
 });
 
+describe('storageClient (druid-internal docs/plan-migration-postgresql.md, lot 3 c)', () => {
+  it('sends the same requests as gristClient, through the client of the directory API', async () => {
+    const record = (seen: string[]) => async (url: string, init: RequestInit = {}) => {
+      seen.push(`${init.method || 'GET'} ${decodeURIComponent(url)} ${init.body ?? ''}`);
+      const path = new URL(url).pathname;
+      const body = path.endsWith('/tables') ? { tables: [{ id: 'Rapports' }] }
+        : path.endsWith('/columns') ? { columns: [{ id: 'name', fields: {} }] }
+          : { records: [{ id: 3, fields: { name: 'x' } }] };
+      return new Response(JSON.stringify(body), { status: 200 });
+    };
+    const exercise = async (c: any) => [
+      await c.tables(),
+      await c.records('Rapports_partages', { grantee: ['bob'] }),
+      await c.add('Rapports', [{ name: 'x' }]),
+      await c.columns('Rapports'),
+      await c.addColumns('Rapports', [{ id: 'y', fields: { type: 'Text' } }]),
+      await c.createTables([{ id: 'T', columns: [] }]),
+      await c.update('Rapports', [{ id: 3, fields: { name: 'z' } }]),
+      await c.remove('Rapports_partages', [4]),
+    ];
+    const formerSeen: string[] = [];
+    const former = store.gristClient({ apiBase: 'https://grist.example.org/api', doc: 'DOC', apiKey: 'k', fetchImpl: record(formerSeen) });
+    const currentSeen: string[] = [];
+    const { createGristReader } = await import('../directory/repository');
+    const current = store.storageClient(
+      createGristReader({ apiBase: 'https://grist.example.org/api', docId: 'DOC', apiKey: 'k', fetch: record(currentSeen) as typeof fetch }),
+      former.key,
+    );
+    const [a, b] = [await exercise(former), await exercise(current)];
+    expect(currentSeen).toEqual(formerSeen);
+    expect(current.key).toBe(former.key);
+    // Reads give the same values; the write results are not used by the store.
+    expect(b.slice(0, 4)).toEqual(a.slice(0, 4));
+  });
+});
+
 describe('client backends', () => {
   afterEach(() => vi.unstubAllGlobals());
 
