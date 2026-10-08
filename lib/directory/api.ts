@@ -22,6 +22,8 @@
 //   PATCH /api/v1/people/<recordId>/openalex-id { openalexId }
 //   POST  /api/v1/people/validations            { entries: [{ recordId, validation }] } → { updated }
 //   POST  /api/v1/abes-exports                  { entries: [{ recordId, hash }], date }  → { updated }
+//   POST  /api/v1/structures                    Structure             → 201 { id: 'S-<rowId>' }   (lot 2 b)
+//   PUT   /api/v1/structures/<recordId>         Structure             → { ok: true }
 // Every write answer carries an `X-Druid-Audit` header (JSON list of the Grist writes) that the host moves to
 // its audit log and never forwards to the browser.
 import { Hono } from 'hono';
@@ -58,6 +60,7 @@ const ResearcherBody = z.object({
   employment: z.looseObject({}),
   identifiers: z.looseObject({}),
 }).loose();
+const StructureBody = z.looseObject({ acronym: z.string().optional(), level: z.union([z.string(), z.number()]).optional() });
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
 const OpenalexBody = z.object({ openalexId: z.string() });
 const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
@@ -170,6 +173,18 @@ export const createDirectoryApi = (): Hono<Env> => {
     const body = await bodyOf(c, AbesBody);
     if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     return c.json({ updated: await c.env.commands!.markAbesSent(body.entries, body.date, ctxOf(c)) }, 200, NO_STORE);
+  });
+  writes.post('/structures', async (c) => {
+    const body = await bodyOf(c, StructureBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.createStructure(body as any, ctxOf(c)), 201, NO_STORE);
+  });
+  writes.put('/structures/:recordId', async (c) => {
+    const recordId = recordIdOf(c.req.param('recordId'));
+    const body = await bodyOf(c, StructureBody);
+    if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    await c.env.commands!.updateStructure(recordId, body as any, ctxOf(c));
+    return c.json({ ok: true }, 200, NO_STORE);
   });
   app.route('/', writes);
 

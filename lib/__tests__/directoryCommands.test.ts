@@ -40,7 +40,10 @@ const fakeGrist = (initial: Record<string, GristRecord[]>, columns: string[] = [
       tables[table] = tables[table].filter((r) => !ids.includes(r.id));
       writes.push(`delete ${table} ${ids.join(',')}`);
     },
-    sql: async (_query, args) => (tables.Annuaire || []).filter((r) => args.includes(r.id)).map((r) => ({ id: r.id, v: r.fields.LABO })),
+    sql: async (query, args) => {
+      const [, col, table] = /SELECT id, (\w+) AS v FROM (\w+)/.exec(query)!;
+      return (tables[table] || []).filter((r) => args.includes(r.id)).map((r) => ({ id: r.id, v: r.fields[col] }));
+    },
   };
   return client;
 };
@@ -205,5 +208,46 @@ describe('write routes', () => {
       repository, commands, publications: {} as any, scope: ALL, writeRefusal: { status: 403, error: 'Read-only instance: writes are disabled' },
     });
     expect(resp.status).toBe(200);
+  });
+});
+
+describe('structures (lot 2 b)', () => {
+  const STRUCTURES: GristRecord[] = [
+    { id: 7, fields: { short_labels: 'LAB-A[fr]', long_labels: 'Laboratoire A[fr]', local_id: '1001', generic_type: 'unit', type: 'UMR' } },
+    { id: 8, fields: { short_labels: 'LAB-B[fr]', long_labels: 'Laboratoire B[fr]', local_id: '1002', generic_type: 'unit', type: 'UR' } },
+  ];
+  const tables = () => ({ Annuaire: ANNUAIRE, Etablissements: ETABLISSEMENTS, Structures: STRUCTURES });
+  const team = (over: Record<string, unknown> = {}) => ({ acronym: 'MULTIX', officialName: 'Équipe Multix', level: '1', parentStructure: 'LAB-A', inclusions: [], participations: [], identifiers: {}, ...over }) as any;
+
+  it('creates a team inside its lab (generated local_id, inclusion in the lab) and returns its Druid id', async () => {
+    const { grist, commands, ctx } = setup(tables());
+    const { id } = await commands.createStructure(team(), ctx(ALL));
+    const row = grist.tables.Structures.find((r) => `S-${r.id}` === id)!;
+    expect(row.fields).toMatchObject({ generic_type: 'team', type: 'TEAM', local_id: 'T-LAB_A-MULTIX', parent_structure: 'LAB-A', short_labels: 'MULTIX[fr]' });
+    expect(row.fields.inclusions).toBe('local-1001[20261008-]');
+  });
+
+  it('refuses a missing acronym, a team without lab, a duplicate, a used local_id and an invalid entity code', async () => {
+    const { grist, commands, ctx } = setup(tables());
+    await expect(commands.createStructure(team({ acronym: ' ' }), ctx(ALL))).rejects.toMatchObject({ status: 400, message: 'The acronym / short name is required' });
+    await expect(commands.createStructure(team({ parentStructure: '' }), ctx(ALL))).rejects.toMatchObject({ status: 400 });
+    await expect(commands.createStructure(team({ acronym: 'LAB-B', level: '2', parentStructure: '' }), ctx(ALL)))
+      .rejects.toMatchObject({ status: 409, message: 'A structure with this acronym already exists: LAB-B' });
+    await expect(commands.createStructure(team({ localId: '1001' }), ctx(ALL))).rejects.toMatchObject({ status: 409, message: 'local_id already used: 1001' });
+    await expect(commands.createStructure(team({ localId: '14 85' }), ctx(ALL))).rejects.toMatchObject({ status: 400 });
+    expect(grist.writes).toEqual([]);
+  });
+
+  it('lets a lab right update its own structure only, and not create another one', async () => {
+    const { grist, commands, ctx } = setup(tables());
+    await commands.updateStructure(7, { acronym: 'LAB-A', officialName: 'Laboratoire A (nouveau nom)', inclusions: [], participations: [], identifiers: {} } as any, ctx(LAB_A));
+    expect(grist.tables.Structures[0].fields.long_labels).toBe('Laboratoire A (nouveau nom)[fr]');
+    // Renaming another lab's structure into its own lab: the existing row is checked too.
+    await expect(commands.updateStructure(8, { acronym: 'LAB-A', identifiers: {} } as any, ctx(LAB_A)))
+      .rejects.toMatchObject({ status: 403, message: 'Rows outside scope or unknown: Structures' });
+    await expect(commands.updateStructure(7, { acronym: 'LAB-B', identifiers: {} } as any, ctx(LAB_A)))
+      .rejects.toMatchObject({ status: 403, message: 'Write outside scope: short_labels' });
+    await expect(commands.createStructure(team(), ctx(LAB_A))).rejects.toMatchObject({ status: 403 });
+    expect(grist.writes).toEqual(['update Structures 7']);
   });
 });

@@ -7,7 +7,7 @@
 // Authorization, as the proxy (server.cjs gristProxyDecision): institution right = everything; lab right =
 // every touched row and every new `LABO` value within its labs, the merge log open to it. Schema changes
 // (affiliation columns, merge log table) are made by the server for every right.
-import type { Researcher } from '../../types';
+import type { Researcher, Structure } from '../../types';
 import { normalizeAcronym } from '../normalize';
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from '../mergeLog';
 import { validationToGristFields, ValidationInfo } from '../validation';
@@ -16,7 +16,8 @@ import {
   AnnuaireColumnMeta, AnnuaireWriteContext, fuzzyDateEncoderFor, membershipFieldsOf, planAffiliationRows,
   researcherCreateFields, researcherUpdateFields, secondaryRowIdentity, toGristDateCell,
 } from './annuaireWrite';
-import { DUPLICATE_DECISION_COL, RATTACHEMENT_CHOICES, RATTACHEMENT_COL, mapInstitutionRecords } from './gristMapping';
+import { DUPLICATE_DECISION_COL, RATTACHEMENT_CHOICES, RATTACHEMENT_COL, mapInstitutionRecords, parseMultiLabel } from './gristMapping';
+import { structureCreateFields, structureUpdateFields } from './structureWrite';
 import type { DirectoryRepository, DirectoryScope, GristClient } from './repository';
 
 /** What a write touched, for the audit log (`api.write` event): table, kind, rows and field names. */
@@ -41,11 +42,15 @@ export interface DirectoryCommands {
   setOpenalexId(recordId: number, openalexId: string, ctx: CommandContext): Promise<void>;
   applyValidations(entries: { recordId: number; validation: ValidationInfo }[], ctx: CommandContext): Promise<number>;
   markAbesSent(entries: { recordId: number; hash: string }[], date: string, ctx: CommandContext): Promise<number>;
+  /** New structure (lot 2 b); returns its Druid id `S-<rowId>`. */
+  createStructure(structure: Structure, ctx: CommandContext): Promise<{ id: string }>;
+  updateStructure(recordId: number, structure: Structure, ctx: CommandContext): Promise<void>;
   /** Columns of the Annuaire (the record form shows the FTE fields only when they exist). */
   annuaireColumns(): Promise<AnnuaireColumnMeta[]>;
 }
 
 const ANNUAIRE = 'Annuaire';
+const STRUCTURES = 'Structures';
 const isRowId = (id: unknown): id is number => Number.isInteger(id) && (id as number) > 0;
 
 export interface GristDirectoryCommandsOptions {
@@ -103,6 +108,22 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
     }
   };
 
+  // Structures: scope column `short_labels` (« LS2N[fr]|LS2N[en] » → its French label), as the proxy.
+  const structureAnchor = (raw: unknown) => normalizeAcronym(parseMultiLabel(raw));
+  const assertStructuresInScope = async (scope: DirectoryScope, ids: number[], newLabels: unknown[]): Promise<void> => {
+    if (!ids.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+    if (scope.all) return;
+    const anchors = anchorsOf(scope);
+    if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
+    if (newLabels.some((v) => !anchors.has(structureAnchor(v)))) throw new ApiError(403, 'Write outside scope: short_labels');
+    if (ids.length === 0) return;
+    const rows = await grist.sql(`SELECT id, short_labels AS v FROM ${STRUCTURES} WHERE id IN (${ids.map(() => '?').join(',')})`, ids);
+    const labelOf = new Map(rows.map((r) => [r.id, r.v]));
+    if (ids.some((id) => !labelOf.has(id) || !anchors.has(structureAnchor(labelOf.get(id))))) {
+      throw new ApiError(403, 'Rows outside scope or unknown: Structures');
+    }
+  };
+
   // ── Writes, each reported to the audit log ───────────────────────────────
   const fieldNames = (records: { fields: Record<string, any> }[]) => [...new Set(records.flatMap((r) => Object.keys(r.fields)))];
   const update = async (ctx: CommandContext, table: string, records: { id: number; fields: Record<string, any> }[]) => {
@@ -148,6 +169,20 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
 
   return {
     annuaireColumns,
+
+    createStructure: (structure, ctx) => writing(async () => {
+      // Uniqueness checked against every structure of the document (the browser only knew the ones it could see).
+      const fields = structureCreateFields(structure, (await repository.structures()).items, todayIso());
+      await assertStructuresInScope(ctx.scope, [], [fields['short_labels']]);
+      const [rowId] = await add(ctx, STRUCTURES, [{ fields }]);
+      return { id: `S-${rowId}` };
+    }),
+
+    updateStructure: (recordId, structure, ctx) => writing(async () => {
+      const fields = structureUpdateFields(structure);
+      await assertStructuresInScope(ctx.scope, [recordId], [fields['short_labels']]);
+      await update(ctx, STRUCTURES, [{ id: recordId, fields }]);
+    }),
 
     createPerson: (researcher, ctx) => writing(async () => {
       const fields = researcherCreateFields(researcher, await writeContext());

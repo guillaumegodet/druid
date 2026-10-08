@@ -1,5 +1,5 @@
 import { t } from '@lingui/core/macro';
-import { Researcher, ResearcherStatus, Presence, Structure, Membership, StructureLevel } from '../types';
+import { Researcher, ResearcherStatus, Presence, Structure, StructureLevel } from '../types';
 import { hasCapability } from './auth';
 import { purgeStoredDirectory } from './directoryStorage';
 import { getGradeFromNcorps } from './gradeTypology';
@@ -32,7 +32,10 @@ export type { RattachementRole, Institution, MergeLogEntry } from './directory/g
 import {
   toGristEpoch, AnnuaireColumnMeta, planAffiliationRows, FUZZY_DATE_COLS,
 } from './directory/annuaireWrite';
-// Moved to lib/directory/annuaireWrite.ts (migration plan, lot 2 a), re-exported for the existing importers.
+import { makeLocalId } from './directory/structureWrite';
+// Moved to lib/directory/annuaireWrite.ts / structureWrite.ts (migration plan, lots 2 a-b), re-exported for the
+// existing importers.
+export { resolveNewStructureLocalId } from './directory/structureWrite';
 export { planAffiliationRows };
 export type { AnnuaireColumnMeta, AffiliationRowPlan } from './directory/annuaireWrite';
 export { PARKING_LABOS };
@@ -793,56 +796,15 @@ async function fuzzyDateCellEncoder(): Promise<FuzzyDateEncoder> {
 // --- Helpers for the Structures V2 table format (= structures.csv of the directory bridge) ---
 
 
-/**
- * Re-encodes a simple value in the V2 multi-label format for writing (`Valeur[fr]`).
- */
-const encodeMultiLabel = (value: any, lang = 'fr'): string => {
-  const v = (value === null || value === undefined) ? '' : String(value).trim();
-  return v ? `${v}[${lang}]` : '';
-};
 
 
 
 
 
-/** Druid StructureMission -> V2 text value for writing. */
-const missionToV2 = (mission: any): string => {
-  switch (mission) {
-    case 'RECHERCHE': return 'research';
-    case 'SERVICES_SCIENTIFIQUES': return 'scientific_services';
-    case 'SERVICES_ADMINISTRATIFS': return 'administrative_services';
-    default: return '';
-  }
-};
-
-/** `YYYY-MM-DD` -> `YYYYMMDD` (empty if invalid). */
-const isoToCompact = (d: any): string => {
-  const s = String(d || '');
-  return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.replace(/-/g, '') : '';
-};
 
 
 
-/**
- * Re-encodes a Membership[] to the V2 column (`inclusions`/`participations`).
- * Keeps the supervision code and always emits a date range
- * (default start `20000101`, end possibly empty = open), as expected by
- * the CRISalid directory bridge.
- */
-const serializeMembershipList = (list: any): string => {
-  if (!Array.isArray(list)) return '';
-  return list
-    .filter((m: any) => m && m.ref)
-    .map((m: any) => {
-      let out = `${m.refType || 'local'}-${String(m.ref).trim()}`;
-      if (m.supervision) out += `[${m.supervision}]`;
-      const start = isoToCompact(m.startDate) || '20000101';
-      const end = isoToCompact(m.endDate);
-      out += `[${start}-${end}]`;
-      return out;
-    })
-    .join('|');
-};
+
 
 /**
  * Column definitions of the Alignement_IdRef review table (created by pushIdrefReview).
@@ -1051,19 +1013,6 @@ export interface LdapCandidatesDiff {
   uidTaken?: Record<string, { gristRowId: number; name: string }>;
 }
 
-/**
- * `local_id` of a structure being created: the entity code entered on creation (supannCodeEntite, e.g. 1485)
- * or, failing that, the generated D-/T- id. It becomes the Neo4j uid `local-<local_id>` through cdb, hence
- * no spaces or special characters.
- */
-export const resolveNewStructureLocalId = (entered: unknown, generate: () => string): string => {
-  const code = String(entered ?? '').trim();
-  if (!code) return generate();
-  if (!/^[A-Za-z0-9][A-Za-z0-9_.-]*$/.test(code)) {
-    throw new Error(t`Invalid entity code “${code}”: letters, digits, “-”, “_” or “.” only`);
-  }
-  return code;
-};
 
 export const GristService = {
   /**
@@ -1166,14 +1115,8 @@ export const GristService = {
     return DirectoryApi.markAbesSent(valid.map((e) => ({ recordId: e.gristRowId, hash: e.hash })), date);
   },
 
-  /** Local id of a structure created from Druid when no entity code (supannCodeEntite) is entered: `T-<LABO>-<SIGLE>` for a
-   * team (convention already in place in the table, e.g. T-GEM-MULTIX), `D-<SIGLE>` otherwise. */
-  makeLocalId: (structure: Pick<Structure, 'level' | 'acronym' | 'parentStructure'>): string => {
-    const slug = (s: string) => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/[^A-Z0-9]+/g, '_').replace(/^_+|_+$/g, '');
-    return String(structure.level) === StructureLevel.EQUIPE
-      ? `T-${slug(structure.parentStructure || '')}-${slug(structure.acronym)}`
-      : `D-${slug(structure.acronym)}`;
-  },
+  /** Local id generated for a new structure without entity code (lib/directory/structureWrite.ts). */
+  makeLocalId: (structure: Pick<Structure, 'level' | 'acronym' | 'parentStructure'>): string => makeLocalId(structure),
 
   /** Blank structure for the creation page (sentinel id `S-new`). */
   blankStructure: (init: Partial<Structure> = {}): Structure => ({
@@ -1209,118 +1152,17 @@ export const GristService = {
   } as Structure),
 
   /**
-   * Creates a structure in the Grist « Structures » table (« Nouvelle structure » page, or
-   * « Ajouter une équipe… » entry of the researcher record's Team menu). The `local_id` is the entity code
-   * entered on creation (supannCodeEntite), otherwise generated (makeLocalId);
-   * for a team, `parent_structure` = lab and `inclusions` = `local-<lab local_id>` (consistent with
-   * structures.csv / cdb). Refuses a duplicate acronym + lab. Returns the Druid id `S-<rowId>`.
+   * Creates a structure (« Nouvelle structure » page): domain API POST /api/v1/structures — local_id, team
+   * inclusion and uniqueness decided by the server against every structure (lib/directory/structureWrite.ts).
+   * Returns the Druid id `S-<rowId>`. `_allStructures` is kept for the callers.
    */
-  createStructure: async (structure: Structure, allStructures: Structure[] = []): Promise<string> => {
-    const acronym = String(structure.acronym || '').trim();
-    if (!acronym) throw new Error(t`The acronym / short name is required`);
-    const level = String(structure.level);
-    const parent = String(structure.parentStructure || '').trim();
-    if (level === StructureLevel.EQUIPE && !parent) throw new Error(t`A team must be included in a lab (Memberships tab)`);
-    const norm = (s: string) => String(s || '').trim().toUpperCase();
-    // Duplicate = same acronym at the same level (a team and a lab often share an acronym); for a
-    // team, within the same lab (review lot 2, finding 10).
-    const dup = allStructures.find((s) => norm(s.acronym) === norm(acronym) && String(s.level) === level
-      && (level !== StructureLevel.EQUIPE || norm(s.parentStructure || '') === norm(parent)));
-    if (dup) throw new Error(t`A structure “${dup.acronym}” already exists${level === StructureLevel.EQUIPE ? t` in ${parent}` : ''}`);
-    const lab = level === StructureLevel.EQUIPE ? allStructures.find((s) => norm(s.acronym) === norm(parent) && String(s.level) === StructureLevel.ENTITE) : undefined;
-    const today = new Date().toISOString().slice(0, 10);
-    const inclusions: Membership[] = (structure.inclusions && structure.inclusions.length)
-      ? structure.inclusions
-      : lab?.localId ? [{ refType: 'local', ref: lab.localId, startDate: today }] : [];
-    const genericType = level === StructureLevel.EQUIPE ? 'team' : level === StructureLevel.ETABLISSEMENT ? 'institution' : 'unit';
-    const type = String(structure.type || '').trim() || (level === StructureLevel.EQUIPE ? 'TEAM' : '');
-    const localId = resolveNewStructureLocalId(structure.localId,
-      () => GristService.makeLocalId({ level: structure.level, acronym, parentStructure: parent }));
-    if (allStructures.some((s) => s.localId === localId)) throw new Error(t`local_id “${localId}” already used`);
-    const rawScopus = structure.identifiers?.scopusId;
-    const scopusNum = rawScopus ? Number(rawScopus) : null;
-    const fields = {
-      'generic_type': genericType,
-      'type': type,
-      'local_id': localId,
-      'parent_structure': parent,
-      'short_labels': encodeMultiLabel(acronym),
-      'long_labels': encodeMultiLabel(structure.officialName || acronym),
-      'descriptions': encodeMultiLabel(structure.description || ''),
-      'nns': structure.rnsrId || '',
-      'web': structure.website || '',
-      'ror': structure.rorId || '',
-      'hal_collection': structure.halCollectionUrl || '',
-      'scopus': Number.isFinite(scopusNum) ? scopusNum : null,
-      'signature': (structure as any).signature || '',
-      'uai': structure.identifiers?.uai || '',
-      'isni': structure.identifiers?.isni || '',
-      'wikidata': structure.identifiers?.wikidata || '',
-      'inclusions': serializeMembershipList(inclusions),
-      'participations': serializeMembershipList(structure.participations || []),
-      'main_mission': missionToV2(structure.primaryMission),
-      'secondary_missions': missionToV2(structure.secondaryMission),
-      'erc_research_field': (structure as any).ercField || '',
-      'hceres_research_areas': (structure as any).hceresAreas || '',
-      'campus': (structure as any).campus || '',
-    };
-    const resp = await fetch(`${gristDocUrl()}/tables/Structures/records`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ records: [{ fields }] }),
-    });
-    if (!resp.ok) throw new Error(t`Error creating the Grist structure: ${await resp.text()}`);
-    const data = await resp.json().catch(() => ({}));
-    const rowId = data?.records?.[0]?.id;
-    return rowId ? `S-${rowId}` : NEW_STRUCTURE_ID;
-  },
+  createStructure: async (structure: Structure, _allStructures: Structure[] = []): Promise<string> =>
+    DirectoryApi.createStructure(structure),
 
   updateStructure: async (structure: any): Promise<void> => {
     const gristId = parseInt(structure.id.replace('S-', ''));
     if (isNaN(gristId)) throw new Error(t`Invalid ID`);
-
-    // Write to the V2 « Structures » table. Only the fields present in the V2 schema
-    // are persisted; the fields without equivalent (city, address, director, level,
-    // nature, status, dates, lineage) are not written back — the table is otherwise
-    // fed by structures.csv of the directory bridge.
-    const rawScopus = structure.identifiers?.scopusId;
-    const scopusNum = rawScopus ? Number(rawScopus) : null;
-    const fields = {
-      'type': structure.type,
-      'parent_structure': structure.parentStructure || '',
-      'short_labels': encodeMultiLabel(structure.acronym),
-      'long_labels': encodeMultiLabel(structure.officialName),
-      'descriptions': encodeMultiLabel(structure.description),
-      'nns': structure.rnsrId,
-      'web': structure.website,
-      'ror': structure.rorId,
-      'hal_collection': structure.halCollectionUrl,
-      'scopus': Number.isFinite(scopusNum) ? scopusNum : null,
-      'signature': structure.signature,
-      // Identifiants tiers V2
-      'uai': structure.identifiers?.uai || '',
-      'isni': structure.identifiers?.isni || '',
-      'wikidata': structure.identifiers?.wikidata || '',
-      // Memberships: re-encoding of both families to the V2 columns.
-      'inclusions': serializeMembershipList(structure.inclusions),
-      'participations': serializeMembershipList(structure.participations),
-      // Missions & themes
-      'main_mission': missionToV2(structure.primaryMission),
-      'secondary_missions': missionToV2(structure.secondaryMission),
-      'erc_research_field': structure.ercField || '',
-      'hceres_research_areas': structure.hceresAreas || '',
-      'campus': structure.campus || ''
-    };
-
-    const resp = await fetch(`${gristDocUrl()}/tables/Structures/records`, {
-      method: 'PATCH',
-      headers: { 
-        'Content-Type': 'application/json' 
-      },
-      body: JSON.stringify({ records: [{ id: gristId, fields }] })
-    });
-
-    if (!resp.ok) throw new Error('Erreur UPDATE Structure Grist');
+    await DirectoryApi.updateStructure(gristId, structure);
   },
 
   /**
