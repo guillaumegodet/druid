@@ -493,12 +493,14 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       if (patch['LABO'] !== undefined) assertLabsInScope(ctx.scope, [patch['LABO']]);
       const [keep, drop] = await recordsOf(trx, [keepM, dropM]);
       const logId = await insertMergeLog(trx, buildMergeLogRow({ keep, drop, patch, author, note }), keepM.person_id);
-      if (Object.keys(patch).length > 0) await writeRecordFields(trx, keepM.person_id, String(keepM.id), patch);
+      // The absorbed row goes first (with its person when it has no other membership): the kept row often takes its
+      // uid or its identifiers, which two people cannot hold at once (Grist allowed it between two requests).
       await trx.deleteFrom('membership').where('id', '=', dropM.id).execute();
       if (dropM.person_id !== keepM.person_id) {
         const left = await trx.selectFrom('membership').select('id').where('person_id', '=', dropM.person_id).executeTakeFirst();
         if (!left) await trx.deleteFrom('person').where('id', '=', dropM.person_id).execute();
       }
+      if (Object.keys(patch).length > 0) await writeRecordFields(trx, keepM.person_id, String(keepM.id), patch);
       ctx.audit({ table: 'Annuaire', kind: 'delete', rows: [dropRowId], count: 1 });
       return { logId };
     }),

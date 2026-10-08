@@ -382,6 +382,11 @@ export const createDirectoryApi = (): Hono<Env> => {
     const headers: Record<string, string> = { ...NO_STORE, ...(audit?.length ? { [AUDIT_HEADER]: JSON.stringify(audit) } : {}) };
     if (err instanceof ApiError) return c.json({ ...err.details, error: err.message }, err.status, headers);
     if (err instanceof DocumentNotAllowedError) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    // PostgreSQL: a value another record already holds (uid…) — a conflict to resolve, not a storage failure.
+    if ((err as { code?: string }).code === '23505') {
+      console.warn('[api/v1]', c.req.method, c.req.path, (err as { detail?: string }).detail || err.message);
+      return c.json({ error: 'Another record already holds this value' }, 409, headers);
+    }
     console.error('[api/v1]', c.req.method, c.req.path, err);
     return c.json({ error: 'Directory storage unavailable' }, 502, headers);
   });
