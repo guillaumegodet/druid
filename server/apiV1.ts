@@ -16,6 +16,14 @@ import {
   createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient, LdapCacheSnapshot,
 } from '../lib/directory/repository';
 import { createGristPublicationsStore } from '../lib/publications/store';
+import { createDb } from '../lib/db/client';
+import { createPgDirectoryRepository } from '../lib/directory/pg/repository';
+import { createPgDirectoryCommands } from '../lib/directory/pg/commands';
+import { createPgLdapCommands } from '../lib/directory/pg/ldapCommands';
+import { createPgAlignCommands } from '../lib/directory/pg/alignCommands';
+import { createPgTableClient } from '../lib/directory/pg/tableClient';
+import { createPgWorkPorts } from '../lib/work/pg/workPorts';
+import type { StorageKind } from '../lib/directory/jobStorage';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
 interface NodeRequest {
@@ -46,10 +54,16 @@ export interface ApiV1Options {
   hasLdap?: boolean;
   /** Qualinka engine for the IdRef search (capability HAS_QUALINKA). */
   hasQualinka?: boolean;
+  /** Storage of the directory and of the work tables (DRUID_STORAGE, lot 6 f): Grist by default. */
+  storage?: StorageKind;
+  /** PostgreSQL of the instance (DRUID_DATABASE_URL, role druid_app), with storage = postgres. */
+  databaseUrl?: string;
 }
 
 // Storage of the Node jobs (lot 3): taken from this bundle by scripts/lib/storage.cjs.
-export { gristClientFromEnv, jobStorageFromEnv, jobContext } from '../lib/directory/jobStorage';
+export {
+  gristClientFromEnv, jobStorageFromEnv, jobContext, tablesFromEnv, storageKindFromEnv, closeDatabases,
+} from '../lib/directory/jobStorage';
 
 /** Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. */
 export const scopeOfSession = (req: Pick<NodeRequest, 'session'>): DirectoryScope | null => {
@@ -118,28 +132,46 @@ export const createServerStorage = (options: ApiV1Options) => {
     return readers.get(docId)!;
   };
   const main = readerFor(options.gristDocId)!;
-  const ldapStatus = jsonFileLoader<Record<string, any>>(options.appRoot, 'ldap_status_cache.json', {});
-  const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
+  const kind: StorageKind = options.storage ?? 'grist';
+  if (kind === 'postgres' && !options.databaseUrl) throw new Error('DRUID_STORAGE=postgres needs DRUID_DATABASE_URL');
+  // The publications (druid-biblio exports, newsletter) stay in the Grist document whatever the storage (lot 8).
   const publications = createGristPublicationsStore({ main, readerFor });
-  const commands = createGristDirectoryCommands({ grist: main, repository });
+  const ldapStatus = jsonFileLoader<Record<string, any>>(options.appRoot, 'ldap_status_cache.json', {});
   const ldapCandidates = jsonFileLoader<any>(options.appRoot, 'ldap_candidates_cache.json', { proposals: [], ambiguous: [] });
   const ldapStructures = jsonFileLoader<Record<string, any>>(options.appRoot, 'structures_ldap_cache.json', {});
-  const ldap = options.hasLdap ? createGristLdapCommands({
-    grist: main, repository, annuaireColumns: commands.annuaireColumns,
-    ldap: { status: ldapStatus, candidates: async () => (await ldapCandidates()).data, structures: async () => (await ldapStructures()).data },
-  }) : undefined;
+  const ldapSource = { status: ldapStatus, candidates: async () => (await ldapCandidates()).data, structures: async () => (await ldapStructures()).data };
   // Alignment caches written by the scripts at the app root (idref_align_cache.json…), re-read when they change.
   const alignLoaders = new Map<string, () => Promise<{ data: Record<string, any> | null; version: string }>>();
-  const align = createGristAlignCommands({
-    grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka: !!options.hasQualinka,
-    caches: {
-      read: async (name) => {
-        if (!alignLoaders.has(name)) alignLoaders.set(name, jsonFileLoader<Record<string, any> | null>(options.appRoot, `${name}.json`, null));
-        return (await alignLoaders.get(name)!()).data;
-      },
+  const caches = {
+    read: async (name: string) => {
+      if (!alignLoaders.has(name)) alignLoaders.set(name, jsonFileLoader<Record<string, any> | null>(options.appRoot, `${name}.json`, null));
+      return (await alignLoaders.get(name)!()).data;
     },
-  });
-  return { grist: main, repository, publications, commands, ldap, align };
+  };
+  const hasQualinka = !!options.hasQualinka;
+
+  if (kind === 'postgres') {
+    const db = createDb({ connectionString: options.databaseUrl!, max: 8 });
+    const repository = createPgDirectoryRepository({ db, loadLdapCache: ldapStatus });
+    const commands = createPgDirectoryCommands({ db, repository });
+    return {
+      kind, grist: main, publications, repository, commands,
+      /** Migrated tables seen as the Grist document (reads of server.cjs, jobs): lib/directory/pg/tableClient.ts. */
+      tables: createPgTableClient({ db, actor: 'server' }),
+      ldap: options.hasLdap ? createPgLdapCommands({ db, repository, ldap: ldapSource }) : undefined,
+      align: createPgAlignCommands({ db, repository, caches, texts: tokenAlignTexts, hasQualinka }),
+      /** Ports of the work routes (tasks, arbitrations, peer lists, reports), writes audited under `actor`. */
+      workPorts: (actor: string) => createPgWorkPorts({ db, actor }),
+    };
+  }
+  const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
+  const commands = createGristDirectoryCommands({ grist: main, repository });
+  return {
+    kind, grist: main, publications, repository, commands, tables: main,
+    ldap: options.hasLdap ? createGristLdapCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, ldap: ldapSource }) : undefined,
+    align: createGristAlignCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka, caches }),
+    workPorts: null,
+  };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;
 

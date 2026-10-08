@@ -151,8 +151,11 @@ export const createPgWorkPorts = ({ db, actor = '', now = () => new Date() }: Pg
       return (await db.selectFrom('task').select(['id', 'key', 'type', 'status']).where('uid', '=', uid).orderBy('id').execute())
         .map((t) => ({ id: Number(t.id), cle: t.key ?? '', type: t.type, statut: t.status }));
     },
-    async events(taskId: number): Promise<Row[]> {
-      const rows = await db.selectFrom('task_event').selectAll().where('task_id', '=', String(taskId)).orderBy('id').execute();
+    /** Events of a task; every event without a task id (the jobs' table view). */
+    async events(taskId?: number): Promise<Row[]> {
+      let q = db.selectFrom('task_event').selectAll().orderBy('id');
+      if (taskId !== undefined) q = q.where('task_id', '=', String(taskId));
+      const rows = await q.execute();
       return rows.map((e) => ({ id: Number(e.id), fields: { tache: Number(e.task_id), ...fieldsOf(e, EVENT) } }));
     },
     addTasks: (rows: Record<string, any>[]) => writing(async (trx) => {

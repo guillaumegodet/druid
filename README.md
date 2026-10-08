@@ -102,6 +102,9 @@ npm test             # Vitest
 Principales variables d'environnement (`.env`) :
 
 - `VITE_GRIST_DOC_ID` : document Grist ; `GRIST_API_KEY` : clé Grist, **côté serveur uniquement**.
+- `DRUID_STORAGE` : stockage de l'annuaire et des tables de travail (tâches, rapports, arbitrages, listes de
+  pairs) : `grist` (par défaut) ou `postgres`, avec `DRUID_DATABASE_URL` (rôle `druid_app`). Le serveur et les
+  jobs (`scripts/lib/storage.cjs`) suivent le même réglage ; les publications restent dans le document Grist.
 - `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID`, `APP_URL` : authentification.
 - `LDAP_URL`, `LDAP_BIND_DN`, `LDAP_BIND_PASSWORD` : synchronisation LDAP (sans valeur par défaut).
 - `ETL_API_URL`, `DASHBOARD_SHARED_SECRET` : back-end bibliométrique (tableau de bord, console ETL,
