@@ -497,7 +497,7 @@ export function mapAnnuaireRecords(records: GristRecord[], institutions: GristRe
     console.warn('Zod Validation Warning (Researchers):', validation.error.format());
   }
 
-  const researchers = validation.success ? validation.data : researchersGrouped as Researcher[];
+  const researchers = (validation.success ? validation.data : researchersGrouped) as Researcher[];
   return researchers;
 }
 

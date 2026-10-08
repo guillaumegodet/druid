@@ -75,7 +75,7 @@ export const AlignLaunchModal: React.FC<Props> = ({ mode, labo, group, sources, 
   const costText = (s: UnifiedAlignSource): string => {
     const cost = estimateCost(estimate?.sources[s]?.unit || {}, runSize(s));
     if ('requests' in cost) return t`≈ ${fmt(cost.requests)} requests`;
-    const parts = [];
+    const parts: string[] = [];
     if (cost.search) parts.push(t`${fmt(cost.search)} Author Search`);
     if (cost.author) parts.push(t`${fmt(cost.author)} Author Retrieval`);
     return parts.length ? `≈ ${parts.join(' + ')}` : '—';

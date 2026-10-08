@@ -47,7 +47,7 @@ export default defineConfig(({ mode }) => {
                 try {
                   let body;
                   if (req.method === 'POST' || req.method === 'PATCH' || req.method === 'PUT') {
-                    const chunks = [];
+                    const chunks: Buffer[] = [];
                     for await (const chunk of req) {
                       chunks.push(chunk);
                     }
