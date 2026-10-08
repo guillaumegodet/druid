@@ -23,4 +23,8 @@ const load = () => {
  */
 const grist = (userAgent) => load().gristClientFromEnv(process.env, userAgent);
 
-module.exports = { grist };
+/** Client, repository and domain commands (lib/directory/jobStorage.ts), with the command context of a job. */
+const jobStorage = (userAgent) => load().jobStorageFromEnv(process.env, userAgent);
+const jobContext = (onWrite) => load().jobContext(onWrite);
+
+module.exports = { grist, jobStorage, jobContext };

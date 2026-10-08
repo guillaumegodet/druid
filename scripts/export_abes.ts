@@ -32,11 +32,14 @@ import { normStatus } from '../lib/validation';
 import { Presence } from '../types';
 import type { Researcher, Structure } from '../types';
 import type { Institution } from '../lib/gristService';
+import { jobContext, jobStorageFromEnv, JobStorage } from '../lib/directory/jobStorage';
 
-const GRIST_BASE = 'https://grist.numerique.gouv.fr/api';
-const DOC = process.env.VITE_GRIST_DOC_ID || process.env.GRIST_DOC_ID;
-const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;
-if (!DOC || !KEY) { console.error('VITE_GRIST_DOC_ID / GRIST_API_KEY manquants'); process.exit(1); }
+// Storage of the jobs (lib/directory/jobStorage.ts): reads, then « sent » flags through the markAbesSent command.
+let storage: JobStorage;
+try {
+  storage = jobStorageFromEnv({ ...process.env, VITE_GRIST_DOC_ID: process.env.VITE_GRIST_DOC_ID || process.env.GRIST_DOC_ID }, 'Druid-CRISalid-export_abes/1.0');
+} catch (e) { console.error((e as Error).message); process.exit(1); }
+const { grist, commands } = storage;
 
 // ── CLI ───────────────────────────────────────────────────────────────────────
 const args = process.argv.slice(2);
@@ -61,30 +64,25 @@ const options: AbesExportOptions = {
 };
 
 // ── Grist ─────────────────────────────────────────────────────────────────────
-const grist = async (path: string, init?: RequestInit) => {
-  const r = await fetch(`${GRIST_BASE}/docs/${DOC}/${path}`, { ...init, headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', ...(init?.headers || {}) } });
-  if (!r.ok) throw new Error(`Grist ${r.status} ${path}: ${await r.text()}`);
-  return r.json();
-};
 // Date cells: epoch (Date column) or fuzzy text (`2026`, `2026-06`, employment/membership columns once migrated).
 const gristDate = (v: any): string => normalizeFuzzyDate(v) ?? '';
 const label = (v: any): string => String(v || '').replace(/\[fr\]/g, '').split('|')[0].trim();
 
 async function main() {
-  const etabRecs = (await grist('tables/Etablissements/records')).records as any[];
+  const etabRecs = await grist.records('Etablissements');
   const etablissements: Institution[] = etabRecs.map((r) => ({
     id: r.id, name: String(r.fields.Employeur || ''), uai: String(r.fields.UAI || ''), ror: String(r.fields.ROR || ''),
     idref: String(r.fields.idref || ''), label: String(r.fields.Libelle || r.fields.Employeur || ''),
   }));
   const etabById = new Map(etablissements.map((e) => [e.id, e]));
 
-  const structures = ((await grist('tables/Structures/records')).records as any[]).map((r) => ({
+  const structures = (await grist.records('Structures')).map((r) => ({
     acronym: label(r.fields.short_labels), officialName: label(r.fields.long_labels), type: String(r.fields.type || ''),
     rnsrId: String(r.fields.nns || ''), rorId: String(r.fields.ror || ''),
     identifiers: { halStructIds: [], idrefId: String(r.fields.idref || '') },
   })) as unknown as Structure[];
 
-  const rows = (await grist('tables/Annuaire/records')).records as any[];
+  const rows = await grist.records('Annuaire');
   const alreadySent: Record<string, string> = {};
   const rowIdByUid = new Map<string, number>();
   const researchers = rows.map((r): Researcher => {
@@ -140,13 +138,11 @@ async function main() {
   console.log(`✓ ${diff.enrichissements.length} lignes → ${base}.xlsx`);
 
   if (flag('mark-sent') && diff.enrichissements.length) {
-    const records = diff.enrichissements
-      .map((row) => ({ id: rowIdByUid.get(row.id_local) || 0, fields: { ABES_export_hash: diff.hashes[row.id_local], ABES_export_date: today } }))
-      .filter((r) => r.id && r.fields.ABES_export_hash);
-    for (let i = 0; i < records.length; i += 200) {
-      await grist('tables/Annuaire/records', { method: 'PATCH', body: JSON.stringify({ records: records.slice(i, i + 200) }) });
-    }
-    console.log(`✓ ${records.length} records flagged as sent (${today})`);
+    const entries = diff.enrichissements
+      .map((row) => ({ recordId: rowIdByUid.get(row.id_local) || 0, hash: diff.hashes[row.id_local] }))
+      .filter((e) => e.recordId && e.hash);
+    const flagged = await commands.markAbesSent(entries, today, jobContext());
+    console.log(`✓ ${flagged} records flagged as sent (${today})`);
 
     // « À traiter › Tâches » (docs/plan-chantiers-taches.md, lot 6): the open « lot ABES » tasks
     // covered by these rows are done. No Taches table yet ⇒ nothing to close.
@@ -154,13 +150,13 @@ async function main() {
       .map((row) => ({ rowId: rowIdByUid.get(row.id_local) || 0, uid: row.id_local, types: abesTaskTypes(row) }))
       .filter((it) => it.types.length);
     let tasks: any[] = [];
-    try { tasks = (await grist(`tables/${tasksSchema.TASKS_TABLE}/records`)).records || []; } catch { tasks = []; }
+    try { tasks = await grist.records(tasksSchema.TASKS_TABLE); } catch { tasks = []; }
     const { patches, events } = tasksSchema.abesSentPatches(tasks, items, { author: 'cli:export_abes', date: today });
     for (let i = 0; i < patches.length; i += 100) {
-      await grist(`tables/${tasksSchema.TASKS_TABLE}/records`, { method: 'PATCH', body: JSON.stringify({ records: patches.slice(i, i + 100) }) });
+      await grist.updateRecords(tasksSchema.TASKS_TABLE, patches.slice(i, i + 100));
     }
     for (let i = 0; i < events.length; i += 100) {
-      await grist(`tables/${tasksSchema.EVENTS_TABLE}/records`, { method: 'POST', body: JSON.stringify({ records: events.slice(i, i + 100).map((fields: any) => ({ fields })) }) });
+      await grist.addRecords(tasksSchema.EVENTS_TABLE, events.slice(i, i + 100).map((fields: any) => ({ fields })));
     }
     console.log(`✓ ${patches.length} « lot ABES » task(s) closed`);
   }

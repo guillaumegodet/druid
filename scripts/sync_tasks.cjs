@@ -71,7 +71,6 @@ const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
 const SINCE = String(common.getArg('since', defaultSince()));
 
-const DOC = process.env.VITE_GRIST_DOC_ID;
 const loadJson = (file) => { try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return {}; } };
 const writeProgress = (p) => { try { fs.writeFileSync(PROGRESS_PATH, JSON.stringify(p)); } catch { /* noop */ } };
 
@@ -622,7 +621,7 @@ async function main() {
   console.log(`[tasks] ${APPLY ? 'APPLY' : 'DRY-RUN'} · rules ${rules.join(', ')} · since ${SINCE}`);
   writeProgress({ running: true, total: rules.length, done: 0, created: 0, verified: 0, resolved: 0, reopened: 0, startedAt: nowIso });
 
-  if (APPLY) await schema.ensureTasksTables({ apiBase: 'https://grist.numerique.gouv.fr/api', doc: DOC, headers: { Authorization: `Bearer ${process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY}`, 'Content-Type': 'application/json' } });
+  if (APPLY) await schema.ensureTasksTablesWith(common.grist());
   const records = await common.gristRecords('Annuaire');
   const annuaire = (records || []).map((r) => ({ id: r.id, key: r.fields.uid_dyna || `g${r.id}`, fields: r.fields }));
   const ctx = {
@@ -714,13 +713,9 @@ async function main() {
     if (creates.length) {
       const rows = creates.map((c) => c.fields);
       const ids = [];
+      const client = common.grist();
       for (let i = 0; i < rows.length; i += 100) {
-        const res = await fetch(`https://grist.numerique.gouv.fr/api/docs/${DOC}/tables/${schema.TASKS_TABLE}/records`, {
-          method: 'POST', headers: { Authorization: `Bearer ${process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ records: rows.slice(i, i + 100).map((fields) => ({ fields })) }),
-        });
-        if (!res.ok) throw new Error(`Grist POST Taches: ${res.status} ${await res.text()}`);
-        ids.push(...((await res.json()).records || []).map((r) => r.id));
+        ids.push(...await client.addRecords(schema.TASKS_TABLE, rows.slice(i, i + 100).map((fields) => ({ fields }))));
       }
       await common.gristCreateRecords(schema.EVENTS_TABLE, ids.map((id, i) => ({ tache: id, date: nowIso, auteur: AUTHOR, action: 'creation', detail: `Détectée par la règle ${creates[i].ruleName}` })));
     }

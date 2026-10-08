@@ -317,40 +317,54 @@ function missingChoicePatches(columns, current) {
 }
 
 /**
- * Creates the two tables when missing and completes the choices of their Choice columns
- * (idempotent). `fetchImpl` lets the caller inject a fetch (proxy agent in scripts).
- * Returns the list of created tables.
+ * Creates the two tables when missing and completes the choices of their Choice columns (idempotent), through a
+ * storage client (`tableIds`, `columns`, `updateColumns`, `addTables`: the GristClient of the API,
+ * scripts/lib/storage.cjs). Returns the list of created tables.
  */
-async function ensureTasksTables({ apiBase, doc, headers, fetchImpl = fetch, log = () => {} }) {
-  const resp = await fetchImpl(`${apiBase}/docs/${doc}/tables`, { headers });
-  if (!resp.ok) throw new Error(`Grist HTTP ${resp.status} (tables list)`);
-  const have = new Set(((await resp.json()).tables || []).map((t) => t.id));
+async function ensureTasksTablesWith(client, log = () => {}) {
+  const have = new Set(await client.tableIds());
   const created = [];
   for (const [id, columns] of [[TASKS_TABLE, TASKS_COLUMNS], [EVENTS_TABLE, EVENTS_COLUMNS]]) {
     if (have.has(id)) {
-      const cols = await fetchImpl(`${apiBase}/docs/${doc}/tables/${id}/columns`, { headers });
-      if (!cols.ok) throw new Error(`Grist HTTP ${cols.status} (columns of ${id})`);
-      const patches = missingChoicePatches(columns, (await cols.json()).columns);
+      const patches = missingChoicePatches(columns, await client.columns(id));
       if (!patches.length) continue;
-      const patch = await fetchImpl(`${apiBase}/docs/${doc}/tables/${id}/columns`, {
-        method: 'PATCH', headers, body: JSON.stringify({ columns: patches }),
-      });
-      if (!patch.ok) throw new Error(`Grist HTTP ${patch.status} (choices of ${id}): ${await patch.text()}`);
+      await client.updateColumns(id, patches);
       log(`✓ ${id}: choices completed (${patches.map((p) => p.id).join(', ')})`);
       continue;
     }
-    const create = await fetchImpl(`${apiBase}/docs/${doc}/tables`, {
-      method: 'POST', headers, body: JSON.stringify({ tables: [{ id, columns }] }),
-    });
-    if (!create.ok) throw new Error(`Grist HTTP ${create.status} (create ${id}): ${await create.text()}`);
+    await client.addTables([{ id, columns }]);
     created.push(id);
     log(`✓ table ${id} created (${columns.length} columns)`);
   }
   return created;
 }
 
+/** Former form (server.cjs, frozen scripts): Grist REST API reached with `fetchImpl` (proxy agent in scripts). */
+async function ensureTasksTables({ apiBase, doc, headers, fetchImpl = fetch, log = () => {} }) {
+  const base = `${apiBase}/docs/${doc}/tables`;
+  const write = async (url, method, body, what) => {
+    const r = await fetchImpl(url, { method, headers, body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(`Grist HTTP ${r.status} (${what}): ${await r.text()}`);
+  };
+  return ensureTasksTablesWith({
+    tableIds: async () => {
+      const r = await fetchImpl(base, { headers });
+      if (!r.ok) throw new Error(`Grist HTTP ${r.status} (tables list)`);
+      return ((await r.json()).tables || []).map((t) => t.id);
+    },
+    columns: async (id) => {
+      const r = await fetchImpl(`${base}/${id}/columns`, { headers });
+      if (!r.ok) throw new Error(`Grist HTTP ${r.status} (columns of ${id})`);
+      return (await r.json()).columns;
+    },
+    updateColumns: (id, columns) => write(`${base}/${id}/columns`, 'PATCH', { columns }, `choices of ${id}`),
+    addTables: (tables) => write(base, 'POST', { tables }, `create ${tables[0].id}`),
+  }, log);
+}
+
 module.exports = {
   TASKS_TABLE, EVENTS_TABLE, BASES, CANALS, STATUSES, TRANSITIONS, PRIORITIES, TASK_TYPES,
   EVENT_ACTIONS, TASKS_COLUMNS, EVENTS_COLUMNS, TITLES_FR, TaskInputError, normalizeCreate,
   normalizePatch, statusOf, applyTransition, abesSentPatches, missingChoicePatches, ensureTasksTables,
+  ensureTasksTablesWith,
 };

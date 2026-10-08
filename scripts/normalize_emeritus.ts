@@ -14,10 +14,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { hasEmeritusTrace, emeritusGradeFor, EMERITUS_GRADES } from '../lib/emeritus';
 import { getGradeFromNcorps } from '../lib/gradeTypology';
-
-const GRIST_BASE = process.env.GRIST_BASE_URL || 'https://grist.numerique.gouv.fr/api';
-const DOC = process.env.VITE_GRIST_DOC_ID;
-const KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY;
+import { gristClientFromEnv } from '../lib/directory/jobStorage';
 
 const args = process.argv.slice(2);
 const opt = (name: string): string | undefined => {
@@ -30,15 +27,6 @@ const APPLY = args.includes('--apply');
 const OUT = opt('--out') || 'scripts/.build/emeritus_plan.json';
 const LDAP_PATH = opt('--ldap');
 
-async function grist(path: string, init: RequestInit = {}): Promise<any> {
-  const r = await fetch(`${GRIST_BASE}/docs/${DOC}/${path}`, {
-    ...init, headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json', ...(init.headers || {}) },
-  });
-  const text = await r.text();
-  if (!r.ok) throw new Error(`Grist ${init.method || 'GET'} ${path} → ${r.status} ${text.slice(0, 300)}`);
-  return text ? JSON.parse(text) : null;
-}
-
 interface PlanItem {
   rowId: number; uid: string; name: string; labo: string;
   before: string; after: string; typeEmploi: string; libTypeEmploi: string; ldapCategory: string; ldapCorps: string;
@@ -46,11 +34,13 @@ interface PlanItem {
 }
 
 async function main() {
-  if (!DOC || !KEY) throw new Error('VITE_GRIST_DOC_ID / GRIST_API_KEY not configured');
+  // Storage client of the jobs (lib/directory/jobStorage.ts); GRIST_BASE_URL = former name of GRIST_API_BASE here.
+  const grist = gristClientFromEnv({ ...process.env, GRIST_API_BASE: process.env.GRIST_API_BASE || process.env.GRIST_BASE_URL },
+    'Druid-CRISalid-normalize_emeritus/1.0');
   let ldap: Record<string, any> = {};
   if (LDAP_PATH) { try { ldap = JSON.parse(readFileSync(LDAP_PATH, 'utf8')); } catch (e) { console.warn(`LDAP cache unreadable (${LDAP_PATH}) — ignored`); } }
 
-  const { records } = await grist('tables/Annuaire/records');
+  const records = await grist.records('Annuaire');
   const changes: PlanItem[] = [];
   const already: PlanItem[] = [];
   for (const r of records) {
@@ -83,8 +73,8 @@ async function main() {
   console.log(`  already normalized: ${already.length}`);
 
   // Choice column: make sure the 4 codes are in the list (otherwise Grist displays them as « hors liste »).
-  const { columns } = await grist('tables/Annuaire/columns');
-  const col = columns.find((c: any) => c.id === 'Corps_grade');
+  const columns = await grist.columns('Annuaire');
+  const col = columns.find((c) => c.id === 'Corps_grade');
   let widget: any = {};
   try { widget = JSON.parse(col?.fields?.widgetOptions || '{}'); } catch { widget = {}; }
   const choices: string[] = Array.isArray(widget.choices) ? widget.choices : [];
@@ -97,10 +87,7 @@ async function main() {
   if (!APPLY) { console.log('Dry run — rerun with --apply to write to Grist.'); return; }
 
   if (missingChoices.length && col) {
-    await grist('tables/Annuaire/columns', {
-      method: 'PATCH',
-      body: JSON.stringify({ columns: [{ id: 'Corps_grade', fields: { widgetOptions: JSON.stringify({ ...widget, choices: [...choices, ...missingChoices] }) } }] }),
-    });
+    await grist.updateColumns('Annuaire', [{ id: 'Corps_grade', fields: { widgetOptions: JSON.stringify({ ...widget, choices: [...choices, ...missingChoices] }) } }]);
   }
   const today = new Date().toISOString().slice(0, 10);
   const byId: Record<number, any> = {};
@@ -111,7 +98,7 @@ async function main() {
     return { id: c.rowId, fields: { Corps_grade: c.after, Commentaires: curCom ? `${curCom}\n${note}` : note } };
   });
   for (let i = 0; i < patch.length; i += 100) {
-    await grist('tables/Annuaire/records', { method: 'PATCH', body: JSON.stringify({ records: patch.slice(i, i + 100) }) });
+    await grist.updateRecords('Annuaire', patch.slice(i, i + 100));
   }
   console.log(`Applied: ${patch.length} records updated.`);
 }

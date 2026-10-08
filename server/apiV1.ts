@@ -48,17 +48,8 @@ export interface ApiV1Options {
   hasQualinka?: boolean;
 }
 
-/**
- * Storage client of the Node jobs and scripts (lot 3): the same Grist client as the API, configured from the
- * environment (VITE_GRIST_DOC_ID, GRIST_API_KEY, GRIST_API_BASE). Every job reads and writes the directory through it,
- * so that one implementation can be swapped for another (PostgreSQL, lot 6).
- */
-export const gristClientFromEnv = (env: Record<string, string | undefined>, userAgent = 'Druid-CRISalid-jobs/1.0'): GristClient => {
-  const docId = env.VITE_GRIST_DOC_ID;
-  const apiKey = env.GRIST_API_KEY || env.VITE_GRIST_API_KEY;
-  if (!docId || !apiKey) throw new Error('VITE_GRIST_DOC_ID / GRIST_API_KEY not configured');
-  return createGristReader({ apiBase: env.GRIST_API_BASE || 'https://grist.numerique.gouv.fr/api', docId, apiKey, userAgent });
-};
+// Storage of the Node jobs (lot 3): taken from this bundle by scripts/lib/storage.cjs.
+export { gristClientFromEnv, jobStorageFromEnv, jobContext } from '../lib/directory/jobStorage';
 
 /** Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. */
 export const scopeOfSession = (req: Pick<NodeRequest, 'session'>): DirectoryScope | null => {
