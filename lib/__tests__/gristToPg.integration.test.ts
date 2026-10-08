@@ -1,7 +1,7 @@
 // Grist → PostgreSQL import, loading part (druid-internal docs/plan-migration-postgresql.md, lot 5), against a migrated
 // database as the owner (DATABASE_URL = druid_owner: the import empties the tables and suspends the triggers). Run by
 // the « database » CI job and `npm run test:db`; skipped otherwise. Rolled back: nothing is left in the database.
-import { afterAll, describe, expect, it } from 'vitest';
+import { afterAll, describe, expect, it, vi } from 'vitest';
 import { sql } from 'kysely';
 import { createDb } from '../db/client';
 import { transformDirectory } from '../migration/gristToPg';
@@ -11,6 +11,8 @@ import { gristDirectoryFixture } from './fixtures/gristDirectory';
 const url = process.env.DATABASE_URL;
 const db = url ? createDb({ connectionString: url, max: 1 }) : null;
 afterAll(async () => { await db?.destroy(); });
+// A test may wait for the lock of another file (see pg_advisory_xact_lock below), and the import takes a few seconds.
+vi.setConfig({ testTimeout: 30000 });
 class Rollback extends Error {}
 
 describe.skipIf(!url)('Grist → PostgreSQL load', () => {
@@ -18,6 +20,8 @@ describe.skipIf(!url)('Grist → PostgreSQL load', () => {
     const { rows, report } = transformDirectory(gristDirectoryFixture());
     const got: Record<string, unknown> = {};
     await expect(db!.transaction().execute(async (trx) => {
+      // Integration test files may run in parallel: one database transaction at a time (the import empties tables).
+      await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
       // The audit log is not emptied by the import: only the rows written by this test are looked at.
       const since = Number((await sql<{ n: string | null }>`SELECT max(id)::text AS n FROM audit_log`.execute(trx)).rows[0].n || 0);
       await loadDirectory(trx, rows, report);

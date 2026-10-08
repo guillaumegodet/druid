@@ -6,6 +6,7 @@
 import { sql, Transaction } from 'kysely';
 import type { DB } from '../db/schema.gen';
 import type { DirectoryRows, MigrationReport } from './gristToPg';
+import type { WorkRows } from './gristToPgWork';
 
 /** Tables the directory import fills, in dependency order. */
 export const DIRECTORY_TABLES = [
@@ -23,11 +24,13 @@ const chunks = <T>(rows: T[]): T[][] => {
 const plain = <T extends Record<string, any>>(row: T): Record<string, any> =>
   Object.fromEntries(Object.entries(row).filter(([k]) => !k.startsWith('$')));
 
+/** jsonb columns: written as JSON text (a value that is itself a string or a list must not be taken for an array). */
+const asJson = (v: unknown) => (v === undefined || v === null ? null : JSON.stringify(v));
 const insertAll = async (trx: Transaction<DB>, table: keyof DB, rows: Record<string, any>[]) => {
   for (const part of chunks(rows)) await trx.insertInto(table as any).values(part as any).execute();
 };
 /** Inserts and returns legacy Grist id → new id. */
-const insertMapped = async (trx: Transaction<DB>, table: 'establishment' | 'structure' | 'membership', rows: Record<string, any>[]) => {
+const insertMapped = async (trx: Transaction<DB>, table: 'establishment' | 'structure' | 'membership' | 'task' | 'report', rows: Record<string, any>[]) => {
   const ids = new Map<number, string>();
   for (const part of chunks(rows)) {
     const back = await trx.insertInto(table).values(part as any).returning(['id', 'legacy_grist_id']).execute();
@@ -66,6 +69,44 @@ export const loadDirectory = async (trx: Transaction<DB>, rows: DirectoryRows, r
 
   const counts: Record<string, number> = {};
   for (const t of DIRECTORY_TABLES) {
+    const r = await sql<{ n: string }>`SELECT count(*)::text AS n FROM ${sql.table(t)}`.execute(trx);
+    counts[t] = Number(r.rows[0].n);
+  }
+  return counts;
+};
+
+/** Tables the work import fills (lot 5 b), emptied first too. */
+export const WORK_TABLES_PG = [
+  'task', 'task_event', 'merge_log', 'alignment_candidate', 'import_batch', 'import_row', 'report', 'report_share',
+  'report_generation', 'benchmark_peer_group',
+] as const;
+
+/** Work tables, after loadDirectory in the same transaction (the people they point to are already there). */
+export const loadWork = async (trx: Transaction<DB>, rows: WorkRows): Promise<Record<string, number>> => {
+  const tables = sql.join(WORK_TABLES_PG.map((t) => sql.table(t)));
+  await sql`TRUNCATE ${tables} RESTART IDENTITY CASCADE`.execute(trx);
+  for (const t of WORK_TABLES_PG) await sql`ALTER TABLE ${sql.table(t)} DISABLE TRIGGER USER`.execute(trx);
+
+  const tasks = await insertMapped(trx, 'task', rows.task.map((t) => ({ ...plain(t), extra: asJson(t.extra) })));
+  await insertAll(trx, 'task_event', rows.task_event.map((e) => ({ ...plain(e), extra: asJson(e.extra), task_id: tasks.get(e.$task)! })));
+  await insertAll(trx, 'merge_log', rows.merge_log.map((m) => ({ ...plain(m), dropped_snapshot: asJson(m.dropped_snapshot),
+    kept_before: asJson(m.kept_before), kept_patch: asJson(m.kept_patch), extra: asJson(m.extra) })));
+  await insertAll(trx, 'alignment_candidate', rows.alignment_candidate.map((a) => ({ ...plain(a), payload: asJson(a.payload) })));
+  const batches = new Map<string, string>();
+  for (const b of rows.import_batch) {
+    const { id } = await trx.insertInto('import_batch').values(b).returning('id').executeTakeFirstOrThrow();
+    batches.set(b.legacy_table, id);
+  }
+  await insertAll(trx, 'import_row', rows.import_row.map((r) => ({ ...plain(r), imported_json: asJson(r.imported_json), extra: asJson(r.extra), batch_id: batches.get(r.$batch)! })));
+  const reports = await insertMapped(trx, 'report', rows.report.map((r) => ({ ...plain(r), definition: asJson(r.definition), extra: asJson(r.extra) })));
+  await insertAll(trx, 'report_share', rows.report_share.map((r) => ({ ...plain(r), report_id: reports.get(r.$report)! })));
+  await insertAll(trx, 'report_generation', rows.report_generation.map((r) => ({ ...plain(r), definition_snapshot: asJson(r.definition_snapshot),
+    ai_texts: asJson(r.ai_texts), extra: asJson(r.extra), report_id: reports.get(r.$report)! })));
+  await insertAll(trx, 'benchmark_peer_group', rows.benchmark_peer_group);
+
+  for (const t of WORK_TABLES_PG) await sql`ALTER TABLE ${sql.table(t)} ENABLE TRIGGER USER`.execute(trx);
+  const counts: Record<string, number> = {};
+  for (const t of WORK_TABLES_PG) {
     const r = await sql<{ n: string }>`SELECT count(*)::text AS n FROM ${sql.table(t)}`.execute(trx);
     counts[t] = Number(r.rows[0].n);
   }

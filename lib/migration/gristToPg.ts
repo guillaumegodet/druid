@@ -94,12 +94,19 @@ export const ISSUE_EXPLANATIONS = {
   corps_duplicate_code: 'Corps_Categorie : code en double, première ligne gardée.',
   corps_without_code: 'Corps_Categorie : ligne sans code, non importée.',
   table_missing: 'Table absente du document : rien à importer.',
+  // Work tables (lot 5 b, gristToPgWork.ts).
+  work_person_unresolved: 'Ligne de travail rattachée à une fiche introuvable (Ref vide, ligne supprimée, uid inconnu) : importée sans personne quand la colonne le permet, sinon non importée.',
+  work_person_by_uid: 'Revue d’alignement sans id de ligne Annuaire : personne retrouvée par son uid (ou g<id de ligne>).',
+  work_value_kept_in_extra: 'Valeur de table de travail non normalisable (statut ou priorité hors liste, date, JSON illisible) : gardée dans extra sous le nom de sa colonne Grist.',
+  work_duplicate: 'Ligne en double sur la clé de la table cible (même personne + source + candidat, même clé de tâche, même liste) : première ligne gardée.',
+  work_orphan: 'Ligne qui renvoie à une ligne parente absente (événement sans tâche, partage ou génération sans rapport) : non importée.',
+  work_column_unmapped: 'Colonne inconnue de l’import dans une table de travail : gardée dans extra / payload.',
 } as const;
 
 export interface MigrationReport {
   generatedAt: string;
   source: Record<string, number>;
-  counts: Record<keyof DirectoryRows, number>;
+  counts: Record<string, number>;
   summary: Partial<Record<IssueCode, number>>;
   issues: Issue[];
 }
@@ -512,11 +519,19 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
     report: {
       generatedAt: now(),
       source: Object.fromEntries(Object.entries(input).map(([t, r]) => [t, r ? r.length : 0])),
-      counts: Object.fromEntries(Object.entries(rows).map(([t, r]) => [t, r.length])) as MigrationReport['counts'],
+      counts: Object.fromEntries(Object.entries(rows).map(([t, r]) => [t, r.length])),
       summary,
       issues,
     },
   };
+};
+
+/** Adds the cases and counts of another transformation (work tables, lot 5 b) to a report. */
+export const mergeReport = (report: MigrationReport, more: { issues: Issue[]; source: Record<string, number>; counts: Record<string, number> }): MigrationReport => {
+  const issues = [...report.issues, ...more.issues];
+  const summary: Partial<Record<IssueCode, number>> = {};
+  for (const i of issues) summary[i.code] = (summary[i.code] || 0) + 1;
+  return { ...report, source: { ...report.source, ...more.source }, counts: { ...report.counts, ...more.counts }, summary, issues };
 };
 
 /** Markdown view of the report (counts, then each kind of case with its explanation and a few row ids). */
