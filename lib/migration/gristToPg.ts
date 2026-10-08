@@ -37,7 +37,7 @@ export interface PersonRow {
 }
 export interface MembershipRow {
   legacy_grist_id: number; person_id: string; lab_label: string | null; type: string | null; role: string | null;
-  start_date: string | null; end_date: string | null; team_labels: string[];
+  start_date: string | null; end_date: string | null; team_labels: string[]; duplicate_decision: string | null;
   $structure: number | null; $teams: number[]; // legacy ids of structures
 }
 export interface IdentifierRow { person_id: string; scheme: string; value: string; is_primary: boolean; source: string }
@@ -129,12 +129,12 @@ const IDENTIFIER_COLUMNS: Record<string, string> = {
 const LINK_COLUMNS = ['CV_institutionnel', 'CV_site_labo', 'CV_pdf_docx_', 'CV_HAL', 'Academia', 'Researchgate', 'Profil_GS',
   'LinkedIn', 'Site_web', 'YouTube', 'Blog', 'Podcast_flux'] as const;
 const SYNC_SOURCES = ['LDAP', 'IdRef', 'HAL', 'ORCID', 'OpenAlex', 'Scopus'] as const;
-const MEMBERSHIP_COLUMNS = ['LABO', 'team', 'affiliation_start_date', 'affiliation_end_date', 'membership_type', 'rattachement'] as const;
+const MEMBERSHIP_COLUMNS = ['LABO', 'team', 'affiliation_start_date', 'affiliation_end_date', 'membership_type', 'rattachement', 'doublon_decision'] as const;
 /** Columns without a normalized home (no use in the code, or not normalized yet): person.extra, from the kept row. */
 const EXTRA_COLUMNS = [
   'Personnel_heberge_dans_les_locaux_de_Nantes_Universite', 'Panels_disciplinaires_Branches_d_Activites_Profession_BAP_',
   'Localisation_Site_global_', 'Pole_de_rattachement_Nantes_Univ_uniquement_', 'Composante_de_rattachement_Nantes_Univ_uniquement_',
-  'campus', 'groupes', 'ABES_export_hash', 'ABES_export_date', 'doublon_decision',
+  'campus', 'groupes', 'ABES_export_hash', 'ABES_export_date',
 ] as const;
 /** Formula columns, recomputed from the rest: not imported. */
 const DERIVED_COLUMNS = ['institution_identifier', 'Alignement_annuaire'] as const;
@@ -384,11 +384,13 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
     for (const col of ['etp_quotite', 'etp_recherche']) if (!isEmpty(f[col]) && num(f[col]) === null) keepRaw(col, f[col]);
 
     // Notes and sources, merged over the rows.
+    // Identical notes on every row (a copied row) stay one note; different ones are joined, each under its row.
     const notes = rows.filter((r) => !isEmpty(r.fields?.Commentaires));
+    const distinct = new Set(notes.map((r) => String(r.fields.Commentaires)));
     const note = notes.length === 0 ? null
-      : notes.length === 1 ? String(notes[0].fields.Commentaires)
+      : distinct.size === 1 ? String(notes[0].fields.Commentaires)
         : notes.map((r) => `[G-${r.id}]\n${r.fields.Commentaires}`).join('\n\n');
-    if (notes.length > 1) issue('notes_merged', 'Annuaire', notes.map((r) => r.id));
+    if (distinct.size > 1) issue('notes_merged', 'Annuaire', notes.map((r) => r.id));
     const sources = unique(rows.flatMap((r) => splitList(r.fields?.Data_source, /[|,]/)));
 
     person.push({
@@ -508,7 +510,7 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
         legacy_grist_id: r.id, person_id: id, lab_label: lab, type: text(m.membership_type),
         role: role && ROLES.includes(role) ? role : null,
         start_date: fuzzyOf('affiliation_start_date'), end_date: fuzzyOf('affiliation_end_date'),
-        team_labels: teamLabels, $structure: structureId, $teams: unique(teams),
+        team_labels: teamLabels, duplicate_decision: text(m.doublon_decision), $structure: structureId, $teams: unique(teams),
       });
     }
   }
