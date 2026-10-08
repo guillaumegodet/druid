@@ -3,14 +3,14 @@
  * @description Client-side guard of a read-only instance (capability READ_ONLY, public demo on
  * Cloudflare — docs/plan-instance-demo-cloudflare.md, lot A2).
  *
- * The real enforcement is server-side (the Grist proxy of functions/ answers 403 to every write);
+ * The real enforcement is server-side (the domain API of functions/api/v1 answers 403 to every write);
  * this guard only makes the refusal immediate and uniform: every write request of the app —
  * GristService, AxesTab, NewsletterPanel, tasks… — rejects before reaching the network with the
- * same message as the proxy, which `translateApiError` already knows. The main edit entry points
+ * same message as the API, which `translateApiError` already knows. The main edit entry points
  * are also hidden (`canWrite()` in lib/auth.ts); this covers the ones that remain.
  */
 
-/** Same text as the proxy refusal (functions/api/grist/[[path]].js), declared in lib/apiErrors.ts. */
+/** Same text as the API refusal (functions/api/v1/[[path]].js), declared in lib/apiErrors.ts. */
 export const READ_ONLY_ERROR = 'Read-only instance: writes are disabled';
 
 const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);

@@ -4,12 +4,12 @@ import { fileURLToPath } from 'url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-const GRIST_DOC_ID = 'qzzYmeoVSwbYGWhqw2kYZz';
+const GRIST_DOC_ID = process.env.VITE_GRIST_DOC_ID || 'qzzYmeoVSwbYGWhqw2kYZz';
 const GRIST_API_KEY = process.env.GRIST_API_KEY || process.env.VITE_GRIST_API_KEY; // read from .env (never hard-coded)
 
 async function run() {
   try {
-    const res = await fetch(`http://localhost:3000/api/grist/docs/${GRIST_DOC_ID}/tables/Structures/columns`, {
+    const res = await fetch(`https://grist.numerique.gouv.fr/api/docs/${GRIST_DOC_ID}/tables/Structures/columns`, {
       headers: { 'Authorization': `Bearer ${GRIST_API_KEY}` }
     });
     const data = await res.json();

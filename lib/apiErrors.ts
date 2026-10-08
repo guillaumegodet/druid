@@ -46,6 +46,7 @@ export const API_ERRORS = [
   msg`Unknown API route`,
   msg`Directory storage unavailable`,
   msg`API v1 unavailable`,
+  msg`Grist proxy removed: use /api/v1`,
   msg`Invalid record`,
   msg`Replaced IdRef record not found`,
   msg`Review table missing, run the alignment script first`,

@@ -7,7 +7,7 @@ const path = require('path');
 const LOG_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'druid-logs-'));
 process.env.DRUID_LOG_DIR = LOG_DIR;
 process.env.SESSION_SECRET = process.env.SESSION_SECRET || 'test-secret';
-const { gristWriteSummary, auditEventOf, isQuietPath } = require(path.join(__dirname, '../lib/activity_log.cjs'));
+const { auditEventOf, isQuietPath } = require(path.join(__dirname, '../lib/activity_log.cjs'));
 
 let ko = 0;
 const check = (label, got, want) => {
@@ -16,23 +16,11 @@ const check = (label, got, want) => {
   console.log(`${ok ? 'OK ' : 'KO '} ${label}${ok ? '' : ` → ${JSON.stringify(got)} (expected ${JSON.stringify(want)})`}`);
 };
 
-// ── Pure helpers ────────────────────────────────────────────────────────────
-const patch = gristWriteSummary('PATCH', 'docs/D1/tables/Annuaire/records?noparse=1',
-  { records: [{ id: 12, fields: { nom: 'Dupont', orcid: '0000-0000-0000-0000' } }, { id: 15, fields: { nom: 'Martin' } }] });
-check('Grist update: table, rows, field names', patch, { doc: 'D1', table: 'Annuaire', kind: 'update', count: 2, rows: [12, 15], fields: ['nom', 'orcid'] });
-check('Grist update: no value', JSON.stringify(patch).includes('Dupont') || JSON.stringify(patch).includes('0000-'), false);
-check('Grist add', gristWriteSummary('POST', 'docs/D1/tables/Taches/records', { records: [{ fields: { titre: 'x' } }] }),
-  { doc: 'D1', table: 'Taches', kind: 'add', count: 1, fields: ['titre'] });
-check('Grist delete', gristWriteSummary('POST', 'docs/D1/tables/Annuaire/data/delete', [3, 4]),
-  { doc: 'D1', table: 'Annuaire', kind: 'delete', count: 2, rows: [3, 4] });
-const apply = gristWriteSummary('POST', 'docs/D1/apply', [['UpdateRecord', 'Structures', 7, { sigle: 'LS2N' }], ['AddRecord', 'Taches', null, {}]]);
-check('Grist apply: actions and tables only', apply,
-  { doc: 'D1', table: null, kind: 'apply', actions: ['UpdateRecord', 'AddRecord'], tables: ['Structures', 'Taches'], count: 2 });
-
+// ── Audit events ────────────────────────────────────────────────────────────
 const ev = (method, p, status, signedIn = true) => auditEventOf({ method, path: p, status, signedIn });
-check('read of Grist: not audited', ev('GET', '/api/grist/docs/D1/tables/Annuaire/records', 200), null);
-check('write to Grist', ev('PATCH', '/api/grist/docs/D1/tables/Annuaire/records', 200), 'grist.write');
-check('refusal', ev('GET', '/api/grist/docs/D1/tables/Annuaire/records', 403), 'access.denied');
+check('read of the domain API: not audited', ev('GET', '/api/v1/people', 200), null);
+check('write through the domain API', ev('PUT', '/api/v1/people/12', 200), 'api.write');
+check('refusal', ev('GET', '/api/v1/merges', 403), 'access.denied');
 check('refusal, anonymous', ev('POST', '/api/tasks', 403, false), 'access.denied');
 check('job started by GET', ev('GET', '/api/sync-ldap-trigger', 200), 'job.start');
 check('job progress: not audited', ev('GET', '/api/sync-ldap-progress', 200), null);

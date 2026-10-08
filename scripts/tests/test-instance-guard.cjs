@@ -34,7 +34,7 @@ const guard = (p, user) => new Promise((resolve) => {
   check('lab viewer: page refused', await guard('/', viewer), 403);
   check('lab viewer: logout reachable', await guard('/auth/logout', viewer), 'NEXT');
   check('lab viewer: health reachable', await guard('/api/health', viewer), 'NEXT');
-  check('anonymous: left to the auth guard', await guard('/api/grist/x', null), 'NEXT');
+  check('anonymous: left to the auth guard', await guard('/api/v1/x', null), 'NEXT');
 
   const server = app.listen(0, '127.0.0.1');
   await new Promise((r) => server.once('listening', r));

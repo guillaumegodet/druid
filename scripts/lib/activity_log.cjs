@@ -25,52 +25,12 @@ const JOB_GET = /^\/api\/(sync-[a-z-]+-trigger|tasks\/detect\/trigger)$/;
 const AI_POST = /^\/api\/(help-chat|chat|report-ai|newsletter\/generate|collab-theme\/(select-topics|synthesize))$/;
 
 /**
- * Summary of a Grist write relayed by the proxy: document, table, kind, rows and field names. Pure.
- * `gristPath` = the part after /api/grist/ (e.g. docs/<doc>/tables/Annuaire/records?…).
- */
-const gristWriteSummary = (method, gristPath, body) => {
-  const clean = String(gristPath || '').split('?')[0];
-  const m = clean.match(/^docs\/([^/]+)(?:\/tables\/([^/]+)\/(records|data\/delete|columns))?(?:\/(apply))?/);
-  const summary = { doc: m?.[1] || null, table: m?.[2] || null };
-  if (m?.[4] === 'apply' || clean.endsWith('/apply')) {
-    // User actions: [["UpdateRecord", "Table", id, {fields}], …] — action names, tables, field names.
-    const actions = Array.isArray(body) ? body.filter(Array.isArray) : [];
-    summary.kind = 'apply';
-    summary.actions = [...new Set(actions.map((a) => String(a[0])))].slice(0, 20);
-    summary.tables = [...new Set(actions.map((a) => String(a[1] ?? '')).filter(Boolean))].slice(0, 20);
-    summary.count = actions.length;
-    return summary;
-  }
-  const sub = m?.[3];
-  if (sub === 'data/delete') {
-    const ids = Array.isArray(body) ? body : [];
-    return { ...summary, kind: 'delete', count: ids.length, rows: ids.slice(0, 50) };
-  }
-  if (sub === 'columns') {
-    const cols = Array.isArray(body?.columns) ? body.columns : [];
-    return { ...summary, kind: 'columns', count: cols.length, fields: cols.map((c) => String(c?.id ?? '')).slice(0, 50) };
-  }
-  const records = Array.isArray(body?.records) ? body.records : [];
-  const fields = new Set();
-  for (const r of records) for (const k of Object.keys((r && r.fields) || {})) fields.add(k);
-  const ids = records.map((r) => r?.id).filter((id) => id !== undefined);
-  return {
-    ...summary,
-    kind: method === 'POST' ? 'add' : method === 'PUT' ? 'upsert' : method === 'DELETE' ? 'delete' : 'update',
-    count: records.length,
-    ...(ids.length ? { rows: ids.slice(0, 50) } : {}),
-    fields: [...fields].slice(0, 80),
-  };
-};
-
-/**
  * Audit event of a finished request, or null. Pure: { method, path, status, signedIn }.
  * Sign-in/out and exports are logged where they happen (server.cjs), not here.
  */
 const auditEventOf = ({ method, path: p, status, signedIn }) => {
   if (status === 403) return 'access.denied';
   if (!signedIn || status === 401) return null;
-  if (p.startsWith('/api/grist/')) return method === 'GET' ? null : 'grist.write';
   if (p.startsWith('/api/audit/')) return null;
   if (method === 'GET') {
     if (JOB_GET.test(p)) return 'job.start';
@@ -110,4 +70,4 @@ const createActivityLog = ({ dir = '', environment = 'production', out = (line) 
   };
 };
 
-module.exports = { createActivityLog, gristWriteSummary, auditEventOf, isQuietPath };
+module.exports = { createActivityLog, auditEventOf, isQuietPath };

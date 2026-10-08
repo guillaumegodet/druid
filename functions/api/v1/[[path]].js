@@ -31,7 +31,8 @@ export async function onRequest(context) {
   const apiKey = secretOf(context.env, instance, 'GRIST_API_KEY');
   if (!apiKey && !instance.readOnly) return json(500, { error: 'GRIST_API_KEY not configured on Cloudflare' });
 
-  const key = `${instance.slug}|${instance.grist.apiBase}|${instance.grist.docId}`;
+  // The key is part of the cache key: a rotated secret never reuses a client built with the former one.
+  const key = `${instance.slug}|${instance.grist.apiBase}|${instance.grist.docId}|${apiKey || ''}`;
   let store = stores.get(key);
   if (!store) {
     const main = createGristReader({
