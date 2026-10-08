@@ -67,6 +67,7 @@ export interface BenchmarkPeerGroup {
 
 export interface Establishment {
   created_at: Generated<Timestamp>;
+  extra: Generated<Json>;
   id: ColumnType<string, never, never>;
   idref: string | null;
   label: string | null;
@@ -124,6 +125,7 @@ export interface Membership {
   start_date: string | null;
   start_lower: ColumnType<string | null, never, never>;
   structure_id: Int8 | null;
+  team_labels: Generated<string[]>;
   type: string | null;
   updated_at: Generated<Timestamp>;
 }
@@ -221,6 +223,7 @@ export interface PersonLink {
 export interface RefCorpsGrade {
   category: string | null;
   code: string;
+  extra: Generated<Json>;
   label: string | null;
 }
 
