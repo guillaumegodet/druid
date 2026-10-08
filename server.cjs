@@ -2969,6 +2969,7 @@ try {
     gristExtraDocIds: String(process.env.GRIST_EXTRA_DOC_IDS || '').split(',').map((s) => s.trim()).filter(Boolean),
     appRoot: __dirname,
     hasLdap: CAPABILITIES.HAS_LDAP,
+    hasQualinka: CAPABILITIES.HAS_QUALINKA,
   });
 } catch (err) {
   // Bundle missing (run `npm run build:server`) or configuration error (no Grist document).

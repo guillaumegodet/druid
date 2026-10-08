@@ -33,6 +33,9 @@
 //   GET  /api/v1/ldap/diff | /ldap/candidates | /ldap/structures      diffs computed by the server
 //   POST /api/v1/ldap/updates { ids }   /ldap/departures { uid, date, accountLabel }
 //   POST /api/v1/ldap/candidates { entries: [{ gristRowId, uid }] }   /ldap/structures { updateIds, createKeys }
+// Alignments (lot 2 e, institution right): GET /api/v1/alignments/unified?mode=&sources= (texts as tokens, see
+// lib/directory/alignTexts.ts), POST /alignments/apply { mode, selected, chosen, decisions },
+// POST /alignments/redirection { rowId, ppn }, POST /alignments/reject { source, row, candidate, … }.
 // Reads of lot 2 c: GET /api/v1/duplicates (DuplicatesDiff, rows of the scope), GET /api/v1/people/rows?ids=1,2
 // (raw Annuaire rows of the scope, for the merge assistant).
 // Every write answer carries an `X-Druid-Audit` header (JSON list of the Grist writes) that the host moves to
@@ -44,6 +47,8 @@ import type { DirectoryRepository, DirectoryScope } from './repository';
 import { DocumentNotAllowedError, PublicationsStore } from '../publications/store';
 import type { CommandContext, DirectoryCommands, WriteAudit } from './commands';
 import type { LdapCommands } from './ldapCommands';
+import type { AlignCommands } from './alignCommands';
+import { UNIFIED_ALIGN_SOURCES, UnifiedAlignSource } from './alignments';
 import { ApiError } from './errors';
 
 export interface DirectoryApiBindings {
@@ -52,6 +57,8 @@ export interface DirectoryApiBindings {
   publications: PublicationsStore;
   /** Write commands; absent on a host without writes (tests of the read routes). */
   commands?: DirectoryCommands;
+  /** Alignment commands (caches of the alignment scripts). */
+  align?: AlignCommands;
   /** LDAP review commands; absent on an instance without LDAP (Cloudflare). */
   ldap?: LdapCommands;
   /** null = no authenticated user. */
@@ -87,6 +94,21 @@ const LdapIdsBody = z.object({ ids: z.array(z.string()).max(20000) });
 const LdapDepartureBody = z.object({ uid: z.string().min(1), date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/), accountLabel: z.string() });
 const LdapCandidatesBody = z.object({ entries: z.array(z.object({ gristRowId: RecordId, uid: z.string().min(1) })).max(20000) });
 const LdapStructuresBody = z.object({ updateIds: z.array(z.string()), createKeys: z.array(z.string()) });
+const AlignMode = z.enum(['search', 'verify']);
+const AlignSourceEnum = z.enum(['idref', 'orcid', 'hal', 'openalex', 'scopus']);
+const AlignApplyBody = z.object({
+  mode: AlignMode, selected: z.array(z.string()).max(50000),
+  chosen: z.record(z.string(), z.string()), decisions: z.record(z.string(), z.enum(['confirm', 'detach', 'ignore'])),
+});
+const AlignRedirectionBody = z.object({ rowId: z.string().regex(/^G-\d+$/), ppn: z.string().min(1) });
+const AlignRejectBody = z.object({
+  source: AlignSourceEnum,
+  row: z.object({ id: z.string().regex(/^G-\d+$/), uid: z.string(), displayName: z.string(), labo: z.string().optional() }),
+  candidate: z.looseObject({}).refine((c: any) => typeof c.id === 'string' || typeof c.ppn === 'string'),
+  candidateCount: z.number().int().min(0).optional(),
+  decision: z.enum(['Rejeté', 'Identité mêlée']),
+  note: z.string().max(2000).default(''),
+});
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
 const OpenalexBody = z.object({ openalexId: z.string() });
 const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
@@ -159,6 +181,14 @@ export const createDirectoryApi = (): Hono<Env> => {
   app.get('/ldap/structures', async (c) => {
     const ldap = ldapOf(c);
     return ldap ? c.json(await ldap.structuresDiff(), 200, NO_STORE) : c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+  });
+  app.get('/alignments/unified', async (c) => {
+    if (!c.env.align) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const mode = AlignMode.safeParse(c.req.query('mode') || 'search');
+    const requested = String(c.req.query('sources') || '').split(',').filter(Boolean);
+    const sources = (requested.length ? requested : UNIFIED_ALIGN_SOURCES) as UnifiedAlignSource[];
+    if (!mode.success || !sources.every((s) => (UNIFIED_ALIGN_SOURCES as string[]).includes(s))) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.align.unifiedDiff(sources, mode.data, { scope: c.env.scope!, audit: () => {} }), 200, NO_STORE);
   });
   app.get('/duplicates', async (c) => c.json(await c.env.repository.duplicates(c.env.scope!), 200, NO_STORE));
   app.get('/people/rows', async (c) => {
@@ -288,6 +318,24 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!ldap) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
     if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     return c.json(await ldap.applyStructures(body.updateIds, body.createKeys, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/alignments/apply', async (c) => {
+    const body = await bodyOf(c, AlignApplyBody);
+    if (!c.env.align) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.align.applySelection(body, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/alignments/redirection', async (c) => {
+    const body = await bodyOf(c, AlignRedirectionBody);
+    if (!c.env.align) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.align.applyRedirection(body.rowId, body.ppn, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/alignments/reject', async (c) => {
+    const body = await bodyOf(c, AlignRejectBody);
+    if (!c.env.align) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.align.reject(body as any, ctxOf(c)), 200, NO_STORE);
   });
   app.route('/', writes);
 

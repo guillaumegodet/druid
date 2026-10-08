@@ -36,7 +36,7 @@ import type { Task } from './lib/tasks';
 import { MergeResearchersModal } from './components/researchers/MergeResearchersModal';
 import type { AlignLaunchChoice } from './components/researchers/AlignLaunchModal';
 import { getUserInfo } from './lib/auth';
-import { UnifiedAlignPage } from './components/researchers/UnifiedAlignPage';
+import { UnifiedAlignPage, type UnifiedSelection } from './components/researchers/UnifiedAlignPage';
 import type { LdapCandProgress } from './components/researchers/LdapCandidatesPage';
 import { LdapAlignPage, LdapAlignMode } from './components/researchers/LdapAlignPage';
 import type { LdapDeparture } from './lib/ldapMoves';
@@ -735,10 +735,26 @@ function App() {
    *  reload the diff: a unified row can mix several sources, so a surgical removal
    *  would be much more complex for an uncertain gain (lot 5, to revisit if the
    *  reload turns out to be too slow in practice). */
-  const handleApplyUnified = async (updates: PersonAlignUpdate[]): Promise<number> => {
+  const handleApplyUnified = async (selection: UnifiedSelection): Promise<number> => {
     try {
       setUnifiedApplying(true);
-      const { updated } = await GristService.applyUnifiedUpdates(updates);
+      const { updated } = await GristService.applyUnifiedSelection({ mode: unifiedMode, ...selection });
+      setError('');
+      unifiedDirtyRef.current = true;
+      await loadUnifiedDiff(unifiedMode);
+      return updated;
+    } catch (err: any) {
+      setError(apiErrorText(err) || t`Error writing (unified view)`);
+      return 0;
+    } finally {
+      setUnifiedApplying(false);
+    }
+  };
+  /** « Mettre à jour » of a replaced IdRef record (verify mode): written by the server, then the diff is reloaded. */
+  const handleApplyIdrefRedirection = async (rowId: string, ppn: string): Promise<number> => {
+    try {
+      setUnifiedApplying(true);
+      const { updated } = await GristService.applyIdrefRedirection(rowId, ppn);
       setError('');
       unifiedDirtyRef.current = true;
       await loadUnifiedDiff(unifiedMode);
@@ -759,8 +775,7 @@ function App() {
   ): Promise<boolean> => {
     try {
       setUnifiedApplying(true);
-      if (src === 'idref') await GristService.rejectIdrefCandidates([{ uid: row.uid, displayName: row.displayName, labo: row.labo, candidateCount, candidate: candidate as IdrefCandidate }], decision, note);
-      else await GristService.rejectAlignCandidates(src, [{ id: row.id, uid: row.uid, displayName: row.displayName, labo: row.labo, candidateCount, candidate: candidate as AlignCandidate }], decision, note);
+      await GristService.rejectUnifiedCandidate(src, row, candidate, candidateCount, decision, note);
       setError('');
       const candId = unifiedCandidateId(src, candidate);
       setUnifiedDiff((prev) => {
@@ -865,6 +880,7 @@ function App() {
             onRerunAll={rerunUnifiedAlign}
             onStop={stopUnifiedRun}
             onApply={writable ? handleApplyUnified : undefined}
+            onApplyRedirection={writable ? handleApplyIdrefRedirection : undefined}
             onRejectCandidate={writable ? handleRejectUnifiedCandidate : undefined}
             onMixedCandidate={writable ? handleMixedUnifiedCandidate : undefined}
           />

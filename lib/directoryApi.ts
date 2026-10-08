@@ -7,6 +7,7 @@ import type { ValidationInfo } from './validation';
 import type { AnnuaireColumnMeta } from './directory/annuaireWrite';
 import type { DuplicatesDiff } from './directory/duplicates';
 import type { LdapCandidatesDiff, LdapDiff, StructuresLdapDiff } from './directory/ldap';
+import type { AlignCandidate, AlignMode, IdrefCandidate, ReviewDecision, UnifiedAlignDiff, UnifiedAlignSource, UnifiedArbitrateDecision } from './directory/alignments';
 import type { AbesExportMark, Institution, MergeLogEntry } from './directory/gristMapping';
 import type { NewsletterItem } from './publications/newsletter';
 import type { AxisCorrectionRow } from './publications/axes';
@@ -93,6 +94,15 @@ export const DirectoryApi = {
       'POST', 'ldap/candidates', { entries }),
   applyStructuresLdap: (updateIds: string[], createKeys: string[]) =>
     send<{ updated: number; created: number }>('POST', 'ldap/structures', { updateIds, createKeys }),
+  alignmentsUnified: (sources: UnifiedAlignSource[], mode: AlignMode): Promise<UnifiedAlignDiff> =>
+    fetchJson(`alignments/unified?mode=${mode}&sources=${sources.join(',')}`),
+  applyAlignSelection: (selection: { mode: AlignMode; selected: string[]; chosen: Record<string, string>; decisions: Record<string, UnifiedArbitrateDecision> }) =>
+    send<{ updated: number }>('POST', 'alignments/apply', selection),
+  applyIdrefRedirection: (rowId: string, ppn: string) => send<{ updated: number }>('POST', 'alignments/redirection', { rowId, ppn }),
+  rejectAlignCandidate: (rejection: {
+    source: UnifiedAlignSource; row: { id: string; uid: string; displayName: string; labo?: string };
+    candidate: AlignCandidate | IdrefCandidate; candidateCount: number; decision: ReviewDecision; note: string;
+  }) => send<{ rejected: number; tableCreated: boolean }>('POST', 'alignments/reject', rejection),
   createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
   updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
 };

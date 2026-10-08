@@ -10,6 +10,8 @@ import path from 'node:path';
 import { AUDIT_HEADER, createDirectoryApi } from '../lib/directory/api';
 import { createGristDirectoryCommands } from '../lib/directory/commands';
 import { createGristLdapCommands } from '../lib/directory/ldapCommands';
+import { createGristAlignCommands } from '../lib/directory/alignCommands';
+import { tokenAlignTexts } from '../lib/directory/alignTexts';
 import {
   createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient, LdapCacheSnapshot,
 } from '../lib/directory/repository';
@@ -42,6 +44,8 @@ export interface ApiV1Options {
   appRoot: string;
   /** LDAP review routes (capability HAS_LDAP). */
   hasLdap?: boolean;
+  /** Qualinka engine for the IdRef search (capability HAS_QUALINKA). */
+  hasQualinka?: boolean;
 }
 
 /** Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. */
@@ -119,9 +123,20 @@ export const createApiV1Handler = (options: ApiV1Options) => {
     grist: main, repository, annuaireColumns: commands.annuaireColumns,
     ldap: { status: ldapStatus, candidates: async () => (await ldapCandidates()).data, structures: async () => (await ldapStructures()).data },
   }) : undefined;
+  // Alignment caches written by the scripts at the app root (idref_align_cache.json…), re-read when they change.
+  const alignLoaders = new Map<string, () => Promise<{ data: Record<string, any> | null; version: string }>>();
+  const align = createGristAlignCommands({
+    grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka: !!options.hasQualinka,
+    caches: {
+      read: async (name) => {
+        if (!alignLoaders.has(name)) alignLoaders.set(name, jsonFileLoader<Record<string, any> | null>(options.appRoot, `${name}.json`, null));
+        return (await alignLoaders.get(name)!()).data;
+      },
+    },
+  });
   return async (req: NodeRequest, res: NodeResponse): Promise<void> => {
     const response = await api.fetch(toWebRequest(req), {
-      repository, publications, commands, ldap, scope: scopeOfSession(req), writeRefusal: null,
+      repository, publications, commands, ldap, align, scope: scopeOfSession(req), writeRefusal: null,
     });
     res.status(response.status);
     const audit = response.headers.get(AUDIT_HEADER);

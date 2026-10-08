@@ -340,16 +340,26 @@ interface UnifiedAlignPageProps {
   onRerunAll: (mode: AlignMode, labo?: string, group?: AlignGroup, choice?: AlignLaunchChoice) => void;
   /** « Stop » of one source's run: records in progress finish, what was found is kept. */
   onStop?: (src: UnifiedAlignSource) => Promise<void>;
-  /** Receives the updates already grouped per record (buildUnifiedUpdates) — written by GristService.applyUnifiedUpdates. */
-  /** Absent on a read-only instance (READ_ONLY): the Apply and Update buttons are hidden. */
-  onApply?: (updates: PersonAlignUpdate[]) => Promise<number | void>;
+  /** Receives the selection (checked candidates, arbitrations, decisions): the server rebuilds the updates from its own
+   * diff with buildUnifiedUpdates (domain API, migration plan lot 2 e). Absent on a read-only instance (READ_ONLY):
+   * the Apply and Update buttons are hidden. */
+  onApply?: (selection: UnifiedSelection) => Promise<number | void>;
+  /** « Mettre à jour » of a replaced IdRef record: the server writes the new PPN found by the verify run. */
+  onApplyRedirection?: (rowId: string, ppn: string) => Promise<number | void>;
   /** « Mauvais candidat »: blacklist of the source's review table → never proposed again. */
   onRejectCandidate?: (src: UnifiedAlignSource, row: RowRef, candidate: Candidate, candidateCount?: number) => Promise<boolean>;
   /** « Identité mêlée »: ticket in the source's review table (neither validated nor rejected). */
   onMixedCandidate?: (src: UnifiedAlignSource, row: RowRef, candidate: Candidate, candidateCount?: number) => Promise<boolean>;
 }
 
-export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, onModeChange, progress, applying = false, onRerunAll, onStop, onApply, onRejectCandidate, onMixedCandidate }) => {
+/** What the page sends when applying: its selection, rebuilt into updates by the server. */
+export interface UnifiedSelection {
+  selected: string[];
+  chosen: Record<string, string>;
+  decisions: Record<string, UnifiedArbitrateDecision>;
+}
+
+export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, onModeChange, progress, applying = false, onRerunAll, onStop, onApply, onApplyRedirection, onRejectCandidate, onMixedCandidate }) => {
   const { t } = useLingui();
   const [toast, setToast] = useState<string | null>(null);
   const [labo, setLabo] = useState('');
@@ -475,7 +485,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
 
   const handleApply = async () => {
     if (!onApply || !updates.length) return;
-    const n = await onApply(updates);
+    const n = await onApply({ selected: [...selected], chosen, decisions });
     const count = typeof n === 'number' ? n : updates.length;
     setToast(t`${count} record(s) written to Grist.`);
     setSelected(new Set());
@@ -485,10 +495,8 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
   // Replaced IdRef record: writes the new PPN (and carries over the name-mismatch validation if it
   // concerned the old PPN and the name still matches) — same write path as Apply.
   const updatePpn = async (row: PersonAlignRow, r: Redirection) => {
-    if (!onApply) return;
-    const fields: Record<string, string> = { IdRef: r.newPpn };
-    if (r.confirmedOld && !r.nameMismatch) fields.IdRef_nom_valide = r.newPpn;
-    const n = await onApply([{ id: row.id, uid: row.uid, displayName: row.displayName, fields, fieldsBySource: { idref: fields }, sources: ['idref'] }]);
+    if (!onApplyRedirection) return;
+    const n = await onApplyRedirection(row.id, r.ppn);
     if (n) setToast(t`IdRef updated in Grist: ${r.ppn} → ${r.newPpn}.`);
   };
   const confirmRerun = () => {
