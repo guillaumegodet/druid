@@ -7,16 +7,14 @@
 // lot 1). gristService.ts imports the helpers it still needs for its writes from this module.
 import { Researcher, Structure, Membership, MembershipType, MEMBERSHIP_TYPES } from '../../types';
 import { getPoleFromLab } from '../mappings';
-import { ResearcherListSchema, StructureListSchema } from '../schemas';
-import { ldapGradeFor, resolveGrade, isRetireeWithoutEmeritus, EmeritusSignals } from '../emeritus';
-import { parseValidation, isExternalEmployer } from '../validation';
+import { StructureListSchema } from '../schemas';
+import { parseValidation } from '../validation';
 import { normalizeFuzzyDate } from '../dates';
 import { withDerivedParents } from '../structureHierarchy';
 import { FTE_COLUMNS, parseFteCell } from '../fte';
-import { normalizeCivility } from '../civility';
 import { HR_ID_COLUMN, normalizeHrId } from '../hrId';
-import { derivePresence, employerKindOf, ldapAccountOf, legacyStatus, presenceFromValidated, PresenceInput } from '../presence';
 import { getTutelleName } from '../uaiMapping';
+import { DirectoryRow, EmployerIndex, RattachementRole, mapDirectoryRows } from './people';
 
 /** A row as returned by the Grist REST API (`GET /tables/<table>/records`). */
 export interface GristRecord {
@@ -26,41 +24,11 @@ export interface GristRecord {
 
 export const RATTACHEMENT_COL = 'rattachement';
 
-export type RattachementRole = 'PRINCIPAL' | 'SECONDAIRE' | 'HISTORIQUE';
-
-export const RATTACHEMENT_CHOICES: RattachementRole[] = ['PRINCIPAL', 'SECONDAIRE', 'HISTORIQUE'];
+// Business rules of the people (storage-independent since lot 6): re-exported for the existing importers.
+export { RATTACHEMENT_CHOICES, assignPublicIds, groupQualifiedRows, slugForExtId } from './people';
+export type { RattachementRole } from './people';
 
 export const DUPLICATE_DECISION_COL = 'doublon_decision';
-
-/**
- * Groups the QUALIFIED Annuaire rows of the same person (same uid_dyna, exactly one
- * `rattachement = PRINCIPAL` row) into a single Druid researcher carried by the principal row,
- * with one membership per row (SECONDAIRE = concurrent, HISTORIQUE = ended).
- * Unqualified groups remain distinct records (visible for arbitration).
- * In-place mutation; returns the filtered list.
- */
-export function groupQualifiedRows(researchers: any[], rowRole: Record<number, RattachementRole | ''>, rowEnd: Record<number, string>): any[] {
-  const byUid = new Map<string, any[]>();
-  for (const r of researchers) if (r.uid) { if (!byUid.has(r.uid)) byUid.set(r.uid, []); byUid.get(r.uid)!.push(r); }
-  const drop = new Set<number>();
-  for (const rows of byUid.values()) {
-    if (rows.length < 2) continue;
-    const principals = rows.filter((r) => rowRole[r.gristRowId] === 'PRINCIPAL');
-    if (principals.length !== 1) continue;                       // not qualified → unchanged
-    const others = rows.filter((r) => r !== principals[0] && rowRole[r.gristRowId]);
-    if (others.length !== rows.length - 1) continue;             // a row without role → unchanged
-    const main = principals[0];
-    main.affiliations = [
-      { ...main.affiliations[0], isPrimary: true, role: 'PRINCIPAL', gristRowId: main.gristRowId },
-      ...others.map((o) => ({
-        ...o.affiliations[0], isPrimary: false, role: rowRole[o.gristRowId], gristRowId: o.gristRowId,
-        endDate: rowRole[o.gristRowId] === 'HISTORIQUE' ? (rowEnd[o.gristRowId] || o.affiliations[0]?.endDate || '') : o.affiliations[0]?.endDate,
-      })),
-    ];
-    for (const o of others) drop.add(o.gristRowId);
-  }
-  return drop.size ? researchers.filter((r) => !drop.has(r.gristRowId)) : researchers;
-}
 
 /** Employing institution (Grist table `Etablissements`). */
 export interface Institution {
@@ -70,60 +38,6 @@ export interface Institution {
   ror: string;  // `ROR` column
   idref: string; // `idref` column — IdRef PPN of the corporate body (ABES export, 510 employer)
   label: string; // `Libelle` column — long form (e.g. « Nantes Université »), otherwise `Employeur`
-}
-
-/** Lowercase ASCII slug used to build an ext_ identifier (accents removed, non-alphanumerics -> '-'). */
-export const slugForExtId = (s: string): string =>
-  (s || '')
-    .normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase().trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-
-/**
- * Assigns the public/central identifier of each researcher (in-place mutation).
- * - real uid_dyna present: id = uid (1st record). Duplicate uids (≈17): the 1st keeps the bare uid
- * (served by the URL), the next ones take `uid-<rowId>` to stay navigable/unique → counted in the log.
- * - No uid (records outside the LDAP directory): synthetic id `ext_<name>-<first-name initial>`,
- * suffixed with the rowId on collision. NB: for harvestable externals, this same `ext_`
- * is now PERSISTED in uid_dyna (+ people.csv) → they go through the « real uid » branch
- * above; the synthetic computation is only a fallback for externals without uid_dyna.
- */
-export function assignPublicIds(researchers: any[]): void {
-  const used = new Set<string>();
-  const uidSeen = new Set<string>();
-  const dupUids = new Set<string>();
-
-  // 1) Records with a real uid
-  for (const r of researchers) {
-    if (!r.uid) continue;
-    if (!uidSeen.has(r.uid)) {
-      r.id = r.uid;
-      uidSeen.add(r.uid);
-    } else {
-      r.id = `${r.uid}-${r.gristRowId}`;
-      dupUids.add(r.uid);
-    }
-    used.add(r.id);
-  }
-
-  // 2) Records without uid -> synthetic identifier ext_<name>-<initial>
-  for (const r of researchers) {
-    if (r.id) continue;
-    const nom = slugForExtId(r.lastName);
-    const initiale = slugForExtId(r.firstName).charAt(0) || 'x';
-    const base = `ext_${nom || 'inconnu'}-${initiale}`;
-    let candidate = base;
-    if (used.has(candidate)) candidate = `${base}-${r.gristRowId}`;
-    r.id = candidate;
-    used.add(candidate);
-  }
-
-  // Count only: this now runs on the server, whose logs must not list people (the uids are listed by the
-  // Duplicates page).
-  if (dupUids.size > 0) {
-    console.warn(`[directory] ${dupUids.size} duplicated uid_dyna in the Annuaire: the URL opens the first record, the next ones get a suffixed id.`);
-  }
 }
 
 export const fromGristDate = (rawDate: any): string => {
@@ -280,225 +194,74 @@ export const parseMembershipList = (raw: any): Membership[] => {
   });
 };
 
+/** Annuaire record → directory row (lib/directory/people.ts): Grist cells decoded, column ids resolved here. Pure. */
+export function gristDirectoryRow(record: GristRecord): DirectoryRow {
+  const fields = record.fields || {};
+  return {
+    rowId: record.id,
+    uid: fields['uid_dyna'] || '',
+    lastName: fields['Nom'] || '',
+    firstName: fields['Prenom'] || '',
+    civility: fields['Civilite'] || fields['Civilité'] || '',
+    email: fields['Email'] || '',
+    nationality: fields['Nationalite'] || '',
+    photoUrl: fields['photo_url'] || '',
+    annuaireUrl: fields['annuaire_url'] || '',
+    birthDate: fromGristDate(fields['DATE_DE_NAISSANCE_JJ_MM_AAAA']),
+    corpsGrade: fields['Corps_grade'] ?? null,
+    employmentType: fields['TYPE_EMPLOI'] ?? null,
+    employmentTypeLabel: fields['LIB_TYPE_EMPLOI'] ?? null,
+    // Grist Reference column: an empty cell is 0 (not null).
+    employer: fields['Employeur'] ?? null,
+    employmentStart: fromGristFuzzyDate(fields['employment_start_date']),
+    employmentEnd: fromGristFuzzyDate(fields['employment_end_date']),
+    hrId: normalizeHrId(fields[HR_ID_COLUMN]),
+    fte: parseFteCell(fields[FTE_COLUMNS.fte]),
+    researchFte: parseFteCell(fields[FTE_COLUMNS.researchFte]),
+    validation: parseValidation(fields, fromGristDate),
+    validatedStatus: fields['validated_status'],
+    lab: fields['LABO'] || '',
+    team: fields['team'] || '',
+    membershipStart: fromGristFuzzyDate(fields[AFFILIATION_START_COL]),
+    membershipEnd: fromGristFuzzyDate(fields[AFFILIATION_END_COL]),
+    membershipType: toMembershipType(fields[MEMBERSHIP_TYPE_COL]),
+    role: (String(fields[RATTACHEMENT_COL] || '').trim().toUpperCase() as RattachementRole) || '',
+    // `groupes` column (names separated by « | ») — missing until scripts/add_groups_column.cjs has been applied.
+    groups: String(fields['groupes'] || '').split('|').map((g: string) => g.trim()).filter(Boolean),
+    identifiers: {
+      orcid: fields['ORCID'] || '',
+      idref: fields['IdRef'] || '',
+      halId: fields['IdHAL'] || '',
+      halIdNum: fields['IdHAL_i'] ? String(fields['IdHAL_i']) : '',   // filled by scripts/sync_hal.cjs (verify) or the Grist review
+      scopusId: fields['ID_SCOPUS'] ? String(fields['ID_SCOPUS']) : '',   // Numeric column in Grist → string (Zod schema)
+      openalexId: fields['openalex_author_id'] || '',
+      openalexIds: fields['OpenAlex_ids'] || '',   // reviewed list (scripts/sync_openalex.cjs + Grist review)
+    },
+    socials: {
+      bluesky: fields['Bluesky'] || '', mastodon: fields['Mastodon'] || '', youtube: fields['YouTube'] || '',
+      podcast: fields['Podcast_flux'] || '', blog: fields['Blog'] || '', linkedin: fields['LinkedIn'] || '',
+    },
+    profiles: {
+      cvInstitutionnel: fields['CV_institutionnel'] || '', cvSiteLabo: fields['CV_site_labo'] || '', cvPdf: fields['CV_pdf_docx_'] || '',
+      cvHal: fields['CV_HAL'] || '', academia: fields['Academia'] || '', researchgate: fields['Researchgate'] || '',
+      googleScholar: fields['Profil_GS'] || '', website: fields['Site_web'] || '',
+    },
+    hdr: fields['HDR'],
+    hdrYear: fields['ANNEE_HDR'],
+  };
+}
+
+/** Etablissements records → employer index (name, UAI) by Grist row id. Pure. */
+export const gristEmployerIndex = (institutions: GristRecord[]): EmployerIndex =>
+  new Map((institutions || []).map((r: any) => [r.id, { name: r.fields['Employeur'] || `Etab ${r.id}`, uai: r.fields['UAI'] || '' }]));
+
 /**
- * Annuaire rows → Druid researchers (moved verbatim from `GristService.fetchResearchers`, migration plan
- * lot 1): one researcher per row, qualified multi-row people grouped on their PRINCIPAL row, public ids
- * assigned, Zod-validated. `institutions` = raw `Etablissements` records (employer label and UAI),
- * `ldapCache` = content of ldap_status_cache.json keyed by uid (`{}` on an instance without LDAP). Pure.
+ * Annuaire rows → Druid researchers (business rules of lib/directory/people.ts). `institutions` = raw
+ * `Etablissements` records (employer label and UAI), `ldapCache` = content of ldap_status_cache.json keyed by uid
+ * (`{}` on an instance without LDAP). Pure.
  */
 export function mapAnnuaireRecords(records: GristRecord[], institutions: GristRecord[], ldapCache: Record<string, any>): Researcher[] {
-  if (!records || records.length === 0) return [];
-  // No LDAP cache (instance without LDAP, test instance, sync never run): an uid missing from it
-  // proves nothing — presence then comes from the dates and validations only.
-  const ldapAvailable = Object.keys(ldapCache).length > 0;
-  const institutionsMap: Record<number, string> = {};
-  const institutionsUaiMap: Record<number, string> = {};
-  institutions.forEach((r: any) => {
-    institutionsMap[r.id] = r.fields['Employeur'] || `Etab ${r.id}`;
-    institutionsUaiMap[r.id] = r.fields['UAI'] || '';
-  });
-
-  const researchersMapped = records.map((record: any) => {
-    const fields = record.fields;
-    const uid = fields['uid_dyna'];
-    const employerId = fields['Employeur'];
-    // Grist Reference column: an empty cell is 0 (not null) → no
-    // employer, we display empty rather than « ID: 0 ».
-    const employerName = (typeof employerId === 'number')
-      ? (employerId === 0 ? '' : (institutionsMap[employerId] || `ID: ${employerId}`))
-      : (employerId || '');
-
-    // Three axes (lib/presence.ts, docs/plan-statut-employeur-ldap.md): employer, LDAP account and
-    // presence. The uid only says whether there is an LDAP account to read (`ext_` = none).
-    const employerUai = (typeof employerId === 'number') ? institutionsUaiMap[employerId] : '';
-    // Known employer ≠ Nantes Université (INSERM, CNRS, Centrale…): the LDAP account is a hosted one —
-    // its state, category and corps describe the account, not the job.
-    const externalEmployer = isExternalEmployer(employerName, employerUai);
-    const employerKind = employerKindOf(employerName, employerUai);
-    const ldapEntry = uid ? ldapCache[uid] : undefined;
-    const ldapEtat: string | undefined = ldapEntry === undefined ? undefined : (typeof ldapEntry === 'string' ? ldapEntry : ldapEntry.etat);
-    const hasRealUid = typeof uid === 'string' && !!uid && !uid.startsWith('ext_');
-    const ldapAccount = ldapAccountOf(uid, ldapEtat);
-
-    const gristCiv = fields['Civilite'] || fields['Civilité'] || '';
-    let ldapCiv = '';
-    if (uid && ldapCache[uid] && (ldapCache[uid] as any).civilite) {
-      ldapCiv = (ldapCache[uid] as any).civilite;
-    }
-    
-    // LDAP first, otherwise Grist
-    let researcherCivility = normalizeCivility(ldapCiv || gristCiv);
-
-    // External employer: the LDAP category and corps describe the hosted account (« CDI
-    // UNIVERSITE », generic corps → « IR ») and not the actual job → keep the Grist values.
-    const ldapCategory: string = (!externalEmployer && uid && ldapCache[uid] && (ldapCache[uid] as any).categorie)
-      ? (ldapCache[uid] as any).categorie
-      : '';
-
-    const ldapEmpCorps: string = (!externalEmployer && uid && ldapCache[uid] && (ldapCache[uid] as any).empCorps)
-      ? (ldapCache[uid] as any).empCorps
-      : '';
-    // LDAP corps transposed to an emeritus code when dynaCategorie says emeritus (see lib/emeritus.ts).
-    const ldapGrade: string | null = ldapGradeFor(ldapCategory, ldapEmpCorps, fields['Corps_grade']);
-
-    const ldapEppn: string = (uid && ldapCache[uid] && (ldapCache[uid] as any).eppn)
-      ? (ldapCache[uid] as any).eppn
-      : '';
-
-    let researcherBirthDate = fromGristDate(fields['DATE_DE_NAISSANCE_JJ_MM_AAAA']);
-    let birthDateFromLdap = false;
-
-    if (uid && ldapCache[uid] && (ldapCache[uid] as any).birthDate) {
-      const ldapBirth = (ldapCache[uid] as any).birthDate;
-      if (/^\d{8}$/.test(ldapBirth)) {
-        researcherBirthDate = `${ldapBirth.substring(0, 4)}-${ldapBirth.substring(4, 6)}-${ldapBirth.substring(6, 8)}`;
-        birthDateFromLdap = true;
-      } else if (ldapBirth) {
-        researcherBirthDate = ldapBirth;
-        birthDateFromLdap = true;
-      }
-    }
-
-    // Emeritus status / retirement (see lib/emeritus.ts): trace of emeritus status ⇒ emeritus grade (PREM, MCFEM,
-    // DREM, CREM) even if Grist is not normalized yet; retired without emeritus status ⇒ Parti.
-    const baseGrade: string = ldapGrade ?? fields['Corps_grade'] ?? '';
-    const emeritusSignals: EmeritusSignals = {
-      grade: baseGrade, typeEmploi: fields['TYPE_EMPLOI'], libTypeEmploi: fields['LIB_TYPE_EMPLOI'], ldapCategory,
-    };
-    const finalGrade = resolveGrade(baseGrade, emeritusSignals);
-
-    // Reliability layer: a validation covering the status sets the presence (INTERNE / EXTERNE, written
-    // before 2026-10-07, read as PRESENT). `derivedPresence` = without it, to flag a conflict.
-    const validation = parseValidation(fields, fromGristDate);
-    const presenceInput: PresenceInput = {
-      employer: employerKind, hasRealUid: hasRealUid && ldapAvailable, ldapEtat,
-      employmentEnd: fromGristFuzzyDate(fields['employment_end_date']),
-      membershipEnd: fromGristFuzzyDate(fields[AFFILIATION_END_COL]),
-      retireeWithoutEmeritus: isRetireeWithoutEmeritus(emeritusSignals),
-    };
-    const derivedPresence = derivePresence(presenceInput);
-    const validatedPresence = validation.validated && validation.validationScope.includes('statut')
-      ? presenceFromValidated(fields['validated_status']) : undefined;
-    const presence = derivePresence({ ...presenceInput, validated: validatedPresence });
-
-    return {
-      id: '',                 // filled after the map (real uid, otherwise ext_<name>-<initial>) — see assignPublicIds
-      gristRowId: record.id,  // technical key for Grist writes
-      uid: uid || '',
-      civility: researcherCivility,
-      lastName: fields['Nom'] || '',
-      firstName: fields['Prenom'] || '',
-      displayName: `${fields['Nom']?.toUpperCase()} ${fields['Prenom']}`,
-      photoUrl: fields['photo_url'] || '',
-      annuaireUrl: fields['annuaire_url'] || '',
-      email: fields['Email'] || '',
-      eppn: ldapEppn,
-      hrId: normalizeHrId(fields[HR_ID_COLUMN]),
-      nationality: fields['Nationalite'] || '',
-      birthDate: researcherBirthDate,
-      status: legacyStatus(presence, employerKind, ldapAccount),
-      derivedStatus: legacyStatus(derivedPresence, employerKind, ldapAccount),
-      presence,
-      derivedPresence,
-      ldapAccount,
-      employerKind,
-      employment: {
-        employer: employerName,
-        institutionId: (typeof employerId === 'number') ? (institutionsUaiMap[employerId] || '') : '',
-        contractType: ldapCategory || fields['TYPE_EMPLOI'] || '',
-        grade: finalGrade,
-        ldapFields: [
-          ...(ldapCategory ? ['contractType'] : []),
-          ...(ldapGrade !== null ? ['grade'] : []),
-        ],
-        internalTypology: fields['LIB_TYPE_EMPLOI'] || '',
-        startDate: fromGristFuzzyDate(fields['employment_start_date']),
-        endDate: fromGristFuzzyDate(fields['employment_end_date']),
-        // Optional columns (lib/fte.ts): absent or empty → null, a real 0 is kept.
-        fte: parseFteCell(fields[FTE_COLUMNS.fte]),
-        researchFte: parseFteCell(fields[FTE_COLUMNS.researchFte]),
-      },
-      affiliations: [{
-        structureName: fields['LABO'] || '',
-        team: fields['team'] || '',
-        // Membership dates in the row's lab/team (affiliation_start/end_date columns, created on
-        // 2026-09-14), distinct from the employment dates (employment_start/end_date, « Emploi » card).
-        startDate: fromGristFuzzyDate(fields[AFFILIATION_START_COL]),
-        endDate: fromGristFuzzyDate(fields[AFFILIATION_END_COL]),
-        membershipType: toMembershipType(fields[MEMBERSHIP_TYPE_COL]),
-        isPrimary: true
-      }],
-      ldapFields: [...(birthDateFromLdap ? ['birthDate'] : [])],
-      // `groupes` column (names separated by « | ») — missing until
-      // scripts/add_groups_column.cjs has been applied → no group.
-      groups: String(fields['groupes'] || '')
-        .split('|')
-        .map((g: string) => g.trim())
-        .filter(Boolean),
-      identifiers: {
-        orcid: fields['ORCID'] || '',
-        idref: fields['IdRef'] || '',
-        halId: fields['IdHAL'] || '',
-        halIdNum: fields['IdHAL_i'] ? String(fields['IdHAL_i']) : '',   // filled by scripts/sync_hal.cjs (verify) or the Grist review
-        scopusId: fields['ID_SCOPUS'] ? String(fields['ID_SCOPUS']) : '',   // Numeric column in Grist → string (Zod schema)
-        openalexId: fields['openalex_author_id'] || '',
-        openalexIds: fields['OpenAlex_ids'] || '',   // reviewed list (scripts/sync_openalex.cjs + Grist review)
-      },
-      // Declared public social media accounts (media monitoring),
-      // editable from the record; columns created in phase 2 of media monitoring.
-      socials: {
-        bluesky: fields['Bluesky'] || '',
-        mastodon: fields['Mastodon'] || '',
-        youtube: fields['YouTube'] || '',
-        podcast: fields['Podcast_flux'] || '',
-        blog: fields['Blog'] || '',
-        linkedin: fields['LinkedIn'] || '',
-      },
-      // Academic profiles & public CVs (Grist Annuaire columns).
-      profiles: {
-        cvInstitutionnel: fields['CV_institutionnel'] || '',
-        cvSiteLabo: fields['CV_site_labo'] || '',
-        cvPdf: fields['CV_pdf_docx_'] || '',
-        cvHal: fields['CV_HAL'] || '',
-        academia: fields['Academia'] || '',
-        researchgate: fields['Researchgate'] || '',
-        googleScholar: fields['Profil_GS'] || '',
-        website: fields['Site_web'] || '',
-      },
-      nuFields: {
-        pole: fields['Pole_de_rattac'] || getPoleFromLab(fields['LABO']),
-        composante: fields['Composante_de_'],
-        location: fields['Localisation_S'],
-        doctoralSchool: fields['ED_de_rattache'],
-        hdr: fields['HDR'] === 'OUI',
-        hdrYear: fields['ANNEE_HDR'],
-      },
-      validation,
-      lastSync: new Date().toISOString().split('T')[0],
-    };
-  });
-
-  // Qualified multi-affiliations (`rattachement` column): a single record per person,
-  // carried by the PRINCIPAL row, the other rows becoming memberships.
-  const rowRole: Record<number, RattachementRole | ''> = {};
-  const rowEnd: Record<number, string> = {};
-  for (const record of records) {
-    rowRole[record.id] = (String(record.fields[RATTACHEMENT_COL] || '').trim().toUpperCase() as RattachementRole) || '';
-    rowEnd[record.id] = fromGristFuzzyDate(record.fields[AFFILIATION_END_COL]) || fromGristFuzzyDate(record.fields['employment_end_date']);
-  }
-  const researchersGrouped = groupQualifiedRows(researchersMapped, rowRole, rowEnd);
-
-  // Public/central identifier: real uid (uid_dyna) when present, otherwise ext_<name>-<initial>.
-  // The Grist rowId (gristRowId) stays internal for writes. See useUrlState / updateResearcher.
-  assignPublicIds(researchersGrouped);
-
-  const validation = ResearcherListSchema.safeParse(researchersGrouped);
-  if (!validation.success) {
-    console.warn('Zod Validation Warning (Researchers):', validation.error.format());
-  }
-
-  const researchers = (validation.success ? validation.data : researchersGrouped) as Researcher[];
-  return researchers;
+  return mapDirectoryRows((records || []).map(gristDirectoryRow), gristEmployerIndex(institutions), ldapCache);
 }
 
 /**
