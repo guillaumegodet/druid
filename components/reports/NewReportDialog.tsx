@@ -14,7 +14,6 @@ import {
   DEFAULT_PERIOD,
   instantiateReportTemplate,
   datasetPublishers,
-  partnerCountries,
   REPORT_TEMPLATES,
   templateById,
 } from '../dashboard/report/templates';
@@ -23,10 +22,14 @@ import type { DashboardDataset } from '../dashboard/types';
 import { buildPartnerCatalog, type PartnerCatalogEntry } from '../dashboard/collabAggregates';
 import { consortiumPartnerGroups } from '../dashboard/consortia';
 import { PartnerInstitutionPicker } from '../dashboard/PartnerInstitutionPicker';
+import { CountryPicker } from '../dashboard/CountryPicker';
+import { countryOptions } from '../dashboard/countryAggregates';
 import { affiliatedPartners } from '../dashboard/report/rorAffiliates';
 import { FUNDER_CATEGORIES, FUNDER_CATEGORY_LABELS } from '../dashboard/fundersAggregates';
 import { loadDashboardDataset } from '../dashboard/useDashboardData';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect, useStructureSlugs } from './ReportControls';
+
+const ALL_YEARS = { start: -Infinity, end: Infinity };
 
 export interface NewReportInitial {
   templateId?: string;
@@ -87,7 +90,13 @@ export const NewReportDialog: React.FC<{
   useEffect(() => { setCountry(''); setPartners([]); setPublisher(''); }, [slug]);
   const publishers = useMemo(() => datasetPublishers(dataset ?? null), [dataset]);
 
-  const countries = useMemo(() => partnerCountries(dataset ?? null), [dataset]);
+  // Partner countries of the whole corpus, with their number of co-publications.
+  const countryChoices = useMemo(
+    () => (dataset ? countryOptions(dataset.publications, ALL_YEARS, dataset.countryNames) : []),
+    // Country labels follow the language.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dataset, i18n.locale],
+  );
   const countryName = (cc: string) => (dataset ? countryLabel(cc, dataset.countryNames) : cc);
 
   // Partner institutions (collaboration template): the structure's partner catalog, consortium
@@ -253,10 +262,14 @@ export const NewReportDialog: React.FC<{
           {template.params.includes('country') && (
             <div className={row}>
               <span className={label}><Trans>Country</Trans></span>
-              <select className={selectCls} value={country} onChange={(e) => setCountry(e.target.value)} disabled={!dataset}>
-                <option value="">{t`Choose a country`}</option>
-                {countries.map((cc) => <option key={cc} value={cc}>{countryName(cc)}</option>)}
-              </select>
+              <CountryPicker
+                options={countryChoices}
+                value={country}
+                placeholder={t`Choose a country`}
+                countryNames={dataset?.countryNames ?? {}}
+                onChange={setCountry}
+                disabled={!dataset}
+              />
             </div>
           )}
           {template.params.includes('partners') && dataset && (

@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
   aggregateCountryFocus,
+  byCountryName,
   countryBounds,
   countryOptions,
   hasCountry,
   publicationCountries,
+  searchCountryOptions,
 } from '../../components/dashboard/countryAggregates';
 import { buildFilterContext, matchesFilters } from '../../components/dashboard/publicationFilters';
 import type { DashboardDataset, DashboardPublication } from '../../components/dashboard/types';
@@ -71,6 +73,35 @@ describe('countries of a publication', () => {
 
   it('lists the partner countries of the period, most frequent first', () => {
     expect(countryOptions(PUBS, RANGE, DS.countryNames).map((o) => `${o.cc}:${o.count}`)).toEqual(['DE:7', 'CA:6', 'US:1']);
+  });
+});
+
+describe('country selector', () => {
+  const NAMES = {
+    VN: { fr: 'Viêt Nam', echarts: 'Vietnam', eu: false },
+    DE: { fr: 'Allemagne', echarts: 'Germany', eu: true },
+    EG: { fr: 'Égypte', echarts: 'Egypt', eu: false },
+    US: { fr: 'États-Unis', echarts: 'United States', eu: false },
+  };
+  const OPTIONS = [
+    { cc: 'DE', label: 'Allemagne', count: 9 },
+    { cc: 'US', label: 'États-Unis', count: 8 },
+    { cc: 'VN', label: 'Viêt Nam', count: 2 },
+    { cc: 'EG', label: 'Égypte', count: 1 },
+  ];
+  const ccs = (os: { cc: string }[]) => os.map((o) => o.cc);
+
+  it('sorts the countries by name, accented initials in their letter', () => {
+    expect(ccs(byCountryName(OPTIONS, 'fr'))).toEqual(['DE', 'EG', 'US', 'VN']);
+  });
+
+  it('finds a country whatever the accents, spaces or language of the search', () => {
+    expect(ccs(searchCountryOptions(OPTIONS, 'vietnam', NAMES))).toEqual(['VN']);
+    expect(ccs(searchCountryOptions(OPTIONS, 'Viêt', NAMES))).toEqual(['VN']);
+    expect(ccs(searchCountryOptions(OPTIONS, 'etats unis', NAMES))).toEqual(['US']);
+    expect(ccs(searchCountryOptions(OPTIONS, 'germany', NAMES))).toEqual(['DE']);
+    expect(ccs(searchCountryOptions(OPTIONS, 'eg', NAMES))).toEqual(['EG']);
+    expect(searchCountryOptions(OPTIONS, '  ', NAMES)).toEqual(OPTIONS);
   });
 });
 

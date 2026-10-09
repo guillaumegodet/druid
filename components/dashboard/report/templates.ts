@@ -7,7 +7,6 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { datasetFeatures, missingFeatures, scopeFeatures, trivialFiltersOf } from '../chartMeta';
 import { buildPartnerCatalog } from '../collabAggregates';
-import { foreignCountriesOf } from '../countryAggregates';
 import { countryLabel } from '../labels';
 import { LARGE_COLLAB_AUTHORS } from '../partnerKpis';
 import type { PubFilters } from '../publicationFilters';
@@ -385,14 +384,6 @@ export function datasetPublishers(dataset: DashboardDataset | null, limit = 60):
 }
 
 export const templateById = (id: string): ReportTemplate | undefined => REPORT_TEMPLATES.find((t) => t.id === id);
-
-/** Foreign partner countries of a dataset, most frequent first (country parameter). */
-export function partnerCountries(dataset: DashboardDataset | null): string[] {
-  if (!dataset) return [];
-  const counts = new Map<string, number>();
-  for (const p of dataset.publications) for (const cc of foreignCountriesOf(p)) counts.set(cc, (counts.get(cc) ?? 0) + 1);
-  return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([cc]) => cc);
-}
 
 /**
  * New report from an instance template (a report published by a super admin, lot 6): same

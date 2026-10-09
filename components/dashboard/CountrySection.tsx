@@ -5,6 +5,7 @@ import { DashboardDataset } from './types';
 import { YearRange } from './overviewAggregates';
 import { PubFilters } from './publicationFilters';
 import { aggregateCountryFocus, countryOptions } from './countryAggregates';
+import { CountryPicker } from './CountryPicker';
 import { countryImpactItems, countryKpiItems } from './countryKpis';
 import { aggregateImpact } from './impactAggregates';
 import { LARGE_COLLAB_AUTHORS } from './partnerKpis';
@@ -105,7 +106,6 @@ export const CountrySection: React.FC<{
   const country = focus.label;
   const hasAuthorCount = dataset.publications.some((p) => typeof p.authorCount === 'number');
   const hasParents = focus.pubs.some((p) => p.partnerInstitutions.some((o) => o.cc === cc && o.parent));
-  const inOptions = options.some((o) => o.cc === cc);
   const chartProps: CountryChartProps = { focus, countryNames: dataset.countryNames, groupAffiliates, open };
   // « Add to a report »: the country and options go with the chart; impact without large collaborations (D2).
   const chartState: ChartState = { filters: listFilters, params: groupAffiliates ? { group: 'grouped' } : {} };
@@ -113,23 +113,19 @@ export const CountrySection: React.FC<{
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="glass-card p-4 flex flex-wrap items-center gap-x-5 gap-y-3">
-        <label className="flex items-center gap-2 text-[13px] text-ink dark:text-[#f5f2ea]">
+      {/* relative z-10: the country list opens over the cards below (each glass card is its own stacking context). */}
+      <div className="glass-card p-4 flex flex-wrap items-center gap-x-5 gap-y-3 relative z-10">
+        <div className="flex items-center gap-2 text-[13px] text-ink dark:text-[#f5f2ea]">
           <Globe2 className="w-4 h-4" />
           <span className="font-semibold"><Trans>Partner country</Trans></span>
-          <select
-            className="input-soft !w-auto py-1.5 pr-7 text-sm cursor-pointer"
+          <CountryPicker
+            options={options}
             value={cc}
-            onChange={(e) => setPicked(e.target.value)}
-          >
-            {!inOptions && <option value={cc}>{country} (0)</option>}
-            {options.map((o) => (
-              <option key={o.cc} value={o.cc}>
-                {o.label} ({fmt(o.count)})
-              </option>
-            ))}
-          </select>
-        </label>
+            valueLabel={country}
+            countryNames={dataset.countryNames}
+            onChange={setPicked}
+          />
+        </div>
         {hasAuthorCount && (
           <label className="flex items-center gap-2 text-[13px] text-ink dark:text-[#f5f2ea] cursor-pointer select-none">
             <input

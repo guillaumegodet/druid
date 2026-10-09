@@ -414,8 +414,8 @@ msgstr "Envoyer"
 #: components/DashboardPage.tsx:79
 #: components/dashboard/InternationalTab.tsx:128
 #: components/dashboard/report/reportCatalog.ts:25
-#: components/dashboard/report/templates.ts:142
-#: components/dashboard/report/templates.ts:273
+#: components/dashboard/report/templates.ts:141
+#: components/dashboard/report/templates.ts:272
 msgid "Overview"
 msgstr "Vue d'ensemble"
 
@@ -436,7 +436,7 @@ msgstr "Ouvrages"
 
 #: components/DashboardPage.tsx:83
 #: components/dashboard/report/reportCatalog.ts:65
-#: components/dashboard/report/templates.ts:362
+#: components/dashboard/report/templates.ts:361
 msgid "Journals"
 msgstr "Revues"
 
@@ -446,9 +446,9 @@ msgid "APC monitoring"
 msgstr "Suivi des APC"
 
 #: components/DashboardPage.tsx:85
-#: components/dashboard/CountrySection.tsx:222
+#: components/dashboard/CountrySection.tsx:218
 #: components/dashboard/report/reportCatalog.ts:77
-#: components/dashboard/report/templates.ts:209
+#: components/dashboard/report/templates.ts:208
 msgid "Funding"
 msgstr "Financements"
 
@@ -463,7 +463,7 @@ msgstr "Benchmark"
 
 #: components/DashboardPage.tsx:88
 #: components/dashboard/report/reportCatalog.ts:87
-#: components/dashboard/report/templates.ts:368
+#: components/dashboard/report/templates.ts:367
 msgid "Signature charter"
 msgstr "Charte de signature"
 
@@ -641,7 +641,7 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/ResearcherDetail.tsx:579
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
-#: components/reports/NewReportDialog.tsx:311
+#: components/reports/NewReportDialog.tsx:324
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:194
 #: components/researchers/AlignLaunchModal.tsx:188
@@ -659,7 +659,7 @@ msgstr "Annuler"
 
 #: components/GroupList.tsx:169
 #: components/StructureDetail.tsx:139
-#: components/reports/NewReportDialog.tsx:323
+#: components/reports/NewReportDialog.tsx:336
 #: components/researchers/LdapMovesPanel.tsx:197
 msgid "Create"
 msgstr "Créer"
@@ -1131,7 +1131,7 @@ msgstr "Acronyme"
 #: components/StructureList.tsx:199
 #: components/dashboard/MediaSourcesAdmin.tsx:215
 #: components/dashboard/MediaSourcesAdmin.tsx:288
-#: components/reports/NewReportDialog.tsx:288
+#: components/reports/NewReportDialog.tsx:301
 #: components/researchers/LdapMovesPanel.tsx:167
 #: components/researchers/LdapMovesPanel.tsx:222
 #: components/researchers/ListHeader.tsx:46
@@ -1242,7 +1242,7 @@ msgstr "Suppression de structures : non disponible"
 #: components/dashboard/StaffSection.tsx:280
 #: components/dashboard/report/ReportWizard.tsx:271
 #: components/dashboard/report/composeReportPdf.ts:63
-#: components/reports/NewReportDialog.tsx:224
+#: components/reports/NewReportDialog.tsx:233
 msgid "Structure"
 msgstr "Structure"
 
@@ -1519,7 +1519,7 @@ msgstr "Type"
 
 #: components/dashboard/ApcTab.tsx:483
 #: components/dashboard/JournalsTab.tsx:202
-#: components/reports/NewReportDialog.tsx:246
+#: components/reports/NewReportDialog.tsx:255
 msgid "Publisher"
 msgstr "Éditeur"
 
@@ -2665,8 +2665,8 @@ msgstr "Par pays"
 
 #: components/dashboard/CollaborationsTab.tsx:309
 #: components/dashboard/PartnerInstitutionPicker.tsx:39
-#: components/dashboard/report/templates.ts:146
-#: components/dashboard/report/templates.ts:199
+#: components/dashboard/report/templates.ts:145
+#: components/dashboard/report/templates.ts:198
 msgid "Partner institutions"
 msgstr "Institutions partenaires"
 
@@ -2821,56 +2821,68 @@ msgstr "Autres pays des co-publications multilatérales"
 msgid "Languages of the co-publications"
 msgstr "Langues des co-publications"
 
-#: components/dashboard/CountrySection.tsx:96
+#: components/dashboard/CountryPicker.tsx:95
+msgid "Search for a country…"
+msgstr "Rechercher un pays…"
+
+#: components/dashboard/CountryPicker.tsx:96
+msgid "Search for a country"
+msgstr "Rechercher un pays"
+
+#: components/dashboard/CountryPicker.tsx:128
+msgid "No partner country matches."
+msgstr "Aucun pays partenaire ne correspond."
+
+#: components/dashboard/CountrySection.tsx:97
 msgid "No international co-publication over the period."
 msgstr "Aucune co-publication internationale sur la période."
 
-#: components/dashboard/CountrySection.tsx:119
+#: components/dashboard/CountrySection.tsx:120
 #: components/dashboard/PublicationsListTab.tsx:361
 msgid "Partner country"
 msgstr "Pays partenaire"
 
-#: components/dashboard/CountrySection.tsx:141
+#: components/dashboard/CountrySection.tsx:137
 msgid "Exclude large collaborations (> {LARGE_COLLAB_AUTHORS} authors)"
 msgstr "Exclure les grandes collaborations (> {LARGE_COLLAB_AUTHORS} auteurs)"
 
-#: components/dashboard/CountrySection.tsx:152
+#: components/dashboard/CountrySection.tsx:148
 msgid "Group hospitals and institutes with their university"
 msgstr "Regrouper hôpitaux et instituts avec leur université"
 
 #. placeholder {0}: bilan.total.toLocaleString(numberLocale())
 #. placeholder {0}: fmt(current.total)
 #. placeholder {0}: fmt(focus.total)
-#: components/dashboard/CountrySection.tsx:161
+#: components/dashboard/CountrySection.tsx:157
 #: components/dashboard/PartnerBilanSection.tsx:273
 #: components/dashboard/PartnerBilanSection.tsx:404
 #: components/dashboard/PartnerBreakdownSection.tsx:183
 msgid "View the {0} publications"
 msgstr "Voir les {0} publications"
 
-#: components/dashboard/CountrySection.tsx:168
+#: components/dashboard/CountrySection.tsx:164
 msgid "No co-publication with {country} over the period."
 msgstr "Aucune co-publication avec {country} sur la période."
 
-#: components/dashboard/CountrySection.tsx:183
+#: components/dashboard/CountrySection.tsx:179
 msgid "Institutions of {country}"
 msgstr "Établissements de {country}"
 
-#: components/dashboard/CountrySection.tsx:190
+#: components/dashboard/CountrySection.tsx:186
 msgid "Labs and researchers involved"
 msgstr "Labos et chercheurs impliqués"
 
-#: components/dashboard/CountrySection.tsx:197
-#: components/dashboard/report/templates.ts:203
+#: components/dashboard/CountrySection.tsx:193
+#: components/dashboard/report/templates.ts:202
 msgid "Themes"
 msgstr "Thématiques"
 
-#: components/dashboard/CountrySection.tsx:208
-#: components/dashboard/report/templates.ts:207
+#: components/dashboard/CountrySection.tsx:204
+#: components/dashboard/report/templates.ts:206
 msgid "Impact"
 msgstr "Impact"
 
-#: components/dashboard/CountrySection.tsx:210
+#: components/dashboard/CountrySection.tsx:206
 msgid "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out. The reference is the other international co-publications of the structure in the same subfields, weighted like the co-publications with {country}."
 msgstr "Les publications de plus de {LARGE_COLLAB_AUTHORS} auteurs sont écartées. La référence est l'ensemble des autres co-publications internationales de la structure dans les mêmes sous-disciplines, pondérées comme les co-publications avec {country}."
 
@@ -2879,12 +2891,12 @@ msgstr "Les publications de plus de {LARGE_COLLAB_AUTHORS} auteurs sont écarté
 #. placeholder {2}: fmt(focus.funderOrigins.country)
 #. placeholder {3}: fmt(focus.funderOrigins.europe)
 #. placeholder {4}: fmt(focus.funderOrigins.france)
-#: components/dashboard/CountrySection.tsx:224
+#: components/dashboard/CountrySection.tsx:220
 msgid "{0} co-publications acknowledge at least one funder ({1}): {2} a funder of {country}, {3} a European one, {4} a French one."
 msgstr "{0} co-publications remercient au moins un financeur ({1}) : {2} un financeur de {country}, {3} un financeur européen, {4} un financeur français."
 
-#: components/dashboard/CountrySection.tsx:230
-#: components/dashboard/report/templates.ts:211
+#: components/dashboard/CountrySection.tsx:226
+#: components/dashboard/report/templates.ts:210
 msgid "Other countries and languages"
 msgstr "Autres pays et langues"
 
@@ -2902,7 +2914,7 @@ msgstr "À propos de « {title} »"
 #: components/reports/AddToReportDialog.tsx:122
 #: components/reports/ChartPicker.tsx:62
 #: components/reports/HistoryDialog.tsx:72
-#: components/reports/NewReportDialog.tsx:170
+#: components/reports/NewReportDialog.tsx:179
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
@@ -3413,7 +3425,7 @@ msgid "Top 25 keywords"
 msgstr "Top 25 des mots-clés"
 
 #: components/dashboard/MarketShareSection.tsx:23
-#: components/reports/NewReportDialog.tsx:255
+#: components/reports/NewReportDialog.tsx:264
 msgid "Country"
 msgstr "Pays"
 
@@ -3612,7 +3624,7 @@ msgstr "Dernière collecte : {0}."
 #: components/dashboard/report/pdfDoc.ts:126
 #: components/groups/GroupDashboardSection.tsx:145
 #: components/reports/HistoryDialog.tsx:105
-#: components/reports/NewReportDialog.tsx:228
+#: components/reports/NewReportDialog.tsx:237
 #: components/reports/ReportControls.tsx:83
 #: components/researchers/FilterPanel.tsx:179
 msgid "Period"
@@ -6461,7 +6473,7 @@ msgstr "Rapport PDF — {0}"
 #: components/dashboard/report/ReportWizard.tsx:282
 #: components/dashboard/report/composeReportPdf.ts:65
 #: components/dashboard/report/pdfDoc.ts:127
-#: components/reports/NewReportDialog.tsx:232
+#: components/reports/NewReportDialog.tsx:241
 #: components/reports/ReportControls.tsx:151
 msgctxt "perimeter"
 msgid "Scope"
@@ -7446,190 +7458,190 @@ msgstr "Stockage du navigateur indisponible : les rapports ne peuvent pas être 
 msgid "Sharing and history are not available on this read-only instance."
 msgstr "Le partage et l'historique ne sont pas disponibles sur cette instance en lecture seule."
 
-#: components/dashboard/report/templates.ts:83
+#: components/dashboard/report/templates.ts:82
 msgid "Empty report"
 msgstr "Rapport vide"
 
-#: components/dashboard/report/templates.ts:84
+#: components/dashboard/report/templates.ts:83
 msgid "Start from scratch and add charts, key figures and text yourself."
 msgstr "Partir de zéro et ajouter vous-même graphiques, chiffres clés et textes."
 
-#: components/dashboard/report/templates.ts:99
+#: components/dashboard/report/templates.ts:98
 msgid "Structure report"
 msgstr "Bilan de structure"
 
-#: components/dashboard/report/templates.ts:100
+#: components/dashboard/report/templates.ts:99
 msgid "Every tab of the dashboard of a structure: output, collaborations, impact, journals, funding, teams…"
 msgstr "Tous les onglets du tableau de bord d'une structure : production, collaborations, impact, revues, financements, équipes…"
 
-#: components/dashboard/report/templates.ts:130
+#: components/dashboard/report/templates.ts:129
 msgid "International collaborations"
 msgstr "Collaborations internationales"
 
-#: components/dashboard/report/templates.ts:131
+#: components/dashboard/report/templates.ts:130
 msgid "Share and evolution of international co-publications, partner countries and institutions, themes and impact."
 msgstr "Part et évolution des co-publications internationales, pays et établissements partenaires, thématiques et impact."
 
-#: components/dashboard/report/templates.ts:144
+#: components/dashboard/report/templates.ts:143
 msgid "Partner countries"
 msgstr "Pays partenaires"
 
-#: components/dashboard/report/templates.ts:148
+#: components/dashboard/report/templates.ts:147
 msgid "Themes of international co-publications"
 msgstr "Thématiques des co-publications internationales"
 
-#: components/dashboard/report/templates.ts:150
+#: components/dashboard/report/templates.ts:149
 msgid "Impact of international co-publications"
 msgstr "Impact des co-publications internationales"
 
-#: components/dashboard/report/templates.ts:167
+#: components/dashboard/report/templates.ts:166
 msgid "Collaboration with a country"
 msgstr "Collaboration avec un pays"
 
-#: components/dashboard/report/templates.ts:168
+#: components/dashboard/report/templates.ts:167
 msgid "Co-publications with one partner country: key figures and rank, institutions and map, labs and researchers involved, who works with whom, themes and specialization, impact, funders, list of publications."
 msgstr "Co-publications avec un pays partenaire : chiffres clés et rang, établissements et carte, labos et chercheurs impliqués, qui travaille avec qui, thématiques et spécialisation, impact, financeurs, liste des publications."
 
-#: components/dashboard/report/templates.ts:185
-#: components/dashboard/report/templates.ts:218
+#: components/dashboard/report/templates.ts:184
+#: components/dashboard/report/templates.ts:217
 msgid "Co-publications of {lab} with {countryName}."
 msgstr "Co-publications de {lab} avec {countryName}."
 
-#: components/dashboard/report/templates.ts:187
+#: components/dashboard/report/templates.ts:186
 msgid "A publication is a co-publication with {countryName} when one of its authors is affiliated with an institution of that country."
 msgstr "Une publication est une co-publication avec {countryName} quand l'un de ses auteurs est affilié à un établissement de ce pays."
 
-#: components/dashboard/report/templates.ts:188
-#: components/dashboard/report/templates.ts:262
+#: components/dashboard/report/templates.ts:187
+#: components/dashboard/report/templates.ts:261
 msgid "Publications with more than {LARGE_COLLAB_AUTHORS} authors (large consortia) are counted in the volumes but left out of the impact indicators and charts."
 msgstr "Les publications de plus de {LARGE_COLLAB_AUTHORS} auteurs (grands consortiums) sont comptées dans les volumes mais écartées des indicateurs et graphiques d'impact."
 
-#: components/dashboard/report/templates.ts:189
+#: components/dashboard/report/templates.ts:188
 msgid "The impact reference is the other international co-publications of {lab} in the same subfields, weighted like the co-publications with {countryName}."
 msgstr "La référence d'impact est l'ensemble des autres co-publications internationales de {lab} dans les mêmes sous-disciplines, pondérées comme les co-publications avec {countryName}."
 
-#: components/dashboard/report/templates.ts:190
+#: components/dashboard/report/templates.ts:189
 msgid "Funders are those the publications acknowledge: they say neither who paid the research nor who holds the grant."
 msgstr "Les financeurs sont ceux que les publications remercient : ils ne disent ni qui a payé la recherche ni qui porte le financement."
 
-#: components/dashboard/report/templates.ts:192
-#: components/dashboard/report/templates.ts:268
-#: components/dashboard/report/templates.ts:327
-#: components/dashboard/report/templates.ts:358
+#: components/dashboard/report/templates.ts:191
+#: components/dashboard/report/templates.ts:267
+#: components/dashboard/report/templates.ts:326
+#: components/dashboard/report/templates.ts:357
 msgid "Summary"
 msgstr "Synthèse"
 
-#: components/dashboard/report/templates.ts:194
-#: components/dashboard/report/templates.ts:270
-#: components/dashboard/report/templates.ts:329
-#: components/dashboard/report/templates.ts:360
+#: components/dashboard/report/templates.ts:193
+#: components/dashboard/report/templates.ts:269
+#: components/dashboard/report/templates.ts:328
+#: components/dashboard/report/templates.ts:359
 #: components/reports/ReportEditor.tsx:415
 msgid "Key figures"
 msgstr "Chiffres clés"
 
-#: components/dashboard/report/templates.ts:197
+#: components/dashboard/report/templates.ts:196
 msgid "Dynamics and rank"
 msgstr "Dynamique et rang"
 
-#: components/dashboard/report/templates.ts:201
-#: components/dashboard/report/templates.ts:278
+#: components/dashboard/report/templates.ts:200
+#: components/dashboard/report/templates.ts:277
 msgid "People and labs involved"
 msgstr "Personnes et labos impliqués"
 
-#: components/dashboard/report/templates.ts:205
-#: components/dashboard/report/templates.ts:283
+#: components/dashboard/report/templates.ts:204
+#: components/dashboard/report/templates.ts:282
 msgid "Analysis by major theme"
 msgstr "Analyse par grand thème"
 
-#: components/dashboard/report/templates.ts:213
-#: components/dashboard/report/templates.ts:287
+#: components/dashboard/report/templates.ts:212
+#: components/dashboard/report/templates.ts:286
 msgid "Annex"
 msgstr "Annexe"
 
-#: components/dashboard/report/templates.ts:219
-#: components/dashboard/report/templates.ts:294
+#: components/dashboard/report/templates.ts:218
+#: components/dashboard/report/templates.ts:293
 msgid "Internal working document"
 msgstr "Document de travail interne"
 
-#: components/dashboard/report/templates.ts:232
+#: components/dashboard/report/templates.ts:231
 msgid "Collaboration with a university or group"
 msgstr "Collaboration avec une université ou un groupe"
 
-#: components/dashboard/report/templates.ts:233
+#: components/dashboard/report/templates.ts:232
 msgid "Co-publications with one or several institutions: key figures, impact against a comparable reference, themes, people and labs involved, per-university breakdown, list of publications."
 msgstr "Co-publications avec un ou plusieurs établissements : chiffres clés, impact face à une référence comparable, thématiques, personnes et labos impliqués, ventilation par université, liste des publications."
 
-#: components/dashboard/report/templates.ts:259
-#: components/dashboard/report/templates.ts:293
+#: components/dashboard/report/templates.ts:258
+#: components/dashboard/report/templates.ts:292
 msgid "Co-publications of {lab} with {partnersLabel}."
 msgstr "Co-publications de {lab} avec {partnersLabel}."
 
-#: components/dashboard/report/templates.ts:261
+#: components/dashboard/report/templates.ts:260
 msgid "Partner scope: {scopeList}."
 msgstr "Périmètre partenaire : {scopeList}."
 
-#: components/dashboard/report/templates.ts:263
+#: components/dashboard/report/templates.ts:262
 msgid "The impact reference is the international co-publications of {lab} in the same subfields, weighted like the collaboration."
 msgstr "La référence d'impact est l'ensemble des co-publications internationales de {lab} dans les mêmes sous-disciplines, pondérées comme la collaboration."
 
-#: components/dashboard/report/templates.ts:275
+#: components/dashboard/report/templates.ts:274
 msgid "Journals and impact"
 msgstr "Revues et impact"
 
-#: components/dashboard/report/templates.ts:281
+#: components/dashboard/report/templates.ts:280
 msgid "Breakdown by university"
 msgstr "Ventilation par université"
 
-#: components/dashboard/report/templates.ts:285
+#: components/dashboard/report/templates.ts:284
 msgid "Other partners in these co-publications"
 msgstr "Autres partenaires de ces co-publications"
 
-#: components/dashboard/report/templates.ts:311
+#: components/dashboard/report/templates.ts:310
 msgid "Funding analysis"
 msgstr "Analyse des financements"
 
-#: components/dashboard/report/templates.ts:312
+#: components/dashboard/report/templates.ts:311
 msgid "Funders acknowledged by the publications, categories (ANR, Europe…), evolution, labs, and the themes and impact of funded publications — optionally for one category of funders."
 msgstr "Financeurs cités par les publications, catégories (ANR, Europe…), évolution, labos, thématiques et impact des publications financées — éventuellement pour une seule catégorie de financeurs."
 
-#: components/dashboard/report/templates.ts:323
+#: components/dashboard/report/templates.ts:322
 msgid "Funding is what the publications acknowledge (OpenAlex funders, ANR and European projects from HAL): it says neither that the funder paid the structure nor that one of its members holds the grant."
 msgstr "Les financements sont ceux que citent les publications (financeurs OpenAlex, projets ANR et européens de HAL) : cela ne dit ni que le financeur a versé des fonds à la structure, ni que l'un de ses membres porte le projet."
 
-#: components/dashboard/report/templates.ts:324
+#: components/dashboard/report/templates.ts:323
 msgid "Only part of the publications acknowledge a funder (see the key figures): the figures describe that part, not the whole funding of the structure."
 msgstr "Seule une partie des publications cite un financeur (voir les chiffres clés) : les chiffres décrivent cette partie, pas l'ensemble des financements de la structure."
 
-#: components/dashboard/report/templates.ts:325
+#: components/dashboard/report/templates.ts:324
 msgid "Funder categories are assigned from the funder names, on a best-effort basis."
 msgstr "Les catégories de financeurs sont déduites des noms des financeurs, au mieux."
 
-#: components/dashboard/report/templates.ts:331
-#: components/reports/NewReportDialog.tsx:237
+#: components/dashboard/report/templates.ts:330
+#: components/reports/NewReportDialog.tsx:246
 msgid "Funders"
 msgstr "Financeurs"
 
-#: components/dashboard/report/templates.ts:333
+#: components/dashboard/report/templates.ts:332
 msgid "What the funded publications are about"
 msgstr "Sujets des publications financées"
 
-#: components/dashboard/report/templates.ts:335
+#: components/dashboard/report/templates.ts:334
 msgid "Impact and partners of the funded publications"
 msgstr "Impact et partenaires des publications financées"
 
-#: components/dashboard/report/templates.ts:349
+#: components/dashboard/report/templates.ts:348
 msgid "Journals and publishing policy"
 msgstr "Revues et politique de publication"
 
-#: components/dashboard/report/templates.ts:350
+#: components/dashboard/report/templates.ts:349
 msgid "Journals used, quartiles, open access and access at NU, APC spending, signature charter — optionally for one publisher."
 msgstr "Revues utilisées, quartiles, accès ouvert et accès à NU, dépenses d'APC, charte de signature — éventuellement pour un seul éditeur."
 
-#: components/dashboard/report/templates.ts:364
+#: components/dashboard/report/templates.ts:363
 msgid "Open access and access at NU"
 msgstr "Accès ouvert et accès à NU"
 
-#: components/dashboard/report/templates.ts:366
+#: components/dashboard/report/templates.ts:365
 msgid "Article processing charges (APC)"
 msgstr "Frais de publication (APC)"
 
@@ -8243,7 +8255,7 @@ msgid "by {0}"
 msgstr "par {0}"
 
 #: components/reports/AddToReportDialog.tsx:158
-#: components/reports/NewReportDialog.tsx:169
+#: components/reports/NewReportDialog.tsx:178
 #: components/reports/ReportsPage.tsx:110
 msgid "New report"
 msgstr "Nouveau rapport"
@@ -8384,43 +8396,43 @@ msgstr "Rétablir les blocs, textes et périmètre de cette version (période fi
 msgid "Restore"
 msgstr "Restaurer"
 
-#: components/reports/NewReportDialog.tsx:175
+#: components/reports/NewReportDialog.tsx:184
 msgid "Template"
 msgstr "Modèle"
 
-#: components/reports/NewReportDialog.tsx:198
+#: components/reports/NewReportDialog.tsx:207
 msgid "Templates of the institution"
 msgstr "Modèles de l'établissement"
 
-#: components/reports/NewReportDialog.tsx:239
+#: components/reports/NewReportDialog.tsx:248
 msgid "All funders"
 msgstr "Tous les financeurs"
 
-#: components/reports/NewReportDialog.tsx:248
+#: components/reports/NewReportDialog.tsx:257
 msgid "All publishers"
 msgstr "Tous les éditeurs"
 
-#: components/reports/NewReportDialog.tsx:257
+#: components/reports/NewReportDialog.tsx:268
 msgid "Choose a country"
 msgstr "Choisir un pays"
 
-#: components/reports/NewReportDialog.tsx:273
+#: components/reports/NewReportDialog.tsx:286
 msgid "Affiliated institutions (ROR) that also co-signed:"
 msgstr "Établissements affiliés (ROR) ayant aussi cosigné :"
 
-#: components/reports/NewReportDialog.tsx:281
+#: components/reports/NewReportDialog.tsx:294
 msgid "Add them"
 msgstr "Les ajouter"
 
-#: components/reports/NewReportDialog.tsx:294
+#: components/reports/NewReportDialog.tsx:307
 msgid "e.g. Collaborations with the University of Ottawa"
 msgstr "ex. Collaborations avec l'Université d'Ottawa"
 
-#: components/reports/NewReportDialog.tsx:301
+#: components/reports/NewReportDialog.tsx:314
 msgid "Loading the structure's data to choose the charts…"
 msgstr "Chargement des données de la structure pour choisir les graphiques…"
 
-#: components/reports/NewReportDialog.tsx:306
+#: components/reports/NewReportDialog.tsx:319
 msgid "No data for this structure: the report will list every chart of the template."
 msgstr "Pas de données pour cette structure : le rapport reprendra tous les graphiques du modèle."
 
