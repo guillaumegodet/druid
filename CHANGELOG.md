@@ -12,10 +12,49 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **API de l'annuaire `/api/v1`** : toutes les lectures et écritures du navigateur (fiches, structures,
+  établissements, doublons et fusions, revue LDAP, alignements des identifiants, newsletter, axes) passent par une
+  API métier du serveur, qui applique elle-même les droits (établissement ou labo) et journalise chaque écriture
+  (table, lignes, noms des champs). Les Functions Cloudflare servent la même API.
+- **Annuaire sur PostgreSQL**, au choix de l'instance : `DRUID_STORAGE=grist|postgres` (`DRUID_DATABASE_URL`, rôle
+  `druid_app`) vaut pour le serveur et les jobs ; Grist reste le défaut. Schéma versionné (`db/migrations`, dbmate,
+  rôles `druid_owner` / `druid_app`) ; import du document Grist (`scripts/.build/migrate_grist_to_pg.cjs`, à blanc
+  par défaut, rapport sans valeurs) ; copie nocturne de la base vers le document Grist, en lecture seule, ligne à
+  ligne avec les mêmes ids (`scripts/.build/copy_pg_to_grist.cjs`, à blanc par défaut). Les publications, la
+  newsletter et les corrections d'affiliations restent dans Grist.
+- **Jetons de service** (`DRUID_SERVICE_TOKENS`, empreintes seulement) : un client machine (druid-biblio) lit
+  l'annuaire sans session — `GET /api/v1/people[?lab=]`, `/structures`, `/institutions` uniquement — et chaque
+  lecture est journalisée (`service.read`). Nouveau jeton : `node scripts/lib/service_tokens.cjs new <nom>`.
+  `GET /api/v1/people?lab=<acronyme>` ne renvoie que les fiches d'un labo.
+- Personnel › Synchroniser › **Importer un annuaire de site** : dépôt du fichier produit par le skill
+  `sync-annuaire-grist` de druid-biblio (`--export`), revue du rapprochement (créations, compléments des champs
+  vides, différences avec le site, présents à valider, homonymes écartés, absents) et application de ce qui est
+  coché. Les fiches créées gardent leur source (`Data_source`) ; la page annuaire du site est enregistrée.
+
 ### Modifié
 - Collaborations › Par pays et modèle de rapport « Collaboration avec un pays » : le pays partenaire se
   choisit dans une liste alphabétique avec recherche (accents ignorés, nom français ou anglais :
   « vietnam » trouve « Viêt Nam ») au lieu d'une liste déroulante triée par nombre de copublications.
+- Liste du personnel : « Chargement des fiches… » pendant le chargement, au lieu de « Synchronisation avec Grist
+  en cours… ».
+- Jobs et scripts (alignements, synchronisations, fusions, export ABES, éméritat, tâches) : ils passent par le
+  stockage de l'instance, et non plus directement par le document Grist.
+
+### Sécurité
+- Les écritures du navigateur sont des commandes contrôlées par le serveur (champs autorisés, périmètre du labo,
+  refus explicites) : le proxy Grist laissait écrire n'importe quelle colonne des tables qu'il ouvrait.
+
+### Retiré
+- **Proxy Grist du navigateur** : `/api/grist/*` répond 410. Un client qui lisait ou écrivait le document par ce
+  proxy doit passer par `/api/v1` (ou par un jeton de service pour un client machine).
+
+### Migration
+- Aucune opération obligatoire : la production reste sur Grist (`DRUID_STORAGE` absent = `grist`), sans base.
+- Pour que druid-biblio lise l'annuaire par l'API : créer un jeton dans le conteneur
+  (`docker exec crisalid-druid-1 node scripts/lib/service_tokens.cjs new druid-biblio`), ajouter
+  `DRUID_SERVICE_TOKENS` à l'environnement de `druid.yaml`, puis `DRUID_API_URL` et `DRUID_SERVICE_TOKEN` à celui de
+  druid-biblio ; sans eux, druid-biblio continue de lire le document Grist.
 
 ## [1.7.1] — 2026-10-07
 
