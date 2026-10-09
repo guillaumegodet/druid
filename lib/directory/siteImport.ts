@@ -113,6 +113,10 @@ export const normName = (s: unknown): string =>
 const normLab = (s: unknown): string =>
   String(s ?? '').toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/²/g, '2').replace(/[^a-z0-9]/g, '');
 
+/** Same value for the import: an email compared without case (« Ali.Assaf@… » = « ali.assaf@… »). */
+const sameValue = (field: SiteField, a: string, b: string): boolean =>
+  (field === 'email' ? a.toLowerCase() === b.toLowerCase() : a === b);
+
 /** Compatible first names: one starts with the other, or same first word. */
 const firstNamesMatch = (a: string, b: string): boolean =>
   !!a && !!b && (a.startsWith(b) || b.startsWith(a) || a.split(' ')[0] === b.split(' ')[0]);
@@ -253,7 +257,7 @@ export function planSiteImport(doc: SiteImportDocument, people: Researcher[], in
       if (!site) continue;
       const current = currentValue(m.researcher, m.team, field).trim();
       if (!current) complements.push({ field, value: site });
-      else if (current !== site && !COMPLEMENT_ONLY.includes(field)) differences.push({ field, current, site });
+      else if (!sameValue(field, current, site) && !COMPLEMENT_ONLY.includes(field)) differences.push({ field, current, site });
     }
     const validated = !!m.researcher.validation?.validated;
     plan.matches.push({

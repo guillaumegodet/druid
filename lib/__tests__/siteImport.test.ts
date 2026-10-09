@@ -73,8 +73,9 @@ describe('site import — matching', () => {
 describe('site import — complements, differences, presence', () => {
   it('fills the empty fields, lists the other values as differences, never overwrites a photo', () => {
     const people = [researcher('durand-a', 'Durand', 'Alice', {
-      email: 'alice@example.org', team: 'EQ1', grade: 'MCF', photoUrl: 'https://old/photo.jpg', rowId: 11,
+      email: 'Alice@Example.org', team: 'EQ1', grade: 'MCF', photoUrl: 'https://old/photo.jpg', rowId: 11,
     })];
+    // The same email in another case is not a difference.
     const plan = planSiteImport(doc([{
       lastName: 'Durand', firstName: 'Alice', email: 'alice@example.org', team: 'EQ1|EQ2', grade: 'PR',
       profileUrl: 'https://lab/durand', directoryUrl: 'https://lab/annuaire/durand', photoUrl: 'https://new/photo.jpg',
