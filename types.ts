@@ -78,6 +78,9 @@ export interface Employment {
   employer: string;        // Paying institution (e.g. Université, CNRS)
   institutionId?: string;  // UAI code of the paying institution
   contractType?: string;   // Tenured, contract staff, etc.
+  /** Employment type as stored in the directory (Grist `TYPE_EMPLOI`), before the LDAP category that `contractType`
+   * shows: druid-biblio classifies its staff on these codes (EC_aut, Ch_aut, AP_aut…). Read-only, never written. */
+  employmentTypeCode?: string;
   grade?: string;          // Corps / grade (e.g. PU, MCF, DR, CR)
   internalTypology?: string; // Internal category (researcher, teacher-researcher, PhD student)
   cnu?: string;            // Section of the Conseil National des Universités

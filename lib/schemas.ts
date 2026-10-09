@@ -37,6 +37,7 @@ export const AffiliationSchema = z.object({
 export const EmploymentSchema = z.object({
   employer: z.string().default(''),
   contractType: z.string().optional().nullable(),
+  employmentTypeCode: z.string().optional().nullable(),
   grade: z.string().optional().nullable(),
   internalTypology: z.string().optional().nullable(),
   cnu: z.string().optional().nullable(),

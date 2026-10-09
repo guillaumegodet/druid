@@ -266,6 +266,7 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
         employer: employerName,
         institutionId: (typeof employerId === 'number') ? (employers.get(employerId)?.uai || '') : '',
         contractType: ldapCategory || row.employmentType || '',
+        employmentTypeCode: row.employmentType || '',
         grade: finalGrade,
         ldapFields: [
           ...(ldapCategory ? ['contractType'] : []),

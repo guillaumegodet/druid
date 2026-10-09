@@ -14,7 +14,7 @@ const annuaireRow = (id: number, fields: Record<string, any>): GristRecord => ({
 });
 
 const ANNUAIRE: GristRecord[] = [
-  annuaireRow(1, { uid_dyna: 'durand-a', Nom: 'Durand', Prenom: 'Alice', LABO: 'LAB-A', Employeur: 10, Email: 'alice@example.org' }),
+  annuaireRow(1, { uid_dyna: 'durand-a', Nom: 'Durand', Prenom: 'Alice', LABO: 'LAB-A', Employeur: 10, Email: 'alice@example.org', TYPE_EMPLOI: 'EC_aut' }),
   annuaireRow(2, { uid_dyna: 'martin-b', Nom: 'Martin', Prenom: 'Bruno', LABO: 'LAB²B' }),
   annuaireRow(3, { Nom: 'Petit', Prenom: 'Chloé', LABO: 'lab-a' }),
   // Same person on two qualified rows: grouped on the PRINCIPAL one.
@@ -53,6 +53,8 @@ describe('createGristDirectoryRepository', () => {
     expect(updatedAt).toBe('2026-10-07T00:00:00Z');
     expect(items.map((r) => r.id).sort()).toEqual(['durand-a', 'ext_petit-c', 'leroy-d', 'martin-b']);
     expect(items.find((r) => r.id === 'durand-a')!.employment.employer).toBe('Université Exemple');
+    // Stored employment type, for the machine clients (lot 8 b): kept even when the LDAP category replaces contractType.
+    expect(items.find((r) => r.id === 'durand-a')!.employment.employmentTypeCode).toBe('EC_aut');
     expect(items.find((r) => r.id === 'leroy-d')!.affiliations.map((a) => a.structureName)).toEqual(['LAB-A', 'LAB²B']);
   });
 
