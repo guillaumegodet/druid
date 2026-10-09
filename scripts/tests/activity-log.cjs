@@ -27,6 +27,8 @@ check('job progress: not audited', ev('GET', '/api/sync-ldap-progress', 200), nu
 check('administration read', ev('GET', '/api/admin/rights/users', 200), 'admin.read');
 check('call to a language model', ev('POST', '/api/report-ai', 200), 'ai.request');
 check('other write', ev('POST', '/api/sync-sovisuplus', 200), 'api.write');
+check('site import preview: a read', ev('POST', '/api/v1/site-imports/preview', 200), null);
+check('site import application', ev('POST', '/api/v1/site-imports/apply', 200), 'api.write');
 check('anonymous 401: not audited', ev('POST', '/api/tasks', 401, false), null);
 check('export report: logged by its route', ev('POST', '/api/audit/export', 204), null);
 // Service tokens (plan-migration-postgresql.md lot 8 a): every read is audited, refusals too.
