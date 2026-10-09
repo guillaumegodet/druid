@@ -120,6 +120,13 @@ export const employerFieldsFor = (institutions: Institution[] | null, employer?:
 export const fteFieldsFor = (columns: AnnuaireColumnMeta[] | null, values: { fte?: number | null; researchFte?: number | null }) =>
   (columns ? fteGristFields(columns, values) : {});
 
+/** Directory page of the lab website (`annuaire_url`, filled by the site imports), only when it has a value — the
+ * record form does not edit it — and when the Annuaire has the column. */
+export const directoryUrlFieldsFor = (columns: AnnuaireColumnMeta[] | null, url?: string): Record<string, string> => {
+  const value = (url || '').trim();
+  return value && columns?.some((c) => c.id === 'annuaire_url') ? { 'annuaire_url': value } : {};
+};
+
 /** HR staff number cell, only when the Annuaire has the column (instances without HR data do not). */
 export const hrIdFieldsFor = (columns: AnnuaireColumnMeta[] | null, hrId?: string): Record<string, number> => {
   const cell = hrIdCell(hrId || '');
@@ -181,8 +188,11 @@ export function researcherCreateFields(researcher: Researcher, ctx: AnnuaireWrit
     'Researchgate': researcher.profiles?.researchgate || null,
     'Profil_GS': researcher.profiles?.googleScholar || null,
     'Site_web': researcher.profiles?.website || null,
+    ...directoryUrlFieldsFor(ctx.columns, researcher.annuaireUrl),
     // Reliability layer (validated status/affiliation).
     ...validationToGristFields(researcher.validation, toGristDateCell),
+    // Record created by an import (lab website directory): its source, to find (and undo) it.
+    ...(researcher.importSource && !researcher.ldapPrefill ? { 'Data_source': researcher.importSource } : {}),
     // Record filled from LDAP (« Fill from LDAP »): same traceability as the directory sync.
     ...(researcher.ldapPrefill ? {
       'statut_dyna': STATUT_DYNA_MAP[researcher.ldapPrefill.etat.toUpperCase()] || researcher.ldapPrefill.etat || null,
@@ -214,6 +224,7 @@ export function researcherUpdateFields(researcher: Researcher, plan: Affiliation
     'IdHAL_i': researcher.identifiers.halIdNum?.replace(/\D/g, '') || null,   // entered in the record or by sync_hal (verify)
     'ID_SCOPUS': researcher.identifiers.scopusId || null,
     'photo_url': researcher.photoUrl?.trim() || null,   // editable from the record's tile
+    ...directoryUrlFieldsFor(ctx.columns, researcher.annuaireUrl),
     'employment_start_date': encodeDate('employment_start_date', researcher.employment.startDate),
     'employment_end_date': encodeDate('employment_end_date', researcher.employment.endDate),
     'Corps_grade': researcher.employment.grade || null,

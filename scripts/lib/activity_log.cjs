@@ -22,6 +22,7 @@ const isQuietPath = (p) =>
 /** GET routes with side effects (they start a background job). */
 const JOB_GET = /^\/api\/(sync-[a-z-]+-trigger|tasks\/detect\/trigger)$/;
 /** POST routes that call a language model (data sent outside: logged as such). */
+const PREVIEW_POST = /^\/api\/v1\/site-imports\/preview$/;
 const AI_POST = /^\/api\/(help-chat|chat|report-ai|newsletter\/generate|collab-theme\/(select-topics|synthesize))$/;
 
 /**
@@ -43,6 +44,8 @@ const auditEventOf = ({ method, path: p, status, signedIn, service = false, serv
   }
   if (!p.startsWith('/api/')) return null;
   if (AI_POST.test(p)) return 'ai.request';
+  // POST that only computes a plan (site import preview, lot 8 d): a read, not audited like the other reads.
+  if (PREVIEW_POST.test(p)) return null;
   return 'api.write';
 };
 

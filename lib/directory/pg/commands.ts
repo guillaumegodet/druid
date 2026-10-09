@@ -217,6 +217,8 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       corps_grade: orNull(r.employment?.grade), employment_type: orNull(r.employment?.contractType),
       fte_ratio: parseFteCell(r.employment?.fte), fte_research: parseFteCell(r.employment?.researchFte),
       photo_url: orNull(String(r.photoUrl ?? '').trim()),
+      // Lab website directory page: written by the site imports only (the record form does not edit it).
+      ...(String(r.annuaireUrl ?? '').trim() ? { directory_url: String(r.annuaireUrl).trim() } : {}),
       ...validationColumns(r.validation),
       ...(employer ? { employer_id: employer.id } : {}),
     };
@@ -273,7 +275,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
           ...(prefill ? {
             ldap_state: STATUT_DYNA_MAP[prefill.etat.toUpperCase()] || prefill.etat || null, sources: ['LDAP'],
             hr_id: normalizeHrId(researcher.hrId) || null,
-          } : {}),
+          } : researcher.importSource ? { sources: [researcher.importSource] } : {}),
         } as any).returning('id').executeTakeFirstOrThrow();
         personId = inserted.id;
         const personExtra: Record<string, any> = { ...extra };

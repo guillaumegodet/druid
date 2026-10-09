@@ -12,6 +12,7 @@ import type { AbesExportMark, Institution, MergeLogEntry } from './directory/gri
 import type { NewsletterItem } from './publications/newsletter';
 import type { NewsletterEditableField } from './publications/store';
 import type { AxisCorrectionRow } from './publications/axes';
+import type { SiteImportPlan, SiteImportResult, SiteImportSelection } from './directory/siteImport';
 
 export const DIRECTORY_API_BASE = '/api/v1';
 
@@ -110,4 +111,8 @@ export const DirectoryApi = {
     send<{ ok: true }>('PATCH', `axis-corrections/${encodeURIComponent(slug)}/${rowId}`, { axe }),
   createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
   updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
+  // Lab website directory import (lot 8 d): file exported by druid-biblio's sync-annuaire-grist skill.
+  siteImportPreview: (document: unknown): Promise<SiteImportPlan> => send('POST', 'site-imports/preview', { document }),
+  siteImportApply: (document: unknown, selection: SiteImportSelection): Promise<SiteImportResult> =>
+    send('POST', 'site-imports/apply', { document, selection }),
 };

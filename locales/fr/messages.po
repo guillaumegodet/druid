@@ -13,38 +13,38 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:144
+#: App.tsx:145
 msgid "Error computing the LDAP diff"
 msgstr "Erreur lors du calcul du diff LDAP"
 
-#: App.tsx:154
+#: App.tsx:155
 msgid "Error searching for duplicates"
 msgstr "Erreur lors de la recherche des doublons"
 
-#: App.tsx:178
+#: App.tsx:179
 msgid "Researcher not found in the loaded scope"
 msgstr "Chercheur introuvable dans le périmètre chargé"
 
-#: App.tsx:191
+#: App.tsx:192
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Chercheur de la tâche introuvable dans le périmètre chargé"
 
-#: App.tsx:322
+#: App.tsx:324
 msgid "Error reading LDAP candidates"
 msgstr "Erreur lecture candidats LDAP"
 
 #. placeholder {0}: trig.status
-#: App.tsx:359
+#: App.tsx:361
 msgid "LDAP search trigger failed: {0}"
 msgstr "Déclenchement recherche LDAP : {0}"
 
-#: App.tsx:373
+#: App.tsx:375
 msgid "Error during the LDAP search"
 msgstr "Erreur lors de la recherche LDAP"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:387
+#: App.tsx:389
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -52,106 +52,106 @@ msgstr ""
 "\n"
 "{0} ignorée(s) : uid déjà porté par une autre ligne du même labo ({1}) — utiliser « Fusionner »."
 
-#: App.tsx:389
+#: App.tsx:391
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "Rattachement LDAP : {updated} fiche(s) rattachée(s) (uid_dyna écrit dans Grist).{skippedMsg}"
 
-#: App.tsx:391
+#: App.tsx:393
 msgid "Error attaching LDAP records"
 msgstr "Erreur lors du rattachement LDAP"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:398
+#: App.tsx:400
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "Rattachement LDAP interrompu après {0} fiche(s) écrite(s) — {1}"
 
-#: App.tsx:476
-#: App.tsx:483
+#: App.tsx:478
+#: App.tsx:485
 msgid "Server error"
 msgstr "Erreur serveur"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:484
+#: App.tsx:486
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "Fichiers SoVisu+ mis à jour : {0} structures (structures.csv), {1} personnes (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:484
+#: App.tsx:486
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} ignorée(s) (sans uid)"
 
-#: App.tsx:486
+#: App.tsx:488
 msgid "Error synchronizing with SoVisu+"
 msgstr "Erreur lors de la synchronisation SoVisu+"
 
-#: App.tsx:496
+#: App.tsx:498
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "Synchronisation LDAP : indisponible sur cette instance (pas de job serveur) — la comparaison sur le cache existant reste consultable."
 
 #. placeholder {0}: trig.status
-#: App.tsx:506
+#: App.tsx:508
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "Déclenchement synchronisation LDAP : {0}"
 
-#: App.tsx:520
+#: App.tsx:522
 msgid "Error during the LDAP synchronization"
 msgstr "Erreur lors de la synchronisation LDAP"
 
-#: App.tsx:532
+#: App.tsx:534
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "Mise à jour LDAP appliquée : {updated} fiche(s) écrite(s) dans Grist."
 
-#: App.tsx:534
+#: App.tsx:536
 msgid "Error writing the LDAP updates"
 msgstr "Erreur lors de l'écriture des mises à jour LDAP"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:541
+#: App.tsx:543
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "Écriture LDAP interrompue après {0} fiche(s) écrite(s) — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:575
+#: App.tsx:577
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation appliquée : {0} fiche(s) écrite(s) dans Grist."
 
-#: App.tsx:577
+#: App.tsx:579
 msgid "Error applying the validations"
 msgstr "Erreur lors de l'application des validations"
 
-#: App.tsx:590
+#: App.tsx:592
 msgid "This record has no Grist row: validation impossible."
 msgstr "Cette fiche n'a pas de ligne Grist : validation impossible."
 
-#: App.tsx:602
+#: App.tsx:604
 msgid "Error validating the record"
 msgstr "Erreur lors de la validation de la fiche"
 
-#: App.tsx:621
+#: App.tsx:623
 msgid "Error while saving"
 msgstr "Erreur lors de l'enregistrement"
 
-#: App.tsx:652
+#: App.tsx:654
 msgid "Error computing the LDAP structures diff"
 msgstr "Erreur lors du calcul du diff structures LDAP"
 
-#: App.tsx:666
+#: App.tsx:668
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "Structures LDAP : {updated} mise(s) à jour, {created} création(s) dans Grist."
 
-#: App.tsx:668
+#: App.tsx:670
 msgid "Error writing the LDAP structures"
 msgstr "Erreur lors de l'écriture des structures LDAP"
 
-#: App.tsx:690
+#: App.tsx:692
 msgid "Error saving the structure"
 msgstr "Erreur lors de l'enregistrement de la structure"
 
-#: App.tsx:699
+#: App.tsx:701
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -159,45 +159,45 @@ msgstr ""
 "Profil {candidateId} marqué « Identité mêlée » pour {displayName}.\n"
 "Note (facultative) : qui possède quoi, ce qu'il faudrait scinder…"
 
-#: App.tsx:708
+#: App.tsx:710
 msgid "Error loading the unified view"
 msgstr "Erreur lors du chargement de la vue unifiée"
 
-#: App.tsx:716
+#: App.tsx:718
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Alignement unifié : indisponible sur cette instance (pas de job serveur pour lancer un run) — la revue des candidats déjà calculés reste consultable."
 
-#: App.tsx:730
+#: App.tsx:732
 msgid "Error during the unified alignment"
 msgstr "Erreur lors de l'alignement unifié"
 
-#: App.tsx:747
-#: App.tsx:763
+#: App.tsx:749
+#: App.tsx:765
 msgid "Error writing (unified view)"
 msgstr "Erreur lors de l'écriture (vue unifiée)"
 
-#: App.tsx:796
+#: App.tsx:798
 msgid "Error rejecting the candidate"
 msgstr "Erreur lors du rejet du candidat"
 
-#: App.tsx:935
+#: App.tsx:938
 msgid "Qualification error"
 msgstr "Erreur de qualification"
 
-#: App.tsx:939
+#: App.tsx:942
 msgid "Requalification error"
 msgstr "Erreur de requalification"
 
-#: App.tsx:945
+#: App.tsx:948
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Ligne Grist {gristRowId} introuvable dans le périmètre chargé"
 
-#: App.tsx:965
+#: App.tsx:968
 msgid "Loading dashboard…"
 msgstr "Chargement du tableau de bord…"
 
-#: App.tsx:983
-#: App.tsx:995
+#: App.tsx:986
+#: App.tsx:998
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:277
@@ -211,20 +211,20 @@ msgstr "Chargement du tableau de bord…"
 msgid "Loading…"
 msgstr "Chargement…"
 
-#: App.tsx:1004
+#: App.tsx:1007
 msgid "View not found"
 msgstr "Vue introuvable"
 
-#: App.tsx:1028
+#: App.tsx:1031
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Votre compte a un droit « labo », mais aucune fiche de l'Annuaire ne porte votre identifiant avec un laboratoire en cours — contactez un administrateur pour faire mettre à jour votre fiche."
 
-#: App.tsx:1032
+#: App.tsx:1035
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "Aucun périmètre ne vous a été attribué dans Druid pour l'instant — contactez un administrateur pour qu'il vous rattache à une structure (groupe Keycloak <0>labo_viewer</0> ou <1>dashboard_viewer</1> sous votre labo)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1073
+#: App.tsx:1079
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Alignement unifié : {0} référentiel(s) en cours"
 
@@ -615,7 +615,7 @@ msgid "Error loading data: {error}"
 msgstr "Erreur au chargement des données : {error}"
 
 #: components/GroupList.tsx:84
-#: components/ResearcherList.tsx:140
+#: components/ResearcherList.tsx:141
 msgid "Error saving groups."
 msgstr "Erreur d'enregistrement des groupes."
 
@@ -649,6 +649,7 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
 #: components/researchers/MergeResearchersModal.tsx:291
+#: components/researchers/SiteImportReview.tsx:286
 #: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
 #: components/researchers/TasksPage.tsx:342
@@ -678,7 +679,7 @@ msgid "Cross-cutting selections of researchers (scientific council, projects, co
 msgstr "Sélections transverses de chercheurs (conseil scientifique, projets, cohortes…)"
 
 #: components/GroupList.tsx:199
-#: components/researchers/ListHeader.tsx:127
+#: components/researchers/ListHeader.tsx:135
 msgid "New"
 msgstr "Nouveau"
 
@@ -1024,22 +1025,22 @@ msgstr "Revalider"
 msgid "Validate"
 msgstr "Valider"
 
-#: components/ResearcherList.tsx:188
+#: components/ResearcherList.tsx:190
 #: components/StructureList.tsx:301
 msgid "List"
 msgstr "Liste"
 
-#: components/ResearcherList.tsx:189
+#: components/ResearcherList.tsx:191
 #: components/StructureList.tsx:302
 msgid "Charts"
 msgstr "Dataviz"
 
-#: components/ResearcherList.tsx:197
+#: components/ResearcherList.tsx:199
 #: components/StructureList.tsx:310
 msgid "List view (table)"
 msgstr "Vue liste (tableau)"
 
-#: components/ResearcherList.tsx:197
+#: components/ResearcherList.tsx:199
 msgid "Chart view"
 msgstr "Vue dataviz (graphiques)"
 
@@ -1134,7 +1135,7 @@ msgstr "Acronyme"
 #: components/reports/NewReportDialog.tsx:301
 #: components/researchers/LdapMovesPanel.tsx:167
 #: components/researchers/LdapMovesPanel.tsx:222
-#: components/researchers/ListHeader.tsx:46
+#: components/researchers/ListHeader.tsx:48
 msgid "Name"
 msgstr "Nom"
 
@@ -1146,7 +1147,7 @@ msgstr "Tutelles"
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
 #: components/etl/EtlMaintenancePanels.tsx:268
-#: components/researchers/ListHeader.tsx:48
+#: components/researchers/ListHeader.tsx:50
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
 #: components/researchers/TasksPage.tsx:176
 msgid "Status"
@@ -1165,17 +1166,17 @@ msgid "Create a structure (team, unit, faculty, institution) in Grist"
 msgstr "Créer une structure (équipe, unité, composante, établissement) dans Grist"
 
 #: components/StructureList.tsx:250
-#: components/researchers/ListHeader.tsx:70
+#: components/researchers/ListHeader.tsx:72
 msgid "Export"
 msgstr "Exporter"
 
 #: components/StructureList.tsx:269
-#: components/researchers/ListHeader.tsx:98
+#: components/researchers/ListHeader.tsx:100
 msgid "Synchronise"
 msgstr "Synchroniser"
 
 #: components/StructureList.tsx:278
-#: components/researchers/ListHeader.tsx:104
+#: components/researchers/ListHeader.tsx:106
 msgid "Force Grist refresh"
 msgstr "Forcer la mise à jour Grist"
 
@@ -2918,6 +2919,8 @@ msgstr "À propos de « {title} »"
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
+#: components/researchers/SiteImportReview.tsx:110
+#: components/researchers/SiteImportReview.tsx:286
 #: components/researchers/UnifiedAlignPage.tsx:703
 msgid "Close"
 msgstr "Fermer"
@@ -3228,6 +3231,7 @@ msgstr "Citations"
 #: components/dashboard/PublicationsListTab.tsx:337
 #: components/researchers/AffiliationsTable.tsx:226
 #: components/researchers/AffiliationsTable.tsx:266
+#: components/researchers/SiteImportReview.tsx:11
 #: lib/importConflicts.ts:74
 #: lib/structureLabels.ts:17
 msgid "Team"
@@ -3657,6 +3661,7 @@ msgstr "Confiance d'appariement : {0} %"
 
 #: components/dashboard/MediaMentionsPanel.tsx:555
 #: components/researchers/MergeResearchersModal.tsx:186
+#: components/researchers/SiteImportReview.tsx:275
 msgid "validated"
 msgstr "validée"
 
@@ -4105,7 +4110,7 @@ msgstr "Citations (déjà reçues)"
 #: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
-#: components/researchers/ListHeader.tsx:49
+#: components/researchers/ListHeader.tsx:51
 #: components/researchers/OpenAlexAffiliationsPage.tsx:107
 #: lib/importConflicts.ts:75
 msgid "Lab"
@@ -9297,7 +9302,7 @@ msgstr "Toutes les fiches du périmètre (relance complète)"
 
 #: components/researchers/AlignLaunchModal.tsx:129
 #: components/researchers/DuplicatesPage.tsx:146
-#: components/researchers/ListHeader.tsx:121
+#: components/researchers/ListHeader.tsx:129
 #: components/researchers/OpenAlexAffiliationsPage.tsx:93
 #: components/researchers/TodoPage.tsx:61
 msgid "To process"
@@ -10341,33 +10346,39 @@ msgstr "Écriture…"
 msgid "Apply ({0})"
 msgstr "Appliquer ({0})"
 
-#: components/researchers/ListHeader.tsx:47
+#: components/researchers/ListHeader.tsx:49
+#: components/researchers/SiteImportReview.tsx:11
 #: lib/importConflicts.ts:69
 msgid "Email"
 msgstr "Email"
 
-#: components/researchers/ListHeader.tsx:57
+#: components/researchers/ListHeader.tsx:59
 msgid "Research staff"
 msgstr "Personnel de recherche"
 
-#: components/researchers/ListHeader.tsx:63
+#: components/researchers/ListHeader.tsx:65
 msgid "Management and validation of researcher identities"
 msgstr "Gestion et validation des identités chercheurs"
 
-#: components/researchers/ListHeader.tsx:86
+#: components/researchers/ListHeader.tsx:88
 msgid "Identifiers, affiliations and notes missing from IdRef records, for ABES"
 msgstr "Identifiants, affiliations et notes manquants dans les notices IdRef, pour l'ABES"
 
-#: components/researchers/ListHeader.tsx:88
+#: components/researchers/ListHeader.tsx:90
 msgid "ABES export (IdRef)"
 msgstr "Export ABES (IdRef)"
 
-#: components/researchers/ListHeader.tsx:112
+#: components/researchers/ListHeader.tsx:114
 #: components/researchers/ValidationImportReview.tsx:76
 msgid "Import a validated list"
 msgstr "Importer une liste fiabilisée"
 
-#: components/researchers/ListHeader.tsx:119
+#: components/researchers/ListHeader.tsx:120
+#: components/researchers/SiteImportReview.tsx:108
+msgid "Import a lab website directory"
+msgstr "Importer un annuaire de site"
+
+#: components/researchers/ListHeader.tsx:127
 msgid "Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)"
 msgstr "Doublons à fusionner ou qualifier, et tâches à réaliser hors Druid (IdRef, ORCID, HAL…)"
 
@@ -10789,6 +10800,123 @@ msgstr "Préc."
 msgctxt "short"
 msgid "Next"
 msgstr "Suiv."
+
+#: components/researchers/SiteImportReview.tsx:11
+#: lib/importConflicts.ts:88
+msgid "Directory page"
+msgstr "Page d'annuaire"
+
+#: components/researchers/SiteImportReview.tsx:11
+msgid "Profile page"
+msgstr "Page de profil"
+
+#: components/researchers/SiteImportReview.tsx:12
+#: lib/importConflicts.ts:89
+msgid "Photo"
+msgstr "Photo"
+
+#: components/researchers/SiteImportReview.tsx:12
+msgid "Corps / grade"
+msgstr "Corps / grade"
+
+#: components/researchers/SiteImportReview.tsx:49
+msgid "This file is not JSON."
+msgstr "Ce fichier n’est pas un fichier JSON."
+
+#: components/researchers/SiteImportReview.tsx:59
+msgid "The file could not be read."
+msgstr "Le fichier n’a pas pu être lu."
+
+#: components/researchers/SiteImportReview.tsx:95
+msgid "The import could not be applied."
+msgstr "L’import n’a pas pu être appliqué."
+
+#: components/researchers/SiteImportReview.tsx:118
+msgid "File produced from the lab's website by the « sync-annuaire-grist » skill of druid-biblio (export mode). Nothing is written before you apply."
+msgstr "Fichier produit à partir du site du labo par le skill « sync-annuaire-grist » de druid-biblio (mode export). Rien n’est écrit avant que vous appliquiez."
+
+#: components/researchers/SiteImportReview.tsx:121
+msgid "Choose the file (.json)"
+msgstr "Choisir le fichier (.json)"
+
+#: components/researchers/SiteImportReview.tsx:125
+msgid "Working…"
+msgstr "En cours…"
+
+#: components/researchers/SiteImportReview.tsx:133
+msgid "Import applied"
+msgstr "Import appliqué"
+
+#. placeholder {0}: result.created
+#. placeholder {1}: result.updated
+#. placeholder {2}: result.validated
+#: components/researchers/SiteImportReview.tsx:134
+msgid "{0} created, {1} updated, {2} validated."
+msgstr "{0} créée(s), {1} mise(s) à jour, {2} validée(s)."
+
+#. placeholder {0}: result.stale
+#: components/researchers/SiteImportReview.tsx:135
+msgid "{0, plural, one {# item skipped: the directory changed since the preview.} other {# items skipped: the directory changed since the preview.}}"
+msgstr "{0, plural, one {# élément ignoré : l’annuaire a changé depuis l’aperçu.} other {# éléments ignorés : l’annuaire a changé depuis l’aperçu.}}"
+
+#. placeholder {0}: plan.lab
+#. placeholder {1}: plan.siteCount
+#. placeholder {2}: plan.labCount
+#: components/researchers/SiteImportReview.tsx:144
+msgid "{0}: {1} on the site, {2} in Druid"
+msgstr "{0} : {1} sur le site, {2} dans Druid"
+
+#. placeholder {0}: plan.creations.length
+#: components/researchers/SiteImportReview.tsx:152
+msgid "{0, plural, one {# person to create (not validated)} other {# people to create (not validated)}}"
+msgstr "{0, plural, one {# personne à créer (non validée)} other {# personnes à créer (non validées)}}"
+
+#. placeholder {0}: c.sameEmailLabs.join(', ')
+#: components/researchers/SiteImportReview.tsx:162
+msgid "Same email already in {0}: probably the same person (multi-affiliation)."
+msgstr "Même email déjà présent dans {0} : sans doute la même personne (multi-appartenance)."
+
+#: components/researchers/SiteImportReview.tsx:170
+msgid "Validate the created records too (the site is a reliable list)"
+msgstr "Valider aussi les fiches créées (le site est une liste fiable)"
+
+#. placeholder {0}: withComplements.length
+#: components/researchers/SiteImportReview.tsx:178
+msgid "{0, plural, one {# record to complete (empty fields)} other {# records to complete (empty fields)}}"
+msgstr "{0, plural, one {# fiche à compléter (champs vides)} other {# fiches à compléter (champs vides)}}"
+
+#. placeholder {0}: withDifferences.length
+#: components/researchers/SiteImportReview.tsx:201
+msgid "{0, plural, one {# record differs from the site — tick where the site is right} other {# records differ from the site — tick where the site is right}}"
+msgstr "{0, plural, one {# fiche diffère du site — cochez là où le site a raison} other {# fiches diffèrent du site — cochez là où le site a raison}}"
+
+#. placeholder {0}: t(FIELD_LABELS[f])
+#: components/researchers/SiteImportReview.tsx:206
+msgid "all: {0}"
+msgstr "tout : {0}"
+
+#. placeholder {0}: toValidate.length
+#: components/researchers/SiteImportReview.tsx:231
+msgid "{0, plural, one {# member present on the site, not validated} other {# members present on the site, not validated}}"
+msgstr "{0, plural, one {# membre présent sur le site, non validé} other {# membres présents sur le site, non validés}}"
+
+#: components/researchers/SiteImportReview.tsx:236
+msgid "validate all"
+msgstr "tout valider"
+
+#. placeholder {0}: plan.ambiguous.length
+#: components/researchers/SiteImportReview.tsx:253
+msgid "{0, plural, one {# homonym left out (to handle on the record)} other {# homonyms left out (to handle on the records)}}"
+msgstr "{0, plural, one {# homonyme écarté (à traiter sur la fiche)} other {# homonymes écartés (à traiter sur les fiches)}}"
+
+#. placeholder {0}: plan.absent.length
+#: components/researchers/SiteImportReview.tsx:269
+msgid "{0, plural, one {# member absent from the site (departure? other spelling?) — nothing is changed} other {# members absent from the site (departures? other spellings?) — nothing is changed}}"
+msgstr "{0, plural, one {# membre absent du site (départ ? autre graphie ?) — rien n’est modifié} other {# membres absents du site (départs ? autres graphies ?) — rien n’est modifié}}"
+
+#: components/researchers/SiteImportReview.tsx:290
+msgid "{total, plural, one {Apply (# record)} other {Apply (# records)}}"
+msgstr "{total, plural, one {Appliquer (# fiche)} other {Appliquer (# fiches)}}"
 
 #: components/researchers/SuggestionsSection.tsx:34
 msgid "Create an ORCID iD"
@@ -12601,458 +12729,462 @@ msgid "Invalid lab"
 msgstr "Laboratoire invalide"
 
 #: lib/apiErrors.ts:54
+msgid "Invalid import file"
+msgstr "Fichier d’import invalide"
+
+#: lib/apiErrors.ts:55
 msgid "Replaced IdRef record not found"
 msgstr "Notice IdRef remplacée introuvable"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:56
 msgid "Review table missing, run the alignment script first"
 msgstr "Table de revue absente, lancez d'abord l'alignement de cette source"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:57
 msgid "Grist error (partial write)"
 msgstr "Erreur Grist (écriture partielle)"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:58
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:59
 msgid "Invalid LDAP uid"
 msgstr "uid LDAP invalide"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:60
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "Cet uid a déjà une fiche dans l'annuaire, fusionnez plutôt les deux fiches"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:61
 msgid "Record not found in Grist"
 msgstr "Fiche introuvable dans Grist"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:62
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:63
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:64
 msgid "Grist error (writing the kept row)"
 msgstr "Erreur Grist (écriture de la ligne conservée)"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:65
 msgid "Grist error (deleting the absorbed row)"
 msgstr "Erreur Grist (suppression de la ligne absorbée)"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:66
 msgid "Merge not found"
 msgstr "Fusion introuvable"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:67
 msgid "Merge already restored"
 msgstr "Fusion déjà restaurée"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:68
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Ligne recréée mais journal des fusions non mis à jour, ne relancez pas la restauration"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:69
 msgid "Row re-created but kept row not restored"
 msgstr "Ligne recréée mais ligne conservée non restaurée"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:70
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:71
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:72
 msgid "A structure with this acronym already exists"
 msgstr "Une structure porte déjà ce sigle"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:73
 msgid "local_id already used"
 msgstr "local_id déjà utilisé"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:74
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Code d'entité invalide (lettres, chiffres, « - », « _ » ou « . » seulement)"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:75
 #: lib/gristService.ts:137
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:76
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:77
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:78
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne « groupes » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:79
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne « openalex_author_id » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:80
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "Pas d'identifiant OpenAlex configuré pour cette structure"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:81
 msgid "No dashboard data for this structure"
 msgstr "Aucune donnée de tableau de bord pour cette structure"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:83
 msgid "messages[] required"
 msgstr "messages[] requis"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:84
 msgid "Assistant unavailable"
 msgstr "Assistant indisponible"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:85
 msgid "Help assistant not configured"
 msgstr "Assistant d'aide non configuré"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:86
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "La newsletter n'est disponible que pour les structures avec un identifiant OpenAlex (pas les groupes)"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:87
 msgid "Generation interrupted"
 msgstr "Génération interrompue"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:88
 msgid "Generation failed"
 msgstr "Échec de la génération"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:89
 msgid "Analysis failed"
 msgstr "Échec de l'analyse"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:90
 msgid "Missing theme"
 msgstr "Thématique manquante"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:91
 msgid "No publication to analyze"
 msgstr "Aucune publication à analyser"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:92
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex injoignable"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:94
 msgid "Report not found"
 msgstr "Rapport introuvable"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:95
 msgid "Not allowed on this report"
 msgstr "Action non autorisée sur ce rapport"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:96
 msgid "Invalid report definition"
 msgstr "Définition de rapport invalide"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:97
 msgid "Report changed since it was loaded"
 msgstr "Le rapport a été modifié depuis son chargement"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:98
 msgid "Invalid report share"
 msgstr "Partage de rapport invalide"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:99
 msgid "Invalid report generation"
 msgstr "Génération de rapport invalide"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:100
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Instance en lecture seule : les rapports sont conservés dans le navigateur"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:101
 msgid "Invalid AI task"
 msgstr "Tâche IA invalide"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:102
 msgid "PDF archiving is not configured on this instance"
 msgstr "L'archivage des PDF n'est pas configuré sur cette instance"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:103
 msgid "Invalid PDF"
 msgstr "PDF invalide"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:104
 msgid "Generation not found"
 msgstr "Génération introuvable"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:105
 msgid "PDF not archived"
 msgstr "PDF non archivé"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:107
 msgid "Invalid record key"
 msgstr "Clé de fiche invalide"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:108
 msgid "Career path not computed yet for this record"
 msgstr "Parcours pas encore calculé pour cette fiche"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:109
 msgid "Grist unreachable"
 msgstr "Grist injoignable"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:110
 msgid "No Annuaire record for this key"
 msgstr "Aucune fiche de l’Annuaire pour cette clé"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:111
 msgid "Refresh outside your scope"
 msgstr "Recalcul hors de votre périmètre"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:112
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Trop de recalculs en cours, réessayez dans une minute"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:113
 msgid "Career-path computation failed"
 msgstr "Le calcul du parcours a échoué"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:114
 msgid "No usable identifier for this record"
 msgstr "Aucun identifiant exploitable pour cette fiche"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:115
 msgid "Unknown suggestion"
 msgstr "Suggestion inconnue"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:117
 msgid "Task not found"
 msgstr "Tâche introuvable"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:118
 msgid "Unknown event action"
 msgstr "Action d’événement inconnue"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:119
 msgid "Empty comment"
 msgstr "Commentaire vide"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:120
 msgid "Nothing to update"
 msgstr "Rien à mettre à jour"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:121
 msgid "Unknown task type"
 msgstr "Type de tâche inconnu"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:122
 msgid "Unknown status"
 msgstr "Statut inconnu"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:123
 msgid "Transition not allowed"
 msgstr "Transition non autorisée"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:124
 msgid "Task detection already running"
 msgstr "Détection des tâches déjà en cours"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:126
 msgid "Name required"
 msgstr "Nom requis"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:127
 msgid "Empty list"
 msgstr "Liste vide"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:128
 msgid "List of identifiers expected"
 msgstr "Liste d'identifiants attendue"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:129
 msgid "Invalid mention identifier"
 msgstr "Identifiant de mention invalide"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:130
 msgid "Invalid source identifier"
 msgstr "Identifiant de source invalide"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:131
 msgid "researchers and structures arrays required"
 msgstr "Tableaux researchers et structures requis"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:132
 msgid "Keycloak admin API unreachable"
 msgstr "API d'administration Keycloak injoignable"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:133
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "API ETL (druid-etl-api) injoignable"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:135
 msgid "Grist path not allowed by the proxy"
 msgstr "Chemin Grist non autorisé par le proxy"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:136
 msgid "Writing to the document root is refused"
 msgstr "Écriture sur la racine du document refusée"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:137
 msgid "Writing to the table definition is refused"
 msgstr "Écriture sur la définition de la table refusée"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:138
 msgid "Method not relayed"
 msgstr "Méthode non relayée"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:139
 msgid "Method not relayed on /tables"
 msgstr "Méthode non relayée sur /tables"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:140
 msgid "Table creation not allowed"
 msgstr "Création de table non autorisée"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:141
 msgid "Table not writable through the proxy"
 msgstr "Table non modifiable via le proxy"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:142
 msgid "Write outside scope"
 msgstr "Écriture hors périmètre"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:143
 msgid "Creation outside scope"
 msgstr "Création hors périmètre"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:144
 msgid "Rows outside scope or unknown"
 msgstr "Ligne(s) hors périmètre ou inconnue(s)"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:145
 msgid "Scope check failed"
 msgstr "Vérification du périmètre impossible"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:146
 msgid "Grist writes require the institution right"
 msgstr "Écriture Grist réservée au droit établissement"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:147
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Écriture Grist réservée aux utilisateurs identifiés (Cloudflare Access)"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:148
 msgid "Read-only instance: writes are disabled"
 msgstr "Instance en lecture seule : les modifications sont désactivées"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:149
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter indisponible sur cette instance"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:150
 msgid "Missing id for PATCH"
 msgstr "id manquant pour PATCH"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:151
 msgid "Invalid Grist identifiers"
 msgstr "Identifiants Grist invalides"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:152
 msgid "Body with a records array expected"
 msgstr "Corps avec un tableau records attendu"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:154
 msgid "An LDAP synchronization is already running"
 msgstr "Une synchronisation LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:155
 msgid "An LDAP structures synchronization is already running"
 msgstr "Une synchronisation LDAP structures est déjà en cours"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:156
 msgid "An LDAP search is already running"
 msgstr "Une recherche LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:157
 msgid "An IdRef alignment is already running"
 msgstr "Un alignement IdRef est déjà en cours"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:158
 msgid "Alignment already running"
 msgstr "Un alignement est déjà en cours"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:159
 msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:160
 msgid "No alignment running"
 msgstr "Aucun alignement en cours"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:161
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:163
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:164
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:165
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:166
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:167
+#: lib/apiErrors.ts:168
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:170
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:171
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:172
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:173
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:175
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:176
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:176
+#: lib/apiErrors.ts:177
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:22
-#: lib/directoryApi.ts:31
-#: lib/directoryApi.ts:46
+#: lib/directoryApi.ts:23
+#: lib/directoryApi.ts:32
+#: lib/directoryApi.ts:47
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Annuaire indisponible ({resource}, HTTP {0})."
 
@@ -13103,14 +13235,6 @@ msgstr "Ids OpenAlex"
 #: lib/importConflicts.ts:87
 msgid "uid_dyna"
 msgstr "uid_dyna"
-
-#: lib/importConflicts.ts:88
-msgid "Directory page"
-msgstr "Page d'annuaire"
-
-#: lib/importConflicts.ts:89
-msgid "Photo"
-msgstr "Photo"
 
 #: lib/importConflicts.ts:96
 msgid "HR"
