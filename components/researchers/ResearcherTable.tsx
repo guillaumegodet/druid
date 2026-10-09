@@ -158,7 +158,7 @@ export const ResearcherTable: React.FC<ResearcherTableProps> = ({
       {loading && (
         <div className="p-20 flex flex-col items-center justify-center gap-4">
           <RefreshCw className="w-8 h-8 text-ink dark:text-accent animate-spin" />
-          <p className="text-muted dark:text-[#8f897c]"><Trans>Synchronising with Grist…</Trans></p>
+          <p className="text-muted dark:text-[#8f897c]"><Trans>Loading the records…</Trans></p>
         </div>
       )}
       {!loading && sortedCount === 0 && (
