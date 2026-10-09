@@ -12,6 +12,11 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- Collaborations › Par pays et modèle de rapport « Collaboration avec un pays » : le pays partenaire se
+  choisit dans une liste alphabétique avec recherche (accents ignorés, nom français ou anglais :
+  « vietnam » trouve « Viêt Nam ») au lieu d'une liste déroulante triée par nombre de copublications.
+
 ## [1.7.1] — 2026-10-07
 
 ### Modifié

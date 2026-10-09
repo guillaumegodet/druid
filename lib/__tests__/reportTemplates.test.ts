@@ -5,7 +5,6 @@ import { KPI_SETS } from '../../components/dashboard/kpiItems';
 import {
   DEFAULT_PERIOD,
   instantiateReportTemplate,
-  partnerCountries,
   REPORT_TEMPLATES,
   templateById,
   type TemplateInput,
@@ -119,11 +118,6 @@ describe('report templates', () => {
 
     // Without a country in the filters, the sets stay empty instead of failing.
     expect(KPI_SETS.country.items(LAB, kb.scope!.range, { source: LAB, filters: {} })).toEqual([]);
-  });
-
-  it('lists partner countries by frequency', () => {
-    expect(partnerCountries(LAB)).toEqual(['CA', 'DE']);
-    expect(partnerCountries(null)).toEqual([]);
   });
 
   it('instantiates an instance template on another structure and period', () => {

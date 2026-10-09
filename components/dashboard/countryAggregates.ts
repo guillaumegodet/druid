@@ -63,6 +63,29 @@ export function countryOptions(
     .sort((a, b) => b.count - a.count || a.label.localeCompare(b.label));
 }
 
+/** The same options in alphabetical order of their label (country selector). */
+export const byCountryName = (options: CountryOption[], locale?: string): CountryOption[] =>
+  [...options].sort((a, b) => a.label.localeCompare(b.label, locale, { sensitivity: 'base' }));
+
+const fold = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+/**
+ * Options matching a search of the country selector: case, accents and punctuation ignored, on the
+ * label but also the English (Natural Earth) name and the ISO code — « vietnam » finds « Viêt Nam ».
+ */
+export function searchCountryOptions(
+  options: CountryOption[],
+  query: string,
+  countryNames: Record<string, CountryName>,
+): CountryOption[] {
+  const q = fold(query);
+  if (!q) return options;
+  return options.filter((o) => {
+    const names = [o.label, countryNames[o.cc]?.fr ?? '', countryNames[o.cc]?.echarts ?? ''];
+    return o.cc.toLowerCase() === q || names.some((n) => fold(n).includes(q) || fold(n).replace(/ /g, '').includes(q));
+  });
+}
+
 export interface CountryInstitution {
   /** ROR when known, else `name:<name>` (or the parent's, when grouped). */
   key: string;
