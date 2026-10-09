@@ -10762,8 +10762,8 @@ msgid "Employer not specified"
 msgstr "Employeur non renseigné"
 
 #: components/researchers/ResearcherTable.tsx:161
-msgid "Synchronising with Grist…"
-msgstr "Synchronisation avec Grist en cours…"
+msgid "Loading the records…"
+msgstr "Chargement des fiches…"
 
 #: components/researchers/ResearcherTable.tsx:165
 msgid "No researcher found."
