@@ -32,7 +32,7 @@ export const SitePersonSchema = z.object({
   employer: Text,
   /** Position as written on the site (« Doctorant », « Post-doctorant », « Maître de conférences »…). */
   position: Text,
-  /** Parser category: Chercheur, Doctorant/Post-doc, Support, Direction. */
+  /** Parser category: « Chercheur », « Doctorant/Post-doc », « Support », « Direction ». */
   role: Text,
   profileUrl: Text,
   directoryUrl: Text,
@@ -280,4 +280,137 @@ export function planSiteImport(doc: SiteImportDocument, people: Researcher[], in
     });
   }
   return plan;
+}
+
+// ── Application (8 d3) ──────────────────────────────────────────────────────────────────────────────────────
+
+/** What the user kept in the review. Indexes are the people's positions in the file. */
+export const SiteImportSelectionSchema = z.object({
+  creations: z.array(z.number().int().min(0)).max(5000).default([]),
+  /** Fields to write on matched members: complements and the differences ticked (« the site is right »). */
+  fields: z.array(z.object({ index: z.number().int().min(0), field: z.enum(SITE_FIELDS as [SiteField, ...SiteField[]]) })).max(30000).default([]),
+  /** Matched members to validate (present on the site). */
+  validate: z.array(z.number().int().min(0)).max(5000).default([]),
+  /** Validate the created records too. */
+  validateNew: z.boolean().default(false),
+});
+export type SiteImportSelection = z.infer<typeof SiteImportSelectionSchema>;
+
+export interface SiteImportResult {
+  created: number;
+  updated: number;
+  validated: number;
+  /** Items the plan no longer has (the directory changed since the preview): not applied. */
+  stale: number;
+  errors: { index: number; name: string; error: string }[];
+}
+
+/** Commands the application needs (lib/directory/commands.ts, Grist or PostgreSQL). */
+export interface SiteImportCommands {
+  createPerson(researcher: Researcher, ctx: any): Promise<{ recordId: number }>;
+  updatePerson(recordId: number, researcher: Researcher, ctx: any): Promise<void>;
+  applyValidations(entries: { recordId: number; validation: any }[], ctx: any): Promise<number>;
+}
+
+/** Site presence → validated presence (INTERNE / EXTERNE written by older parsers read as PRESENT). */
+export const presenceOfSite = (status: string): 'PRESENT' | 'DEPART' | 'PARTI' => {
+  const s = status.trim().toUpperCase();
+  return s === 'DEPART' || s === 'PARTI' ? s : 'PRESENT';
+};
+
+const validationOf = (status: string, source: string, today: string, actor: string) => ({
+  validated: true, validatedStatus: presenceOfSite(status), validationDate: today, validationSource: source,
+  validationScope: ['statut', 'rattachement'], validatedBy: actor,
+});
+
+/** A researcher with the site's values written on the given fields (the lab's membership for the team). */
+export const withSiteFields = (r: Researcher, lab: string, p: SitePerson, fields: SiteField[]): Researcher => {
+  const out: Researcher = structuredClone(r);
+  for (const field of fields) {
+    const v = p[field];
+    if (!v) continue;
+    if (field === 'email') out.email = v;
+    else if (field === 'profileUrl') out.profiles = { ...(out.profiles || {}), cvSiteLabo: v };
+    else if (field === 'directoryUrl') out.annuaireUrl = v;
+    else if (field === 'grade') out.employment = { ...out.employment, grade: v };
+    else if (field === 'photoUrl') out.photoUrl = v;
+    else if (field === 'team') {
+      const a = out.affiliations.find((x) => normLab(x.structureName) === normLab(lab));
+      if (a) a.team = v;
+    }
+  }
+  return out;
+};
+
+/** New record of a site person (creation of the plan). */
+export const newResearcherOf = (c: SiteImportCreation, lab: string, source: string, validation: ReturnType<typeof validationOf> | null): Researcher => {
+  const p = c.person;
+  return {
+    id: '', uid: p.uid, lastName: p.lastName, firstName: p.firstName, displayName: `${p.lastName.toUpperCase()} ${p.firstName}`.trim(),
+    civility: '', email: p.email, status: '' as any,
+    employment: { employer: c.employer, grade: c.grade, contractType: c.employmentType },
+    affiliations: [{ structureName: lab, team: p.team, startDate: '', isPrimary: true }],
+    groups: [], identifiers: {}, photoUrl: p.photoUrl, annuaireUrl: p.directoryUrl,
+    profiles: p.profileUrl ? { cvSiteLabo: p.profileUrl } : {},
+    ...(validation ? { validation: validation as any } : {}),
+    importSource: source,
+  } as Researcher;
+};
+
+/**
+ * Applies the rows the user kept. The plan is computed again here from the file and the current directory (the
+ * browser's copy is never trusted): an item the plan no longer has is counted as stale and skipped. Order: creations,
+ * then field updates, then validations (an update rewrites the record, its validation included).
+ */
+export async function applySiteImport(args: {
+  doc: SiteImportDocument; selection: SiteImportSelection; people: Researcher[]; institutions: Institution[];
+  commands: SiteImportCommands; ctx: any; today: string; actor: string;
+}): Promise<SiteImportResult> {
+  const { doc, selection, people, institutions, commands, ctx, today, actor } = args;
+  const plan = planSiteImport(doc, people, institutions);
+  const source = doc.source || `Site ${doc.lab}`;
+  // Lab label as the directory writes it (the file may differ in case or accents).
+  const lab = people.flatMap((r) => r.affiliations || []).find((a) => normLab(a.structureName) === normLab(doc.lab))?.structureName || doc.lab;
+  const result: SiteImportResult = { created: 0, updated: 0, validated: 0, stale: 0, errors: [] };
+  const fail = (index: number, name: string, e: unknown) =>
+    result.errors.push({ index, name, error: e instanceof Error ? e.message : String(e) });
+
+  const creations = new Map(plan.creations.map((c) => [c.index, c]));
+  for (const index of new Set(selection.creations)) {
+    const c = creations.get(index);
+    if (!c) { result.stale++; continue; }
+    try {
+      await commands.createPerson(newResearcherOf(c, lab, source, selection.validateNew ? validationOf(c.person.status, source, today, actor) : null), ctx);
+      result.created++;
+    } catch (e) { fail(index, `${c.person.firstName} ${c.person.lastName}`.trim(), e); }
+  }
+
+  const matches = new Map(plan.matches.map((m) => [m.index, m]));
+  const fieldsOf = new Map<number, Set<SiteField>>();
+  for (const { index, field } of selection.fields) fieldsOf.set(index, (fieldsOf.get(index) ?? new Set()).add(field));
+  const byId = new Map(people.map((r) => [r.id, r]));
+  for (const [index, fields] of fieldsOf) {
+    const m = matches.get(index);
+    const offered = new Set([...(m?.complements ?? []).map((c) => c.field), ...(m?.differences ?? []).map((d) => d.field)]);
+    const kept = [...fields].filter((f) => offered.has(f));
+    if (!m || kept.length < fields.size) result.stale++;
+    if (!m || !kept.length) continue;
+    const r = byId.get(m.researcherId);
+    try {
+      if (!r?.gristRowId) throw new Error('record without row id');
+      await commands.updatePerson(r.gristRowId, withSiteFields(r, lab, m.person, kept), ctx);
+      result.updated++;
+    } catch (e) { fail(index, m.name, e); }
+  }
+
+  const toValidate = [...new Set(selection.validate)].map((index) => ({ index, m: matches.get(index) }));
+  const entries: { recordId: number; validation: any }[] = [];
+  for (const { index, m } of toValidate) {
+    if (!m || !m.toValidate || !m.recordId) { result.stale++; continue; }
+    entries.push({ recordId: m.recordId, validation: validationOf(m.person.status, source, today, actor) });
+  }
+  if (entries.length) {
+    try { result.validated = await commands.applyValidations(entries, ctx); } catch (e) { fail(-1, 'validations', e); }
+  }
+  return result;
 }

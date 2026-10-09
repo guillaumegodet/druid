@@ -95,6 +95,17 @@ describe('createPerson', () => {
   });
 });
 
+describe('createPerson — site import (lot 8 d3)', () => {
+  it('writes the directory URL and the source of an imported record, only when the Annuaire has the column', async () => {
+    const { grist, commands, ctx } = setup(undefined, ['LABO', 'rattachement', 'doublon_decision', 'annuaire_url']);
+    const { recordId } = await commands.createPerson(researcher({ uid: '', annuaireUrl: 'https://lab/annuaire/x', importSource: 'Site LAB-A' } as any), ctx(ALL));
+    expect(grist.tables.Annuaire.find((r) => r.id === recordId)!.fields).toMatchObject({ annuaire_url: 'https://lab/annuaire/x', Data_source: 'Site LAB-A' });
+    const other = setup();
+    const created = await other.commands.createPerson(researcher({ uid: '', annuaireUrl: 'https://lab/annuaire/x' } as any), other.ctx(ALL));
+    expect(other.grist.tables.Annuaire.find((r) => r.id === created.recordId)!.fields).not.toHaveProperty('annuaire_url');
+  });
+});
+
 describe('updatePerson', () => {
   it('rewrites the record row (fuzzy dates as text when the column is Text)', async () => {
     const { grist, commands, ctx } = setup(undefined, ['LABO', 'rattachement', 'doublon_decision', 'affiliation_start_date']);

@@ -30,6 +30,8 @@
 //   POST  /api/v1/people/uid-switch             { fromUid, rowId?, toUid, author }
 //   POST  /api/v1/merges                        { keepRowId, dropRowId, fields, author, note? } → 201 { logId }
 //   POST  /api/v1/merges/<logId>/restore        → { restoredRowId }
+//   POST  /api/v1/site-imports/preview          { document }             → SiteImportPlan        (lot 8 d)
+//   POST  /api/v1/site-imports/apply            { document, selection }  → SiteImportResult
 // LDAP review (lot 2 d, Nantes only — no route without the `ldap` binding; institution right):
 //   GET  /api/v1/ldap/diff | /ldap/candidates | /ldap/structures      diffs computed by the server
 //   POST /api/v1/ldap/updates { ids }   /ldap/departures { uid, date, accountLabel }
@@ -54,6 +56,7 @@ import type { LdapCommands } from './ldapCommands';
 import type { AlignCommands } from './alignCommands';
 import { UNIFIED_ALIGN_SOURCES, UnifiedAlignSource } from './alignments';
 import { ApiError } from './errors';
+import { applySiteImport, planSiteImport, SiteImportDocumentSchema, SiteImportSelectionSchema } from './siteImport';
 
 export interface DirectoryApiBindings {
   repository: DirectoryRepository;
@@ -123,6 +126,8 @@ const NewsletterPatchBody = z.object({
   }).strict().refine((f) => Object.keys(f).length > 0),
 });
 const AxisPatchBody = z.object({ axe: z.string().max(500) });
+const SiteImportPreviewBody = z.object({ document: SiteImportDocumentSchema });
+const SiteImportApplyBody = z.object({ document: SiteImportDocumentSchema, selection: SiteImportSelectionSchema });
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
 const OpenalexBody = z.object({ openalexId: z.string() });
 const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
@@ -383,6 +388,28 @@ export const createDirectoryApi = (): Hono<Env> => {
     c.get('audit').push({ table, kind: 'update', rows: [rowId], fields: [AXES_GRIST[slug].field], count: 1 });
     return c.json({ ok: true }, 200, NO_STORE);
   });
+  // Import of a lab website directory (lot 8 d): file exported by druid-biblio's sync-annuaire-grist skill. Institution
+  // right only (the plan reads the whole directory: other labs, employers). Preview = the plan, nothing written;
+  // apply = the plan computed again here and the rows the user kept written by the domain commands.
+  writes.post('/site-imports/preview', async (c) => {
+    if (!c.env.scope!.all) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    const body = await bodyOf(c, SiteImportPreviewBody);
+    if (!body) return c.json({ error: 'Invalid import file' }, 400, NO_STORE);
+    const [people, institutions] = await Promise.all([c.env.repository.people(c.env.scope!), c.env.repository.institutions()]);
+    return c.json(planSiteImport(body.document, people.items, institutions.items), 200, NO_STORE);
+  });
+  writes.post('/site-imports/apply', async (c) => {
+    if (!c.env.scope!.all) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    const body = await bodyOf(c, SiteImportApplyBody);
+    if (!body) return c.json({ error: 'Invalid import file' }, 400, NO_STORE);
+    const [people, institutions] = await Promise.all([c.env.repository.people(c.env.scope!), c.env.repository.institutions()]);
+    const result = await applySiteImport({
+      doc: body.document, selection: body.selection, people: people.items, institutions: institutions.items,
+      commands: c.env.commands!, ctx: ctxOf(c), today: new Date().toISOString().slice(0, 10), actor: c.env.actor || 'druid',
+    });
+    return c.json(result, 200, NO_STORE);
+  });
+
   app.route('/', writes);
 
   app.notFound((c) => c.json({ error: 'Unknown API route' }, 404, NO_STORE));

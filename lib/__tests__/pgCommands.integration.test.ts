@@ -69,6 +69,17 @@ const STEPS: [string, Step][] = [
     validation: { validated: true, validatedStatus: 'PRESENT', validationDate: '2026-10-01', validationSource: 'contrat', validationScope: ['statut'], validatedBy: 'alice' },
     ldapPrefill: { etat: 'N', date: '2026-10-08' },
   } as any, ctxOf())],
+  ['create a record from a lab website import (directory URL, source; lot 8 d)', (s) => s.commands.createPerson({
+    id: '', uid: '', civility: '', lastName: 'Importe', firstName: 'Ines', displayName: '', email: 'ines@example.org',
+    employment: { employer: 'CNRS', contractType: 'DOCTORANT', grade: '' } as any,
+    affiliations: [{ structureName: 'LAB1', team: 'TEAMA', startDate: '', isPrimary: true }] as any,
+    identifiers: {}, groups: [], photoUrl: 'https://lab.example.org/ines.jpg', annuaireUrl: 'https://lab.example.org/annuaire/ines',
+    profiles: { cvSiteLabo: 'https://lab.example.org/ines' }, importSource: 'Site LAB1',
+  } as any, ctxOf())],
+  ['write a directory URL on an existing record (site import)', (s, people) => {
+    const r = people.find((p) => p.gristRowId === 104)!;
+    return s.commands.updatePerson(104, { ...r, annuaireUrl: 'https://lab.example.org/annuaire/104' } as any, ctxOf());
+  }],
   ['update a single-row record (identity, identifiers, links, employment, validation)', (s, people) => {
     const r = people.find((p) => p.gristRowId === 105)!;
     return s.commands.updatePerson(105, {

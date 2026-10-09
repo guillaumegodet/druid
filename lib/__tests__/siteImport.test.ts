@@ -1,7 +1,9 @@
 // Import of a lab website directory (druid-internal docs/plan-migration-postgresql.md, lot 8 d2): matching, creations,
 // complements, differences, presence. Rules ported from druid-biblio's sync_annuaire.py. Fictitious data only.
 import { describe, it, expect } from 'vitest';
-import { planSiteImport, SiteImportDocumentSchema, typingOf, employerResolver, normName } from '../directory/siteImport';
+import {
+  planSiteImport, SiteImportDocumentSchema, typingOf, employerResolver, normName, applySiteImport, SiteImportSelectionSchema,
+} from '../directory/siteImport';
 import type { Researcher } from '../../types';
 import type { Institution } from '../directory/gristMapping';
 
@@ -126,5 +128,68 @@ describe('site import — typing and employer', () => {
     expect(normName("  Le Brun-D’Arc  ")).toBe('le brun d arc');
     expect(() => SiteImportDocumentSchema.parse({ format: 'other', version: 1, lab: 'X', people: [] })).toThrow();
     expect(() => SiteImportDocumentSchema.parse({ format: 'druid-site-import', version: 1, lab: 'X', people: [{ firstName: 'x' }] })).toThrow();
+  });
+});
+
+describe('site import — application (lot 8 d3)', () => {
+  const fakeCommands = () => {
+    const calls: { op: string; recordId?: number; researcher?: Researcher; entries?: any[] }[] = [];
+    let next = 500;
+    return {
+      calls,
+      createPerson: async (researcher: Researcher) => { calls.push({ op: 'create', researcher }); return { recordId: next++ }; },
+      updatePerson: async (recordId: number, researcher: Researcher) => {
+        if (researcher.lastName === 'Casse') throw new Error('Grist HTTP 500');
+        calls.push({ op: 'update', recordId, researcher });
+      },
+      applyValidations: async (entries: any[]) => { calls.push({ op: 'validate', entries }); return entries.length; },
+    };
+  };
+  const PEOPLE = [
+    researcher('durand-a', 'Durand', 'Alice', { rowId: 11, team: 'EQ1', lab: 'Lab-A' }),
+    researcher('martin-b', 'Martin', 'Bruno', { rowId: 12, validated: true, grade: 'MCF' }),
+    researcher('casse-c', 'Casse', 'Carl', { rowId: 13 }),
+  ];
+  const DOC = doc([
+    { lastName: 'Durand', firstName: 'Alice', team: 'EQ1|EQ2', profileUrl: 'https://lab/durand', status: 'EXTERNE' },
+    { lastName: 'Martin', firstName: 'Bruno', grade: 'PR' },
+    { lastName: 'Nouveau', firstName: 'Noé', employer: 'Organisme national', position: 'Post-doctorant', directoryUrl: 'https://lab/annuaire/noe' },
+    { lastName: 'Casse', firstName: 'Carl', email: 'carl@example.org' },
+  ]);
+  const run = (selection: any, commands = fakeCommands()) => applySiteImport({
+    doc: DOC, selection: SiteImportSelectionSchema.parse(selection), people: PEOPLE, institutions: INSTITUTIONS,
+    commands, ctx: {}, today: '2026-10-09', actor: 'admin-x',
+  }).then((result) => ({ result, calls: commands.calls }));
+
+  it('applies only what was ticked, in order: creations, field updates, then validations', async () => {
+    const { result, calls } = await run({
+      creations: [2], validateNew: true,
+      fields: [{ index: 0, field: 'profileUrl' }, { index: 0, field: 'team' }, { index: 1, field: 'grade' }],
+      validate: [0],
+    });
+    expect(result).toEqual({ created: 1, updated: 2, validated: 1, stale: 0, errors: [] });
+    expect(calls.map((c) => c.op)).toEqual(['create', 'update', 'update', 'validate']);
+    const created = calls[0].researcher!;
+    expect(created).toMatchObject({
+      lastName: 'Nouveau', annuaireUrl: 'https://lab/annuaire/noe', importSource: 'Site LAB-A',
+      employment: { employer: 'ORGANISME', grade: 'POST-DOC', contractType: 'Ch_aut' },
+      affiliations: [{ structureName: 'Lab-A', isPrimary: true }],
+      validation: { validated: true, validatedStatus: 'PRESENT', validationSource: 'Site LAB-A', validatedBy: 'admin-x' },
+    });
+    // The lab's membership gets the site's teams; the rest of the record is untouched.
+    expect(calls[1]).toMatchObject({ recordId: 11, researcher: { profiles: { cvSiteLabo: 'https://lab/durand' } } });
+    expect(calls[1].researcher!.affiliations[0].team).toBe('EQ1|EQ2');
+    expect(calls[2].researcher!.employment.grade).toBe('PR');
+    expect(calls[3].entries).toEqual([{ recordId: 11, validation: expect.objectContaining({ validatedStatus: 'PRESENT', validationDate: '2026-10-09' }) }]);
+    expect(PEOPLE[0].affiliations[0].team).toBe('EQ1');
+  });
+
+  it('skips what the plan no longer offers and reports the failures without stopping', async () => {
+    const { result, calls } = await run({
+      creations: [0], fields: [{ index: 1, field: 'email' }, { index: 3, field: 'email' }], validate: [1, 9],
+    });
+    expect(result.stale).toBe(4);
+    expect(result.errors).toEqual([{ index: 3, name: 'CASSE Carl', error: 'Grist HTTP 500' }]);
+    expect(calls).toEqual([]);
   });
 });

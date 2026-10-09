@@ -180,6 +180,9 @@ export interface Researcher {
   /** Set by « Fill from LDAP » on a record being created (lib/ldapPerson.ts): createResearcher then
    *  writes the LDAP traceability (statut_dyna, Data_source, LDAP_derniere_maj). Never read from Grist. */
   ldapPrefill?: { etat: string; date: string };
+  /** Set by an import (lab website directory, lib/directory/siteImport.ts) on a record being created: createPerson
+   * records it as the source of the record (`Data_source`). Never read. */
+  importSource?: string;
 }
 
 /** Cross-cutting functional group (members = column `groupes` of the Grist Annuaire) */
