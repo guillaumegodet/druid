@@ -44,6 +44,15 @@ const ADMINS_ONLY = DRUID_ENV !== 'production';
 // DRUID_LOG_DIR (mounted outside the container, rotated by the host), stdout without it.
 const { createActivityLog, auditEventOf, isQuietPath } = require('./scripts/lib/activity_log.cjs');
 const activity = createActivityLog({ dir: process.env.DRUID_LOG_DIR || '', environment: DRUID_ENV });
+// Service tokens (scripts/lib/service_tokens.cjs, plan-migration-postgresql.md lot 8 a): machine clients reading the
+// directory through /api/v1 without a session. Fingerprints only, in DRUID_SERVICE_TOKENS.
+const serviceTokens = require('./scripts/lib/service_tokens.cjs');
+const SERVICE_TOKENS = (() => {
+  const { tokens, rejected } = serviceTokens.parseServiceTokens(process.env.DRUID_SERVICE_TOKENS);
+  if (rejected.length) console.warn(`[Service tokens] DRUID_SERVICE_TOKENS: ignored ${rejected.join(', ')} (expected <name>:<sha256 hex>)`);
+  if (tokens.length) console.log(`[Service tokens] ${tokens.map((t) => t.name).join(', ')}`);
+  return tokens;
+})();
 // Client address behind the gateway: X-Forwarded-For is only believed from the proxies listed in TRUST_PROXY
 // (the gateway network, e.g. 192.168.64.0/20) — otherwise req.ip is the direct peer.
 if (process.env.TRUST_PROXY) app.set('trust proxy', process.env.TRUST_PROXY.split(',').map((s) => s.trim()).filter(Boolean));
@@ -286,13 +295,14 @@ app.use((req, res, next) => {
   const id = crypto.randomBytes(6).toString('hex');
   res.set('X-Request-Id', id);
   res.on('finish', () => {
-    const user = req.session?.user?.preferred_username || null;
+    const user = req.session?.user?.preferred_username || (req.service ? `service:${req.service.name}` : null);
     const base = { req: id, user, ip: req.ip, method: req.method, path: req.path, status: res.statusCode };
     if (!isQuietPath(req.path)) {
       activity.access({ ...base, ms: Number((process.hrtime.bigint() - started) / 1000000n),
         bytes: Number(res.get('Content-Length')) || undefined });
     }
-    const event = auditEventOf({ method: req.method, path: req.path, status: res.statusCode, signedIn: !!user });
+    const event = auditEventOf({ method: req.method, path: req.path, status: res.statusCode, signedIn: !!user,
+      service: !!req.service, serviceRefused: !!req.serviceRefused });
     if (event === 'api.write' && res.locals.apiAudit) {
       // Domain API (/api/v1): the Grist writes the command made (table, kind, rows, fields) — lib/directory/api.ts.
       activity.audit(event, { ...base, writes: res.locals.apiAudit });
@@ -453,6 +463,11 @@ app.get('/api/me', (req, res) => {
   });
 });
 
+// ── Service tokens ──────────────────────────────────────────────────────────
+// A request with `Authorization: Bearer` is a machine client (druid-biblio…): authenticated by its token only (401,
+// never the session as a fallback) and limited to a few directory reads (403). Browsers never send that header.
+app.use(serviceTokens.serviceTokenGuard(SERVICE_TOKENS));
+
 // ── Auth guard middleware ───────────────────────────────────────────────────
 // Applied after auth routes so /auth/* is always reachable
 app.use((req, res, next) => {
@@ -466,7 +481,7 @@ app.use((req, res, next) => {
     // Not on a non-production instance (reserved to administrators).
     (!ADMINS_ONLY && (req.path.startsWith('/embed') || req.path.startsWith('/api/public/'))) ||
     req.path === '/vendor/world.json';
-  if (isPublic || req.session.user) return next();
+  if (isPublic || req.session.user || req.service) return next();
   // API calls get 401, browser navigation gets redirect
   if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Unauthorized' });
   // Keep the requested page (?page=TASKS&tab=…) across the Keycloak round trip.

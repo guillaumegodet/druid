@@ -106,6 +106,10 @@ Principales variables d'environnement (`.env`) :
   pairs) : `grist` (par défaut) ou `postgres`, avec `DRUID_DATABASE_URL` (rôle `druid_app`). Le serveur et les
   jobs (`scripts/lib/storage.cjs`) suivent le même réglage ; les publications restent dans le document Grist.
 - `KEYCLOAK_URL`, `KEYCLOAK_REALM`, `KEYCLOAK_CLIENT_ID`, `APP_URL` : authentification.
+- `DRUID_SERVICE_TOKENS` : jetons de service des clients machine (druid-biblio…), qui lisent l'annuaire sans session
+  (`Authorization: Bearer <jeton>`, routes `GET /api/v1/people[?lab=]`, `/structures`, `/institutions` seulement,
+  chaque lecture journalisée). Entrées `<nom>:<empreinte sha256>` séparées par des virgules ; le serveur ne garde que
+  l'empreinte. Nouveau jeton : `node scripts/lib/service_tokens.cjs new <nom>`. Pas encore sur Cloudflare.
 - `LDAP_URL`, `LDAP_BIND_DN`, `LDAP_BIND_PASSWORD` : synchronisation LDAP (sans valeur par défaut).
 - `ETL_API_URL`, `DASHBOARD_SHARED_SECRET` : back-end bibliométrique (tableau de bord, console ETL,
   groupes).

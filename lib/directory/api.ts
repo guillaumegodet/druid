@@ -5,7 +5,8 @@
 // passes, per request, the stores of its instance and the scope of the authenticated user as Hono
 // bindings: this module never reads a session, a header or an environment variable itself.
 //
-//   GET /api/v1/people                   → { items: Researcher[], updatedAt }   (rows of the user's labs)
+//   GET /api/v1/people[?lab=<acronym>]   → { items: Researcher[], updatedAt }   (rows of the user's labs; `lab`
+//                                          narrows to one of them — 403 outside the scope, 400 when empty)
 //   GET /api/v1/structures               → { items: Structure[], updatedAt }
 //   GET /api/v1/institutions             → { items: Institution[], updatedAt }
 //   GET /api/v1/abes-exports             → { items: AbesExportMark[], updatedAt } (rows of the user's labs)
@@ -145,7 +146,16 @@ export const createDirectoryApi = (): Hono<Env> => {
     await next();
   });
 
-  app.get('/people', async (c) => c.json(await c.env.repository.people(c.env.scope!), 200, NO_STORE));
+  app.get('/people', async (c) => {
+    // `?lab=`: the rows of one lab only (a client rebuilding a lab's staff must not load the whole directory), with the
+    // same lab rule as the scope (normalized LABO of the row).
+    const lab = c.req.query('lab');
+    if (lab === undefined) return c.json(await c.env.repository.people(c.env.scope!), 200, NO_STORE);
+    const anchor = normalizeAcronym(lab);
+    if (!anchor) return c.json({ error: 'Invalid lab' }, 400, NO_STORE);
+    if (!scopeAllowsSlug(c.env.scope!, anchor)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    return c.json(await c.env.repository.people({ all: false, labAnchors: [anchor] }), 200, NO_STORE);
+  });
   app.get('/structures', async (c) => c.json(await c.env.repository.structures(), 200, NO_STORE));
   app.get('/institutions', async (c) => c.json(await c.env.repository.institutions(), 200, NO_STORE));
   app.get('/abes-exports', async (c) => c.json(await c.env.repository.abesExports(c.env.scope!), 200, NO_STORE));
