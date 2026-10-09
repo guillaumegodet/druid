@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/build-info.cjs && node scripts/prepare-cloudflare-assets.cjs && npm run build:server && npm run build:migrate && vite build",
+    "build": "node scripts/build-info.cjs && node scripts/prepare-cloudflare-assets.cjs && npm run build:server && npm run build:migrate && npm run build:copy && vite build",
     "build:server": "esbuild server/apiV1.ts --bundle --platform=node --format=cjs --target=node20 --outfile=server-api.cjs --log-level=warning",
     "preview": "vite preview",
     "i18n:extract": "lingui extract --clean",
@@ -22,6 +22,7 @@
     "db:types": "kysely-codegen",
     "test:db": "vitest run --no-file-parallelism lib/__tests__/*.integration.test.ts",
     "migrate:grist-to-pg": "npm run -s build:migrate && node scripts/.build/migrate_grist_to_pg.cjs",
+    "build:copy": "mkdir -p scripts/.build && esbuild scripts/copy_pg_to_grist.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/copy_pg_to_grist.cjs --log-level=warning",
     "build:migrate": "mkdir -p scripts/.build && esbuild scripts/migrate_grist_to_pg.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/migrate_grist_to_pg.cjs --log-level=warning"
   },
   "dependencies": {
