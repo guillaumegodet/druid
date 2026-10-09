@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.0.0] — 2026-10-09
+
 ### Ajouté
 - **API de l'annuaire `/api/v1`** : toutes les lectures et écritures du navigateur (fiches, structures,
   établissements, doublons et fusions, revue LDAP, alignements des identifiants, newsletter, axes) passent par une
