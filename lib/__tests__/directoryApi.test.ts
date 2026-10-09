@@ -211,6 +211,18 @@ describe('createDirectoryApi', () => {
     expect((await call('/api/v1/institutions', { repository, scope })).status).toBe(200);
   });
 
+  it('narrows the people to one lab of the scope with ?lab= (lot 8 a)', async () => {
+    const repository = stubRepository();
+    expect((await call('/api/v1/people?lab=LAB-A', { repository, scope: ALL })).status).toBe(200);
+    expect(repository.people).toHaveBeenLastCalledWith({ all: false, labAnchors: ['laba'] });
+    expect((await call('/api/v1/people?lab=lab-a', { repository, scope: { all: false, labAnchors: ['laba', 'lab2b'] } })).status).toBe(200);
+    expect(repository.people).toHaveBeenLastCalledWith({ all: false, labAnchors: ['laba'] });
+    expect((await call('/api/v1/people?lab=LAB²B', { repository, scope: { all: false, labAnchors: ['laba'] } })).status).toBe(403);
+    expect((await call('/api/v1/people?lab=', { repository, scope: ALL })).status).toBe(400);
+    expect((await call('/api/v1/people?lab=--', { repository, scope: ALL })).status).toBe(400);
+    expect(repository.people).toHaveBeenCalledTimes(2);
+  });
+
   it('answers 404 on an unknown route or method and 502 when the storage fails', async () => {
     const repository = stubRepository();
     expect((await call('/api/v1/nothing', { repository, scope: ALL })).status).toBe(404);
@@ -274,6 +286,11 @@ describe('scopeOfSession (server/apiV1.ts)', () => {
     expect(scopeOfSession({ session: {} })).toBeNull();
     expect(scopeOfSession({ session: { user: { access: { allSlugs: true, labAnchors: [] } } } })).toEqual({ all: true, labAnchors: [] });
     expect(scopeOfSession({ session: { user: { access: { allSlugs: false, labAnchors: ['laba'] } } } })).toEqual({ all: false, labAnchors: ['laba'] });
+  });
+
+  it('gives a service token the institution scope (server.cjs restricts its routes)', () => {
+    expect(scopeOfSession({ service: { name: 'druid-biblio' } })).toEqual({ all: true, labAnchors: [] });
+    expect(scopeOfSession({ service: { name: '' } })).toBeNull();
   });
 });
 

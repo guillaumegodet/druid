@@ -25,11 +25,15 @@ const JOB_GET = /^\/api\/(sync-[a-z-]+-trigger|tasks\/detect\/trigger)$/;
 const AI_POST = /^\/api\/(help-chat|chat|report-ai|newsletter\/generate|collab-theme\/(select-topics|synthesize))$/;
 
 /**
- * Audit event of a finished request, or null. Pure: { method, path, status, signedIn }.
+ * Audit event of a finished request, or null. Pure: { method, path, status, signedIn, service, serviceRefused }.
+ * `service`: request authenticated by a service token (lot 8 a of plan-migration-postgresql.md) — each of its reads
+ * is logged (institution-wide data leaving the application); `serviceRefused`: a token that matched no entry.
  * Sign-in/out and exports are logged where they happen (server.cjs), not here.
  */
-const auditEventOf = ({ method, path: p, status, signedIn }) => {
+const auditEventOf = ({ method, path: p, status, signedIn, service = false, serviceRefused = false }) => {
+  if (serviceRefused) return 'service.refused';
   if (status === 403) return 'access.denied';
+  if (service) return status < 400 ? 'service.read' : null;
   if (!signedIn || status === 401) return null;
   if (p.startsWith('/api/audit/')) return null;
   if (method === 'GET') {

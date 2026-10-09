@@ -58,6 +58,7 @@ jobs:
           node scripts/tests/migration-001.cjs
           DRUID_ENV=test node scripts/tests/test-instance-guard.cjs
           node scripts/tests/activity-log.cjs
+          node scripts/tests/service-tokens.cjs
       # Structural rules only: the list of names lives in a private repository (local pre-push hook).
       - name: Publication guard
         run: node scripts/publication/check_public_tree.mjs

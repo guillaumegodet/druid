@@ -50,6 +50,7 @@ export const API_ERRORS = [
   msg`Grist proxy removed: use /api/v1`,
   msg`Not available on the PostgreSQL storage yet`,
   msg`Invalid record`,
+  msg`Invalid lab`,
   msg`Replaced IdRef record not found`,
   msg`Review table missing, run the alignment script first`,
   msg`Grist error (partial write)`,

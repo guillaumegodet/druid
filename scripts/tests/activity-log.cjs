@@ -29,6 +29,12 @@ check('call to a language model', ev('POST', '/api/report-ai', 200), 'ai.request
 check('other write', ev('POST', '/api/sync-sovisuplus', 200), 'api.write');
 check('anonymous 401: not audited', ev('POST', '/api/tasks', 401, false), null);
 check('export report: logged by its route', ev('POST', '/api/audit/export', 204), null);
+// Service tokens (plan-migration-postgresql.md lot 8 a): every read is audited, refusals too.
+const svc = (method, p, status, extra) => auditEventOf({ method, path: p, status, signedIn: true, service: true, ...extra });
+check('service read', svc('GET', '/api/v1/people', 200), 'service.read');
+check('service read failed: not audited', svc('GET', '/api/v1/people', 502), null);
+check('service on a closed route', svc('GET', '/api/tasks', 403), 'access.denied');
+check('unknown service token', auditEventOf({ method: 'GET', path: '/api/v1/people', status: 401, signedIn: false, serviceRefused: true }), 'service.refused');
 check('static files are quiet', [isQuietPath('/assets/index.js'), isQuietPath('/api/health'), isQuietPath('/api/me')], [true, true, false]);
 
 // ── Through the server ──────────────────────────────────────────────────────

@@ -32,6 +32,8 @@ interface NodeRequest {
   headers: Record<string, string | string[] | undefined>;
   body?: unknown;
   session?: { user?: { preferred_username?: string; access?: { allSlugs?: boolean; labAnchors?: string[] } } };
+  /** Machine client authenticated by a service token (server.cjs, scripts/lib/service_tokens.cjs). */
+  service?: { name: string };
 }
 interface NodeResponse {
   status(code: number): NodeResponse;
@@ -65,8 +67,12 @@ export {
   gristClientFromEnv, jobStorageFromEnv, jobContext, tablesFromEnv, storageKindFromEnv, closeDatabases,
 } from '../lib/directory/jobStorage';
 
-/** Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. */
-export const scopeOfSession = (req: Pick<NodeRequest, 'session'>): DirectoryScope | null => {
+/**
+ * Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. A service token reads the
+ * institution-wide directory: server.cjs only lets it reach a few read routes (SERVICE_READ_ROUTES).
+ */
+export const scopeOfSession = (req: Pick<NodeRequest, 'session' | 'service'>): DirectoryScope | null => {
+  if (req.service?.name) return { all: true, labAnchors: [] };
   const access = req.session?.user?.access;
   if (!req.session?.user || !access) return null;
   return { all: !!access.allSlugs, labAnchors: Array.isArray(access.labAnchors) ? access.labAnchors : [] };
@@ -180,7 +186,8 @@ export const createApiV1Handler = (storage: ServerStorage) => {
   const api = createDirectoryApi();
   return async (req: NodeRequest, res: NodeResponse): Promise<void> => {
     const response = await api.fetch(toWebRequest(req), {
-      ...storage, scope: scopeOfSession(req), actor: req.session?.user?.preferred_username, writeRefusal: null,
+      ...storage, scope: scopeOfSession(req),
+      actor: req.service?.name ? `service:${req.service.name}` : req.session?.user?.preferred_username, writeRefusal: null,
     });
     res.status(response.status);
     const audit = response.headers.get(AUDIT_HEADER);
