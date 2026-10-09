@@ -44,6 +44,7 @@ import type { LdapRunProgress } from './components/researchers/LdapVerifyPanel';
 import { LdapCandidatesDiff, LdapResolved } from './lib/gristService';
 import { StructuresLdapReview } from './components/structures/StructuresLdapReview';
 import { ValidationImportReview } from './components/researchers/ValidationImportReview';
+import { SiteImportReview } from './components/researchers/SiteImportReview';
 import { ValidationDiff, ValidationScope, ValidationInfo } from './lib/validation';
 import { fetchDashboardStructures } from './lib/dashboardSource';
 
@@ -192,6 +193,7 @@ function App() {
     handleResearcherSelect(r);
   };
   const [validationImportOpen, setValidationImportOpen] = useState(false);
+  const [siteImportOpen, setSiteImportOpen] = useState(false);
   // « Tableau de bord » section (druid-biblio): available slugs + preselected structure.
   const [dashboardSlugs, setDashboardSlugs] = useState<string[]>([]);
   const [dashboardStruct, setDashboardStruct] = useState<string | null>(null);
@@ -822,6 +824,7 @@ function App() {
             duplicatesCount={duplicatesCount + tasksState.openCount + conflictsState.openCount}
             onMergeResearchers={writable ? (rowIds) => setMergeRowIds(rowIds) : undefined}
             onImportValidation={writable && hasCapability('HAS_STATUS_VALIDATION') ? () => setValidationImportOpen(true) : undefined}
+            onImportSite={writable && canUseEstablishmentTools() ? () => setSiteImportOpen(true) : undefined}
           />
         );
       case ViewState.RESEARCHER_DETAIL:
@@ -1066,6 +1069,9 @@ function App() {
           onApply={handleApplyValidation}
           onClose={() => setValidationImportOpen(false)}
         />
+      )}
+      {siteImportOpen && (
+        <SiteImportReview onClose={() => setSiteImportOpen(false)} onApplied={() => { void refreshData(); }} />
       )}
       {isUnifiedRunning(unifiedProgress) && (
         <div className="fixed bottom-4 right-24 z-50 flex items-center gap-3 px-5 py-3 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-xl border border-white/80 dark:border-white/15 shadow-soft text-[13px] font-semibold text-ink dark:text-[#f5f2ea]">

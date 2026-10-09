@@ -38,6 +38,7 @@ interface ResearcherListProps {
   /** Callback running the IdRef alignment (search = missing, verify = check existing) */
   /** Opens the import workshop for a verified list (manual validation) */
   onImportValidation?: () => void;
+  onImportSite?: () => void;
   /** Opens the ORCID or HAL alignment page (search = missing, verify = check existing). */
   /** Opens the merge assistant on two records (Grist row numbers) */
   onMergeResearchers?: (rowIds: [number, number]) => void;
@@ -59,7 +60,7 @@ interface ResearcherListProps {
 export const ResearcherList: React.FC<ResearcherListProps> = ({
   researchers, setResearchers, onSelectResearcher, onNewResearcher,
   loading = false, onManualSync, onOpenDuplicates, duplicatesCount,
-  onImportValidation, onMergeResearchers,
+  onImportValidation, onImportSite, onMergeResearchers,
 }) => {
   const { t } = useLingui();
   // Career-path signals (docs/plan-parcours-affiliations.md, lot 4): server job only; a failure just
@@ -173,6 +174,7 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
         onOpenDuplicates={onOpenDuplicates}
         duplicatesCount={duplicatesCount}
         onImportValidation={onImportValidation}
+        onImportSite={onImportSite}
         onNewResearcher={onNewResearcher}
         showSyncMenu={showSyncMenu}
         onToggleSyncMenu={() => setShowSyncMenu(v => !v)}

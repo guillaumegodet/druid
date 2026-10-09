@@ -13,38 +13,38 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:144
+#: App.tsx:145
 msgid "Error computing the LDAP diff"
 msgstr "Error computing the LDAP diff"
 
-#: App.tsx:154
+#: App.tsx:155
 msgid "Error searching for duplicates"
 msgstr "Error searching for duplicates"
 
-#: App.tsx:178
+#: App.tsx:179
 msgid "Researcher not found in the loaded scope"
 msgstr "Researcher not found in the loaded scope"
 
-#: App.tsx:191
+#: App.tsx:192
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:322
+#: App.tsx:324
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:359
+#: App.tsx:361
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:373
+#: App.tsx:375
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:387
+#: App.tsx:389
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -52,106 +52,106 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:389
+#: App.tsx:391
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 
-#: App.tsx:391
+#: App.tsx:393
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:398
+#: App.tsx:400
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:476
-#: App.tsx:483
+#: App.tsx:478
+#: App.tsx:485
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:484
+#: App.tsx:486
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:484
+#: App.tsx:486
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:486
+#: App.tsx:488
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#: App.tsx:496
+#: App.tsx:498
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:506
+#: App.tsx:508
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:520
+#: App.tsx:522
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:532
+#: App.tsx:534
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "LDAP update applied: {updated} record(s) written to Grist."
 
-#: App.tsx:534
+#: App.tsx:536
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:541
+#: App.tsx:543
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:575
+#: App.tsx:577
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation applied: {0} record(s) written to Grist."
 
-#: App.tsx:577
+#: App.tsx:579
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:590
+#: App.tsx:592
 msgid "This record has no Grist row: validation impossible."
 msgstr "This record has no Grist row: validation impossible."
 
-#: App.tsx:602
+#: App.tsx:604
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:621
+#: App.tsx:623
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:652
+#: App.tsx:654
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:666
+#: App.tsx:668
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "LDAP structures: {updated} updated, {created} created in Grist."
 
-#: App.tsx:668
+#: App.tsx:670
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:690
+#: App.tsx:692
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:699
+#: App.tsx:701
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -159,45 +159,45 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:708
+#: App.tsx:710
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:716
+#: App.tsx:718
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:730
+#: App.tsx:732
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:747
-#: App.tsx:763
+#: App.tsx:749
+#: App.tsx:765
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:796
+#: App.tsx:798
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:935
+#: App.tsx:938
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:939
+#: App.tsx:942
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:945
+#: App.tsx:948
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:965
+#: App.tsx:968
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:983
-#: App.tsx:995
+#: App.tsx:986
+#: App.tsx:998
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:277
@@ -211,20 +211,20 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1004
+#: App.tsx:1007
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1028
+#: App.tsx:1031
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1032
+#: App.tsx:1035
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1073
+#: App.tsx:1079
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -615,7 +615,7 @@ msgid "Error loading data: {error}"
 msgstr "Error loading data: {error}"
 
 #: components/GroupList.tsx:84
-#: components/ResearcherList.tsx:140
+#: components/ResearcherList.tsx:141
 msgid "Error saving groups."
 msgstr "Error saving groups."
 
@@ -649,6 +649,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
 #: components/researchers/MergeResearchersModal.tsx:291
+#: components/researchers/SiteImportReview.tsx:286
 #: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
 #: components/researchers/TasksPage.tsx:342
@@ -678,7 +679,7 @@ msgid "Cross-cutting selections of researchers (scientific council, projects, co
 msgstr "Cross-cutting selections of researchers (scientific council, projects, cohorts…)"
 
 #: components/GroupList.tsx:199
-#: components/researchers/ListHeader.tsx:127
+#: components/researchers/ListHeader.tsx:135
 msgid "New"
 msgstr "New"
 
@@ -1024,22 +1025,22 @@ msgstr "Revalidate"
 msgid "Validate"
 msgstr "Validate"
 
-#: components/ResearcherList.tsx:188
+#: components/ResearcherList.tsx:190
 #: components/StructureList.tsx:301
 msgid "List"
 msgstr "List"
 
-#: components/ResearcherList.tsx:189
+#: components/ResearcherList.tsx:191
 #: components/StructureList.tsx:302
 msgid "Charts"
 msgstr "Charts"
 
-#: components/ResearcherList.tsx:197
+#: components/ResearcherList.tsx:199
 #: components/StructureList.tsx:310
 msgid "List view (table)"
 msgstr "List view (table)"
 
-#: components/ResearcherList.tsx:197
+#: components/ResearcherList.tsx:199
 msgid "Chart view"
 msgstr "Chart view"
 
@@ -1134,7 +1135,7 @@ msgstr "Acronym"
 #: components/reports/NewReportDialog.tsx:301
 #: components/researchers/LdapMovesPanel.tsx:167
 #: components/researchers/LdapMovesPanel.tsx:222
-#: components/researchers/ListHeader.tsx:46
+#: components/researchers/ListHeader.tsx:48
 msgid "Name"
 msgstr "Name"
 
@@ -1146,7 +1147,7 @@ msgstr "Supervising bodies"
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
 #: components/etl/EtlMaintenancePanels.tsx:268
-#: components/researchers/ListHeader.tsx:48
+#: components/researchers/ListHeader.tsx:50
 #: components/researchers/OpenAlexAffiliationsPage.tsx:111
 #: components/researchers/TasksPage.tsx:176
 msgid "Status"
@@ -1165,17 +1166,17 @@ msgid "Create a structure (team, unit, faculty, institution) in Grist"
 msgstr "Create a structure (team, unit, faculty, institution) in Grist"
 
 #: components/StructureList.tsx:250
-#: components/researchers/ListHeader.tsx:70
+#: components/researchers/ListHeader.tsx:72
 msgid "Export"
 msgstr "Export"
 
 #: components/StructureList.tsx:269
-#: components/researchers/ListHeader.tsx:98
+#: components/researchers/ListHeader.tsx:100
 msgid "Synchronise"
 msgstr "Synchronise"
 
 #: components/StructureList.tsx:278
-#: components/researchers/ListHeader.tsx:104
+#: components/researchers/ListHeader.tsx:106
 msgid "Force Grist refresh"
 msgstr "Force Grist refresh"
 
@@ -2918,6 +2919,8 @@ msgstr "About “{title}”"
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
+#: components/researchers/SiteImportReview.tsx:110
+#: components/researchers/SiteImportReview.tsx:286
 #: components/researchers/UnifiedAlignPage.tsx:703
 msgid "Close"
 msgstr "Close"
@@ -3228,6 +3231,7 @@ msgstr "Citations"
 #: components/dashboard/PublicationsListTab.tsx:337
 #: components/researchers/AffiliationsTable.tsx:226
 #: components/researchers/AffiliationsTable.tsx:266
+#: components/researchers/SiteImportReview.tsx:11
 #: lib/importConflicts.ts:74
 #: lib/structureLabels.ts:17
 msgid "Team"
@@ -3657,6 +3661,7 @@ msgstr "Matching confidence: {0}%"
 
 #: components/dashboard/MediaMentionsPanel.tsx:555
 #: components/researchers/MergeResearchersModal.tsx:186
+#: components/researchers/SiteImportReview.tsx:275
 msgid "validated"
 msgstr "validated"
 
@@ -4105,7 +4110,7 @@ msgstr "Citations (already received)"
 #: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
-#: components/researchers/ListHeader.tsx:49
+#: components/researchers/ListHeader.tsx:51
 #: components/researchers/OpenAlexAffiliationsPage.tsx:107
 #: lib/importConflicts.ts:75
 msgid "Lab"
@@ -9297,7 +9302,7 @@ msgstr "All records of the scope (full rerun)"
 
 #: components/researchers/AlignLaunchModal.tsx:129
 #: components/researchers/DuplicatesPage.tsx:146
-#: components/researchers/ListHeader.tsx:121
+#: components/researchers/ListHeader.tsx:129
 #: components/researchers/OpenAlexAffiliationsPage.tsx:93
 #: components/researchers/TodoPage.tsx:61
 msgid "To process"
@@ -10341,33 +10346,39 @@ msgstr "Writing…"
 msgid "Apply ({0})"
 msgstr "Apply ({0})"
 
-#: components/researchers/ListHeader.tsx:47
+#: components/researchers/ListHeader.tsx:49
+#: components/researchers/SiteImportReview.tsx:11
 #: lib/importConflicts.ts:69
 msgid "Email"
 msgstr "Email"
 
-#: components/researchers/ListHeader.tsx:57
+#: components/researchers/ListHeader.tsx:59
 msgid "Research staff"
 msgstr "Research staff"
 
-#: components/researchers/ListHeader.tsx:63
+#: components/researchers/ListHeader.tsx:65
 msgid "Management and validation of researcher identities"
 msgstr "Management and validation of researcher identities"
 
-#: components/researchers/ListHeader.tsx:86
+#: components/researchers/ListHeader.tsx:88
 msgid "Identifiers, affiliations and notes missing from IdRef records, for ABES"
 msgstr "Identifiers, affiliations and notes missing from IdRef records, for ABES"
 
-#: components/researchers/ListHeader.tsx:88
+#: components/researchers/ListHeader.tsx:90
 msgid "ABES export (IdRef)"
 msgstr "ABES export (IdRef)"
 
-#: components/researchers/ListHeader.tsx:112
+#: components/researchers/ListHeader.tsx:114
 #: components/researchers/ValidationImportReview.tsx:76
 msgid "Import a validated list"
 msgstr "Import a validated list"
 
-#: components/researchers/ListHeader.tsx:119
+#: components/researchers/ListHeader.tsx:120
+#: components/researchers/SiteImportReview.tsx:108
+msgid "Import a lab website directory"
+msgstr "Import a lab website directory"
+
+#: components/researchers/ListHeader.tsx:127
 msgid "Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)"
 msgstr "Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)"
 
@@ -10789,6 +10800,123 @@ msgstr "Prev."
 msgctxt "short"
 msgid "Next"
 msgstr "Next"
+
+#: components/researchers/SiteImportReview.tsx:11
+#: lib/importConflicts.ts:88
+msgid "Directory page"
+msgstr "Directory page"
+
+#: components/researchers/SiteImportReview.tsx:11
+msgid "Profile page"
+msgstr "Profile page"
+
+#: components/researchers/SiteImportReview.tsx:12
+#: lib/importConflicts.ts:89
+msgid "Photo"
+msgstr "Photo"
+
+#: components/researchers/SiteImportReview.tsx:12
+msgid "Corps / grade"
+msgstr "Corps / grade"
+
+#: components/researchers/SiteImportReview.tsx:49
+msgid "This file is not JSON."
+msgstr "This file is not JSON."
+
+#: components/researchers/SiteImportReview.tsx:59
+msgid "The file could not be read."
+msgstr "The file could not be read."
+
+#: components/researchers/SiteImportReview.tsx:95
+msgid "The import could not be applied."
+msgstr "The import could not be applied."
+
+#: components/researchers/SiteImportReview.tsx:118
+msgid "File produced from the lab's website by the « sync-annuaire-grist » skill of druid-biblio (export mode). Nothing is written before you apply."
+msgstr "File produced from the lab's website by the « sync-annuaire-grist » skill of druid-biblio (export mode). Nothing is written before you apply."
+
+#: components/researchers/SiteImportReview.tsx:121
+msgid "Choose the file (.json)"
+msgstr "Choose the file (.json)"
+
+#: components/researchers/SiteImportReview.tsx:125
+msgid "Working…"
+msgstr "Working…"
+
+#: components/researchers/SiteImportReview.tsx:133
+msgid "Import applied"
+msgstr "Import applied"
+
+#. placeholder {0}: result.created
+#. placeholder {1}: result.updated
+#. placeholder {2}: result.validated
+#: components/researchers/SiteImportReview.tsx:134
+msgid "{0} created, {1} updated, {2} validated."
+msgstr "{0} created, {1} updated, {2} validated."
+
+#. placeholder {0}: result.stale
+#: components/researchers/SiteImportReview.tsx:135
+msgid "{0, plural, one {# item skipped: the directory changed since the preview.} other {# items skipped: the directory changed since the preview.}}"
+msgstr "{0, plural, one {# item skipped: the directory changed since the preview.} other {# items skipped: the directory changed since the preview.}}"
+
+#. placeholder {0}: plan.lab
+#. placeholder {1}: plan.siteCount
+#. placeholder {2}: plan.labCount
+#: components/researchers/SiteImportReview.tsx:144
+msgid "{0}: {1} on the site, {2} in Druid"
+msgstr "{0}: {1} on the site, {2} in Druid"
+
+#. placeholder {0}: plan.creations.length
+#: components/researchers/SiteImportReview.tsx:152
+msgid "{0, plural, one {# person to create (not validated)} other {# people to create (not validated)}}"
+msgstr "{0, plural, one {# person to create (not validated)} other {# people to create (not validated)}}"
+
+#. placeholder {0}: c.sameEmailLabs.join(', ')
+#: components/researchers/SiteImportReview.tsx:162
+msgid "Same email already in {0}: probably the same person (multi-affiliation)."
+msgstr "Same email already in {0}: probably the same person (multi-affiliation)."
+
+#: components/researchers/SiteImportReview.tsx:170
+msgid "Validate the created records too (the site is a reliable list)"
+msgstr "Validate the created records too (the site is a reliable list)"
+
+#. placeholder {0}: withComplements.length
+#: components/researchers/SiteImportReview.tsx:178
+msgid "{0, plural, one {# record to complete (empty fields)} other {# records to complete (empty fields)}}"
+msgstr "{0, plural, one {# record to complete (empty fields)} other {# records to complete (empty fields)}}"
+
+#. placeholder {0}: withDifferences.length
+#: components/researchers/SiteImportReview.tsx:201
+msgid "{0, plural, one {# record differs from the site — tick where the site is right} other {# records differ from the site — tick where the site is right}}"
+msgstr "{0, plural, one {# record differs from the site — tick where the site is right} other {# records differ from the site — tick where the site is right}}"
+
+#. placeholder {0}: t(FIELD_LABELS[f])
+#: components/researchers/SiteImportReview.tsx:206
+msgid "all: {0}"
+msgstr "all: {0}"
+
+#. placeholder {0}: toValidate.length
+#: components/researchers/SiteImportReview.tsx:231
+msgid "{0, plural, one {# member present on the site, not validated} other {# members present on the site, not validated}}"
+msgstr "{0, plural, one {# member present on the site, not validated} other {# members present on the site, not validated}}"
+
+#: components/researchers/SiteImportReview.tsx:236
+msgid "validate all"
+msgstr "validate all"
+
+#. placeholder {0}: plan.ambiguous.length
+#: components/researchers/SiteImportReview.tsx:253
+msgid "{0, plural, one {# homonym left out (to handle on the record)} other {# homonyms left out (to handle on the records)}}"
+msgstr "{0, plural, one {# homonym left out (to handle on the record)} other {# homonyms left out (to handle on the records)}}"
+
+#. placeholder {0}: plan.absent.length
+#: components/researchers/SiteImportReview.tsx:269
+msgid "{0, plural, one {# member absent from the site (departure? other spelling?) — nothing is changed} other {# members absent from the site (departures? other spellings?) — nothing is changed}}"
+msgstr "{0, plural, one {# member absent from the site (departure? other spelling?) — nothing is changed} other {# members absent from the site (departures? other spellings?) — nothing is changed}}"
+
+#: components/researchers/SiteImportReview.tsx:290
+msgid "{total, plural, one {Apply (# record)} other {Apply (# records)}}"
+msgstr "{total, plural, one {Apply (# record)} other {Apply (# records)}}"
 
 #: components/researchers/SuggestionsSection.tsx:34
 msgid "Create an ORCID iD"
@@ -13054,9 +13182,9 @@ msgid "Load failed"
 msgstr "Load failed"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:22
-#: lib/directoryApi.ts:31
-#: lib/directoryApi.ts:46
+#: lib/directoryApi.ts:23
+#: lib/directoryApi.ts:32
+#: lib/directoryApi.ts:47
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Directory unavailable ({resource}, HTTP {0})."
 
@@ -13107,14 +13235,6 @@ msgstr "OpenAlex ids"
 #: lib/importConflicts.ts:87
 msgid "uid_dyna"
 msgstr "uid_dyna"
-
-#: lib/importConflicts.ts:88
-msgid "Directory page"
-msgstr "Directory page"
-
-#: lib/importConflicts.ts:89
-msgid "Photo"
-msgstr "Photo"
 
 #: lib/importConflicts.ts:96
 msgid "HR"
