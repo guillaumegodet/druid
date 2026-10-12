@@ -36,7 +36,6 @@
     "express-session": "^1.18.1",
     "fast-xml-parser": "^5.11.2",
     "hono": "^4.13.13",
-    "http-proxy-middleware": "^4.2.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
     "kysely": "^0.29.6",
