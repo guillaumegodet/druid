@@ -1352,39 +1352,48 @@ msgstr "people.csv — {0} personnes, {1}"
 msgid "people.csv — never generated"
 msgstr "people.csv — jamais généré"
 
-#: components/admin/GraphActionsPanel.tsx:78
+#: components/admin/GraphActionsPanel.tsx:80
 msgid "Identifier removals sent to the CRISalid graph"
 msgstr "Retraits d'identifiants envoyés au graphe CRISalid"
 
-#: components/admin/GraphActionsPanel.tsx:81
+#: components/admin/GraphActionsPanel.tsx:83
 msgid "dry run: nothing is sent"
 msgstr "à blanc : rien n'est envoyé"
 
 #. placeholder {0}: status.counts.sent
-#: components/admin/GraphActionsPanel.tsx:83
+#: components/admin/GraphActionsPanel.tsx:85
 msgid "{0} sent"
 msgstr "{0} envoyés"
 
-#: components/admin/GraphActionsPanel.tsx:84
+#: components/admin/GraphActionsPanel.tsx:86
 msgid "{toSend} to send"
 msgstr "{toSend} à envoyer"
 
 #. placeholder {0}: status.counts.blocked
-#: components/admin/GraphActionsPanel.tsx:85
+#: components/admin/GraphActionsPanel.tsx:87
 msgid "{0} blocked"
 msgstr "{0} bloqués"
 
 #. placeholder {0}: status.failed.length
-#: components/admin/GraphActionsPanel.tsx:86
+#: components/admin/GraphActionsPanel.tsx:88
 msgid "{0} failed"
 msgstr "{0} en échec"
 
 #. placeholder {0}: status.unreadable.length
-#: components/admin/GraphActionsPanel.tsx:88
+#: components/admin/GraphActionsPanel.tsx:90
 msgid "{0} values to correct"
 msgstr "{0} valeurs à corriger"
 
+#: components/admin/GraphActionsPanel.tsx:92
+msgid "Details"
+msgstr "Détail"
+
 #: components/admin/GraphActionsPanel.tsx:93
+#: components/researchers/SuggestionsSection.tsx:181
+msgid "Hide"
+msgstr "Masquer"
+
+#: components/admin/GraphActionsPanel.tsx:97
 msgid "An identifier removed or changed in the directory is sent to the CRISalid graph as a removal, so that the graph cleans up the publications harvested with it. One pass every night; the SoVisu+ export sends the pending removals first. The graph acknowledges nothing: a new snapshot of the graph checks that they were applied."
 msgstr "Un identifiant retiré ou modifié dans l'annuaire part vers le graphe CRISalid comme un retrait, pour que le graphe nettoie les publications moissonnées avec lui. Un passage chaque nuit ; l'export vers SoVisu+ envoie d'abord les retraits en attente. Le graphe n'accuse pas réception : un nouvel instantané du graphe vérifie qu'ils ont été appliqués."
 
@@ -1392,68 +1401,68 @@ msgstr "Un identifiant retiré ou modifié dans l'annuaire part vers le graphe C
 #. placeholder {1}: formatDate(status.state.lastPeopleCsvAt)
 #. placeholder {2}: status.state.snapshot
 #. placeholder {3}: formatDate(status.state.lastSnapshotAt)
-#: components/admin/GraphActionsPanel.tsx:101
+#: components/admin/GraphActionsPanel.tsx:105
 msgid "Known state of the graph: {0} identifiers from the people.csv export of {1}, {2} from the snapshot of {3}."
 msgstr "État connu du graphe : {0} identifiants issus de l'export people.csv du {1}, {2} de l'instantané du {3}."
 
 #. placeholder {0}: status.failed.length
-#: components/admin/GraphActionsPanel.tsx:107
+#: components/admin/GraphActionsPanel.tsx:111
 msgid "Failed ({0})"
 msgstr "En échec ({0})"
 
 #. placeholder {0}: a.attempts
 #. placeholder {1}: formatDate(a.updated_at)
-#: components/admin/GraphActionsPanel.tsx:110
+#: components/admin/GraphActionsPanel.tsx:114
 msgid "({0} attempts, last on {1})"
 msgstr "({0} tentatives, dernière le {1})"
 
-#: components/admin/GraphActionsPanel.tsx:112
+#: components/admin/GraphActionsPanel.tsx:116
 msgid "Sent again at the next pass."
 msgstr "Renvoyés au prochain passage."
 
-#: components/admin/GraphActionsPanel.tsx:113
+#: components/admin/GraphActionsPanel.tsx:117
 msgid "To send ({toSend})"
 msgstr "À envoyer ({toSend})"
 
-#: components/admin/GraphActionsPanel.tsx:115
+#: components/admin/GraphActionsPanel.tsx:119
 msgid "At the next pass, or at the next SoVisu+ export."
 msgstr "Au prochain passage, ou au prochain export vers SoVisu+."
 
 #. placeholder {0}: status.blocked.length
-#: components/admin/GraphActionsPanel.tsx:116
+#: components/admin/GraphActionsPanel.tsx:120
 msgid "Blocked ({0})"
 msgstr "Bloqués ({0})"
 
-#: components/admin/GraphActionsPanel.tsx:118
+#: components/admin/GraphActionsPanel.tsx:122
 msgid "The graph does not accept the removal of this type of identifier yet: the export to SoVisu+ keeps the value until it does."
 msgstr "Le graphe n'accepte pas encore le retrait de ce type d'identifiant : l'export vers SoVisu+ garde la valeur en attendant."
 
 #. placeholder {0}: status.unreadable.length
-#: components/admin/GraphActionsPanel.tsx:119
+#: components/admin/GraphActionsPanel.tsx:123
 msgid "Values to correct in the directory ({0})"
 msgstr "Valeurs à corriger dans l'annuaire ({0})"
 
-#: components/admin/GraphActionsPanel.tsx:121
+#: components/admin/GraphActionsPanel.tsx:125
 msgid "Not a well-formed identifier (several values in one field, « N/C »…): no removal can be derived from it."
 msgstr "Identifiant mal formé (plusieurs valeurs dans un champ, « N/C »…) : aucun retrait ne peut en être déduit."
 
 #. placeholder {0}: status.recentSent.length
 #. placeholder {1}: status.counts.sent
-#: components/admin/GraphActionsPanel.tsx:122
+#: components/admin/GraphActionsPanel.tsx:126
 msgid "Recently sent ({0} of {1})"
 msgstr "Envoyés récemment ({0} sur {1})"
 
 #. placeholder {0}: a.actor
-#: components/admin/GraphActionsPanel.tsx:124
+#: components/admin/GraphActionsPanel.tsx:128
 msgid "correction by {0}"
 msgstr "correction de {0}"
 
 #. placeholder {0}: status.orphans.length
-#: components/admin/GraphActionsPanel.tsx:127
+#: components/admin/GraphActionsPanel.tsx:131
 msgid "Persons of the graph without a record ({0})"
 msgstr "Personnes du graphe sans fiche ({0})"
 
-#: components/admin/GraphActionsPanel.tsx:129
+#: components/admin/GraphActionsPanel.tsx:133
 msgid "Merged, renamed or deleted records: their identifiers stay in the graph, to settle by hand."
 msgstr "Fiches fusionnées, renommées ou supprimées : leurs identifiants restent dans le graphe, à régler à la main."
 
@@ -11247,10 +11256,6 @@ msgstr "Préparer l’e-mail"
 #: components/researchers/SuggestionsSection.tsx:176
 msgid "Create a task"
 msgstr "Créer une tâche"
-
-#: components/researchers/SuggestionsSection.tsx:181
-msgid "Hide"
-msgstr "Masquer"
 
 #: components/researchers/SuggestionsSection.tsx:187
 msgid "Why hide it? (already done, not relevant…)"
