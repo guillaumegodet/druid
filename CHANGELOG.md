@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.3.0] — 2026-10-12
+
 ### Modifié
 - **Brèves de la newsletter dans PostgreSQL** (instances sur PostgreSQL, plan PostgreSQL lot 14 a) : table
   `newsletter_item` au lieu de la table Grist `Newsletter` ; génération, liste et validation passent par le store des
