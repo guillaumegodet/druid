@@ -19,6 +19,10 @@ const SCHEMES = Object.keys(GRAPH_TYPE_OF_SCHEME) as (keyof typeof GRAPH_TYPE_OF
 const SCHEME_OF_TYPE = Object.fromEntries(Object.entries(GRAPH_TYPE_OF_SCHEME).map(([s, t]) => [t, s])) as Record<GraphIdentifierType, string>;
 const OPEN_STATUSES = ['pending', 'blocked', 'failed'] as const;
 
+/** One writer of the outbox and the state at a time: two concurrent passes would queue the same removal (the unique
+ * index would refuse it), a snapshot loaded during a pass would be planned against half a state. */
+const lockGraphActions = (trx: Transaction<DB>) => sql`SELECT pg_advisory_xact_lock(hashtext('druid.graph_actions'))`.execute(trx);
+
 /** Above this many removals to send in one pass, the pass is refused: a wrong read of the directory must not turn
  * into a mass removal (each one deletes publications in the graph). Lifted on purpose with `force`. */
 export const MAX_REMOVALS_PER_PASS = 25;
@@ -109,8 +113,7 @@ export const planAndRecordGraphActions = (
   db: Queryable, options: { force?: boolean; limit?: number; accepted?: Iterable<GraphIdentifierType> } = {},
 ): Promise<RecordedPlan> =>
   inTransaction(db, async (trx) => {
-    // One pass at a time: two concurrent passes would queue the same removal (the unique index would refuse it).
-    await sql`SELECT pg_advisory_xact_lock(hashtext('druid.graph_actions'))`.execute(trx);
+    await lockGraphActions(trx);
     const input = await loadGraphPlanInput(trx);
     return recordGraphPlan(trx, planGraphActions({ ...input, accepted: options.accepted }), options);
   });
@@ -139,3 +142,26 @@ export const markGraphActionFailed = (db: Queryable, id: string, error: string) 
   db.updateTable('graph_action')
     .set((eb) => ({ status: 'failed', attempts: eb('attempts', '+', 1), last_error: error.slice(0, 2000) }))
     .where('id', '=', id).where('status', 'in', ['pending', 'failed']).execute();
+
+/** Removals published before `takenAt`: a snapshot taken afterwards shows whether the IKG applied them. */
+export const removalsSentBefore = (db: Queryable, takenAt: string) =>
+  db.selectFrom('graph_action').select(['id', 'uid', 'type', 'value', 'sent_at'])
+    .where('action_type', '=', 'REMOVE').where('status', '=', 'sent').where('sent_at', '<', new Date(takenAt))
+    .orderBy('sent_at').execute() as Promise<(GraphIdentifier & { id: string; sent_at: Date | null })[]>;
+
+/**
+ * Replaces the state with a snapshot of the graph (origin `snapshot`) and returns the previous state, for the report.
+ * The snapshot is the truth: rows written since by people.csv exports or sent removals are replaced as well.
+ */
+export const replaceGraphState = (db: Queryable, identifiers: GraphIdentifier[]): Promise<GraphIdentifier[]> =>
+  inTransaction(db, async (trx) => {
+    await lockGraphActions(trx);
+    const previous = await trx.selectFrom('graph_identifier_state').select(['uid', 'type', 'value']).execute() as GraphIdentifier[];
+    await trx.deleteFrom('graph_identifier_state').execute();
+    for (let i = 0; i < identifiers.length; i += 1000) {
+      await trx.insertInto('graph_identifier_state')
+        .values(identifiers.slice(i, i + 1000).map(({ uid, type, value }) => ({ uid, type, value, origin: 'snapshot' })))
+        .execute();
+    }
+    return previous;
+  });
