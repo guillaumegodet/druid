@@ -2395,20 +2395,27 @@ app.post('/api/sync-sovisuplus', requireEstablishmentScope, async (req, res) => 
     return res.status(400).json({ error: 'researchers and structures arrays required' });
   }
   // Graph publisher on (lot 11 d): people.csv drops an identifier from the person of the graph without cleaning up the
-  // publications harvested with it, so every removal must have reached the graph first.
+  // publications harvested with it, so the removals still to send leave first (one publisher pass), then the file.
   const graph = serverStorage?.graph || null;
   let keep = [];
   if (graph) {
+    let prepared;
     try {
-      const gate = await graph.peopleCsvGate();
-      if (gate.toSend > 0) {
-        return res.status(409).json({ error: `Identifier removals still to send to the CRISalid graph, try again in a few minutes: ${gate.toSend}` });
-      }
-      keep = gate.keep;
+      prepared = await graph.prepareGraphForPeopleCsv();
     } catch (err) {
-      console.error('[SoVisu+] graph gate error:', err);
-      return res.status(500).json({ error: 'Cannot check the removals to send to the CRISalid graph' });
+      console.error('[SoVisu+] graph removals error:', err);
+      return res.status(500).json({ error: 'Cannot send the identifier removals to the CRISalid graph' });
     }
+    const { pass, refused, toSend } = prepared;
+    if (pass?.sent.length) console.log(`[SoVisu+] graph removals sent before people.csv: ${pass.sent.join(', ')}`);
+    for (const f of pass?.failed || []) console.log(`[SoVisu+] graph removal failed ${f.action}: ${f.error}`);
+    if (refused) {
+      return res.status(409).json({ error: `Too many identifier removals to send to the CRISalid graph at once, an administrator must check them: ${refused}` });
+    }
+    if (toSend > 0) {
+      return res.status(409).json({ error: `Identifier removals could not be sent to the CRISalid graph, try again later: ${toSend}` });
+    }
+    keep = prepared.keep;
   }
   const { csv, count, skipped, dedup, exportedUids, exported } = buildPeopleCsv(body.researchers, body.structures, { keep });
   try {
@@ -2571,9 +2578,11 @@ try {
     // Directory and work tables in PostgreSQL (druid-internal docs/plan-migration-postgresql.md, lot 6 f).
     storage: apiV1.storageKindFromEnv(process.env),
     databaseUrl: process.env.DRUID_DATABASE_URL || '',
-    // Identifier removals sent to the CRISalid graph (lot 11 d): `on` gates the people.csv export.
+    // Identifier removals sent to the CRISalid graph (lot 11 d): `on` makes the people.csv export send them first.
     graphActions: apiV1.graphActionsModeFromEnv(process.env),
     graphAcceptedTypes: apiV1.acceptedTypesFromEnv(process.env),
+    amqpUrl: process.env.DRUID_AMQP_URL || '',
+    graphExchange: process.env.DRUID_GRAPH_EXCHANGE || 'graph',
     appRoot: __dirname,
     hasLdap: CAPABILITIES.HAS_LDAP,
     hasQualinka: CAPABILITIES.HAS_QUALINKA,

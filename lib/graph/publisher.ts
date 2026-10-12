@@ -1,5 +1,6 @@
 // One pass of the graph publisher (lot 11 d of druid-internal docs/plan-migration-postgresql.md): plans and records
-// the identifier removals (lib/graph/pg.ts), then publishes the pending and failed ones to the CRISalid bus.
+// the identifier removals (lib/graph/pg.ts), then publishes the pending and failed ones to the CRISalid bus. Run once a
+// night by scripts/graph_publish.ts, and by the people.csv export just before it writes the file.
 // DRUID_GRAPH_ACTIONS chooses the mode: `off` (default: nothing), `dry-run` (plan computed and reported, nothing
 // recorded nor sent), `on`. A message published but whose `sent` mark could not be written is sent again at the next
 // pass: the IKG then answers « nothing to remove », without effect.
@@ -8,11 +9,11 @@ import type { DB } from '../db/schema.gen';
 import type { GraphBus } from './bus';
 import {
   GRAPH_TYPE_OF_SCHEME, IKG_ACCEPTED_TYPES, planGraphActions, removalMessage, removalRoutingKey,
-  type GraphIdentifierType,
+  type GraphIdentifier, type GraphIdentifierType,
 } from './identifierActions';
 import {
-  MAX_REMOVALS_PER_PASS, actionsToSend, loadGraphPlanInput, markGraphActionFailed, markGraphActionSent,
-  planAndRecordGraphActions,
+  GraphPlanRefused, MAX_REMOVALS_PER_PASS, actionsToSend, loadGraphPlanInput, markGraphActionFailed, markGraphActionSent,
+  peopleCsvGate, planAndRecordGraphActions,
 } from './pg';
 
 export type GraphActionsMode = 'off' | 'dry-run' | 'on';
@@ -113,4 +114,32 @@ export const runGraphPass = async ({
     await bus.close();
   }
   return report;
+};
+
+export interface PeopleCsvPreparation {
+  pass: GraphPassReport | null;
+  /** More removals to send than one pass allows: nothing was sent, an administrator checks the plan and forces it. */
+  refused: number;
+  /** Removals still to send after the pass (bus refused or unreachable): the export must wait. */
+  toSend: number;
+  /** Values of the graph kept in people.csv: their removal is refused by the IKG yet. */
+  keep: GraphIdentifier[];
+}
+
+/**
+ * Before a people.csv export with the publisher on: people.csv drops an identifier from the person of the graph
+ * without cleaning up the publications harvested with it, and the IKG then answers « nothing to remove » to the
+ * removal. So the export sends the removals still to send itself (one pass), then checks that none is left.
+ */
+export const prepareGraphForPeopleCsv = async (
+  { db, openBus, accepted = [...IKG_ACCEPTED_TYPES] }: Pick<GraphPassOptions, 'db' | 'openBus' | 'accepted'>,
+): Promise<PeopleCsvPreparation> => {
+  let pass: GraphPassReport | null = null;
+  try {
+    pass = await runGraphPass({ db, mode: 'on', openBus, accepted });
+  } catch (err) {
+    if (!(err instanceof GraphPlanRefused)) throw err;
+    return { pass: null, refused: err.toSend, toSend: err.toSend, keep: [] };
+  }
+  return { pass, refused: 0, ...(await peopleCsvGate(db, accepted)) };
 };

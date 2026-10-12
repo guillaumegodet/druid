@@ -24,8 +24,9 @@ import { createPgAlignCommands } from '../lib/directory/pg/alignCommands';
 import { createPgTableClient } from '../lib/directory/pg/tableClient';
 import { createPgWorkPorts } from '../lib/work/pg/workPorts';
 import type { StorageKind } from '../lib/directory/jobStorage';
-import { peopleCsvGate, recordPeopleCsvExport } from '../lib/graph/pg';
-import type { GraphActionsMode } from '../lib/graph/publisher';
+import { recordPeopleCsvExport } from '../lib/graph/pg';
+import { prepareGraphForPeopleCsv, type GraphActionsMode } from '../lib/graph/publisher';
+import { connectGraphBus } from '../lib/graph/bus';
 import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
@@ -63,9 +64,13 @@ export interface ApiV1Options {
   storage?: StorageKind;
   /** PostgreSQL of the instance (DRUID_DATABASE_URL, role druid_app), with storage = postgres. */
   databaseUrl?: string;
-  /** Identifier removals sent to the CRISalid graph (DRUID_GRAPH_ACTIONS, lot 11 d): `on` gates the people.csv export. */
+  /** Identifier removals sent to the CRISalid graph (DRUID_GRAPH_ACTIONS, lot 11 d): `on` makes the people.csv export
+   * send the removals still to send first. */
   graphActions?: GraphActionsMode;
   graphAcceptedTypes?: GraphIdentifierType[];
+  /** CRISalid bus (DRUID_AMQP_URL, DRUID_GRAPH_EXCHANGE). */
+  amqpUrl?: string;
+  graphExchange?: string;
 }
 
 // Storage of the Node jobs (lot 3): taken from this bundle by scripts/lib/storage.cjs.
@@ -175,9 +180,15 @@ export const createServerStorage = (options: ApiV1Options) => {
       align: createPgAlignCommands({ db, repository, caches, texts: tokenAlignTexts, hasQualinka }),
       /** Ports of the work routes (tasks, arbitrations, peer lists, reports), writes audited under `actor`. */
       workPorts: (actor: string) => createPgWorkPorts({ db, actor }),
-      /** Gate and state update of the people.csv export while the graph publisher is on (lot 11 d). */
+      /** Removals sent before the people.csv export and state update after it, while the graph publisher is on (lot 11 d). */
       graph: options.graphActions === 'on' ? {
-        peopleCsvGate: () => peopleCsvGate(db, options.graphAcceptedTypes),
+        prepareGraphForPeopleCsv: () => prepareGraphForPeopleCsv({
+          db, accepted: options.graphAcceptedTypes,
+          openBus: async () => {
+            if (!options.amqpUrl) throw new Error('DRUID_AMQP_URL is not set');
+            return connectGraphBus(options.amqpUrl, options.graphExchange || 'graph');
+          },
+        }),
         recordPeopleCsvExport: (uids: string[], identifiers: GraphIdentifier[]) => recordPeopleCsvExport(db, uids, identifiers),
       } : null,
     };

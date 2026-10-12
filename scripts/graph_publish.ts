@@ -2,7 +2,8 @@
  * Graph publisher (druid-internal docs/plan-migration-postgresql.md, lot 11 d): one pass that compares the directory
  * with what the CRISalid knowledge graph holds (graph_identifier_state, loaded by import_graph_snapshot), queues the
  * identifier removals and publishes them to the CRISalid bus as SoVisu+ user actions, so that the IKG cleans up the
- * publications harvested with a wrong identifier. Run every 10 minutes by ofelia.
+ * publications harvested with a wrong identifier. Run once a night by ofelia; the people.csv export runs the same
+ * pass just before writing the file, so a correction never waits for the night to be exported.
  *
  * DRUID_GRAPH_ACTIONS: `off` (default, nothing), `dry-run` (plan only, nothing recorded nor sent), `on`. A pass with
  * more than 25 removals to send is refused (exit code 2) unless `--force`. The logs name persons and identifier types,

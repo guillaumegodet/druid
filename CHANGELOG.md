@@ -16,7 +16,7 @@ données à exécuter au déploiement).
 - **Retraits d'identifiants envoyés au graphe CRISalid** (instances sur PostgreSQL) : un identifiant retiré ou corrigé
   dans l'annuaire part vers l'IKG comme action utilisateur `REMOVE` (format SoVisu+), pour que le graphe nettoie les
   publications moissonnées avec lui — `people.csv` retire l'identifiant de la personne mais laissait ces publications
-  attribuées. Publieur `scripts/.build/graph_publish.cjs` (toutes les 10 minutes), `DRUID_GRAPH_ACTIONS=off|dry-run|on`
+  attribuées. Publieur `scripts/.build/graph_publish.cjs` (une fois par nuit), `DRUID_GRAPH_ACTIONS=off|dry-run|on`
   (`off` par défaut), `DRUID_AMQP_URL` (utilisateur RabbitMQ limité à l'écriture sur l'exchange `graph`) ; message
   confirmé par le bus et routé vers une file, sinon en échec et rejoué. Point de départ : instantané du graphe
   (`scripts/graph/export_graph_identifiers.sh` sur l'hôte du graphe, `scripts/.build/import_graph_snapshot.cjs`).
@@ -24,9 +24,10 @@ données à exécuter au déploiement).
   refusés sauf `--force`, Scopus gardé en attente tant que l'IKG le refuse (`DRUID_GRAPH_ACCEPTED_TYPES`).
 
 ### Modifié
-- **Export `people.csv` vers SoVisu+** avec le publieur actif : refusé tant que des retraits restent à envoyer au graphe
-  (sinon l'identifiant disparaîtrait sans nettoyage) ; un identifiant dont l'IKG refuse encore le retrait (Scopus) y
-  garde la valeur du graphe ; l'export devient l'état connu du graphe.
+- **Export `people.csv` vers SoVisu+** avec le publieur actif : envoie d'abord au graphe les retraits en attente (sinon
+  l'identifiant disparaîtrait sans nettoyage), et n'est refusé que s'ils n'ont pas pu partir (bus refusé ou injoignable,
+  plus de 25 retraits d'un coup) ; un identifiant dont l'IKG refuse encore le retrait (Scopus) y garde la valeur du
+  graphe ; l'export devient l'état connu du graphe.
 
 ### Migration
 - `20261013090000_graph_actions` (tables `graph_identifier_state`, `graph_action`), appliquée par `druid-migrate`.

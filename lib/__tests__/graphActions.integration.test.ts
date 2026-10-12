@@ -10,7 +10,7 @@ import {
   peopleCsvGate, recordPeopleCsvExport, removalsSentBefore, replaceGraphState,
 } from '../graph/pg';
 import { GraphBusError, type GraphBus } from '../graph/bus';
-import { runGraphPass } from '../graph/publisher';
+import { prepareGraphForPeopleCsv, runGraphPass } from '../graph/publisher';
 
 const url = process.env.DATABASE_URL_APP;
 const db = url ? createDb({ connectionString: url, max: 1 }) : null;
@@ -185,6 +185,31 @@ describe.skipIf(!url)('graph actions (PostgreSQL)', () => {
       const ok = fakeBus();
       expect((await runGraphPass({ db: trx, mode: 'on', openBus: async () => ok.bus })).sent).toHaveLength(3);
       expect((await actions(trx)).map((a) => [a.status, a.last_error])).toEqual(Array(3).fill(['sent', null]));
+    });
+  });
+
+  it('before people.csv, the export sends the removals itself; it waits if the bus refuses them or if there are too many', async () => {
+    await inRollback(async (trx) => {
+      await person(trx, 'zz-ada-l', { idref: '012345678' });
+      await state(trx, [['zz-ada-l', 'idref', '123456789'], ['zz-ada-l', 'scopus', '11111111111']]);
+      const down = await prepareGraphForPeopleCsv({ db: trx, openBus: async () => { throw new Error('ECONNREFUSED'); } });
+      expect(down).toMatchObject({ refused: 0, toSend: 1 });
+      expect(down.pass?.failed.map((f) => f.error)).toEqual(['bus unreachable: ECONNREFUSED']);
+
+      const ok = fakeBus();
+      expect(await prepareGraphForPeopleCsv({ db: trx, openBus: async () => ok.bus })).toMatchObject({
+        refused: 0, toSend: 0, keep: [{ uid: 'zz-ada-l', type: 'scopus', value: '11111111111' }],
+      });
+      expect(ok.sent.map((m) => m.message.parameters)).toEqual([{ type: 'idref', value: '123456789' }]);
+
+      for (let i = 0; i < 26; i++) {
+        const uid = `zz-p-${String(i).padStart(2, '0')}`;
+        await person(trx, uid, {});
+        await state(trx, [[uid, 'idref', '123456789']]);
+      }
+      const many = fakeBus();
+      expect(await prepareGraphForPeopleCsv({ db: trx, openBus: async () => many.bus })).toEqual({ pass: null, refused: 26, toSend: 26, keep: [] });
+      expect(many.sent).toEqual([]);
     });
   });
 
