@@ -372,7 +372,7 @@ export const createDirectoryApi = (): Hono<Env> => {
     const slug = await c.env.publications.newsletterSlugOf(id);
     if (slug === null) return c.json({ error: 'Not found' }, 404, NO_STORE);
     if (!scopeAllowsSlug(c.env.scope!, slug)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
-    await c.env.publications.updateNewsletterItem(id, body.fields);
+    await c.env.publications.updateNewsletterItem(id, body.fields, c.env.actor);
     c.get('audit').push({ table: 'Newsletter', kind: 'update', rows: [id], fields: Object.keys(body.fields), count: 1 });
     return c.json({ ok: true }, 200, NO_STORE);
   });

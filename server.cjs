@@ -13,7 +13,8 @@ const storage = () => {
 const gristClient = () => storage().grist;
 // Tables of the directory read by the routes below (records of a key, labs, structures): the Grist document, or with
 // DRUID_STORAGE=postgres the migrated tables seen as that document (lot 6 f). The tables that are not migrated
-// (Newsletter, Corrections_affiliations_Openalex, publications) stay read through gristClient().
+// (Corrections_affiliations_Openalex, publications) stay read through gristClient(); the news items go through
+// storage().publications (lot 14 a).
 const tables = () => storage().tables;
 const STORAGE_KIND = String(process.env.DRUID_STORAGE || 'grist').trim().toLowerCase();
 if (!GRIST_API_KEY) {
@@ -1494,14 +1495,12 @@ app.post('/api/newsletter/generate', async (req, res) => {
   const limit = Math.min(6, Math.max(1, parseInt(body.limit, 10) || 4));
   const chars = Math.min(1000, Math.max(300, parseInt(body.chars, 10) || 300));
 
-  const doc = process.env.VITE_GRIST_DOC_ID;
-  const gristKey = GRIST_API_KEY;
-  if (!doc || !gristKey) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID / GRIST_API_KEY not configured' });
-
   try {
-    const grist = gristClient();
+    // News items: PostgreSQL table newsletter_item or Grist table Newsletter (publications store, lot 14 a).
+    const publications = storage().publications;
+    const actor = req.session.user?.preferred_username || 'druid';
     // 1. Briefs already in the table (any status) → a work_id is never regenerated.
-    const existing = new Set((await grist.records('Newsletter', { slug: [slug] })).map((r) => String(r.fields.work_id || '')));
+    const existing = await publications.newsletterWorkIds(slug);
 
     // 2. OpenAlex articles of the period (type article only).
     const from = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10);
@@ -1602,8 +1601,8 @@ app.post('/api/newsletter/generate', async (req, res) => {
         valide_par: '',
         commentaire: '',
       };
-      const [id] = await grist.addRecords('Newsletter', [{ fields }]);
-      created.push({ id: id ?? null, fields });
+      const id = await publications.addNewsletterItem(fields, actor);
+      created.push({ id, fields });
     }
 
     return res.json({ created, skipped: existing.size, remaining: works.length - created.length });

@@ -12,6 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **Brèves de la newsletter dans PostgreSQL** (instances sur PostgreSQL, plan PostgreSQL lot 14 a) : table
+  `newsletter_item` au lieu de la table Grist `Newsletter` ; génération, liste et validation passent par le store des
+  publications, chaque écriture est signée dans le journal d'audit. Les instances sur Grist (Cloudflare) ne changent pas ;
+  les corrections d'axes restent dans le document Grist de la structure (lot 10).
+
+### Migration
+- `20261014090000_newsletter` (table `newsletter_item`), appliquée par `druid-migrate`, puis import des brèves depuis
+  Grist : `docker exec crisalid-druid-1 node scripts/.build/import_newsletter.cjs --out=/app/logs/newsletter_import`
+  (à blanc), puis avec `--apply` ; la table Grist `Newsletter` reste en archive.
+
 ### Corrigé
 - Administration › suivi des retraits envoyés au graphe CRISalid : l'encart ne montrait pas qu'il se déplie (ligne de
   titre sans triangle) ; chevron et lien « Détail » / « Masquer » ajoutés.

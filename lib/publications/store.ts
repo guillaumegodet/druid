@@ -1,9 +1,9 @@
-// Publications side of the storage (D10 of druid-internal docs/plan-migration-postgresql.md): the tables fed
-// by druid-biblio or by the editorial workflow (Newsletter, axis corrections) stay in Grist and do not move
-// to PostgreSQL with the directory. Druid reads them through this store, kept apart from the
-// DirectoryRepository so that the directory can change storage without them.
+// Publications side of the storage (D10 of druid-internal docs/plan-migration-postgresql.md): the news items of the
+// newsletter and the axis corrections of a structure. Druid reads them through this store, kept apart from the
+// DirectoryRepository. Grist implementation here (instances on Grist, axis corrections everywhere until lot 10);
+// the news items of an instance on PostgreSQL are in `newsletter_item` (lib/publications/pg.ts, lot 14 a).
 import type { GristClient } from '../directory/repository';
-import { mapNewsletterRecords, NewsletterItem } from './newsletter';
+import { mapNewsletterRecords, NewsletterItem, NewsletterNewItem } from './newsletter';
 import { AXES_GRIST, AxisCorrectionRow, axisCorrectionRows } from './axes';
 
 export interface PublicationsStore {
@@ -14,8 +14,12 @@ export interface PublicationsStore {
   axisCorrections(slug: string): Promise<AxisCorrectionRow[] | null>;
   /** Structure (`slug`) of a news item, null when the item does not exist (lot 2 f: scope of a write). */
   newsletterSlugOf(id: number): Promise<string | null>;
-  /** Editorial fields of a news item (status, brief, validation). */
-  updateNewsletterItem(id: number, fields: Partial<Record<NewsletterEditableField, string>>): Promise<void>;
+  /** Editorial fields of a news item (status, brief, validation); `actor` signs the write in the audit log. */
+  updateNewsletterItem(id: number, fields: Partial<Record<NewsletterEditableField, string>>, actor?: string): Promise<void>;
+  /** OpenAlex works that already have a news item for the structure (any status): never generated again. */
+  newsletterWorkIds(slug: string): Promise<Set<string>>;
+  /** Records a generated news item; returns its id. */
+  addNewsletterItem(item: NewsletterNewItem, actor?: string): Promise<number | null>;
   /** Retained axis of a publication in the correction table of the structure. */
   updateAxisCorrection(slug: string, rowId: number, axe: string): Promise<{ table: string }>;
 }
@@ -58,6 +62,13 @@ export const createGristPublicationsStore = ({ main, readerFor }: GristPublicati
   },
   async updateNewsletterItem(id, fields) {
     await main.updateRecords('Newsletter', [{ id, fields }]);
+  },
+  async newsletterWorkIds(slug) {
+    return new Set((await main.records('Newsletter', { slug: [slug] })).map((r) => String(r.fields.work_id || '')));
+  },
+  async addNewsletterItem(item) {
+    const [id] = await main.addRecords('Newsletter', [{ fields: { ...item } }]);
+    return id ?? null;
   },
   async updateAxisCorrection(slug, rowId, axe) {
     const cfg = AXES_GRIST[slug];

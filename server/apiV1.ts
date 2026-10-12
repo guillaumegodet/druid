@@ -16,6 +16,7 @@ import {
   createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient, LdapCacheSnapshot,
 } from '../lib/directory/repository';
 import { createGristPublicationsStore } from '../lib/publications/store';
+import { createPgPublicationsStore } from '../lib/publications/pg';
 import { createDb } from '../lib/db/client';
 import { createPgDirectoryRepository } from '../lib/directory/pg/repository';
 import { createPgDirectoryCommands } from '../lib/directory/pg/commands';
@@ -152,8 +153,9 @@ export const createServerStorage = (options: ApiV1Options) => {
   const main = readerFor(options.gristDocId)!;
   const kind: StorageKind = options.storage ?? 'grist';
   if (kind === 'postgres' && !options.databaseUrl) throw new Error('DRUID_STORAGE=postgres needs DRUID_DATABASE_URL');
-  // The publications (druid-biblio exports, newsletter) stay in the Grist document whatever the storage (lot 8).
-  const publications = createGristPublicationsStore({ main, readerFor });
+  // Publications: news items in PostgreSQL on an instance on PostgreSQL (lot 14 a), in the Grist document otherwise;
+  // axis corrections in the Grist document of the structure in both cases (until lot 10).
+  const gristPublications = createGristPublicationsStore({ main, readerFor });
   const ldapStatus = jsonFileLoader<Record<string, any>>(options.appRoot, 'ldap_status_cache.json', {});
   const ldapCandidates = jsonFileLoader<any>(options.appRoot, 'ldap_candidates_cache.json', { proposals: [], ambiguous: [] });
   const ldapStructures = jsonFileLoader<Record<string, any>>(options.appRoot, 'structures_ldap_cache.json', {});
@@ -172,6 +174,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     const db = createDb({ connectionString: options.databaseUrl!, max: 8 });
     const repository = createPgDirectoryRepository({ db, loadLdapCache: ldapStatus });
     const commands = createPgDirectoryCommands({ db, repository });
+    const publications = createPgPublicationsStore({ db, grist: gristPublications });
     return {
       kind, grist: main, publications, repository, commands,
       /** Migrated tables seen as the Grist document (reads of server.cjs, jobs): lib/directory/pg/tableClient.ts. */
@@ -200,7 +203,7 @@ export const createServerStorage = (options: ApiV1Options) => {
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
   const commands = createGristDirectoryCommands({ grist: main, repository });
   return {
-    kind, grist: main, publications, repository, commands, tables: main,
+    kind, grist: main, publications: gristPublications, repository, commands, tables: main,
     ldap: options.hasLdap ? createGristLdapCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, ldap: ldapSource }) : undefined,
     align: createGristAlignCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka, caches }),
     workPorts: null,
