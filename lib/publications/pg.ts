@@ -39,7 +39,8 @@ export interface PgPublicationsStoreOptions {
 
 export const createPgPublicationsStore = ({ db, grist }: PgPublicationsStoreOptions): PublicationsStore => ({
   async newsletter(slug) {
-    const rows = await db.selectFrom('newsletter_item').selectAll().where('slug', '=', slug).execute();
+    // By id: same order as the Grist rows for items published the same day (the import keeps the Grist row order).
+    const rows = await db.selectFrom('newsletter_item').selectAll().where('slug', '=', slug).orderBy('id').execute();
     return mapNewsletterRecords(rows.map(recordOf) as Parameters<typeof mapNewsletterRecords>[0]);
   },
   axisCorrections: (slug) => grist.axisCorrections(slug),
