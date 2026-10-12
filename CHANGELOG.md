@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.1.0] — 2026-10-12
+
 ### Ajouté
 - **Retraits d'identifiants envoyés au graphe CRISalid** (instances sur PostgreSQL) : un identifiant retiré ou corrigé
   dans l'annuaire part vers l'IKG comme action utilisateur `REMOVE` (format SoVisu+), pour que le graphe nettoie les
