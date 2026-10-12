@@ -39,7 +39,6 @@ export const API_ERRORS = [
   msg`ILAAS_API_KEY not configured (druid service env)`,
   msg`ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)`,
   msg`VITE_GRIST_DOC_ID not configured`,
-  msg`VITE_GRIST_DOC_ID / GRIST_API_KEY not configured`,
   msg`GRIST_API_KEY not configured`,
   msg`GRIST_API_KEY not configured on Cloudflare`,
   // directory domain API (/api/v1, lib/directory/api.ts)

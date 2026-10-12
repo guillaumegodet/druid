@@ -1,6 +1,7 @@
-// News items of the general-public newsletter (Grist `Newsletter` table), publications side of the
-// storage (D10 of druid-internal docs/plan-migration-postgresql.md: these tables follow druid-biblio and stay
-// in Grist; Druid reads them through the PublicationsStore). Pure module, shared by the browser and the API.
+// News items of the general-public newsletter, publications side of the storage (D10 of druid-internal
+// docs/plan-migration-postgresql.md): PostgreSQL table `newsletter_item` on an instance on PostgreSQL (lot 14 a),
+// Grist table `Newsletter` otherwise; Druid reads them through the PublicationsStore. Pure module, shared by the
+// browser and the API.
 import type { GristRecord } from '../directory/gristMapping';
 
 export type NewsletterStatus = 'genere' | 'envoye' | 'valide' | 'rejete' | 'publie';
@@ -23,6 +24,32 @@ export interface NewsletterItem {
   chercheur_photo: string;
   chercheur_url: string;
   valide_par: string;
+}
+
+/** Columns of a news item as the generation writes it (Grist `Newsletter` table, PostgreSQL `newsletter_item`). */
+export interface NewsletterNewItem {
+  work_id: string;
+  slug: string;
+  numero: string;
+  titre: string;
+  doi: string;
+  date_publication: string;
+  journal: string;
+  auteurs: string;
+  labs: string;
+  accroche: string;
+  resume: string;
+  resume_genere: string;
+  statut: NewsletterStatus;
+  chercheur_nom: string;
+  chercheur_email: string;
+  chercheur_photo: string;
+  chercheur_url: string;
+  /** ISO date-time of the generation. */
+  genere_le: string;
+  valide_le: string;
+  valide_par: string;
+  commentaire: string;
 }
 
 /** Newsletter rows → items, most recent publication first (moved from NewsletterPanel). Pure. */

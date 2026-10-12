@@ -181,6 +181,33 @@ export interface MergeLog {
   uid: string | null;
 }
 
+export interface NewsletterItem {
+  accroche: Generated<string>;
+  auteurs: Generated<string>;
+  chercheur_email: Generated<string>;
+  chercheur_nom: Generated<string>;
+  chercheur_photo: Generated<string>;
+  chercheur_url: Generated<string>;
+  commentaire: Generated<string>;
+  created_at: Generated<Timestamp>;
+  date_publication: Generated<string>;
+  doi: Generated<string>;
+  genere_le: Timestamp | null;
+  id: Generated<Int8>;
+  journal: Generated<string>;
+  labs: Generated<string>;
+  numero: Generated<string>;
+  resume: Generated<string>;
+  resume_genere: Generated<string>;
+  slug: string;
+  statut: Generated<string>;
+  titre: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  valide_le: Timestamp | null;
+  valide_par: Generated<string>;
+  work_id: string;
+}
+
 export interface Person {
   birth_date: string | null;
   civility: string | null;
@@ -379,6 +406,7 @@ export interface DB {
   membership: Membership;
   membership_team: MembershipTeam;
   merge_log: MergeLog;
+  newsletter_item: NewsletterItem;
   person: Person;
   person_identifier: PersonIdentifier;
   person_identifier_check: PersonIdentifierCheck;

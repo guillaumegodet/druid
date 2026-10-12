@@ -188,6 +188,8 @@ describe('createDirectoryApi', () => {
     axisCorrections: vi.fn(async (slug: string) => (slug === 'ec-nantes' ? [] : null)),
     newsletterSlugOf: vi.fn(async () => null),
     updateNewsletterItem: vi.fn(),
+    newsletterWorkIds: vi.fn(async () => new Set<string>()),
+    addNewsletterItem: vi.fn(async () => null),
     updateAxisCorrection: vi.fn(async () => ({ table: 't' })),
   });
   const call = (path: string, bindings: any, method = 'GET') =>
