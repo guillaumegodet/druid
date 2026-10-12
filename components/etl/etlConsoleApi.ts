@@ -106,7 +106,6 @@ export interface StructureDetail {
 export interface ConsoleMeta {
   druidTabs: { key: string; label: string }[];
   teamLabels: string[];
-  correctionStatuses: string[];
 }
 
 export interface GristTeam {
@@ -141,33 +140,6 @@ export interface EffectifsSyncResponse extends Partial<EffectifsResponse> {
   stats: EffectifsSyncStats;
   warning?: string;
 }
-
-export interface DetectResponse {
-  suspects: number;
-  added: number;
-  alreadyPresent: number;
-  columnsCreated: number;
-}
-
-/** Record of the Grist table Corrections_affiliations_Openalex. */
-export interface Correction {
-  id: number;
-  work_id: string;
-  doi: string;
-  titre: string;
-  annee: number | string;
-  auteur: string;
-  affiliation_brute: string;
-  url_openalex: string;
-  raison_detection: string;
-  statut: string;
-  date_detection: string;
-  date_soumission: string;
-  date_resolution: string;
-  notes: string;
-}
-
-export type CorrectionPatch = Partial<Pick<Correction, 'statut' | 'date_soumission' | 'date_resolution' | 'notes'>>;
 
 async function asJson<T>(resp: Response): Promise<T> {
   if (resp.status === 401) {
@@ -221,13 +193,4 @@ export const EtlConsoleApi = {
   syncEffectifs: async (slug: string): Promise<EffectifsSyncResponse> =>
     asJson(await fetch(`${base}/${enc(slug)}/effectifs/sync`, json('POST', {}))),
 
-  /** Detects the suspicious affiliations in the parquet and pushes them to the Grist table. */
-  detectAffiliations: async (slug: string): Promise<DetectResponse> =>
-    asJson(await fetch(`${base}/${enc(slug)}/affiliations/detect`, json('POST', {}))),
-
-  corrections: async (slug: string): Promise<{ corrections: Correction[]; count: number; statuses: string[] }> =>
-    asJson(await fetch(`${base}/${enc(slug)}/corrections`)),
-
-  updateCorrection: async (slug: string, id: number, patch: CorrectionPatch): Promise<{ id: number }> =>
-    asJson(await fetch(`${base}/${enc(slug)}/corrections/${id}`, json('POST', patch))),
 };

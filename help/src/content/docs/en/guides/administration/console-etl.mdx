@@ -33,8 +33,8 @@ The configuration is organised in four sections:
 |---|---|
 | **1. Structure identity** | Acronym, full name, start and end years, term for internal groupings (“team”), research FTE (enables the output ratios). |
 | **2. Data sources** | OpenAlex institution identifier(s), BSO affiliation markers (acronym, name, RNSR…), URL of the BSO dump, HAL collection and start year, identifier of the structure in the CRISalid graph, OpenAlex contact e-mail. |
-| **3. Grist and affiliation checks** | Acronym of the structure in the directory (LABO field), positive and negative affiliation keywords, signature template of the charter. |
-| **4. Sub-structures and display** | Laboratories of a composite institution, hidden tabs of the dashboard, restricting the corpus to the publications of the headcount. |
+| **3. Grist directory** | Acronym of the structure in the directory (LABO field), teams read from Grist. |
+| **4. Sub-structures and display** | Laboratories of a composite institution, hidden tabs of the dashboard, restricting the corpus to the publications of the headcount, signature template of the charter. |
 
 - **Save the configuration** is enough for hidden tabs and identity: the dashboard takes them
   into account without a regeneration.
@@ -64,9 +64,6 @@ automatically.
 - **Staff (Grist directory)**: how many members were kept (validated, not validated
   ignored, people leaving ignored). **Resynchronise from Grist** updates the list without
   regenerating.
-- **OpenAlex affiliation checks**: detects publications with a suspicious affiliation and
-  follows up their correction (see
-  [An affiliation is wrong](/en/guides/corriger/affiliation-fausse/)).
 
 ## What happens next
 

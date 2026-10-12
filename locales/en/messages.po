@@ -181,28 +181,28 @@ msgstr "Error writing (unified view)"
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:944
+#: App.tsx:943
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:948
+#: App.tsx:947
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:954
+#: App.tsx:953
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:974
+#: App.tsx:973
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:992
-#: App.tsx:1004
+#: App.tsx:991
+#: App.tsx:1003
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:277
-#: components/etl/EtlConsolePage.tsx:457
+#: components/etl/EtlConsolePage.tsx:441
 #: components/reports/HistoryDialog.tsx:78
 #: components/reports/ReportEditor.tsx:265
 #: components/reports/ReportsPage.tsx:134
@@ -212,20 +212,20 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1014
+#: App.tsx:1013
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1038
+#: App.tsx:1037
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1042
+#: App.tsx:1041
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1086
+#: App.tsx:1085
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -1126,7 +1126,7 @@ msgid "Saving…"
 msgstr "Saving…"
 
 #: components/StructureList.tsx:198
-#: components/etl/EtlConsolePage.tsx:355
+#: components/etl/EtlConsolePage.tsx:351
 msgid "Acronym"
 msgstr "Acronym"
 
@@ -1147,9 +1147,7 @@ msgstr "Supervising bodies"
 
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
-#: components/etl/EtlMaintenancePanels.tsx:268
 #: components/researchers/ListHeader.tsx:50
-#: components/researchers/OpenAlexAffiliationsPage.tsx:111
 #: components/researchers/TasksPage.tsx:176
 msgid "Status"
 msgstr "Status"
@@ -3581,7 +3579,7 @@ msgid "Add to the selection…"
 msgstr "Add to the selection…"
 
 #: components/dashboard/MarketShareSection.tsx:232
-#: components/etl/EtlConsolePage.tsx:487
+#: components/etl/EtlConsolePage.tsx:471
 #: components/reports/ShareDialog.tsx:131
 msgid "Remove"
 msgstr "Remove"
@@ -3842,7 +3840,6 @@ msgstr "Harvested sources ({0})"
 #: components/researchers/DuplicatesPage.tsx:131
 #: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/LdapMovesPanel.tsx:124
-#: components/researchers/OpenAlexAffiliationsPage.tsx:80
 #: components/researchers/TasksPage.tsx:132
 msgid "Refresh"
 msgstr "Refresh"
@@ -4226,7 +4223,6 @@ msgstr "Citations (already received)"
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
 #: components/researchers/ListHeader.tsx:51
-#: components/researchers/OpenAlexAffiliationsPage.tsx:107
 #: lib/importConflicts.ts:75
 msgid "Lab"
 msgstr "Lab"
@@ -4245,7 +4241,6 @@ msgid "robot, energy…"
 msgstr "robot, energy…"
 
 #: components/dashboard/NewsTab.tsx:635
-#: components/researchers/OpenAlexAffiliationsPage.tsx:109
 msgid "Author"
 msgstr "Author"
 
@@ -7820,297 +7815,288 @@ msgstr "Signature charter compliance"
 msgid "of the {0} analysable publications"
 msgstr "of the {0} analysable publications"
 
-#: components/etl/EtlConsolePage.tsx:191
+#: components/etl/EtlConsolePage.tsx:187
 msgid "ETL API unreachable"
 msgstr "ETL API unreachable"
 
-#: components/etl/EtlConsolePage.tsx:222
+#: components/etl/EtlConsolePage.tsx:218
 msgid "Structure could not be read"
 msgstr "Structure could not be read"
 
 #. placeholder {0}: d.config.acronym
 #. placeholder {1}: d.slug
-#: components/etl/EtlConsolePage.tsx:256
+#: components/etl/EtlConsolePage.tsx:252
 msgid "Structure “{0}” created (data/{1}/config.yaml). Run the regeneration to produce its data."
 msgstr "Structure “{0}” created (data/{1}/config.yaml). Run the regeneration to produce its data."
 
-#: components/etl/EtlConsolePage.tsx:257
+#: components/etl/EtlConsolePage.tsx:253
 msgid "Configuration saved. Hidden tabs and identity are picked up by the dashboard without regeneration."
 msgstr "Configuration saved. Hidden tabs and identity are picked up by the dashboard without regeneration."
 
-#: components/etl/EtlConsolePage.tsx:260
-#: components/etl/EtlMaintenancePanels.tsx:221
+#: components/etl/EtlConsolePage.tsx:256
 #: components/groups/AuthorResolveModal.tsx:64
 msgid "Save error"
 msgstr "Save error"
 
-#: components/etl/EtlConsolePage.tsx:281
+#: components/etl/EtlConsolePage.tsx:277
 #: components/groups/GroupDashboardSection.tsx:107
 msgid "Error at launch"
 msgstr "Error at launch"
 
-#: components/etl/EtlConsolePage.tsx:312
+#: components/etl/EtlConsolePage.tsx:308
 msgid "Structure to configure"
 msgstr "Structure to configure"
 
-#: components/etl/EtlConsolePage.tsx:314
+#: components/etl/EtlConsolePage.tsx:310
 msgid "➕ New structure"
 msgstr "➕ New structure"
 
 #. placeholder {0}: fmtDate(files.dashboard.updatedAt)
-#: components/etl/EtlConsolePage.tsx:324
+#: components/etl/EtlConsolePage.tsx:320
 msgid "Dashboard as of {0}"
 msgstr "Dashboard as of {0}"
 
-#: components/etl/EtlConsolePage.tsx:325
+#: components/etl/EtlConsolePage.tsx:321
 msgid "No dashboard generated yet"
 msgstr "No dashboard generated yet"
 
-#: components/etl/EtlConsolePage.tsx:330
+#: components/etl/EtlConsolePage.tsx:326
 #: components/groups/GroupDashboardSection.tsx:182
 msgid "View the dashboard"
 msgstr "View the dashboard"
 
-#: components/etl/EtlConsolePage.tsx:340
+#: components/etl/EtlConsolePage.tsx:336
 msgid "An ETL is already running for “{otherJob}” — one at a time; the regeneration will have to wait for it to finish."
 msgstr "An ETL is already running for “{otherJob}” — one at a time; the regeneration will have to wait for it to finish."
 
-#: components/etl/EtlConsolePage.tsx:347
+#: components/etl/EtlConsolePage.tsx:343
 msgid "1. Structure identity"
 msgstr "1. Structure identity"
 
-#: components/etl/EtlConsolePage.tsx:350
-#: components/etl/EtlConsolePage.tsx:486
+#: components/etl/EtlConsolePage.tsx:346
+#: components/etl/EtlConsolePage.tsx:470
 msgid "Full name"
 msgstr "Full name"
 
-#: components/etl/EtlConsolePage.tsx:352
+#: components/etl/EtlConsolePage.tsx:348
 msgid "Laboratoire de Psychologie des Pays de la Loire"
 msgstr "Laboratoire de Psychologie des Pays de la Loire"
 
-#: components/etl/EtlConsolePage.tsx:360
+#: components/etl/EtlConsolePage.tsx:356
 msgid "OpenAlex institution ID(s) — several IDs separated by “|” for a cluster"
 msgstr "OpenAlex institution ID(s) — several IDs separated by “|” for a cluster"
 
-#: components/etl/EtlConsolePage.tsx:366
+#: components/etl/EtlConsolePage.tsx:362
 msgid "Start year"
 msgstr "Start year"
 
-#: components/etl/EtlConsolePage.tsx:371
+#: components/etl/EtlConsolePage.tsx:367
 msgid "End year"
 msgstr "End year"
 
-#: components/etl/EtlConsolePage.tsx:377
+#: components/etl/EtlConsolePage.tsx:373
 msgid "Research FTE (0 = ratios hidden)"
 msgstr "Research FTE (0 = ratios hidden)"
 
-#: components/etl/EtlConsolePage.tsx:382
+#: components/etl/EtlConsolePage.tsx:378
 msgid "Contact email (OpenAlex polite pool)"
 msgstr "Contact email (OpenAlex polite pool)"
 
-#: components/etl/EtlConsolePage.tsx:386
+#: components/etl/EtlConsolePage.tsx:382
 msgid "Term for internal groupings"
 msgstr "Term for internal groupings"
 
-#: components/etl/EtlConsolePage.tsx:396
+#: components/etl/EtlConsolePage.tsx:392
 msgid "2. Data sources"
 msgstr "2. Data sources"
 
-#: components/etl/EtlConsolePage.tsx:398
+#: components/etl/EtlConsolePage.tsx:394
 msgid "BSO dump URL (downloaded automatically at generation)"
 msgstr "BSO dump URL (downloaded automatically at generation)"
 
-#: components/etl/EtlConsolePage.tsx:403
+#: components/etl/EtlConsolePage.tsx:399
 msgid "BSO affiliation markers (one per line: acronym, name, RNSR/UAI number…)"
 msgstr "BSO affiliation markers (one per line: acronym, name, RNSR/UAI number…)"
 
-#: components/etl/EtlConsolePage.tsx:409
+#: components/etl/EtlConsolePage.tsx:405
 #: components/structures/IdentifiersTab.tsx:70
 msgid "HAL collection"
 msgstr "HAL collection"
 
-#: components/etl/EtlConsolePage.tsx:414
+#: components/etl/EtlConsolePage.tsx:410
 msgid "HAL from year (0 = whole period)"
 msgstr "HAL from year (0 = whole period)"
 
-#: components/etl/EtlConsolePage.tsx:419
+#: components/etl/EtlConsolePage.tsx:415
 msgid "CRISalid structure uid (graph)"
 msgstr "CRISalid structure uid (graph)"
 
-#: components/etl/EtlConsolePage.tsx:425
+#: components/etl/EtlConsolePage.tsx:421
 msgid "Staff (Grist directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation."
 msgstr "Staff (Grist directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation."
 
-#: components/etl/EtlConsolePage.tsx:427
+#: components/etl/EtlConsolePage.tsx:423
 msgid "Nantilus HLM export missing: the “journal access” step will be skipped."
 msgstr "Nantilus HLM export missing: the “journal access” step will be skipped."
 
-#: components/etl/EtlConsolePage.tsx:434
-msgid "3. Grist and affiliation checks"
-msgstr "3. Grist and affiliation checks"
+#: components/etl/EtlConsolePage.tsx:430
+msgid "3. Grist directory"
+msgstr "3. Grist directory"
 
-#: components/etl/EtlConsolePage.tsx:436
+#: components/etl/EtlConsolePage.tsx:432
 msgid "Acronym in the Grist directory (LABO field)"
 msgstr "Acronym in the Grist directory (LABO field)"
 
-#: components/etl/EtlConsolePage.tsx:442
-msgid "Positive keywords (one per line, at least one expected in the raw affiliation)"
-msgstr "Positive keywords (one per line, at least one expected in the raw affiliation)"
-
-#: components/etl/EtlConsolePage.tsx:447
-msgid "Negative keywords (one per line, presence = wrong affiliation)"
-msgstr "Negative keywords (one per line, presence = wrong affiliation)"
-
-#: components/etl/EtlConsolePage.tsx:455
+#: components/etl/EtlConsolePage.tsx:439
 msgid "Teams read from Grist (Structures table, read-only)"
 msgstr "Teams read from Grist (Structures table, read-only)"
 
-#: components/etl/EtlConsolePage.tsx:460
+#: components/etl/EtlConsolePage.tsx:444
 msgid "No team found in Grist for this structure (auto-discovered from the staff list)."
 msgstr "No team found in Grist for this structure (auto-discovered from the staff list)."
 
-#: components/etl/EtlConsolePage.tsx:477
+#: components/etl/EtlConsolePage.tsx:461
 msgid "4. Sub-structures and display"
 msgstr "4. Sub-structures and display"
 
-#: components/etl/EtlConsolePage.tsx:480
+#: components/etl/EtlConsolePage.tsx:464
 msgid "Composite institution: one row per laboratory (OpenAlex ID starting with I) for the per-lab breakdown."
 msgstr "Composite institution: one row per laboratory (OpenAlex ID starting with I) for the per-lab breakdown."
 
-#: components/etl/EtlConsolePage.tsx:495
+#: components/etl/EtlConsolePage.tsx:479
 msgid "Add a sub-structure"
 msgstr "Add a sub-structure"
 
-#: components/etl/EtlConsolePage.tsx:500
+#: components/etl/EtlConsolePage.tsx:484
 msgid "Tabs hidden in the dashboard (applied without regeneration)"
 msgstr "Tabs hidden in the dashboard (applied without regeneration)"
 
-#: components/etl/EtlConsolePage.tsx:513
+#: components/etl/EtlConsolePage.tsx:497
 msgid "Restrict the corpus to publications with at least one author from the staff list"
 msgstr "Restrict the corpus to publications with at least one author from the staff list"
 
-#: components/etl/EtlConsolePage.tsx:516
+#: components/etl/EtlConsolePage.tsx:500
 msgid "Signature charter template (empty = built-in template for the acronym)"
 msgstr "Signature charter template (empty = built-in template for the acronym)"
 
-#: components/etl/EtlConsolePage.tsx:518
+#: components/etl/EtlConsolePage.tsx:502
 msgid "Nantes Université, …, ACRONYM, UMR XXXX, F-44000 Nantes, France"
 msgstr "Nantes Université, …, ACRONYM, UMR XXXX, F-44000 Nantes, France"
 
-#: components/etl/EtlConsolePage.tsx:527
+#: components/etl/EtlConsolePage.tsx:511
 msgid "Create the structure"
 msgstr "Create the structure"
 
-#: components/etl/EtlConsolePage.tsx:527
+#: components/etl/EtlConsolePage.tsx:511
 msgid "Save the configuration"
 msgstr "Save the configuration"
 
-#: components/etl/EtlConsolePage.tsx:531
+#: components/etl/EtlConsolePage.tsx:515
 msgid "Save and regenerate the data"
 msgstr "Save and regenerate the data"
 
-#: components/etl/EtlConsolePage.tsx:535
+#: components/etl/EtlConsolePage.tsx:519
 msgid "Re-download the BSO dump"
 msgstr "Re-download the BSO dump"
 
-#: components/etl/EtlConsolePage.tsx:538
+#: components/etl/EtlConsolePage.tsx:522
 msgid "Unsaved changes"
 msgstr "Unsaved changes"
 
-#: components/etl/EtlConsolePage.tsx:554
+#: components/etl/EtlConsolePage.tsx:538
 msgid "Log of the last generation"
 msgstr "Log of the last generation"
 
 #. placeholder {0}: fmtDate(status?.startedAt)
-#: components/etl/EtlConsolePage.tsx:556
+#: components/etl/EtlConsolePage.tsx:540
 msgid "Running since {0}"
 msgstr "Running since {0}"
 
 #. placeholder {0}: fmtDate(status?.endedAt)
-#: components/etl/EtlConsolePage.tsx:557
+#: components/etl/EtlConsolePage.tsx:541
 msgid "Finished on {0}"
 msgstr "Finished on {0}"
 
 #. placeholder {0}: fmtDate(status?.endedAt)
-#: components/etl/EtlConsolePage.tsx:558
+#: components/etl/EtlConsolePage.tsx:542
 msgid "Failed on {0}"
 msgstr "Failed on {0}"
 
-#: components/etl/EtlConsolePage.tsx:559
+#: components/etl/EtlConsolePage.tsx:543
 msgid "Never run from this console"
 msgstr "Never run from this console"
 
 #. placeholder {0}: status?.warnings?.length
-#: components/etl/EtlConsolePage.tsx:565
+#: components/etl/EtlConsolePage.tsx:549
 msgid "{0} warning(s) — see the log."
 msgstr "{0} warning(s) — see the log."
 
-#: components/etl/EtlConsolePage.tsx:569
+#: components/etl/EtlConsolePage.tsx:553
 msgid "— no log —"
 msgstr "— no log —"
 
-#: components/etl/EtlConsolePage.tsx:573
+#: components/etl/EtlConsolePage.tsx:557
 msgid "Structure files"
 msgstr "Structure files"
 
-#: components/etl/EtlConsolePage.tsx:576
-#: components/etl/EtlConsolePage.tsx:578
-#: components/etl/EtlConsolePage.tsx:581
-#: components/etl/EtlConsolePage.tsx:584
-#: components/etl/EtlConsolePage.tsx:586
+#: components/etl/EtlConsolePage.tsx:560
+#: components/etl/EtlConsolePage.tsx:562
+#: components/etl/EtlConsolePage.tsx:565
+#: components/etl/EtlConsolePage.tsx:568
+#: components/etl/EtlConsolePage.tsx:570
 msgid "missing"
 msgstr "missing"
 
 #. placeholder {0}: files.effectifs.rows ?? 0
 #. placeholder {1}: fmtDate(files.effectifs.updatedAt)
-#: components/etl/EtlConsolePage.tsx:581
+#: components/etl/EtlConsolePage.tsx:565
 msgid "{0} members — {1}"
 msgstr "{0} members — {1}"
 
-#: components/etl/EtlConsolePage.tsx:583
+#: components/etl/EtlConsolePage.tsx:567
 msgid "BSO dump"
 msgstr "BSO dump"
 
-#: components/etl/EtlMaintenancePanels.tsx:36
+#: components/etl/EtlMaintenancePanels.tsx:32
 msgid "Staff list could not be read"
 msgstr "Staff list could not be read"
 
 #. placeholder {0}: r.count
-#: components/etl/EtlMaintenancePanels.tsx:58
+#: components/etl/EtlMaintenancePanels.tsx:54
 msgid "{0} validated researchers synchronised → effectifs.csv"
 msgstr "{0} validated researchers synchronised → effectifs.csv"
 
-#: components/etl/EtlMaintenancePanels.tsx:61
+#: components/etl/EtlMaintenancePanels.tsx:57
 msgid "Nothing to synchronise"
 msgstr "Nothing to synchronise"
 
-#: components/etl/EtlMaintenancePanels.tsx:64
+#: components/etl/EtlMaintenancePanels.tsx:60
 msgid "Grist error"
 msgstr "Grist error"
 
-#: components/etl/EtlMaintenancePanels.tsx:76
+#: components/etl/EtlMaintenancePanels.tsx:72
 msgid "Staff (Grist directory)"
 msgstr "Staff (Grist directory)"
 
-#: components/etl/EtlMaintenancePanels.tsx:78
+#: components/etl/EtlMaintenancePanels.tsx:74
 msgid "Filter LABO = “{gristLabo}”, validated researchers excluding departures"
 msgstr "Filter LABO = “{gristLabo}”, validated researchers excluding departures"
 
-#: components/etl/EtlMaintenancePanels.tsx:78
+#: components/etl/EtlMaintenancePanels.tsx:74
 msgid "Fill in the Grist acronym (section 3) and save"
 msgstr "Fill in the Grist acronym (section 3) and save"
 
-#: components/etl/EtlMaintenancePanels.tsx:80
+#: components/etl/EtlMaintenancePanels.tsx:76
 msgid "Resynchronise from Grist"
 msgstr "Resynchronise from Grist"
 
 #. placeholder {0}: data.count
 #. placeholder {1}: fmtDate(data.updatedAt)
-#: components/etl/EtlMaintenancePanels.tsx:85
+#: components/etl/EtlMaintenancePanels.tsx:81
 msgid "{0} members in effectifs.csv — updated on {1}. The file is also resynchronised at each regeneration."
 msgstr "{0} members in effectifs.csv — updated on {1}. The file is also resynchronised at each regeneration."
 
-#: components/etl/EtlMaintenancePanels.tsx:86
+#: components/etl/EtlMaintenancePanels.tsx:82
 msgid "No cached staff list for this structure."
 msgstr "No cached staff list for this structure."
 
@@ -8118,111 +8104,18 @@ msgstr "No cached staff list for this structure."
 #. placeholder {1}: stats.valides_retenus ?? 0
 #. placeholder {2}: stats.non_valides_ignores ?? 0
 #. placeholder {3}: stats.departs_ignores ?? 0
-#: components/etl/EtlMaintenancePanels.tsx:90
+#: components/etl/EtlMaintenancePanels.tsx:86
 msgid "Out of {0} row(s) LABO = {gristLabo} in the directory: {1} validated kept, {2} unvalidated ignored, {3} departing ignored."
 msgstr "Out of {0} row(s) LABO = {gristLabo} in the directory: {1} validated kept, {2} unvalidated ignored, {3} departing ignored."
 
-#: components/etl/EtlMaintenancePanels.tsx:115
+#: components/etl/EtlMaintenancePanels.tsx:111
 msgid "Collapse the preview"
 msgstr "Collapse the preview"
 
 #. placeholder {0}: data?.rows.length ?? 0
-#: components/etl/EtlMaintenancePanels.tsx:115
+#: components/etl/EtlMaintenancePanels.tsx:111
 msgid "Show all {0} rows"
 msgstr "Show all {0} rows"
-
-#: components/etl/EtlMaintenancePanels.tsx:151
-msgid "Suspicious"
-msgstr "Suspicious"
-
-#: components/etl/EtlMaintenancePanels.tsx:152
-#: lib/tasks.ts:89
-msgid "In progress"
-msgstr "In progress"
-
-#: components/etl/EtlMaintenancePanels.tsx:153
-#: components/reports/ReportEditor.tsx:323
-#: components/researchers/TasksPage.tsx:386
-msgid "History"
-msgstr "History"
-
-#: components/etl/EtlMaintenancePanels.tsx:164
-msgid "Corrections could not be read"
-msgstr "Corrections could not be read"
-
-#: components/etl/EtlMaintenancePanels.tsx:185
-msgid "No suspicious affiliation detected."
-msgstr "No suspicious affiliation detected."
-
-#. placeholder {0}: r.suspects
-#. placeholder {1}: r.added
-#. placeholder {2}: r.alreadyPresent
-#: components/etl/EtlMaintenancePanels.tsx:186
-msgid "{0} suspect(s) detected — {1} new added to Grist, {2} already present."
-msgstr "{0} suspect(s) detected — {1} new added to Grist, {2} already present."
-
-#: components/etl/EtlMaintenancePanels.tsx:189
-msgid "Detection error"
-msgstr "Detection error"
-
-#: components/etl/EtlMaintenancePanels.tsx:236
-msgid "OpenAlex affiliation checks"
-msgstr "OpenAlex affiliation checks"
-
-#: components/etl/EtlMaintenancePanels.tsx:238
-msgid "Regenerate the data first"
-msgstr "Regenerate the data first"
-
-#: components/etl/EtlMaintenancePanels.tsx:238
-msgid "Fill in the affiliation keywords (section 3) and save"
-msgstr "Fill in the affiliation keywords (section 3) and save"
-
-#: components/etl/EtlMaintenancePanels.tsx:238
-msgid "Compares the authors' raw affiliation with the keywords and pushes suspects to Grist"
-msgstr "Compares the authors' raw affiliation with the keywords and pushes suspects to Grist"
-
-#: components/etl/EtlMaintenancePanels.tsx:240
-msgid "Detect suspicious affiliations"
-msgstr "Detect suspicious affiliations"
-
-#. placeholder {0}: items.length
-#: components/etl/EtlMaintenancePanels.tsx:254
-msgid "{0} entry(ies) in Grist for this structure"
-msgstr "{0} entry(ies) in Grist for this structure"
-
-#: components/etl/EtlMaintenancePanels.tsx:258
-msgid "No entry in this category."
-msgstr "No entry in this category."
-
-#: components/etl/EtlMaintenancePanels.tsx:265
-#: components/researchers/OpenAlexAffiliationsPage.tsx:108
-msgid "Publication"
-msgstr "Publication"
-
-#: components/etl/EtlMaintenancePanels.tsx:266
-#: components/researchers/OpenAlexAffiliationsPage.tsx:110
-msgid "Raw affiliation"
-msgstr "Raw affiliation"
-
-#: components/etl/EtlMaintenancePanels.tsx:267
-msgid "Reason"
-msgstr "Reason"
-
-#: components/etl/EtlMaintenancePanels.tsx:269
-msgid "Submitted on"
-msgstr "Submitted on"
-
-#: components/etl/EtlMaintenancePanels.tsx:270
-msgid "Resolved on"
-msgstr "Resolved on"
-
-#: components/etl/EtlMaintenancePanels.tsx:271
-msgid "Notes"
-msgstr "Notes"
-
-#: components/etl/EtlMaintenancePanels.tsx:307
-msgid "Save to Grist"
-msgstr "Save to Grist"
 
 #: components/groups/AuthorResolveModal.tsx:36
 #: lib/alignTextsI18n.ts:12
@@ -8637,6 +8530,11 @@ msgstr "Share"
 #: components/reports/ReportEditor.tsx:322
 msgid "PDFs generated from this report"
 msgstr "PDFs generated from this report"
+
+#: components/reports/ReportEditor.tsx:323
+#: components/researchers/TasksPage.tsx:386
+msgid "History"
+msgstr "History"
 
 #: components/reports/ReportEditor.tsx:326
 msgid "Make your own copy"
@@ -9418,7 +9316,6 @@ msgstr "All records of the scope (full rerun)"
 #: components/researchers/AlignLaunchModal.tsx:129
 #: components/researchers/DuplicatesPage.tsx:146
 #: components/researchers/ListHeader.tsx:129
-#: components/researchers/OpenAlexAffiliationsPage.tsx:93
 #: components/researchers/TodoPage.tsx:61
 msgid "To process"
 msgstr "To process"
@@ -9546,7 +9443,7 @@ msgid "Recomputes the groups from the Directory (no LDAP run)"
 msgstr "Recomputes the groups from the Directory (no LDAP run)"
 
 #: components/researchers/DuplicatesPage.tsx:126
-#: components/researchers/TodoPage.tsx:77
+#: components/researchers/TodoPage.tsx:75
 msgid "Duplicates"
 msgstr "Duplicates"
 
@@ -9986,13 +9883,12 @@ msgid "Keep current"
 msgstr "Keep current"
 
 #: components/researchers/ImportConflictsPage.tsx:165
-#: components/researchers/OpenAlexAffiliationsPage.tsx:101
-msgid "Nothing to show with these filters."
-msgstr "Nothing to show with these filters."
-
-#: components/researchers/ImportConflictsPage.tsx:165
 msgid "No conflict left to settle."
 msgstr "No conflict left to settle."
+
+#: components/researchers/ImportConflictsPage.tsx:165
+msgid "Nothing to show with these filters."
+msgstr "Nothing to show with these filters."
 
 #: components/researchers/ImportConflictsPage.tsx:173
 msgid "Open the record"
@@ -10803,48 +10699,6 @@ msgstr "{0} selected"
 msgid "Clear selection"
 msgstr "Clear selection"
 
-#: components/researchers/OpenAlexAffiliationsPage.tsx:66
-msgid "All labs"
-msgstr "All labs"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:70
-msgid "To process only"
-msgstr "To process only"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:72
-msgid "Search (title, author, affiliation…)"
-msgstr "Search (title, author, affiliation…)"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:75
-msgid "Status, submission and notes are edited in the ETL console of the lab"
-msgstr "Status, submission and notes are edited in the ETL console of the lab"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:76
-msgid "Process in the ETL console"
-msgstr "Process in the ETL console"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:79
-#: components/researchers/TasksPage.tsx:131
-msgid "Re-reads the Grist table"
-msgstr "Re-reads the Grist table"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:94
-msgid "Labs concerned"
-msgstr "Labs concerned"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:95
-msgid "Detected in total"
-msgstr "Detected in total"
-
-#: components/researchers/OpenAlexAffiliationsPage.tsx:98
-msgid "Publications whose raw OpenAlex affiliation does not match the lab. Read-only here: to submit a correction to OpenAlex or mark it processed, open the lab in the ETL console."
-msgstr "Publications whose raw OpenAlex affiliation does not match the lab. Read-only here: to submit a correction to OpenAlex or mark it processed, open the lab in the ETL console."
-
-#. placeholder {0}: rows.length
-#: components/researchers/OpenAlexAffiliationsPage.tsx:133
-msgid "First {MAX_ROWS} rows out of {0} — narrow with the lab filter."
-msgstr "First {MAX_ROWS} rows out of {0} — narrow with the lab filter."
-
 #: components/researchers/PresenceBadge.tsx:35
 msgid "No status"
 msgstr "No status"
@@ -11374,6 +11228,10 @@ msgstr "Mine"
 msgid "Search (title, name, lab…)"
 msgstr "Search (title, name, lab…)"
 
+#: components/researchers/TasksPage.tsx:131
+msgid "Re-reads the Grist table"
+msgstr "Re-reads the Grist table"
+
 #: components/researchers/TasksPage.tsx:134
 msgid "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
 msgstr "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
@@ -11559,43 +11417,31 @@ msgstr "Mark as sent (task on hold)"
 msgid "Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands"
 msgstr "Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands"
 
-#: components/researchers/TodoPage.tsx:68
+#: components/researchers/TodoPage.tsx:67
 msgid "Values of an imported directory that differ from Druid — choose which one to keep"
 msgstr "Values of an imported directory that differ from Druid — choose which one to keep"
 
-#: components/researchers/TodoPage.tsx:69
-msgid "Publications with a suspicious OpenAlex affiliation, detected by the ETL console"
-msgstr "Publications with a suspicious OpenAlex affiliation, detected by the ETL console"
-
-#: components/researchers/TodoPage.tsx:76
+#: components/researchers/TodoPage.tsx:74
 msgid "Records sharing the same uid_dyna"
 msgstr "Records sharing the same uid_dyna"
 
-#: components/researchers/TodoPage.tsx:81
+#: components/researchers/TodoPage.tsx:79
 msgid "Tasks to carry out outside Druid"
 msgstr "Tasks to carry out outside Druid"
 
-#: components/researchers/TodoPage.tsx:82
+#: components/researchers/TodoPage.tsx:80
 msgid "Tasks"
 msgstr "Tasks"
 
-#: components/researchers/TodoPage.tsx:84
-msgid "Suspicious OpenAlex affiliations (ETL console), read-only"
-msgstr "Suspicious OpenAlex affiliations (ETL console), read-only"
-
-#: components/researchers/TodoPage.tsx:85
-msgid "OpenAlex affiliations"
-msgstr "OpenAlex affiliations"
-
-#: components/researchers/TodoPage.tsx:88
+#: components/researchers/TodoPage.tsx:83
 msgid "Conflicts left by a directory import"
 msgstr "Conflicts left by a directory import"
 
-#: components/researchers/TodoPage.tsx:89
+#: components/researchers/TodoPage.tsx:84
 msgid "Directory conflicts {conflictSource}"
 msgstr "Directory conflicts {conflictSource}"
 
-#: components/researchers/TodoPage.tsx:89
+#: components/researchers/TodoPage.tsx:84
 msgid "Directory conflicts"
 msgstr "Directory conflicts"
 
@@ -13640,6 +13486,10 @@ msgstr "Internal (Druid)"
 #: lib/tasks.ts:88
 msgid "To do"
 msgstr "To do"
+
+#: lib/tasks.ts:89
+msgid "In progress"
+msgstr "In progress"
 
 #: lib/tasks.ts:90
 msgid "Waiting"

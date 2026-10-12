@@ -18,14 +18,21 @@ données à exécuter au déploiement).
   publications, chaque écriture est signée dans le journal d'audit. Les instances sur Grist (Cloudflare) ne changent pas ;
   les corrections d'axes restent dans le document Grist de la structure (lot 10).
 
+### Corrigé
+- Administration › suivi des retraits envoyés au graphe CRISalid : l'encart ne montrait pas qu'il se déplie (ligne de
+  titre sans triangle) ; chevron et lien « Détail » / « Masquer » ajoutés.
+
+### Retiré
+- **Contrôle des affiliations OpenAlex** (abandonné pour le moment, plan PostgreSQL lot 14 b) : onglet « À traiter ›
+  Affiliations OpenAlex », route `/api/tasks/openalex-affiliations`, bloc « Vérification des affiliations OpenAlex » et
+  mots-clés de contrôle de la console ETL. Aucune correction n'avait été traitée ; la table Grist
+  `Corrections_affiliations_Openalex` reste en archive (554 lignes), les mots-clés restent dans les `config.yaml` de
+  druid-biblio. Centre d'aide : « Une affiliation est fausse » renvoie au signalement chez OpenAlex.
+
 ### Migration
 - `20261014090000_newsletter` (table `newsletter_item`), appliquée par `druid-migrate`, puis import des brèves depuis
   Grist : `docker exec crisalid-druid-1 node scripts/.build/import_newsletter.cjs --out=/app/logs/newsletter_import`
   (à blanc), puis avec `--apply` ; la table Grist `Newsletter` reste en archive.
-
-### Corrigé
-- Administration › suivi des retraits envoyés au graphe CRISalid : l'encart ne montrait pas qu'il se déplie (ligne de
-  titre sans triangle) ; chevron et lien « Détail » / « Masquer » ajoutés.
 
 ## [2.2.0] — 2026-10-12
 

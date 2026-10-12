@@ -7,7 +7,7 @@ import {
   ConsoleMeta, EtlConsoleApi, EtlStatus, GristTeam, SousStructure, StructureConfig,
   StructureConfigPayload, StructureDetail, StructureSummary,
 } from './etlConsoleApi';
-import { CorrectionsPanel, EffectifsPanel } from './EtlMaintenancePanels';
+import { EffectifsPanel } from './EtlMaintenancePanels';
 import { apiErrorText, translateApiError } from '../../lib/apiErrors';
 
 const POLL_MS = 3000;
@@ -33,8 +33,6 @@ interface FormState {
   druid_tabs_hidden: string[];
   filter_to_effectifs: boolean;
   grist_labo_acronyme: string;
-  positifs: string;
-  negatifs: string;
   charte_modele: string;
 }
 
@@ -42,7 +40,7 @@ const EMPTY_FORM: FormState = {
   name: '', acronym: '', openalex_id: '', year_from: 2020, year_to: currentYear, etpr: 0,
   mailto: '', team_label: 'équipe', bso_markers: '', bso_url: '', hal_collection: '',
   hal_year_from: 0, crisalid_structure_uid: '', sous_structures: [], druid_tabs_hidden: [],
-  filter_to_effectifs: false, grist_labo_acronyme: '', positifs: '', negatifs: '', charte_modele: '',
+  filter_to_effectifs: false, grist_labo_acronyme: '', charte_modele: '',
 };
 
 const fromConfig = (c: StructureConfig): FormState => ({
@@ -63,8 +61,6 @@ const fromConfig = (c: StructureConfig): FormState => ({
   druid_tabs_hidden: c.druid_tabs_hidden || [],
   filter_to_effectifs: Boolean(c.filter_to_effectifs),
   grist_labo_acronyme: c.grist?.labo_acronyme || '',
-  positifs: (c.affiliation_controle?.mots_cles_positifs || []).join('\n'),
-  negatifs: (c.affiliation_controle?.mots_cles_negatifs || []).join('\n'),
   charte_modele: c.charte?.modele || '',
 });
 
@@ -86,7 +82,6 @@ const toPayload = (f: FormState): StructureConfigPayload => ({
   druid_tabs_hidden: f.druid_tabs_hidden,
   filter_to_effectifs: f.filter_to_effectifs,
   grist: { labo_acronyme: f.grist_labo_acronyme },
-  affiliation_controle: { mots_cles_positifs: f.positifs, mots_cles_negatifs: f.negatifs },
   charte: { modele: f.charte_modele },
 });
 
@@ -101,9 +96,10 @@ const NewStructureIcon = Plus;
  * @description Native ETL console (admin role), replacing the former
  * Streamlit page in an iframe: configuration of a structure (druid-biblio
  * config.yaml), saving, full regeneration tracked live
- * (polled status), Grist teams and file state; maintenance blocks
- * (Grist staff, suspicious affiliations and corrections) in
- * EtlMaintenancePanels. Lots 2-3 of the plan docs/archive/plan-console-etl-native.md.
+ * (polled status), Grist teams and file state; maintenance block
+ * (Grist staff) in EtlMaintenancePanels. The OpenAlex affiliation check (keywords, detection,
+ * corrections in Grist) was dropped on 2026-10-12 (druid-internal plan-migration-postgresql.md,
+ * lot 14 b); the keywords saved in config.yaml are kept by druid-biblio. Lots 2-3 of the plan docs/archive/plan-console-etl-native.md.
  */
 export const EtlConsolePage: React.FC<{
   /** Structure of the current dashboard: preselected if it exists. */
@@ -429,26 +425,14 @@ export const EtlConsolePage: React.FC<{
           </p>
         </section>
 
-        {/* Grist & affiliations */}
+        {/* Grist directory */}
         <section className={cardCls}>
-          <h4 className="section-label"><Trans>3. Grist and affiliation checks</Trans></h4>
+          <h4 className="section-label"><Trans>3. Grist directory</Trans></h4>
           <label className={labelCls}>
             <Trans>Acronym in the Grist directory (LABO field)</Trans>
             <input className={inputCls} value={form.grist_labo_acronyme}
               onChange={(e) => update('grist_labo_acronyme', e.target.value)} placeholder="LPPL" disabled={busy} />
           </label>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <label className={labelCls}>
-              <Trans>Positive keywords (one per line, at least one expected in the raw affiliation)</Trans>
-              <textarea className={`${inputCls} h-24 resize-y`} value={form.positifs}
-                onChange={(e) => update('positifs', e.target.value)} placeholder={'Nantes\nLPPL'} disabled={busy} />
-            </label>
-            <label className={labelCls}>
-              <Trans>Negative keywords (one per line, presence = wrong affiliation)</Trans>
-              <textarea className={`${inputCls} h-24 resize-y`} value={form.negatifs}
-                onChange={(e) => update('negatifs', e.target.value)} placeholder={'Paris Cité\nUMR 7219'} disabled={busy} />
-            </label>
-          </div>
           <div>
             <h5 className="text-xs font-semibold text-muted dark:text-[#c3beb0] flex items-center gap-1.5 mb-1">
               <Users className="w-3.5 h-3.5" />
@@ -589,7 +573,7 @@ export const EtlConsolePage: React.FC<{
         </div>
       )}
 
-      {/* Maintenance: Grist staff, suspicious affiliations and corrections */}
+      {/* Maintenance: Grist staff */}
       {!isNew && selected && detail && (
         <div className="grid grid-cols-1 gap-4">
           <EffectifsPanel
@@ -597,15 +581,6 @@ export const EtlConsolePage: React.FC<{
             gristLabo={detail.config.grist?.labo_acronyme || ''}
             disabled={busy}
             onSynced={() => void loadDetail(selected)}
-          />
-          <CorrectionsPanel
-            slug={selected}
-            hasParquet={Boolean(files?.parquet.exists)}
-            hasKeywords={Boolean(
-              detail.config.affiliation_controle?.mots_cles_positifs?.length
-              || detail.config.affiliation_controle?.mots_cles_negatifs?.length,
-            )}
-            disabled={busy}
           />
         </div>
       )}
