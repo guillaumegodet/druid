@@ -2523,6 +2523,20 @@ app.get('/api/sovisu-export-status', requireEstablishmentScope, (req, res) => {
   }
 });
 
+// Identifier removals sent to the CRISalid graph (lot 11 e of druid-internal docs/plan-migration-postgresql.md):
+// outbox by status, what the next pass would queue, persons of the graph without a record, known state. Same audience
+// as the SoVisu+ export. `available: false` when the publisher is off or the instance is not on PostgreSQL.
+app.get('/api/graph-actions-status', requireEstablishmentScope, async (req, res) => {
+  const overview = serverStorage?.graphOverview || null;
+  if (!overview) return res.json({ available: false });
+  try {
+    res.json({ available: true, mode: serverStorage.graphMode, ...(await overview()) });
+  } catch (err) {
+    console.error('[graph] status error:', err);
+    res.status(500).json({ error: 'Cannot read the removals sent to the CRISalid graph' });
+  }
+});
+
 // ── Structures hierarchy dataviz (vendored crisalid-directory-bridge tool) ───
 // Runs scripts/structures-viz/visualize_structures.py on the current structures.csv
 // (/cdb-data/structures.csv) and returns the standalone HTML (Cytoscape.js). Shown in

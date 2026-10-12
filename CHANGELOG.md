@@ -12,6 +12,13 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Administration › suivi des retraits envoyés au graphe CRISalid** (publieur en `dry-run` ou `on`) : encart repliable
+  sous l'état de l'export SoVisu+ — retraits envoyés (les 30 derniers, avec l'auteur de la correction), à envoyer, en
+  échec (erreur, tentatives), bloqués (type refusé par l'IKG), valeurs de l'annuaire à corriger, personnes du graphe sans
+  fiche, état connu du graphe (dernier export `people.csv`, dernier instantané) ; un clic sur un uid ouvre la fiche.
+  Route `GET /api/graph-actions-status`. Centre d'aide : étape 8 du tutoriel « Identifiants d'un labo de A à Z ».
+
 ## [2.1.0] — 2026-10-12
 
 ### Ajouté

@@ -92,6 +92,11 @@ produit est à transmettre à l'ABES ou à traiter par la bibliothèque. Voir
    l'étape 1.
 2. Envoyez la liste à CRISalid (**Administration › Synchroniser avec SoVisu+**, si votre
    instance le permet).
+3. Les identifiants que vous avez retirés ou corrigés partent aussi vers le graphe CRISalid,
+   qui retire les publications moissonnées avec eux (chaque nuit, et avant chaque envoi
+   vers SoVisu+). L'encart **Retraits d'identifiants envoyés au graphe CRISalid** de
+   l'Administration en donne le suivi. Les publications moissonnées il y a longtemps ne sont
+   pas toujours retirées : vérifiez la fiche dans SoVisu+.
 
 ## Récapitulatif
 

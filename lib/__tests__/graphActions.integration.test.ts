@@ -6,7 +6,7 @@ import { afterAll, describe, expect, it, vi } from 'vitest';
 import { sql, Transaction } from 'kysely';
 import { createDb, withActor, type DB } from '../db/client';
 import {
-  GraphPlanRefused, actionsToSend, markGraphActionFailed, markGraphActionSent, planAndRecordGraphActions,
+  GraphPlanRefused, actionsToSend, graphActionsOverview, markGraphActionFailed, markGraphActionSent, planAndRecordGraphActions,
   peopleCsvGate, recordPeopleCsvExport, removalsSentBefore, replaceGraphState,
 } from '../graph/pg';
 import { GraphBusError, type GraphBus } from '../graph/bus';
@@ -210,6 +210,36 @@ describe.skipIf(!url)('graph actions (PostgreSQL)', () => {
       const many = fakeBus();
       expect(await prepareGraphForPeopleCsv({ db: trx, openBus: async () => many.bus })).toEqual({ pass: null, refused: 26, toSend: 26, keep: [] });
       expect(many.sent).toEqual([]);
+    });
+  });
+
+  it('overview: outbox by status, removals of the next pass, values to correct, persons of the graph without a record', async () => {
+    await inRollback(async (trx) => {
+      await person(trx, 'zz-ada-l', { idref: '012345678' });
+      await person(trx, 'zz-babbage-c', { orcid: 'N/C' });
+      await state(trx, [
+        ['zz-ada-l', 'idref', '123456789'], ['zz-ada-l', 'scopus', '11111111111'], ['zz-ada-l', 'orcid', '0000-0001-2345-6780'],
+        ['zz-babbage-c', 'orcid', '0000-0003-1111-2220'], ['zz-gone-x', 'idref', '02345678X'],
+      ]);
+      await planAndRecordGraphActions(trx);
+      const [first] = await actionsToSend(trx);
+      await markGraphActionSent(trx, first.id);
+      const [second] = await actionsToSend(trx);
+      await markGraphActionFailed(trx, second.id, 'no queue bound');
+      // Corrected since the pass: queued by the next one.
+      await person(trx, 'zz-dora-e', {});
+      await state(trx, [['zz-dora-e', 'idref', '034567891']]);
+
+      const o = await graphActionsOverview(trx);
+      expect(o.counts).toEqual({ pending: 0, sent: 1, blocked: 1, failed: 1, cancelled: 0 });
+      expect(o.recentSent.map((a) => [a.uid, a.type])).toEqual([[first.uid, first.type]]);
+      expect(o.failed).toMatchObject([{ uid: second.uid, type: second.type, attempts: 1, last_error: 'no queue bound' }]);
+      expect(o.blocked).toMatchObject([{ uid: 'zz-ada-l', type: 'scopus', value: '11111111111' }]);
+      expect(o.toQueue).toEqual([{ uid: 'zz-dora-e', type: 'idref', value: '034567891' }]);
+      expect(o.unreadable).toEqual([{ uid: 'zz-babbage-c', type: 'orcid', value: 'N/C' }]);
+      expect(o.orphans).toEqual(['zz-gone-x']);
+      expect(o.state).toMatchObject({ snapshot: 5, peopleCsv: 0, lastPeopleCsvAt: null }); // 5 + 1 - the sent one
+      expect(o.state.lastSnapshotAt).toBeInstanceOf(Date);
     });
   });
 

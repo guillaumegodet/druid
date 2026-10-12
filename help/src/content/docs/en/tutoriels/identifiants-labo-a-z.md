@@ -88,6 +88,11 @@ or handled by the library. See [Export a file for ABES](/en/guides/identifiants/
 1. Go back to the **Charts** view: compare the identifier coverage with that of step 1.
 2. Send the list to CRISalid (**Administration › Synchronise with SoVisu+**, if your instance
    allows it).
+3. The identifiers you removed or corrected are also sent to the CRISalid graph, which removes
+   the publications harvested with them (every night, and before each export to SoVisu+). The
+   **Identifier removals sent to the CRISalid graph** panel of the Administration shows their
+   follow-up. Publications harvested long ago are not always removed: check the record in
+   SoVisu+.
 
 ## Summary
 
