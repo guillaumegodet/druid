@@ -7,6 +7,7 @@ import { sql, Transaction } from 'kysely';
 import { createDb, withActor, type DB } from '../db/client';
 import {
   GraphPlanRefused, actionsToSend, markGraphActionFailed, markGraphActionSent, planAndRecordGraphActions,
+  removalsSentBefore, replaceGraphState,
 } from '../graph/pg';
 
 const url = process.env.DATABASE_URL_APP;
@@ -98,6 +99,28 @@ describe.skipIf(!url)('graph actions (PostgreSQL)', () => {
       await trx.insertInto('person_identifier').values({ person_id: ada, scheme: 'orcid', value: '0000-0002-1825-0097' }).execute();
       expect(await planAndRecordGraphActions(trx)).toMatchObject({ queued: 0, cancelled: 1 });
       expect((await actions(trx)).map((a) => a.status)).toEqual(['cancelled']);
+    });
+  });
+
+  it('a snapshot replaces the state; a removal it still shows is queued again at the next pass', async () => {
+    await inRollback(async (trx) => {
+      await person(trx, 'zz-ada-l', {});
+      await state(trx, [['zz-ada-l', 'idref', '123456789']]);
+      await planAndRecordGraphActions(trx);
+      const [action] = await actionsToSend(trx);
+      await markGraphActionSent(trx, action.id);
+      await trx.updateTable('graph_action').set({ sent_at: '2026-10-12T08:00:00Z' }).execute();
+      expect(await removalsSentBefore(trx, '2026-10-12T07:59:00Z')).toEqual([]);
+      expect((await removalsSentBefore(trx, '2026-10-12T09:00:00Z')).map((a) => a.id)).toEqual([action.id]);
+
+      // The graph did not apply it: the snapshot brings the value back, with another row.
+      const previous = await replaceGraphState(trx, [
+        { uid: 'zz-ada-l', type: 'idref', value: '123456789' }, { uid: 'zz-ada-l', type: 'orcid', value: '0000-0003-1111-2222' },
+      ]);
+      expect(previous).toEqual([]);
+      expect(await trx.selectFrom('graph_identifier_state').select(['type', 'origin']).orderBy('type').execute())
+        .toEqual([{ type: 'idref', origin: 'snapshot' }, { type: 'orcid', origin: 'snapshot' }]);
+      expect(await planAndRecordGraphActions(trx)).toMatchObject({ queued: 2 });
     });
   });
 });
