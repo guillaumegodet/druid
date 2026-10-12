@@ -9,8 +9,6 @@ const TEXT_COLUMNS = [
 ] as const;
 
 export interface NewsletterImportRow extends Record<(typeof TEXT_COLUMNS)[number], string> {
-  /** Grist row id, kept; undefined when PostgreSQL already uses it for another item (a new id is taken). */
-  id: number | undefined;
   slug: string;
   work_id: string;
   statut: NewsletterStatus;
@@ -39,11 +37,10 @@ const timestamp = (v: unknown): Date | null => {
 
 export const planNewsletterImport = (
   records: { id: number; fields: Record<string, unknown> }[],
-  present: { id: number; slug: string; work_id: string }[],
+  present: { slug: string; work_id: string }[],
 ): NewsletterImportPlan => {
   const plan: NewsletterImportPlan = { rows: [], alreadyPresent: 0, setAside: [], byStructure: {}, byStatus: {} };
   const keys = new Set(present.map((p) => `${p.slug}\u0000${p.work_id}`));
-  const takenIds = new Set(present.map((p) => p.id));
   const seen = new Map<string, number>();
   for (const r of [...records].sort((a, b) => a.id - b.id)) {
     const slug = text(r.fields.slug).trim();
@@ -56,7 +53,7 @@ export const planNewsletterImport = (
     if (!STATUSES.includes(statut)) { plan.setAside.push({ id: r.id, reason: `statut inconnu « ${statut} »` }); continue; }
     seen.set(key, r.id);
     const row = {
-      id: takenIds.has(r.id) ? undefined : r.id, slug, work_id: workId, statut,
+      slug, work_id: workId, statut,
       genere_le: timestamp(r.fields.genere_le), valide_le: timestamp(r.fields.valide_le),
     } as NewsletterImportRow;
     for (const c of TEXT_COLUMNS) row[c] = text(r.fields[c]);

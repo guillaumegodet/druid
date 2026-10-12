@@ -1,8 +1,8 @@
 /**
  * Import of the news items of the newsletter from the instance's Grist document (table `Newsletter`) into PostgreSQL
- * (`newsletter_item`), lot 14 a of druid-internal docs/plan-migration-postgresql.md. Each item keeps its Grist row id
- * (the ids the Newsletter panel holds stay valid), the sequence is moved past them. Idempotent: an item already in the
- * table (same structure and OpenAlex work) is left as it is.
+ * (`newsletter_item`), lot 14 a of druid-internal docs/plan-migration-postgresql.md. The items get new ids: no id of a
+ * news item is kept anywhere (the Newsletter panel reloads its list), and the application role may not move the
+ * sequence. Idempotent: an item already in the table (same structure and OpenAlex work) is left as it is.
  *
  * DRY-RUN by default (plan and report only), `--apply` writes, in one transaction signed `import:newsletter`. Refused
  * unless the instance runs on PostgreSQL. The report (JSON + Markdown) gives counts by structure and status and the
@@ -13,7 +13,6 @@
  */
 import { mkdirSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { sql } from 'kysely';
 import { withActor } from '../lib/db/client';
 import { closeDatabases, databaseFromEnv, gristClientFromEnv, storageKindFromEnv } from '../lib/directory/jobStorage';
 import { planNewsletterImport } from '../lib/publications/newsletterImport';
@@ -28,15 +27,14 @@ async function main() {
   const tables = await grist.tableIds();
   const records = tables.includes('Newsletter') ? await grist.records('Newsletter') : [];
   const db = databaseFromEnv(process.env);
-  const present = await db.selectFrom('newsletter_item').select(['id', 'slug', 'work_id']).execute();
-  const plan = planNewsletterImport(records, present.map((p) => ({ id: Number(p.id), slug: p.slug, work_id: p.work_id })));
+  const present = await db.selectFrom('newsletter_item').select(['slug', 'work_id']).execute();
+  const plan = planNewsletterImport(records, present);
 
   if (APPLY && plan.rows.length) {
     await withActor(db, 'import:newsletter', async (trx) => {
       for (let i = 0; i < plan.rows.length; i += 200) {
-        await trx.insertInto('newsletter_item').values(plan.rows.slice(i, i + 200).map((r) => ({ ...r, id: r.id === undefined ? undefined : String(r.id) }))).execute();
+        await trx.insertInto('newsletter_item').values(plan.rows.slice(i, i + 200)).execute();
       }
-      await sql`SELECT setval(pg_get_serial_sequence('newsletter_item', 'id'), GREATEST((SELECT max(id) FROM newsletter_item), 1))`.execute(trx);
     });
   }
 
