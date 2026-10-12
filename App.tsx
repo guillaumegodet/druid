@@ -179,6 +179,12 @@ function App() {
     if (!r) { setError(t`Researcher not found in the loaded scope`); return; }
     handleResearcherSelect(r);
   };
+  /** Opens a record by uid, back to the Administration (follow-up of the removals sent to the CRISalid graph). */
+  const openResearcherByUid = (uid: string) => {
+    const r = researchers.find((res) => res.uid === uid);
+    if (!r) { setError(t`Researcher not found in the loaded scope`); return; }
+    handleResearcherSelect(r, ViewState.ADMIN);
+  };
   const [todoTab, setTodoTab] = useState<TodoTab>('doublons');
   const [taskForm, setTaskForm] = useState<{ researcher: Researcher | null } | null>(null);
   const openTodo = (tab?: TodoTab) => {
@@ -1000,7 +1006,8 @@ function App() {
             }
           >
             <AdminPage initialTab={adminTab} struct={adminStruct} onOpenDashboard={openDashboardFor}
-              onSyncToSovisu={hasCapability('HAS_SOVISU_EXPORT') ? handleSyncToSovisu : undefined} syncingSovisu={loading} />
+              onSyncToSovisu={hasCapability('HAS_SOVISU_EXPORT') ? handleSyncToSovisu : undefined} syncingSovisu={loading}
+              onOpenResearcherUid={openResearcherByUid} />
           </React.Suspense>
         );
       default:

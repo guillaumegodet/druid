@@ -215,3 +215,60 @@ export const recordPeopleCsvExport = (db: Queryable, uids: string[], identifiers
     }
     return values.length;
   });
+
+/** How many sent removals the overview lists, most recent first. */
+const RECENT_SENT = 30;
+
+export interface GraphActionsOverview {
+  /** Actions of the outbox by status (all time). */
+  counts: Record<'pending' | 'sent' | 'blocked' | 'failed' | 'cancelled', number>;
+  /** Removals the next pass would queue (directory corrected since the last pass). */
+  toQueue: GraphIdentifier[];
+  pending: (GraphIdentifier & { created_at: Date })[];
+  failed: (GraphIdentifier & { attempts: number; last_error: string | null; updated_at: Date })[];
+  blocked: (GraphIdentifier & { created_at: Date })[];
+  recentSent: (GraphIdentifier & { actor: string | null; sent_at: Date | null })[];
+  /** Directory values no removal can be derived from (record to correct). */
+  unreadable: GraphIdentifier[];
+  /** Persons of the graph without a Druid record (merged, renamed or deleted records): to settle by hand. */
+  orphans: string[];
+  /** Known state of the graph: identifiers by origin, and the date of the last snapshot and people.csv export. */
+  state: { snapshot: number; peopleCsv: number; lastSnapshotAt: Date | null; lastPeopleCsvAt: Date | null };
+}
+
+/** Follow-up of the removals sent to the graph (Administration, lot 11 e): outbox, next pass, known state. */
+export const graphActionsOverview = async (
+  db: Queryable, accepted?: Iterable<GraphIdentifierType>,
+): Promise<GraphActionsOverview> => {
+  const actions = db.selectFrom('graph_action').where('action_type', '=', 'REMOVE');
+  const [byStatus, pending, failed, blocked, recentSent, byOrigin, input] = await Promise.all([
+    actions.select(['status', sql<number>`count(*)::int`.as('n')]).groupBy('status').execute(),
+    actions.select(['uid', 'type', 'value', 'created_at']).where('status', '=', 'pending').orderBy('created_at').execute(),
+    actions.select(['uid', 'type', 'value', 'attempts', 'last_error', 'updated_at']).where('status', '=', 'failed')
+      .orderBy('updated_at', 'desc').execute(),
+    actions.select(['uid', 'type', 'value', 'created_at']).where('status', '=', 'blocked').orderBy('uid').orderBy('type').execute(),
+    actions.select(['uid', 'type', 'value', 'actor', 'sent_at']).where('status', '=', 'sent')
+      .orderBy('sent_at', 'desc').limit(RECENT_SENT).execute(),
+    db.selectFrom('graph_identifier_state')
+      .select(['origin', sql<number>`count(*)::int`.as('n'), sql<Date>`max(updated_at)`.as('last')]).groupBy('origin').execute(),
+    loadGraphPlanInput(db),
+  ]);
+  const plan = planGraphActions({ ...input, accepted });
+  const counts = { pending: 0, sent: 0, blocked: 0, failed: 0, cancelled: 0 };
+  for (const s of byStatus) counts[s.status as keyof typeof counts] = s.n;
+  const origin = (o: string) => byOrigin.find((r) => r.origin === o);
+  return {
+    counts,
+    toQueue: plan.removals.filter((r) => r.status === 'pending').map(({ uid, type, value }) => ({ uid, type, value })),
+    pending: pending as GraphActionsOverview['pending'],
+    failed: failed as GraphActionsOverview['failed'],
+    blocked: blocked as GraphActionsOverview['blocked'],
+    recentSent: recentSent as GraphActionsOverview['recentSent'],
+    unreadable: plan.unreadable,
+    orphans: plan.orphans,
+    state: {
+      snapshot: origin('snapshot')?.n ?? 0, peopleCsv: origin('people_csv')?.n ?? 0,
+      lastSnapshotAt: origin('snapshot')?.last ?? null, lastPeopleCsvAt: origin('people_csv')?.last ?? null,
+    },
+  };
+};

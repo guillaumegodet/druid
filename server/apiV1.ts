@@ -24,7 +24,7 @@ import { createPgAlignCommands } from '../lib/directory/pg/alignCommands';
 import { createPgTableClient } from '../lib/directory/pg/tableClient';
 import { createPgWorkPorts } from '../lib/work/pg/workPorts';
 import type { StorageKind } from '../lib/directory/jobStorage';
-import { recordPeopleCsvExport } from '../lib/graph/pg';
+import { graphActionsOverview, recordPeopleCsvExport } from '../lib/graph/pg';
 import { prepareGraphForPeopleCsv, type GraphActionsMode } from '../lib/graph/publisher';
 import { connectGraphBus } from '../lib/graph/bus';
 import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
@@ -191,6 +191,10 @@ export const createServerStorage = (options: ApiV1Options) => {
         }),
         recordPeopleCsvExport: (uids: string[], identifiers: GraphIdentifier[]) => recordPeopleCsvExport(db, uids, identifiers),
       } : null,
+      /** Follow-up of the removals sent to the graph (Administration, lot 11 e), from `dry-run` on. */
+      graphOverview: options.graphActions && options.graphActions !== 'off'
+        ? () => graphActionsOverview(db, options.graphAcceptedTypes) : null,
+      graphMode: options.graphActions || 'off',
     };
   }
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
@@ -201,6 +205,8 @@ export const createServerStorage = (options: ApiV1Options) => {
     align: createGristAlignCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka, caches }),
     workPorts: null,
     graph: null,
+    graphOverview: null,
+    graphMode: 'off' as GraphActionsMode,
   };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;

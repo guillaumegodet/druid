@@ -22,29 +22,30 @@ msgid "Error searching for duplicates"
 msgstr "Error searching for duplicates"
 
 #: App.tsx:179
+#: App.tsx:185
 msgid "Researcher not found in the loaded scope"
 msgstr "Researcher not found in the loaded scope"
 
-#: App.tsx:192
+#: App.tsx:198
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:324
+#: App.tsx:330
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:361
+#: App.tsx:367
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:375
+#: App.tsx:381
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:389
+#: App.tsx:395
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -52,106 +53,106 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:391
+#: App.tsx:397
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 
-#: App.tsx:393
+#: App.tsx:399
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:400
+#: App.tsx:406
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:478
-#: App.tsx:485
+#: App.tsx:484
+#: App.tsx:491
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:486
+#: App.tsx:492
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:486
+#: App.tsx:492
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:488
+#: App.tsx:494
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#: App.tsx:498
+#: App.tsx:504
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:508
+#: App.tsx:514
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:522
+#: App.tsx:528
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:534
+#: App.tsx:540
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "LDAP update applied: {updated} record(s) written to Grist."
 
-#: App.tsx:536
+#: App.tsx:542
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:543
+#: App.tsx:549
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:577
+#: App.tsx:583
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation applied: {0} record(s) written to Grist."
 
-#: App.tsx:579
+#: App.tsx:585
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:592
+#: App.tsx:598
 msgid "This record has no Grist row: validation impossible."
 msgstr "This record has no Grist row: validation impossible."
 
-#: App.tsx:604
+#: App.tsx:610
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:623
+#: App.tsx:629
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:654
+#: App.tsx:660
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:668
+#: App.tsx:674
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "LDAP structures: {updated} updated, {created} created in Grist."
 
-#: App.tsx:670
+#: App.tsx:676
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:692
+#: App.tsx:698
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:701
+#: App.tsx:707
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -159,45 +160,45 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:710
+#: App.tsx:716
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:718
+#: App.tsx:724
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:732
+#: App.tsx:738
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:749
-#: App.tsx:765
+#: App.tsx:755
+#: App.tsx:771
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:798
+#: App.tsx:804
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:938
+#: App.tsx:944
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:942
+#: App.tsx:948
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:948
+#: App.tsx:954
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:968
+#: App.tsx:974
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:986
-#: App.tsx:998
+#: App.tsx:992
+#: App.tsx:1004
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:277
@@ -211,20 +212,20 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1007
+#: App.tsx:1014
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1031
+#: App.tsx:1038
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1035
+#: App.tsx:1042
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1079
+#: App.tsx:1086
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -237,7 +238,7 @@ msgid "Unknown"
 msgstr "Unknown"
 
 #: components/AccountMenu.tsx:100
-#: components/admin/AdminPage.tsx:99
+#: components/admin/AdminPage.tsx:102
 msgid "Administration"
 msgstr "Administration"
 
@@ -1303,53 +1304,158 @@ msgstr "Previous"
 msgid "Next"
 msgstr "Next"
 
-#: components/admin/AdminPage.tsx:75
+#: components/admin/AdminPage.tsx:78
 msgid "ETL console"
 msgstr "ETL console"
 
-#: components/admin/AdminPage.tsx:76
+#: components/admin/AdminPage.tsx:79
 msgid "Access rights"
 msgstr "Access rights"
 
-#: components/admin/AdminPage.tsx:77
+#: components/admin/AdminPage.tsx:80
 msgid "Media sources"
 msgstr "Media sources"
 
-#: components/admin/AdminPage.tsx:89
+#: components/admin/AdminPage.tsx:92
 msgid "Section reserved for administrators."
 msgstr "Section reserved for administrators."
 
-#: components/admin/AdminPage.tsx:111
+#: components/admin/AdminPage.tsx:114
 msgid "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
 msgstr "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
 
-#: components/admin/AdminPage.tsx:114
+#: components/admin/AdminPage.tsx:117
 msgid "Synchronise with SoVisu+"
 msgstr "Synchronise with SoVisu+"
 
-#: components/admin/AdminPage.tsx:121
+#: components/admin/AdminPage.tsx:124
 msgid "Last export to SoVisu+:"
 msgstr "Last export to SoVisu+:"
 
 #. placeholder {0}: exportStatus.structures.count
 #. placeholder {1}: formatStatusDate(exportStatus.structures.updatedAt)
-#: components/admin/AdminPage.tsx:123
+#: components/admin/AdminPage.tsx:126
 msgid "structures.csv — {0} structures, {1}"
 msgstr "structures.csv — {0} structures, {1}"
 
-#: components/admin/AdminPage.tsx:124
+#: components/admin/AdminPage.tsx:127
 msgid "structures.csv — never generated"
 msgstr "structures.csv — never generated"
 
 #. placeholder {0}: exportStatus.people.count
 #. placeholder {1}: formatStatusDate(exportStatus.people.updatedAt)
-#: components/admin/AdminPage.tsx:127
+#: components/admin/AdminPage.tsx:130
 msgid "people.csv — {0} people, {1}"
 msgstr "people.csv — {0} people, {1}"
 
-#: components/admin/AdminPage.tsx:128
+#: components/admin/AdminPage.tsx:131
 msgid "people.csv — never generated"
 msgstr "people.csv — never generated"
+
+#: components/admin/GraphActionsPanel.tsx:78
+msgid "Identifier removals sent to the CRISalid graph"
+msgstr "Identifier removals sent to the CRISalid graph"
+
+#: components/admin/GraphActionsPanel.tsx:81
+msgid "dry run: nothing is sent"
+msgstr "dry run: nothing is sent"
+
+#. placeholder {0}: status.counts.sent
+#: components/admin/GraphActionsPanel.tsx:83
+msgid "{0} sent"
+msgstr "{0} sent"
+
+#: components/admin/GraphActionsPanel.tsx:84
+msgid "{toSend} to send"
+msgstr "{toSend} to send"
+
+#. placeholder {0}: status.counts.blocked
+#: components/admin/GraphActionsPanel.tsx:85
+msgid "{0} blocked"
+msgstr "{0} blocked"
+
+#. placeholder {0}: status.failed.length
+#: components/admin/GraphActionsPanel.tsx:86
+msgid "{0} failed"
+msgstr "{0} failed"
+
+#. placeholder {0}: status.unreadable.length
+#: components/admin/GraphActionsPanel.tsx:88
+msgid "{0} values to correct"
+msgstr "{0} values to correct"
+
+#: components/admin/GraphActionsPanel.tsx:93
+msgid "An identifier removed or changed in the directory is sent to the CRISalid graph as a removal, so that the graph cleans up the publications harvested with it. One pass every night; the SoVisu+ export sends the pending removals first. The graph acknowledges nothing: a new snapshot of the graph checks that they were applied."
+msgstr "An identifier removed or changed in the directory is sent to the CRISalid graph as a removal, so that the graph cleans up the publications harvested with it. One pass every night; the SoVisu+ export sends the pending removals first. The graph acknowledges nothing: a new snapshot of the graph checks that they were applied."
+
+#. placeholder {0}: status.state.peopleCsv
+#. placeholder {1}: formatDate(status.state.lastPeopleCsvAt)
+#. placeholder {2}: status.state.snapshot
+#. placeholder {3}: formatDate(status.state.lastSnapshotAt)
+#: components/admin/GraphActionsPanel.tsx:101
+msgid "Known state of the graph: {0} identifiers from the people.csv export of {1}, {2} from the snapshot of {3}."
+msgstr "Known state of the graph: {0} identifiers from the people.csv export of {1}, {2} from the snapshot of {3}."
+
+#. placeholder {0}: status.failed.length
+#: components/admin/GraphActionsPanel.tsx:107
+msgid "Failed ({0})"
+msgstr "Failed ({0})"
+
+#. placeholder {0}: a.attempts
+#. placeholder {1}: formatDate(a.updated_at)
+#: components/admin/GraphActionsPanel.tsx:110
+msgid "({0} attempts, last on {1})"
+msgstr "({0} attempts, last on {1})"
+
+#: components/admin/GraphActionsPanel.tsx:112
+msgid "Sent again at the next pass."
+msgstr "Sent again at the next pass."
+
+#: components/admin/GraphActionsPanel.tsx:113
+msgid "To send ({toSend})"
+msgstr "To send ({toSend})"
+
+#: components/admin/GraphActionsPanel.tsx:115
+msgid "At the next pass, or at the next SoVisu+ export."
+msgstr "At the next pass, or at the next SoVisu+ export."
+
+#. placeholder {0}: status.blocked.length
+#: components/admin/GraphActionsPanel.tsx:116
+msgid "Blocked ({0})"
+msgstr "Blocked ({0})"
+
+#: components/admin/GraphActionsPanel.tsx:118
+msgid "The graph does not accept the removal of this type of identifier yet: the export to SoVisu+ keeps the value until it does."
+msgstr "The graph does not accept the removal of this type of identifier yet: the export to SoVisu+ keeps the value until it does."
+
+#. placeholder {0}: status.unreadable.length
+#: components/admin/GraphActionsPanel.tsx:119
+msgid "Values to correct in the directory ({0})"
+msgstr "Values to correct in the directory ({0})"
+
+#: components/admin/GraphActionsPanel.tsx:121
+msgid "Not a well-formed identifier (several values in one field, « N/C »…): no removal can be derived from it."
+msgstr "Not a well-formed identifier (several values in one field, « N/C »…): no removal can be derived from it."
+
+#. placeholder {0}: status.recentSent.length
+#. placeholder {1}: status.counts.sent
+#: components/admin/GraphActionsPanel.tsx:122
+msgid "Recently sent ({0} of {1})"
+msgstr "Recently sent ({0} of {1})"
+
+#. placeholder {0}: a.actor
+#: components/admin/GraphActionsPanel.tsx:124
+msgid "correction by {0}"
+msgstr "correction by {0}"
+
+#. placeholder {0}: status.orphans.length
+#: components/admin/GraphActionsPanel.tsx:127
+msgid "Persons of the graph without a record ({0})"
+msgstr "Persons of the graph without a record ({0})"
+
+#: components/admin/GraphActionsPanel.tsx:129
+msgid "Merged, renamed or deleted records: their identifiers stay in the graph, to settle by hand."
+msgstr "Merged, renamed or deleted records: their identifiers stay in the graph, to settle by hand."
 
 #. placeholder {0}: d.year
 #. placeholder {1}: d.total.toLocaleString(numberLocale())
@@ -13034,162 +13140,166 @@ msgid "Cannot send the identifier removals to the CRISalid graph"
 msgstr "Cannot send the identifier removals to the CRISalid graph"
 
 #: lib/apiErrors.ts:135
+msgid "Cannot read the removals sent to the CRISalid graph"
+msgstr "Cannot read the removals sent to the CRISalid graph"
+
+#: lib/apiErrors.ts:136
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:137
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:139
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:140
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:141
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:142
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:143
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:144
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:145
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:146
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:147
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:148
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:149
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:150
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:151
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:152
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:153
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:154
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:155
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:156
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:158
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:159
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:160
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:161
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:162
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:163
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:164
 msgid "No alignment running"
 msgstr "No alignment running"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:165
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:167
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:167
+#: lib/apiErrors.ts:168
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:169
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:170
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:172
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:174
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:175
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:176
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:176
+#: lib/apiErrors.ts:177
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:178
+#: lib/apiErrors.ts:179
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:179
+#: lib/apiErrors.ts:180
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:180
+#: lib/apiErrors.ts:181
 msgid "Load failed"
 msgstr "Load failed"
 

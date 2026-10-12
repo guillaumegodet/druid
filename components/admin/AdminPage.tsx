@@ -9,6 +9,7 @@ import { MediaSourcesAdmin } from '../dashboard/MediaSourcesAdmin';
 import { HelpButton } from '../HelpButton';
 import { ADMIN_TAB_HELP } from '../../lib/helpLinks';
 import { numberLocale } from '../../lib/i18n';
+import { GraphActionsPanel } from './GraphActionsPanel';
 
 export type { AdminTab };
 
@@ -40,7 +41,9 @@ export const AdminPage: React.FC<{
    *  Absent on an instance without the HAS_SOVISU_EXPORT capability. */
   onSyncToSovisu?: () => void;
   syncingSovisu?: boolean;
-}> = ({ initialTab, struct, onOpenDashboard, onSyncToSovisu, syncingSovisu = false }) => {
+  /** Opens a directory record by uid (follow-up of the removals sent to the CRISalid graph). */
+  onOpenResearcherUid?: (uid: string) => void;
+}> = ({ initialTab, struct, onOpenDashboard, onSyncToSovisu, syncingSovisu = false, onOpenResearcherUid }) => {
   const { t } = useLingui();
   const tabs = useMemo(adminTabsFor, []);
   const [tab, setTab] = useState<AdminTab>(initialTab && tabs.includes(initialTab) ? initialTab : tabs[0] ?? 'console');
@@ -128,6 +131,7 @@ export const AdminPage: React.FC<{
             : t`people.csv — never generated`}
         </p>
       )}
+      {onSyncToSovisu && !syncingSovisu && <GraphActionsPanel onOpenResearcher={onOpenResearcherUid} />}
 
       {tab === 'console' && (
         <EtlConsolePage struct={struct ?? null} onOpenDashboard={onOpenDashboard} />
