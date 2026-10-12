@@ -13022,162 +13022,174 @@ msgid "researchers and structures arrays required"
 msgstr "Tableaux researchers et structures requis"
 
 #: lib/apiErrors.ts:132
+msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
+msgstr "Les retraits d'identifiants n'ont pas pu partir vers le graphe CRISalid, réessayez plus tard"
+
+#: lib/apiErrors.ts:133
+msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
+msgstr "Trop de retraits d'identifiants à envoyer d'un coup au graphe CRISalid, un administrateur doit les vérifier"
+
+#: lib/apiErrors.ts:134
+msgid "Cannot send the identifier removals to the CRISalid graph"
+msgstr "Impossible d'envoyer les retraits d'identifiants au graphe CRISalid"
+
+#: lib/apiErrors.ts:135
 msgid "Keycloak admin API unreachable"
 msgstr "API d'administration Keycloak injoignable"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:136
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "API ETL (druid-etl-api) injoignable"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:138
 msgid "Grist path not allowed by the proxy"
 msgstr "Chemin Grist non autorisé par le proxy"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:139
 msgid "Writing to the document root is refused"
 msgstr "Écriture sur la racine du document refusée"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:140
 msgid "Writing to the table definition is refused"
 msgstr "Écriture sur la définition de la table refusée"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:141
 msgid "Method not relayed"
 msgstr "Méthode non relayée"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:142
 msgid "Method not relayed on /tables"
 msgstr "Méthode non relayée sur /tables"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:143
 msgid "Table creation not allowed"
 msgstr "Création de table non autorisée"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:144
 msgid "Table not writable through the proxy"
 msgstr "Table non modifiable via le proxy"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:145
 msgid "Write outside scope"
 msgstr "Écriture hors périmètre"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:146
 msgid "Creation outside scope"
 msgstr "Création hors périmètre"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:147
 msgid "Rows outside scope or unknown"
 msgstr "Ligne(s) hors périmètre ou inconnue(s)"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:148
 msgid "Scope check failed"
 msgstr "Vérification du périmètre impossible"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:149
 msgid "Grist writes require the institution right"
 msgstr "Écriture Grist réservée au droit établissement"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:150
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Écriture Grist réservée aux utilisateurs identifiés (Cloudflare Access)"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:151
 msgid "Read-only instance: writes are disabled"
 msgstr "Instance en lecture seule : les modifications sont désactivées"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:152
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter indisponible sur cette instance"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:153
 msgid "Missing id for PATCH"
 msgstr "id manquant pour PATCH"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:154
 msgid "Invalid Grist identifiers"
 msgstr "Identifiants Grist invalides"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:155
 msgid "Body with a records array expected"
 msgstr "Corps avec un tableau records attendu"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:157
 msgid "An LDAP synchronization is already running"
 msgstr "Une synchronisation LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:158
 msgid "An LDAP structures synchronization is already running"
 msgstr "Une synchronisation LDAP structures est déjà en cours"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:159
 msgid "An LDAP search is already running"
 msgstr "Une recherche LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:160
 msgid "An IdRef alignment is already running"
 msgstr "Un alignement IdRef est déjà en cours"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:161
 msgid "Alignment already running"
 msgstr "Un alignement est déjà en cours"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:162
 msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:163
 msgid "No alignment running"
 msgstr "Aucun alignement en cours"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:164
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:166
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:167
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:168
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:169
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:171
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:173
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:174
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:175
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:176
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:178
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:176
+#: lib/apiErrors.ts:179
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:180
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 

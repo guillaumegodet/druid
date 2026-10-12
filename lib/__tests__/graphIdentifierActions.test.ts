@@ -5,6 +5,7 @@ import {
   comparableValue, planGraphActions, removalMessage, removalRoutingKey,
   type GraphIdentifier, type OpenAction,
 } from '../graph/identifierActions';
+import { acceptedTypesFromEnv, graphActionsModeFromEnv } from '../graph/publisher';
 
 const id = (uid: string, type: GraphIdentifier['type'], value: string): GraphIdentifier => ({ uid, type, value });
 const open = (a: GraphIdentifier, status: OpenAction['status'], actionId = `a-${a.uid}-${a.type}`): OpenAction => ({ ...a, id: actionId, status });
@@ -95,5 +96,19 @@ describe('removalMessage', () => {
     });
     expect(removalMessage({ id: 'u-2', ...id('a', 'orcid', 'x') }, 't').personUid).toBe('druid');
     expect(removalRoutingKey).toBe('task.people.person.remove.interactive');
+  });
+});
+
+describe('publisher settings', () => {
+  it('DRUID_GRAPH_ACTIONS: off by default, refused when unknown', () => {
+    expect(graphActionsModeFromEnv({})).toBe('off');
+    expect(graphActionsModeFromEnv({ DRUID_GRAPH_ACTIONS: ' Dry-Run ' })).toBe('dry-run');
+    expect(() => graphActionsModeFromEnv({ DRUID_GRAPH_ACTIONS: 'yes' })).toThrow(/off, dry-run, on/);
+  });
+
+  it('DRUID_GRAPH_ACCEPTED_TYPES: the IKG list by default, Scopus can be added, unknown types refused', () => {
+    expect(acceptedTypesFromEnv({})).toEqual(['orcid', 'idref', 'idhals', 'idhali']);
+    expect(acceptedTypesFromEnv({ DRUID_GRAPH_ACCEPTED_TYPES: 'orcid, idref,idhals,idhali,Scopus' })).toContain('scopus');
+    expect(() => acceptedTypesFromEnv({ DRUID_GRAPH_ACCEPTED_TYPES: 'orcid,openalex' })).toThrow(/openalex/);
   });
 });

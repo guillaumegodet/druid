@@ -24,6 +24,10 @@ import { createPgAlignCommands } from '../lib/directory/pg/alignCommands';
 import { createPgTableClient } from '../lib/directory/pg/tableClient';
 import { createPgWorkPorts } from '../lib/work/pg/workPorts';
 import type { StorageKind } from '../lib/directory/jobStorage';
+import { recordPeopleCsvExport } from '../lib/graph/pg';
+import { prepareGraphForPeopleCsv, type GraphActionsMode } from '../lib/graph/publisher';
+import { connectGraphBus } from '../lib/graph/bus';
+import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
 interface NodeRequest {
@@ -60,12 +64,20 @@ export interface ApiV1Options {
   storage?: StorageKind;
   /** PostgreSQL of the instance (DRUID_DATABASE_URL, role druid_app), with storage = postgres. */
   databaseUrl?: string;
+  /** Identifier removals sent to the CRISalid graph (DRUID_GRAPH_ACTIONS, lot 11 d): `on` makes the people.csv export
+   * send the removals still to send first. */
+  graphActions?: GraphActionsMode;
+  graphAcceptedTypes?: GraphIdentifierType[];
+  /** CRISalid bus (DRUID_AMQP_URL, DRUID_GRAPH_EXCHANGE). */
+  amqpUrl?: string;
+  graphExchange?: string;
 }
 
 // Storage of the Node jobs (lot 3): taken from this bundle by scripts/lib/storage.cjs.
 export {
   gristClientFromEnv, jobStorageFromEnv, jobContext, tablesFromEnv, storageKindFromEnv, closeDatabases,
 } from '../lib/directory/jobStorage';
+export { acceptedTypesFromEnv, graphActionsModeFromEnv } from '../lib/graph/publisher';
 
 /**
  * Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. A service token reads the
@@ -168,6 +180,17 @@ export const createServerStorage = (options: ApiV1Options) => {
       align: createPgAlignCommands({ db, repository, caches, texts: tokenAlignTexts, hasQualinka }),
       /** Ports of the work routes (tasks, arbitrations, peer lists, reports), writes audited under `actor`. */
       workPorts: (actor: string) => createPgWorkPorts({ db, actor }),
+      /** Removals sent before the people.csv export and state update after it, while the graph publisher is on (lot 11 d). */
+      graph: options.graphActions === 'on' ? {
+        prepareGraphForPeopleCsv: () => prepareGraphForPeopleCsv({
+          db, accepted: options.graphAcceptedTypes,
+          openBus: async () => {
+            if (!options.amqpUrl) throw new Error('DRUID_AMQP_URL is not set');
+            return connectGraphBus(options.amqpUrl, options.graphExchange || 'graph');
+          },
+        }),
+        recordPeopleCsvExport: (uids: string[], identifiers: GraphIdentifier[]) => recordPeopleCsvExport(db, uids, identifiers),
+      } : null,
     };
   }
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
@@ -177,6 +200,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     ldap: options.hasLdap ? createGristLdapCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, ldap: ldapSource }) : undefined,
     align: createGristAlignCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka, caches }),
     workPorts: null,
+    graph: null,
   };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;

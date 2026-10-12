@@ -13022,162 +13022,174 @@ msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
 #: lib/apiErrors.ts:132
+msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
+msgstr "Identifier removals could not be sent to the CRISalid graph, try again later"
+
+#: lib/apiErrors.ts:133
+msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
+msgstr "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
+
+#: lib/apiErrors.ts:134
+msgid "Cannot send the identifier removals to the CRISalid graph"
+msgstr "Cannot send the identifier removals to the CRISalid graph"
+
+#: lib/apiErrors.ts:135
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:136
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:138
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:139
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:140
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:141
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:142
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:143
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:144
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:145
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:146
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:147
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:148
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:149
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:150
 msgid "Grist writes require an authenticated user (Cloudflare Access)"
 msgstr "Grist writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:151
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:152
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:153
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:154
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:155
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:157
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:158
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:159
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:160
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:161
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:162
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:163
 msgid "No alignment running"
 msgstr "No alignment running"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:164
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:166
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:167
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:168
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:169
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:171
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:173
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:174
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:175
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:176
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:178
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:176
+#: lib/apiErrors.ts:179
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:180
 msgid "Load failed"
 msgstr "Load failed"
 
