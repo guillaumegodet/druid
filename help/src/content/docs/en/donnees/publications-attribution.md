@@ -118,7 +118,7 @@ threshold.
   publications of a person who has left no longer appear there, even if they date from their
   time in the structure. For a multi-year report, prefer the *Affiliation* scope.
 - **Wrong affiliations in OpenAlex**: OpenAlex sometimes attributes a publication to the
-  wrong institution. These errors can be spotted and reported from the ETL console (see
+  wrong institution. These errors are reported to OpenAlex (see
   [An affiliation is wrong](/en/guides/corriger/affiliation-fausse/)).
 - **Multi-site laboratories**: a unit with several supervising bodies also counts the
   publications of its members attached to other institutions.

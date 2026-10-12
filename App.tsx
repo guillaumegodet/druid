@@ -247,7 +247,7 @@ function App() {
       setUrlVersion((v) => v + 1);
       // Legacy « Doublons » page URL → « À traiter » section, Doublons tab.
       if (String(newState.page) === 'DUPLICATES') { setCurrentView(ViewState.TASKS); setTodoTab('doublons'); return; }
-      if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'affiliations' || newState.tab === 'conflits')) setTodoTab(newState.tab);
+      if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'conflits')) setTodoTab(newState.tab);
       if (newState.page === ViewState.REPORTS) {
         const n = Number(newState.id);
         setReportId(Number.isInteger(n) && n > 0 ? n : null);
@@ -928,7 +928,6 @@ function App() {
             conflictTables={conflictsState.tables}
             onOpenConflictRecord={openConflictRecord}
             onConflictsResolved={afterConflictResolved}
-            onOpenConsole={hasCapability('HAS_ETL_API') ? (slug) => openAdmin('console', slug) : undefined}
             duplicates={{
               diff: dupDiff,
               loading: dupLoading,

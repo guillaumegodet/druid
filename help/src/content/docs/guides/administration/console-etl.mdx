@@ -33,8 +33,8 @@ La configuration est organisée en quatre sections :
 |---|---|
 | **1. Identité de la structure** | Acronyme, nom complet, années de début et de fin, terme pour les regroupements internes (« équipe »), ETP recherche (active les ratios de production). |
 | **2. Sources de données** | Identifiant(s) d'institution OpenAlex, marqueurs d'affiliation BSO (sigle, nom, RNSR…), URL du dump BSO, collection HAL et année de départ, identifiant de la structure dans le graphe CRISalid, e-mail de contact OpenAlex. |
-| **3. Grist et contrôle des affiliations** | Acronyme de la structure dans l'annuaire (champ LABO), mots-clés d'affiliation positifs et négatifs, modèle de signature de la charte. |
-| **4. Sous-structures et affichage** | Laboratoires d'une institution composite, onglets masqués du tableau de bord, restriction du corpus aux publications des effectifs. |
+| **3. Annuaire Grist** | Acronyme de la structure dans l'annuaire (champ LABO), équipes lues dans Grist. |
+| **4. Sous-structures et affichage** | Laboratoires d'une institution composite, onglets masqués du tableau de bord, restriction du corpus aux publications des effectifs, modèle de signature de la charte. |
 
 - **Enregistrer la configuration** suffit pour les onglets masqués et l'identité : le tableau
   de bord en tient compte sans régénération.
@@ -63,9 +63,6 @@ départs), les quartiles des revues et leur accès sont mis à jour automatiquem
 - **Effectifs (Annuaire Grist)** : combien de membres ont été retenus (validés, non
   validés ignorés, départs ignorés). **Resynchroniser depuis Grist** met à jour la liste sans
   régénérer.
-- **Vérification des affiliations OpenAlex** : détecte les publications à l'affiliation
-  suspecte et suit leur correction (voir
-  [Une affiliation est fausse](/guides/corriger/affiliation-fausse/)).
 
 ## Ce qui se passe ensuite
 

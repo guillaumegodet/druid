@@ -229,26 +229,6 @@ export type TaskPatchInput = Partial<Pick<Task, 'assignee' | 'priorite' | 'canal
 
 export const countOpenTasks = (tasks: Task[]): number => tasks.filter((x) => isOpenStatus(x.statut)).length;
 
-/** Row of the Grist table Corrections_affiliations_Openalex (read-only « Affiliations OpenAlex »
- * tab, lot 6; edited in Administration › ETL console). */
-export interface OpenAlexAffiliationCorrection {
-  id: number;
-  labo_slug: string;
-  work_id: string;
-  doi: string;
-  titre: string;
-  annee: number | string;
-  auteur: string;
-  affiliation_brute: string;
-  url_openalex: string;
-  raison_detection: string;
-  statut: string;
-  date_detection: string;
-  date_soumission: string;
-  date_resolution: string;
-  notes: string;
-}
-
 /** One exported ABES row, as sent to /api/tasks/abes-sent (lib/abesExport.ts abesTaskTypes). */
 export interface AbesSentItem { rowId: number; uid: string; types: string[] }
 
@@ -269,8 +249,6 @@ export const TasksApi = {
     request<{ task: Task }>(`/api/tasks/${id}`, { method: 'PATCH', body: JSON.stringify(patch) }).then((d) => d.task),
   transition: (id: number, statut: TaskStatus, extra: { motif?: string; resolution?: string } = {}) =>
     request<{ task: Task }>(`/api/tasks/${id}/transition`, { method: 'POST', body: JSON.stringify({ statut, ...extra }) }).then((d) => d.task),
-  openalexAffiliations: () =>
-    request<{ corrections: OpenAlexAffiliationCorrection[] }>('/api/tasks/openalex-affiliations').then((d) => d.corrections),
   abesSent: (date: string, items: AbesSentItem[]) =>
     request<{ closed: number }>('/api/tasks/abes-sent', { method: 'POST', body: JSON.stringify({ date, items }) }).then((d) => d.closed),
   addEvent: (id: number, action: 'commentaire' | 'email_prepare', detail: string) =>

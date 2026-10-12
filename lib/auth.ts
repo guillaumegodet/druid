@@ -57,7 +57,7 @@ export interface DruidCapabilities {
    * list, filters, reliability panel, import of a curated list). False for an instance
    * that only enters its internal researchers and has no need to validate (Centrale). */
   HAS_STATUS_VALIDATION: boolean;
-  /** « À traiter › Tâches » and « Affiliations OpenAlex » tabs, « Report a correction » button
+  /** « À traiter › Tâches » tab, « Report a correction » button
    * (docs/plan-chantiers-taches.md): /api/tasks routes of server.cjs — false on Cloudflare. */
   HAS_TASKS: boolean;
   /** Public read-only instance (demo on Cloudflare, docs/plan-instance-demo-cloudflare.md):

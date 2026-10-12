@@ -1,16 +1,16 @@
 import React from 'react';
-import { ClipboardList, Copy, Building2, GitCompareArrows } from 'lucide-react';
+import { ClipboardList, Copy, GitCompareArrows } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useCompactHeader } from '../../hooks/useCompactHeader';
 import { DuplicatesPage } from './DuplicatesPage';
 import { TasksPage } from './TasksPage';
-import { OpenAlexAffiliationsPage } from './OpenAlexAffiliationsPage';
 import { ImportConflictsPage } from './ImportConflictsPage';
 import type { ConflictTable } from '../../lib/importConflicts';
 import { HelpButton } from '../HelpButton';
 import { TODO_TAB_HELP } from '../../lib/helpLinks';
 
-export type TodoTab = 'doublons' | 'taches' | 'affiliations' | 'conflits';
+export type TodoTab = 'doublons' | 'taches' | 'conflits';
+const TODO_TABS: readonly string[] = ['doublons', 'taches', 'conflits'];
 
 type DuplicatesProps = React.ComponentProps<typeof DuplicatesPage>;
 type TasksProps = React.ComponentProps<typeof TasksPage>;
@@ -22,10 +22,8 @@ interface Props {
   tasksOpenCount: number;
   duplicates: Omit<DuplicatesProps, 'embedded'>;
   tasks: TasksProps;
-  /** « Tâches » + « Affiliations OpenAlex » tabs available (capability HAS_TASKS: server routes). */
+  /** « Tâches » tab available (capability HAS_TASKS: server routes). */
   withTasks: boolean;
-  /** Opens the ETL console of a lab (Administration), from the « Affiliations OpenAlex » tab. */
-  onOpenConsole?: (slug: string) => void;
   /** Directory-import arbitration tables (`Arbitrage_*`); the tab shows when there is one. */
   conflictTables: ConflictTable[];
   onOpenConflictRecord: (record: number, uid: string) => void;
@@ -34,15 +32,17 @@ interface Props {
 
 /**
  * « À traiter » section of the Personnel tab (docs/plan-chantiers-taches.md, lot 2): what is
- * left to do, in two tabs — the uid_dyna duplicates (DuplicatesPage, unchanged) and the tasks
- * to carry out outside Druid (TasksPage), plus the read-only OpenAlex affiliations (lot 6).
- * directory-import conflicts (ImportConflictsPage, when an `Arbitrage_*` table exists).
- * URL ?page=TASKS&tab=doublons|taches|affiliations|conflits; the pill of the
+ * left to do: the uid_dyna duplicates (DuplicatesPage, unchanged), the tasks to carry out
+ * outside Druid (TasksPage) and the directory-import conflicts (ImportConflictsPage, when an
+ * `Arbitrage_*` table exists). The read-only « OpenAlex affiliations » tab (lot 6) was dropped on
+ * 2026-10-12 with the Grist corrections table (druid-internal plan-migration-postgresql.md, lot 14 b).
+ * URL ?page=TASKS&tab=doublons|taches|conflits (any other value ⇒ doublons); the pill of the
  * Personnel header carries the sum of both counters. Admin-only (decision of 2026-09-23).
  */
-export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, duplicatesCount, tasksOpenCount, duplicates, tasks, withTasks, onOpenConsole, conflictTables, onOpenConflictRecord, onConflictsResolved }) => {
+export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, duplicatesCount, tasksOpenCount, duplicates, tasks, withTasks, conflictTables, onOpenConflictRecord, onConflictsResolved }) => {
   const withConflicts = withTasks && conflictTables.length > 0;
-  const tab: TodoTab = !withTasks || (requestedTab === 'conflits' && !withConflicts) ? 'doublons' : requestedTab;
+  const tab: TodoTab = !withTasks || !TODO_TABS.includes(requestedTab) || (requestedTab === 'conflits' && !withConflicts)
+    ? 'doublons' : requestedTab;
   // One import source ⇒ named in the tab (« Directory conflicts Centrale »); several ⇒ chosen in the tab.
   const conflictSource = conflictTables.length === 1 ? conflictTables[0].source : '';
   const conflictsOpen = conflictTables.reduce((n, x) => n + x.open, 0);
@@ -64,9 +64,7 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
                   ? <Trans>Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation</Trans>
                   : tab === 'taches'
                     ? <Trans>Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands</Trans>
-                    : tab === 'conflits'
-                      ? <Trans>Values of an imported directory that differ from Druid — choose which one to keep</Trans>
-                      : <Trans>Publications with a suspicious OpenAlex affiliation, detected by the ETL console</Trans>}
+                    : <Trans>Values of an imported directory that differ from Druid — choose which one to keep</Trans>}
               </p>
             </div>
             <HelpButton path={TODO_TAB_HELP[tab]} />
@@ -81,9 +79,6 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
               <button onClick={() => onTabChange('taches')} className={tabCls(tab === 'taches')} title={t`Tasks to carry out outside Druid`}>
                 <ClipboardList className="w-4 h-4" /> <Trans>Tasks</Trans> {counter(tasksOpenCount)}
               </button>
-              <button onClick={() => onTabChange('affiliations')} className={tabCls(tab === 'affiliations')} title={t`Suspicious OpenAlex affiliations (ETL console), read-only`}>
-                <Building2 className="w-4 h-4" /> <Trans>OpenAlex affiliations</Trans>
-              </button>
               {withConflicts && (
                 <button onClick={() => onTabChange('conflits')} className={tabCls(tab === 'conflits')} title={t`Conflicts left by a directory import`}>
                   <GitCompareArrows className="w-4 h-4" /> {conflictSource ? t`Directory conflicts ${conflictSource}` : t`Directory conflicts`} {counter(conflictsOpen)}
@@ -95,8 +90,7 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
       </header>
       {tab === 'doublons' ? <DuplicatesPage embedded {...duplicates} />
         : tab === 'taches' ? <TasksPage {...tasks} />
-          : tab === 'conflits' ? <ImportConflictsPage tables={conflictTables} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />
-            : <OpenAlexAffiliationsPage onOpenConsole={onOpenConsole} />}
+          : <ImportConflictsPage tables={conflictTables} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />}
     </div>
   );
 };
