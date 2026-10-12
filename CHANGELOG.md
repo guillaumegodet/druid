@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.2.0] — 2026-10-12
+
 ### Ajouté
 - **Administration › suivi des retraits envoyés au graphe CRISalid** (publieur en `dry-run` ou `on`) : encart repliable
   sous l'état de l'export SoVisu+ — retraits envoyés (les 30 derniers, avec l'auteur de la correction), à envoyer, en
