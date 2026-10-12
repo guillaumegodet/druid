@@ -79,6 +79,29 @@ export interface Establishment {
   updated_at: Generated<Timestamp>;
 }
 
+export interface GraphAction {
+  action_type: string;
+  actor: string | null;
+  attempts: Generated<number>;
+  created_at: Generated<Timestamp>;
+  id: Generated<string>;
+  last_error: string | null;
+  sent_at: Timestamp | null;
+  status: Generated<string>;
+  type: string;
+  uid: string;
+  updated_at: Generated<Timestamp>;
+  value: string;
+}
+
+export interface GraphIdentifierState {
+  origin: string;
+  type: string;
+  uid: string;
+  updated_at: Generated<Timestamp>;
+  value: string;
+}
+
 export interface IdentifierConflict {
   people: Int8 | null;
   person_ids: string[] | null;
@@ -348,6 +371,8 @@ export interface DB {
   audit_log: AuditLog;
   benchmark_peer_group: BenchmarkPeerGroup;
   establishment: Establishment;
+  graph_action: GraphAction;
+  graph_identifier_state: GraphIdentifierState;
   identifier_conflict: IdentifierConflict;
   import_batch: ImportBatch;
   import_row: ImportRow;

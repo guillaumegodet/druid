@@ -1,0 +1,141 @@
+// PostgreSQL side of the corrections carried to the CRISalid knowledge graph (lot 11 of druid-internal
+// docs/plan-migration-postgresql.md): reads what planGraphActions compares, records its plan in the outbox
+// (graph_action) and keeps graph_identifier_state in step with what is actually sent. The publisher (lot 11 d) runs a
+// pass in one transaction (plan recorded), then publishes the pending actions one by one.
+import { sql, type Kysely, type Transaction } from 'kysely';
+import type { DB } from '../db/schema.gen';
+import {
+  GRAPH_TYPE_OF_SCHEME, comparableValue, planGraphActions,
+  type GraphActionPlan, type GraphIdentifier, type GraphIdentifierType, type OpenAction,
+} from './identifierActions';
+
+type Queryable = Kysely<DB> | Transaction<DB>;
+
+/** Runs `fn` in the caller's transaction, or in a new one. */
+const inTransaction = <T>(db: Queryable, fn: (trx: Transaction<DB>) => Promise<T>): Promise<T> =>
+  db.isTransaction ? fn(db as Transaction<DB>) : db.transaction().execute(fn);
+
+const SCHEMES = Object.keys(GRAPH_TYPE_OF_SCHEME) as (keyof typeof GRAPH_TYPE_OF_SCHEME)[];
+const SCHEME_OF_TYPE = Object.fromEntries(Object.entries(GRAPH_TYPE_OF_SCHEME).map(([s, t]) => [t, s])) as Record<GraphIdentifierType, string>;
+const OPEN_STATUSES = ['pending', 'blocked', 'failed'] as const;
+
+/** Above this many removals to send in one pass, the pass is refused: a wrong read of the directory must not turn
+ * into a mass removal (each one deletes publications in the graph). Lifted on purpose with `force`. */
+export const MAX_REMOVALS_PER_PASS = 25;
+
+export class GraphPlanRefused extends Error {
+  constructor(readonly toSend: number, readonly limit: number) {
+    super(`${toSend} identifier removals to send in one pass (limit ${limit}): refused, check the plan and force it`);
+  }
+}
+
+/** Primary identifiers of the directory, state, open actions: what planGraphActions compares. */
+export const loadGraphPlanInput = async (db: Queryable) => {
+  const [identifiers, persons, state, open] = await Promise.all([
+    db.selectFrom('person_identifier as pi').innerJoin('person as p', 'p.id', 'pi.person_id')
+      .select(['p.uid', 'pi.scheme', 'pi.value'])
+      .where('pi.is_primary', '=', true).where('pi.scheme', 'in', SCHEMES).where('p.uid', 'is not', null).execute(),
+    db.selectFrom('person').select('uid').where('uid', 'is not', null).execute(),
+    db.selectFrom('graph_identifier_state').select(['uid', 'type', 'value']).execute(),
+    db.selectFrom('graph_action').select(['id', 'uid', 'type', 'value', 'status'])
+      .where('action_type', '=', 'REMOVE').where('status', 'in', OPEN_STATUSES).execute(),
+  ]);
+  return {
+    directory: identifiers.map((i): GraphIdentifier => ({
+      uid: i.uid!, type: GRAPH_TYPE_OF_SCHEME[i.scheme as keyof typeof GRAPH_TYPE_OF_SCHEME], value: i.value,
+    })),
+    uids: persons.map((p) => p.uid!),
+    state: state as GraphIdentifier[],
+    open: open as OpenAction[],
+  };
+};
+
+/**
+ * Author of a correction: last actor that deleted or changed this identifier of this person (audit log), null when
+ * the log has none (a job without actor, a change older than the database).
+ */
+const correctionActor = async (trx: Transaction<DB>, id: GraphIdentifier): Promise<string | null> => {
+  const row = await trx.selectFrom('audit_log as a')
+    .innerJoin('person as p', (j) => j.on(sql<boolean>`p.id = (a.before ->> 'person_id')::uuid`))
+    .select('a.actor')
+    .where('a.table_name', '=', 'person_identifier').where('a.action', 'in', ['delete', 'update'])
+    .where('p.uid', '=', id.uid)
+    .where(sql`a.before ->> 'scheme'`, '=', SCHEME_OF_TYPE[id.type])
+    .where(sql`lower(a.before ->> 'value')`, '=', comparableValue(id.value))
+    .where('a.actor', 'is not', null)
+    .orderBy('a.at', 'desc').limit(1)
+    .executeTakeFirst();
+  return row?.actor ?? null;
+};
+
+export interface RecordedPlan {
+  queued: number;
+  blocked: number;
+  unblocked: number;
+  cancelled: number;
+  unreadable: GraphIdentifier[];
+  orphans: string[];
+}
+
+/** Records a plan in the outbox (inside the caller's transaction). Refuses a pass with too many removals to send. */
+export const recordGraphPlan = async (
+  trx: Transaction<DB>, plan: GraphActionPlan, { force = false, limit = MAX_REMOVALS_PER_PASS } = {},
+): Promise<RecordedPlan> => {
+  const toSend = plan.removals.filter((r) => r.status === 'pending').length + plan.unblocked.length;
+  if (toSend > limit && !force) throw new GraphPlanRefused(toSend, limit);
+  for (const r of plan.removals) {
+    await trx.insertInto('graph_action').values({
+      action_type: 'REMOVE', uid: r.uid, type: r.type, value: r.value, status: r.status, actor: await correctionActor(trx, r),
+    }).execute();
+  }
+  if (plan.unblocked.length) {
+    await trx.updateTable('graph_action').set({ status: 'pending' }).where('id', 'in', plan.unblocked).where('status', '=', 'blocked').execute();
+  }
+  if (plan.cancelled.length) {
+    await trx.updateTable('graph_action').set({ status: 'cancelled' }).where('id', 'in', plan.cancelled).where('status', 'in', OPEN_STATUSES).execute();
+  }
+  return {
+    queued: plan.removals.filter((r) => r.status === 'pending').length,
+    blocked: plan.removals.filter((r) => r.status === 'blocked').length,
+    unblocked: plan.unblocked.length,
+    cancelled: plan.cancelled.length,
+    unreadable: plan.unreadable,
+    orphans: plan.orphans,
+  };
+};
+
+/** One reconciliation pass: reads, plans and records in a single transaction (nothing is sent here). */
+export const planAndRecordGraphActions = (
+  db: Queryable, options: { force?: boolean; limit?: number; accepted?: Iterable<GraphIdentifierType> } = {},
+): Promise<RecordedPlan> =>
+  inTransaction(db, async (trx) => {
+    // One pass at a time: two concurrent passes would queue the same removal (the unique index would refuse it).
+    await sql`SELECT pg_advisory_xact_lock(hashtext('druid.graph_actions'))`.execute(trx);
+    const input = await loadGraphPlanInput(trx);
+    return recordGraphPlan(trx, planGraphActions({ ...input, accepted: options.accepted }), options);
+  });
+
+/** Actions to publish, oldest first; `failed` ones are retried after the pending ones. */
+export const actionsToSend = (db: Queryable, limit = MAX_REMOVALS_PER_PASS) =>
+  db.selectFrom('graph_action').select(['id', 'uid', 'type', 'value', 'actor', 'attempts', 'created_at'])
+    .where('status', 'in', ['pending', 'failed'])
+    .orderBy(sql`status = 'failed'`).orderBy('created_at').orderBy('id').limit(limit).execute();
+
+/** The bus accepted the message: the graph no longer holds the identifier as far as Druid knows. */
+export const markGraphActionSent = (db: Queryable, id: string) =>
+  inTransaction(db, async (trx) => {
+    const action = await trx.updateTable('graph_action')
+      .set((eb) => ({ status: 'sent', sent_at: sql`now()`, attempts: eb('attempts', '+', 1), last_error: null }))
+      .where('id', '=', id).where('status', 'in', ['pending', 'failed'])
+      .returning(['uid', 'type', 'value']).executeTakeFirst();
+    if (!action) return false;
+    await trx.deleteFrom('graph_identifier_state').where('uid', '=', action.uid).where('type', '=', action.type)
+      .where(sql`lower(value)`, '=', comparableValue(action.value)).execute();
+    return true;
+  });
+
+/** The bus refused the message (or could not be reached): retried at the next pass. */
+export const markGraphActionFailed = (db: Queryable, id: string, error: string) =>
+  db.updateTable('graph_action')
+    .set((eb) => ({ status: 'failed', attempts: eb('attempts', '+', 1), last_error: error.slice(0, 2000) }))
+    .where('id', '=', id).where('status', 'in', ['pending', 'failed']).execute();
