@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Share2 } from 'lucide-react';
+import { ChevronRight, Share2 } from 'lucide-react';
 import { Trans } from '@lingui/react/macro';
 import { numberLocale } from '../../lib/i18n';
 
@@ -71,10 +71,12 @@ export const GraphActionsPanel: React.FC<{
   );
 
   return (
-    <details className={`rounded-card bg-white/40 dark:bg-white/5 border overflow-hidden ${
+    <details className={`group rounded-card bg-white/40 dark:bg-white/5 border overflow-hidden ${
       alert ? 'border-red-300 dark:border-red-400/40' : 'border-ink/5 dark:border-white/10'}`}>
-      <summary className="px-4 py-2 text-[12px] font-semibold text-muted dark:text-[#8f897c] flex flex-wrap items-center gap-x-3 gap-y-1 cursor-pointer hover:bg-accent/10 transition-colors">
+      {/* A flex summary loses the native disclosure triangle: chevron and « Details » show that it opens. */}
+      <summary className="list-none [&::-webkit-details-marker]:hidden px-4 py-2 text-[12px] font-semibold text-muted dark:text-[#8f897c] flex flex-wrap items-center gap-x-3 gap-y-1 cursor-pointer hover:bg-accent/10 transition-colors">
         <span className="inline-flex items-center gap-1.5 text-ink dark:text-[#f5f2ea]">
+          <ChevronRight className="w-3.5 h-3.5 transition-transform group-open:rotate-90" />
           <Share2 className="w-3.5 h-3.5 text-[#e09e2a]" /> <Trans>Identifier removals sent to the CRISalid graph</Trans>
         </span>
         {status.mode === 'dry-run' && (
@@ -87,6 +89,8 @@ export const GraphActionsPanel: React.FC<{
         {status.unreadable.length > 0 && (
           <span className="text-red-600 dark:text-red-400"><Trans>{status.unreadable.length} values to correct</Trans></span>
         )}
+        <span className="ml-auto underline decoration-dotted underline-offset-2 group-open:hidden"><Trans>Details</Trans></span>
+        <span className="ml-auto underline decoration-dotted underline-offset-2 hidden group-open:inline"><Trans>Hide</Trans></span>
       </summary>
       <div className="px-4 py-3 space-y-3 text-[12px] text-muted-light dark:text-[#8f897c]">
         <p>

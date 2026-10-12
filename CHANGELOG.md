@@ -12,6 +12,10 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- Administration › suivi des retraits envoyés au graphe CRISalid : l'encart ne montrait pas qu'il se déplie (ligne de
+  titre sans triangle) ; chevron et lien « Détail » / « Masquer » ajoutés.
+
 ## [2.2.0] — 2026-10-12
 
 ### Ajouté
