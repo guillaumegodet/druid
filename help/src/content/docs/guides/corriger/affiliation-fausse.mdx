@@ -8,9 +8,9 @@ sidebar:
 import QuiOu from '../../../../components/QuiOu.astro';
 
 <QuiOu
-	profils="Administrateurs Druid (suivi) ; administrateurs techniques (détection, console ETL)"
-	menu="Personnel › À traiter › Affiliations OpenAlex ; Administration › Console ETL"
-	disponibilite="instances reliées à la console ETL, pour la détection automatique"
+	profils="Administrateurs Druid (annuaire) ; tout utilisateur qui repère une erreur (publications)"
+	menu="Fiche chercheur › Appartenances ; Tableau de bord › Liste des publications, Charte de signature"
+	disponibilite="toutes les instances"
 />
 
 Une affiliation peut être fausse à deux endroits : **dans l'annuaire** (le laboratoire
@@ -26,35 +26,20 @@ Le laboratoire ou l'équipe d'une personne est faux sur sa fiche : corrigez la c
 
 ## Dans une publication
 
-### Repérer les affiliations suspectes
+### Repérer une affiliation fausse
 
-Pour chaque structure, Druid peut comparer l'**affiliation brute** écrite par les auteurs
-(telle qu'OpenAlex la reçoit) à une liste de mots-clés attendus et interdits. Les
-publications dont l'affiliation ne correspond pas sont **suspectes**.
+Une publication attribuée à tort à la structure, ou qui lui manque, se repère dans le
+**tableau de bord** : la **liste des publications** donne pour chacune le lien vers sa
+notice OpenAlex, et l'onglet **Charte de signature** montre les signatures qui ne
+mentionnent pas la structure comme prévu.
 
-1. Dans **Administration › Console ETL**, ouvrez la structure (administrateurs techniques).
-2. Renseignez les mots-clés d'affiliation de la structure et enregistrez.
-3. Dans **Vérification des affiliations OpenAlex**, cliquez sur **Détecter les affiliations
-   suspectes**.
+### Signaler l'erreur à OpenAlex
 
-Les suspects sont enregistrés avec le statut **Détectée**. Les administrateurs Druid les
-retrouvent dans **Personnel › À traiter › Affiliations OpenAlex** (lecture seule, avec le
-filtre **À traiter seulement**).
-
-### Traiter une affiliation suspecte
-
-1. Ouvrez la publication (lien vers OpenAlex) et comparez l'affiliation brute à
-   l'institution attribuée.
+1. Ouvrez la publication sur OpenAlex et comparez l'**affiliation brute** (écrite par les
+   auteurs) à l'institution qu'OpenAlex en a déduite.
 2. Si l'erreur est confirmée, signalez-la à OpenAlex, par la procédure de correction décrite
    dans le centre d'aide d'OpenAlex ([help.openalex.org](https://help.openalex.org)), avec le
    lien de la publication et l'affiliation correcte.
-3. Dans la console ETL, passez la ligne au statut **Soumise** et notez la date et vos
-   remarques, puis **Enregistrer dans Grist**.
-4. Quand OpenAlex a corrigé, passez-la à **Traitée**. Si ce n'était pas une erreur, passez-la
-   à **Ignorée**.
-
-Le bouton **Traiter dans la console ETL**, depuis l'onglet Affiliations OpenAlex, ouvre
-directement la bonne structure.
 
 ### Dans HAL
 
@@ -70,10 +55,8 @@ le déposant ou le référent HAL du laboratoire qui modifie le dépôt.
 
 ## Limites connues
 
-- **La détection dépend des mots-clés** : trop larges, ils laissent passer des erreurs ; trop
-  stricts, ils signalent des affiliations correctes mais rédigées autrement.
-- **Druid ne corrige pas OpenAlex** : il aide à repérer et à suivre les erreurs, la
-  correction se fait chez OpenAlex.
+- **Druid ne corrige pas OpenAlex** et ne détecte pas automatiquement les affiliations
+  suspectes : la correction se fait chez OpenAlex.
 - **Une affiliation mal écrite par l'auteur** (sans le nom de la structure) n'est pas une
   erreur d'OpenAlex : la solution est d'appliquer la charte de signature dans les prochaines
   publications, et de déposer les anciennes dans HAL avec la bonne affiliation.
@@ -82,4 +65,3 @@ le déposant ou le référent HAL du laboratoire qui modifie le dépôt.
 
 - [Publications et attribution](/donnees/publications-attribution/)
 - [Une publication manque ou est mal attribuée](/guides/corriger/publication-manquante/)
-- [Piloter la console ETL](/guides/administration/console-etl/)

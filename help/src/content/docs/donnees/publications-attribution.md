@@ -119,8 +119,8 @@ choisi.
   membres. Les publications d'une personne partie n'y figurent plus, même si elles datent
   de sa présence. Pour un bilan sur plusieurs années, préférez le périmètre *Affiliation*.
 - **Affiliations fausses dans OpenAlex** : OpenAlex attribue parfois une publication à la
-  mauvaise institution. Ces erreurs peuvent être repérées et signalées depuis la console
-  ETL (voir [Une affiliation est fausse](/guides/corriger/affiliation-fausse/)).
+  mauvaise institution. Ces erreurs se signalent à OpenAlex (voir
+  [Une affiliation est fausse](/guides/corriger/affiliation-fausse/)).
 - **Laboratoires multi-sites** : une unité à plusieurs tutelles compte aussi les
   publications de ses membres rattachés à d'autres établissements.
 - **Publications sans DOI** : plus difficiles à dédoublonner, elles peuvent apparaître deux

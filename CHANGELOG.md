@@ -12,6 +12,13 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Retiré
+- **Contrôle des affiliations OpenAlex** (abandonné pour le moment, plan PostgreSQL lot 14 b) : onglet « À traiter ›
+  Affiliations OpenAlex », route `/api/tasks/openalex-affiliations`, bloc « Vérification des affiliations OpenAlex » et
+  mots-clés de contrôle de la console ETL. Aucune correction n'avait été traitée ; la table Grist
+  `Corrections_affiliations_Openalex` reste en archive (554 lignes), les mots-clés restent dans les `config.yaml` de
+  druid-biblio. Centre d'aide : « Une affiliation est fausse » renvoie au signalement chez OpenAlex.
+
 ### Corrigé
 - Administration › suivi des retraits envoyés au graphe CRISalid : l'encart ne montrait pas qu'il se déplie (ligne de
   titre sans triangle) ; chevron et lien « Détail » / « Masquer » ajoutés.

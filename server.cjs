@@ -13,7 +13,7 @@ const storage = () => {
 const gristClient = () => storage().grist;
 // Tables of the directory read by the routes below (records of a key, labs, structures): the Grist document, or with
 // DRUID_STORAGE=postgres the migrated tables seen as that document (lot 6 f). The tables that are not migrated
-// (Newsletter, Corrections_affiliations_Openalex, publications) stay read through gristClient().
+// (Newsletter, publications) stay read through gristClient().
 const tables = () => storage().tables;
 const STORAGE_KIND = String(process.env.DRUID_STORAGE || 'grist').trim().toLowerCase();
 if (!GRIST_API_KEY) {
@@ -2155,24 +2155,6 @@ app.get('/api/tasks/detect/progress', requireSuperAdmin, (req, res) => {
 app.post('/api/tasks/abes-sent', requireSuperAdmin, withTasks(async (req, res, tasks) => {
   res.json(await tasks.abesSent(req.body, taskAuthor(req)));
 }));
-
-// « À traiter › Affiliations OpenAlex » tab (lot 6): read-only view of the suspicious OpenAlex
-// affiliations detected by the ETL console (Grist table Corrections_affiliations_Openalex, edited
-// in Administration › ETL console). Missing table ⇒ empty list.
-app.get('/api/tasks/openalex-affiliations', requireSuperAdmin, async (req, res) => {
-  const doc = process.env.VITE_GRIST_DOC_ID;
-  if (!doc) return res.status(500).json({ error: 'VITE_GRIST_DOC_ID not configured' });
-  try {
-    const rows = await gristClient().records('Corrections_affiliations_Openalex').catch((e) => {
-      if (e.status === 404) return [];
-      throw e;
-    });
-    const corrections = rows.map((r) => ({ id: r.id, ...r.fields }));
-    res.json({ corrections });
-  } catch (e) {
-    res.status(502).json({ error: e.message });
-  }
-});
 
 // « À traiter › Conflits annuaire <source> »: arbitration of the conflicts left by a directory import
 // (scripts/lib/import_conflicts.cjs). Admin-only, like the other « À traiter » tabs; every choice is written with the
