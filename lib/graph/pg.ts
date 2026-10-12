@@ -40,7 +40,7 @@ export const loadGraphPlanInput = async (db: Queryable) => {
       .select(['p.uid', 'pi.scheme', 'pi.value'])
       .where('pi.is_primary', '=', true).where('pi.scheme', 'in', SCHEMES).where('p.uid', 'is not', null).execute(),
     db.selectFrom('person').select('uid').where('uid', 'is not', null).execute(),
-    db.selectFrom('graph_identifier_state').select(['uid', 'type', 'value']).execute(),
+    db.selectFrom('graph_identifier_state').select(['uid', 'type', 'value']).orderBy('uid').orderBy('type').execute(),
     db.selectFrom('graph_action').select(['id', 'uid', 'type', 'value', 'status'])
       .where('action_type', '=', 'REMOVE').where('status', 'in', OPEN_STATUSES).execute(),
   ]);
@@ -75,6 +75,9 @@ const correctionActor = async (trx: Transaction<DB>, id: GraphIdentifier): Promi
 export interface RecordedPlan {
   queued: number;
   blocked: number;
+  /** The removals queued (pending) and blocked by the pass: person and type, for the logs. */
+  queuedActions: { uid: string; type: string }[];
+  blockedActions: { uid: string; type: string }[];
   unblocked: number;
   cancelled: number;
   unreadable: GraphIdentifier[];
@@ -101,6 +104,8 @@ export const recordGraphPlan = async (
   return {
     queued: plan.removals.filter((r) => r.status === 'pending').length,
     blocked: plan.removals.filter((r) => r.status === 'blocked').length,
+    queuedActions: plan.removals.filter((r) => r.status === 'pending').map(({ uid, type }) => ({ uid, type })),
+    blockedActions: plan.removals.filter((r) => r.status === 'blocked').map(({ uid, type }) => ({ uid, type })),
     unblocked: plan.unblocked.length,
     cancelled: plan.cancelled.length,
     unreadable: plan.unreadable,
@@ -122,7 +127,8 @@ export const planAndRecordGraphActions = (
 export const actionsToSend = (db: Queryable, limit = MAX_REMOVALS_PER_PASS) =>
   db.selectFrom('graph_action').select(['id', 'uid', 'type', 'value', 'actor', 'attempts', 'created_at'])
     .where('status', 'in', ['pending', 'failed'])
-    .orderBy(sql`status = 'failed'`).orderBy('created_at').orderBy('id').limit(limit).execute();
+    .orderBy(sql`status = 'failed'`).orderBy('created_at').orderBy('id').limit(limit)
+    .execute() as Promise<(GraphIdentifier & { id: string; actor: string | null; attempts: number; created_at: Date })[]>;
 
 /** The bus accepted the message: the graph no longer holds the identifier as far as Druid knows. */
 export const markGraphActionSent = (db: Queryable, id: string) =>
@@ -164,4 +170,48 @@ export const replaceGraphState = (db: Queryable, identifiers: GraphIdentifier[])
         .execute();
     }
     return previous;
+  });
+
+/**
+ * Gate of the people.csv export (server.cjs, /api/sync-sovisuplus) while the publisher is on. people.csv drops an
+ * identifier from the person of the graph without cleaning up the publications harvested with it, so every removal
+ * must have been sent first: `toSend` > 0 refuses the export. `keep`: values whose removal the IKG refuses yet
+ * (blocked); people.csv writes them instead of the directory value, so that the graph keeps them and the removal can
+ * still be sent once the IKG accepts the type.
+ */
+export const peopleCsvGate = async (db: Queryable, accepted?: Iterable<GraphIdentifierType>) => {
+  const input = await loadGraphPlanInput(db);
+  const plan = planGraphActions({ ...input, accepted });
+  const cancelled = new Set(plan.cancelled);
+  const unblocked = new Set(plan.unblocked);
+  const open = input.open.filter((a) => !cancelled.has(a.id));
+  const toSend = open.filter((a) => a.status !== 'blocked' || unblocked.has(a.id)).length
+    + plan.removals.filter((r) => r.status === 'pending').length;
+  const keep = [
+    ...open.filter((a) => a.status === 'blocked' && !unblocked.has(a.id)),
+    ...plan.removals.filter((r) => r.status === 'blocked'),
+  ].map(({ uid, type, value }): GraphIdentifier => ({ uid, type, value }));
+  return { toSend, keep };
+};
+
+/**
+ * After a people.csv export: once cdb has loaded it, the graph holds for each exported person exactly the exported
+ * identifiers (origin `people_csv`). Persons left out of the file keep their state.
+ */
+export const recordPeopleCsvExport = (db: Queryable, uids: string[], identifiers: GraphIdentifier[]) =>
+  inTransaction(db, async (trx) => {
+    await lockGraphActions(trx);
+    for (let i = 0; i < uids.length; i += 1000) {
+      await trx.deleteFrom('graph_identifier_state').where('uid', 'in', uids.slice(i, i + 1000)).execute();
+    }
+    const rows = new Map<string, GraphIdentifier>();
+    for (const id of identifiers) {
+      const k = `${id.uid}\u0000${id.type}`;
+      if (id.value.trim() && !rows.has(k)) rows.set(k, id);
+    }
+    const values = [...rows.values()].map(({ uid, type, value }) => ({ uid, type, value: value.trim(), origin: 'people_csv' }));
+    for (let i = 0; i < values.length; i += 1000) {
+      await trx.insertInto('graph_identifier_state').values(values.slice(i, i + 1000)).execute();
+    }
+    return values.length;
   });

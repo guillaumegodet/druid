@@ -2315,8 +2315,15 @@ const isoDate = (v, edge = 'start') => fuzzyDateBound(v, edge);
  * (lot 2, docs/plan-architecture-multi-instances.md). One row per person: qualified
  * multi-affiliations already arrive grouped (record carried by the PRINCIPAL
  * row); unqualified duplicates are deduplicated on the uid (1st occurrence).
+ * `keep` (graph publisher, lot 11 d of druid-internal docs/plan-migration-postgresql.md): identifiers {uid, type, value}
+ * written instead of the directory value — those whose removal from the graph the IKG refuses yet. Returns also the
+ * exported uids and identifiers (graph types), which become the state of the graph once cdb has loaded the file.
  */
-function buildPeopleCsv(researchers, structures) {
+function buildPeopleCsv(researchers, structures, { keep = [] } = {}) {
+  const kept = new Map(keep.map((k) => [`${k.uid}\u0000${k.type}`, k.value]));
+  const identifier = (uid, type, value) => (kept.has(`${uid}\u0000${type}`) ? kept.get(`${uid}\u0000${type}`) : value || '');
+  const exportedUids = [];
+  const exported = [];
   const structureByAcronym = {};
   for (const s of structures) {
     if (s.acronym) structureByAcronym[s.acronym.toUpperCase().trim()] = s;
@@ -2337,6 +2344,15 @@ function buildPeopleCsv(researchers, structures) {
     // build the Neo4j uid local-<local_id>). The local_id is now the only structure pivot.
     const mainResearchStructure = struct?.localId || '';
     const uai = r.employment?.institutionId || '';
+    const ids = {
+      idhals: identifier(r.uid, 'idhals', r.identifiers?.halId),
+      idhali: identifier(r.uid, 'idhali', r.identifiers?.halIdNum),
+      orcid: identifier(r.uid, 'orcid', r.identifiers?.orcid),
+      idref: identifier(r.uid, 'idref', r.identifiers?.idref),
+      scopus: identifier(r.uid, 'scopus', r.identifiers?.scopusId),
+    };
+    exportedUids.push(r.uid);
+    for (const [type, value] of Object.entries(ids)) if (String(value).trim()) exported.push({ uid: r.uid, type, value: String(value) });
 
     const row = [
       r.firstName || '',
@@ -2345,11 +2361,11 @@ function buildPeopleCsv(researchers, structures) {
       r.uid,
       r.uid,
       r.eppn || '',
-      r.identifiers?.halId || '',
-      r.identifiers?.halIdNum || '',                // idhali = Annuaire column IdHAL_i (HAL alignment)
-      r.identifiers?.orcid || '',
-      r.identifiers?.idref || '',
-      r.identifiers?.scopusId || '',
+      ids.idhals,
+      ids.idhali,                                   // idhali = Annuaire column IdHAL_i (HAL alignment)
+      ids.orcid,
+      ids.idref,
+      ids.scopus,
       // openalex = Annuaire column OpenAlex_ids (OpenAlex alignment, pipe-separated A-ids). Harmless
       // today: cdb / the IKG ignore an unknown identifier type (« Unknown identifier type »)
       // and keep only one value per type — no effect until the consortium issues A1/A2 are
@@ -2370,23 +2386,44 @@ function buildPeopleCsv(researchers, structures) {
     rows.push(row.join(','));
   }
 
-  return { csv: rows.join('\n') + '\n', count: rows.length - 1, skipped, dedup };
+  return { csv: rows.join('\n') + '\n', count: rows.length - 1, skipped, dedup, exportedUids, exported };
 }
 
-app.post('/api/sync-sovisuplus', requireEstablishmentScope, (req, res) => {
+app.post('/api/sync-sovisuplus', requireEstablishmentScope, async (req, res) => {
   const body = req.body;
   if (!body || !Array.isArray(body.researchers) || !Array.isArray(body.structures)) {
     return res.status(400).json({ error: 'researchers and structures arrays required' });
   }
-  const { csv, count, skipped, dedup } = buildPeopleCsv(body.researchers, body.structures);
+  // Graph publisher on (lot 11 d): people.csv drops an identifier from the person of the graph without cleaning up the
+  // publications harvested with it, so every removal must have reached the graph first.
+  const graph = serverStorage?.graph || null;
+  let keep = [];
+  if (graph) {
+    try {
+      const gate = await graph.peopleCsvGate();
+      if (gate.toSend > 0) {
+        return res.status(409).json({ error: `Identifier removals still to send to the CRISalid graph, try again in a few minutes: ${gate.toSend}` });
+      }
+      keep = gate.keep;
+    } catch (err) {
+      console.error('[SoVisu+] graph gate error:', err);
+      return res.status(500).json({ error: 'Cannot check the removals to send to the CRISalid graph' });
+    }
+  }
+  const { csv, count, skipped, dedup, exportedUids, exported } = buildPeopleCsv(body.researchers, body.structures, { keep });
   try {
     fs.writeFileSync(CSV_PATH, csv, 'utf8');
-    console.log(`[SoVisu+] people.csv written: ${count} rows, ${skipped} skipped (no uid), ${dedup} duplicate uid rows dropped`);
-    res.json({ success: true, count, skipped, dedup });
+    console.log(`[SoVisu+] people.csv written: ${count} rows, ${skipped} skipped (no uid), ${dedup} duplicate uid rows dropped`
+      + (keep.length ? `, ${keep.length} identifiers kept for the graph (removal refused by the IKG yet)` : ''));
   } catch (err) {
     console.error('[SoVisu+] Write error:', err);
-    res.status(500).json({ error: `Cannot write ${CSV_PATH}: ${err.message}` });
+    return res.status(500).json({ error: `Cannot write ${CSV_PATH}: ${err.message}` });
   }
+  if (graph) {
+    // The file is written: a failure here only leaves the state behind, the next graph snapshot sets it right.
+    await graph.recordPeopleCsvExport(exportedUids, exported).catch((err) => console.error('[SoVisu+] graph state update error:', err));
+  }
+  res.json({ success: true, count, skipped, dedup });
 });
 
 // ── structures.csv generation (from Grist, for cdb) ────────────────────────
@@ -2534,6 +2571,9 @@ try {
     // Directory and work tables in PostgreSQL (druid-internal docs/plan-migration-postgresql.md, lot 6 f).
     storage: apiV1.storageKindFromEnv(process.env),
     databaseUrl: process.env.DRUID_DATABASE_URL || '',
+    // Identifier removals sent to the CRISalid graph (lot 11 d): `on` gates the people.csv export.
+    graphActions: apiV1.graphActionsModeFromEnv(process.env),
+    graphAcceptedTypes: apiV1.acceptedTypesFromEnv(process.env),
     appRoot: __dirname,
     hasLdap: CAPABILITIES.HAS_LDAP,
     hasQualinka: CAPABILITIES.HAS_QUALINKA,

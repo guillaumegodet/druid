@@ -24,6 +24,9 @@ import { createPgAlignCommands } from '../lib/directory/pg/alignCommands';
 import { createPgTableClient } from '../lib/directory/pg/tableClient';
 import { createPgWorkPorts } from '../lib/work/pg/workPorts';
 import type { StorageKind } from '../lib/directory/jobStorage';
+import { peopleCsvGate, recordPeopleCsvExport } from '../lib/graph/pg';
+import type { GraphActionsMode } from '../lib/graph/publisher';
+import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
 interface NodeRequest {
@@ -60,12 +63,16 @@ export interface ApiV1Options {
   storage?: StorageKind;
   /** PostgreSQL of the instance (DRUID_DATABASE_URL, role druid_app), with storage = postgres. */
   databaseUrl?: string;
+  /** Identifier removals sent to the CRISalid graph (DRUID_GRAPH_ACTIONS, lot 11 d): `on` gates the people.csv export. */
+  graphActions?: GraphActionsMode;
+  graphAcceptedTypes?: GraphIdentifierType[];
 }
 
 // Storage of the Node jobs (lot 3): taken from this bundle by scripts/lib/storage.cjs.
 export {
   gristClientFromEnv, jobStorageFromEnv, jobContext, tablesFromEnv, storageKindFromEnv, closeDatabases,
 } from '../lib/directory/jobStorage';
+export { acceptedTypesFromEnv, graphActionsModeFromEnv } from '../lib/graph/publisher';
 
 /**
  * Session access (server.cjs parseDruidAccess) → scope; null without an authenticated user. A service token reads the
@@ -168,6 +175,11 @@ export const createServerStorage = (options: ApiV1Options) => {
       align: createPgAlignCommands({ db, repository, caches, texts: tokenAlignTexts, hasQualinka }),
       /** Ports of the work routes (tasks, arbitrations, peer lists, reports), writes audited under `actor`. */
       workPorts: (actor: string) => createPgWorkPorts({ db, actor }),
+      /** Gate and state update of the people.csv export while the graph publisher is on (lot 11 d). */
+      graph: options.graphActions === 'on' ? {
+        peopleCsvGate: () => peopleCsvGate(db, options.graphAcceptedTypes),
+        recordPeopleCsvExport: (uids: string[], identifiers: GraphIdentifier[]) => recordPeopleCsvExport(db, uids, identifiers),
+      } : null,
     };
   }
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
@@ -177,6 +189,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     ldap: options.hasLdap ? createGristLdapCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, ldap: ldapSource }) : undefined,
     align: createGristAlignCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka, caches }),
     workPorts: null,
+    graph: null,
   };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;

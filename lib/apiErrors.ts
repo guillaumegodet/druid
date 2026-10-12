@@ -129,6 +129,8 @@ export const API_ERRORS = [
   msg`Invalid mention identifier`,
   msg`Invalid source identifier`,
   msg`researchers and structures arrays required`,
+  msg`Identifier removals still to send to the CRISalid graph, try again in a few minutes`,
+  msg`Cannot check the removals to send to the CRISalid graph`,
   msg`Keycloak admin API unreachable`,
   msg`ETL API (druid-etl-api) unreachable`,
   // Grist proxy

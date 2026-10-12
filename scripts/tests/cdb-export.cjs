@@ -141,6 +141,23 @@ function STRUCT_INDEX(header) {
   check('structures.csv: no record → 0 data row', { lines: csv.trim().split('\n').length, count }, { lines: 1, count: 0 });
 }
 
+// ── buildPeopleCsv: values kept for the graph (graph publisher, lot 11 d) ───
+{
+  const r = baseResearcher({ uid: 'u9', identifiers: { idref: '012345678', scopusId: '' , orcid: '0000-0003-1111-2222' } });
+  const { csv, exportedUids, exported } = buildPeopleCsv([r, baseResearcher({ uid: 'u8' })], STRUCTURES, {
+    keep: [{ uid: 'u9', type: 'scopus', value: '11111111111' }, { uid: 'u7', type: 'idref', value: 'x' }],
+  });
+  const cells = csv.trim().split('\n')[1].split(',');
+  check('people.csv: a value kept for the graph replaces the directory value', [cells[8], cells[9], cells[10]], ['0000-0003-1111-2222', '012345678', '11111111111']);
+  check('people.csv: exported uids and identifiers (graph types)', { exportedUids, exported }, {
+    exportedUids: ['u9', 'u8'],
+    exported: [
+      { uid: 'u9', type: 'orcid', value: '0000-0003-1111-2222' }, { uid: 'u9', type: 'idref', value: '012345678' },
+      { uid: 'u9', type: 'scopus', value: '11111111111' },
+    ],
+  });
+}
+
 // ── countCsvRecords (export status shown in Administration) ──────────────────
 check('count: header only → 0', countCsvRecords('a,b\n'), 0);
 check('count: 2 rows, no trailing newline', countCsvRecords('a,b\n1,2\n3,4'), 2);

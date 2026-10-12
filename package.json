@@ -23,12 +23,13 @@
     "test:db": "vitest run --no-file-parallelism lib/__tests__/*.integration.test.ts",
     "migrate:grist-to-pg": "npm run -s build:migrate && node scripts/.build/migrate_grist_to_pg.cjs",
     "build:copy": "mkdir -p scripts/.build && esbuild scripts/copy_pg_to_grist.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/copy_pg_to_grist.cjs --log-level=warning",
-    "build:graph": "mkdir -p scripts/.build && esbuild scripts/import_graph_snapshot.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_graph_snapshot.cjs --log-level=warning",
+    "build:graph": "mkdir -p scripts/.build && esbuild scripts/import_graph_snapshot.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_graph_snapshot.cjs --log-level=warning && esbuild scripts/graph_publish.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/graph_publish.cjs --log-level=warning",
     "build:migrate": "mkdir -p scripts/.build && esbuild scripts/migrate_grist_to_pg.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/migrate_grist_to_pg.cjs --log-level=warning"
   },
   "dependencies": {
     "@lingui/core": "^5.9.5",
     "@lingui/react": "^5.9.5",
+    "amqplib": "^2.2.0",
     "dbmate": "^2.36.0",
     "dotenv": "^16.4.5",
     "echarts": "^6.0.0",
