@@ -1,5 +1,5 @@
 /**
- * Directory statistics of the « Headcount » view of the dashboard (Tableau de bord › People ›
+ * Directory statistics of the « Directory » view of the dashboard (Tableau de bord › People ›
  * Headcount) and of the « Key figures » strip of the People page — computed on the Druid
  * records themselves, as of today (docs/plan-tableau-de-bord-familles.md, decisions D3 and D4).
  * Pure functions: labels are translated by the components.

@@ -88,7 +88,7 @@ produit est à transmettre à l'ABES ou à traiter par la bibliothèque. Voir
 
 ## Étape 8 — Mesurer le résultat et envoyer à CRISalid
 
-1. Revenez à la vue **Effectifs** du tableau de bord : comparez la couverture des identifiants à celle de
+1. Revenez à la vue **Annuaire** du tableau de bord : comparez la couverture des identifiants à celle de
    l'étape 1.
 2. Envoyez la liste à CRISalid (**Administration › Synchroniser avec SoVisu+**, si votre
    instance le permet).

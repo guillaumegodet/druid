@@ -491,7 +491,6 @@ msgstr "Affiliation"
 #: components/dashboard/StaffSection.tsx:294
 #: components/dashboard/StaffSection.tsx:309
 #: components/dashboard/StaffTab.tsx:227
-#: components/dashboard/dashboardNav.ts:95
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:288
 #: components/dashboard/report/ReportWizard.tsx:477
@@ -721,6 +720,7 @@ msgid "People"
 msgstr "Personnel"
 
 #: components/ResearcherDetail.tsx:268
+#: components/dashboard/dashboardNav.ts:95
 #: components/researchers/DuplicatesPage.tsx:145
 msgid "Directory"
 msgstr "Annuaire"
@@ -5227,17 +5227,17 @@ msgstr "Annuaire Druid au {0} — {1} fiches avec une appartenance en cours à {
 msgid "Open the list in People"
 msgstr "Ouvrir la liste dans Personnel"
 
-#. placeholder {0}: fmt(presence.home)
-#. placeholder {1}: fmt(presence.external)
-#: components/dashboard/StaffTab.tsx:228
-msgid "{0} institution · {1} other employer"
-msgstr "{0} établissement · {1} autre employeur"
-
 #: components/dashboard/StaffTab.tsx:228
 #: components/researchers/KeyFiguresStrip.tsx:25
 #: lib/researcherLabels.ts:23
 msgid "Present"
 msgstr "Présent"
+
+#. placeholder {0}: fmt(presence.home)
+#. placeholder {1}: fmt(presence.external)
+#: components/dashboard/StaffTab.tsx:228
+msgid "{0} institution · {1} other employer"
+msgstr "{0} établissement · {1} autre employeur"
 
 #: components/dashboard/StaffTab.tsx:229
 #: components/researchers/KeyFiguresStrip.tsx:26
@@ -5278,28 +5278,28 @@ msgid "Present staff by employer kind, then announced and effective departures"
 msgstr "Présents par type d'employeur, puis départs annoncés et effectifs"
 
 #: components/dashboard/StaffTab.tsx:236
-msgid "From the civility of the records"
-msgstr "D'après la civilité des fiches"
-
-#: components/dashboard/StaffTab.tsx:236
 msgid "Gender balance"
 msgstr "Parité femmes / hommes"
 
-#: components/dashboard/StaffTab.tsx:237
-msgid "Records carrying each identifier (share of the headcount)"
-msgstr "Fiches portant chaque identifiant (part de l'effectif)"
+#: components/dashboard/StaffTab.tsx:236
+msgid "From the civility of the records"
+msgstr "D'après la civilité des fiches"
 
 #: components/dashboard/StaffTab.tsx:237
 msgid "Identifier coverage"
 msgstr "Couverture des identifiants"
 
-#: components/dashboard/StaffTab.tsx:239
-msgid "Age in {currentYear}, records with a birth date"
-msgstr "Âge en {currentYear}, fiches avec date de naissance"
+#: components/dashboard/StaffTab.tsx:237
+msgid "Records carrying each identifier (share of the headcount)"
+msgstr "Fiches portant chaque identifiant (part de l'effectif)"
 
 #: components/dashboard/StaffTab.tsx:239
 msgid "Age groups"
 msgstr "Tranches d'âge"
+
+#: components/dashboard/StaffTab.tsx:239
+msgid "Age in {currentYear}, records with a birth date"
+msgstr "Âge en {currentYear}, fiches avec date de naissance"
 
 #: components/dashboard/StaffTab.tsx:241
 msgid "Employers"
@@ -5972,17 +5972,13 @@ msgid "What is published and where: books, journals, the full list and where the
 msgstr "Ce qui est publié et où : ouvrages, revues, liste complète et provenance des notices."
 
 #: components/dashboard/dashboardNav.ts:66
-msgid "Monographs, chapters and edited books by year and type."
-msgstr "Monographies, chapitres et directions d'ouvrage par année et par type."
-
-#: components/dashboard/dashboardNav.ts:66
 #: components/dashboard/report/reportCatalog.ts:60
 msgid "Books"
 msgstr "Ouvrages"
 
-#: components/dashboard/dashboardNav.ts:67
-msgid "Publication journals, Scimago quartiles and access at the institution."
-msgstr "Revues de publication, quartiles Scimago et accès dans l'établissement."
+#: components/dashboard/dashboardNav.ts:66
+msgid "Monographs, chapters and edited books by year and type."
+msgstr "Monographies, chapitres et directions d'ouvrage par année et par type."
 
 #: components/dashboard/dashboardNav.ts:67
 #: components/dashboard/report/reportCatalog.ts:65
@@ -5990,39 +5986,43 @@ msgstr "Revues de publication, quartiles Scimago et accès dans l'établissement
 msgid "Journals"
 msgstr "Revues"
 
+#: components/dashboard/dashboardNav.ts:67
+msgid "Publication journals, Scimago quartiles and access at the institution."
+msgstr "Revues de publication, quartiles Scimago et accès dans l'établissement."
+
 #: components/dashboard/dashboardNav.ts:68
 msgid "Every publication, filterable and exportable as CSV."
 msgstr "Toutes les publications, filtrables et exportables en CSV."
-
-#: components/dashboard/dashboardNav.ts:69
-msgid "Where the publications come from (CRISalid, BSO, OpenAlex, HAL)."
-msgstr "Provenance des publications (CRISalid, BSO, OpenAlex, HAL)."
 
 #: components/dashboard/dashboardNav.ts:69
 #: components/dashboard/report/reportCatalog.ts:116
 msgid "Sources"
 msgstr "Sources"
 
+#: components/dashboard/dashboardNav.ts:69
+msgid "Where the publications come from (CRISalid, BSO, OpenAlex, HAL)."
+msgstr "Provenance des publications (CRISalid, BSO, OpenAlex, HAL)."
+
 #: components/dashboard/dashboardNav.ts:75
 msgid "Citations, field-normalised impact (FWCI) and comparison with other universities."
 msgstr "Citations, impact normalisé par discipline (FWCI) et comparaison avec d'autres universités."
-
-#: components/dashboard/dashboardNav.ts:77
-msgid "FWCI, top 1 % / 10 %, most cited publications, by team and researcher."
-msgstr "FWCI, top 1 % / 10 %, publications les plus citées, par équipe et par chercheur."
 
 #: components/dashboard/dashboardNav.ts:77
 #: components/dashboard/report/reportCatalog.ts:50
 msgid "Impact and citations"
 msgstr "Impact et citations"
 
-#: components/dashboard/dashboardNav.ts:78
-msgid "Position among comparable universities (Leiden ranking, OpenAlex)."
-msgstr "Position parmi les universités comparables (classement de Leiden, OpenAlex)."
+#: components/dashboard/dashboardNav.ts:77
+msgid "FWCI, top 1 % / 10 %, most cited publications, by team and researcher."
+msgstr "FWCI, top 1 % / 10 %, publications les plus citées, par équipe et par chercheur."
 
 #: components/dashboard/dashboardNav.ts:78
 msgid "Benchmark"
 msgstr "Benchmark"
+
+#: components/dashboard/dashboardNav.ts:78
+msgid "Position among comparable universities (Leiden ranking, OpenAlex)."
+msgstr "Position parmi les universités comparables (classement de Leiden, OpenAlex)."
 
 #: components/dashboard/dashboardNav.ts:83
 #: components/dashboard/report/reportCatalog.ts:33
@@ -6042,18 +6042,18 @@ msgid "National and international co-publications, partner countries and institu
 msgstr "Copublications nationales et internationales, pays et établissements partenaires."
 
 #: components/dashboard/dashboardNav.ts:87
-msgid "Co-signature network between researchers and labs."
-msgstr "Réseau de cosignatures entre chercheurs et labos."
-
-#: components/dashboard/dashboardNav.ts:87
 #: components/dashboard/report/reportCatalog.ts:110
 msgid "Network"
 msgstr "Réseau"
 
+#: components/dashboard/dashboardNav.ts:87
+msgid "Co-signature network between researchers and labs."
+msgstr "Réseau de cosignatures entre chercheurs et labos."
+
 #: components/dashboard/dashboardNav.ts:92
 msgctxt "dashboard family"
 msgid "People"
-msgstr "Personnes"
+msgstr "Effectifs"
 
 #: components/dashboard/dashboardNav.ts:93
 msgid "Who makes up the structure and who publishes: headcount, researchers, teams, PhD students."
@@ -6064,23 +6064,23 @@ msgid "Today's directory: presence, employers, grades, gender balance, identifie
 msgstr "L'annuaire du jour : présence, employeurs, grades, parité, couverture des identifiants."
 
 #: components/dashboard/dashboardNav.ts:96
-msgid "Publication rate per research FTE, age pyramid and most prolific authors."
-msgstr "Taux de publication par ETP recherche, pyramide des âges et auteurs les plus prolifiques."
-
-#: components/dashboard/dashboardNav.ts:96
 #: components/dashboard/report/reportCatalog.ts:105
 msgid "Researchers"
 msgstr "Chercheurs"
 
-#: components/dashboard/dashboardNav.ts:97
-msgid "Production by team, members, disciplinary profile."
-msgstr "Production par équipe, membres, profil disciplinaire."
+#: components/dashboard/dashboardNav.ts:96
+msgid "Publication rate per research FTE, age pyramid and most prolific authors."
+msgstr "Taux de publication par ETP recherche, pyramide des âges et auteurs les plus prolifiques."
 
 #: components/dashboard/dashboardNav.ts:97
 #: components/dashboard/report/reportCatalog.ts:92
 #: components/dashboard/report/reportTables.ts:49
 msgid "Teams"
 msgstr "Équipes"
+
+#: components/dashboard/dashboardNav.ts:97
+msgid "Production by team, members, disciplinary profile."
+msgstr "Production par équipe, membres, profil disciplinaire."
 
 #: components/dashboard/dashboardNav.ts:98
 msgid "Publications involving PhD students, by team and by year."
@@ -6095,36 +6095,36 @@ msgid "Strategy and compliance: strategic axes, funding, publication charges, si
 msgstr "Stratégie et conformité : axes stratégiques, financements, frais de publication, charte de signature."
 
 #: components/dashboard/dashboardNav.ts:106
-msgid "Publications matched to the strategic axes of the structure."
-msgstr "Publications rapprochées des axes stratégiques de la structure."
-
-#: components/dashboard/dashboardNav.ts:106
 #: components/dashboard/report/reportCatalog.ts:82
 msgid "Strategic axes"
 msgstr "Axes stratégiques"
+
+#: components/dashboard/dashboardNav.ts:106
+msgid "Publications matched to the strategic axes of the structure."
+msgstr "Publications rapprochées des axes stratégiques de la structure."
 
 #: components/dashboard/dashboardNav.ts:107
 msgid "Funders and projects cited in the publications."
 msgstr "Financeurs et projets cités dans les publications."
 
 #: components/dashboard/dashboardNav.ts:108
-msgid "Article processing charges paid and publisher agreements."
-msgstr "Frais de publication payés et accords avec les éditeurs."
-
-#: components/dashboard/dashboardNav.ts:108
 #: components/dashboard/report/reportCatalog.ts:70
 msgid "APC monitoring"
 msgstr "Suivi des APC"
 
-#: components/dashboard/dashboardNav.ts:109
-msgid "Compliance of the affiliations with the signature charter."
-msgstr "Conformité des affiliations à la charte de signature."
+#: components/dashboard/dashboardNav.ts:108
+msgid "Article processing charges paid and publisher agreements."
+msgstr "Frais de publication payés et accords avec les éditeurs."
 
 #: components/dashboard/dashboardNav.ts:109
 #: components/dashboard/report/reportCatalog.ts:87
 #: components/dashboard/report/templates.ts:367
 msgid "Signature charter"
 msgstr "Charte de signature"
+
+#: components/dashboard/dashboardNav.ts:109
+msgid "Compliance of the affiliations with the signature charter."
+msgstr "Conformité des affiliations à la charte de signature."
 
 #: components/dashboard/dashboardNav.ts:114
 #: components/dashboard/dashboardNav.ts:117

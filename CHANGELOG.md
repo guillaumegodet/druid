@@ -13,12 +13,12 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Modifié
-- **Tableau de bord en sept familles d'analyses** (Vue d'ensemble · Publications · Impact · Collaborations · Personnes ·
+- **Tableau de bord en sept familles d'analyses** (Vue d'ensemble · Publications · Impact · Collaborations · Effectifs ·
   Pilotage · Veille) : les 17 onglets sont regroupés sur deux rangées (familles avec icône, puis vues de la famille
   ouverte) ; la Vue d'ensemble se termine par une grille « Explorer les analyses » (description, chiffre repère, vues
   cliquables). Les liens partagés `?tab=…`, les liens d'aide, le catalogue des rapports et `druid_tabs_hidden`
   gardent les clés d'onglet existantes.
-- **Nouvelle vue Personnes › Effectifs** : les statistiques d'annuaire de l'ancienne vue « Graphiques » de la page
+- **Nouvelle vue Effectifs › Annuaire** : les statistiques d'annuaire de l'ancienne vue « Graphiques » de la page
   Personnel (présence et employeur, parité, couverture des identifiants, employeurs, grades, types d'emploi, labos),
   calculées à ce jour sur les fiches rattachées à la structure du tableau de bord (équipes comprises), en ECharts avec
   export PNG. Bouton « Ouvrir la liste dans Personnel » (filtre Labo).

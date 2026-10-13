@@ -9,7 +9,7 @@ export interface TabVisibilityInput {
   hasAxes: boolean;
   /** Benchmark data exported for the structure. */
   hasBenchmark: boolean;
-  /** Druid directory records matched to the structure (« Headcount » view, decision D3 of
+  /** Druid directory records matched to the structure (« Directory » view, decision D3 of
    *  docs/plan-tableau-de-bord-familles.md). Missing = the caller has no directory at all. */
   hasStaff?: boolean;
 }

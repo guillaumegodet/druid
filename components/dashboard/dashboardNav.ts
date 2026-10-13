@@ -92,7 +92,7 @@ export const DASHBOARD_FAMILIES: DashboardFamilyDef[] = [
     label: msg({ message: 'People', context: 'dashboard family' }),
     description: msg`Who makes up the structure and who publishes: headcount, researchers, teams, PhD students.`,
     tabs: [
-      { key: 'staff', label: msg`Headcount`, hint: msg`Today's directory: presence, employers, grades, gender balance, identifier coverage.` },
+      { key: 'staff', label: msg`Directory`, hint: msg`Today's directory: presence, employers, grades, gender balance, identifier coverage.` },
       { key: 'researchers', label: msg`Researchers`, hint: msg`Publication rate per research FTE, age pyramid and most prolific authors.` },
       { key: 'teams', label: msg`Teams`, hint: msg`Production by team, members, disciplinary profile.` },
       { key: 'phd', label: msg`PhD students`, hint: msg`Publications involving PhD students, by team and by year.` },

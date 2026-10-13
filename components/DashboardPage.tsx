@@ -51,12 +51,12 @@ export type { DashboardTab } from './dashboard/dashboardNav';
 interface DashboardPageProps {
   /** druid-biblio slug to preselect (e.g. from a Structure record); null = default. */
   struct?: string | null;
-  /** Druid researchers (Effectifs): « Membres par équipe » links → researcher record, « Headcount » view. */
+  /** Druid researchers (Effectifs): « Membres par équipe » links → researcher record, « Directory » view. */
   researchers?: Researcher[];
-  /** Druid structures: matches the dashboard slug to a structure for the « Headcount » view. */
+  /** Druid structures: matches the dashboard slug to a structure for the « Directory » view. */
   structures?: Structure[];
   onOpenResearcher?: (r: Researcher) => void;
-  /** « Headcount » view: opens the People page filtered on the structure (acronym, null = no filter). */
+  /** « Directory » view: opens the People page filtered on the structure (acronym, null = no filter). */
   onOpenPeople?: (labAcronym: string | null) => void;
   /** Admins: opens the ETL console (Administration section) on the current structure. */
   onOpenAdmin?: (slug: string) => void;
@@ -211,7 +211,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       ? data.publications.length - scopedData.publications.length
       : 0;
 
-  // ── « Headcount » view: Druid records of the structure (D3 of the plan). A structure whose
+  // ── « Directory » view: Druid records of the structure (D3 of the plan). A structure whose
   // acronym matches the slug (and its teams); the institution-wide corpus takes every record;
   // groups and unmatched slugs have no headcount view.
   const staffStructure = useMemo(() => {

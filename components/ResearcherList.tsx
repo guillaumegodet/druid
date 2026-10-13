@@ -37,7 +37,7 @@ interface ResearcherListProps {
   /** Callback running the IdRef alignment (search = missing, verify = check existing) */
   /** Opens the import workshop for a verified list (manual validation) */
   onImportValidation?: () => void;
-  /** Opens Tableau de bord › People › Headcount on the lab of the filter (null = default structure). */
+  /** Opens Tableau de bord › People › Directory on the lab of the filter (null = default structure). */
   onOpenStaffDashboard?: (labAcronym: string | null) => void;
   onImportSite?: () => void;
   /** Opens the ORCID or HAL alignment page (search = missing, verify = check existing). */
@@ -185,7 +185,7 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
       />
 
       <div className="px-4 md:px-7 py-4 flex-1 overflow-auto" data-page-scroll>
-        {/* Key figures of the selection; the charts live in Tableau de bord › People › Headcount. */}
+        {/* Key figures of the selection; the charts live in Tableau de bord › People › Directory. */}
         <KeyFiguresStrip
           researchers={filters.sortedResearchers}
           onOpenDashboard={onOpenStaffDashboard ? () => onOpenStaffDashboard(filters.filterLabs.length === 1 ? filters.filterLabs[0] : null) : undefined}

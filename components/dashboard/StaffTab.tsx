@@ -104,7 +104,7 @@ const presenceColor = (t: VizTheme, key: PresenceSlice): string =>
   ({ home: t.series[2], external: t.series[1], unknown: t.inkMuted, depart: t.series[4], parti: t.series[3] })[key];
 
 /**
- * « Headcount » view of the People family: the Druid directory as of today, restricted to the
+ * « Directory » view of the People family (« Effectifs › Annuaire » in French): the Druid directory as of today, restricted to the
  * records with an active affiliation to the dashboard structure (lib/staffDirectoryAggregates.ts,
  * docs/plan-tableau-de-bord-familles.md D3). Charts are not shareable: the directory is not part
  * of the druid-biblio export behind the embed page and the reports.
