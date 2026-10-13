@@ -26,6 +26,13 @@ données à exécuter au déploiement).
   HDR, part de femmes, ORCID) qui suit les filtres, avec le bouton « Toutes les analyses d'effectifs » vers la vue
   Effectifs du labo filtré. `?mode=dashboard` n'est plus lu.
 
+### Corrigé
+- **Instances sur PostgreSQL : la liste des personnes n'était plus rafraîchie après une écriture hors de l'écran
+  de la fiche** (arbitrage d'un conflit d'import, tâche, synchronisation). La version des listes mises en cache
+  (dernière ligne du journal d'audit) était triée en texte (« 999 » devant « 5237 ») et ne bougeait plus ; un
+  identifiant pris depuis l'annuaire Centrale restait invisible dans la fiche jusqu'au redémarrage. Tri numérique
+  rétabli, test d'intégration ajouté.
+
 ### Retiré
 - `components/ResearcherDashboard.tsx` (graphiques recharts de la page Personnel), remplacé par la vue Effectifs.
 

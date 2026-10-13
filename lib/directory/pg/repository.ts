@@ -31,11 +31,12 @@ const inScope = (scope: DirectoryScope) => {
 export const createPgDirectoryRepository = ({ db, loadLdapCache }: PgDirectoryRepositoryOptions): DirectoryRepository => {
   const ldap = async (): Promise<LdapCacheSnapshot> => (loadLdapCache ? loadLdapCache() : { data: {}, version: '' });
 
-  /** Last audit row: id = version (cache key), date = `updatedAt` of the lists. */
+  /** Last audit row: id = version (cache key), date = `updatedAt` of the lists. The output column is not named `id`:
+   * `ORDER BY id` would then sort the text alias ('999' > '5237') and the version would stop moving. */
   const version = async (): Promise<{ key: string; updatedAt: string }> => {
-    const r = await sql<{ id: string | null; at: Date | null }>`SELECT id::text AS id, at FROM audit_log ORDER BY id DESC LIMIT 1`.execute(db);
+    const r = await sql<{ key: string | null; at: Date | null }>`SELECT id::text AS key, at FROM audit_log ORDER BY id DESC LIMIT 1`.execute(db);
     const row = r.rows[0];
-    return { key: row?.id ?? '0', updatedAt: row?.at ? new Date(row.at).toISOString() : '' };
+    return { key: row?.key ?? '0', updatedAt: row?.at ? new Date(row.at).toISOString() : '' };
   };
 
   /** Every directory row (one per membership, Grist order = row id), with the employer index. */
