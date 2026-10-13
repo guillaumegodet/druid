@@ -1,5 +1,5 @@
 // Two-level navigation of the « Tableau de bord »: seven families of analyses, each holding the
-// former flat tabs (docs/plan-tableau-de-bord-familles.md, decisions D1 and D2). The leaf keys
+// former flat tabs (docs/archive/plan-tableau-de-bord-familles.md, decisions D1 and D2). The leaf keys
 // are unchanged: they stay in the URL (?tab=), in the help links (lib/helpLinks.ts), in the report
 // catalog (report/reportCatalog.ts) and in the `druid_tabs_hidden` setting of the config.yaml.
 import { msg } from '@lingui/core/macro';

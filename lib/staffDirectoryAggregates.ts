@@ -1,7 +1,7 @@
 /**
  * Directory statistics of the « Directory » view of the dashboard (Tableau de bord › People ›
  * Headcount) and of the « Key figures » strip of the People page — computed on the Druid
- * records themselves, as of today (docs/plan-tableau-de-bord-familles.md, decisions D3 and D4).
+ * records themselves, as of today (docs/archive/plan-tableau-de-bord-familles.md, decisions D3 and D4).
  * Pure functions: labels are translated by the components.
  */
 import { Affiliation, Presence, Researcher, Structure } from '../types';

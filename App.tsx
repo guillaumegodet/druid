@@ -241,7 +241,7 @@ function App() {
 
   /** People › « All the headcount analyses »: Tableau de bord › People › Headcount on the lab of
    *  the filter when it has a dashboard, else the default structure (D4 of
-   *  docs/plan-tableau-de-bord-familles.md). */
+   *  docs/archive/plan-tableau-de-bord-familles.md). */
   const openStaffDashboard = (labAcronym: string | null) => {
     const slug = (labAcronym && dashboardSlugFor(labAcronym))
       || (dashboardSlugs.includes('univ-nantes') ? 'univ-nantes' : dashboardSlugs[0]);

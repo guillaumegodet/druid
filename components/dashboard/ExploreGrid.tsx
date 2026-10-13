@@ -7,7 +7,7 @@ import { FAMILY_ICONS } from './familyIcons';
 /**
  * « Explore the analyses » — one card per family at the foot of the overview, with the views
  * of the family as chips and a headline figure when one is immediate (D5 of
- * docs/plan-tableau-de-bord-familles.md). The discovery path for a first visitor.
+ * docs/archive/plan-tableau-de-bord-familles.md). The discovery path for a first visitor.
  */
 export const ExploreGrid: React.FC<{
   /** Visible families, overview excluded by the caller. */

@@ -11,7 +11,7 @@ const pctText = (n: number | null) => (n == null ? '—' : `${n} %`);
 /**
  * « Key figures » of the People page: five tiles following the filters of the list (the
  * at-a-glance figures of the former « Charts » view), and the way to the full analyses in
- * the dashboard (People › Directory view; docs/plan-tableau-de-bord-familles.md, D4).
+ * the dashboard (People › Directory view; docs/archive/plan-tableau-de-bord-familles.md, D4).
  */
 export const KeyFiguresStrip: React.FC<{
   researchers: Researcher[];
