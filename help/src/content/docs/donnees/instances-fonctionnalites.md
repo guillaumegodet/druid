@@ -43,7 +43,7 @@ Votre **profil** détermine les rubriques que vous voyez et le périmètre des d
 | **Direction ou gestion de labo** | Les laboratoires attribués | Idem, sans dépendre de sa propre fiche. |
 | **Services centraux** | Tout l'établissement | Structures, Outils d'alignement. |
 | **Administrateur Druid** | Tout l'établissement | Groupes, À traiter (doublons et tâches), Signaler une correction, consultation des droits. |
-| **Administrateur technique** | Selon son autre profil | Console ETL, onglets masqués du tableau de bord ; avec un accès à tout l'établissement : menu Synchroniser, création de fiches. |
+| **Administrateur technique** | Selon son autre profil | Console ETL, vues masquées du tableau de bord ; avec un accès à tout l'établissement : menu Synchroniser, création de fiches. |
 | **Chargé·e de communication** | — | Sources médias de la veille. |
 
 Les profils se **cumulent**. Un compte connecté sans droit particulier est traité comme

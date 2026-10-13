@@ -91,7 +91,7 @@ science ouverte*, based on Unpaywall) when the publication is in it, otherwise f
 ## APCs
 
 **APCs** (*Article Processing Charges*) are the fees paid to a publisher to publish in open
-access. The **APC monitoring** tab presents them from three angles:
+access. The **Steering › APC monitoring** view presents them from three angles:
 
 | Sub-tab | Source | What it measures |
 |---|---|---|
@@ -123,6 +123,6 @@ Amounts in foreign currencies are converted into euros at an approximate rate.
 ## How to report an error
 
 Does an indicator look wrong? First check the chosen scope and period, then the list of the
-publications concerned (**Publication list** tab). Then see
+publications concerned (**Publications › Publication list** view). Then see
 [A publication is missing or wrongly attributed](/en/guides/corriger/publication-manquante/)
 or [Support](/en/guides/support/).

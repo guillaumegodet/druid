@@ -104,7 +104,7 @@ harvests the publications over the following days.
 A few days later:
 
 - in SoVisu+, the laboratory's members appear with their publications;
-- in the laboratory's dashboard, the **Sources** tab shows the share of publications found
+- in the laboratory's dashboard, the **Publications › Sources** view shows the share of publications found
   by CRISalid;
 - the **Headcount** scope now recognises the validated members (after the dashboard is
   regenerated).
@@ -117,7 +117,7 @@ A few days later:
 - [ ] Records validated with the laboratory's list as the source
 - [ ] Identifiers completed
 - [ ] List sent to CRISalid
-- [ ] Result checked in SoVisu+ and in the Sources tab
+- [ ] Result checked in SoVisu+ and in the Sources view
 
 ## What next
 
