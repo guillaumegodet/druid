@@ -197,8 +197,8 @@ msgstr "Grist row {gristRowId} not found in the loaded scope"
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:1022
-#: App.tsx:1034
+#: App.tsx:1023
+#: App.tsx:1035
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:277
@@ -212,27 +212,27 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1044
+#: App.tsx:1045
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1068
+#: App.tsx:1069
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1072
+#: App.tsx:1073
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1116
+#: App.tsx:1117
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
 #: components/AccountMenu.tsx:86
 #: components/AccountMenu.tsx:194
 #: components/dashboard/NewsTab.tsx:231
-#: components/dashboard/StaffTab.tsx:151
+#: components/dashboard/StaffTab.tsx:152
 msgid "Unknown"
 msgstr "Unknown"
 
@@ -411,72 +411,72 @@ msgstr "Stop the answer"
 msgid "Send"
 msgstr "Send"
 
-#: components/DashboardPage.tsx:305
+#: components/DashboardPage.tsx:310
 #: components/dashboard/FundersTab.tsx:53
 #: components/dashboard/FundersTab.tsx:202
 #: components/researchers/AffiliationHistorySection.tsx:41
 msgid "publications"
 msgstr "publications"
 
-#: components/DashboardPage.tsx:306
+#: components/DashboardPage.tsx:311
 msgid "citations"
 msgstr "citations"
 
-#: components/DashboardPage.tsx:308
+#: components/DashboardPage.tsx:313
 msgid "international"
 msgstr "international"
 
-#: components/DashboardPage.tsx:310
+#: components/DashboardPage.tsx:315
 msgid "members"
 msgstr "members"
 
-#: components/DashboardPage.tsx:353
+#: components/DashboardPage.tsx:358
 #: components/Sidebar.tsx:161
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Dashboard"
 
 #. placeholder {0}: data.lab
-#: components/DashboardPage.tsx:353
+#: components/DashboardPage.tsx:358
 msgid "Dashboard — {0}"
 msgstr "Dashboard — {0}"
 
-#: components/DashboardPage.tsx:367
+#: components/DashboardPage.tsx:372
 #: components/reports/ReportControls.tsx:44
 msgid "Structure or group"
 msgstr "Structure or group"
 
-#: components/DashboardPage.tsx:369
+#: components/DashboardPage.tsx:374
 #: components/Sidebar.tsx:159
 #: components/reports/ReportControls.tsx:47
 msgid "Structures"
 msgstr "Structures"
 
-#: components/DashboardPage.tsx:377
+#: components/DashboardPage.tsx:382
 #: components/Sidebar.tsx:160
 #: components/reports/ReportControls.tsx:51
 msgid "Groups"
 msgstr "Groups"
 
-#: components/DashboardPage.tsx:388
+#: components/DashboardPage.tsx:393
 msgid "Open the ETL console on this structure"
 msgstr "Open the ETL console on this structure"
 
-#: components/DashboardPage.tsx:389
+#: components/DashboardPage.tsx:394
 msgid "Configure"
 msgstr "Configure"
 
 #. placeholder {0}: excluded.toLocaleString(numberLocale())
-#: components/DashboardPage.tsx:399
+#: components/DashboardPage.tsx:404
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 
-#: components/DashboardPage.tsx:400
+#: components/DashboardPage.tsx:405
 #: components/dashboard/report/ReportWizard.tsx:311
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 
-#: components/DashboardPage.tsx:405
+#: components/DashboardPage.tsx:410
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:287
 #: components/dashboard/report/ReportWizard.tsx:477
@@ -487,10 +487,10 @@ msgstr "Affiliation: all publications signed by the structure. Staff: only those
 msgid "Affiliation"
 msgstr "Affiliation"
 
-#: components/DashboardPage.tsx:406
+#: components/DashboardPage.tsx:411
 #: components/dashboard/StaffSection.tsx:294
 #: components/dashboard/StaffSection.tsx:309
-#: components/dashboard/StaffTab.tsx:227
+#: components/dashboard/StaffTab.tsx:228
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:288
 #: components/dashboard/report/ReportWizard.tsx:477
@@ -501,46 +501,50 @@ msgstr "Affiliation"
 msgid "Headcount"
 msgstr "Headcount"
 
-#: components/DashboardPage.tsx:431
+#: components/DashboardPage.tsx:436
 msgid "Copy the link to this view (structure, tab, period, scope)"
 msgstr "Copy the link to this view (structure, tab, period, scope)"
 
-#: components/DashboardPage.tsx:435
+#: components/DashboardPage.tsx:440
 #: components/dashboard/NewsTab.tsx:836
 #: components/reports/ShareDialog.tsx:188
 msgid "Copied!"
 msgstr "Copied!"
 
-#: components/DashboardPage.tsx:435
+#: components/DashboardPage.tsx:440
 #: components/dashboard/EChartCard.tsx:362
 #: components/reports/ShareDialog.tsx:188
 msgid "Copy link"
 msgstr "Copy link"
 
-#: components/DashboardPage.tsx:442
+#: components/DashboardPage.tsx:447
 msgid "Create a report from this dashboard (editable, then exported as PDF)"
 msgstr "Create a report from this dashboard (editable, then exported as PDF)"
 
-#: components/DashboardPage.tsx:446
+#: components/DashboardPage.tsx:451
 msgid "PDF report"
 msgstr "PDF report"
 
-#: components/DashboardPage.tsx:453
+#: components/DashboardPage.tsx:458
 msgid "Analyses"
 msgstr "Analyses"
 
-#: components/DashboardPage.tsx:497
+#: components/DashboardPage.tsx:502
 msgid "Loading data…"
 msgstr "Loading data…"
 
-#: components/DashboardPage.tsx:506
+#: components/DashboardPage.tsx:511
 msgid "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 msgstr "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 
-#: components/DashboardPage.tsx:510
+#: components/DashboardPage.tsx:515
 #: components/dashboard/EmbedPage.tsx:97
 msgid "Error loading data: {error}"
 msgstr "Error loading data: {error}"
+
+#: components/DashboardPage.tsx:559
+msgid "Loading the directory…"
+msgstr "Loading the directory…"
 
 #: components/GroupList.tsx:84
 #: components/ResearcherList.tsx:142
@@ -3469,7 +3473,7 @@ msgstr "Hearing"
 #: components/dashboard/MediaMentionsPanel.tsx:91
 #: components/dashboard/NewsTab.tsx:116
 #: components/dashboard/NewsTab.tsx:126
-#: components/dashboard/StaffTab.tsx:150
+#: components/dashboard/StaffTab.tsx:151
 #: components/dashboard/fundersAggregates.ts:42
 #: lib/tasks.ts:70
 msgid "Other"
@@ -4744,7 +4748,7 @@ msgstr "Top 20 internal authors, grouped and coloured by {0}"
 #: components/dashboard/ResearchersTab.tsx:161
 #: components/dashboard/StaffSection.tsx:38
 #: components/dashboard/StaffSection.tsx:42
-#: components/dashboard/StaffTab.tsx:123
+#: components/dashboard/StaffTab.tsx:124
 #: components/researchers/FteInput.tsx:29
 msgid "Not provided"
 msgstr "Not provided"
@@ -5170,41 +5174,41 @@ msgstr "Former members without end date (left out): {0}."
 msgid "* includes research FTE estimated from the grade."
 msgstr "* includes research FTE estimated from the grade."
 
-#: components/dashboard/StaffTab.tsx:138
+#: components/dashboard/StaffTab.tsx:139
 msgid "Present — institution"
 msgstr "Present — institution"
 
-#: components/dashboard/StaffTab.tsx:139
+#: components/dashboard/StaffTab.tsx:140
 msgid "Present — other employer"
 msgstr "Present — other employer"
 
-#: components/dashboard/StaffTab.tsx:140
+#: components/dashboard/StaffTab.tsx:141
 msgid "Present — employer not specified"
 msgstr "Present — employer not specified"
 
-#: components/dashboard/StaffTab.tsx:148
-#: components/dashboard/StaffTab.tsx:230
+#: components/dashboard/StaffTab.tsx:149
+#: components/dashboard/StaffTab.tsx:231
 #: components/researchers/KeyFiguresStrip.tsx:27
 msgid "Women"
 msgstr "Women"
 
-#: components/dashboard/StaffTab.tsx:149
+#: components/dashboard/StaffTab.tsx:150
 msgid "Men"
 msgstr "Men"
 
-#: components/dashboard/StaffTab.tsx:190
+#: components/dashboard/StaffTab.tsx:191
 msgid "30 and under"
 msgstr "30 and under"
 
-#: components/dashboard/StaffTab.tsx:190
+#: components/dashboard/StaffTab.tsx:191
 msgid "31–45"
 msgstr "31–45"
 
-#: components/dashboard/StaffTab.tsx:190
+#: components/dashboard/StaffTab.tsx:191
 msgid "46–60"
 msgstr "46–60"
 
-#: components/dashboard/StaffTab.tsx:190
+#: components/dashboard/StaffTab.tsx:191
 msgid "61 and over"
 msgstr "61 and over"
 
@@ -5212,22 +5216,22 @@ msgstr "61 and over"
 #. placeholder {0}: fmt(kpis.leaving)
 #. placeholder {1}: fmt(k.left)
 #. placeholder {1}: fmt(kpis.left)
-#: components/dashboard/StaffTab.tsx:209
+#: components/dashboard/StaffTab.tsx:210
 #: components/researchers/KeyFiguresStrip.tsx:25
 msgid "{0} leaving · {1} left"
 msgstr "{0} leaving · {1} left"
 
 #. placeholder {0}: new Date().toLocaleDateString(i18n.locale)
 #. placeholder {1}: fmt(researchers.length)
-#: components/dashboard/StaffTab.tsx:215
+#: components/dashboard/StaffTab.tsx:216
 msgid "Druid directory as of {0} — {1} records with an active affiliation to {structureLabel}. Live data, independent of the period and scope above."
 msgstr "Druid directory as of {0} — {1} records with an active affiliation to {structureLabel}. Live data, independent of the period and scope above."
 
-#: components/dashboard/StaffTab.tsx:221
+#: components/dashboard/StaffTab.tsx:222
 msgid "Open the list in People"
 msgstr "Open the list in People"
 
-#: components/dashboard/StaffTab.tsx:228
+#: components/dashboard/StaffTab.tsx:229
 #: components/researchers/KeyFiguresStrip.tsx:25
 #: lib/researcherLabels.ts:23
 msgid "Present"
@@ -5235,17 +5239,17 @@ msgstr "Present"
 
 #. placeholder {0}: fmt(presence.home)
 #. placeholder {1}: fmt(presence.external)
-#: components/dashboard/StaffTab.tsx:228
+#: components/dashboard/StaffTab.tsx:229
 msgid "{0} institution · {1} other employer"
 msgstr "{0} institution · {1} other employer"
 
-#: components/dashboard/StaffTab.tsx:229
+#: components/dashboard/StaffTab.tsx:230
 #: components/researchers/KeyFiguresStrip.tsx:26
 msgid "HDR holders"
 msgstr "HDR holders"
 
 #. placeholder {0}: pctText(kpis.hdrRate)
-#: components/dashboard/StaffTab.tsx:229
+#: components/dashboard/StaffTab.tsx:230
 msgid "{0} of the headcount"
 msgstr "{0} of the headcount"
 
@@ -5253,83 +5257,83 @@ msgstr "{0} of the headcount"
 #. placeholder {0}: fmt(kpis.women)
 #. placeholder {1}: fmt(k.men)
 #. placeholder {1}: fmt(kpis.men)
-#: components/dashboard/StaffTab.tsx:230
+#: components/dashboard/StaffTab.tsx:231
 #: components/researchers/KeyFiguresStrip.tsx:27
 msgid "{0} women · {1} men"
 msgstr "{0} women · {1} men"
 
 #. placeholder {0}: fmt(k.orcid)
 #. placeholder {0}: fmt(kpis.orcid)
-#: components/dashboard/StaffTab.tsx:231
+#: components/dashboard/StaffTab.tsx:232
 #: components/researchers/KeyFiguresStrip.tsx:28
 msgid "{0} records"
 msgstr "{0} records"
 
-#: components/dashboard/StaffTab.tsx:231
+#: components/dashboard/StaffTab.tsx:232
 msgid "ORCID filled in"
 msgstr "ORCID filled in"
 
-#: components/dashboard/StaffTab.tsx:235
+#: components/dashboard/StaffTab.tsx:236
 msgid "Presence and employer"
 msgstr "Presence and employer"
 
-#: components/dashboard/StaffTab.tsx:235
+#: components/dashboard/StaffTab.tsx:236
 msgid "Present staff by employer kind, then announced and effective departures"
 msgstr "Present staff by employer kind, then announced and effective departures"
 
-#: components/dashboard/StaffTab.tsx:236
+#: components/dashboard/StaffTab.tsx:237
 msgid "Gender balance"
 msgstr "Gender balance"
 
-#: components/dashboard/StaffTab.tsx:236
+#: components/dashboard/StaffTab.tsx:237
 msgid "From the civility of the records"
 msgstr "From the civility of the records"
 
-#: components/dashboard/StaffTab.tsx:237
+#: components/dashboard/StaffTab.tsx:238
 msgid "Identifier coverage"
 msgstr "Identifier coverage"
 
-#: components/dashboard/StaffTab.tsx:237
+#: components/dashboard/StaffTab.tsx:238
 msgid "Records carrying each identifier (share of the headcount)"
 msgstr "Records carrying each identifier (share of the headcount)"
 
-#: components/dashboard/StaffTab.tsx:239
+#: components/dashboard/StaffTab.tsx:240
 msgid "Age groups"
 msgstr "Age groups"
 
-#: components/dashboard/StaffTab.tsx:239
+#: components/dashboard/StaffTab.tsx:240
 msgid "Age in {currentYear}, records with a birth date"
 msgstr "Age in {currentYear}, records with a birth date"
 
-#: components/dashboard/StaffTab.tsx:241
+#: components/dashboard/StaffTab.tsx:242
 msgid "Employers"
 msgstr "Employers"
 
-#: components/dashboard/StaffTab.tsx:241
+#: components/dashboard/StaffTab.tsx:242
 msgid "Top 8 paying institutions"
 msgstr "Top 8 paying institutions"
 
-#: components/dashboard/StaffTab.tsx:242
+#: components/dashboard/StaffTab.tsx:243
 msgid "Grades"
 msgstr "Grades"
 
-#: components/dashboard/StaffTab.tsx:242
+#: components/dashboard/StaffTab.tsx:243
 msgid "Top 8 corps / grades"
 msgstr "Top 8 corps / grades"
 
-#: components/dashboard/StaffTab.tsx:243
+#: components/dashboard/StaffTab.tsx:244
 msgid "Employment types"
 msgstr "Employment types"
 
-#: components/dashboard/StaffTab.tsx:243
+#: components/dashboard/StaffTab.tsx:244
 msgid "Top 10"
 msgstr "Top 10"
 
-#: components/dashboard/StaffTab.tsx:245
+#: components/dashboard/StaffTab.tsx:246
 msgid "Breakdown by lab"
 msgstr "Breakdown by lab"
 
-#: components/dashboard/StaffTab.tsx:245
+#: components/dashboard/StaffTab.tsx:246
 msgid "Primary affiliation, top 8"
 msgstr "Primary affiliation, top 8"
 

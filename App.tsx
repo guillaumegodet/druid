@@ -1007,6 +1007,7 @@ function App() {
               struct={dashboardStruct}
               researchers={researchers}
               structures={structures}
+              researchersLoading={loading}
               onOpenResearcher={handleResearcherSelect}
               onOpenPeople={openPeopleForLab}
               onOpenAdmin={(slug) => openAdmin('console', slug)}

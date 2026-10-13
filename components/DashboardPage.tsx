@@ -55,6 +55,9 @@ interface DashboardPageProps {
   researchers?: Researcher[];
   /** Druid structures: matches the dashboard slug to a structure for the « Directory » view. */
   structures?: Structure[];
+  /** Directory still loading: the « Directory » view waits instead of being hidden (a deep link
+   *  ?tab=staff would otherwise fall back to the overview before the records arrive). */
+  researchersLoading?: boolean;
   onOpenResearcher?: (r: Researcher) => void;
   /** « Directory » view: opens the People page filtered on the structure (acronym, null = no filter). */
   onOpenPeople?: (labAcronym: string | null) => void;
@@ -88,6 +91,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   struct,
   researchers,
   structures,
+  researchersLoading = false,
   onOpenResearcher,
   onOpenPeople,
   onOpenAdmin,
@@ -232,7 +236,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // « Vue d'ensemble » always stays visible.
   const hasAxes = (data?.strategicAxes?.length ?? 0) > 0;
   const hasBenchmark = data?.benchmark != null;
-  const hasStaff = (staffResearchers?.length ?? 0) > 0;
+  // While the directory loads, keep the view in the catalog (hidden later if nothing matches).
+  const hasStaff = (staffResearchers?.length ?? 0) > 0 || (researchersLoading && !(slug && groupSlugs.includes(slug)));
   const families = useMemo(() => {
     const keys = visibleTabKeys(
       DASHBOARD_TABS.map(({ key }) => key),
@@ -547,6 +552,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 />
               )}
               {tab === 'phd' && <PhdTab dataset={scopedData} range={range} onOpenList={openList} />}
+              {tab === 'staff' && researchersLoading && !staffResearchers && (
+                <div className="flex-1 flex items-center justify-center">
+                  <div className="flex items-center gap-3 px-5 py-3 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-xl border border-white/80 dark:border-white/15 shadow-soft text-[13px] font-semibold text-ink dark:text-[#f5f2ea]">
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <Trans>Loading the directory…</Trans>
+                  </div>
+                </div>
+              )}
               {tab === 'staff' && staffResearchers && (
                 <StaffTab
                   researchers={staffResearchers}
