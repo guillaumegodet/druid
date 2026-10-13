@@ -107,7 +107,7 @@ const presenceColor = (t: VizTheme, key: PresenceSlice): string =>
 /**
  * « Directory » view of the People family (« Effectifs › Annuaire » in French): the Druid directory as of today, restricted to the
  * records with an active affiliation to the dashboard structure (lib/staffDirectoryAggregates.ts,
- * docs/plan-tableau-de-bord-familles.md D3). Charts are not shareable: the directory is not part
+ * docs/archive/plan-tableau-de-bord-familles.md D3). Charts are not shareable: the directory is not part
  * of the druid-biblio export behind the embed page and the reports.
  */
 export const StaffTab: React.FC<{

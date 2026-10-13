@@ -83,7 +83,7 @@ const LIVE_TABS: ReadonlySet<DashboardTab> = new Set<DashboardTab>(['news', 'sta
  * structure preselected). The old ?tab=console|streamlit|rights links
  * are redirected by App.tsx.
  *
- * Navigation on two levels since 2026-10-13 (docs/plan-tableau-de-bord-familles.md): seven
+ * Navigation on two levels since 2026-10-13 (docs/archive/plan-tableau-de-bord-familles.md): seven
  * families of analyses (dashboard/dashboardNav.ts), the active family showing its views as a
  * second row of pills. The URL keeps the leaf key (?tab=journals), so the old links still work.
  */
