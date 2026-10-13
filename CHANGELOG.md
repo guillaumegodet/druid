@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.5.0] — 2026-10-13
+
 ### Ajouté
 - **Administration › Établissements** (droit établissement) : la liste des établissements employeurs proposée par le
   champ « Établissement employeur » des fiches se gère désormais dans Druid — ajout (nom, forme longue, UAI, ROR,
