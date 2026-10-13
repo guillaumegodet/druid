@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.4.0] — 2026-10-13
+
 ### Modifié
 - **Tableau de bord en sept familles d'analyses** (Vue d'ensemble · Publications · Impact · Collaborations · Effectifs ·
   Pilotage · Veille) : les 17 onglets sont regroupés sur deux rangées (familles avec icône, puis vues de la famille
