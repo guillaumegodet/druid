@@ -1,0 +1,59 @@
+---
+title: "Manage employing institutions"
+description: "Add or fix an institution in the list offered by the « Employing institution » field of a record."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrators and central services (institution right)"
+	menu="Administration › Institutions"
+	disponibilite="every instance whose directory can be edited"
+/>
+
+The **Employing institution** field of a record (« Employment » card) is a dropdown: it only offers the
+institutions Druid already knows. When a person is employed by an institution missing from the list (a
+partner university, a research body, a hospital…), add it here first, then go back to the record.
+
+## Add an institution
+
+1. Open **Administration › Institutions**.
+2. In the **Add an employing institution** block, enter the **name**: that is the value the dropdown will
+   show. Stay consistent with the existing names (short form, in capitals: `U PARIS NANTERRE`, `CNRS`,
+   `CHU NANTES`).
+3. If you know them, fill in the **long form** (« Université Paris Nanterre ») and the identifiers:
+   - **UAI**: code of the institution in the French ministry register (7 digits and a letter, e.g. `0921204J`);
+   - **ROR**: identifier in the [Research Organization Registry](https://ror.org) (9 characters, with or
+     without `https://ror.org/`);
+   - **IdRef PPN**: number of the corporate body record in [IdRef](https://www.idref.fr) (9 characters),
+     used by the ABES export.
+4. Click **Add**. The institution appears in the list and in the dropdown of the records.
+
+Druid refuses a name already in use (regardless of case and accents) and a UAI code already carried by
+another institution: check the list before adding, the same institution sometimes appears under two spellings.
+
+## Fix an institution
+
+Click **Edit** at the end of the row, correct the fields and **Save**. Renaming an institution does not touch
+the records: they keep the value they carried, which then shows as « (not in list) » in the dropdown until
+it is selected again. Prefer completing the identifiers or the long form over renaming.
+
+## What the list shows
+
+| Column | Content |
+|---|---|
+| Name | dropdown value |
+| Long form | full label, when it differs from the name |
+| UAI, ROR, IdRef | identifiers, with a link to ROR and IdRef |
+| Records | number of loaded records whose employer is this institution |
+
+Institutions are never deleted from Druid: records refer to them. A duplicated institution is handled by
+moving its records to the other spelling, then leaving it empty.
+
+## See also
+
+- [Read a record](/en/guides/personnes/lire-une-fiche/): the « Employment » card and its employer field.
+- [People statuses](/en/donnees/statuts-des-personnes/): how the employer feeds the displayed status
+  (Present, Leaving, Left) and the « Internal staff » shortcut.

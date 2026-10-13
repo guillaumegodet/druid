@@ -70,6 +70,7 @@ export const ADMIN_TAB_HELP: Record<AdminTab, string> = {
   console: '/guides/administration/console-etl/',
   rights: '/guides/administration/donner-des-droits/',
   media: '/guides/veille/sources-medias/',
+  institutions: '/guides/administration/etablissements/',
 };
 
 /**

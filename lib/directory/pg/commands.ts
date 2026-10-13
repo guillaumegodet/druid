@@ -23,6 +23,7 @@ import { STATUT_DYNA_MAP } from '../../ldapCodes';
 import { fromGristDate, fromGristFuzzyDate, parseMultiLabel } from '../gristMapping';
 import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
+import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
 import { OPENALEX_AUTHOR_SOURCE, loadPersonParts, readRecordFields, resolveStructures, writeRecordFields } from './recordFields';
 import { insertStructure, writeStructure } from './structures';
@@ -409,6 +410,29 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       if (!current) throw new ApiError(404, `Structure not found: S-${recordId}`);
       await writeStructure(trx, recordId, { ...(current.extra as object), local_id: current.local_id, ...fields });
       ctx.audit({ table: 'Structures', kind: 'update', rows: [recordId], fields: Object.keys(fields), count: 1 });
+    }),
+
+    // ── Employing institutions (`establishment`): institution right only; the audit trigger logs the row ──
+    createInstitution: (input, ctx) => writing(ctx, async (trx) => {
+      if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
+      const f = prepareInstitutionWrite(input, (await repository.institutions()).items);
+      const { id } = await trx.insertInto('establishment')
+        .values({ name: f.name, label: orNull(f.label), uai: orNull(f.uai), ror: orNull(f.ror), idref: orNull(f.idref) })
+        .returning('id').executeTakeFirstOrThrow();
+      ctx.audit({ table: 'Etablissements', kind: 'create', rows: [Number(id)], fields: ['Employeur', 'Libelle', 'UAI', 'ROR', 'idref'], count: 1 });
+      return { id: Number(id) };
+    }),
+
+    updateInstitution: (recordId, input, ctx) => writing(ctx, async (trx) => {
+      if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      const existing = (await repository.institutions()).items;
+      if (!existing.some((e) => e.id === recordId)) throw new ApiError(404, `Institution not found: ${recordId}`);
+      const f = prepareInstitutionWrite(input, existing, recordId);
+      await trx.updateTable('establishment')
+        .set({ name: f.name, label: orNull(f.label), uai: orNull(f.uai), ror: orNull(f.ror), idref: orNull(f.idref), updated_at: sql`now()` })
+        .where('id', '=', String(recordId)).execute();
+      ctx.audit({ table: 'Etablissements', kind: 'update', rows: [recordId], fields: ['Employeur', 'Libelle', 'UAI', 'ROR', 'idref'], count: 1 });
     }),
 
     /**

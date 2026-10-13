@@ -20,6 +20,7 @@ import {
   AFFILIATION_END_COL, DUPLICATE_DECISION_COL, RATTACHEMENT_CHOICES, RATTACHEMENT_COL, mapInstitutionRecords, parseMultiLabel,
 } from './gristMapping';
 import { structureCreateFields, structureUpdateFields } from './structureWrite';
+import { institutionGristFields, prepareInstitutionWrite, type InstitutionInput } from './institutionWrite';
 import type { DirectoryRepository, DirectoryScope, GristClient } from './repository';
 
 /** What a write touched, for the audit log (`api.write` event): table, kind, rows and field names. */
@@ -49,6 +50,9 @@ export interface DirectoryCommands {
   /** New structure (lot 2 b); returns its Druid id `S-<rowId>`. */
   createStructure(structure: Structure, ctx: CommandContext): Promise<{ id: string }>;
   updateStructure(recordId: number, structure: Structure, ctx: CommandContext): Promise<void>;
+  /** Employing institutions (Administration › Institutions): institution right only; returns the row id. */
+  createInstitution(input: InstitutionInput, ctx: CommandContext): Promise<{ id: number }>;
+  updateInstitution(recordId: number, input: InstitutionInput, ctx: CommandContext): Promise<void>;
   // ── Duplicates and merges (lot 2 c) ──
   qualifyDuplicates(args: { rowIds: number[]; principalRowId?: number; mode: 'concomitant' | 'successif' | 'a_revoir'; endDate?: string; author: string },
     ctx: CommandContext): Promise<{ updated: number }>;
@@ -63,6 +67,7 @@ export interface DirectoryCommands {
 
 const ANNUAIRE = 'Annuaire';
 const STRUCTURES = 'Structures';
+const INSTITUTIONS = 'Etablissements';
 const isRowId = (id: unknown): id is number => Number.isInteger(id) && (id as number) > 0;
 
 export interface GristDirectoryCommandsOptions {
@@ -334,6 +339,23 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
       const fields = structureUpdateFields(structure);
       await assertStructuresInScope(ctx.scope, [recordId], [fields['short_labels']]);
       await update(ctx, STRUCTURES, [{ id: recordId, fields }]);
+    }),
+
+    // ── Employing institutions: the whole table, institution right only (a lab right never wrote it) ──
+    createInstitution: (input, ctx) => writing(async () => {
+      if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
+      const fields = prepareInstitutionWrite(input, (await repository.institutions()).items);
+      const [id] = await add(ctx, INSTITUTIONS, [{ fields: institutionGristFields(fields) }]);
+      return { id };
+    }),
+
+    updateInstitution: (recordId, input, ctx) => writing(async () => {
+      if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      const existing = (await repository.institutions()).items;
+      if (!existing.some((e) => e.id === recordId)) throw new ApiError(404, `Institution not found: ${recordId}`);
+      const fields = prepareInstitutionWrite(input, existing, recordId);
+      await update(ctx, INSTITUTIONS, [{ id: recordId, fields: institutionGristFields(fields) }]);
     }),
 
     createPerson: (researcher, ctx) => writing(async () => {

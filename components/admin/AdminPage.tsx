@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { adminTabsFor, type AdminTab } from '../../lib/auth';
-import { ViewState } from '../../types';
+import { ViewState, type Researcher } from '../../types';
 import { EtlConsolePage } from '../etl/EtlConsolePage';
 import { RightsPage } from '../rights/RightsPage';
 import { MediaSourcesAdmin } from '../dashboard/MediaSourcesAdmin';
@@ -10,6 +10,7 @@ import { HelpButton } from '../HelpButton';
 import { ADMIN_TAB_HELP } from '../../lib/helpLinks';
 import { numberLocale } from '../../lib/i18n';
 import { GraphActionsPanel } from './GraphActionsPanel';
+import { InstitutionsAdmin } from './InstitutionsAdmin';
 
 export type { AdminTab };
 
@@ -23,8 +24,8 @@ const formatStatusDate = (iso: string) =>
 /**
  * @component AdminPage
  * @description « Administration » section (navigation bar entry):
- * ETL console (admin role), rights management (super admin) and media sources
- * (super admin or media administrator). Gathers tools formerly
+ * ETL console (admin role), rights management (super admin), media sources
+ * (super admin or media administrator) and employing institutions (institution right). Gathers tools formerly
  * scattered across the dashboard tabs (console, rights) and the media
  * monitoring (sources). The current tab and the console's structure are in
  * the URL (?tab=console|rights|media&struct=<slug>) to remain shareable.
@@ -43,7 +44,9 @@ export const AdminPage: React.FC<{
   syncingSovisu?: boolean;
   /** Opens a directory record by uid (follow-up of the removals sent to the CRISalid graph). */
   onOpenResearcherUid?: (uid: string) => void;
-}> = ({ initialTab, struct, onOpenDashboard, onSyncToSovisu, syncingSovisu = false, onOpenResearcherUid }) => {
+  /** Loaded directory (Institutions tab: records per employing institution). */
+  researchers?: Researcher[];
+}> = ({ initialTab, struct, onOpenDashboard, onSyncToSovisu, syncingSovisu = false, onOpenResearcherUid, researchers }) => {
   const { t } = useLingui();
   const tabs = useMemo(adminTabsFor, []);
   const [tab, setTab] = useState<AdminTab>(initialTab && tabs.includes(initialTab) ? initialTab : tabs[0] ?? 'console');
@@ -78,6 +81,7 @@ export const AdminPage: React.FC<{
     console: <Trans>ETL console</Trans>,
     rights: <Trans>Access rights</Trans>,
     media: <Trans>Media sources</Trans>,
+    institutions: <Trans>Institutions</Trans>,
   };
   const tabBtn = (active: boolean) =>
     `pill px-4 py-1.5 text-[13px] transition-colors cursor-pointer ${
@@ -140,6 +144,11 @@ export const AdminPage: React.FC<{
       {tab === 'media' && (
         <div className="max-w-5xl">
           <MediaSourcesAdmin />
+        </div>
+      )}
+      {tab === 'institutions' && (
+        <div className="max-w-5xl">
+          <InstitutionsAdmin researchers={researchers} />
         </div>
       )}
     </div>

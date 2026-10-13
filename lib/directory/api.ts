@@ -25,6 +25,8 @@
 //   POST  /api/v1/abes-exports                  { entries: [{ recordId, hash }], date }  → { updated }
 //   POST  /api/v1/structures                    Structure             → 201 { id: 'S-<rowId>' }   (lot 2 b)
 //   PUT   /api/v1/structures/<recordId>         Structure             → { ok: true }
+//   POST  /api/v1/institutions                  { name, label?, uai?, ror?, idref? } → 201 { id }   (institution right)
+//   PUT   /api/v1/institutions/<recordId>       { name, label?, uai?, ror?, idref? } → { ok: true }
 //   POST  /api/v1/duplicates/qualification      { rowIds, principalRowId?, mode, endDate?, author }  (lot 2 c)
 //   POST  /api/v1/duplicates/unqualification    { rowIds }
 //   POST  /api/v1/people/uid-switch             { fromUid, rowId?, toUid, author }
@@ -92,6 +94,9 @@ const ResearcherBody = z.object({
 }).loose();
 const StructureBody = z.looseObject({ acronym: z.string().optional(), level: z.union([z.string(), z.number()]).optional() });
 const RowIds = z.array(RecordId).min(1).max(500);
+const InstitutionBody = z.object({
+  name: z.string(), label: z.string().optional(), uai: z.string().optional(), ror: z.string().optional(), idref: z.string().optional(),
+});
 const QualifyBody = z.object({
   rowIds: RowIds, principalRowId: RecordId.optional(), mode: z.enum(['concomitant', 'successif', 'a_revoir']),
   endDate: z.string().optional(), author: z.string(),
@@ -292,6 +297,18 @@ export const createDirectoryApi = (): Hono<Env> => {
     const body = await bodyOf(c, StructureBody);
     if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     await c.env.commands!.updateStructure(recordId, body as any, ctxOf(c));
+    return c.json({ ok: true }, 200, NO_STORE);
+  });
+  writes.post('/institutions', async (c) => {
+    const body = await bodyOf(c, InstitutionBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.commands!.createInstitution(body, ctxOf(c)), 201, NO_STORE);
+  });
+  writes.put('/institutions/:recordId', async (c) => {
+    const recordId = recordIdOf(c.req.param('recordId'));
+    const body = await bodyOf(c, InstitutionBody);
+    if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    await c.env.commands!.updateInstitution(recordId, body, ctxOf(c));
     return c.json({ ok: true }, 200, NO_STORE);
   });
   writes.post('/duplicates/qualification', async (c) => {
