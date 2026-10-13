@@ -12,6 +12,16 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
 
 ### Dashboard
 
+- **Seven families of analyses** instead of a row of seventeen tabs: **Overview**,
+  **Publications**, **Impact**, **Collaborations**, **People**, **Steering** and **Watch**.
+  Click a family, then one of its views on the second row. The Overview ends with an
+  **Explore the analyses** grid presenting each family. Shared links and existing reports keep
+  working. See
+  [Choose a structure, a period, a scope](/en/guides/tableau-de-bord/structure-periode-perimetre/#4-browse-the-families-of-analyses).
+- **People › Directory view**: the directory statistics formerly in the « Charts » view of
+  People (presence and employer, gender balance, identifier coverage, employers, grades,
+  employment types), computed as of today on the records of the structure. See
+  [Read the staff](/en/guides/tableau-de-bord/chercheurs-effectifs/#directory-headcount).
 - **Collaborations › By country**: the review of the collaborations with one partner country —
   key figures and rank, trend, institutions of the country on a map and by province or region,
   labs and researchers involved, « who works with whom », themes and specialization, impact,
@@ -19,7 +29,7 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
   [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/#review-collaborations-with-a-country).
 - **More complete publication countries**: the countries of the co-signing institutions now
   count; the international figures rise.
-- **Richer Researchers tab**: population filter (membership, category, presence),
+- **Richer Researchers view**: population filter (membership, category, presence),
   headcount, research FTE, **publication rate per research FTE and per age bracket**, age
   pyramid, publications per member, table exportable as CSV. See
   [Read the staff and the publication rate per FTE](/en/guides/tableau-de-bord/chercheurs-effectifs/).

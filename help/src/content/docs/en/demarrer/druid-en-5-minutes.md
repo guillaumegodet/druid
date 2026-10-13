@@ -34,7 +34,7 @@ are the ones used to harvest each researcher's publications.
 | **People** | The list of records, with filters and charts (gender balance, ages, grades, identifier coverage). A click opens a person's record. | Everyone (limited to their lab for a lab profile) |
 | **Structures** | Laboratories, teams and faculties, their hierarchy and their description. | Central services and administrators |
 | **Groups** | Cross-cutting selections of researchers (a council, a project, a cohort) with their own dashboard. | Administrators |
-| **Dashboard** | The bibliometric indicators of a structure or a group, in about fifteen tabs. | Everyone (limited to their lab for a lab profile) |
+| **Dashboard** | The bibliometric indicators of a structure or a group, grouped in seven families of analyses (Overview, Publications, Impact, Collaborations, People, Steering, Watch). | Everyone (limited to their lab for a lab profile) |
 | **My reports** | Your bibliometric reports, those shared with you and those visible to everyone; creation from a template, PDF export. | Everyone (on the structures they see) |
 | **Alignment tools** | Researcher identifier alignment and, if your instance is connected to an LDAP directory, LDAP alignment. | Central services and administrators |
 | **Administration** | ETL console, rights management, media sources for the news watch, depending on your profile. | Administrators and communication officers |

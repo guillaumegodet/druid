@@ -86,7 +86,7 @@ Voir [Traiter un doublon](/guides/personnes/traiter-un-doublon/) et
 ## Administrateurs techniques
 
 Profil réservé à l'équipe qui exploite Druid : **console ETL** (régénération des tableaux
-de bord), onglets masqués du tableau de bord. Cumulé avec un droit sur tout
+de bord), vues masquées du tableau de bord. Cumulé avec un droit sur tout
 l'établissement, il donne aussi le menu **Synchroniser** de Personnel (dont **Importer une
 liste fiabilisée**, pour valider d'un coup les fiches d'un labo à partir d'une liste sûre)
 et le bouton **Nouveau** (créer une fiche). Voir [Piloter la console ETL](/guides/administration/console-etl/).
@@ -94,7 +94,7 @@ et le bouton **Nouveau** (créer une fiche). Voir [Piloter la console ETL](/guid
 ## Chargé·es de communication
 
 Accès à **Administration › Sources médias**, pour choisir les médias suivis par la veille,
-et à l'onglet **Veille** du tableau de bord. Voir
+et à la famille **Veille** du tableau de bord. Voir
 [Gérer les sources médias](/guides/veille/sources-medias/).
 
 ## Demander un accès supplémentaire

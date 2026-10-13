@@ -41,7 +41,7 @@ Your **profile** determines the sections you see and the scope of the data.
 | **Lab management** | The laboratories granted | Same, without depending on your own record. |
 | **Central services** | The whole institution | Structures, Alignment tools. |
 | **Druid administrator** | The whole institution | Groups, To process (duplicates and tasks), Report a correction, viewing rights. |
-| **Technical administrator** | Depending on their other profile | ETL console, hidden tabs of the dashboard; with access to the whole institution: Synchronise menu, creating records. |
+| **Technical administrator** | Depending on their other profile | ETL console, hidden views of the dashboard; with access to the whole institution: Synchronise menu, creating records. |
 | **Communication officer** | — | Media sources of the news watch. |
 
 Profiles **add up**. An account logged in without any specific right is treated as a

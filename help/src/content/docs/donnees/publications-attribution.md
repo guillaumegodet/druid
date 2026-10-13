@@ -103,7 +103,7 @@ repérées que de cette façon.
 
 ## Charte de signature
 
-L'onglet **Charte de signature** compare l'affiliation écrite par les auteurs à la forme
+La vue **Pilotage › Charte de signature** compare l'affiliation écrite par les auteurs à la forme
 recommandée par l'établissement : mention exacte de l'établissement, nom ou sigle de la
 structure, code d'unité, adresse, tutelles requises. Chaque publication reçoit un score ;
 elle est **conforme** si l'établissement est mentionné et si le score atteint le seuil

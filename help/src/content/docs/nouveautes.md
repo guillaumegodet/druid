@@ -13,6 +13,16 @@ n'existent que sur les instances qui en disposent (voir
 
 ### Tableau de bord
 
+- **Sept familles d'analyses** au lieu d'une rangée de dix-sept onglets : **Vue d'ensemble**,
+  **Publications**, **Impact**, **Collaborations**, **Effectifs**, **Pilotage** et **Veille**.
+  Cliquez une famille, puis l'une de ses vues sur la seconde rangée. La Vue d'ensemble se
+  termine par une grille **Explorer les analyses** qui présente chaque famille. Les liens
+  partagés et les rapports existants continuent de fonctionner. Voir
+  [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/#4-parcourir-les-familles-danalyses).
+- **Vue Effectifs › Annuaire** : les statistiques d'annuaire autrefois dans la vue « Graphiques »
+  de Personnel (présence et employeur, parité, couverture des identifiants, employeurs,
+  grades, types d'emploi), calculées à ce jour sur les fiches de la structure. Voir
+  [Lire les effectifs](/guides/tableau-de-bord/chercheurs-effectifs/#effectifs-de-lannuaire).
 - **Collaborations › Par pays** : le bilan des collaborations avec un pays partenaire —
   chiffres clés et rang, évolution, établissements du pays sur une carte et par province ou
   région, labos et chercheurs impliqués, « qui travaille avec qui », thématiques et
@@ -20,7 +30,7 @@ n'existent que sur les instances qui en disposent (voir
   [Analyser les collaborations](/guides/tableau-de-bord/collaborations/#faire-le-bilan-avec-un-pays).
 - **Pays des publications complétés** : les pays des institutions cosignataires sont désormais
   pris en compte ; les chiffres internationaux augmentent.
-- **Onglet Chercheurs enrichi** : filtre de la population (appartenance, catégorie,
+- **Vue Chercheurs enrichie** : filtre de la population (appartenance, catégorie,
   présence), effectif, ETP recherche, **taux de publication par ETP recherche et par tranche
   d'âge**, pyramide des âges, publications par membre, tableau exportable en CSV. Voir
   [Lire les effectifs et le taux de publication par ETP](/guides/tableau-de-bord/chercheurs-effectifs/).

@@ -92,7 +92,7 @@ quand la publication y figure, sinon d'**OpenAlex**.
 ## APC
 
 Les **APC** (*Article Processing Charges*) sont les frais payés à un éditeur pour publier
-en accès ouvert. L'onglet **Suivi des APC** les présente sous trois angles :
+en accès ouvert. La vue **Pilotage › Suivi des APC** les présente sous trois angles :
 
 | Sous-onglet | Source | Ce qu'il mesure |
 |---|---|---|
@@ -124,6 +124,6 @@ Les montants en devises étrangères sont convertis en euros à un taux approxim
 ## Comment signaler une erreur
 
 Un indicateur vous semble faux ? Vérifiez d'abord le périmètre et la période choisis, puis
-la liste des publications concernées (onglet **Liste des publications**). Voir ensuite
+la liste des publications concernées (vue **Publications › Liste des publications**). Voir ensuite
 [Une publication manque ou est mal attribuée](/guides/corriger/publication-manquante/) ou
 le [Support](/guides/support/).

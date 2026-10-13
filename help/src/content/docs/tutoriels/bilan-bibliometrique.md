@@ -45,14 +45,14 @@ Les chiffres ne valent que ce que valent l'annuaire et les affiliations :
 
 ## Étape 3 — Relever les chiffres clés
 
-| Onglet | À relever | À savoir |
+| Vue | À relever | À savoir |
 |---|---|---|
 | **Vue d'ensemble** | Nombre de publications par an et par type, part en accès ouvert, collaborations internationales, ratios par ETP | Comptage entier : une copublication de deux unités compte pour chacune. |
-| **Impact et citations** | FWCI moyen, part dans le top 10 % et le top 1 % | Instable sur les publications récentes et les petits effectifs. |
-| **Revues** | Principales revues, répartition par quartile SJR | Un seul classement SCImago pour toutes les années. |
-| **Ouvrages** | Livres et chapitres | Couverture incomplète hors HAL. |
-| **Collaborations** | Partenaires nationaux et internationaux | Voir [Analyser les collaborations](/guides/tableau-de-bord/collaborations/). |
-| **Charte de signature** | Taux de conformité des affiliations | Utile pour un plan d'action sur la signature. |
+| **Impact › Impact et citations** | FWCI moyen, part dans le top 10 % et le top 1 % | Instable sur les publications récentes et les petits effectifs. |
+| **Publications › Revues** | Principales revues, répartition par quartile SJR | Un seul classement SCImago pour toutes les années. |
+| **Publications › Ouvrages** | Livres et chapitres | Couverture incomplète hors HAL. |
+| **Collaborations › Partenariats** | Partenaires nationaux et internationaux | Voir [Analyser les collaborations](/guides/tableau-de-bord/collaborations/). |
+| **Pilotage › Charte de signature** | Taux de conformité des affiliations | Utile pour un plan d'action sur la signature. |
 
 La définition de chaque indicateur et ses limites sont dans [Indicateurs](/donnees/indicateurs/) :
 reprenez-les dans la partie « méthodologie » de votre rapport. Le bouton **Méthodologie** de
@@ -60,7 +60,7 @@ chaque graphique donne aussi sa description et ses limites.
 
 ## Étape 4 — Vérifier la liste des publications
 
-1. Ouvrez **Liste des publications** et **Exporter en CSV (résultats filtrés)**.
+1. Ouvrez **Publications › Liste des publications** et **Exporter en CSV (résultats filtrés)**.
 2. Faites relire la liste par l'unité : publications manquantes, publications qui ne sont
    pas de l'unité.
 3. Pour chaque écart, voir [Une publication manque ou est mal attribuée](/guides/corriger/publication-manquante/).

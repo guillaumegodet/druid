@@ -69,11 +69,11 @@ usually after an update of the headcount or ahead of an evaluation report. Betwe
 regenerations, the figures do not move, even if the sources change: if in doubt about how
 fresh a dashboard is, ask [support](/en/guides/support/) for the date of the last generation.
 
-The news watch (**Watch** tab) is fed every day by the collection of media mentions.
+The news watch (**Watch** family of the dashboard) is fed every day by the collection of media mentions.
 
-## The Sources tab of the dashboard
+## The Sources view of the dashboard
 
-The **Sources** tab compares, for the structure on display, the publications found by the
+The **Publications › Sources** view compares, for the structure on display, the publications found by the
 CRISalid harvester (from the researchers' identifiers) with those found by the ETL (BSO,
 OpenAlex, HAL). It helps you spot:
 

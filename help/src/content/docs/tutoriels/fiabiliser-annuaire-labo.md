@@ -106,7 +106,7 @@ puis moissonne les publications au fil des jours.
 Quelques jours plus tard :
 
 - dans SoVisu+, les membres du laboratoire apparaissent avec leurs publications ;
-- dans le tableau de bord du laboratoire, l'onglet **Sources** montre la part des
+- dans le tableau de bord du laboratoire, la vue **Publications › Sources** montre la part des
   publications trouvées par CRISalid ;
 - le périmètre **Effectifs** reconnaît désormais les membres validés (après régénération du
   tableau de bord).
@@ -119,7 +119,7 @@ Quelques jours plus tard :
 - [ ] Fiches validées avec la liste du laboratoire comme source
 - [ ] Identifiants complétés
 - [ ] Liste envoyée à CRISalid
-- [ ] Résultat vérifié dans SoVisu+ et dans l'onglet Sources
+- [ ] Résultat vérifié dans SoVisu+ et dans la vue Sources
 
 ## Et ensuite
 

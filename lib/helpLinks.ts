@@ -55,7 +55,7 @@ export const DASHBOARD_TAB_HELP: Record<DashboardTab, string> = {
   network: '/guides/tableau-de-bord/reseau/',
   list: '/guides/tableau-de-bord/liste-des-publications/',
   news: '/guides/veille/nouvelles-publications/',
-  sources: '/donnees/sources-des-donnees/#longlet-sources-du-tableau-de-bord',
+  sources: '/donnees/sources-des-donnees/#la-vue-sources-du-tableau-de-bord',
 };
 
 /** Help page of each « À traiter » tab. */
@@ -82,7 +82,7 @@ export const EN_ANCHORS: Record<string, string> = {
   apc: 'apcs',
   'charte-de-signature': 'signature-charter',
   'comment-les-auteurs-sont-reconnus': 'how-authors-are-recognised',
-  'longlet-sources-du-tableau-de-bord': 'the-sources-tab-of-the-dashboard',
+  'la-vue-sources-du-tableau-de-bord': 'the-sources-view-of-the-dashboard',
   'effectifs-de-lannuaire': 'directory-headcount',
 };
 

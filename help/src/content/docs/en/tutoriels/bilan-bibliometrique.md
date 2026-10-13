@@ -43,14 +43,14 @@ The figures are only as good as the directory and the affiliations:
 
 ## Step 3 — Note the key figures
 
-| Tab | What to note | Worth knowing |
+| View | What to note | Worth knowing |
 |---|---|---|
 | **Overview** | Number of publications per year and per type, open-access share, international collaboration, ratios per FTE | Full counting: a co-publication of two units counts for each. |
-| **Impact and citations** | Mean FWCI, share in the top 10% and the top 1% | Unstable for recent publications and small numbers. |
-| **Journals** | Main journals, breakdown by SJR quartile | A single SCImago ranking for all years. |
-| **Books** | Books and chapters | Incomplete coverage outside HAL. |
-| **Collaborations** | National and international partners | See [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/). |
-| **Signature charter** | Affiliation compliance rate | Useful for an action plan on affiliations. |
+| **Impact › Impact and citations** | Mean FWCI, share in the top 10% and the top 1% | Unstable for recent publications and small numbers. |
+| **Publications › Journals** | Main journals, breakdown by SJR quartile | A single SCImago ranking for all years. |
+| **Publications › Books** | Books and chapters | Incomplete coverage outside HAL. |
+| **Collaborations › Partnerships** | National and international partners | See [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/). |
+| **Steering › Signature charter** | Affiliation compliance rate | Useful for an action plan on affiliations. |
 
 The definition of each indicator and its limitations are in
 [Indicators](/en/donnees/indicateurs/): reuse them in the “methodology” part of your report.
@@ -58,7 +58,7 @@ Each chart's **Methodology** button also gives its description and limitations.
 
 ## Step 4 — Check the list of publications
 
-1. Open **Publication list** and **Export as CSV (filtered results)**.
+1. Open **Publications › Publication list** and **Export as CSV (filtered results)**.
 2. Have the list reviewed by the unit: missing publications, publications that are not the
    unit's.
 3. For each discrepancy, see [A publication is missing or wrongly attributed](/en/guides/corriger/publication-manquante/).

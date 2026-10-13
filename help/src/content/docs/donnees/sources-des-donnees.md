@@ -70,12 +70,12 @@ Entre deux régénérations, les chiffres ne bougent pas, même si les sources �
 de doute sur la fraîcheur d'un tableau de bord, demandez la date de la dernière génération
 au [support](/guides/support/).
 
-La veille (onglet **Veille**) est alimentée chaque jour par la collecte des mentions dans
+La veille (famille **Veille** du tableau de bord) est alimentée chaque jour par la collecte des mentions dans
 les médias.
 
-## L'onglet Sources du tableau de bord
+## La vue Sources du tableau de bord
 
-L'onglet **Sources** compare, pour la structure affichée, les publications trouvées par le
+La vue **Publications › Sources** compare, pour la structure affichée, les publications trouvées par le
 moissonneur CRISalid (à partir des identifiants des chercheurs) et celles trouvées par
 l'ETL (BSO, OpenAlex, HAL). Il sert à repérer :
 

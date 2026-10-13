@@ -83,7 +83,7 @@ See [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/) and
 ## Technical administrators
 
 Profile reserved for the team that runs Druid: **ETL console** (regenerating the
-dashboards), hidden tabs of the dashboard. Combined with a right on the whole institution, it
+dashboards), hidden views of the dashboard. Combined with a right on the whole institution, it
 also gives the **Synchronise** menu of People (including **Import a validated list**, to
 validate a lab's records at once from a trusted list) and the **New** button (create a
 record). See [Run the ETL console](/en/guides/administration/console-etl/).
@@ -91,7 +91,7 @@ record). See [Run the ETL console](/en/guides/administration/console-etl/).
 ## Communication officers
 
 Access to **Administration › Media sources**, to choose the media followed by the news
-watch, and to the **Watch** tab of the dashboard. See
+watch, and to the **Watch** family of the dashboard. See
 [Manage media sources](/en/guides/veille/sources-medias/).
 
 ## Requesting additional access

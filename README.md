@@ -33,7 +33,8 @@ Université, et s'inscrit dans l'écosystème [CRISalid](https://github.com/CRIS
   statuts validés à partir d'une liste fiable passent avant le LDAP et expirent au bout de 18 mois.
 - **Rubrique « À traiter »** : les doublons à fusionner et les tâches à mener hors de Druid, avec des
   e-mails prêts à copier.
-- **Dataviz RH** : parité, pyramide des âges, grades, employeurs.
+- **Chiffres clés** de la liste (fiches, présents, HDR, parité, ORCID), qui suivent les filtres ; les analyses
+  d'effectifs complètes sont dans le tableau de bord (famille **Effectifs › Annuaire**).
 
 ### 2. Identifiants fiabilisés
 
@@ -46,10 +47,17 @@ Université, et s'inscrit dans l'écosystème [CRISalid](https://github.com/CRIS
 ### 3. Pilotage de la recherche
 
 Le tableau de bord bibliométrique (ECharts) s'appuie sur les exports d'un back-end qui agrège OpenAlex et
-le Baromètre de la science ouverte (BSO). Ses onglets : vue d'ensemble, collaborations (nationales,
-internationales, par établissement partenaire ou consortium), impact et citations, ouvrages, revues, suivi
-des APC, financements, axes stratégiques, benchmark, charte de signature, équipes, doctorants, chercheurs,
-réseau, liste des publications, veille et sources.
+le Baromètre de la science ouverte (BSO). Ses analyses sont rangées en **sept familles** :
+
+| Famille | Vues |
+|---|---|
+| **Vue d'ensemble** | chiffres clés, évolution, types, accès ouvert, mots-clés, grille « Explorer les analyses » |
+| **Publications** | ouvrages, revues, liste des publications, sources |
+| **Impact** | impact et citations, benchmark |
+| **Collaborations** | partenariats (nationaux, internationaux, par pays, par établissement partenaire ou consortium), réseau de cosignatures |
+| **Effectifs** | annuaire du jour, chercheurs (taux de publication par ETP, pyramide des âges), équipes, doctorants |
+| **Pilotage** | axes stratégiques, financements, suivi des APC, charte de signature |
+| **Veille** | nouvelles publications, mentions dans les médias, newsletter |
 
 - **Veille** : les dernières publications, lues directement sur OpenAlex.
 - **Intégration** : chaque graphique peut s'afficher hors authentification (`/embed`), et un lien direct
@@ -80,8 +88,7 @@ Les variables propres à chaque instance sont décrites dans [`instances/README.
 
 ## Stack technique
 
-- **Front** : React 19 + TypeScript, Vite, Tailwind CSS, icônes Lucide ; ECharts (tableau de bord) et
-  Recharts (dataviz RH).
+- **Front** : React 19 + TypeScript, Vite, Tailwind CSS, icônes Lucide ; ECharts (tableau de bord).
 - **Serveur** : `server.cjs` (Express), avec authentification Keycloak (OIDC), proxy Grist (la clé ne
   quitte pas le serveur), API du tableau de bord, de la veille et des chats. Sur Cloudflare, des Pages
   Functions (`functions/`) jouent ce rôle.

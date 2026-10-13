@@ -35,7 +35,7 @@ Druid sont celles qui permettent de moissonner les publications de chaque cherch
 | **Personnel** | La liste des fiches, avec filtres et graphiques (parité, âges, grades, couverture des identifiants). Un clic ouvre la fiche d'une personne. | Tout le monde (limité à son labo pour un profil labo) |
 | **Structures** | Les laboratoires, équipes et composantes, leur hiérarchie et leur fiche descriptive. | Services centraux et administrateurs |
 | **Groupes** | Des sélections transverses de chercheurs (un conseil, un projet, une cohorte) avec leur propre tableau de bord. | Administrateurs |
-| **Tableau de bord** | Les indicateurs bibliométriques d'une structure ou d'un groupe, en une quinzaine d'onglets. | Tout le monde (limité à son labo pour un profil labo) |
+| **Tableau de bord** | Les indicateurs bibliométriques d'une structure ou d'un groupe, classés en sept familles d'analyses (Vue d'ensemble, Publications, Impact, Collaborations, Effectifs, Pilotage, Veille). | Tout le monde (limité à son labo pour un profil labo) |
 | **Mes rapports** | Vos rapports bibliométriques, ceux partagés avec vous et ceux visibles par tous ; création à partir d'un modèle, export PDF. | Tout le monde (sur les structures qu'il voit) |
 | **Outils d'alignement** | L'alignement des identifiants chercheurs et, si votre instance est reliée à un annuaire LDAP, l'alignement LDAP. | Services centraux et administrateurs |
 | **Administration** | Console ETL, gestion des droits, sources médias de la veille, selon votre profil. | Administrateurs et chargé·es de communication |

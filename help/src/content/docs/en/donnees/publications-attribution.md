@@ -102,7 +102,7 @@ one. The institution sub-tab shows how many publications are found only this way
 
 ## Signature charter
 
-The **Signature charter** tab compares the affiliation written by the authors with the form
+The **Steering › Signature charter** view compares the affiliation written by the authors with the form
 recommended by the institution: exact mention of the institution, name or acronym of the
 structure, unit code, address, required supervising bodies. Each publication gets a score;
 it is **compliant** if the institution is mentioned and the score reaches the chosen
