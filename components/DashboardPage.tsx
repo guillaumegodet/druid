@@ -11,6 +11,7 @@ import { BooksTab } from './dashboard/BooksTab';
 import { TeamsTab } from './dashboard/TeamsTab';
 import { PhdTab } from './dashboard/PhdTab';
 import { ResearchersTab } from './dashboard/ResearchersTab';
+import { StaffTab } from './dashboard/StaffTab';
 import { NetworkTab } from './dashboard/NetworkTab';
 import { JournalsTab } from './dashboard/JournalsTab';
 import { ApcTab } from './dashboard/ApcTab';
@@ -22,29 +23,41 @@ import { PublicationsListTab } from './dashboard/PublicationsListTab';
 import { PublicationsListModal } from './dashboard/PublicationsListModal';
 import { NewsTab } from './dashboard/NewsTab';
 import { SourcesTab } from './dashboard/SourcesTab';
+import { ExploreGrid } from './dashboard/ExploreGrid';
+import { FAMILY_ICONS } from './dashboard/familyIcons';
+import {
+  DASHBOARD_TABS, DashboardFamily, DashboardTab, familyOf, isDashboardTab, visibleFamilies,
+} from './dashboard/dashboardNav';
 import { PubFilters } from './dashboard/publicationFilters';
 import { AddToReportContext, ShareScopeContext, type AddToReport, type ChartState } from './dashboard/EChartCard';
 import { AddToReportDialog } from './reports/AddToReportDialog';
 import { sanitizeChartParams } from './dashboard/chartMeta';
 import { NewReportDialog } from './reports/NewReportDialog';
 import { reportsBackend } from './dashboard/report/reportsApi';
+import { hasStaffAttributes } from './dashboard/staffAggregates';
 import { getRoles } from '../lib/auth';
-import { Researcher, ViewState } from '../types';
+import { Researcher, Structure, ViewState } from '../types';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { msg } from '@lingui/core/macro';
-import type { MessageDescriptor } from '@lingui/core';
 import { numberLocale } from '../lib/i18n';
+import { normalizeAcronym } from '../lib/normalize';
 import { fetchDashboardStructures } from '../lib/dashboardSource';
+import { researchersOfSlug } from '../lib/staffDirectoryAggregates';
 import { HelpButton } from './HelpButton';
 import { visibleTabKeys } from './dashboard/tabAvailability';
 import { DASHBOARD_TAB_HELP } from '../lib/helpLinks';
 
+export type { DashboardTab } from './dashboard/dashboardNav';
+
 interface DashboardPageProps {
   /** druid-biblio slug to preselect (e.g. from a Structure record); null = default. */
   struct?: string | null;
-  /** Druid researchers (Effectifs): « Membres par équipe » links → researcher record. */
+  /** Druid researchers (Effectifs): « Membres par équipe » links → researcher record, « Directory » view. */
   researchers?: Researcher[];
+  /** Druid structures: matches the dashboard slug to a structure for the « Directory » view. */
+  structures?: Structure[];
   onOpenResearcher?: (r: Researcher) => void;
+  /** « Directory » view: opens the People page filtered on the structure (acronym, null = no filter). */
+  onOpenPeople?: (labAcronym: string | null) => void;
   /** Admins: opens the ETL console (Administration section) on the current structure. */
   onOpenAdmin?: (slug: string) => void;
   /** « Ajouter à un rapport »: opens the report the chart was added to. */
@@ -53,47 +66,8 @@ interface DashboardPageProps {
 
 const DEFAULT_STRUCT = 'univ-nantes';
 
-type Tab =
-  | 'overview'
-  | 'collaborations'
-  | 'impact'
-  | 'books'
-  | 'teams'
-  | 'phd'
-  | 'researchers'
-  | 'network'
-  | 'journals'
-  | 'apc'
-  | 'funders'
-  | 'themes'
-  | 'benchmark'
-  | 'charte'
-  | 'list'
-  | 'news'
-  | 'sources';
-
-/** Dashboard tab keys (help links: lib/helpLinks.ts DASHBOARD_TAB_HELP). */
-export type DashboardTab = Tab;
-
-const NATIVE_TABS: { key: Tab; label: MessageDescriptor }[] = [
-  { key: 'overview', label: msg`Overview` },
-  { key: 'collaborations', label: msg`Collaborations` },
-  { key: 'impact', label: msg`Impact and citations` },
-  { key: 'books', label: msg`Books` },
-  { key: 'journals', label: msg`Journals` },
-  { key: 'apc', label: msg`APC monitoring` },
-  { key: 'funders', label: msg`Funding` },
-  { key: 'themes', label: msg`Strategic axes` },
-  { key: 'benchmark', label: msg`Benchmark` },
-  { key: 'charte', label: msg`Signature charter` },
-  { key: 'teams', label: msg`Teams` },
-  { key: 'phd', label: msg`PhD students` },
-  { key: 'researchers', label: msg`Researchers` },
-  { key: 'network', label: msg`Network` },
-  { key: 'list', label: msg`Publication list` },
-  { key: 'news', label: msg`Watch` },
-  { key: 'sources', label: msg`Sources` },
-];
+/** Views where the period and scope selectors do not apply (live data). */
+const LIVE_TABS: ReadonlySet<DashboardTab> = new Set<DashboardTab>(['news', 'staff']);
 
 /**
  * @component DashboardPage
@@ -105,11 +79,17 @@ const NATIVE_TABS: { key: Tab; label: MessageDescriptor }[] = [
  * admins reach it through the header's « Configurer » button (current
  * structure preselected). The old ?tab=console|streamlit|rights links
  * are redirected by App.tsx.
+ *
+ * Navigation on two levels since 2026-10-13 (docs/plan-tableau-de-bord-familles.md): seven
+ * families of analyses (dashboard/dashboardNav.ts), the active family showing its views as a
+ * second row of pills. The URL keeps the leaf key (?tab=journals), so the old links still work.
  */
 export const DashboardPage: React.FC<DashboardPageProps> = ({
   struct,
   researchers,
+  structures,
   onOpenResearcher,
+  onOpenPeople,
   onOpenAdmin,
   onOpenReport,
 }) => {
@@ -120,8 +100,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // by the server) — editable from the admin without regenerating the data.
   const [tabsHiddenBySlug, setTabsHiddenBySlug] = useState<Record<string, string[]>>({});
   const [slug, setSlug] = useState<string | null>(struct ?? null);
-  const [tab, setTab] = useState<Tab>('overview');
+  const [tab, setTab] = useState<DashboardTab>('overview');
   const [linkCopied, setLinkCopied] = useState(false);
+  // Last view opened in each family, so that coming back to a family lands where the user was.
+  const lastTabByFamily = useRef<Partial<Record<DashboardFamily, DashboardTab>>>({});
+  const goTo = useCallback((next: DashboardTab) => {
+    lastTabByFamily.current[familyOf(next)] = next;
+    setTab(next);
+  }, []);
 
   // ── Shareable link: the full state (structure/group, tab, period,
   // scope) is reflected in the URL, like the Streamlit did
@@ -133,17 +119,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     const p = new URLSearchParams(window.location.search);
     const s = p.get('struct');
     if (s && /^[a-z0-9_-]+$/.test(s)) setSlug(s);
-    const t = p.get('tab');
+    const requested = p.get('tab');
     // The former console/streamlit/rights tabs live in the Administration
     // section: App.tsx redirects those links before reaching this point.
-    if (t && NATIVE_TABS.some((n) => n.key === t)) setTab(t as Tab);
+    if (isDashboardTab(requested)) goTo(requested);
     const from = Number(p.get('from'));
     const to = Number(p.get('to'));
     if (Number.isFinite(from) && Number.isFinite(to) && from > 0 && to >= from) {
       pendingRange.current = { start: from, end: to };
     }
     if (p.get('perimetre') === 'effectifs') pendingScope.current = 'effectifs';
-  }, []);
+  }, [goTo]);
   // Publication list filters — controllable from the other tabs.
   const [listFilters, setListFilters] = useState<PubFilters>({});
 
@@ -154,9 +140,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const closeDrill = useCallback(() => setDrillFilters(null), []);
   const openDrillInTab = useCallback((filters: PubFilters) => {
     setListFilters(filters);
-    setTab('list');
+    goTo('list');
     setDrillFilters(null);
-  }, []);
+  }, [goTo]);
 
   // Structure change = different corpus, the filters no longer make sense.
   useEffect(() => {
@@ -225,22 +211,49 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
       ? data.publications.length - scopedData.publications.length
       : 0;
 
+  // ── « Directory » view: Druid records of the structure (D3 of the plan). A structure whose
+  // acronym matches the slug (and its teams); the institution-wide corpus takes every record;
+  // groups and unmatched slugs have no headcount view.
+  const staffStructure = useMemo(() => {
+    if (!slug) return null;
+    const target = normalizeAcronym(slug);
+    return (structures ?? []).find((s) => s.acronym && normalizeAcronym(s.acronym) === target) ?? null;
+  }, [slug, structures]);
+  const staffResearchers = useMemo(() => {
+    if (!slug || !researchers?.length) return null;
+    const matched = researchersOfSlug(slug, structures ?? [], researchers);
+    if (matched) return matched;
+    return slug === DEFAULT_STRUCT && !groupSlugs.includes(slug) ? researchers : null;
+  }, [slug, structures, researchers, groupSlugs]);
+
   // Strategic axes: tab hidden when the structure has no configured axes
   // (strategic_axes in config.yaml, missing for groups in particular).
   // Plus the tabs hidden by the admin (druid_tabs_hidden) —
   // « Vue d'ensemble » always stays visible.
   const hasAxes = (data?.strategicAxes?.length ?? 0) > 0;
   const hasBenchmark = data?.benchmark != null;
-  const visibleTabs = useMemo(() => {
-    const keys = new Set(visibleTabKeys(
-      NATIVE_TABS.map(({ key }) => key),
-      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark },
-    ));
-    return NATIVE_TABS.filter(({ key }) => keys.has(key));
-  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark]);
+  const hasStaff = (staffResearchers?.length ?? 0) > 0;
+  const families = useMemo(() => {
+    const keys = visibleTabKeys(
+      DASHBOARD_TABS.map(({ key }) => key),
+      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff },
+    );
+    return visibleFamilies(keys);
+  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff]);
+  const visibleKeys = useMemo(() => new Set(families.flatMap((f) => f.tabs.map((x) => x.key))), [families]);
   useEffect(() => {
-    if (data && !visibleTabs.some((t) => t.key === tab)) setTab('overview');
-  }, [tab, data, visibleTabs]);
+    if (data && !visibleKeys.has(tab)) goTo('overview');
+  }, [tab, data, visibleKeys, goTo]);
+  const family = familyOf(tab);
+  const activeFamily = families.find((f) => f.key === family);
+
+  /** Family pill: the last view opened there, else its first visible view. */
+  const openFamily = (key: DashboardFamily) => {
+    const def = families.find((f) => f.key === key);
+    if (!def) return;
+    const remembered = lastTabByFamily.current[key];
+    goTo(remembered && def.tabs.some((x) => x.key === remembered) ? remembered : def.tabs[0].key);
+  };
 
   const bounds = useMemo(
     () => getYearBounds(scopedData?.publications ?? []),
@@ -277,6 +290,27 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     window.history.replaceState(null, '', `${window.location.pathname}?${p.toString()}`);
   }, [data, slug, tab, range, scope]);
 
+  // Headline figures of the « Explore » cards (overview): one pass over the period.
+  const exploreFigures = useMemo(() => {
+    if (!scopedData) return {};
+    let pubs = 0; let intl = 0; let intlKnown = 0; let citations = 0;
+    for (const p of scopedData.publications) {
+      if (p.year == null || p.year < range.start || p.year > range.end) continue;
+      pubs++;
+      citations += p.citedByCount ?? 0;
+      if (p.isInternational != null) { intlKnown++; if (p.isInternational) intl++; }
+    }
+    const n = (v: number) => v.toLocaleString(numberLocale());
+    const out: Partial<Record<DashboardFamily, { value: string; label: string }>> = {
+      publications: { value: n(pubs), label: t`publications` },
+      impact: { value: n(citations), label: t`citations` },
+    };
+    if (intlKnown > 0) out.collaborations = { value: `${Math.round((intl / intlKnown) * 100)} %`, label: t`international` };
+    const people = staffResearchers?.length ?? scopedData.members?.length ?? 0;
+    if (people > 0) out.people = { value: n(people), label: t`members` };
+    return out;
+  }, [scopedData, range, staffResearchers, t]);
+
   const copyLink = () => {
     copyToClipboard(window.location.href).then((ok) => {
       if (!ok) return;
@@ -293,14 +327,21 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const [addTarget, setAddTarget] = useState<{ chartId: string; title: string; state: ChartState | null } | null>(null);
   const addToReport = useCallback<AddToReport>((chartId, title, state) => setAddTarget({ chartId, title, state }), []);
 
-  const tabBtn = (active: boolean) =>
-    `pill px-4 py-1.5 text-[13px] transition-colors cursor-pointer ${
+  const familyBtn = (active: boolean) =>
+    `pill flex items-center gap-2 px-4 py-2 text-[13px] font-semibold transition-colors cursor-pointer ${
       active
         ? 'bg-ink text-white dark:bg-accent dark:text-ink shadow-nav-active'
         : 'bg-white/60 dark:bg-white/10 text-ink dark:text-[#f5f2ea] hover:bg-white dark:hover:bg-white/15'
     }`;
+  const viewBtn = (active: boolean) =>
+    `pill px-3 py-1 text-xs transition-colors cursor-pointer ${
+      active
+        ? 'bg-accent text-ink shadow-nav-active'
+        : 'bg-white/50 dark:bg-white/5 text-muted dark:text-[#c3beb0] hover:bg-white dark:hover:bg-white/10'
+    }`;
 
   const isAdmin = getRoles().includes('admin');
+  const live = LIVE_TABS.has(tab);
 
   return (
     <div className="h-full flex flex-col gap-4 p-6 overflow-y-auto">
@@ -348,9 +389,9 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               <Settings className="w-3.5 h-3.5" /> <Trans>Configure</Trans>
             </button>
           )}
-          {/* Period and scope do not apply to the media monitoring tab (live
-              OpenAlex data, tab-specific period). */}
-          {tab !== 'news' && data && canScopeHeadcount && (
+          {/* Period and scope do not apply to the live views (media monitoring with its own
+              period, directory headcount as of today). */}
+          {!live && data && canScopeHeadcount && (
             <div
               className="flex items-center gap-0.5 p-0.5 rounded-full bg-white/60 dark:bg-white/10 border border-white/70 dark:border-white/15"
               title={
@@ -380,7 +421,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               ))}
             </div>
           )}
-          {tab !== 'news' && data && (
+          {!live && data && (
             <YearRangeSelector bounds={bounds} range={range} onChange={setRange} />
           )}
           {data && (
@@ -408,14 +449,45 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
         </div>
       </div>
 
-      {/* Tab row */}
-      <div className="flex flex-wrap items-center gap-1.5">
-        {visibleTabs.map(({ key, label }) => (
-          <button key={key} type="button" className={tabBtn(tab === key)} onClick={() => setTab(key)}>
-            {t(label)}
-          </button>
-        ))}
-      </div>
+      {/* Navigation: families, then the views of the active family */}
+      <nav aria-label={t`Analyses`} className="flex flex-col gap-2">
+        <div className="flex flex-wrap items-center gap-1.5">
+          {families.map((f) => {
+            const Icon = FAMILY_ICONS[f.key];
+            const active = f.key === family;
+            return (
+              <button
+                key={f.key}
+                type="button"
+                className={familyBtn(active)}
+                aria-current={active ? 'page' : undefined}
+                title={t(f.description)}
+                onClick={() => openFamily(f.key)}
+              >
+                <Icon className="w-4 h-4" />
+                {t(f.label)}
+              </button>
+            );
+          })}
+        </div>
+        {activeFamily && activeFamily.tabs.length > 1 && (
+          <div className="flex flex-wrap items-center gap-1.5 px-1" role="tablist">
+            {activeFamily.tabs.map((x) => (
+              <button
+                key={x.key}
+                type="button"
+                role="tab"
+                aria-selected={tab === x.key}
+                className={viewBtn(tab === x.key)}
+                title={t(x.hint)}
+                onClick={() => goTo(x.key)}
+              >
+                {t(x.label)}
+              </button>
+            ))}
+          </div>
+        )}
+      </nav>
 
       <>
           {loading && (
@@ -444,12 +516,19 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
             <AddToReportContext.Provider value={addToReport}>
             <ShareScopeContext.Provider value={{ slug, range, perimetre: scope }}>
               {tab === 'overview' && (
-                <OverviewTab
-                  publications={scopedData.publications}
-                  range={range}
-                  etpr={scopedData.etpr}
-                  onOpenList={openList}
-                />
+                <>
+                  <OverviewTab
+                    publications={scopedData.publications}
+                    range={range}
+                    etpr={scopedData.etpr}
+                    onOpenList={openList}
+                  />
+                  <ExploreGrid
+                    families={families.filter((f) => f.key !== 'overview')}
+                    figures={exploreFigures}
+                    onNavigate={goTo}
+                  />
+                </>
               )}
               {tab === 'collaborations' && (
                 <CollaborationsTab dataset={scopedData} range={range} onOpenList={openList} />
@@ -468,6 +547,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 />
               )}
               {tab === 'phd' && <PhdTab dataset={scopedData} range={range} onOpenList={openList} />}
+              {tab === 'staff' && staffResearchers && (
+                <StaffTab
+                  researchers={staffResearchers}
+                  structureLabel={scopedData.lab}
+                  showAgeGroups={!hasStaffAttributes(scopedData)}
+                  onOpenPeople={onOpenPeople ? () => onOpenPeople(staffStructure?.acronym ?? null) : undefined}
+                />
+              )}
               {tab === 'researchers' && (
                 <ResearchersTab dataset={scopedData} range={range} onOpenList={openList} />
               )}

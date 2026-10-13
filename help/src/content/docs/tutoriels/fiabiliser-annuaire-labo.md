@@ -24,7 +24,7 @@ enchaîne les guides dans le bon ordre.
 ## Étape 1 — Faire l'état des lieux
 
 1. Dans **Personnel**, filtrez sur le laboratoire (**Labo (affil. principale)**).
-2. Notez le nombre de fiches, puis passez en vue **Dataviz** : répartition par présence et employeur,
+2. Notez le nombre de fiches, puis ouvrez **Toutes les analyses d'effectifs** (tableau de bord) : répartition par présence et employeur,
    couverture des identifiants. Gardez ces chiffres : ils serviront à mesurer le progrès.
 3. Filtrez **Validation › Non validé** : ce sont les fiches à traiter en priorité.
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { List, LayoutGrid } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { ResearcherDashboard } from './ResearcherDashboard';
+import { KeyFiguresStrip } from './researchers/KeyFiguresStrip';
 import { Researcher, ResearcherStatus } from '../types';
 import { GristService } from '../lib/gristService';
 import { AbesExportModal } from './researchers/AbesExportModal';
@@ -38,6 +37,8 @@ interface ResearcherListProps {
   /** Callback running the IdRef alignment (search = missing, verify = check existing) */
   /** Opens the import workshop for a verified list (manual validation) */
   onImportValidation?: () => void;
+  /** Opens Tableau de bord › People › Directory on the lab of the filter (null = default structure). */
+  onOpenStaffDashboard?: (labAcronym: string | null) => void;
   onImportSite?: () => void;
   /** Opens the ORCID or HAL alignment page (search = missing, verify = check existing). */
   /** Opens the merge assistant on two records (Grist row numbers) */
@@ -60,7 +61,7 @@ interface ResearcherListProps {
 export const ResearcherList: React.FC<ResearcherListProps> = ({
   researchers, setResearchers, onSelectResearcher, onNewResearcher,
   loading = false, onManualSync, onOpenDuplicates, duplicatesCount,
-  onImportValidation, onImportSite, onMergeResearchers,
+  onImportValidation, onImportSite, onMergeResearchers, onOpenStaffDashboard,
 }) => {
   const { t } = useLingui();
   // Career-path signals (docs/plan-parcours-affiliations.md, lot 4): server job only; a failure just
@@ -184,30 +185,11 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
       />
 
       <div className="px-4 md:px-7 py-4 flex-1 overflow-auto" data-page-scroll>
-        {/* List / Dataviz toggle as pills */}
-        <div className="inline-flex items-center gap-1 bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white/70 dark:border-white/15 rounded-full p-1 mb-4">
-          {([
-            { key: 'list', label: t`List`, Icon: List },
-            { key: 'dashboard', label: t`Charts`, Icon: LayoutGrid },
-          ] as const).map(({ key, label, Icon }) => {
-            const active = filters.viewMode === key;
-            return (
-              <button
-                key={key}
-                onClick={() => filters.updateViewMode(key)}
-                aria-pressed={active}
-                title={key === 'list' ? t`List view (table)` : t`Chart view`}
-                className={`flex items-center gap-2 px-5 h-9 rounded-full font-disp font-semibold text-sm transition-colors ${
-                  active
-                    ? 'bg-ink text-white dark:bg-accent dark:text-ink shadow-nav-active'
-                    : 'text-muted dark:text-[#8f897c] hover:text-ink dark:hover:text-[#f5f2ea]'
-                }`}
-              >
-                <Icon className="w-4 h-4" /> {label}
-              </button>
-            );
-          })}
-        </div>
+        {/* Key figures of the selection; the charts live in Tableau de bord › People › Directory. */}
+        <KeyFiguresStrip
+          researchers={filters.sortedResearchers}
+          onOpenDashboard={onOpenStaffDashboard ? () => onOpenStaffDashboard(filters.filterLabs.length === 1 ? filters.filterLabs[0] : null) : undefined}
+        />
 
         <FilterPanel
           searchTerm={filters.searchTerm}
@@ -253,26 +235,22 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
         />
 
         <div className="glass-card overflow-hidden">
-          {filters.viewMode === 'list' ? (
-            <ResearcherTable
-              researchers={filters.paginatedResearchers}
-              selectedIds={selectedIds}
-              isAllSelected={isAllSelected}
-              onToggleSelect={toggleSelect}
-              onToggleSelectAll={toggleSelectAll}
-              onSelectResearcher={onSelectResearcher}
-              loading={loading}
-              sortedCount={filters.sortedResearchers.length}
-              sortConfig={filters.sortConfig}
-              onSort={filters.handleSort}
-              currentPage={filters.currentPage}
-              totalPages={filters.totalPages}
-              onPageChange={filters.setCurrentPage}
-              departureKeys={departureKeys}
-            />
-          ) : (
-            <ResearcherDashboard researchers={filters.sortedResearchers} />
-          )}
+          <ResearcherTable
+            researchers={filters.paginatedResearchers}
+            selectedIds={selectedIds}
+            isAllSelected={isAllSelected}
+            onToggleSelect={toggleSelect}
+            onToggleSelectAll={toggleSelectAll}
+            onSelectResearcher={onSelectResearcher}
+            loading={loading}
+            sortedCount={filters.sortedResearchers.length}
+            sortConfig={filters.sortConfig}
+            onSort={filters.handleSort}
+            currentPage={filters.currentPage}
+            totalPages={filters.totalPages}
+            onPageChange={filters.setCurrentPage}
+            departureKeys={departureKeys}
+          />
         </div>
       </div>
     </div>

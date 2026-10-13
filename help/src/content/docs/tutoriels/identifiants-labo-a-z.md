@@ -20,7 +20,7 @@ rend sûr un profil HAL qui porte le même ORCID. L'ordre des sources compte.
 
 ## Étape 1 — Mesurer le point de départ
 
-Dans **Personnel**, filtrez le laboratoire et passez en vue **Dataviz** : le graphique
+Dans **Personnel**, filtrez le laboratoire puis **Toutes les analyses d'effectifs** : le graphique
 **Couverture des identifiants** donne la part des fiches qui ont chaque identifiant. Notez-la.
 
 ## Étape 2 — Vérifier les identifiants existants
@@ -88,7 +88,7 @@ produit est à transmettre à l'ABES ou à traiter par la bibliothèque. Voir
 
 ## Étape 8 — Mesurer le résultat et envoyer à CRISalid
 
-1. Revenez à la vue **Dataviz** : comparez la couverture des identifiants à celle de
+1. Revenez à la vue **Annuaire** du tableau de bord : comparez la couverture des identifiants à celle de
    l'étape 1.
 2. Envoyez la liste à CRISalid (**Administration › Synchroniser avec SoVisu+**, si votre
    instance le permet).

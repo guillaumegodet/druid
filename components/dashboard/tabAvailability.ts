@@ -9,6 +9,9 @@ export interface TabVisibilityInput {
   hasAxes: boolean;
   /** Benchmark data exported for the structure. */
   hasBenchmark: boolean;
+  /** Druid directory records matched to the structure (« Directory » view, decision D3 of
+   *  docs/plan-tableau-de-bord-familles.md). Missing = the caller has no directory at all. */
+  hasStaff?: boolean;
 }
 
 /**
@@ -19,6 +22,8 @@ export function visibleTabKeys<T extends string>(tabs: readonly T[], input: TabV
   const hidden = new Set(input.hidden);
   return tabs.filter((key) =>
     key === 'overview' ||
-    (!hidden.has(key) && (key !== 'themes' || input.hasAxes) && (key !== 'benchmark' || input.hasBenchmark)));
+    (!hidden.has(key)
+      && (key !== 'themes' || input.hasAxes)
+      && (key !== 'benchmark' || input.hasBenchmark)
+      && (key !== 'staff' || input.hasStaff === true)));
 }
-
