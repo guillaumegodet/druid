@@ -28,7 +28,7 @@ const PAGE_SIZE = 50;
 
 /**
  * Centralizes all the filtering, sorting and pagination logic of the researcher list.
- * Keeps the filters and the display mode in sync with the URL parameters. Ported from
+ * Keeps the filters in sync with the URL parameters. Ported from
  * docker/druid-demo/hooks/useResearcherFilters.ts (lot 3 of the multi-instance
  * architecture plan, ResearcherList refactor sub-lot) — adapted on two points where Nantes
  * deliberately diverges:
@@ -50,7 +50,6 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
     return { ...r, nuFields: { ...r.nuFields, pole: r.nuFields?.pole || calculatedPole } };
   }), [researchers]);
 
-  const [viewMode, setViewMode] = useState<'list' | 'dashboard'>('list');
   const [searchTerm, setSearchTerm] = useState('');
   // Presence / employer / LDAP account axes (lib/presence.ts) — they replaced the « status » filter.
   const [filterPresence, setFilterPresence] = useState<string[]>([]);
@@ -72,7 +71,7 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
   const splitFilter = (v: string) => (v ? v.split(',').filter(Boolean) : []);
 
   const { setUrlState } = useUrlState(
-    { search: '', presence: '', ldap: '', status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '', mode: 'list' },
+    { search: '', presence: '', ldap: '', status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '' },
     (newState) => {
       if (newState.search !== undefined) setSearchTerm(newState.search || '');
       if (newState.presence !== undefined) setFilterPresence(splitFilter(newState.presence || ''));
@@ -85,7 +84,6 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
       if (newState.contractType !== undefined) setFilterContractTypes(splitFilter(newState.contractType || ''));
       if (newState.pole !== undefined) setFilterPoles(splitFilter(newState.pole || ''));
       if (newState.parcours !== undefined) setFilterParcours(splitFilter(newState.parcours || ''));
-      if (newState.mode !== undefined) setViewMode((newState.mode as 'list' | 'dashboard') || 'list');
       // Links bookmarked before the three axes (?status=INTERNE…): translated, unless the new parameters are set.
       if (newState.status) {
         const legacy = filtersFromLegacyStatus(splitFilter(newState.status));
@@ -241,10 +239,8 @@ export function useResearcherFilters(researchers: Researcher[], parcoursSignals:
     setIdFilters({ orcid: false, hal: false, idref: false, scopus: false });
     setUrlState({ presence: '', ldap: '', status: '', validation: '', employer: '', lab: '', membership: '', grade: '', contractType: '', pole: '', parcours: '' });
   };
-  const updateViewMode = (val: 'list' | 'dashboard') => { setViewMode(val); setUrlState({ mode: val }); };
 
   return {
-    viewMode, updateViewMode,
     searchTerm, updateSearch,
     filterPresence, updatePresence,
     filterLdap, updateLdap,

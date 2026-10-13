@@ -20,7 +20,7 @@ holding the same ORCID certain. The order of the sources matters.
 
 ## Step 1 — Measure the starting point
 
-In **People**, filter the laboratory and switch to the **Charts** view: the **Identifier
+In **People**, filter the laboratory then **All the headcount analyses**: the **Identifier
 coverage** chart gives the share of records holding each identifier. Note it down.
 
 ## Step 2 — Check the existing identifiers
@@ -85,7 +85,7 @@ or handled by the library. See [Export a file for ABES](/en/guides/identifiants/
 
 ## Step 8 — Measure the result and send to CRISalid
 
-1. Go back to the **Charts** view: compare the identifier coverage with that of step 1.
+1. Go back to the **Headcount** view of the dashboard: compare the identifier coverage with that of step 1.
 2. Send the list to CRISalid (**Administration › Synchronise with SoVisu+**, if your instance
    allows it).
 3. The identifiers you removed or corrected are also sent to the CRISalid graph, which removes

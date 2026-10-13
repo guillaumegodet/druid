@@ -13,7 +13,7 @@
  */
 import { ViewState } from '../types';
 import type { AdminTab } from './auth';
-import type { DashboardTab } from '../components/DashboardPage';
+import type { DashboardTab } from '../components/dashboard/dashboardNav';
 import type { TodoTab } from '../components/researchers/TodoPage';
 
 /** Public URL of the help centre, overridable per instance (e.g. a custom domain). */
@@ -50,6 +50,7 @@ export const DASHBOARD_TAB_HELP: Record<DashboardTab, string> = {
   charte: '/donnees/publications-attribution/#charte-de-signature',
   teams: '/donnees/publications-attribution/#comment-les-auteurs-sont-reconnus',
   phd: '/donnees/publications-attribution/#comment-les-auteurs-sont-reconnus',
+  staff: '/guides/tableau-de-bord/chercheurs-effectifs/#effectifs-de-lannuaire',
   researchers: '/guides/tableau-de-bord/chercheurs-effectifs/',
   network: '/guides/tableau-de-bord/reseau/',
   list: '/guides/tableau-de-bord/liste-des-publications/',
@@ -82,6 +83,7 @@ export const EN_ANCHORS: Record<string, string> = {
   'charte-de-signature': 'signature-charter',
   'comment-les-auteurs-sont-reconnus': 'how-authors-are-recognised',
   'longlet-sources-du-tableau-de-bord': 'the-sources-tab-of-the-dashboard',
+  'effectifs-de-lannuaire': 'directory-headcount',
 };
 
 /**

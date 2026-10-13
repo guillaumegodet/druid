@@ -1,6 +1,6 @@
 ---
 title: "Rechercher et filtrer les personnels"
-description: "Trouver une personne, filtrer la liste par labo, présence, employeur, grade ou identifiant, et passer en vue graphiques."
+description: "Trouver une personne, filtrer la liste par labo, présence, employeur, grade ou identifiant, et lire les chiffres clés de la sélection."
 sidebar:
   order: 1
 ---
@@ -45,12 +45,14 @@ En dessous :
 
 Le nombre de fiches retenues s'affiche à côté du titre.
 
-## Passer en vue graphiques
+## Lire les chiffres clés
 
-Le bouton **Dataviz** remplace le tableau par des graphiques calculés sur la liste filtrée :
-répartition par présence et employeur, parité femmes / hommes, tranches d'âge, grades, employeurs, types
-d'emploi, répartition par labo, taux de HDR et **couverture des identifiants**. **Liste**
-revient au tableau.
+Le bandeau **Chiffres clés**, au-dessus des filtres, suit la liste filtrée : fiches retenues,
+présents (départs annoncés et effectifs), titulaires d'une HDR, part de femmes, fiches avec
+ORCID. Le bouton **Toutes les analyses d'effectifs** ouvre le tableau de bord sur la vue
+**Personnes › Effectifs** du labo filtré (présence et employeur, parité, grades, employeurs,
+types d'emploi, **couverture des identifiants**) — voir
+[Lire les effectifs](/guides/tableau-de-bord/chercheurs-effectifs/#effectifs-de-lannuaire).
 
 ## Agir sur une sélection
 
@@ -73,7 +75,7 @@ Rien n'est modifié : la recherche et les filtres ne changent que l'affichage. L
 - **Les filtres Identifiants ne trouvent que les fiches qui ont l'identifiant.** Pour
   repérer les identifiants manquants, utilisez la page
   [Alignement des identifiants](/guides/identifiants/aligner-les-identifiants/) ou la vue
-  graphiques (couverture des identifiants).
+  **Tableau de bord › Personnes › Effectifs** (couverture des identifiants).
 - **Le filtre Labo porte sur le rattachement principal** : une personne rattachée en
   secondaire à un labo n'apparaît pas dans ce filtre.
 - **Le filtre Dates** ignore les fiches sans date d'emploi, qui restent affichées.

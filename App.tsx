@@ -228,6 +228,34 @@ function App() {
     setViewAndUrl(ViewState.DASHBOARD);
   };
 
+  /** Keys written by the dashboard (DashboardPage) and by the People filters (useResearcherFilters):
+   *  dropped when jumping from one section to the other so that the target reads a clean URL. */
+  const DASHBOARD_URL_KEYS = ['struct', 'tab', 'from', 'to', 'perimetre'];
+  const PEOPLE_URL_KEYS = ['search', 'presence', 'ldap', 'status', 'validation', 'employer', 'lab', 'membership', 'grade', 'contractType', 'pole', 'parcours', 'mode'];
+  const replaceUrlKeys = (drop: string[], set: Record<string, string>) => {
+    const p = new URLSearchParams(window.location.search);
+    for (const k of drop) p.delete(k);
+    for (const [k, v] of Object.entries(set)) p.set(k, v);
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}?${p.toString()}`);
+  };
+
+  /** People › « All the headcount analyses »: Tableau de bord › People › Headcount on the lab of
+   *  the filter when it has a dashboard, else the default structure (D4 of
+   *  docs/plan-tableau-de-bord-familles.md). */
+  const openStaffDashboard = (labAcronym: string | null) => {
+    const slug = (labAcronym && dashboardSlugFor(labAcronym))
+      || (dashboardSlugs.includes('univ-nantes') ? 'univ-nantes' : dashboardSlugs[0]);
+    if (!slug) return;
+    replaceUrlKeys(PEOPLE_URL_KEYS, { tab: 'staff' });
+    openDashboardFor(slug);
+  };
+
+  /** Tableau de bord › Headcount › « Open the list in People »: the list filtered on the lab. */
+  const openPeopleForLab = (labAcronym: string | null) => {
+    replaceUrlKeys([...DASHBOARD_URL_KEYS, ...PEOPLE_URL_KEYS], labAcronym ? { lab: labAcronym } : {});
+    setViewAndUrl(ViewState.RESEARCHERS_LIST);
+  };
+
   // Administration section: requested tab + structure to preselect
   // in the ETL console (from the URL or the dashboard's « Configurer » button).
   const [adminTab, setAdminTab] = useState<AdminTab | null>(null);
@@ -831,6 +859,7 @@ function App() {
             onMergeResearchers={writable ? (rowIds) => setMergeRowIds(rowIds) : undefined}
             onImportValidation={writable && hasCapability('HAS_STATUS_VALIDATION') ? () => setValidationImportOpen(true) : undefined}
             onImportSite={writable && canUseEstablishmentTools() ? () => setSiteImportOpen(true) : undefined}
+            onOpenStaffDashboard={dashboardSlugs.length > 0 ? openStaffDashboard : undefined}
           />
         );
       case ViewState.RESEARCHER_DETAIL:
@@ -977,7 +1006,9 @@ function App() {
             <DashboardPage
               struct={dashboardStruct}
               researchers={researchers}
+              structures={structures}
               onOpenResearcher={handleResearcherSelect}
+              onOpenPeople={openPeopleForLab}
               onOpenAdmin={(slug) => openAdmin('console', slug)}
               onOpenReport={(id) => openReport(id)}
             />

@@ -22,7 +22,7 @@ This walkthrough puts the guides in the right order.
 ## Step 1 — Take stock
 
 1. In **People**, filter on the laboratory (**Lab (primary affil.)**).
-2. Note the number of records, then switch to the **Charts** view: breakdown by presence and employer,
+2. Note the number of records, then open **All the headcount analyses** (dashboard): breakdown by presence and employer,
    identifier coverage. Keep these figures: they will help measure progress.
 3. Filter **Validation › Not validated**: these are the records to handle first.
 
