@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.4.0] — 2026-10-13
+
 ### Modifié
 - **Tableau de bord en sept familles d'analyses** (Vue d'ensemble · Publications · Impact · Collaborations · Effectifs ·
   Pilotage · Veille) : les 17 onglets sont regroupés sur deux rangées (familles avec icône, puis vues de la famille
@@ -32,6 +34,11 @@ données à exécuter au déploiement).
   (dernière ligne du journal d'audit) était triée en texte (« 999 » devant « 5237 ») et ne bougeait plus ; un
   identifiant pris depuis l'annuaire Centrale restait invisible dans la fiche jusqu'au redémarrage. Tri numérique
   rétabli, test d'intégration ajouté.
+- Un lien direct vers la vue Effectifs › Annuaire (`?tab=staff`) retombait sur la Vue d'ensemble, les fiches de
+  l'annuaire arrivant après les données bibliométriques ; la vue attend désormais le chargement de l'annuaire.
+- Centre d'aide : le build Cloudflare des branches de PR du Worker `druid-aide` échouait (bloc `previews` manquant
+  dans `help/wrangler.jsonc`, réglages « Previews Base » à la racine du dépôt) ; chaque PR touchant `help/` a de
+  nouveau une URL de prévisualisation.
 
 ### Retiré
 - `components/ResearcherDashboard.tsx` (graphiques recharts de la page Personnel), remplacé par la vue Annuaire.
