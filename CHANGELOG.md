@@ -34,7 +34,8 @@ données à exécuter au déploiement).
   rétabli, test d'intégration ajouté.
 
 ### Retiré
-- `components/ResearcherDashboard.tsx` (graphiques recharts de la page Personnel), remplacé par la vue Effectifs.
+- `components/ResearcherDashboard.tsx` (graphiques recharts de la page Personnel), remplacé par la vue Annuaire.
+- Dépendance `recharts` (plus aucun graphique ne l'utilise : tout est en ECharts).
 
 ## [2.3.0] — 2026-10-12
 
