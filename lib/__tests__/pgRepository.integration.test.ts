@@ -94,4 +94,32 @@ describe.skipIf(!url)('DirectoryRepository contract: Grist = PostgreSQL', () => 
     expect(differences(gristStructures, got.structures[1], 'structures')).toEqual([]);
     expect(got.pgUpdatedAt[1]).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
+
+  // The version of the lists is the last audit row by its numeric id: a text comparison would keep '999' above
+  // '1000' and the people list cached on it would never be reloaded (ORCID settled by an arbitration never shown).
+  it('the version of the lists follows the numeric id of the audit log', async () => {
+    const directory = transformDirectory(gristDirectoryFixture());
+    const seen: { updatedAt: string; orcid: string }[] = [];
+    await expect(db!.transaction().execute(async (trx) => {
+      await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
+      await loadDirectory(trx, directory.rows, directory.report);
+      const pg = createPgDirectoryRepository({ db: trx, loadLdapCache: async () => ({ data: {}, version: 'l1' }) });
+      const orcidOf = async () => (await pg.people(ALL)).items.find((p) => p.id === 'dupont-a')!.identifiers.orcid ?? '';
+      // Next ids: 999 (or 9999…, above the rows already there), then 1000… — '1000' sorts below '999' as text.
+      const { rows: [{ max }] } = await sql<{ max: string | null }>`SELECT max(id)::text AS max FROM audit_log`.execute(trx);
+      let base = 999;
+      while (base <= Number(max ?? 0)) base = base * 10 + 9;
+      await sql`ALTER TABLE audit_log ALTER COLUMN id RESTART WITH ${sql.raw(String(base))}`.execute(trx);
+      await sql`INSERT INTO audit_log (table_name, action, at) VALUES ('person', 'update', '2030-01-01T00:00:00Z')`.execute(trx);
+      seen.push({ updatedAt: (await pg.people(ALL)).updatedAt, orcid: await orcidOf() });
+      const person = await trx.selectFrom('person').select('id').where('uid', '=', 'dupont-a').executeTakeFirstOrThrow();
+      await trx.deleteFrom('person_identifier').where('person_id', '=', person.id).where('scheme', '=', 'orcid').execute();
+      await trx.insertInto('person_identifier').values({ person_id: person.id, scheme: 'orcid', value: '0000-0002-0000-0002', is_primary: true, source: 'test' } as any).execute();
+      await sql`INSERT INTO audit_log (table_name, action, at) VALUES ('person_identifier', 'insert', '2030-01-02T00:00:00Z')`.execute(trx);
+      seen.push({ updatedAt: (await pg.people(ALL)).updatedAt, orcid: await orcidOf() });
+      throw new Rollback();
+    })).rejects.toBeInstanceOf(Rollback);
+    expect(seen[0].updatedAt).toBe('2030-01-01T00:00:00.000Z');
+    expect(seen[1]).toEqual({ updatedAt: '2030-01-02T00:00:00.000Z', orcid: '0000-0002-0000-0002' });
+  });
 });
