@@ -37,7 +37,8 @@ const Donut: React.FC<{
       center: ['50%', '44%'],
       avoidLabelOverlap: true,
       itemStyle: { borderColor: t.surface, borderWidth: 2 },
-      label: { formatter: '{b}\n{d} %', color: t.inkSecondary, fontSize: 11 },
+      // Slice labels show the share only: the names (long for the presence slices) stay in the legend.
+      label: { formatter: '{d} %', color: t.inkSecondary, fontSize: 11 },
       data: present.map((d) => ({ name: d.name, value: d.value, itemStyle: { color: d.color } })),
     }],
   }), [present, t]);
@@ -168,7 +169,7 @@ export const StaffTab: React.FC<{
       },
       grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
       xAxis: { ...baseCategoryAxis(t), data: IDENTIFIER_KEYS.map((k) => names[k]) },
-      yAxis: { ...baseValueAxis(t), max: total > 0 ? total : undefined },
+      yAxis: baseValueAxis(t),
       series: [{
         type: 'bar',
         data: IDENTIFIER_KEYS.map((k) => ids[k]),
@@ -193,7 +194,7 @@ export const StaffTab: React.FC<{
       textStyle: baseTextStyle(t),
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...baseTooltip(t) },
       grid: { left: 8, right: 16, top: 24, bottom: 8, containLabel: true },
-      xAxis: { ...baseCategoryAxis(t), data: AGE_GROUPS.map((k) => labels[k]) },
+      xAxis: { ...baseCategoryAxis(t), data: AGE_GROUPS.map((k) => labels[k]), axisLabel: { interval: 0, color: t.inkSecondary, fontSize: 11 } },
       yAxis: baseValueAxis(t),
       series: [{
         type: 'bar',
