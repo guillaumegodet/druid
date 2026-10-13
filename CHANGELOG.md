@@ -12,6 +12,13 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Administration › Établissements** (droit établissement) : la liste des établissements employeurs proposée par le
+  champ « Établissement employeur » des fiches se gère désormais dans Druid — ajout (nom, forme longue, UAI, ROR,
+  PPN IdRef, avec contrôle de forme et refus des doublons de nom ou d'UAI), modification en ligne, nombre de fiches
+  par établissement. Routes `POST` / `PUT /api/v1/institutions`, sur PostgreSQL comme sur Grist ; page d'aide
+  « Gérer les établissements employeurs ».
+
 ## [2.4.0] — 2026-10-13
 
 ### Modifié

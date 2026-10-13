@@ -405,3 +405,51 @@ describe('LDAP review (lot 2 d)', () => {
     expect((await call(ALL, true)).status).toBe(200);
   });
 });
+
+describe('employing institutions (Administration › Institutions)', () => {
+  const input = { name: 'U PARIS NANTERRE', label: 'Université Paris Nanterre', uai: '0921204J', ror: 'https://ror.org/013bkhk48', idref: '026403587' };
+
+  it('creates the Etablissements row, normalized, and drops the repository caches', async () => {
+    const { grist, commands, audit, ctx, invalidate } = setup();
+    const { id } = await commands.createInstitution(input, ctx(ALL));
+    expect(grist.tables.Etablissements.find((r) => r.id === id)!.fields)
+      .toEqual({ Employeur: 'U PARIS NANTERRE', Libelle: 'Université Paris Nanterre', UAI: '0921204J', ROR: '013bkhk48', idref: '026403587' });
+    expect(audit[0]).toMatchObject({ table: 'Etablissements', kind: 'create', rows: [id], count: 1 });
+    expect(invalidate).toHaveBeenCalled();
+  });
+
+  it('updates a row, refuses an unknown one and a duplicate name', async () => {
+    const { grist, commands, ctx } = setup();
+    await commands.updateInstitution(10, { name: 'UNIVERSITE EXEMPLE', label: 'Université Exemple', uai: '0000000A' }, ctx(ALL));
+    expect(grist.tables.Etablissements[0].fields).toEqual({ Employeur: 'UNIVERSITE EXEMPLE', Libelle: 'Université Exemple', UAI: '0000000A', ROR: '', idref: '' });
+    await expect(commands.updateInstitution(99, input, ctx(ALL))).rejects.toMatchObject({ status: 404, message: 'Institution not found: 99' });
+    await expect(commands.createInstitution({ name: 'université exemple' }, ctx(ALL)))
+      .rejects.toMatchObject({ status: 409, message: 'An institution with this name already exists: UNIVERSITE EXEMPLE' });
+    await expect(commands.createInstitution({ name: 'X', uai: 'abc' }, ctx(ALL))).rejects.toMatchObject({ status: 400, message: 'Invalid UAI code: ABC' });
+    expect(grist.writes).toEqual(['update Etablissements 10']);
+  });
+
+  it('is reserved to the institution right', async () => {
+    const { grist, commands, ctx } = setup();
+    await expect(commands.createInstitution(input, ctx(LAB_A))).rejects.toMatchObject({ status: 403, message: 'Institutions require the institution right' });
+    await expect(commands.updateInstitution(10, input, ctx(LAB_A))).rejects.toMatchObject({ status: 403 });
+    expect(grist.writes).toEqual([]);
+  });
+
+  it('is served by POST and PUT /api/v1/institutions', async () => {
+    const { grist, commands } = setup();
+    const repository = createGristDirectoryRepository({ grist });
+    const api = createDirectoryApi();
+    const call = (method: string, path: string, body: unknown) => api.fetch(
+      new Request(`http://druid.test${path}`, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }),
+      { repository, commands, publications: {} as any, scope: ALL },
+    );
+    const created = await call('POST', '/api/v1/institutions', input);
+    expect(created.status).toBe(201);
+    const { id } = await created.json();
+    expect((await call('PUT', `/api/v1/institutions/${id}`, { ...input, label: 'Paris Nanterre' })).status).toBe(200);
+    expect(grist.tables.Etablissements.find((r) => r.id === id)!.fields.Libelle).toBe('Paris Nanterre');
+    expect((await call('POST', '/api/v1/institutions', { label: 'no name' })).status).toBe(400);
+    expect((await call('PUT', '/api/v1/institutions/abc', input)).status).toBe(400);
+  });
+});

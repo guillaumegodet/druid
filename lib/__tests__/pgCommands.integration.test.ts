@@ -6,6 +6,7 @@
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { sql } from 'kysely';
 import type { Researcher } from '../../types';
+import type { Institution } from '../directory/gristMapping';
 import { createDb } from '../db/client';
 import { createGristDirectoryCommands, type CommandContext, type DirectoryCommands } from '../directory/commands';
 import { createGristDirectoryRepository, type DirectoryRepository, type DirectoryScope } from '../directory/repository';
@@ -116,6 +117,18 @@ const STEPS: [string, Step][] = [
     const created = (await s.repo.structures()).items.find((x) => x.id === id)!;
     await s.commands.updateStructure(Number(id.slice(2)), { ...created, type: 'EA', officialName: 'Laboratoire renommé', rorId: '05abcde67' } as any, ctxOf());
     return id;
+  }],
+  ['create an employing institution, update it, refuse a duplicate (row ids differ: fields compared)', async (s) => {
+    const { id } = await s.commands.createInstitution({ name: 'U PARIS NANTERRE', label: 'Université Paris Nanterre', uai: '0921204J', ror: 'https://ror.org/013bkhk48' }, ctxOf());
+    await s.commands.updateInstitution(id, { name: 'U PARIS NANTERRE', label: 'Université Paris Nanterre', uai: '0921204J', ror: '013bkhk48', idref: '026403587' }, ctxOf());
+    const fieldsOf = ({ id: _id, ...rest }: Institution) => rest;
+    return [
+      fieldsOf((await s.repo.institutions()).items.find((e) => e.id === id)!),
+      await s.commands.createInstitution({ name: 'u. paris-nanterre' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+      await s.commands.createInstitution({ name: 'INRIA', uai: '0921204J' }, ctxOf()).catch((e) => `${e.status} ${e.message}`),
+      await s.commands.updateInstitution(id, { name: 'X' }, ctxOf({ all: false, labAnchors: ['lab1'] })).catch((e) => `${e.status} ${e.message}`),
+      (await s.repo.people(ALL)).items.length,
+    ];
   }],
   // ── Duplicates and merges (lot 6 c) ──
   ['qualify concomitant, unqualify, qualify successive with an end, then « à revoir »', async (s) => [

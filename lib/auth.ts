@@ -185,7 +185,7 @@ export const isMediaAdmin = (): boolean => _userInfo?.access.isMediaAdmin ?? fal
 export const canAdminMediaSources = (): boolean => isSuperAdmin() || isMediaAdmin();
 
 /** Tabs of the Administration section available to the user (display order). */
-export type AdminTab = 'console' | 'rights' | 'media';
+export type AdminTab = 'console' | 'rights' | 'media' | 'institutions';
 export const adminTabsFor = (): AdminTab[] => {
   const tabs: AdminTab[] = [];
   // console/rights assume a server (ETL relay, Keycloak admin API): absent on
@@ -194,6 +194,7 @@ export const adminTabsFor = (): AdminTab[] => {
   if (getRoles().includes('admin') && hasCapability('HAS_ETL_API')) tabs.push('console');
   if (isSuperAdmin() && hasCapability('HAS_KEYCLOAK_ADMIN')) tabs.push('rights');
   if (canAdminMediaSources()) tabs.push('media');           // media monitoring sources
+  if (canUseEstablishmentTools() && canWrite()) tabs.push('institutions');   // employing institutions (dropdown of the record form)
   return tabs;
 };
 /** The « Administration » entry of the bar is visible as soon as one tab is available. */

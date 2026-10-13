@@ -5,6 +5,7 @@ import { t } from '@lingui/core/macro';
 import type { Researcher, Structure } from '../types';
 import type { ValidationInfo } from './validation';
 import type { AnnuaireColumnMeta } from './directory/annuaireWrite';
+import type { InstitutionInput } from './directory/institutionWrite';
 import type { DuplicatesDiff } from './directory/duplicates';
 import type { LdapCandidatesDiff, LdapDiff, StructuresLdapDiff } from './directory/ldap';
 import type { AlignCandidate, AlignMode, IdrefCandidate, ReviewDecision, UnifiedAlignDiff, UnifiedAlignSource, UnifiedArbitrateDecision } from './directory/alignments';
@@ -111,6 +112,9 @@ export const DirectoryApi = {
     send<{ ok: true }>('PATCH', `axis-corrections/${encodeURIComponent(slug)}/${rowId}`, { axe }),
   createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
   updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
+  // Employing institutions (Administration › Institutions): institution right.
+  createInstitution: async (input: InstitutionInput): Promise<number> => (await send<{ id: number }>('POST', 'institutions', input)).id,
+  updateInstitution: (recordId: number, input: InstitutionInput): Promise<unknown> => send('PUT', `institutions/${recordId}`, input),
   // Lab website directory import (lot 8 d): file exported by druid-biblio's sync-annuaire-grist skill.
   siteImportPreview: (document: unknown): Promise<SiteImportPlan> => send('POST', 'site-imports/preview', { document }),
   siteImportApply: (document: unknown, selection: SiteImportSelection): Promise<SiteImportResult> =>

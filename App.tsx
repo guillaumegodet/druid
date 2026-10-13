@@ -1038,7 +1038,7 @@ function App() {
           >
             <AdminPage initialTab={adminTab} struct={adminStruct} onOpenDashboard={openDashboardFor}
               onSyncToSovisu={hasCapability('HAS_SOVISU_EXPORT') ? handleSyncToSovisu : undefined} syncingSovisu={loading}
-              onOpenResearcherUid={openResearcherByUid} />
+              onOpenResearcherUid={openResearcherByUid} researchers={researchers} />
           </React.Suspense>
         );
       default:

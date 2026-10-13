@@ -121,6 +121,8 @@ export const GristService = {
 
   /** Employing institutions (record dropdown + name → rowId resolution). */
   fetchInstitutions: (): Promise<Institution[]> => fetchInstitutionsInternal(),
+  /** Drops the cached list (after a write on Administration › Institutions): the next read goes to the API. */
+  invalidateInstitutions: (): void => { institutionsCache = null; },
 
   /** New record (domain API POST /api/v1/people: fields built and scope checked by the server). */
   createResearcher: async (researcher: Researcher): Promise<void> => {

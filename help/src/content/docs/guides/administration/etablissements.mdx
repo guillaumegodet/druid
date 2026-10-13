@@ -1,0 +1,63 @@
+---
+title: "Gérer les établissements employeurs"
+description: "Ajouter ou corriger un établissement dans la liste proposée par le champ « Établissement employeur » d'une fiche."
+sidebar:
+  order: 3
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs et services centraux (droit établissement)"
+	menu="Administration › Établissements"
+	disponibilite="toutes les instances où l'annuaire est modifiable"
+/>
+
+Le champ **Établissement employeur** d'une fiche (carte « Emploi ») est un menu déroulant : il ne propose
+que les établissements déjà connus de Druid. Quand une personne est employée par un établissement absent
+de la liste (une université partenaire, un organisme, un hôpital…), il faut d'abord l'ajouter ici, puis
+revenir sur la fiche.
+
+## Ajouter un établissement
+
+1. Ouvrez **Administration › Établissements**.
+2. Dans le bloc **Ajouter un établissement employeur**, renseignez le **nom** : c'est la valeur que montrera
+   le menu déroulant. Restez cohérent avec les noms existants (forme courte, en capitales : `U PARIS NANTERRE`,
+   `CNRS`, `CHU NANTES`).
+3. Complétez si vous les connaissez la **forme longue** (« Université Paris Nanterre ») et les identifiants :
+   - **UAI** : code de l'établissement au répertoire du ministère (7 chiffres et une lettre, par exemple
+     `0921204J`) ;
+   - **ROR** : identifiant du [Research Organization Registry](https://ror.org) (9 caractères, avec ou sans
+     `https://ror.org/`) ;
+   - **PPN IdRef** : numéro de la notice de collectivité dans [IdRef](https://www.idref.fr) (9 caractères),
+     repris par l'export ABES.
+4. Cliquez sur **Ajouter**. L'établissement apparaît dans la liste et dans le menu déroulant des fiches.
+
+Druid refuse un nom déjà pris (à la casse et aux accents près) et un code UAI déjà porté par un autre
+établissement : vérifiez la liste avant d'ajouter, un même établissement y figure parfois sous deux
+graphies.
+
+## Corriger un établissement
+
+Cliquez sur **Modifier** au bout de la ligne, corrigez les champs et **Enregistrez**. Renommer un
+établissement ne touche pas aux fiches : elles gardent la valeur qu'elles portaient, qui apparaît alors
+comme « (hors liste) » dans le menu déroulant jusqu'à ce qu'on la resélectionne. Préférez donc compléter
+les identifiants ou la forme longue plutôt que de renommer.
+
+## Ce que montre la liste
+
+| Colonne | Contenu |
+|---|---|
+| Nom | valeur du menu déroulant |
+| Forme longue | libellé complet, quand il diffère du nom |
+| UAI, ROR, IdRef | identifiants, avec un lien vers ROR et IdRef |
+| Fiches | nombre de fiches chargées dont l'employeur est cet établissement |
+
+Les établissements ne se suppriment pas depuis Druid : des fiches les référencent. Un établissement en
+doublon se traite en reportant ses fiches sur l'autre graphie, puis en le laissant vide.
+
+## Voir aussi
+
+- [Lire une fiche](/guides/personnes/lire-une-fiche/) : la carte « Emploi » et son champ employeur.
+- [Statuts des personnes](/donnees/statuts-des-personnes/) : comment l'employeur entre dans le statut
+  affiché (Présent, Départ, Parti) et le raccourci « Personnels internes ».
