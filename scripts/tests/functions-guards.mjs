@@ -63,7 +63,9 @@ check('capabilities default', [capabilitiesFor(resolveInstance({})).READ_ONLY, c
 check('capabilities from variables', [capabilitiesFor(resolveInstance({ READ_ONLY: 'true' })).READ_ONLY, capabilitiesFor(resolveInstance({ SHOW_STATUS_VALIDATION: 'true' })).HAS_STATUS_VALIDATION], [true, true]);
 
 // Registry only (the demo instance.json of this repository, as validated by the build)
-const demoRaw = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
+// The demo of this repository is on PostgreSQL (lot 10 c); the Grist cases keep a copy of it on a public document.
+const demoFile = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
+const demoRaw = { ...demoFile, storage: 'grist', grist: { docId: 'docDemoPublic01', publicRead: true } };
 const demoReg = parseInstanceConfig(demoRaw).config;
 const demo = resolveInstance({}, demoReg);
 check('registry only: demo', [pick(demo), demo.grist, demo.features, demo.admins, demo.fromRegistry],
@@ -103,7 +105,7 @@ check('buildUser carries the instance block (user and anonymous)',
   ['docEcole0001', 'docEcole0001', ['slug', 'label', 'gristDocId', 'gristPublicBaseUrl', 'gristUiUrl', 'storage']]);
 
 // Storage of the instance (druid-internal docs/plan-migration-postgresql.md, lot 10 a): registry, DRUID_STORAGE override
-const pgReg = parseInstanceConfig({ ...demoRaw, grist: undefined, storage: 'postgres' }).config;
+const pgReg = parseInstanceConfig(demoFile).config;
 const pgDemo = resolveInstance({}, pgReg);
 check('registry: PostgreSQL instance has no document', [pgDemo.storage, pgDemo.grist, publicInstanceInfo(pgDemo).gristDocId, publicInstanceInfo(pgDemo).storage],
   ['postgres', { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null }, '', 'postgres']);

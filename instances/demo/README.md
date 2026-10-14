@@ -2,7 +2,9 @@
 
 Read-only public instance (`DRUID_INSTANCE=demo`, `READ_ONLY=true`, see `../README.md`), plan
 `docs/plan-instance-demo-cloudflare.md`. **Fictitious data only**: fictitious university « UDémo »,
-labs LIRA / BIOS / LMD, teams IA-Démo / Net-Démo / Gen-Démo.
+labs LIRA / BIOS / LMD, teams IA-Démo / Net-Démo / Gen-Démo. Since lot 10 c of the PostgreSQL migration the
+directory lives in a PostgreSQL database (`storage: "postgres"`, section below); the Grist doc is kept for a while as
+a fallback (`storage: "grist"` + the `grist` block in `instance.json`).
 
 | File | Role |
 | --- | --- |
