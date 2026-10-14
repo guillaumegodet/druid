@@ -12,6 +12,8 @@ export interface EuTopic {
   destination: string;
   deadlines: string[];
   summary: string;
+  /** French translation of the summary, '' when not translated. */
+  summaryFr?: string;
 }
 
 export interface EuMatch {
@@ -23,6 +25,8 @@ export interface EuMatch {
   score: number;
   overall: MatchOverall;
   justification: string;
+  /** French translation of the justification, '' when not translated. */
+  justificationFr?: string;
   publications: { uid: string; title: string; year: number | null; relevant: boolean; reason: string }[];
   /** Opinions given on the pair: counts per verdict, and the verdict of the current user. */
   feedback: Partial<Record<FeedbackVerdict, number>>;

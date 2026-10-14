@@ -591,6 +591,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 <EuCallsTab
                   researchers={staffResearchers}
                   structureLabel={scopedData.lab}
+                  publications={scopedData.publications}
                   onOpenResearcher={onOpenResearcher}
                 />
               )}

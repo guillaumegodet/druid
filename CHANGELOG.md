@@ -12,11 +12,21 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Appels européens en français** : les résumés des topics et les justifications des appariements, écrits en anglais par
+  le batch, sont traduits une fois à l'import par le modèle de l'instance (`import_trm.cjs --translate-only` pour les
+  données déjà importées) et affichés en français quand l'interface est en français (migration
+  `20261015110000_eu_calls_fr.sql`).
+
 ### Corrigé
 - **Build Cloudflare Pages des instances PostgreSQL** : la compilation des Functions par le build system échouait
   (« Could not resolve "events" », 24 erreurs) même avec le flag `nodejs_compat` posé sur le projet. Le pilote
   node-postgres est désormais pré-assemblé par `npm run build` (`functions/_generated/pg.js`) avec ses modules Node en
   `node:*`, acceptés sans flag ; `lib/db/core.ts` porte la création Kysely commune au serveur et aux Functions.
+- **Appels européens** : les titres des topics viennent désormais du portail Funding & Tenders (titre officiel et échéances),
+  à l'import et par `import_trm.cjs --refresh-titles` — l'extraction des PDF coupait des mots (« Ne xt generation ») ;
+  l'indice d'un appariement montre la force évaluée par le modèle (forte / plausible / faible) et, à part, le score relatif
+  au sein du topic sous forme de barre : le meilleur candidat d'un topic valait toujours « 100 », même jugé faible.
 
 ### Modifié
 - **Démo publique sur PostgreSQL** (lot 10 c) : `instances/demo/instance.json` passe en `storage: "postgres"` ; l'instance
