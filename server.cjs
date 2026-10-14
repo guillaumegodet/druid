@@ -2237,6 +2237,62 @@ app.post('/api/mentions/:id/review', (req, res) => {
   });
 });
 
+// ── « European calls » tab (druid-internal docs/plan-eu-calls.md, lot 2) ──────────────
+// Horizon Europe work programme topics matched to the researchers by the Topic-to-Researcher Match batch of
+// crisalid-agents, imported by scripts/import_trm.ts (PostgreSQL only, storage().euCalls). Reads are open to any
+// logged-in user within their scope: a lab scope only sees the matches of the directory records of its labs (the
+// topics themselves are public data). The feedback goes back to the batch for its evaluation (CSV, establishment).
+const EU_FEEDBACK_VERDICTS = ['relevant', 'not_relevant', 'already_applying'];
+const withEuCalls = (handler) => async (req, res) => {
+  const store = storage().euCalls;
+  if (!store) return res.status(501).json({ error: 'The European calls need the PostgreSQL storage' });
+  try {
+    await handler(req, res, store);
+  } catch (e) {
+    console.error('[eu-calls]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+};
+/** Directory uids the session may see: undefined = every match (institution scope), [] = none. */
+const euCallsUidsOf = async (req) => {
+  const access = req.session?.user?.access;
+  if (!access) return [];
+  if (access.allSlugs) return undefined;
+  if (!Array.isArray(access.labAnchors) || !access.labAnchors.length) return [];
+  const { items } = await storage().repository.people({ all: false, labAnchors: access.labAnchors });
+  return items.map((r) => r.uid).filter(Boolean);
+};
+app.get('/api/eu-calls/overview', withEuCalls(async (req, res, store) => res.json(await store.overview())));
+app.get('/api/eu-calls/topics', withEuCalls(async (req, res, store) => res.json({ items: await store.topics() })));
+app.get('/api/eu-calls/matches', withEuCalls(async (req, res, store) => {
+  const topicId = typeof req.query.topic === 'string' ? req.query.topic : undefined;
+  if (topicId && !/^[A-Za-z0-9-]{1,80}$/.test(topicId)) return res.status(400).json({ error: 'Invalid topic id' });
+  const uids = await euCallsUidsOf(req);
+  res.json({ items: await store.matches({ uids, topicId, viewer: req.session.user.preferred_username }) });
+}));
+app.post('/api/eu-calls/feedback', withEuCalls(async (req, res, store) => {
+  const { pairId, verdict } = req.body || {};
+  const comment = typeof req.body?.comment === 'string' ? req.body.comment.slice(0, 2000) : '';
+  if (typeof pairId !== 'string' || !/^[A-Za-z0-9-]{1,80}\|[^|]{1,200}$/.test(pairId)) return res.status(400).json({ error: 'Invalid pair id' });
+  if (!EU_FEEDBACK_VERDICTS.includes(verdict)) return res.status(400).json({ error: 'Invalid verdict' });
+  // The pair must be visible to its author (same rule as the reads).
+  const uids = await euCallsUidsOf(req);
+  const uid = pairId.split('|')[1].replace(/^local-/, '');
+  if (uids && !uids.includes(uid)) return res.status(403).json({ error: 'Forbidden' });
+  const saved = await store.saveFeedback({ pairId, author: req.session.user.preferred_username, verdict, comment });
+  if (!saved) return res.status(404).json({ error: 'Unknown pair' });
+  res.json({ ok: true });
+}));
+app.get('/api/eu-calls/feedback.csv', requireEstablishmentScope, withEuCalls(async (req, res, store) => {
+  const rows = await store.feedbackRows();
+  const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+  const head = ['pair_id', 'topic_id', 'person_uid', 'overall', 'score', 'verdict', 'comment', 'author', 'created_at'];
+  const lines = [head.join(';'), ...rows.map((r) => head.map((k) => cell(r[k])).join(';'))];
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="eu-calls-feedback.csv"');
+  res.send(`﻿${lines.join('\r\n')}\r\n`);
+}));
+
 // ── Administration of the media monitoring sources (Sources page of the
 // « Veille > Médias » tab) — media_admin role or super admin, NOT open to any
 // logged-in user like /api/mentions above: it writes to the registry of

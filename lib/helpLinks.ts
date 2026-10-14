@@ -45,6 +45,7 @@ export const DASHBOARD_TAB_HELP: Record<DashboardTab, string> = {
   journals: '/donnees/indicateurs/#quartiles-des-revues',
   apc: '/donnees/indicateurs/#apc',
   funders: '/donnees/indicateurs/',
+  'eu-calls': '/donnees/indicateurs/',
   themes: '/donnees/indicateurs/',
   benchmark: '/donnees/indicateurs/',
   charte: '/donnees/publications-attribution/#charte-de-signature',
