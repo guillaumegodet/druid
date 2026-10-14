@@ -163,6 +163,27 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
     return true;
   };
 
+  /** Ids of every topic known (to refresh their titles from the portal). */
+  const topicIds = async (cluster?: string): Promise<string[]> => {
+    let q = db.selectFrom('eu_topic').select('topic_id');
+    if (cluster) q = q.where('cluster', '=', cluster);
+    return (await q.execute()).map((r) => r.topic_id);
+  };
+
+  /** Replaces the title (and the deadlines when the portal gives some) of the topics; returns the number changed. */
+  const updateTopicsFromPortal = async (topics: { topicId: string; title: string; deadlines: string[] }[]): Promise<number> => {
+    let changed = 0;
+    for (const t of topics) {
+      const result = await db.updateTable('eu_topic')
+        .set({ title: t.title, ...(t.deadlines.length ? { deadlines: t.deadlines } : {}), updated_at: sql`now()` })
+        .where('topic_id', '=', t.topicId)
+        .where((eb) => eb.or([eb('title', '<>', t.title), ...(t.deadlines.length ? [eb('deadlines', '<>', sql<string[]>`${t.deadlines}::text[]`)] : [])]))
+        .executeTakeFirst();
+      changed += Number(result.numUpdatedRows);
+    }
+    return changed;
+  };
+
   /** Every opinion given, for the evaluation of the batch (CSV export of the administration). */
   const feedbackRows = async () =>
     (await db.selectFrom('eu_topic_feedback as f')
@@ -171,7 +192,7 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
       .orderBy('f.created_at').execute())
       .map((r) => ({ ...r, created_at: iso(r.created_at) }));
 
-  return { importRun, overview, topics, matches, saveFeedback, feedbackRows };
+  return { importRun, overview, topics, matches, saveFeedback, feedbackRows, topicIds, updateTopicsFromPortal };
 };
 
 export type EuCallsStore = ReturnType<typeof createEuCallsStore>;

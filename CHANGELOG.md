@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Appels européens** : les titres des topics viennent désormais du portail Funding & Tenders (titre officiel et échéances),
+  à l'import et par `import_trm.cjs --refresh-titles` — l'extraction des PDF coupait des mots (« Ne xt generation ») ;
+  l'indice d'un appariement montre la force évaluée par le modèle (forte / plausible / faible) et, à part, le score relatif
+  au sein du topic sous forme de barre : le meilleur candidat d'un topic valait toujours « 100 », même jugé faible.
+
 ### Modifié
 - **Démo publique sur PostgreSQL** (lot 10 c) : `instances/demo/instance.json` passe en `storage: "postgres"` ; l'instance
   lit une base Neon par la liaison Hyperdrive `HYPERDRIVE` du projet Pages (rechargée depuis `demo-data.mjs` à chaque

@@ -1066,7 +1066,7 @@ msgid "All supervising bodies"
 msgstr "Toutes tutelles"
 
 #: components/StructureList.tsx:395
-#: components/dashboard/EuCallsTab.tsx:318
+#: components/dashboard/EuCallsTab.tsx:325
 msgid "All clusters"
 msgstr "Tous pôles"
 
@@ -3285,150 +3285,157 @@ msgstr "filtres :"
 msgid "Source: Druid / druid-biblio (CRISalid, OpenAlex, HAL, BSO)"
 msgstr "Source : Druid (CRISalid, OpenAlex, HAL, BSO)"
 
-#: components/dashboard/EuCallsTab.tsx:34
-#: components/researchers/alignAtoms.tsx:195
-msgid "strong"
-msgstr "fort"
+#: components/dashboard/EuCallsTab.tsx:36
+msgid "strong match"
+msgstr "adéquation forte"
 
-#: components/dashboard/EuCallsTab.tsx:34
-#: components/researchers/alignAtoms.tsx:195
-msgid "weak"
-msgstr "faible"
+#: components/dashboard/EuCallsTab.tsx:36
+msgid "plausible match"
+msgstr "adéquation plausible"
 
-#: components/dashboard/EuCallsTab.tsx:34
-msgid "plausible"
-msgstr "plausible"
+#: components/dashboard/EuCallsTab.tsx:36
+msgid "weak match"
+msgstr "adéquation faible"
 
-#: components/dashboard/EuCallsTab.tsx:34
+#: components/dashboard/EuCallsTab.tsx:36
 msgid "unrated"
 msgstr "non évaluée"
 
-#: components/dashboard/EuCallsTab.tsx:36
-msgid "Match strength assessed by the language model, score normalised within the topic"
-msgstr "Force de l'appariement évaluée par le modèle de langage, score normalisé au sein du topic"
+#: components/dashboard/EuCallsTab.tsx:39
+msgid "Strength of the match as assessed by the language model from the publications"
+msgstr "Force de l'adéquation évaluée par le modèle de langage d'après les publications"
 
-#: components/dashboard/EuCallsTab.tsx:45
+#: components/dashboard/EuCallsTab.tsx:42
+msgid "Relative score within the topic: the best candidate of the topic is at 100 %, the others in proportion"
+msgstr "Score relatif au sein du topic : le meilleur candidat du topic est à 100 %, les autres en proportion"
+
+#. placeholder {0}: Math.round(score * 100)
+#: components/dashboard/EuCallsTab.tsx:42
+msgid "Relative score {0} %"
+msgstr "Score relatif {0} %"
+
+#: components/dashboard/EuCallsTab.tsx:52
 msgid "Relevant"
 msgstr "Pertinent"
 
-#: components/dashboard/EuCallsTab.tsx:46
+#: components/dashboard/EuCallsTab.tsx:53
 msgid "Not relevant"
 msgstr "Non pertinent"
 
-#: components/dashboard/EuCallsTab.tsx:47
+#: components/dashboard/EuCallsTab.tsx:54
 msgid "Already applying"
 msgstr "Déjà en montage"
 
-#: components/dashboard/EuCallsTab.tsx:65
+#: components/dashboard/EuCallsTab.tsx:72
 msgid "Your opinion on this match (one per person, the last one wins)"
 msgstr "Votre avis sur cet appariement (un par personne, le dernier compte)"
 
-#: components/dashboard/EuCallsTab.tsx:111
+#: components/dashboard/EuCallsTab.tsx:118
 msgid "Fewer publications"
 msgstr "Moins de publications"
 
 #. placeholder {0}: relevant.length - 3
-#: components/dashboard/EuCallsTab.tsx:111
+#: components/dashboard/EuCallsTab.tsx:118
 msgid "{0, plural, one {# more publication} other {# more publications}}"
 msgstr "{0, plural, one {# autre publication} other {# autres publications}}"
 
-#: components/dashboard/EuCallsTab.tsx:141
+#: components/dashboard/EuCallsTab.tsx:148
 #: components/dashboard/NewsTab.tsx:735
 #: components/researchers/TasksPage.tsx:161
 msgid "Closed"
 msgstr "Fermé"
 
 #. placeholder {0}: fmtDate(topic.nextDeadline)
-#: components/dashboard/EuCallsTab.tsx:141
+#: components/dashboard/EuCallsTab.tsx:148
 msgid "Deadline {0}"
 msgstr "Échéance {0}"
 
-#: components/dashboard/EuCallsTab.tsx:141
+#: components/dashboard/EuCallsTab.tsx:148
 msgid "No deadline"
 msgstr "Sans échéance"
 
 #. placeholder {0}: topic.matches.length
-#: components/dashboard/EuCallsTab.tsx:144
+#: components/dashboard/EuCallsTab.tsx:151
 msgid "{0, plural, =0 {No researcher} one {# researcher} other {# researchers}}"
 msgstr "{0, plural, =0 {Aucun chercheur} one {# chercheur} other {# chercheurs}}"
 
-#: components/dashboard/EuCallsTab.tsx:145
+#: components/dashboard/EuCallsTab.tsx:152
 msgid "{strong, plural, one {# strong} other {# strong}}"
 msgstr "{strong, plural, one {# forte} other {# fortes}}"
 
-#: components/dashboard/EuCallsTab.tsx:153
+#: components/dashboard/EuCallsTab.tsx:160
 msgid "Call"
 msgstr "Appel"
 
-#: components/dashboard/EuCallsTab.tsx:154
+#: components/dashboard/EuCallsTab.tsx:161
 msgid "Deadlines"
 msgstr "Échéances"
 
-#: components/dashboard/EuCallsTab.tsx:156
+#: components/dashboard/EuCallsTab.tsx:163
 msgid "Funding & Tenders portal"
 msgstr "Portail Funding & Tenders"
 
-#: components/dashboard/EuCallsTab.tsx:160
+#: components/dashboard/EuCallsTab.tsx:167
 msgid "No researcher of this structure was retained for this topic."
 msgstr "Aucun chercheur de cette structure n'a été retenu pour ce topic."
 
-#: components/dashboard/EuCallsTab.tsx:178
+#: components/dashboard/EuCallsTab.tsx:185
 #: components/structures/ClassificationTab.tsx:69
 msgid "Topics"
 msgstr "Thématiques"
 
-#: components/dashboard/EuCallsTab.tsx:178
+#: components/dashboard/EuCallsTab.tsx:185
 #: components/dashboard/dashboardNav.ts:97
 #: components/dashboard/report/reportCatalog.ts:105
 msgid "Researchers"
 msgstr "Chercheurs"
 
-#: components/dashboard/EuCallsTab.tsx:282
+#: components/dashboard/EuCallsTab.tsx:289
 msgid "Loading the European calls…"
 msgstr "Chargement des appels européens…"
 
-#: components/dashboard/EuCallsTab.tsx:291
+#: components/dashboard/EuCallsTab.tsx:298
 msgid "Horizon Europe work programme topics matched automatically to the researchers of {structureLabel} from the publications known to the CRISalid graph (partial coverage). Your opinion on each match helps improve the matching."
 msgstr "Topics du programme de travail Horizon Europe appariés automatiquement aux chercheurs de {structureLabel} d'après les publications connues du graphe CRISalid (couverture partielle). Votre avis sur chaque appariement aide à améliorer l'appariement."
 
 #. placeholder {0}: matchedUids.size
-#: components/dashboard/EuCallsTab.tsx:297
+#: components/dashboard/EuCallsTab.tsx:304
 msgid "{0, plural, =0 {No researcher retained yet.} one {# researcher retained on at least one topic.} other {# researchers retained on at least one topic.}}"
 msgstr "{0, plural, =0 {Aucun chercheur retenu pour l'instant.} one {# chercheur retenu sur au moins un topic.} other {# chercheurs retenus sur au moins un topic.}}"
 
-#: components/dashboard/EuCallsTab.tsx:308
+#: components/dashboard/EuCallsTab.tsx:315
 msgid "Search a topic…"
 msgstr "Rechercher un topic…"
 
-#: components/dashboard/EuCallsTab.tsx:308
+#: components/dashboard/EuCallsTab.tsx:315
 msgid "Search a researcher…"
 msgstr "Rechercher un chercheur…"
 
-#: components/dashboard/EuCallsTab.tsx:316
+#: components/dashboard/EuCallsTab.tsx:323
 #: components/researchers/FilterPanel.tsx:177
 #: components/researchers/FilterPanel.tsx:309
 #: components/researchers/GeneralTab.tsx:358
 msgid "Cluster"
 msgstr "Pôle"
 
-#: components/dashboard/EuCallsTab.tsx:322
+#: components/dashboard/EuCallsTab.tsx:329
 msgid "Include closed calls"
 msgstr "Inclure les appels clos"
 
-#: components/dashboard/EuCallsTab.tsx:326
+#: components/dashboard/EuCallsTab.tsx:333
 msgid "Topics with researchers only"
 msgstr "Topics avec chercheurs seulement"
 
-#: components/dashboard/EuCallsTab.tsx:333
+#: components/dashboard/EuCallsTab.tsx:340
 msgid "No topic matches these filters."
 msgstr "Aucun topic ne correspond à ces filtres."
 
-#: components/dashboard/EuCallsTab.tsx:340
+#: components/dashboard/EuCallsTab.tsx:347
 msgid "No researcher matches these filters."
 msgstr "Aucun chercheur ne correspond à ces filtres."
 
 #. placeholder {0}: r.matches.length
-#: components/dashboard/EuCallsTab.tsx:353
+#: components/dashboard/EuCallsTab.tsx:360
 msgid "{0, plural, one {# topic} other {# topics}}"
 msgstr "{0, plural, one {# topic} other {# topics}}"
 
@@ -12594,8 +12601,16 @@ msgid "Ignore"
 msgstr "Ignorer"
 
 #: components/researchers/alignAtoms.tsx:195
+msgid "strong"
+msgstr "fort"
+
+#: components/researchers/alignAtoms.tsx:195
 msgid "medium"
 msgstr "moyen"
+
+#: components/researchers/alignAtoms.tsx:195
+msgid "weak"
+msgstr "faible"
 
 #: components/researchers/alignAtoms.tsx:198
 msgid "Nantes affiliation or the record’s lab found on the profile"

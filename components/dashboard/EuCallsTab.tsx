@@ -29,12 +29,19 @@ const OVERALL_STYLE: Record<MatchOverall, string> = {
   none: 'bg-stone-200 text-stone-700 dark:bg-white/10 dark:text-[#c3beb0]',
 };
 
+/** Strength assessed by the model (the badge), and beside it the relative score within the topic as a thin bar: the
+ * best candidate of a topic always scores 1, whatever the model thinks of it, so the number alone misled. */
 const OverallBadge: React.FC<{ overall: MatchOverall; score: number }> = ({ overall, score }) => {
   const { t } = useLingui();
-  const label: Record<MatchOverall, string> = { strong: t`strong`, plausible: t`plausible`, weak: t`weak`, none: t`unrated` };
+  const label: Record<MatchOverall, string> = { strong: t`strong match`, plausible: t`plausible match`, weak: t`weak match`, none: t`unrated` };
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${OVERALL_STYLE[overall]}`} title={t`Match strength assessed by the language model, score normalised within the topic`}>
-      {label[overall]} · {Math.round(score * 100)}
+    <span className="inline-flex items-center gap-2">
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${OVERALL_STYLE[overall]}`} title={t`Strength of the match as assessed by the language model from the publications`}>
+        {label[overall]}
+      </span>
+      <span className="inline-block w-12 h-1.5 rounded-full bg-ink/10 dark:bg-white/10 overflow-hidden" title={t`Relative score within the topic: the best candidate of the topic is at 100 %, the others in proportion`} aria-label={t`Relative score ${Math.round(score * 100)} %`}>
+        <span className="block h-full bg-ink/50 dark:bg-[#f5f2ea]/60" style={{ width: `${Math.round(score * 100)}%` }} />
+      </span>
     </span>
   );
 };
