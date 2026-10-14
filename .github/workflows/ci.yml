@@ -70,7 +70,7 @@ jobs:
         run: |
           npm run build
           # Nothing instance-specific in the bundle: every doc id must come from /api/me.
-          for id in $(jq -r .grist.docId instances/*/instance.json); do
+          for id in $(jq -r '.grist.docId // empty' instances/*/instance.json); do
             if grep -rqF "$id" dist; then echo "doc id $id found in the shared bundle"; exit 1; fi
           done
           # Same runtime settings as the Pages projects (Settings › Functions): node-postgres through Hyperdrive

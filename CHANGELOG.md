@@ -12,6 +12,11 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **Démo publique sur PostgreSQL** (lot 10 c) : `instances/demo/instance.json` passe en `storage: "postgres"` ; l'instance
+  lit une base Neon par la liaison Hyperdrive `HYPERDRIVE` du projet Pages (rechargée depuis `demo-data.mjs` à chaque
+  déploiement de production, secret de build `DEMO_DATABASE_URL`). Le document Grist public n'est plus lu.
+
 ### Ajouté
 - **Instances Cloudflare sur PostgreSQL** (lot 10 a du plan de migration) : `storage: "postgres"` dans `instance.json`
   et une liaison Hyperdrive `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` sur un déploiement partagé) remplacent le document Grist
