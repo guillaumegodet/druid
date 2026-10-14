@@ -73,10 +73,9 @@ jobs:
           for id in $(jq -r '.grist.docId // empty' instances/*/instance.json); do
             if grep -rqF "$id" dist; then echo "doc id $id found in the shared bundle"; exit 1; fi
           done
-          # Same runtime settings as the Pages projects (Settings › Functions): node-postgres through Hyperdrive
-          # (lot 10 a of the PostgreSQL migration plan) needs Node.js compatibility.
-          npx --yes wrangler@3 pages functions build --outdir /tmp/functions-build \
-            --compatibility-date 2026-10-14 --compatibility-flags nodejs_compat
+          # Like the Pages build system: no compatibility flag reaches this compilation, so the Node built-ins of
+          # node-postgres must already be `node:*` imports (functions/_generated/pg.js, scripts/functions_pg_bundle.cjs).
+          npx --yes wrangler@3 pages functions build --outdir /tmp/functions-build --compatibility-date 2026-10-14
       - name: Build of a dedicated project (druid-demo)
         env:
           CF_PAGES: '1'

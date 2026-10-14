@@ -2,7 +2,7 @@
 // on 2026-10-12): table `newsletter_item`, written under the actor of the request (audit log). The axis corrections are
 // in the Grist document of the structure (Centrale) until lot 10: delegated to the Grist store.
 import { sql, type Kysely, type Selectable, type Transaction } from 'kysely';
-import { withActor, type DB } from '../db/client';
+import { withActor, type DB } from '../db/core';
 import { ApiError } from '../directory/errors';
 import type { NewsletterItem as NewsletterItemRow } from '../db/schema.gen';
 import { mapNewsletterRecords, type NewsletterNewItem } from './newsletter';

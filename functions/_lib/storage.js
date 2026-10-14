@@ -9,9 +9,11 @@
 //    the lifetime of the isolate.
 //  - postgres: the PostgreSQL database of the instance through its Hyperdrive binding HYPERDRIVE (HYPERDRIVE__<SLUG>),
 //    one database client per request (the connections of a Worker do not outlive the request; Hyperdrive holds the
-//    real pool), released by `release()` once the response is built.
-import pg from 'pg';
-import { createDb } from '../../lib/db/client.ts';
+//    real pool), released by `release()` once the response is built. The driver comes from the bundle written by the
+//    build (functions/_generated/pg.js, scripts/functions_pg_bundle.cjs: node-postgres with its Node built-ins as
+//    `node:*`, which the Pages Functions build accepts without a flag), never from the `pg` package directly.
+import pg from '../_generated/pg.js';
+import { createDbWith } from '../../lib/db/core.ts';
 import { createGristAlignCommands } from '../../lib/directory/alignCommands.ts';
 import { tokenAlignTexts } from '../../lib/directory/alignTexts.ts';
 import { createGristDirectoryCommands } from '../../lib/directory/commands.ts';
@@ -78,7 +80,7 @@ const pgStorage = (context, instance) => {
   if (!connectionString) {
     return { instance, apiKey: undefined, store: null, missing: 'HYPERDRIVE binding not configured on Cloudflare', release: async () => {} };
   }
-  const db = createDb({ connectionString, max: 1 });
+  const db = createDbWith(pg, { connectionString, max: 1 });
   const store = createPgStorage({
     db, tablesActor: 'cloudflare', align: { caches: alignCachesOf(context, instance), texts: tokenAlignTexts, hasQualinka: false },
   });
@@ -97,5 +99,6 @@ export const storageOf = (context) => {
   return instance.storage === 'postgres' ? pgStorage(context, instance) : gristStorage(context, instance);
 };
 
-// Keeps the driver referenced in the bundle of the Functions (node-postgres through Hyperdrive, nodejs_compat).
+// Keeps the driver referenced in the bundle of the Functions (node-postgres through Hyperdrive; the runtime needs the
+// Node.js compatibility of the project, `nodejs_compat`).
 export const PG_DRIVER = pg;
