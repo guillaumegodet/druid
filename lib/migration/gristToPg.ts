@@ -491,10 +491,11 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
       const teamLabels = splitList(m.team, /\|/);
       const teams: number[] = [];
       for (const t of teamLabels) {
-        // Same acronym in several labs: the team under the lab of this membership.
+        // Only a team under the lab of this membership (generic codes E1, E2… exist in several labs); without a
+        // resolved lab, the one structure of that acronym.
         const all = candidates.get(normalizeAcronym(t)) || [];
-        const underLab = all.filter((id) => parentOf.get(id) === structureId);
-        const s = all.length === 1 ? all[0] : underLab.length === 1 ? underLab[0] : undefined;
+        const underLab = structureId === null ? all : all.filter((id) => parentOf.get(id) === structureId);
+        const s = underLab.length === 1 ? underLab[0] : undefined;
         if (s !== undefined && s !== structureId) teams.push(s);
         else if (s === undefined) issue('team_unresolved', 'Annuaire', [r.id], ['team'], all.length > 1 ? 'ambiguous' : undefined);
       }

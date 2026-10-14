@@ -306,7 +306,12 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
   }
 };
 
-/** Structure of a lab label and of its team labels (a team of the same acronym in two labs: the one under the lab). */
+/**
+ * Structure of a lab label and of its team labels. A team label is linked only to a structure under the lab of the
+ * membership: the generic codes of the lab rosters (E1, E2…) exist in several labs, and the one lab that declares
+ * them as structures must not receive the members of the others. Without a resolved lab, a label is linked when
+ * exactly one structure bears that acronym.
+ */
 export const resolveStructures = async (trx: Transaction<DB>, lab: string, teams: string[]): Promise<{ structureId: string | null; teamIds: string[] }> => {
   const rows = await trx.selectFrom('structure').select(['id', 'acronym', 'parent_id']).orderBy('id').execute();
   const byAcronym = new Map<string, typeof rows>();
@@ -319,8 +324,8 @@ export const resolveStructures = async (trx: Transaction<DB>, lab: string, teams
   const structureId = lab && lab.toLowerCase() !== 'zzz' ? byAcronym.get(normalizeAcronym(lab))?.[0]?.id ?? null : null;
   const teamIds = teams.map((t) => {
     const all = byAcronym.get(normalizeAcronym(t)) || [];
-    const under = all.filter((s) => s.parent_id === structureId);
-    return all.length === 1 ? all[0].id : under.length === 1 ? under[0].id : null;
+    const candidates = structureId === null ? all : all.filter((s) => s.parent_id === structureId);
+    return candidates.length === 1 ? candidates[0].id : null;
   }).filter((id): id is string => id !== null && id !== structureId);
   return { structureId, teamIds: [...new Set(teamIds)] };
 };

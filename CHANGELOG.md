@@ -12,6 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Équipes d'une appartenance** : un libellé d'équipe n'est plus relié à une équipe d'un autre labo. Les codes
+  génériques des annuaires de labos (E1, E2…) existent dans plusieurs labos, et le seul labo qui les déclarait comme
+  structures recevait les membres des autres (à Nantes : 628 liens faux vers les équipes du CRCI2NA, dans 12 labos).
+  Une équipe n'est reliée que sous le labo de l'appartenance ; sans labo résolu, seulement si l'acronyme est unique.
+
+### Migration
+- `20261014120000_team_links_under_lab` (appliquée par `druid-migrate`) : supprime les liens d'équipe dont l'équipe
+  n'est pas sous le labo de l'appartenance ; les libellés `team_labels` sont conservés et seront reliés à la création
+  des équipes du labo (fait pour l'IMN le 2026-10-14).
+
 ## [2.5.0] — 2026-10-13
 
 ### Ajouté
