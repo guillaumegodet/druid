@@ -21,6 +21,10 @@ import {
   type AxisCorrectionIndex,
 } from './axesCorrections';
 import { DirectoryApi } from '../../lib/directoryApi';
+import { useAxisReviews } from './axisReviewsHook';
+import { AxisReviewTable } from './AxisReviewTable';
+import { effectiveAxisOf } from '../../lib/publications/axisReviews';
+import { canWrite } from '../../lib/auth';
 
 const PAGE_SIZE = 25;
 
@@ -298,12 +302,21 @@ export const AxesTab: React.FC<{
   const axes = useMemo(() => dataset.strategicAxes.map((a) => a.name), [dataset.strategicAxes]);
   const hasAxes = axes.length > 0 && dataset.publications.some((p) => p.chosenAxe);
   const corrections = useAxesCorrections(dataset.slug, hasAxes);
+  // Axis reviews (PostgreSQL instances, docs/plan-axes-embeddings.md lot 3): the curation of the automatic
+  // classification; a review takes precedence over the Grist correction and the ETL.
+  const reviews = useAxisReviews(dataset.slug, hasAxes);
+  const byEmbeddings = useMemo(() => dataset.publications.some((p) => p.axeMethod && p.axeMethod !== 'keywords'), [dataset.publications]);
 
-  // Effective axis: Grist correction otherwise ETL classification (1st axis if multiple, like axeOfPub).
+  // Effective axis: review, otherwise Grist correction, otherwise ETL classification (1st axis if multiple).
   const axeOf = useMemo(() => {
     const index = { byDoi: corrections.byDoi, byTitle: corrections.byTitle };
-    return (p: DashboardPublication): string => effectiveAxe(index, p);
-  }, [corrections.byDoi, corrections.byTitle]);
+    const reviewIndex = reviews.index;
+    return (p: DashboardPublication): string => {
+      const base = effectiveAxe(index, p);
+      const review = reviewIndex.size ? reviews.reviewOf(p) : undefined;
+      return review ? effectiveAxisOf(review, base, AXE_OTHER) : base;
+    };
+  }, [corrections.byDoi, corrections.byTitle, reviews]);
 
   const agg = useMemo(
     () => aggregateAxes(dataset.publications, range, axes, axeOf),
@@ -326,9 +339,15 @@ export const AxesTab: React.FC<{
   return (
     <div className="flex flex-col gap-4">
       <p className="text-sm text-muted dark:text-[#c3beb0] px-1">
-        <Trans>
-          Axis assigned from OpenAlex topics and the keywords defined in the configuration (≥ 2 matches with a clear lead). Corrections entered below are saved in the Grist curation table and take precedence over the classification.
-        </Trans>
+        {byEmbeddings ? (
+          <Trans>
+            Axis assigned automatically from the title and abstract of each publication, compared with the description of the axes; the language model then decides between the closest axes and « unclassified » (theoretical or methodological work stays unclassified on purpose). The decisions taken in the curation below take precedence over the classification and apply at once to the charts.
+          </Trans>
+        ) : (
+          <Trans>
+            Axis assigned from OpenAlex topics and the keywords defined in the configuration (≥ 2 matches with a clear lead). Corrections entered below are saved in the Grist curation table and take precedence over the classification.
+          </Trans>
+        )}
       </p>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
@@ -405,8 +424,27 @@ export const AxesTab: React.FC<{
         ))}
       </div>
 
-      {/* ── Grist curation ── */}
-      {corrections.configured ? (
+      {/* ── Curation: axis reviews (PostgreSQL), else the Grist correction table of the structure ── */}
+      {reviews.supported ? (
+        reviews.error ? (
+          <div className="glass-card p-5 text-sm text-muted dark:text-[#c3beb0]">
+            <Trans>Curation unavailable ({reviews.error}) — the classifications shown are those of the ETL.</Trans>
+          </div>
+        ) : (
+          <AxisReviewTable
+            publications={dataset.publications}
+            range={range}
+            axes={axes}
+            reviews={reviews}
+            axeOf={axeOf}
+            canWrite={canWrite()}
+          />
+        )
+      ) : reviews.supported === null && !corrections.configured ? (
+        <div className="glass-card p-5 flex items-center gap-2 text-sm text-muted-light dark:text-[#8f897c]">
+          <RefreshCw className="w-4 h-4 animate-spin" /> <Trans>Loading the curation…</Trans>
+        </div>
+      ) : corrections.configured ? (
         corrections.error ? (
           <div className="glass-card p-5 text-sm text-muted dark:text-[#c3beb0]">
             <Trans>Grist curation unavailable ({corrections.error}) — the classifications shown are those of the ETL.</Trans>
@@ -426,7 +464,7 @@ export const AxesTab: React.FC<{
         )
       ) : (
         <p className="text-[11px] text-muted-lighter dark:text-[#8f897c] px-1">
-          <Trans>Grist curation not configured for this structure (see AXES_GRIST in AxesTab).</Trans>
+          <Trans>Curation of the axes needs the PostgreSQL storage (or a Grist correction table for this structure).</Trans>
         </p>
       )}
     </div>

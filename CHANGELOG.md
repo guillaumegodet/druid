@@ -13,6 +13,12 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Tableau de bord › Pilotage › Axes stratégiques : curation** (instances PostgreSQL) : chaque publication de la période
+  avec son axe automatique, sa confiance, ses axes secondaires et la motivation du classement (druid-biblio, axes par
+  embeddings + modèle), et les décisions des relecteurs — Confirmer, Corriger (un ou plusieurs axes, note), Hors axes,
+  Incertain, annulation — appliquées immédiatement aux graphiques ; filtres (à relire, relues, par décision, axe
+  automatique, confiance faible, texte), avancement global et par axe, taux de confirmation, tirage d'un échantillon de
+  40 publications à relire. Le texte d'introduction décrit la méthode effectivement utilisée.
 - **Revues des axes stratégiques** (`/api/v1/axis-reviews/:slug`, PostgreSQL seulement) : décision d'un utilisateur sur
   la classification automatique d'une publication — confirmée, corrigée (un ou plusieurs axes), hors axes, incertaine —
   une par publication et structure, signée et journalisée ; socle de l'écran de curation de l'onglet Axes stratégiques

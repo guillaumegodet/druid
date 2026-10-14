@@ -572,6 +572,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/ResearcherDetail.tsx:476
 #: components/ResearcherDetail.tsx:579
 #: components/admin/InstitutionsAdmin.tsx:223
+#: components/dashboard/AxisReviewTable.tsx:263
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
 #: components/reports/NewReportDialog.tsx:324
@@ -766,6 +767,7 @@ msgstr "Export PDF"
 #: components/ResearcherDetail.tsx:315
 #: components/StructureDetail.tsx:139
 #: components/admin/InstitutionsAdmin.tsx:219
+#: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
@@ -1119,7 +1121,8 @@ msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 #: components/StructureList.tsx:513
 #: components/dashboard/ApcTab.tsx:506
 #: components/dashboard/ApcTab.tsx:839
-#: components/dashboard/AxesTab.tsx:276
+#: components/dashboard/AxesTab.tsx:280
+#: components/dashboard/AxisReviewTable.tsx:307
 #: components/dashboard/CharteTab.tsx:442
 #: components/dashboard/FundersTab.tsx:396
 #: components/dashboard/ImpactTab.tsx:248
@@ -1133,7 +1136,8 @@ msgstr "Previous"
 #: components/StructureList.tsx:520
 #: components/dashboard/ApcTab.tsx:508
 #: components/dashboard/ApcTab.tsx:845
-#: components/dashboard/AxesTab.tsx:282
+#: components/dashboard/AxesTab.tsx:286
+#: components/dashboard/AxisReviewTable.tsx:309
 #: components/dashboard/CharteTab.tsx:448
 #: components/dashboard/FundersTab.tsx:407
 #: components/dashboard/ImpactTab.tsx:254
@@ -1547,7 +1551,8 @@ msgstr "Export (CSV)"
 
 #: components/dashboard/ApcTab.tsx:480
 #: components/dashboard/ApcTab.tsx:744
-#: components/dashboard/AxesTab.tsx:207
+#: components/dashboard/AxesTab.tsx:211
+#: components/dashboard/AxisReviewTable.tsx:200
 #: components/dashboard/CharteTab.tsx:391
 #: components/dashboard/ImpactTab.tsx:209
 #: components/dashboard/PublicationsListTab.tsx:284
@@ -1589,7 +1594,8 @@ msgstr "hybrid"
 #. placeholder {0}: currentPage + 1
 #: components/dashboard/ApcTab.tsx:507
 #: components/dashboard/ApcTab.tsx:842
-#: components/dashboard/AxesTab.tsx:279
+#: components/dashboard/AxesTab.tsx:283
+#: components/dashboard/AxisReviewTable.tsx:308
 #: components/dashboard/CharteTab.tsx:445
 #: components/dashboard/FundersTab.tsx:399
 #: components/dashboard/ImpactTab.tsx:251
@@ -1749,29 +1755,33 @@ msgstr "Nantes U corresponding author — agreement triggered (confirmed payer)"
 msgid "Elsevier article under agreement, published non-OA (no APC)"
 msgstr "Elsevier article under agreement, published non-OA (no APC)"
 
-#: components/dashboard/AxesTab.tsx:159
+#: components/dashboard/AxesTab.tsx:163
+#: components/dashboard/AxisReviewTable.tsx:138
 msgid "Classification curation"
 msgstr "Classification curation"
 
 #. placeholder {0}: rows.length.toLocaleString(numberLocale())
 #. placeholder {1}: matched.toLocaleString(numberLocale())
-#: components/dashboard/AxesTab.tsx:162
+#: components/dashboard/AxesTab.tsx:166
 msgid "{0} publications · {1} editable (present in the Grist table) — corrections apply immediately to the charts"
 msgstr "{0} publications · {1} editable (present in the Grist table) — corrections apply immediately to the charts"
 
-#: components/dashboard/AxesTab.tsx:175
+#: components/dashboard/AxesTab.tsx:179
 msgid "Filter by axis"
 msgstr "Filter by axis"
 
-#: components/dashboard/AxesTab.tsx:177
+#: components/dashboard/AxesTab.tsx:181
+#: components/dashboard/AxisReviewTable.tsx:180
 msgid "All axes"
 msgstr "All axes"
 
-#: components/dashboard/AxesTab.tsx:188
+#: components/dashboard/AxesTab.tsx:192
+#: components/dashboard/AxisReviewTable.tsx:188
 msgid "Title, DOI or journal…"
 msgstr "Title, DOI or journal…"
 
-#: components/dashboard/AxesTab.tsx:208
+#: components/dashboard/AxesTab.tsx:212
+#: components/dashboard/AxisReviewTable.tsx:201
 #: components/dashboard/CharteTab.tsx:396
 #: components/dashboard/ImpactTab.tsx:210
 #: components/dashboard/MediaSourcesAdmin.tsx:384
@@ -1782,74 +1792,246 @@ msgstr "Title, DOI or journal…"
 msgid "Title"
 msgstr "Title"
 
-#: components/dashboard/AxesTab.tsx:209
+#: components/dashboard/AxesTab.tsx:213
 msgid "Selected axis"
 msgstr "Selected axis"
 
-#: components/dashboard/AxesTab.tsx:210
+#: components/dashboard/AxesTab.tsx:214
+#: components/dashboard/AxisReviewTable.tsx:223
 msgid "Rationale"
 msgstr "Rationale"
 
-#: components/dashboard/AxesTab.tsx:243
+#: components/dashboard/AxesTab.tsx:247
 msgid "{effective} (not in list)"
 msgstr "{effective} (not in list)"
 
-#: components/dashboard/AxesTab.tsx:257
+#: components/dashboard/AxesTab.tsx:261
 msgid "Publication absent from the Grist curation table"
 msgstr "Publication absent from the Grist curation table"
 
-#: components/dashboard/AxesTab.tsx:316
+#: components/dashboard/AxesTab.tsx:329
 msgid "No strategic axis defined for this structure: fill in<0>strategic_axes</0>(names + keywords) in its druid-biblio configuration then rerun the ETL."
 msgstr "No strategic axis defined for this structure: fill in<0>strategic_axes</0>(names + keywords) in its druid-biblio configuration then rerun the ETL."
 
-#: components/dashboard/AxesTab.tsx:329
+#: components/dashboard/AxesTab.tsx:343
+msgid "Axis assigned automatically from the title and abstract of each publication, compared with the description of the axes; the language model then decides between the closest axes and « unclassified » (theoretical or methodological work stays unclassified on purpose). The decisions taken in the curation below take precedence over the classification and apply at once to the charts."
+msgstr "Axis assigned automatically from the title and abstract of each publication, compared with the description of the axes; the language model then decides between the closest axes and « unclassified » (theoretical or methodological work stays unclassified on purpose). The decisions taken in the curation below take precedence over the classification and apply at once to the charts."
+
+#: components/dashboard/AxesTab.tsx:347
 msgid "Axis assigned from OpenAlex topics and the keywords defined in the configuration (≥ 2 matches with a clear lead). Corrections entered below are saved in the Grist curation table and take precedence over the classification."
 msgstr "Axis assigned from OpenAlex topics and the keywords defined in the configuration (≥ 2 matches with a clear lead). Corrections entered below are saved in the Grist curation table and take precedence over the classification."
 
-#: components/dashboard/AxesTab.tsx:337
+#: components/dashboard/AxesTab.tsx:356
 #: components/dashboard/embedRegistry.tsx:619
 #: components/dashboard/embedRegistry.tsx:624
 msgid "Breakdown by strategic axis"
 msgstr "Breakdown by strategic axis"
 
-#: components/dashboard/AxesTab.tsx:345
+#: components/dashboard/AxesTab.tsx:364
 #: components/dashboard/embedRegistry.tsx:632
 #: components/dashboard/embedRegistry.tsx:637
 msgid "Publications by axis"
 msgstr "Publications by axis"
 
-#: components/dashboard/AxesTab.tsx:356
+#: components/dashboard/AxesTab.tsx:375
 #: components/dashboard/embedRegistry.tsx:647
 #: components/dashboard/embedRegistry.tsx:652
 msgid "Yearly evolution by strategic axis"
 msgstr "Yearly evolution by strategic axis"
 
-#: components/dashboard/AxesTab.tsx:363
+#: components/dashboard/AxesTab.tsx:382
 #: components/dashboard/embedRegistry.tsx:661
 #: components/dashboard/embedRegistry.tsx:666
 msgid "Publication types by strategic axis"
 msgstr "Publication types by strategic axis"
 
-#: components/dashboard/AxesTab.tsx:374
+#: components/dashboard/AxesTab.tsx:393
 msgid "Keywords by strategic axis"
 msgstr "Keywords by strategic axis"
 
-#: components/dashboard/AxesTab.tsx:385
+#: components/dashboard/AxesTab.tsx:404
 msgid "(no keyword defined)"
 msgstr "(no keyword defined)"
 
+#. placeholder {0}: reviews.error
+#: components/dashboard/AxesTab.tsx:431
+msgid "Curation unavailable ({0}) — the classifications shown are those of the ETL."
+msgstr "Curation unavailable ({0}) — the classifications shown are those of the ETL."
+
+#: components/dashboard/AxesTab.tsx:445
+msgid "Loading the curation…"
+msgstr "Loading the curation…"
+
 #. placeholder {0}: corrections.error
-#: components/dashboard/AxesTab.tsx:412
+#: components/dashboard/AxesTab.tsx:450
 msgid "Grist curation unavailable ({0}) — the classifications shown are those of the ETL."
 msgstr "Grist curation unavailable ({0}) — the classifications shown are those of the ETL."
 
-#: components/dashboard/AxesTab.tsx:416
+#: components/dashboard/AxesTab.tsx:454
 msgid "Loading the Grist curation table…"
 msgstr "Loading the Grist curation table…"
 
-#: components/dashboard/AxesTab.tsx:429
-msgid "Grist curation not configured for this structure (see AXES_GRIST in AxesTab)."
-msgstr "Grist curation not configured for this structure (see AXES_GRIST in AxesTab)."
+#: components/dashboard/AxesTab.tsx:467
+msgid "Curation of the axes needs the PostgreSQL storage (or a Grist correction table for this structure)."
+msgstr "Curation of the axes needs the PostgreSQL storage (or a Grist correction table for this structure)."
+
+#: components/dashboard/AxisReviewTable.tsx:32
+msgid "Confidence of the automatic classification"
+msgstr "Confidence of the automatic classification"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+msgid "Confirmed"
+msgstr "Confirmed"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+msgid "Corrected"
+msgstr "Corrected"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+#: components/dashboard/AxisReviewTable.tsx:279
+msgid "Outside the axes"
+msgstr "Outside the axes"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+#: components/dashboard/AxisReviewTable.tsx:284
+msgid "Unsure"
+msgstr "Unsure"
+
+#. placeholder {0}: progress.reviewed.toLocaleString(numberLocale())
+#. placeholder {1}: progress.total.toLocaleString(numberLocale())
+#: components/dashboard/AxisReviewTable.tsx:141
+msgid "{0} of {1} publications reviewed over the period"
+msgstr "{0} of {1} publications reviewed over the period"
+
+#. placeholder {0}: Math.round(progress.agreement * 100)
+#: components/dashboard/AxisReviewTable.tsx:145
+msgid "automatic axis confirmed in {0} % of the decisions"
+msgstr "automatic axis confirmed in {0} % of the decisions"
+
+#: components/dashboard/AxisReviewTable.tsx:151
+msgid "40 publications not reviewed yet, spread over the axes, the doubtful ones first"
+msgstr "40 publications not reviewed yet, spread over the axes, the doubtful ones first"
+
+#: components/dashboard/AxisReviewTable.tsx:152
+msgid "Draw a sample"
+msgstr "Draw a sample"
+
+#: components/dashboard/AxisReviewTable.tsx:169
+msgid "Review status"
+msgstr "Review status"
+
+#: components/dashboard/AxisReviewTable.tsx:170
+#: components/dashboard/MediaMentionsPanel.tsx:359
+msgid "To review"
+msgstr "To review"
+
+#: components/dashboard/AxisReviewTable.tsx:171
+msgid "Reviewed"
+msgstr "Reviewed"
+
+#: components/dashboard/AxisReviewTable.tsx:176
+msgid "Current sample"
+msgstr "Current sample"
+
+#: components/dashboard/AxisReviewTable.tsx:177
+#: components/dashboard/BenchmarkTab.tsx:1206
+#: components/dashboard/BenchmarkTab.tsx:1279
+msgid "All publications"
+msgstr "All publications"
+
+#: components/dashboard/AxisReviewTable.tsx:179
+msgid "Filter by automatic axis"
+msgstr "Filter by automatic axis"
+
+#: components/dashboard/AxisReviewTable.tsx:184
+msgid "Low confidence only"
+msgstr "Low confidence only"
+
+#. placeholder {0}: c.works_count
+#. placeholder {0}: rows.length
+#. placeholder {0}: state.total
+#: components/dashboard/AxisReviewTable.tsx:190
+#: components/dashboard/ImpactTab.tsx:174
+#: components/dashboard/NetworkTab.tsx:352
+#: components/groups/AuthorResolveModal.tsx:124
+msgid "{0, plural, one {# publication} other {# publications}}"
+msgstr "{0, plural, one {# publication} other {# publications}}"
+
+#: components/dashboard/AxisReviewTable.tsx:194
+msgid "Read-only: the decisions are shown but cannot be changed here."
+msgstr "Read-only: the decisions are shown but cannot be changed here."
+
+#: components/dashboard/AxisReviewTable.tsx:202
+msgid "Automatic axis"
+msgstr "Automatic axis"
+
+#: components/dashboard/AxisReviewTable.tsx:203
+#: components/researchers/ImportConflictsPage.tsx:190
+msgid "Decision"
+msgstr "Decision"
+
+#: components/dashboard/AxisReviewTable.tsx:204
+msgid "Actions"
+msgstr "Actions"
+
+#: components/dashboard/AxisReviewTable.tsx:231
+msgid "Secondary axes"
+msgstr "Secondary axes"
+
+#: components/dashboard/AxisReviewTable.tsx:233
+msgid "keywords"
+msgstr "keywords"
+
+#: components/dashboard/AxisReviewTable.tsx:242
+msgid "Shown as:"
+msgstr "Shown as:"
+
+#: components/dashboard/AxisReviewTable.tsx:255
+msgid "Principal axis"
+msgstr "Principal axis"
+
+#: components/dashboard/AxisReviewTable.tsx:255
+msgid "Click to add or remove; the first one chosen is the principal axis"
+msgstr "Click to add or remove; the first one chosen is the principal axis"
+
+#: components/dashboard/AxisReviewTable.tsx:260
+msgid "Note (optional)"
+msgstr "Note (optional)"
+
+#: components/dashboard/AxisReviewTable.tsx:270
+msgid "The automatic axis is right"
+msgstr "The automatic axis is right"
+
+#: components/dashboard/AxisReviewTable.tsx:271
+#: components/dashboard/MediaSourcesAdmin.tsx:251
+#: components/researchers/ImportConflictsPage.tsx:149
+#: components/researchers/alignAtoms.tsx:178
+msgid "Confirm"
+msgstr "Confirm"
+
+#: components/dashboard/AxisReviewTable.tsx:274
+msgid "Choose one or several axes"
+msgstr "Choose one or several axes"
+
+#: components/dashboard/AxisReviewTable.tsx:275
+msgid "Correct"
+msgstr "Correct"
+
+#: components/dashboard/AxisReviewTable.tsx:278
+msgid "Theoretical or methodological work: stays unclassified"
+msgstr "Theoretical or methodological work: stays unclassified"
+
+#: components/dashboard/AxisReviewTable.tsx:283
+msgid "To be decided by someone else"
+msgstr "To be decided by someone else"
+
+#: components/dashboard/AxisReviewTable.tsx:288
+msgid "Remove the decision"
+msgstr "Remove the decision"
+
+#: components/dashboard/AxisReviewTable.tsx:299
+msgid "No publication matches these filters."
+msgstr "No publication matches these filters."
 
 #: components/dashboard/BenchmarkTab.tsx:65
 msgid "Publications (P)"
@@ -2190,11 +2372,6 @@ msgstr "The OpenAlex scope (institutions.lineage: institution + “child” ROR 
 #: components/dashboard/BenchmarkTab.tsx:1206
 msgid "Core publications (Leiden)"
 msgstr "Core publications (Leiden)"
-
-#: components/dashboard/BenchmarkTab.tsx:1206
-#: components/dashboard/BenchmarkTab.tsx:1279
-msgid "All publications"
-msgstr "All publications"
 
 #: components/dashboard/BenchmarkTab.tsx:1207
 msgid "“Core” subset defined by Leiden (indexed international journals, excluding conference proceedings) — the only base on which field-normalised indicators (MNCS, share in the top 10%/1%) are computed."
@@ -3260,15 +3437,6 @@ msgstr "FWCI ranking"
 msgid "Most cited publications"
 msgstr "Most cited publications"
 
-#. placeholder {0}: c.works_count
-#. placeholder {0}: rows.length
-#. placeholder {0}: state.total
-#: components/dashboard/ImpactTab.tsx:174
-#: components/dashboard/NetworkTab.tsx:352
-#: components/groups/AuthorResolveModal.tsx:124
-msgid "{0, plural, one {# publication} other {# publications}}"
-msgstr "{0, plural, one {# publication} other {# publications}}"
-
 #: components/dashboard/ImpactTab.tsx:174
 msgid "citations normalised by discipline (FWCI)"
 msgstr "citations normalised by discipline (FWCI)"
@@ -3664,10 +3832,6 @@ msgstr "Mentions"
 msgid "To review ({pendingCount})"
 msgstr "To review ({pendingCount})"
 
-#: components/dashboard/MediaMentionsPanel.tsx:359
-msgid "To review"
-msgstr "To review"
-
 #: components/dashboard/MediaMentionsPanel.tsx:440
 msgid "Loading the media watch…"
 msgstr "Loading the media watch…"
@@ -3802,12 +3966,6 @@ msgstr "Health"
 #: components/dashboard/MediaSourcesAdmin.tsx:242
 msgid "built-in"
 msgstr "built-in"
-
-#: components/dashboard/MediaSourcesAdmin.tsx:251
-#: components/researchers/ImportConflictsPage.tsx:149
-#: components/researchers/alignAtoms.tsx:178
-msgid "Confirm"
-msgstr "Confirm"
 
 #: components/dashboard/MediaSourcesAdmin.tsx:266
 msgid "Delete this feed"
@@ -10211,10 +10369,6 @@ msgstr "Current value"
 msgid "{source} value"
 msgstr "{source} value"
 
-#: components/researchers/ImportConflictsPage.tsx:190
-msgid "Decision"
-msgstr "Decision"
-
 #: components/researchers/ImportConflictsPage.tsx:199
 msgid "edited since the import"
 msgstr "edited since the import"
@@ -13500,11 +13654,17 @@ msgid "Load failed"
 msgstr "Load failed"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:24
-#: lib/directoryApi.ts:33
-#: lib/directoryApi.ts:48
+#: lib/directoryApi.ts:25
+#: lib/directoryApi.ts:34
+#: lib/directoryApi.ts:49
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Directory unavailable ({resource}, HTTP {0})."
+
+#. placeholder {0}: 'axis-reviews'
+#. placeholder {1}: resp.status
+#: lib/directoryApi.ts:69
+msgid "Directory unavailable ({0}, HTTP {1})."
+msgstr "Directory unavailable ({0}, HTTP {1})."
 
 #: lib/gristService.ts:241
 msgid "Invalid ID"
