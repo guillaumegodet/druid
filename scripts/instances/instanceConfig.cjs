@@ -52,13 +52,17 @@ const instanceSchema = z.strictObject({
   domains: z.array(z.string().regex(HOST_RE, 'expected a lowercase host name')).min(1),
   access: z.enum(['public', 'cloudflare-access', 'keycloak']),
   readOnly: z.boolean(),
+  // Storage of the directory (druid-internal docs/plan-migration-postgresql.md, lot 10): the Grist document below, or a
+  // PostgreSQL database reached through the Hyperdrive binding HYPERDRIVE (HYPERDRIVE__<SLUG> on a shared deployment).
+  // On target "docker" the server reads DRUID_STORAGE instead; the field only documents the instance.
+  storage: z.enum(['grist', 'postgres']).default('grist'),
   grist: z.strictObject({
     docId: z.string().regex(GRIST_DOC_RE, 'expected a Grist doc id'),
     apiBase: z.url().default(DEFAULT_GRIST_API_BASE),
     // The doc is shared publicly as viewer: the browser reads it directly, without a key.
     publicRead: z.boolean().default(false),
     extraDocIds: z.array(z.string().regex(GRIST_DOC_RE, 'expected a Grist doc id')).default([]),
-  }),
+  }).nullable().default(null),
   capabilities: capabilitiesSchema.default({}),
   features: z.strictObject({
     // /api/news/* and /api/newsletter/* hold the structures and staff filters of the instance.
@@ -82,16 +86,23 @@ const instanceSchema = z.strictObject({
 const crossFieldErrors = (c) => {
   const errors = [];
   if (c.access === 'public' && !c.readOnly) errors.push('access "public" requires readOnly: true (no authentication, no writes)');
-  if (c.grist.publicRead && !c.readOnly) errors.push('grist.publicRead requires readOnly: true (the browser reads the doc without the proxy)');
+  if (c.storage === 'grist' && !c.grist) errors.push('storage "grist" needs the grist block (document of the instance)');
+  if (c.storage === 'postgres') {
+    // No document left on a PostgreSQL instance: the axes of a structure follow it in lot 10 d, the key would be unused.
+    if (c.grist) errors.push('storage "postgres" excludes the grist block (no document is read any more)');
+    if (c.secrets.includes('GRIST_API_KEY')) errors.push('storage "postgres" does not use the GRIST_API_KEY secret');
+    if (c.features.newsletter) errors.push('features.newsletter still reads the Newsletter table of a Grist document (lot 10 d)');
+  }
+  if (c.grist?.publicRead && !c.readOnly) errors.push('grist.publicRead requires readOnly: true (the browser reads the doc without the proxy)');
   if (c.readOnly && c.admins.length) errors.push('a readOnly instance has no administrator: admins must be empty');
   if (c.admins.length && c.access !== 'cloudflare-access') errors.push('admins only apply to access "cloudflare-access" (Keycloak holds its own roles)');
   if (c.target === 'cloudflare' && c.access === 'keycloak') errors.push('access "keycloak" is not available on target "cloudflare"');
   if (c.target === 'cloudflare') {
     const fixed = Object.keys(c.capabilities).filter((k) => !TUNABLE_CAPABILITIES.includes(k));
     if (fixed.length) errors.push(`capabilities not settable on target "cloudflare": ${fixed.join(', ')}`);
-    if (c.grist.extraDocIds.length) errors.push('grist.extraDocIds is not supported on target "cloudflare" (the proxy serves one doc)');
+    if (c.grist?.extraDocIds.length) errors.push('grist.extraDocIds is not supported on target "cloudflare" (the proxy serves one doc)');
   }
-  if (!c.grist.publicRead && !c.secrets.includes('GRIST_API_KEY')) errors.push('a doc without publicRead needs the GRIST_API_KEY secret');
+  if (c.grist && !c.grist.publicRead && !c.secrets.includes('GRIST_API_KEY')) errors.push('a doc without publicRead needs the GRIST_API_KEY secret');
   if ((c.features.news || c.features.newsletter) && c.target !== 'cloudflare') errors.push('features news/newsletter only exist on target "cloudflare"');
   if (c.deployment && c.target !== 'cloudflare') errors.push('deployment only exists on target "cloudflare"');
   return errors;
@@ -125,7 +136,8 @@ const publicRepoErrors = (raw) => {
   if (raw.readOnly !== true) errors.push('an instance of the public repository must be readOnly');
   if (raw.access !== 'public') errors.push('an instance of the public repository must have access "public"');
   if (Array.isArray(raw.admins) && raw.admins.length) errors.push('an instance of the public repository has no admins');
-  if (!raw.grist || raw.grist.publicRead !== true) errors.push('an instance of the public repository must read a public doc (grist.publicRead)');
+  // Its data is public either way: a doc shared as viewer, or a database of fictitious rows (lot 10, the demo).
+  if (raw.storage !== 'postgres' && (!raw.grist || raw.grist.publicRead !== true)) errors.push('an instance of the public repository must read a public doc (grist.publicRead) or a PostgreSQL database (storage)');
   return errors;
 };
 
@@ -134,10 +146,10 @@ const publicRepoErrors = (raw) => {
  * Real environment variables keep priority over .env files in Vite: a Pages variable still wins.
  * @returns {Record<string, string>}
  */
-const viteEnvFromConfig = (c) => ({
+const viteEnvFromConfig = (c) => (c.grist ? {
   VITE_GRIST_DOC_ID: c.grist.docId,
   ...(c.grist.publicRead ? { VITE_GRIST_PUBLIC_BASE_URL: c.grist.apiBase } : {}),
-});
+} : {});
 
 const isTrue = (v) => String(v || '').toLowerCase() === 'true';
 const emailSet = (list) => [...new Set(list.map((e) => e.trim().toLowerCase()).filter(Boolean))].sort().join(',');
@@ -145,10 +157,10 @@ const emailSet = (list) => [...new Set(list.map((e) => e.trim().toLowerCase()).f
 // Pages variables that duplicate a registry field during the transition (lot 5 f removes them).
 // `personal`: the value is never printed (build logs).
 const ENV_OVERRIDES = [
-  { name: 'VITE_GRIST_DOC_ID', expected: (c) => c.grist.docId },
-  { name: 'GRIST_DOC_ID', expected: (c) => c.grist.docId },
-  { name: 'VITE_GRIST_PUBLIC_BASE_URL', expected: (c) => (c.grist.publicRead ? c.grist.apiBase : '') },
-  { name: 'GRIST_API_BASE', expected: (c) => c.grist.apiBase },
+  { name: 'VITE_GRIST_DOC_ID', expected: (c) => c.grist?.docId || '' },
+  { name: 'GRIST_DOC_ID', expected: (c) => c.grist?.docId || '' },
+  { name: 'VITE_GRIST_PUBLIC_BASE_URL', expected: (c) => (c.grist?.publicRead ? c.grist.apiBase : '') },
+  { name: 'GRIST_API_BASE', expected: (c) => c.grist?.apiBase || '' },
   { name: 'INSTANCE_LABEL', expected: (c) => c.label },
   { name: 'READ_ONLY', expected: (c) => c.readOnly, normalize: isTrue },
   { name: 'SHOW_STATUS_VALIDATION', expected: (c) => !!c.capabilities.HAS_STATUS_VALIDATION, normalize: isTrue },

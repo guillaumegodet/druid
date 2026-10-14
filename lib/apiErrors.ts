@@ -41,6 +41,7 @@ export const API_ERRORS = [
   msg`VITE_GRIST_DOC_ID not configured`,
   msg`GRIST_API_KEY not configured`,
   msg`GRIST_API_KEY not configured on Cloudflare`,
+  msg`HYPERDRIVE binding not configured on Cloudflare`,
   // directory domain API (/api/v1, lib/directory/api.ts)
   msg`Unknown API route`,
   msg`Directory storage unavailable`,
@@ -157,7 +158,7 @@ export const API_ERRORS = [
   msg`Rows outside scope or unknown`,
   msg`Scope check failed`,
   msg`Grist writes require the institution right`,
-  msg`Grist writes require an authenticated user (Cloudflare Access)`,
+  msg`Writes require an authenticated user (Cloudflare Access)`,
   msg`Read-only instance: writes are disabled`,
   msg`Newsletter not available on this instance`,
   msg`Missing id for PATCH`,

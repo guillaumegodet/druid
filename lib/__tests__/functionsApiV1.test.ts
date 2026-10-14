@@ -27,6 +27,9 @@ const privReg = parseInstanceConfig({
   admins: ['admin@example.org'], openalexMailto: 'veille@example.org', secrets: ['GRIST_API_KEY'],
 }).config;
 const multiReg = buildRegistry([demoReg, demo2Reg], { mode: 'multi' }).registry;
+// The demo on PostgreSQL (lot 10 a): same instance, no document, Hyperdrive binding instead of a key.
+const pgReg = parseInstanceConfig({ ...demoRaw, grist: undefined, storage: 'postgres' }).config;
+const pgDemo = resolveInstance({}, pgReg);
 const d2 = resolveForHost('demo-2.example.org', { GRIST_API_KEY: 'common' }, multiReg);
 const ecoleShared = resolveInstance({}, privReg, { shared: true });
 
@@ -43,7 +46,7 @@ beforeEach(() => {
   }) as typeof fetch;
 });
 
-const call = (method: string, path: string, { env = {}, instance, headers = {}, body }: { env?: Record<string, string>; instance?: any; headers?: Record<string, string>; body?: unknown } = {}) =>
+const call = (method: string, path: string, { env = {}, instance, headers = {}, body }: { env?: Record<string, unknown>; instance?: any; headers?: Record<string, string>; body?: unknown } = {}) =>
   onRequest({
     request: new Request(`https://h.example.org${path}`, { method, headers: { 'Content-Type': 'application/json', ...headers }, body: body === undefined ? undefined : JSON.stringify(body) }),
     env, params: {}, data: instance ? { instance } : {},
@@ -91,5 +94,38 @@ describe('functions/api/v1 (Cloudflare)', () => {
     const { onRequest: proxy } = await import('../../functions/api/grist/[[path]].js');
     const r = await proxy();
     expect([r.status, (await r.json()).error]).toEqual([410, 'Grist proxy removed: use /api/v1']);
+  });
+
+  it('PostgreSQL instance without its Hyperdrive binding: 500 before any call', async () => {
+    const r = await call('GET', '/api/v1/structures', { instance: pgDemo, env: {} });
+    expect([r.status, (await r.json()).error, calls]).toEqual([500, 'HYPERDRIVE binding not configured on Cloudflare', []]);
+    // Shared deployment: the binding of another instance is never borrowed.
+    const shared = resolveInstance({}, pgReg, { shared: true });
+    const s = await call('GET', '/api/v1/structures', { instance: shared, env: { HYPERDRIVE: { connectionString: 'postgres://x' } } });
+    expect(s.status).toBe(500);
+  });
+});
+
+// Needs DATABASE_URL_APP (druid_app on a migrated database): run by the « database » CI job and `npm run test:db`.
+const pgUrl = process.env.DATABASE_URL_APP;
+describe.skipIf(!pgUrl)('functions/api/v1 on PostgreSQL through Hyperdrive (lot 10 a)', () => {
+  const binding = { connectionString: pgUrl };
+
+  it('reads the database of the instance, never Grist; a read-only instance refuses writes', async () => {
+    const r = await call('GET', '/api/v1/structures', { instance: pgDemo, env: { HYPERDRIVE: binding } });
+    expect(r.status).toBe(200);
+    expect(Array.isArray((await r.json()).items)).toBe(true);
+    const p = await call('GET', '/api/v1/people', { instance: pgDemo, env: { HYPERDRIVE: binding } });
+    expect(p.status).toBe(200);
+    expect(Array.isArray((await p.json()).items)).toBe(true);
+    expect(calls).toEqual([]);
+    const w = await call('PATCH', '/api/v1/people/groups', { instance: pgDemo, env: { HYPERDRIVE: binding }, headers: ACCESS, body: GROUPS });
+    expect([w.status, (await w.json()).error]).toEqual([403, 'Read-only instance: writes are disabled']);
+  });
+
+  it('shared deployment: binding of the instance only', async () => {
+    const shared = resolveInstance({}, pgReg, { shared: true });
+    const r = await call('GET', '/api/v1/structures', { instance: shared, env: { HYPERDRIVE__DEMO: binding } });
+    expect(r.status).toBe(200);
   });
 });

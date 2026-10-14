@@ -210,7 +210,7 @@ export async function onRequestGet(context) {
     let byName = null
     if (env.GRIST_API_KEY) {
       try {
-        byName = await fetchEffectifs(slug, storageOf(context).store.grist)
+        byName = await fetchEffectifs(slug, storageOf(context).store.tables)
       } catch (e) {
         byName = null
       }

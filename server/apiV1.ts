@@ -16,13 +16,9 @@ import {
   createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient, LdapCacheSnapshot,
 } from '../lib/directory/repository';
 import { createGristPublicationsStore } from '../lib/publications/store';
-import { createPgPublicationsStore } from '../lib/publications/pg';
 import { createDb } from '../lib/db/client';
-import { createPgDirectoryRepository } from '../lib/directory/pg/repository';
-import { createPgDirectoryCommands } from '../lib/directory/pg/commands';
 import { createPgLdapCommands } from '../lib/directory/pg/ldapCommands';
-import { createPgAlignCommands } from '../lib/directory/pg/alignCommands';
-import { createPgTableClient } from '../lib/directory/pg/tableClient';
+import { createPgStorage } from '../lib/directory/pg/storage';
 import { createPgWorkPorts } from '../lib/work/pg/workPorts';
 import type { StorageKind } from '../lib/directory/jobStorage';
 import { graphActionsOverview, recordPeopleCsvExport } from '../lib/graph/pg';
@@ -172,15 +168,15 @@ export const createServerStorage = (options: ApiV1Options) => {
 
   if (kind === 'postgres') {
     const db = createDb({ connectionString: options.databaseUrl!, max: 8 });
-    const repository = createPgDirectoryRepository({ db, loadLdapCache: ldapStatus });
-    const commands = createPgDirectoryCommands({ db, repository });
-    const publications = createPgPublicationsStore({ db, grist: gristPublications });
+    // Same assembly as the Cloudflare Functions (lib/directory/pg/storage.ts, lot 10 a).
+    const { repository, commands, publications, tables, align } = createPgStorage({
+      db, loadLdapCache: ldapStatus, gristPublications, tablesActor: 'server',
+      align: { caches, texts: tokenAlignTexts, hasQualinka },
+    });
     return {
-      kind, grist: main, publications, repository, commands,
-      /** Migrated tables seen as the Grist document (reads of server.cjs, jobs): lib/directory/pg/tableClient.ts. */
-      tables: createPgTableClient({ db, actor: 'server' }),
+      kind, grist: main, publications, repository, commands, tables,
       ldap: options.hasLdap ? createPgLdapCommands({ db, repository, ldap: ldapSource }) : undefined,
-      align: createPgAlignCommands({ db, repository, caches, texts: tokenAlignTexts, hasQualinka }),
+      align: align!,
       /** Ports of the work routes (tasks, arbitrations, peer lists, reports), writes audited under `actor`. */
       workPorts: (actor: string) => createPgWorkPorts({ db, actor }),
       /** Removals sent before the people.csv export and state update after it, while the graph publisher is on (lot 11 d). */
