@@ -1,5 +1,6 @@
 // Bundle of the PostgreSQL driver for the Cloudflare Pages Functions: functions/_generated/pg.js (ignored by git),
-// written by scripts/prepare-cloudflare-assets.cjs at every Pages build and by the Functions tests when absent.
+// written by `npm run build` right after scripts/prepare-cloudflare-assets.cjs (which empties functions/_generated/) on
+// every build, Pages or not, and by the Functions tests when absent.
 //
 // Why: the Functions are compiled by the wrangler of the Pages build system, which rejects the bare Node built-ins
 // required by node-postgres (`require('events')`, `net`, `tls`…) unless it receives the `nodejs_compat` flag — and the
@@ -20,11 +21,18 @@ const isBuiltin = (name) => BUILTINS.has(name) || BUILTINS.has(name.split('/')[0
 const nodePrefixPlugin = {
   name: 'druid-node-prefix',
   setup(build) {
-    // `events`, `node:events`, `util/types`… → external `node:events`, `node:util/types`.
+    // `events`, `node:events`, `util/types`… → `node:events`, `node:util/types`, reached through a small ES module
+    // (namespace druid-node) so that the CommonJS `require()` of the driver becomes a static `import` of the bundle:
+    // a bare external would leave a dynamic `require("node:events")`, refused by the Workers runtime in an ES module.
     build.onResolve({ filter: /^(node:)?[a-z_][a-z0-9_]*(\/[a-z_][a-z0-9_]*)?$/ }, (args) => {
       const name = args.path.replace(/^node:/, '');
-      return isBuiltin(name) ? { path: `node:${name}`, external: true } : null;
+      if (!isBuiltin(name)) return null;
+      return args.namespace === 'druid-node' ? { path: `node:${name}`, external: true } : { path: `node:${name}`, namespace: 'druid-node' };
     });
+    build.onLoad({ filter: /.*/, namespace: 'druid-node' }, (args) => ({
+      loader: 'js',
+      contents: `import * as m from '${args.path}';\nexport * from '${args.path}';\nexport default m.default ?? m;\n`,
+    }));
     // pg-cloudflare opens the TCP socket through the runtime module.
     build.onResolve({ filter: /^cloudflare:/ }, (args) => ({ path: args.path, external: true }));
     // Optional native binding of node-postgres (libpq): never available on Cloudflare.
