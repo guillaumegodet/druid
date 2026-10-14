@@ -8,7 +8,9 @@
  * graph, the uids are matched to the directory by the tab, not here.
  *
  * Usage (env DRUID_STORAGE=postgres, DRUID_DATABASE_URL):
- *   node scripts/.build/import_trm.cjs --file=<report.json> [--file=<other report.json>…] [--by=<who>]
+ *   node scripts/.build/import_trm.cjs --file=<report.json> [--file=<other report.json>…] [--by=<who>] [--merge]
+ * `--merge`: the report completes the run already imported for its cluster (topics replayed after a failure of the
+ * batch, `topic_researcher_match.py --topic … --out <other directory>`) instead of replacing it.
  */
 import { readFileSync } from 'fs';
 import { closeDatabases, databaseFromEnv, storageKindFromEnv } from '../lib/directory/jobStorage';
@@ -18,6 +20,7 @@ import { parseTrmReport } from '../lib/euCalls/trm';
 const args = process.argv.slice(2);
 const FILES = args.filter((a) => a.startsWith('--file=')).map((a) => a.slice('--file='.length));
 const BY = args.find((a) => a.startsWith('--by='))?.slice('--by='.length) || 'import_trm';
+const MERGE = args.includes('--merge');
 
 async function main() {
   if (storageKindFromEnv(process.env) !== 'postgres') throw new Error('DRUID_STORAGE is not postgres: the European calls need the PostgreSQL storage');
@@ -26,11 +29,12 @@ async function main() {
   const store = createEuCallsStore(db);
   for (const file of FILES) {
     const run = parseTrmReport(readFileSync(file, 'utf8'));
-    const report = await store.importRun(run, BY);
+    const report = await store.importRun(run, BY, { merge: MERGE });
     const covered = new Set(run.matches.map((m) => m.topicId)).size;
     console.log(`${file}: run ${report.runId} (${report.cluster}, model ${run.model || '?'}) — ${report.topics} topics `
       + `(${run.failedTopics.length} failed in the batch), ${report.matches} matches on ${covered} topics`
-      + (report.replacedRunId ? `; replaced run ${report.replacedRunId}` : ''));
+      + (report.replacedRunId ? `; replaced run ${report.replacedRunId}` : '')
+      + (report.mergedIntoRunId ? `; merged into run ${report.mergedIntoRunId}` : ''));
     for (const f of run.failedTopics) console.log(`  failed topic ${f.topicId}: ${f.error}`);
   }
 }

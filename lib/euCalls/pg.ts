@@ -34,6 +34,15 @@ export interface ImportReport {
   matches: number;
   /** Run of the same cluster this import replaced, if any. */
   replacedRunId: string | null;
+  /** With `merge`: run of the cluster the topics of the report were added to. */
+  mergedIntoRunId: string | null;
+}
+
+export interface ImportOptions {
+  /** The report completes the run already imported for its cluster (topics replayed after a failure of the batch):
+   * its topics and their matches replace the same topics of that run, the other topics stay. Without a previous run
+   * the report is imported as a run of its own. */
+  merge?: boolean;
 }
 
 export interface MatchesQuery {
@@ -47,12 +56,14 @@ export interface MatchesQuery {
 const iso = (v: Date | string | null | undefined): string => (v instanceof Date ? v.toISOString() : v ?? '');
 
 export const createEuCallsStore = (db: Kysely<DB>) => {
-  const importRun = async (run: TrmRun, importedBy: string): Promise<ImportReport> =>
+  const importRun = async (run: TrmRun, importedBy: string, options: ImportOptions = {}): Promise<ImportReport> =>
     db.transaction().execute(async (trx) => {
       // One importer at a time: two imports of the same cluster would both delete then insert.
       await sql`SELECT pg_advisory_xact_lock(hashtext('druid.eu_calls_import'))`.execute(trx);
-      const previous = await trx.selectFrom('eu_topic_match_run').select('run_id').where('cluster', '=', run.cluster).executeTakeFirst();
-      if (previous) await trx.deleteFrom('eu_topic_match_run').where('run_id', '=', previous.run_id).execute();
+      const previous = await trx.selectFrom('eu_topic_match_run').select(['run_id', 'topics', 'failed_topics'])
+        .where('cluster', '=', run.cluster).executeTakeFirst();
+      const merge = !!options.merge && !!previous;
+      if (previous && !merge) await trx.deleteFrom('eu_topic_match_run').where('run_id', '=', previous.run_id).execute();
       for (const t of run.topics) {
         await trx.insertInto('eu_topic')
           .values({ topic_id: t.topicId, cluster: t.cluster, title: t.title, call_id: t.callId, destination: t.destination, deadlines: t.deadlines, summary: t.summary })
@@ -61,20 +72,35 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
           }))
           .execute();
       }
-      await trx.insertInto('eu_topic_match_run').values({
-        run_id: run.runId, cluster: run.cluster, started_at: run.startedAt || sql`now()`, model: run.model,
-        settings: JSON.stringify(run.settings), topics: run.topics.length, failed_topics: run.failedTopics.length, imported_by: importedBy,
-      }).execute();
+      let runId = run.runId;
+      if (merge) {
+        runId = previous!.run_id;
+        const topicIds = run.topics.map((t) => t.topicId);
+        if (topicIds.length) await trx.deleteFrom('eu_topic_match').where('run_id', '=', runId).where('topic_id', 'in', topicIds).execute();
+        // The replayed topics were counted as failed by the first run.
+        await trx.updateTable('eu_topic_match_run').set({
+          topics: previous!.topics + run.topics.length, failed_topics: Math.max(0, previous!.failed_topics - run.topics.length),
+          imported_at: sql`now()`, imported_by: importedBy,
+        }).where('run_id', '=', runId).execute();
+      } else {
+        await trx.insertInto('eu_topic_match_run').values({
+          run_id: runId, cluster: run.cluster, started_at: run.startedAt || sql`now()`, model: run.model,
+          settings: JSON.stringify(run.settings), topics: run.topics.length, failed_topics: run.failedTopics.length, imported_by: importedBy,
+        }).execute();
+      }
       // A match of a topic in error cannot exist (the parser drops them); a match of a topic absent from the report is
       // refused by the foreign key, which is what we want.
       for (const m of run.matches) {
         await trx.insertInto('eu_topic_match').values({
-          pair_id: m.pairId, run_id: run.runId, topic_id: m.topicId, person_uid: m.personUid, uid: m.uid, person_name: m.personName,
+          pair_id: m.pairId, run_id: runId, topic_id: m.topicId, person_uid: m.personUid, uid: m.uid, person_name: m.personName,
           units: m.units, score: m.score, raw_score: m.rawScore, overall: m.overall, justification: m.justification,
           publications: JSON.stringify(m.publications),
         }).execute();
       }
-      return { runId: run.runId, cluster: run.cluster, topics: run.topics.length, matches: run.matches.length, replacedRunId: previous?.run_id ?? null };
+      return {
+        runId, cluster: run.cluster, topics: run.topics.length, matches: run.matches.length,
+        replacedRunId: previous && !merge ? previous.run_id : null, mergedIntoRunId: merge ? runId : null,
+      };
     });
 
   const overview = async (): Promise<EuCallsOverview> => {
