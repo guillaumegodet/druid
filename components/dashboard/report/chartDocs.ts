@@ -345,6 +345,11 @@ export const CHART_DOCS: Record<string, ChartDocSource> = {
     methode: msg`Same classification, crossed with document type.`,
     limites: msg`Same caveats as the breakdown by axis.`,
   },
+  'axes-equipes': {
+    description: msg`How the publications of each team spread over the strategic axes, unclassified (theoretical or methodological) work included.`,
+    methode: msg`Same classification, crossed with the teams of the authors in the directory; a publication signed by several teams counts once in each.`,
+    limites: msg`Same caveats as the breakdown by axis; « Non identifié » gathers the publications whose authors have no team in the directory.`,
+  },
 
   // ── Signature charter ──────────────────────────────────────────────────────
   'charte-conformite': {

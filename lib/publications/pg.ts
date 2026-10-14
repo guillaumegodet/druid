@@ -7,6 +7,8 @@ import { ApiError } from '../directory/errors';
 import type { NewsletterItem as NewsletterItemRow } from '../db/schema.gen';
 import { mapNewsletterRecords, type NewsletterNewItem } from './newsletter';
 import type { PublicationsStore } from './store';
+import type { AxisReview, AxisReviewInput } from './axisReviews';
+import type { AxisReview as AxisReviewRow } from '../db/schema.gen';
 
 /** '' or an unreadable date → NULL; the panel and the generation write ISO strings. */
 const timestampOf = (v: string | undefined): Date | null => {
@@ -25,6 +27,11 @@ const asActor = async <T>(db: Queryable, actor: string, fn: (trx: Transaction<DB
   await sql`SELECT set_config('druid.actor', ${actor}, true)`.execute(db);
   return fn(db as Transaction<DB>);
 };
+
+const reviewOf = (r: Selectable<AxisReviewRow>): AxisReview => ({
+  workKey: r.work_key, doi: r.doi, title: r.title, decision: r.decision as AxisReview['decision'], axes: r.axes,
+  autoAxis: r.auto_axis, autoConfidence: r.auto_confidence, author: r.author, note: r.note, updatedAt: isoOf(r.updated_at),
+});
 
 /** Row → the record shape of the Grist table, so that the items are mapped (and sorted) by one function. */
 const recordOf = (r: Selectable<NewsletterItemRow>) => ({
@@ -68,5 +75,26 @@ export const createPgPublicationsStore = ({ db, grist }: PgPublicationsStoreOpti
   updateAxisCorrection: (slug, rowId, axe) => {
     if (!grist) throw new ApiError(404, `No axis corrections for structure: ${slug}`);
     return grist.updateAxisCorrection(slug, rowId, axe);
+  },
+  // Axis reviews (druid-internal docs/plan-axes-embeddings.md, lot 2): table axis_review, one row per publication and
+  // structure, written under the actor of the request.
+  axisReviewsSupported: true,
+  async axisReviews(slug) {
+    const rows = await db.selectFrom('axis_review').selectAll().where('slug', '=', slug).orderBy('updated_at', 'desc').execute();
+    return rows.map(reviewOf);
+  },
+  async saveAxisReview(slug, input: AxisReviewInput, actor) {
+    const values = {
+      slug, work_key: input.workKey, doi: input.doi ?? '', title: input.title ?? '', decision: input.decision, axes: input.axes ?? [],
+      auto_axis: input.autoAxis ?? '', auto_confidence: input.autoConfidence ?? null, author: actor, note: input.note ?? '',
+    };
+    const row = await asActor(db, actor, (trx) => trx.insertInto('axis_review').values(values)
+      .onConflict((oc) => oc.columns(['slug', 'work_key']).doUpdateSet({ ...values, slug: undefined, work_key: undefined } as any))
+      .returningAll().executeTakeFirstOrThrow());
+    return reviewOf(row);
+  },
+  async deleteAxisReview(slug, workKey, actor) {
+    const result = await asActor(db, actor, (trx) => trx.deleteFrom('axis_review').where('slug', '=', slug).where('work_key', '=', workKey).executeTakeFirst());
+    return Number(result.numDeletedRows) > 0;
   },
 });

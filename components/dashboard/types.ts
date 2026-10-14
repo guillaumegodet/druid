@@ -109,8 +109,13 @@ export interface DashboardPublication {
   chosenTheme: string | null;
   /** Assigned strategic axis (OpenAlex topics classification, see strategicAxes). */
   chosenAxe: string | null;
-  /** Rationale of the classification (triggering keywords). */
+  /** Rationale of the classification (triggering keywords, or the model's reason with the closest sub-theme). */
   axeMotivation: string | null;
+  /** Axes by embeddings (druid-biblio axes_embeddings, docs/plan-axes-embeddings.md): confidence in [0, 1], secondary
+   * axes, method (`embeddings+llm`, `embeddings`, `keywords`); absent from older exports. */
+  axeConfidence?: number | null;
+  axesSecondary?: string[];
+  axeMethod?: string | null;
   issn: string | null;
   journalAccess: string | null;
   licenceNationale: boolean;

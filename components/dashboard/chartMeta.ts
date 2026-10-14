@@ -192,6 +192,7 @@ export const CHART_META: Record<string, ChartMeta> = {
   'axes-barres': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
   'axes-evolution': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
   'axes-types': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
+  'axes-equipes': { tab: 'themes', requires: ['axes', 'teams'], trivialUnder: ['axe', 'team'] },
   // ── Signature charter
   'charte-conformite': charte({ trivialUnder: ['charterCompliant'] }),
   'charte-scores': charte(),

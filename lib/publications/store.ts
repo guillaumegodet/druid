@@ -5,6 +5,7 @@
 import type { GristClient } from '../directory/repository';
 import { mapNewsletterRecords, NewsletterItem, NewsletterNewItem } from './newsletter';
 import { AXES_GRIST, AxisCorrectionRow, axisCorrectionRows } from './axes';
+import type { AxisReview, AxisReviewInput } from './axisReviews';
 
 export interface PublicationsStore {
   /** News items of a structure (`slug` column of the Newsletter table), most recent first; none on an
@@ -22,6 +23,14 @@ export interface PublicationsStore {
   addNewsletterItem(item: NewsletterNewItem, actor?: string): Promise<number | null>;
   /** Retained axis of a publication in the correction table of the structure. */
   updateAxisCorrection(slug: string, rowId: number, axe: string): Promise<{ table: string }>;
+  /** Axis reviews (curation of the automatic classification, docs/plan-axes-embeddings.md lot 2): PostgreSQL only. */
+  axisReviewsSupported: boolean;
+  /** Reviews of a structure, most recent first. */
+  axisReviews(slug: string): Promise<AxisReview[]>;
+  /** Records (or replaces) the review of `actor` on a publication; one review per publication and structure. */
+  saveAxisReview(slug: string, input: AxisReviewInput, actor: string): Promise<AxisReview>;
+  /** Removes a review; false when there was none. */
+  deleteAxisReview(slug: string, workKey: string, actor: string): Promise<boolean>;
 }
 
 /** Fields of a news item the editorial workflow writes (NewsletterPanel). */
@@ -78,4 +87,9 @@ export const createGristPublicationsStore = ({ main, readerFor }: GristPublicati
     await client.updateRecords(cfg.table, [{ id: rowId, fields: { [cfg.field]: axe } }]);
     return { table: cfg.table };
   },
+  // Axis reviews live in PostgreSQL only (the Grist corrections of Centrale stay until lot 5 of the axes plan).
+  axisReviewsSupported: false,
+  async axisReviews() { return []; },
+  async saveAxisReview() { throw new DocumentNotAllowedError('Axis reviews need the PostgreSQL storage'); },
+  async deleteAxisReview() { throw new DocumentNotAllowedError('Axis reviews need the PostgreSQL storage'); },
 });

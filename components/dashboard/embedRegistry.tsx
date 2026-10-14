@@ -671,6 +671,21 @@ export const EMBED_CHARTS: Record<string, Entry> = {
       );
     },
   },
+  'axes-equipes': {
+    label: msg`Strategic axes by team`,
+    Chart: (p) => {
+      const { d, seriesColors } = useAxes(p);
+      return (
+        <StackedBarHChart
+          title={i18n._(msg`Strategic axes by team`)}
+          exportName="axes-equipes"
+          data={d.byTeam}
+          colors={seriesColors}
+          height={Math.max(260, d.byTeam.categories.length * 34 + 90)}
+        />
+      );
+    },
+  },
   'charte-conformite': {
     label: msg`Corpus compliance (signature charter)`,
     Chart: (p) => {

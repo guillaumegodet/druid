@@ -572,6 +572,7 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/ResearcherDetail.tsx:476
 #: components/ResearcherDetail.tsx:579
 #: components/admin/InstitutionsAdmin.tsx:223
+#: components/dashboard/AxisReviewTable.tsx:263
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
 #: components/reports/NewReportDialog.tsx:324
@@ -766,6 +767,7 @@ msgstr "Export PDF"
 #: components/ResearcherDetail.tsx:315
 #: components/StructureDetail.tsx:139
 #: components/admin/InstitutionsAdmin.tsx:219
+#: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
@@ -1120,7 +1122,8 @@ msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 #: components/StructureList.tsx:513
 #: components/dashboard/ApcTab.tsx:506
 #: components/dashboard/ApcTab.tsx:839
-#: components/dashboard/AxesTab.tsx:276
+#: components/dashboard/AxesTab.tsx:281
+#: components/dashboard/AxisReviewTable.tsx:307
 #: components/dashboard/CharteTab.tsx:442
 #: components/dashboard/FundersTab.tsx:396
 #: components/dashboard/ImpactTab.tsx:248
@@ -1134,7 +1137,8 @@ msgstr "Précédent"
 #: components/StructureList.tsx:520
 #: components/dashboard/ApcTab.tsx:508
 #: components/dashboard/ApcTab.tsx:845
-#: components/dashboard/AxesTab.tsx:282
+#: components/dashboard/AxesTab.tsx:287
+#: components/dashboard/AxisReviewTable.tsx:309
 #: components/dashboard/CharteTab.tsx:448
 #: components/dashboard/FundersTab.tsx:407
 #: components/dashboard/ImpactTab.tsx:254
@@ -1414,7 +1418,7 @@ msgid "{0}: ≈ €{1} — {2} publication(s)"
 msgstr "{0} : ≈ {1} € — {2} publication(s)"
 
 #: components/dashboard/ApcTab.tsx:175
-#: components/dashboard/embedRegistry.tsx:746
+#: components/dashboard/embedRegistry.tsx:761
 msgid "Total APC cost per year"
 msgstr "Coût APC total par année"
 
@@ -1434,7 +1438,7 @@ msgid "{0} publication(s) — total ≈ €{1}"
 msgstr "{0} publication(s) — total ≈ {1} €"
 
 #: components/dashboard/ApcTab.tsx:225
-#: components/dashboard/embedRegistry.tsx:760
+#: components/dashboard/embedRegistry.tsx:775
 msgid "Mean APC cost per journal"
 msgstr "Coût APC moyen par revue"
 
@@ -1548,7 +1552,8 @@ msgstr "Exporter (CSV)"
 
 #: components/dashboard/ApcTab.tsx:480
 #: components/dashboard/ApcTab.tsx:744
-#: components/dashboard/AxesTab.tsx:207
+#: components/dashboard/AxesTab.tsx:212
+#: components/dashboard/AxisReviewTable.tsx:200
 #: components/dashboard/CharteTab.tsx:391
 #: components/dashboard/ImpactTab.tsx:209
 #: components/dashboard/PublicationsListTab.tsx:284
@@ -1590,7 +1595,8 @@ msgstr "hybride"
 #. placeholder {0}: currentPage + 1
 #: components/dashboard/ApcTab.tsx:507
 #: components/dashboard/ApcTab.tsx:842
-#: components/dashboard/AxesTab.tsx:279
+#: components/dashboard/AxesTab.tsx:284
+#: components/dashboard/AxisReviewTable.tsx:308
 #: components/dashboard/CharteTab.tsx:445
 #: components/dashboard/FundersTab.tsx:399
 #: components/dashboard/ImpactTab.tsx:251
@@ -1750,29 +1756,33 @@ msgstr "Auteur correspondant Nantes U — accord déclenché (payeur confirmé)"
 msgid "Elsevier article under agreement, published non-OA (no APC)"
 msgstr "Article Elsevier sous accord, publié en non-OA (aucun APC)"
 
-#: components/dashboard/AxesTab.tsx:159
+#: components/dashboard/AxesTab.tsx:164
+#: components/dashboard/AxisReviewTable.tsx:138
 msgid "Classification curation"
 msgstr "Curation des classifications"
 
 #. placeholder {0}: rows.length.toLocaleString(numberLocale())
 #. placeholder {1}: matched.toLocaleString(numberLocale())
-#: components/dashboard/AxesTab.tsx:162
+#: components/dashboard/AxesTab.tsx:167
 msgid "{0} publications · {1} editable (present in the Grist table) — corrections apply immediately to the charts"
 msgstr "{0} publications · {1} modifiables (présentes dans la table Grist) — les corrections s'appliquent immédiatement aux graphiques"
 
-#: components/dashboard/AxesTab.tsx:175
+#: components/dashboard/AxesTab.tsx:180
 msgid "Filter by axis"
 msgstr "Filtrer par axe"
 
-#: components/dashboard/AxesTab.tsx:177
+#: components/dashboard/AxesTab.tsx:182
+#: components/dashboard/AxisReviewTable.tsx:180
 msgid "All axes"
 msgstr "Tous les axes"
 
-#: components/dashboard/AxesTab.tsx:188
+#: components/dashboard/AxesTab.tsx:193
+#: components/dashboard/AxisReviewTable.tsx:188
 msgid "Title, DOI or journal…"
 msgstr "Titre, DOI ou revue…"
 
-#: components/dashboard/AxesTab.tsx:208
+#: components/dashboard/AxesTab.tsx:213
+#: components/dashboard/AxisReviewTable.tsx:201
 #: components/dashboard/CharteTab.tsx:396
 #: components/dashboard/ImpactTab.tsx:210
 #: components/dashboard/MediaSourcesAdmin.tsx:384
@@ -1783,74 +1793,275 @@ msgstr "Titre, DOI ou revue…"
 msgid "Title"
 msgstr "Titre"
 
-#: components/dashboard/AxesTab.tsx:209
+#: components/dashboard/AxesTab.tsx:214
 msgid "Selected axis"
 msgstr "Axe retenu"
 
-#: components/dashboard/AxesTab.tsx:210
+#: components/dashboard/AxesTab.tsx:215
+#: components/dashboard/AxisReviewTable.tsx:223
 msgid "Rationale"
 msgstr "Motivation"
 
-#: components/dashboard/AxesTab.tsx:243
+#: components/dashboard/AxesTab.tsx:248
 msgid "{effective} (not in list)"
 msgstr "{effective} (hors liste)"
 
-#: components/dashboard/AxesTab.tsx:257
+#: components/dashboard/AxesTab.tsx:262
 msgid "Publication absent from the Grist curation table"
 msgstr "Publication absente de la table Grist de curation"
 
-#: components/dashboard/AxesTab.tsx:316
+#: components/dashboard/AxesTab.tsx:331
 msgid "No strategic axis defined for this structure: fill in<0>strategic_axes</0>(names + keywords) in its druid-biblio configuration then rerun the ETL."
 msgstr "Aucun axe stratégique défini pour cette structure : renseignez<0>strategic_axes</0>(noms + mots-clés) dans sa configuration druid-biblio puis relancez l'ETL."
 
-#: components/dashboard/AxesTab.tsx:329
+#: components/dashboard/AxesTab.tsx:345
+msgid "Axis assigned automatically from the title and abstract of each publication, compared with the description of the axes; the language model then decides between the closest axes and « unclassified » (theoretical or methodological work stays unclassified on purpose). The decisions taken in the curation below take precedence over the classification and apply at once to the charts."
+msgstr "Axe attribué automatiquement d'après le titre et le résumé de chaque publication, comparés à la description des axes ; le modèle de langage tranche ensuite entre les axes les plus proches et « non classée » (les travaux théoriques ou méthodologiques restent volontairement non classés). Les décisions prises dans la curation ci-dessous priment sur la classification et s'appliquent immédiatement aux graphiques."
+
+#: components/dashboard/AxesTab.tsx:349
 msgid "Axis assigned from OpenAlex topics and the keywords defined in the configuration (≥ 2 matches with a clear lead). Corrections entered below are saved in the Grist curation table and take precedence over the classification."
 msgstr "Axe attribué d'après les topics OpenAlex et les mots-clés définis en configuration (≥ 2 correspondances avec avance nette). Les corrections saisies ci-dessous sont enregistrées dans la table Grist de curation et priment sur la classification."
 
-#: components/dashboard/AxesTab.tsx:337
+#: components/dashboard/AxesTab.tsx:358
 #: components/dashboard/embedRegistry.tsx:619
 #: components/dashboard/embedRegistry.tsx:624
 msgid "Breakdown by strategic axis"
 msgstr "Répartition par axe stratégique"
 
-#: components/dashboard/AxesTab.tsx:345
+#: components/dashboard/AxesTab.tsx:366
 #: components/dashboard/embedRegistry.tsx:632
 #: components/dashboard/embedRegistry.tsx:637
 msgid "Publications by axis"
 msgstr "Publications par axe"
 
-#: components/dashboard/AxesTab.tsx:356
+#: components/dashboard/AxesTab.tsx:377
 #: components/dashboard/embedRegistry.tsx:647
 #: components/dashboard/embedRegistry.tsx:652
 msgid "Yearly evolution by strategic axis"
 msgstr "Évolution annuelle par axe stratégique"
 
-#: components/dashboard/AxesTab.tsx:363
+#: components/dashboard/AxesTab.tsx:384
 #: components/dashboard/embedRegistry.tsx:661
 #: components/dashboard/embedRegistry.tsx:666
 msgid "Publication types by strategic axis"
 msgstr "Types de publication par axe stratégique"
 
-#: components/dashboard/AxesTab.tsx:374
+#: components/dashboard/AxesTab.tsx:396
+#: components/dashboard/NewsTab.tsx:42
+#: components/dashboard/NewsTab.tsx:585
+#: components/dashboard/StaffSection.tsx:254
+#: components/dashboard/StaffSection.tsx:379
+#: components/dashboard/charts/YearlyEvolutionChart.tsx:41
+#: components/dashboard/dashboardNav.ts:64
+#: components/dashboard/kpiItems.ts:35
+#: components/dashboard/report/composeReportPdf.ts:70
+#: components/dashboard/report/pdfDoc.ts:128
+#: components/reports/HistoryDialog.tsx:106
+#: components/researchers/AffiliationHistorySection.tsx:258
+msgid "Publications"
+msgstr "Publications"
+
+#: components/dashboard/AxesTab.tsx:396
+msgid "Share (%)"
+msgstr "Part (%)"
+
+#: components/dashboard/AxesTab.tsx:412
+#: components/dashboard/embedRegistry.tsx:675
+#: components/dashboard/embedRegistry.tsx:680
+msgid "Strategic axes by team"
+msgstr "Axes stratégiques par équipe"
+
+#: components/dashboard/AxesTab.tsx:412
+msgid "Strategic axes by team (share of each team's publications)"
+msgstr "Axes stratégiques par équipe (part des publications de chaque équipe)"
+
+#: components/dashboard/AxesTab.tsx:425
 msgid "Keywords by strategic axis"
 msgstr "Mots-clés par axe stratégique"
 
-#: components/dashboard/AxesTab.tsx:385
+#: components/dashboard/AxesTab.tsx:436
 msgid "(no keyword defined)"
 msgstr "(aucun mot-clé défini)"
 
+#. placeholder {0}: reviews.error
+#: components/dashboard/AxesTab.tsx:463
+msgid "Curation unavailable ({0}) — the classifications shown are those of the ETL."
+msgstr "Curation indisponible ({0}) — les classifications affichées sont celles de l'ETL."
+
+#: components/dashboard/AxesTab.tsx:477
+msgid "Loading the curation…"
+msgstr "Chargement de la curation…"
+
 #. placeholder {0}: corrections.error
-#: components/dashboard/AxesTab.tsx:412
+#: components/dashboard/AxesTab.tsx:482
 msgid "Grist curation unavailable ({0}) — the classifications shown are those of the ETL."
 msgstr "Curation Grist indisponible ({0}) — les classifications affichées sont celles de l'ETL."
 
-#: components/dashboard/AxesTab.tsx:416
+#: components/dashboard/AxesTab.tsx:486
 msgid "Loading the Grist curation table…"
 msgstr "Chargement de la table de curation Grist…"
 
-#: components/dashboard/AxesTab.tsx:429
-msgid "Grist curation not configured for this structure (see AXES_GRIST in AxesTab)."
-msgstr "Curation Grist non configurée pour cette structure (voir AXES_GRIST dans AxesTab)."
+#: components/dashboard/AxesTab.tsx:499
+msgid "Curation of the axes needs the PostgreSQL storage (or a Grist correction table for this structure)."
+msgstr "La curation des axes nécessite le stockage PostgreSQL (ou une table de corrections Grist pour cette structure)."
+
+#: components/dashboard/AxisReviewTable.tsx:32
+msgid "Confidence of the automatic classification"
+msgstr "Confiance de la classification automatique"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+msgid "Confirmed"
+msgstr "Confirmée"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+msgid "Corrected"
+msgstr "Corrigée"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+#: components/dashboard/AxisReviewTable.tsx:279
+msgid "Outside the axes"
+msgstr "Hors axes"
+
+#: components/dashboard/AxisReviewTable.tsx:130
+#: components/dashboard/AxisReviewTable.tsx:284
+msgid "Unsure"
+msgstr "Incertaine"
+
+#. placeholder {0}: progress.reviewed.toLocaleString(numberLocale())
+#. placeholder {1}: progress.total.toLocaleString(numberLocale())
+#: components/dashboard/AxisReviewTable.tsx:141
+msgid "{0} of {1} publications reviewed over the period"
+msgstr "{0} publications relues sur {1} sur la période"
+
+#. placeholder {0}: Math.round(progress.agreement * 100)
+#: components/dashboard/AxisReviewTable.tsx:145
+msgid "automatic axis confirmed in {0} % of the decisions"
+msgstr "axe automatique confirmé dans {0} % des décisions"
+
+#: components/dashboard/AxisReviewTable.tsx:151
+msgid "40 publications not reviewed yet, spread over the axes, the doubtful ones first"
+msgstr "40 publications non relues, réparties entre les axes, les douteuses d'abord"
+
+#: components/dashboard/AxisReviewTable.tsx:152
+msgid "Draw a sample"
+msgstr "Tirer un échantillon"
+
+#: components/dashboard/AxisReviewTable.tsx:169
+msgid "Review status"
+msgstr "Statut de relecture"
+
+#: components/dashboard/AxisReviewTable.tsx:170
+#: components/dashboard/MediaMentionsPanel.tsx:359
+msgid "To review"
+msgstr "À valider"
+
+#: components/dashboard/AxisReviewTable.tsx:171
+msgid "Reviewed"
+msgstr "Relues"
+
+#: components/dashboard/AxisReviewTable.tsx:176
+msgid "Current sample"
+msgstr "Échantillon en cours"
+
+#: components/dashboard/AxisReviewTable.tsx:177
+#: components/dashboard/BenchmarkTab.tsx:1206
+#: components/dashboard/BenchmarkTab.tsx:1279
+msgid "All publications"
+msgstr "Toutes les publications"
+
+#: components/dashboard/AxisReviewTable.tsx:179
+msgid "Filter by automatic axis"
+msgstr "Filtrer par axe automatique"
+
+#: components/dashboard/AxisReviewTable.tsx:184
+msgid "Low confidence only"
+msgstr "Confiance faible seulement"
+
+#. placeholder {0}: c.works_count
+#. placeholder {0}: rows.length
+#. placeholder {0}: state.total
+#: components/dashboard/AxisReviewTable.tsx:190
+#: components/dashboard/ImpactTab.tsx:174
+#: components/dashboard/NetworkTab.tsx:352
+#: components/groups/AuthorResolveModal.tsx:124
+msgid "{0, plural, one {# publication} other {# publications}}"
+msgstr "{0, plural, one {# publication} other {# publications}}"
+
+#: components/dashboard/AxisReviewTable.tsx:194
+msgid "Read-only: the decisions are shown but cannot be changed here."
+msgstr "Lecture seule : les décisions sont affichées mais ne peuvent pas être modifiées ici."
+
+#: components/dashboard/AxisReviewTable.tsx:202
+msgid "Automatic axis"
+msgstr "Axe automatique"
+
+#: components/dashboard/AxisReviewTable.tsx:203
+#: components/researchers/ImportConflictsPage.tsx:190
+msgid "Decision"
+msgstr "Décision"
+
+#: components/dashboard/AxisReviewTable.tsx:204
+msgid "Actions"
+msgstr "Actions"
+
+#: components/dashboard/AxisReviewTable.tsx:231
+msgid "Secondary axes"
+msgstr "Axes secondaires"
+
+#: components/dashboard/AxisReviewTable.tsx:233
+msgid "keywords"
+msgstr "mots-clés"
+
+#: components/dashboard/AxisReviewTable.tsx:242
+msgid "Shown as:"
+msgstr "Affichée comme :"
+
+#: components/dashboard/AxisReviewTable.tsx:255
+msgid "Principal axis"
+msgstr "Axe principal"
+
+#: components/dashboard/AxisReviewTable.tsx:255
+msgid "Click to add or remove; the first one chosen is the principal axis"
+msgstr "Cliquer pour ajouter ou retirer ; le premier choisi est l'axe principal"
+
+#: components/dashboard/AxisReviewTable.tsx:260
+msgid "Note (optional)"
+msgstr "Note (facultative)"
+
+#: components/dashboard/AxisReviewTable.tsx:270
+msgid "The automatic axis is right"
+msgstr "L'axe automatique est juste"
+
+#: components/dashboard/AxisReviewTable.tsx:271
+#: components/dashboard/MediaSourcesAdmin.tsx:251
+#: components/researchers/ImportConflictsPage.tsx:149
+#: components/researchers/alignAtoms.tsx:178
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: components/dashboard/AxisReviewTable.tsx:274
+msgid "Choose one or several axes"
+msgstr "Choisir un ou plusieurs axes"
+
+#: components/dashboard/AxisReviewTable.tsx:275
+msgid "Correct"
+msgstr "Corriger"
+
+#: components/dashboard/AxisReviewTable.tsx:278
+msgid "Theoretical or methodological work: stays unclassified"
+msgstr "Travail théorique ou méthodologique : reste non classé"
+
+#: components/dashboard/AxisReviewTable.tsx:283
+msgid "To be decided by someone else"
+msgstr "À faire trancher par quelqu'un d'autre"
+
+#: components/dashboard/AxisReviewTable.tsx:288
+msgid "Remove the decision"
+msgstr "Retirer la décision"
+
+#: components/dashboard/AxisReviewTable.tsx:299
+msgid "No publication matches these filters."
+msgstr "Aucune publication ne correspond à ces filtres."
 
 #: components/dashboard/BenchmarkTab.tsx:65
 msgid "Publications (P)"
@@ -2192,11 +2403,6 @@ msgstr "Le périmètre OpenAlex (institutions.lineage : établissement + structu
 msgid "Core publications (Leiden)"
 msgstr "Publications core (Leiden)"
 
-#: components/dashboard/BenchmarkTab.tsx:1206
-#: components/dashboard/BenchmarkTab.tsx:1279
-msgid "All publications"
-msgstr "Toutes les publications"
-
 #: components/dashboard/BenchmarkTab.tsx:1207
 msgid "“Core” subset defined by Leiden (indexed international journals, excluding conference proceedings) — the only base on which field-normalised indicators (MNCS, share in the top 10%/1%) are computed."
 msgstr "Sous-ensemble « core » défini par Leiden (revues internationales indexées, hors actes de conférence) — c'est la seule base sur laquelle les indicateurs normalisés par discipline (MNCS, part dans le top 10 %/1 %) sont calculés."
@@ -2460,7 +2666,7 @@ msgid "threshold"
 msgstr "seuil"
 
 #: components/dashboard/CharteTab.tsx:71
-#: components/dashboard/embedRegistry.tsx:688
+#: components/dashboard/embedRegistry.tsx:703
 msgid "Distribution of compliance scores"
 msgstr "Distribution des scores de conformité"
 
@@ -2482,7 +2688,7 @@ msgid "“Nantes Université” mention"
 msgstr "Mention « Nantes Université »"
 
 #: components/dashboard/CharteTab.tsx:136
-#: components/dashboard/embedRegistry.tsx:699
+#: components/dashboard/embedRegistry.tsx:714
 msgid "Compliance rate per year"
 msgstr "Taux de conformité par année"
 
@@ -2491,7 +2697,7 @@ msgid "Full compliance vs simple “Nantes Université” mention"
 msgstr "Conformité complète vs simple mention « Nantes Université »"
 
 #: components/dashboard/CharteTab.tsx:187
-#: components/dashboard/embedRegistry.tsx:710
+#: components/dashboard/embedRegistry.tsx:725
 msgid "Presence rate by criterion"
 msgstr "Taux de présence par critère"
 
@@ -2507,7 +2713,7 @@ msgid "{0}: {1}% compliant ({2} analysable publications)"
 msgstr "{0} : {1} % conformes ({2} publications analysables)"
 
 #: components/dashboard/CharteTab.tsx:249
-#: components/dashboard/embedRegistry.tsx:721
+#: components/dashboard/embedRegistry.tsx:736
 msgid "Compliance rate by team"
 msgstr "Taux de conformité par équipe"
 
@@ -2657,12 +2863,12 @@ msgid "No collaboration"
 msgstr "Pas de collaboration"
 
 #: components/dashboard/CollaborationsTab.tsx:93
-#: components/dashboard/embedRegistry.tsx:837
+#: components/dashboard/embedRegistry.tsx:852
 msgid "Evolution of collaboration types"
 msgstr "Évolution des types de collaboration"
 
 #: components/dashboard/CollaborationsTab.tsx:110
-#: components/dashboard/embedRegistry.tsx:827
+#: components/dashboard/embedRegistry.tsx:842
 msgid "Collaboration types"
 msgstr "Types de collaboration"
 
@@ -2773,14 +2979,14 @@ msgid "Co-signing French institutions (outside Nantes Université) — <0>{0}</0
 msgstr "Institutions françaises (hors Nantes Université) co-signataires — <0>{0}</0> publications avec ≥ 1 partenaire national."
 
 #: components/dashboard/CollaborationsTab.tsx:398
-#: components/dashboard/embedRegistry.tsx:946
+#: components/dashboard/embedRegistry.tsx:961
 msgid "Most co-signing institutions"
 msgstr "Institutions les plus co-signataires"
 
 #: components/dashboard/CountryCharts.tsx:41
 #: components/dashboard/countryKpis.ts:62
-#: components/dashboard/embedRegistry.tsx:983
-#: components/dashboard/embedRegistry.tsx:988
+#: components/dashboard/embedRegistry.tsx:998
+#: components/dashboard/embedRegistry.tsx:1003
 #: components/dashboard/partnerKpis.ts:175
 msgid "Labs involved"
 msgstr "Labos impliqués"
@@ -3240,7 +3446,7 @@ msgid "{0} publication(s)"
 msgstr "{0} publication(s)"
 
 #: components/dashboard/FundersTab.tsx:73
-#: components/dashboard/embedRegistry.tsx:768
+#: components/dashboard/embedRegistry.tsx:783
 msgid "Main funders"
 msgstr "Principaux financeurs"
 
@@ -3249,7 +3455,7 @@ msgid "Number of publications acknowledging each funder · colour = category · 
 msgstr "Nombre de publications remerciant chaque financeur · couleur = catégorie · top 15"
 
 #: components/dashboard/FundersTab.tsx:123
-#: components/dashboard/embedRegistry.tsx:772
+#: components/dashboard/embedRegistry.tsx:787
 msgid "Breakdown by funder category"
 msgstr "Répartition par catégorie de financeur"
 
@@ -3269,7 +3475,7 @@ msgid "funded publications"
 msgstr "publications financées"
 
 #: components/dashboard/FundersTab.tsx:178
-#: components/dashboard/embedRegistry.tsx:776
+#: components/dashboard/embedRegistry.tsx:791
 msgid "Funded publications per year"
 msgstr "Publications financées par année"
 
@@ -3278,7 +3484,7 @@ msgid "Bars = publications acknowledging ≥ 1 funder · label = share of the ye
 msgstr "Barres = publications remerciant ≥ 1 financeur · étiquette = part du corpus de l'année"
 
 #: components/dashboard/FundersTab.tsx:219
-#: components/dashboard/embedRegistry.tsx:780
+#: components/dashboard/embedRegistry.tsx:795
 msgid "Breakdown of funders by lab"
 msgstr "Répartition des financeurs par laboratoire"
 
@@ -3408,15 +3614,6 @@ msgstr "Classement FWCI"
 msgid "Most cited publications"
 msgstr "Publications les plus citées"
 
-#. placeholder {0}: c.works_count
-#. placeholder {0}: rows.length
-#. placeholder {0}: state.total
-#: components/dashboard/ImpactTab.tsx:174
-#: components/dashboard/NetworkTab.tsx:352
-#: components/groups/AuthorResolveModal.tsx:124
-msgid "{0, plural, one {# publication} other {# publications}}"
-msgstr "{0, plural, one {# publication} other {# publications}}"
-
 #: components/dashboard/ImpactTab.tsx:174
 msgid "citations normalised by discipline (FWCI)"
 msgstr "citations normalisées par discipline (FWCI)"
@@ -3471,7 +3668,7 @@ msgid "Explore further"
 msgstr "Approfondir"
 
 #: components/dashboard/JournalsTab.tsx:60
-#: components/dashboard/embedRegistry.tsx:732
+#: components/dashboard/embedRegistry.tsx:747
 msgid "Publications by access category"
 msgstr "Publications par catégorie d'accès"
 
@@ -3483,7 +3680,7 @@ msgid "{0}: {1}% accessible ({2} journal publications)"
 msgstr "{0} : {1} % accessibles ({2} publications en revue)"
 
 #: components/dashboard/JournalsTab.tsx:111
-#: components/dashboard/embedRegistry.tsx:739
+#: components/dashboard/embedRegistry.tsx:754
 msgid "Share of publications accessible at NU per year"
 msgstr "Part des publications accessibles à NU par année"
 
@@ -3812,10 +4009,6 @@ msgstr "Mentions"
 msgid "To review ({pendingCount})"
 msgstr "À valider ({pendingCount})"
 
-#: components/dashboard/MediaMentionsPanel.tsx:359
-msgid "To review"
-msgstr "À valider"
-
 #: components/dashboard/MediaMentionsPanel.tsx:440
 msgid "Loading the media watch…"
 msgstr "Chargement de la veille médias…"
@@ -3950,12 +4143,6 @@ msgstr "Santé"
 #: components/dashboard/MediaSourcesAdmin.tsx:242
 msgid "built-in"
 msgstr "intégré"
-
-#: components/dashboard/MediaSourcesAdmin.tsx:251
-#: components/researchers/ImportConflictsPage.tsx:149
-#: components/researchers/alignAtoms.tsx:178
-msgid "Confirm"
-msgstr "Confirmer"
 
 #: components/dashboard/MediaSourcesAdmin.tsx:266
 msgid "Delete this feed"
@@ -4128,20 +4315,6 @@ msgstr "Les publications n'ont pas pu être chargées."
 #: components/researchers/AffiliationHistorySection.tsx:107
 msgid "(untitled)"
 msgstr "(sans titre)"
-
-#: components/dashboard/NewsTab.tsx:42
-#: components/dashboard/NewsTab.tsx:585
-#: components/dashboard/StaffSection.tsx:254
-#: components/dashboard/StaffSection.tsx:379
-#: components/dashboard/charts/YearlyEvolutionChart.tsx:41
-#: components/dashboard/dashboardNav.ts:64
-#: components/dashboard/kpiItems.ts:35
-#: components/dashboard/report/composeReportPdf.ts:70
-#: components/dashboard/report/pdfDoc.ts:128
-#: components/reports/HistoryDialog.tsx:106
-#: components/researchers/AffiliationHistorySection.tsx:258
-msgid "Publications"
-msgstr "Publications"
 
 #: components/dashboard/NewsTab.tsx:43
 msgid "Media"
@@ -4742,8 +4915,8 @@ msgid "{0, plural, one {# publication excluded} other {# publications excluded}}
 msgstr "{0, plural, one {# publication écartée} other {# publications écartées}}"
 
 #: components/dashboard/PartnerBreakdownSection.tsx:119
-#: components/dashboard/embedRegistry.tsx:957
-#: components/dashboard/embedRegistry.tsx:962
+#: components/dashboard/embedRegistry.tsx:972
+#: components/dashboard/embedRegistry.tsx:977
 msgid "Co-publications by university"
 msgstr "Co-publications par université"
 
@@ -4752,8 +4925,8 @@ msgid "Click a bar for details"
 msgstr "Cliquez sur une barre pour détailler"
 
 #: components/dashboard/PartnerBreakdownSection.tsx:133
-#: components/dashboard/embedRegistry.tsx:973
-#: components/dashboard/embedRegistry.tsx:976
+#: components/dashboard/embedRegistry.tsx:988
+#: components/dashboard/embedRegistry.tsx:991
 msgid "Yearly trend by university"
 msgstr "Évolution annuelle par université"
 
@@ -5065,8 +5238,8 @@ msgid "still to be harvested on the CRISalid side"
 msgstr "reste à moissonner côté CRISalid"
 
 #: components/dashboard/SourcesTab.tsx:71
-#: components/dashboard/embedRegistry.tsx:1000
-#: components/dashboard/embedRegistry.tsx:1003
+#: components/dashboard/embedRegistry.tsx:1015
+#: components/dashboard/embedRegistry.tsx:1018
 msgid "Main source of records"
 msgstr "Source principale des notices"
 
@@ -5075,8 +5248,8 @@ msgid "“winning” source of the merge (priority CRISalid > BSO > OpenAlex > H
 msgstr "source « gagnante » de la fusion (priorité CRISalid > BSO > OpenAlex > HAL)"
 
 #: components/dashboard/SourcesTab.tsx:77
-#: components/dashboard/embedRegistry.tsx:1010
-#: components/dashboard/embedRegistry.tsx:1013
+#: components/dashboard/embedRegistry.tsx:1025
+#: components/dashboard/embedRegistry.tsx:1028
 msgid "Overlaps between sources"
 msgstr "Recouvrements entre sources"
 
@@ -5089,13 +5262,13 @@ msgid "source combinations in which each publication was seen"
 msgstr "combinaisons de sources où chaque publication a été vue"
 
 #: components/dashboard/SourcesTab.tsx:90
-#: components/dashboard/embedRegistry.tsx:1025
+#: components/dashboard/embedRegistry.tsx:1040
 msgid "Coverage by year"
 msgstr "Couverture par année"
 
 #: components/dashboard/SourcesTab.tsx:95
-#: components/dashboard/embedRegistry.tsx:1032
-#: components/dashboard/embedRegistry.tsx:1035
+#: components/dashboard/embedRegistry.tsx:1047
+#: components/dashboard/embedRegistry.tsx:1050
 msgid "Sub-sources of the CRISalid harvester"
 msgstr "Sous-sources du harvester CRISalid"
 
@@ -5104,8 +5277,8 @@ msgid "a publication may count in several harvested sources"
 msgstr "une publication peut compter dans plusieurs sources moissonnées"
 
 #: components/dashboard/SourcesTab.tsx:101
-#: components/dashboard/embedRegistry.tsx:1042
-#: components/dashboard/embedRegistry.tsx:1045
+#: components/dashboard/embedRegistry.tsx:1057
+#: components/dashboard/embedRegistry.tsx:1060
 msgid "OpenAlex diagnosis of harvester records"
 msgstr "Diagnostic OpenAlex des notices du harvester"
 
@@ -5789,7 +5962,7 @@ msgid "Countries:"
 msgstr "Pays :"
 
 #: components/dashboard/charts/CountryEvolutionChart.tsx:88
-#: components/dashboard/embedRegistry.tsx:917
+#: components/dashboard/embedRegistry.tsx:932
 msgid "Evolution of the main partner countries"
 msgstr "Évolution des principaux pays partenaires"
 
@@ -5905,7 +6078,7 @@ msgid "Arcs towards the cities of geolocated foreign partner organisations"
 msgstr "Arcs vers les villes des organismes partenaires étrangers géolocalisés"
 
 #: components/dashboard/charts/FranceMapChart.tsx:78
-#: components/dashboard/embedRegistry.tsx:907
+#: components/dashboard/embedRegistry.tsx:922
 msgid "Map of French partner institutions"
 msgstr "Carte des institutions françaises partenaires"
 
@@ -6084,7 +6257,7 @@ msgid "Share of publications by OpenAlex subfield"
 msgstr "Part des publications par sous-domaine OpenAlex"
 
 #: components/dashboard/charts/TeamOrgNetworkChart.tsx:59
-#: components/dashboard/embedRegistry.tsx:928
+#: components/dashboard/embedRegistry.tsx:943
 msgid "Network teams ↔ foreign organisations"
 msgstr "Réseau équipes ↔ organismes étrangers"
 
@@ -6491,83 +6664,83 @@ msgstr "Domaines OpenAlex"
 msgid "A publication may belong to several domains"
 msgstr "Une publication peut relever de plusieurs domaines"
 
-#: components/dashboard/embedRegistry.tsx:675
+#: components/dashboard/embedRegistry.tsx:690
 msgid "Corpus compliance (signature charter)"
 msgstr "Conformité du corpus (charte de signature)"
 
-#: components/dashboard/embedRegistry.tsx:753
+#: components/dashboard/embedRegistry.tsx:768
 msgid "Elsevier APCs by lab"
 msgstr "APC Elsevier par labo"
 
-#: components/dashboard/embedRegistry.tsx:790
-#: components/dashboard/embedRegistry.tsx:797
+#: components/dashboard/embedRegistry.tsx:805
+#: components/dashboard/embedRegistry.tsx:812
 msgid "Internal co-publications per year"
 msgstr "Co-publications internes par année"
 
-#: components/dashboard/embedRegistry.tsx:802
-#: components/dashboard/embedRegistry.tsx:809
+#: components/dashboard/embedRegistry.tsx:817
+#: components/dashboard/embedRegistry.tsx:824
 msgid "Co-publications with NU labs per year"
 msgstr "Co-publications avec les labos NU par année"
 
-#: components/dashboard/embedRegistry.tsx:814
-#: components/dashboard/embedRegistry.tsx:821
+#: components/dashboard/embedRegistry.tsx:829
+#: components/dashboard/embedRegistry.tsx:836
 msgid "National co-publications per year"
 msgstr "Co-publications nationales par année"
 
-#: components/dashboard/embedRegistry.tsx:833
+#: components/dashboard/embedRegistry.tsx:848
 msgid "Broadest category per publication"
 msgstr "Catégorie la plus large par publication"
 
-#: components/dashboard/embedRegistry.tsx:847
+#: components/dashboard/embedRegistry.tsx:862
 msgid "Domains of internal co-publications"
 msgstr "Domaines des co-publications internes"
 
-#: components/dashboard/embedRegistry.tsx:851
+#: components/dashboard/embedRegistry.tsx:866
 msgid "Subfields of internal co-publications"
 msgstr "Sous-disciplines des co-publications internes"
 
-#: components/dashboard/embedRegistry.tsx:855
+#: components/dashboard/embedRegistry.tsx:870
 msgid "Internal collaboration topics by lab"
 msgstr "Thématiques des collaborations internes par labo"
 
-#: components/dashboard/embedRegistry.tsx:859
+#: components/dashboard/embedRegistry.tsx:874
 msgid "Domains of co-publications with NU labs"
 msgstr "Domaines des co-publications avec les labos NU"
 
-#: components/dashboard/embedRegistry.tsx:863
+#: components/dashboard/embedRegistry.tsx:878
 msgid "Subfields of co-publications with NU labs"
 msgstr "Sous-disciplines des co-publications avec les labos NU"
 
-#: components/dashboard/embedRegistry.tsx:867
+#: components/dashboard/embedRegistry.tsx:882
 msgid "Collaboration topics with NU labs"
 msgstr "Thématiques des collaborations avec les labos NU"
 
-#: components/dashboard/embedRegistry.tsx:871
+#: components/dashboard/embedRegistry.tsx:886
 msgid "Most co-signing labs of the structure"
 msgstr "Labos de la structure les plus co-signataires"
 
-#: components/dashboard/embedRegistry.tsx:879
+#: components/dashboard/embedRegistry.tsx:894
 msgid "Most co-signing labs (within the structure)"
 msgstr "Labos les plus co-signataires (dans la structure)"
 
-#: components/dashboard/embedRegistry.tsx:889
-#: components/dashboard/embedRegistry.tsx:897
+#: components/dashboard/embedRegistry.tsx:904
+#: components/dashboard/embedRegistry.tsx:912
 msgid "Most co-signing Nantes Université labs"
 msgstr "Labos Nantes Université les plus co-signataires"
 
-#: components/dashboard/embedRegistry.tsx:938
+#: components/dashboard/embedRegistry.tsx:953
 msgid "Most co-signing French institutions"
 msgstr "Institutions françaises les plus co-signataires"
 
-#: components/dashboard/embedRegistry.tsx:963
+#: components/dashboard/embedRegistry.tsx:978
 msgid "A publication co-signed by several of them counts for each"
 msgstr "Une publication cosignée par plusieurs compte pour chacune"
 
-#: components/dashboard/embedRegistry.tsx:989
+#: components/dashboard/embedRegistry.tsx:1004
 msgid "Publications per member lab (a co-signed publication counts for each lab)"
 msgstr "Publications par labo membre (une publication cosignée compte pour chaque labo)"
 
-#: components/dashboard/embedRegistry.tsx:1022
+#: components/dashboard/embedRegistry.tsx:1037
 msgid "Source coverage by year"
 msgstr "Couverture des sources par année"
 
@@ -7619,283 +7792,295 @@ msgstr "Types de publication (articles, communications…) au sein de chaque axe
 msgid "Same classification, crossed with document type."
 msgstr "Même classification, croisée avec le type de document."
 
-#: components/dashboard/report/chartDocs.ts:352
+#: components/dashboard/report/chartDocs.ts:349
+msgid "How the publications of each team spread over the strategic axes, unclassified (theoretical or methodological) work included."
+msgstr "Répartition des publications de chaque équipe entre les axes stratégiques, travaux non classés (théoriques ou méthodologiques) compris."
+
+#: components/dashboard/report/chartDocs.ts:350
+msgid "Same classification, crossed with the teams of the authors in the directory; a publication signed by several teams counts once in each."
+msgstr "Même classification, croisée avec les équipes des auteurs dans l'annuaire ; une publication signée par plusieurs équipes compte une fois dans chacune."
+
+#: components/dashboard/report/chartDocs.ts:351
+msgid "Same caveats as the breakdown by axis; « Non identifié » gathers the publications whose authors have no team in the directory."
+msgstr "Mêmes réserves que la répartition par axe ; « Non identifié » regroupe les publications dont les auteurs n'ont pas d'équipe dans l'annuaire."
+
+#: components/dashboard/report/chartDocs.ts:357
 msgid "Share of publications whose signature complies with the Nantes Université signature charter."
 msgstr "Part des publications dont la signature respecte la charte de signature de Nantes Université."
 
-#: components/dashboard/report/chartDocs.ts:354
+#: components/dashboard/report/chartDocs.ts:359
 msgid "Among “analysable” publications (affiliation signature available in OpenAlex), a publication is compliant if the mention “Nantes Université” is present and its compliance score against the structure's template reaches 75%."
 msgstr "Sur les publications « analysables » (signature d'affiliation disponible dans OpenAlex), une publication est conforme si la mention « Nantes Université » est présente et si son score de conformité au modèle de la structure atteint 75 %."
 
-#: components/dashboard/report/chartDocs.ts:356
+#: components/dashboard/report/chartDocs.ts:361
 msgid "The analysis is based on the raw affiliation transcribed by OpenAlex, which may truncate or rephrase the article's actual signature."
 msgstr "L'analyse porte sur l'affiliation brute retranscrite par OpenAlex, qui peut tronquer ou reformuler la signature réelle de l'article."
 
-#: components/dashboard/report/chartDocs.ts:360
+#: components/dashboard/report/chartDocs.ts:365
 msgid "Distribution of signature compliance scores (0 to 100% of the template criteria)."
 msgstr "Distribution des scores de conformité des signatures (0 à 100 % des critères du modèle)."
 
-#: components/dashboard/report/chartDocs.ts:362
+#: components/dashboard/report/chartDocs.ts:367
 msgid "Score of each analysable publication, in 10% bands; the score measures the share of signature template criteria that are met."
 msgstr "Score de chaque publication analysable, par tranches de 10 % ; le score mesure la part des critères du modèle de signature satisfaits."
 
-#: components/dashboard/report/chartDocs.ts:366
+#: components/dashboard/report/chartDocs.ts:371
 msgid "Annual progression of the charter compliance rate and of the “Nantes Université” mention rate."
 msgstr "Progression annuelle du taux de conformité à la charte et du taux de mention « Nantes Université »."
 
-#: components/dashboard/report/chartDocs.ts:368
+#: components/dashboard/report/chartDocs.ts:373
 msgid "Rates computed by year on analysable publications (75% compliance threshold + NU mention required)."
 msgstr "Taux calculés par année sur les publications analysables (seuil de conformité 75 % + mention NU requise)."
 
-#: components/dashboard/report/chartDocs.ts:372
+#: components/dashboard/report/chartDocs.ts:377
 msgid "Presence rate of each charter criterion in signatures: NU mention, structure, unit code, address, parent bodies."
 msgstr "Taux de présence de chaque critère de la charte dans les signatures : mention NU, structure, code d'unité, adresse, tutelles."
 
-#: components/dashboard/report/chartDocs.ts:374
+#: components/dashboard/report/chartDocs.ts:379
 msgid "For each criterion, share of publications meeting it among those where it applies to the structure's template."
 msgstr "Pour chaque critère, part des publications le satisfaisant parmi celles où il est applicable au modèle de la structure."
 
-#: components/dashboard/report/chartDocs.ts:377
+#: components/dashboard/report/chartDocs.ts:382
 msgid "Charter compliance rate by team of the structure."
 msgstr "Taux de conformité à la charte par équipe de la structure."
 
-#: components/dashboard/report/chartDocs.ts:379
+#: components/dashboard/report/chartDocs.ts:384
 msgid "Compliance (75% threshold + NU mention) by team, for teams with at least 3 analysable publications."
 msgstr "Conformité (seuil 75 % + mention NU) par équipe, pour les équipes comptant au moins 3 publications analysables."
 
-#: components/dashboard/report/chartDocs.ts:380
+#: components/dashboard/report/chartDocs.ts:385
 msgid "Small teams close to the 3-publication threshold have unreliable rates."
 msgstr "Les petites équipes proches du seuil de 3 publications ont des taux peu robustes."
 
-#: components/dashboard/report/chartDocs.ts:385
+#: components/dashboard/report/chartDocs.ts:390
 msgid "Breakdown of publications between the structure's teams."
 msgstr "Répartition des publications entre les équipes de la structure."
 
-#: components/dashboard/report/chartDocs.ts:387
+#: components/dashboard/report/chartDocs.ts:392
 msgid "Teams assigned by matching authors to the staff list; a co-signed publication counts in each of its teams; beyond 7 teams, the least productive are folded into “Others”."
 msgstr "Équipes attribuées via l'appariement des auteurs aux effectifs ; une publication co-signée compte dans chacune de ses équipes ; au-delà de 7 équipes, les moins productives sont repliées en « Autres »."
 
-#: components/dashboard/report/chartDocs.ts:389
+#: components/dashboard/report/chartDocs.ts:394
 msgid "The total exceeds the number of publications (multiple counting of inter-team co-signatures); “Unidentified” = authors not matched to the staff list."
 msgstr "Le total dépasse le nombre de publications (multi-comptage des co-signatures inter-équipes) ; « Non identifié » = auteurs non appariés aux effectifs."
 
-#: components/dashboard/report/chartDocs.ts:392
+#: components/dashboard/report/chartDocs.ts:397
 msgid "Annual trend of publications by team."
 msgstr "Évolution annuelle des publications par équipe."
 
-#: components/dashboard/report/chartDocs.ts:393
+#: components/dashboard/report/chartDocs.ts:398
 msgid "Same team assignment, broken down by year (stacked areas)."
 msgstr "Même attribution par équipe, déclinée par année (aires empilées)."
 
-#: components/dashboard/report/chartDocs.ts:394
+#: components/dashboard/report/chartDocs.ts:399
 msgid "Same multiple-counting caveats as the breakdown by team."
 msgstr "Mêmes réserves de multi-comptage que la répartition par équipe."
 
-#: components/dashboard/report/chartDocs.ts:397
+#: components/dashboard/report/chartDocs.ts:402
 msgid "Publication types by team."
 msgstr "Types de publication par équipe."
 
-#: components/dashboard/report/chartDocs.ts:398
+#: components/dashboard/report/chartDocs.ts:403
 msgid "Same team assignment, crossed with document type."
 msgstr "Même attribution par équipe, croisée avec le type de document."
 
-#: components/dashboard/report/chartDocs.ts:402
+#: components/dashboard/report/chartDocs.ts:407
 msgid "Compared disciplinary profile of the teams: share of each team's output across a set of OpenAlex subjects (subfields or topics)."
 msgstr "Profil disciplinaire comparé des équipes : part de la production de chaque équipe sur un jeu de sujets OpenAlex (sous-disciplines ou topics)."
 
-#: components/dashboard/report/chartDocs.ts:404
+#: components/dashboard/report/chartDocs.ts:409
 msgid "For each of the 6 most productive teams, share (%) of its publications falling under each axis. Automatic mode: the 8 most frequent subjects of the chosen level in the unit. “By theme (AI)” mode: subjects selected by an LLM among those actually present in the corpus, from a free-text theme, then adjusted by hand."
 msgstr "Pour chacune des 6 équipes les plus productives, part (%) de ses publications relevant de chaque axe. Mode automatique : les 8 sujets les plus fréquents du niveau choisi dans la structure. Mode « par thématique (IA) » : sujets sélectionnés par un LLM parmi ceux réellement présents dans le corpus, à partir d'une thématique libre, puis corrigés à la main."
 
-#: components/dashboard/report/chartDocs.ts:406
+#: components/dashboard/report/chartDocs.ts:411
 msgid "A team's shares do not add up to 100% (a publication may fall under several subjects, and subjects outside the axes are not shown). In AI mode, the selection of axes depends on how the theme is phrased."
 msgstr "Les parts d'une équipe ne totalisent pas 100 % (une publication peut relever de plusieurs sujets, et les sujets hors axes ne sont pas affichés). En mode IA, la sélection des axes dépend de la formulation de la thématique."
 
-#: components/dashboard/report/chartDocs.ts:410
+#: components/dashboard/report/chartDocs.ts:415
 msgid "Disciplinary profile of the teams as a teams × subjects heatmap: same measure as the radar, readable with more teams and comparable column by column."
 msgstr "Profil disciplinaire des équipes en heatmap équipes × sujets : même mesure que le radar, lisible avec davantage d'équipes et comparable colonne par colonne."
 
-#: components/dashboard/report/chartDocs.ts:412
+#: components/dashboard/report/chartDocs.ts:417
 msgid "For each of the 12 most productive teams, share (%) of its publications falling under each axis (same axes and modes as the radar). The shade and the number in each cell carry the share."
 msgstr "Pour chacune des 12 équipes les plus productives, part (%) de ses publications relevant de chaque axe (mêmes axes et mêmes modes que le radar). La teinte et le nombre dans la cellule portent la part."
 
-#: components/dashboard/report/chartDocs.ts:414
+#: components/dashboard/report/chartDocs.ts:419
 msgid "A team's shares do not add up to 100% (a publication may fall under several subjects). Long labels are truncated (tooltip on hover)."
 msgstr "Les parts d'une équipe ne totalisent pas 100 % (une publication peut relever de plusieurs sujets). Les libellés longs sont tronqués (infobulle au survol)."
 
-#: components/dashboard/report/chartDocs.ts:419
+#: components/dashboard/report/chartDocs.ts:424
 msgid "Publications involving at least one PhD student, by team."
 msgstr "Publications impliquant au moins un doctorant, par équipe."
 
-#: components/dashboard/report/chartDocs.ts:421
+#: components/dashboard/report/chartDocs.ts:426
 msgid "Publications where at least one author is identified as a PhD student in the staff list, broken down by team (folded into “Others” beyond 7)."
 msgstr "Publications dont au moins un auteur est identifié comme doctorant dans les effectifs, réparties par équipe (repli « Autres » au-delà de 7)."
 
-#: components/dashboard/report/chartDocs.ts:423
+#: components/dashboard/report/chartDocs.ts:428
 msgid "Depends on the quality of staff matching and on PhD student status being up to date in the lists."
 msgstr "Dépend de la qualité de l'appariement effectifs et du statut doctorant à jour dans les listes."
 
-#: components/dashboard/report/chartDocs.ts:426
+#: components/dashboard/report/chartDocs.ts:431
 msgid "Annual trend of publications involving PhD students."
 msgstr "Évolution annuelle des publications impliquant des doctorants."
 
-#: components/dashboard/report/chartDocs.ts:427
+#: components/dashboard/report/chartDocs.ts:432
 msgid "Same publications, by year and team (stacked areas)."
 msgstr "Mêmes publications, par année et par équipe (aires empilées)."
 
-#: components/dashboard/report/chartDocs.ts:430
+#: components/dashboard/report/chartDocs.ts:435
 msgid "Number of publications per PhD student over the period."
 msgstr "Nombre de publications par doctorant sur la période."
 
-#: components/dashboard/report/chartDocs.ts:432
+#: components/dashboard/report/chartDocs.ts:437
 msgid "Count of publications for each author identified as a PhD student in the staff list."
 msgstr "Comptage des publications de chaque auteur identifié comme doctorant dans les effectifs."
 
-#: components/dashboard/report/chartDocs.ts:434
+#: components/dashboard/report/chartDocs.ts:439
 msgid "Publication volume varies greatly with discipline and thesis year: not to be read as an individual ranking."
 msgstr "Le volume de publications varie fortement selon la discipline et l'année de thèse : à ne pas lire comme un palmarès individuel."
 
-#: components/dashboard/report/chartDocs.ts:439
+#: components/dashboard/report/chartDocs.ts:444
 msgid "Most prolific authors of the structure over the period."
 msgstr "Auteurs de la structure les plus prolifiques sur la période."
 
-#: components/dashboard/report/chartDocs.ts:441
+#: components/dashboard/report/chartDocs.ts:446
 msgid "Count of publications per internal author (OpenAlex authors matched by name to the staff list); top 20 shown."
 msgstr "Comptage des publications par auteur interne (auteurs OpenAlex appariés par nom aux effectifs) ; 20 premiers affichés."
 
-#: components/dashboard/report/chartDocs.ts:443
+#: components/dashboard/report/chartDocs.ts:448
 msgid "Raw volume measures neither quality nor individual contribution (co-signature practices vary greatly across disciplines); matching homonyms remain possible."
 msgstr "Le volume brut ne mesure ni la qualité ni la contribution individuelle (pratiques de co-signature très variables selon les disciplines) ; les homonymies d'appariement restent possibles."
 
-#: components/dashboard/report/chartDocs.ts:449
+#: components/dashboard/report/chartDocs.ts:454
 msgid "Internal co-signature network: each node is an author of the structure, each link a volume of co-signed publications."
 msgstr "Réseau des co-signatures internes : chaque nœud est un auteur de la structure, chaque lien un volume de publications co-signées."
 
-#: components/dashboard/report/chartDocs.ts:451
+#: components/dashboard/report/chartDocs.ts:456
 msgid "Internal authors with at least 2 publications over the period (threshold raised to 8 for very large corpora, for readability); colour corresponds to the author's first team."
 msgstr "Auteurs internes ayant au moins 2 publications sur la période (seuil relevé à 8 pour les très gros corpus, pour la lisibilité) ; la couleur correspond à la première équipe de l'auteur."
 
-#: components/dashboard/report/chartDocs.ts:453
+#: components/dashboard/report/chartDocs.ts:458
 msgid "Authors below the threshold and their links are not shown; the spatial layout (force-directed) has no meaning in itself."
 msgstr "Les auteurs sous le seuil et leurs liens ne sont pas affichés ; la disposition spatiale (force) n'a pas de signification en soi."
 
-#: components/dashboard/report/chartDocs.ts:459
+#: components/dashboard/report/chartDocs.ts:464
 msgid "Breakdown of publications by their “primary” source: the one that supplied the record kept when the sources were merged."
 msgstr "Répartition des publications selon leur source « principale » : celle qui a fourni la notice conservée lors de la fusion des sources."
 
-#: components/dashboard/report/chartDocs.ts:461
+#: components/dashboard/report/chartDocs.ts:466
 msgid "The ETL merges four sources by DOI, HAL/OpenAlex identifier, then normalised title, with priority CRISalid harvester > BSO > OpenAlex > HAL. The primary source is that of the first insertion; the other sources enrich the record without replacing it."
 msgstr "L'ETL fusionne quatre sources par DOI, identifiant HAL/OpenAlex puis titre normalisé, avec priorité harvester CRISalid > BSO > OpenAlex > HAL. La source principale est celle de la première insertion ; les autres sources enrichissent la notice sans la remplacer."
 
-#: components/dashboard/report/chartDocs.ts:463
+#: components/dashboard/report/chartDocs.ts:468
 msgid "The primary source reflects the merge priority, not exhaustiveness: a “CRISalid” publication may also be known to OpenAlex and HAL (see overlaps)."
 msgstr "La source principale reflète la priorité de fusion, pas une exhaustivité : une publication « CRISalid » peut aussi être connue d'OpenAlex et de HAL (voir les recouvrements)."
 
-#: components/dashboard/report/chartDocs.ts:467
+#: components/dashboard/report/chartDocs.ts:472
 msgid "Combinations of sources in which each publication was seen: measures the overlaps and the exclusive contribution of each source, including the share of the corpus harvested by the CRISalid harvester."
 msgstr "Combinaisons de sources où chaque publication a été vue : mesure les recouvrements et les apports exclusifs de chaque source, dont la part du corpus moissonnée par le harvester CRISalid."
 
-#: components/dashboard/report/chartDocs.ts:469
+#: components/dashboard/report/chartDocs.ts:474
 msgid "For each publication, the set of sources in which it appears (CRISalid harvester, BSO, OpenAlex by affiliation, HAL by collection) is recorded at merge time; each publication counts in a single combination."
 msgstr "Pour chaque publication, l'ensemble des sources où elle apparaît (harvester CRISalid, BSO, OpenAlex par affiliation, HAL par collection) est enregistré lors de la fusion ; chaque publication compte dans une seule combinaison."
 
-#: components/dashboard/report/chartDocs.ts:471
+#: components/dashboard/report/chartDocs.ts:476
 msgid "The CRISalid harvester harvests by person identifiers (current members) whereas OpenAlex/HAL are queried by affiliation: part of the differences reflects this difference in scope, not a coverage defect."
 msgstr "Le harvester CRISalid moissonne par identifiants de personnes (membres actuels) alors qu'OpenAlex/HAL sont interrogés par affiliation : une partie des écarts reflète cette différence de périmètre, pas un défaut de couverture."
 
-#: components/dashboard/report/chartDocs.ts:475
+#: components/dashboard/report/chartDocs.ts:480
 msgid "Annual trend of coverage: publications seen both by the CRISalid harvester and the classic sources, by the harvester alone, or by the classic sources alone."
 msgstr "Évolution annuelle de la couverture : publications vues à la fois par le harvester CRISalid et les sources classiques, par le harvester seul, ou par les sources classiques seules."
 
-#: components/dashboard/report/chartDocs.ts:477
+#: components/dashboard/report/chartDocs.ts:482
 msgid "Each publication is classified according to the presence of “crisalid” and of at least one classic source (BSO/OpenAlex/HAL) among its sources, then counted by publication year."
 msgstr "Chaque publication est classée selon la présence de « crisalid » et d'au moins une source classique (BSO/OpenAlex/HAL) dans ses sources, puis comptée par année de publication."
 
-#: components/dashboard/report/chartDocs.ts:479
+#: components/dashboard/report/chartDocs.ts:484
 msgid "Harvester coverage depends on the identifiers recorded for researchers (ORCID, idHAL, IdRef…) and on the date of the last harvests: low coverage may stem from missing identifiers."
 msgstr "La couverture du harvester dépend des identifiants renseignés pour les chercheurs (ORCID, idHAL, IdRef…) et de la date des derniers moissonnages : une couverture faible peut venir d'identifiants manquants."
 
-#: components/dashboard/report/chartDocs.ts:483
+#: components/dashboard/report/chartDocs.ts:488
 msgid "Sub-sources harvested by the CRISalid harvester for the structure's publications: HAL, ScanR, IdRef/Sudoc, OpenAlex, Scopus."
 msgstr "Sous-sources moissonnées par le harvester CRISalid pour les publications de la structure : HAL, ScanR, IdRef/Sudoc, OpenAlex, Scopus."
 
-#: components/dashboard/report/chartDocs.ts:485
+#: components/dashboard/report/chartDocs.ts:490
 msgid "For each publication seen by the harvester, count of the sources its records in the CRISalid graph come from (a deduplicated publication may have records from several sources)."
 msgstr "Pour chaque publication vue par le harvester, comptage des sources d'où proviennent ses notices dans le graphe CRISalid (une publication dédoublonnée peut avoir des notices de plusieurs sources)."
 
-#: components/dashboard/report/chartDocs.ts:487
+#: components/dashboard/report/chartDocs.ts:492
 msgid "A publication counts in each of its sub-sources: the total exceeds the number of publications. IdRef/Sudoc mainly contributes theses and books, poorly covered elsewhere."
 msgstr "Une publication compte dans chacune de ses sous-sources : le total dépasse le nombre de publications. IdRef/Sudoc apporte surtout les thèses et ouvrages, peu couverts ailleurs."
 
-#: components/dashboard/report/chartDocs.ts:491
+#: components/dashboard/report/chartDocs.ts:496
 msgid "OpenAlex diagnosis of records whose primary source is the CRISalid harvester: present in the structure's OpenAlex corpus, found in OpenAlex without the structure being credited, or outside OpenAlex."
 msgstr "Diagnostic OpenAlex des notices dont le harvester CRISalid est la source principale : présentes dans le corpus OpenAlex de la structure, trouvées dans OpenAlex sans que la structure y soit créditée, ou hors OpenAlex."
 
-#: components/dashboard/report/chartDocs.ts:493
+#: components/dashboard/report/chartDocs.ts:498
 msgid "Harvester records absent from the structure's OpenAlex corpus are looked up again in OpenAlex by OpenAlex identifier, then by DOI, to retrieve the indicators (FWCI, citations, co-author countries, APC)."
 msgstr "Les notices du harvester absentes du corpus OpenAlex de la structure sont ré-interrogées dans OpenAlex par identifiant OpenAlex puis par DOI, pour récupérer les indicateurs (FWCI, citations, pays des co-auteurs, APC)."
 
-#: components/dashboard/report/chartDocs.ts:495
+#: components/dashboard/report/chartDocs.ts:500
 msgid "“Structure not credited” signals an affiliation defect in OpenAlex (corrections to request); “outside OpenAlex” records (often without DOI: theses, French books) remain without citation indicators."
 msgstr "« Structure non créditée » signale un défaut d'affiliation dans OpenAlex (corrections à demander) ; les notices « hors OpenAlex » (souvent sans DOI : thèses, ouvrages français) restent sans indicateurs de citation."
 
-#: components/dashboard/report/chartDocs.ts:501
+#: components/dashboard/report/chartDocs.ts:506
 msgid "Position of the institution (percentile 0-100, higher = better ranked) among the 2831 universities of the Leiden Ranking Open Edition (CWTS), period 2020-2023, all disciplines. P = number of publications. MNCS (Mean Normalized Citation Score) = average impact normalised by field/year/type, 1 = world average. PP_top10 / PP_top1 = share of the institution's publications among the 10% / 1% most cited worldwide (for a comparable field/year). PP_collab / PP_int_collab = share of publications in collaboration (resp. in international collaboration). PP_OA = share of open-access publications."
 msgstr "Positionnement de l'établissement (percentile 0-100, plus haut = mieux classé) parmi les 2831 universités du Leiden Ranking Open Edition (CWTS), période 2020-2023, toutes disciplines. P = nombre de publications. MNCS (Mean Normalized Citation Score) = impact moyen normalisé par discipline/année/type, 1 = moyenne mondiale. PP_top10 / PP_top1 = part des publications de l'établissement parmi les 10 % / 1 % les plus citées mondialement (à discipline/année comparables). PP_collab / PP_int_collab = part des publications en collaboration (resp. en collaboration internationale). PP_OA = part des publications en accès ouvert."
 
-#: components/dashboard/report/chartDocs.ts:503
+#: components/dashboard/report/chartDocs.ts:508
 msgid "Percentile = rank of the institution's value in the distribution of the 2831 universities of the reference (share of universities with a value lower than or equal to its own). CC0 reference built by CWTS from OpenAlex (same source as the publication corpus), queryable without an account or fees."
 msgstr "Percentile = rang de la valeur de l'établissement dans la distribution des 2831 universités du référentiel (part des universités à valeur inférieure ou égale à la sienne). Référentiel CC0, construit par le CWTS depuis OpenAlex (même source que le corpus de publications), interrogeable sans compte ni frais."
 
-#: components/dashboard/report/chartDocs.ts:505
+#: components/dashboard/report/chartDocs.ts:510
 msgid "Built at whole-university level, independently of the period/scope selected above (see the warning banner). A university absent from the reference (outside the Leiden scope, e.g. a non-university grande école) has no percentile."
 msgstr "Construit au niveau université entière, indépendamment de la période/du périmètre sélectionnés ci-dessus (cf. bandeau d'avertissement). Une université absente du référentiel (hors périmètre Leiden, ex. grande école non universitaire) n'a pas de percentile."
 
-#: components/dashboard/report/chartDocs.ts:509
+#: components/dashboard/report/chartDocs.ts:514
 msgid "Same principle as the world percentile, but recomputed only within the manually chosen universities (+ the institution itself) rather than over the 2831 universities of the full reference."
 msgstr "Même principe que le percentile mondial, mais recalculé uniquement au sein des universités choisies manuellement (+ l'établissement lui-même) plutôt que sur les 2831 universités du référentiel entier."
 
-#: components/dashboard/report/chartDocs.ts:511
+#: components/dashboard/report/chartDocs.ts:516
 msgid "For each indicator, percentile = share of group members (selected universities + institution) with a value lower than or equal to its own. Changes with every university added or removed."
 msgstr "Pour chaque indicateur, percentile = part des membres du groupe (universités sélectionnées + établissement) à valeur inférieure ou égale à la sienne. Change à chaque ajout/retrait d'une université."
 
-#: components/dashboard/report/chartDocs.ts:513
+#: components/dashboard/report/chartDocs.ts:518
 msgid "The percentile is of little significance for a very small group (only a few universities): the smaller the group, the more each member weighs on the ranking."
 msgstr "Percentile peu significatif sur un très petit groupe (quelques universités seulement) : plus le groupe est petit, plus chacune pèse sur le classement."
 
-#: components/dashboard/report/chartDocs.ts:517
+#: components/dashboard/report/chartDocs.ts:522
 msgid "OpenAlex subfields (“subfields”, ~250 in total, the intermediate level between broad domain and precise topic) most represented in the institution's publication corpus over the selected period."
 msgstr "Sous-disciplines OpenAlex (« subfields », ~250 au total, niveau intermédiaire entre grand domaine et topic précis) les plus représentées dans le corpus de publications de l'établissement sur la période sélectionnée."
 
-#: components/dashboard/report/chartDocs.ts:519
+#: components/dashboard/report/chartDocs.ts:524
 msgid "Each publication carries one or more subfields (automatic OpenAlex assignment); one occurrence counted per publication and per distinct subfield (a publication can therefore count in several bars)."
 msgstr "Chaque publication porte une ou plusieurs sous-disciplines (attribution automatique OpenAlex) ; comptage d'une occurrence par publication et par sous-discipline distincte (une publication peut donc compter dans plusieurs barres)."
 
-#: components/dashboard/report/chartDocs.ts:521
+#: components/dashboard/report/chartDocs.ts:526
 msgid "The total number of occurrences exceeds the number of publications (multiple membership). Based on the corpus exported for this structure, not on the official OpenAlex figures in the block above."
 msgstr "Le total des occurrences dépasse le nombre de publications (multi-appartenance). Porte sur le corpus exporté pour cette structure, pas sur les chiffres OpenAlex officiels du bloc ci-dessus."
 
-#: components/dashboard/report/chartDocs.ts:525
+#: components/dashboard/report/chartDocs.ts:530
 msgid "Breakdown of the institution's publication corpus between the 4 broad domains of the OpenAlex taxonomy: Life Sciences, Physical Sciences, Health Sciences, Social Sciences."
 msgstr "Répartition du corpus de publications de l'établissement entre les 4 grands domaines de la taxonomie OpenAlex : Sciences de la vie, Sciences physiques, Sciences de la santé, Sciences sociales."
 
-#: components/dashboard/report/chartDocs.ts:527
+#: components/dashboard/report/chartDocs.ts:532
 msgid "Broadest level of the OpenAlex classification hierarchy (Domain > Field > Subfield > Topic); one occurrence counted per publication and per distinct domain."
 msgstr "Niveau le plus large de la hiérarchie de classification OpenAlex (Domain > Field > Subfield > Topic) ; comptage d'une occurrence par publication et par domaine distinct."
 
-#: components/dashboard/report/chartDocs.ts:529
+#: components/dashboard/report/chartDocs.ts:534
 msgid "An interdisciplinary publication may count in several domains; the total may exceed the number of publications."
 msgstr "Une publication interdisciplinaire peut compter dans plusieurs domaines ; le total peut dépasser le nombre de publications."
 
-#: components/dashboard/report/chartDocs.ts:533
+#: components/dashboard/report/chartDocs.ts:538
 msgid "Subfields where the institution publishes proportionally much more than the world average — a sign of disciplinary “signature” or specialisation, not a judgement of quality."
 msgstr "Sous-disciplines où l'établissement publie proportionnellement bien plus que la moyenne mondiale — un indice de « signature » ou de spécialisation disciplinaire, pas un jugement de qualité."
 
-#: components/dashboard/report/chartDocs.ts:535
+#: components/dashboard/report/chartDocs.ts:540
 msgid "For each subfield with at least 10 publications over the period, ratio = (share of this subfield in the institution's corpus) / (share of this subfield in world OpenAlex output, all domains, all years). Ratio > 1 = over-represented, < 1 = under-represented. World reference: one-off import of works_count per OpenAlex subfield (scripts/import_openalex_topics_reference.py on the ETL side)."
 msgstr "Pour chaque sous-discipline à au moins 10 publications sur la période, ratio = (part de cette sous-discipline dans le corpus de l'établissement) / (part de cette sous-discipline dans la production mondiale OpenAlex, tous domaines, toutes années). Ratio > 1 = sur-représentée, < 1 = sous-représentée. Référentiel mondial : import ponctuel des works_count par sous-discipline OpenAlex (scripts/import_openalex_topics_reference.py côté ETL)."
 
-#: components/dashboard/report/chartDocs.ts:537
+#: components/dashboard/report/chartDocs.ts:542
 msgid "The world reference is not filtered by year or language: a subfield may appear over-represented simply because it is poorly covered by OpenAlex worldwide (a known bias in the humanities and social sciences). The 10-publication threshold limits statistical noise but remains arbitrary."
 msgstr "Le référentiel mondial n'est pas filtré par année ni par langue : une sous-discipline peut apparaître sur-représentée simplement parce qu'elle est peu couverte par OpenAlex à l'échelle mondiale (biais connu en SHS). Le seuil de 10 publications limite le bruit statistique mais reste arbitraire."
 
@@ -10350,10 +10535,6 @@ msgstr "Valeur actuelle"
 #: components/researchers/ImportConflictsPage.tsx:189
 msgid "{source} value"
 msgstr "Valeur {source}"
-
-#: components/researchers/ImportConflictsPage.tsx:190
-msgid "Decision"
-msgstr "Décision"
 
 #: components/researchers/ImportConflictsPage.tsx:199
 msgid "edited since the import"
@@ -13648,9 +13829,10 @@ msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:24
-#: lib/directoryApi.ts:33
-#: lib/directoryApi.ts:48
+#: lib/directoryApi.ts:25
+#: lib/directoryApi.ts:34
+#: lib/directoryApi.ts:49
+#: lib/directoryApi.ts:70
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Annuaire indisponible ({resource}, HTTP {0})."
 

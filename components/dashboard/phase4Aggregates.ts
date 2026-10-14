@@ -6,7 +6,7 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { DashboardPublication } from './types';
 import { CountItem, YearRange } from './overviewAggregates';
-import { StackedByYear, StackedByCategory } from './structureAggregates';
+import { TEAM_UNKNOWN, StackedByYear, StackedByCategory } from './structureAggregates';
 
 function inRangePubs(pubs: DashboardPublication[], range: YearRange): DashboardPublication[] {
   return pubs.filter(
@@ -285,6 +285,9 @@ export interface AxesAggregates {
   byAxe: CountItem[];
   byYear: StackedByYear;
   byType: StackedByCategory;
+  /** Teams as categories (most publications first, « Non identifié » last), series = axes; a publication signed by
+   * several teams counts once in each (docs/plan-axes-embeddings.md, request of 2026-10-14). */
+  byTeam: StackedByCategory;
   total: number;
 }
 
@@ -333,13 +336,32 @@ export function aggregateAxes(
     ),
   }));
 
+  const teamCounts = new Map<string, number>();
+  for (const p of inRange) for (const team of new Set(p.teams.filter(Boolean))) teamCounts.set(team, (teamCounts.get(team) ?? 0) + 1);
+  const teamSet = [...teamCounts.keys()]
+    .sort((a, b) => (a === TEAM_UNKNOWN ? 1 : 0) - (b === TEAM_UNKNOWN ? 1 : 0) || (teamCounts.get(b)! - teamCounts.get(a)!) || a.localeCompare(b));
+  const byTeamSeries = present.map((axe) => ({
+    name: axe,
+    data: teamSet.map((team) => inRange.filter((p) => p.teams.includes(team) && norm(axeOf(p)) === axe).length),
+  }));
+
   return {
     axeNames: present,
     byAxe,
     byYear: { keys: present, years, series: byYearSeries },
     // types as categories, series = axes (as in the Streamlit: bars stacked per axis)
     byType: { categories: typeSet, series: byTypeSeries },
+    byTeam: { categories: teamSet, series: byTeamSeries },
     total: inRange.length,
+  };
+}
+
+/** Stacked counts → shares of each category (percent, one decimal); a category without publication stays at 0. */
+export function shareByCategory(data: StackedByCategory): StackedByCategory {
+  const totals = data.categories.map((_, i) => data.series.reduce((n, s) => n + (s.data[i] ?? 0), 0));
+  return {
+    categories: data.categories,
+    series: data.series.map((s) => ({ name: s.name, data: s.data.map((v, i) => (totals[i] ? Math.round((1000 * v) / totals[i]) / 10 : 0)) })),
   };
 }
 

@@ -29,6 +29,10 @@ const grist: PublicationsStore = {
   newsletterWorkIds: async () => new Set(), addNewsletterItem: async () => null,
   axisCorrections: async (slug) => (slug === 'ec-nantes' ? [{ gristId: 7, doi: '10.1/x', title: 'T', axe: 'énergies' }] : null),
   updateAxisCorrection: async () => ({ table: 'Publications_centrale_axes_strategiques2' }),
+  axisReviewsSupported: false,
+  axisReviews: async () => [],
+  saveAxisReview: async () => { throw new Error('unsupported'); },
+  deleteAxisReview: async () => false,
 };
 const item = (workId: string, over: Partial<NewsletterNewItem> = {}): NewsletterNewItem => ({
   work_id: workId, slug: 'zz-ls2n', numero: '2026-10', titre: `Titre ${workId}`, doi: '', date_publication: '2026-09-01',

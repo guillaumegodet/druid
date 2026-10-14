@@ -12,18 +12,13 @@ import { axeOfPub } from './publicationFilters';
 import type { DashboardDataset, DashboardPublication } from './types';
 import { AXES_GRIST, axisCorrectionRows, AxisCorrectionRow } from '../../lib/publications/axes';
 import { DirectoryApi } from '../../lib/directoryApi';
+import { normTitle } from '../../lib/normalize';
 
 // Configuration and row mapping live in lib/publications/axes.ts (shared with the API, migration plan lot 1 b).
 export { AXES_GRIST };
 
-/** Title normalization for matching (same rule as the study). */
-export function normTitle(s: string | null): string {
-  return (s ?? '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]/g, '');
-}
+// Title normalization for matching (same rule as the study), shared with the API since the axis reviews.
+export { normTitle };
 
 export interface AxisCorrection {
   gristId: number;
