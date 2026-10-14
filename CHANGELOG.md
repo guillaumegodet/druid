@@ -12,6 +12,23 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **Démo publique sur PostgreSQL** (lot 10 c) : `instances/demo/instance.json` passe en `storage: "postgres"` ; l'instance
+  lit une base Neon par la liaison Hyperdrive `HYPERDRIVE` du projet Pages (rechargée depuis `demo-data.mjs` à chaque
+  déploiement de production, secret de build `DEMO_DATABASE_URL`). Le document Grist public n'est plus lu.
+
+### Ajouté
+- **Tableau de bord › Pilotage › Appels européens** : topics du programme de travail Horizon Europe 2026-2027 appariés
+  aux chercheurs de la structure par le batch *Topic-to-Researcher Match* de crisalid-agents, en deux vues (par topic
+  avec échéances, appel et lien vers le portail Funding & Tenders ; par chercheur), avec les avis des utilisateurs
+  (« Pertinent », « Non pertinent », « Déjà en montage ») renvoyés au batch pour son évaluation (`/api/eu-calls/*`,
+  export CSV des avis pour les droits établissement). L'onglet n'apparaît qu'une fois un rapport importé ; PostgreSQL
+  seulement.
+
+### Migration
+- `db/migrations/20261015090000_eu_calls.sql` (tables `eu_topic`, `eu_topic_match_run`, `eu_topic_match`,
+  `eu_topic_feedback`), puis `node scripts/.build/import_trm.cjs --file=<rapport TRM .json>` par cluster.
+
 ### Ajouté
 - **Tableau de bord › Pilotage › Axes stratégiques : curation** (instances PostgreSQL) : chaque publication de la période
   avec son axe automatique, sa confiance, ses axes secondaires et la motivation du classement (druid-biblio, axes par

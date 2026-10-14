@@ -411,72 +411,72 @@ msgstr "Stop the answer"
 msgid "Send"
 msgstr "Send"
 
-#: components/DashboardPage.tsx:310
+#: components/DashboardPage.tsx:320
 #: components/dashboard/FundersTab.tsx:53
 #: components/dashboard/FundersTab.tsx:202
 #: components/researchers/AffiliationHistorySection.tsx:41
 msgid "publications"
 msgstr "publications"
 
-#: components/DashboardPage.tsx:311
+#: components/DashboardPage.tsx:321
 msgid "citations"
 msgstr "citations"
 
-#: components/DashboardPage.tsx:313
+#: components/DashboardPage.tsx:323
 msgid "international"
 msgstr "international"
 
-#: components/DashboardPage.tsx:315
+#: components/DashboardPage.tsx:325
 msgid "members"
 msgstr "members"
 
-#: components/DashboardPage.tsx:358
+#: components/DashboardPage.tsx:368
 #: components/Sidebar.tsx:161
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Dashboard"
 
 #. placeholder {0}: data.lab
-#: components/DashboardPage.tsx:358
+#: components/DashboardPage.tsx:368
 msgid "Dashboard — {0}"
 msgstr "Dashboard — {0}"
 
-#: components/DashboardPage.tsx:372
+#: components/DashboardPage.tsx:382
 #: components/reports/ReportControls.tsx:44
 msgid "Structure or group"
 msgstr "Structure or group"
 
-#: components/DashboardPage.tsx:374
+#: components/DashboardPage.tsx:384
 #: components/Sidebar.tsx:159
 #: components/reports/ReportControls.tsx:47
 msgid "Structures"
 msgstr "Structures"
 
-#: components/DashboardPage.tsx:382
+#: components/DashboardPage.tsx:392
 #: components/Sidebar.tsx:160
 #: components/reports/ReportControls.tsx:51
 msgid "Groups"
 msgstr "Groups"
 
-#: components/DashboardPage.tsx:393
+#: components/DashboardPage.tsx:403
 msgid "Open the ETL console on this structure"
 msgstr "Open the ETL console on this structure"
 
-#: components/DashboardPage.tsx:394
+#: components/DashboardPage.tsx:404
 msgid "Configure"
 msgstr "Configure"
 
 #. placeholder {0}: excluded.toLocaleString(numberLocale())
-#: components/DashboardPage.tsx:404
+#: components/DashboardPage.tsx:414
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list ({0} publications excluded for lack of a match)."
 
-#: components/DashboardPage.tsx:405
+#: components/DashboardPage.tsx:415
 #: components/dashboard/report/ReportWizard.tsx:311
 msgid "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 msgstr "Affiliation: all publications signed by the structure. Staff: only those with at least one member recognised in the staff list."
 
-#: components/DashboardPage.tsx:410
+#: components/DashboardPage.tsx:420
 #: components/dashboard/report/ReportWizard.tsx:197
 #: components/dashboard/report/ReportWizard.tsx:287
 #: components/dashboard/report/ReportWizard.tsx:477
@@ -487,7 +487,7 @@ msgstr "Affiliation: all publications signed by the structure. Staff: only those
 msgid "Affiliation"
 msgstr "Affiliation"
 
-#: components/DashboardPage.tsx:411
+#: components/DashboardPage.tsx:421
 #: components/dashboard/StaffSection.tsx:294
 #: components/dashboard/StaffSection.tsx:309
 #: components/dashboard/StaffTab.tsx:228
@@ -501,48 +501,48 @@ msgstr "Affiliation"
 msgid "Headcount"
 msgstr "Headcount"
 
-#: components/DashboardPage.tsx:436
+#: components/DashboardPage.tsx:446
 msgid "Copy the link to this view (structure, tab, period, scope)"
 msgstr "Copy the link to this view (structure, tab, period, scope)"
 
-#: components/DashboardPage.tsx:440
+#: components/DashboardPage.tsx:450
 #: components/dashboard/NewsTab.tsx:836
 #: components/reports/ShareDialog.tsx:188
 msgid "Copied!"
 msgstr "Copied!"
 
-#: components/DashboardPage.tsx:440
+#: components/DashboardPage.tsx:450
 #: components/dashboard/EChartCard.tsx:362
 #: components/reports/ShareDialog.tsx:188
 msgid "Copy link"
 msgstr "Copy link"
 
-#: components/DashboardPage.tsx:447
+#: components/DashboardPage.tsx:457
 msgid "Create a report from this dashboard (editable, then exported as PDF)"
 msgstr "Create a report from this dashboard (editable, then exported as PDF)"
 
-#: components/DashboardPage.tsx:451
+#: components/DashboardPage.tsx:461
 msgid "PDF report"
 msgstr "PDF report"
 
-#: components/DashboardPage.tsx:458
+#: components/DashboardPage.tsx:468
 msgid "Analyses"
 msgstr "Analyses"
 
-#: components/DashboardPage.tsx:502
+#: components/DashboardPage.tsx:512
 msgid "Loading data…"
 msgstr "Loading data…"
 
-#: components/DashboardPage.tsx:511
+#: components/DashboardPage.tsx:521
 msgid "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 msgstr "This structure's data has not been exported yet (<0>dashboard.json</0> missing) — rerun the ETL from the administration page."
 
-#: components/DashboardPage.tsx:515
+#: components/DashboardPage.tsx:525
 #: components/dashboard/EmbedPage.tsx:97
 msgid "Error loading data: {error}"
 msgstr "Error loading data: {error}"
 
-#: components/DashboardPage.tsx:559
+#: components/DashboardPage.tsx:569
 msgid "Loading the directory…"
 msgstr "Loading the directory…"
 
@@ -726,7 +726,7 @@ msgid "People"
 msgstr "People"
 
 #: components/ResearcherDetail.tsx:268
-#: components/dashboard/dashboardNav.ts:95
+#: components/dashboard/dashboardNav.ts:96
 #: components/researchers/DuplicatesPage.tsx:145
 msgid "Directory"
 msgstr "Directory"
@@ -1066,6 +1066,7 @@ msgid "All supervising bodies"
 msgstr "All supervising bodies"
 
 #: components/StructureList.tsx:395
+#: components/dashboard/EuCallsTab.tsx:318
 msgid "All clusters"
 msgstr "All clusters"
 
@@ -1851,7 +1852,7 @@ msgstr "Publication types by strategic axis"
 #: components/dashboard/StaffSection.tsx:254
 #: components/dashboard/StaffSection.tsx:379
 #: components/dashboard/charts/YearlyEvolutionChart.tsx:41
-#: components/dashboard/dashboardNav.ts:63
+#: components/dashboard/dashboardNav.ts:64
 #: components/dashboard/kpiItems.ts:35
 #: components/dashboard/report/composeReportPdf.ts:70
 #: components/dashboard/report/pdfDoc.ts:128
@@ -3139,7 +3140,7 @@ msgid "Themes"
 msgstr "Themes"
 
 #: components/dashboard/CountrySection.tsx:204
-#: components/dashboard/dashboardNav.ts:74
+#: components/dashboard/dashboardNav.ts:75
 #: components/dashboard/report/templates.ts:206
 msgid "Impact"
 msgstr "Impact"
@@ -3149,7 +3150,7 @@ msgid "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out. 
 msgstr "Publications with more than {LARGE_COLLAB_AUTHORS} authors are left out. The reference is the other international co-publications of the structure in the same subfields, weighted like the co-publications with {country}."
 
 #: components/dashboard/CountrySection.tsx:218
-#: components/dashboard/dashboardNav.ts:107
+#: components/dashboard/dashboardNav.ts:108
 #: components/dashboard/report/reportCatalog.ts:77
 #: components/dashboard/report/templates.ts:208
 msgid "Funding"
@@ -3283,6 +3284,153 @@ msgstr "filters:"
 #: components/dashboard/EmbedPage.tsx:112
 msgid "Source: Druid / druid-biblio (CRISalid, OpenAlex, HAL, BSO)"
 msgstr "Source: Druid / druid-biblio (CRISalid, OpenAlex, HAL, BSO)"
+
+#: components/dashboard/EuCallsTab.tsx:34
+#: components/researchers/alignAtoms.tsx:195
+msgid "strong"
+msgstr "strong"
+
+#: components/dashboard/EuCallsTab.tsx:34
+#: components/researchers/alignAtoms.tsx:195
+msgid "weak"
+msgstr "weak"
+
+#: components/dashboard/EuCallsTab.tsx:34
+msgid "plausible"
+msgstr "plausible"
+
+#: components/dashboard/EuCallsTab.tsx:34
+msgid "unrated"
+msgstr "unrated"
+
+#: components/dashboard/EuCallsTab.tsx:36
+msgid "Match strength assessed by the language model, score normalised within the topic"
+msgstr "Match strength assessed by the language model, score normalised within the topic"
+
+#: components/dashboard/EuCallsTab.tsx:45
+msgid "Relevant"
+msgstr "Relevant"
+
+#: components/dashboard/EuCallsTab.tsx:46
+msgid "Not relevant"
+msgstr "Not relevant"
+
+#: components/dashboard/EuCallsTab.tsx:47
+msgid "Already applying"
+msgstr "Already applying"
+
+#: components/dashboard/EuCallsTab.tsx:65
+msgid "Your opinion on this match (one per person, the last one wins)"
+msgstr "Your opinion on this match (one per person, the last one wins)"
+
+#: components/dashboard/EuCallsTab.tsx:111
+msgid "Fewer publications"
+msgstr "Fewer publications"
+
+#. placeholder {0}: relevant.length - 3
+#: components/dashboard/EuCallsTab.tsx:111
+msgid "{0, plural, one {# more publication} other {# more publications}}"
+msgstr "{0, plural, one {# more publication} other {# more publications}}"
+
+#: components/dashboard/EuCallsTab.tsx:141
+#: components/dashboard/NewsTab.tsx:735
+#: components/researchers/TasksPage.tsx:161
+msgid "Closed"
+msgstr "Closed"
+
+#. placeholder {0}: fmtDate(topic.nextDeadline)
+#: components/dashboard/EuCallsTab.tsx:141
+msgid "Deadline {0}"
+msgstr "Deadline {0}"
+
+#: components/dashboard/EuCallsTab.tsx:141
+msgid "No deadline"
+msgstr "No deadline"
+
+#. placeholder {0}: topic.matches.length
+#: components/dashboard/EuCallsTab.tsx:144
+msgid "{0, plural, =0 {No researcher} one {# researcher} other {# researchers}}"
+msgstr "{0, plural, =0 {No researcher} one {# researcher} other {# researchers}}"
+
+#: components/dashboard/EuCallsTab.tsx:145
+msgid "{strong, plural, one {# strong} other {# strong}}"
+msgstr "{strong, plural, one {# strong} other {# strong}}"
+
+#: components/dashboard/EuCallsTab.tsx:153
+msgid "Call"
+msgstr "Call"
+
+#: components/dashboard/EuCallsTab.tsx:154
+msgid "Deadlines"
+msgstr "Deadlines"
+
+#: components/dashboard/EuCallsTab.tsx:156
+msgid "Funding & Tenders portal"
+msgstr "Funding & Tenders portal"
+
+#: components/dashboard/EuCallsTab.tsx:160
+msgid "No researcher of this structure was retained for this topic."
+msgstr "No researcher of this structure was retained for this topic."
+
+#: components/dashboard/EuCallsTab.tsx:178
+#: components/structures/ClassificationTab.tsx:69
+msgid "Topics"
+msgstr "Topics"
+
+#: components/dashboard/EuCallsTab.tsx:178
+#: components/dashboard/dashboardNav.ts:97
+#: components/dashboard/report/reportCatalog.ts:105
+msgid "Researchers"
+msgstr "Researchers"
+
+#: components/dashboard/EuCallsTab.tsx:282
+msgid "Loading the European calls…"
+msgstr "Loading the European calls…"
+
+#: components/dashboard/EuCallsTab.tsx:291
+msgid "Horizon Europe work programme topics matched automatically to the researchers of {structureLabel} from the publications known to the CRISalid graph (partial coverage). Your opinion on each match helps improve the matching."
+msgstr "Horizon Europe work programme topics matched automatically to the researchers of {structureLabel} from the publications known to the CRISalid graph (partial coverage). Your opinion on each match helps improve the matching."
+
+#. placeholder {0}: matchedUids.size
+#: components/dashboard/EuCallsTab.tsx:297
+msgid "{0, plural, =0 {No researcher retained yet.} one {# researcher retained on at least one topic.} other {# researchers retained on at least one topic.}}"
+msgstr "{0, plural, =0 {No researcher retained yet.} one {# researcher retained on at least one topic.} other {# researchers retained on at least one topic.}}"
+
+#: components/dashboard/EuCallsTab.tsx:308
+msgid "Search a topic…"
+msgstr "Search a topic…"
+
+#: components/dashboard/EuCallsTab.tsx:308
+msgid "Search a researcher…"
+msgstr "Search a researcher…"
+
+#: components/dashboard/EuCallsTab.tsx:316
+#: components/researchers/FilterPanel.tsx:177
+#: components/researchers/FilterPanel.tsx:309
+#: components/researchers/GeneralTab.tsx:358
+msgid "Cluster"
+msgstr "Cluster"
+
+#: components/dashboard/EuCallsTab.tsx:322
+msgid "Include closed calls"
+msgstr "Include closed calls"
+
+#: components/dashboard/EuCallsTab.tsx:326
+msgid "Topics with researchers only"
+msgstr "Topics with researchers only"
+
+#: components/dashboard/EuCallsTab.tsx:333
+msgid "No topic matches these filters."
+msgstr "No topic matches these filters."
+
+#: components/dashboard/EuCallsTab.tsx:340
+msgid "No researcher matches these filters."
+msgstr "No researcher matches these filters."
+
+#. placeholder {0}: r.matches.length
+#: components/dashboard/EuCallsTab.tsx:353
+msgid "{0, plural, one {# topic} other {# topics}}"
+msgstr "{0, plural, one {# topic} other {# topics}}"
 
 #: components/dashboard/ExploreGrid.tsx:23
 msgid "Explore the analyses"
@@ -3507,8 +3655,8 @@ msgid "No geolocated foreign partner organisation over the period."
 msgstr "No geolocated foreign partner organisation over the period."
 
 #: components/dashboard/InternationalTab.tsx:128
-#: components/dashboard/dashboardNav.ts:55
-#: components/dashboard/dashboardNav.ts:58
+#: components/dashboard/dashboardNav.ts:56
+#: components/dashboard/dashboardNav.ts:59
 #: components/dashboard/report/reportCatalog.ts:25
 #: components/dashboard/report/templates.ts:141
 #: components/dashboard/report/templates.ts:272
@@ -4399,11 +4547,6 @@ msgstr "Link"
 msgid "Open"
 msgstr "Open"
 
-#: components/dashboard/NewsTab.tsx:735
-#: components/researchers/TasksPage.tsx:161
-msgid "Closed"
-msgstr "Closed"
-
 #: components/dashboard/NewsTab.tsx:744
 msgid "Open the publication"
 msgstr "Open the publication"
@@ -4871,7 +5014,7 @@ msgstr "Publications per PhD student"
 
 #: components/dashboard/PublicationsListModal.tsx:46
 #: components/dashboard/PublicationsListTab.tsx:214
-#: components/dashboard/dashboardNav.ts:68
+#: components/dashboard/dashboardNav.ts:69
 #: components/reports/ReportEditor.tsx:436
 msgid "Publication list"
 msgstr "Publication list"
@@ -5160,7 +5303,7 @@ msgid "Visiting"
 msgstr "Visiting"
 
 #: components/dashboard/StaffSection.tsx:41
-#: components/dashboard/dashboardNav.ts:98
+#: components/dashboard/dashboardNav.ts:99
 #: components/dashboard/report/reportCatalog.ts:100
 #: components/researchers/AlignLaunchModal.tsx:101
 msgid "PhD students"
@@ -6228,183 +6371,186 @@ msgstr "Large collaborations"
 msgid "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
 msgstr "{0} publications with more than {LARGE_COLLAB_AUTHORS} authors"
 
-#: components/dashboard/dashboardNav.ts:56
+#: components/dashboard/dashboardNav.ts:57
 msgid "Key figures, yearly evolution, publication types, open access and keywords."
 msgstr "Key figures, yearly evolution, publication types, open access and keywords."
 
-#: components/dashboard/dashboardNav.ts:58
+#: components/dashboard/dashboardNav.ts:59
 msgid "Key figures and the main breakdowns of the corpus."
 msgstr "Key figures and the main breakdowns of the corpus."
 
-#: components/dashboard/dashboardNav.ts:64
+#: components/dashboard/dashboardNav.ts:65
 msgid "What is published and where: books, journals, the full list and where the records come from."
 msgstr "What is published and where: books, journals, the full list and where the records come from."
 
-#: components/dashboard/dashboardNav.ts:66
+#: components/dashboard/dashboardNav.ts:67
 #: components/dashboard/report/reportCatalog.ts:60
 msgid "Books"
 msgstr "Books"
 
-#: components/dashboard/dashboardNav.ts:66
+#: components/dashboard/dashboardNav.ts:67
 msgid "Monographs, chapters and edited books by year and type."
 msgstr "Monographs, chapters and edited books by year and type."
 
-#: components/dashboard/dashboardNav.ts:67
+#: components/dashboard/dashboardNav.ts:68
 #: components/dashboard/report/reportCatalog.ts:65
 #: components/dashboard/report/templates.ts:361
 msgid "Journals"
 msgstr "Journals"
 
-#: components/dashboard/dashboardNav.ts:67
+#: components/dashboard/dashboardNav.ts:68
 msgid "Publication journals, Scimago quartiles and access at the institution."
 msgstr "Publication journals, Scimago quartiles and access at the institution."
 
-#: components/dashboard/dashboardNav.ts:68
+#: components/dashboard/dashboardNav.ts:69
 msgid "Every publication, filterable and exportable as CSV."
 msgstr "Every publication, filterable and exportable as CSV."
 
-#: components/dashboard/dashboardNav.ts:69
+#: components/dashboard/dashboardNav.ts:70
 #: components/dashboard/report/reportCatalog.ts:116
 msgid "Sources"
 msgstr "Sources"
 
-#: components/dashboard/dashboardNav.ts:69
+#: components/dashboard/dashboardNav.ts:70
 msgid "Where the publications come from (CRISalid, BSO, OpenAlex, HAL)."
 msgstr "Where the publications come from (CRISalid, BSO, OpenAlex, HAL)."
 
-#: components/dashboard/dashboardNav.ts:75
+#: components/dashboard/dashboardNav.ts:76
 msgid "Citations, field-normalised impact (FWCI) and comparison with other universities."
 msgstr "Citations, field-normalised impact (FWCI) and comparison with other universities."
 
-#: components/dashboard/dashboardNav.ts:77
+#: components/dashboard/dashboardNav.ts:78
 #: components/dashboard/report/reportCatalog.ts:50
 msgid "Impact and citations"
 msgstr "Impact and citations"
 
-#: components/dashboard/dashboardNav.ts:77
+#: components/dashboard/dashboardNav.ts:78
 msgid "FWCI, top 1 % / 10 %, most cited publications, by team and researcher."
 msgstr "FWCI, top 1 % / 10 %, most cited publications, by team and researcher."
 
-#: components/dashboard/dashboardNav.ts:78
+#: components/dashboard/dashboardNav.ts:79
 msgid "Benchmark"
 msgstr "Benchmark"
 
-#: components/dashboard/dashboardNav.ts:78
+#: components/dashboard/dashboardNav.ts:79
 msgid "Position among comparable universities (Leiden ranking, OpenAlex)."
 msgstr "Position among comparable universities (Leiden ranking, OpenAlex)."
 
-#: components/dashboard/dashboardNav.ts:83
+#: components/dashboard/dashboardNav.ts:84
 #: components/dashboard/report/reportCatalog.ts:33
 msgid "Collaborations"
 msgstr "Collaborations"
 
-#: components/dashboard/dashboardNav.ts:84
+#: components/dashboard/dashboardNav.ts:85
 msgid "Who the structure publishes with: countries, partner institutions, other labs."
 msgstr "Who the structure publishes with: countries, partner institutions, other labs."
 
-#: components/dashboard/dashboardNav.ts:86
+#: components/dashboard/dashboardNav.ts:87
 msgid "Partnerships"
 msgstr "Partnerships"
 
-#: components/dashboard/dashboardNav.ts:86
+#: components/dashboard/dashboardNav.ts:87
 msgid "National and international co-publications, partner countries and institutions."
 msgstr "National and international co-publications, partner countries and institutions."
 
-#: components/dashboard/dashboardNav.ts:87
+#: components/dashboard/dashboardNav.ts:88
 #: components/dashboard/report/reportCatalog.ts:110
 msgid "Network"
 msgstr "Network"
 
-#: components/dashboard/dashboardNav.ts:87
+#: components/dashboard/dashboardNav.ts:88
 msgid "Co-signature network between researchers and labs."
 msgstr "Co-signature network between researchers and labs."
 
-#: components/dashboard/dashboardNav.ts:92
+#: components/dashboard/dashboardNav.ts:93
 msgctxt "dashboard family"
 msgid "People"
 msgstr "People"
 
-#: components/dashboard/dashboardNav.ts:93
+#: components/dashboard/dashboardNav.ts:94
 msgid "Who makes up the structure and who publishes: headcount, researchers, teams, PhD students."
 msgstr "Who makes up the structure and who publishes: headcount, researchers, teams, PhD students."
 
-#: components/dashboard/dashboardNav.ts:95
+#: components/dashboard/dashboardNav.ts:96
 msgid "Today's directory: presence, employers, grades, gender balance, identifier coverage."
 msgstr "Today's directory: presence, employers, grades, gender balance, identifier coverage."
 
-#: components/dashboard/dashboardNav.ts:96
-#: components/dashboard/report/reportCatalog.ts:105
-msgid "Researchers"
-msgstr "Researchers"
-
-#: components/dashboard/dashboardNav.ts:96
+#: components/dashboard/dashboardNav.ts:97
 msgid "Publication rate per research FTE, age pyramid and most prolific authors."
 msgstr "Publication rate per research FTE, age pyramid and most prolific authors."
 
-#: components/dashboard/dashboardNav.ts:97
+#: components/dashboard/dashboardNav.ts:98
 #: components/dashboard/report/reportCatalog.ts:92
 #: components/dashboard/report/reportTables.ts:49
 msgid "Teams"
 msgstr "Teams"
 
-#: components/dashboard/dashboardNav.ts:97
+#: components/dashboard/dashboardNav.ts:98
 msgid "Production by team, members, disciplinary profile."
 msgstr "Production by team, members, disciplinary profile."
 
-#: components/dashboard/dashboardNav.ts:98
+#: components/dashboard/dashboardNav.ts:99
 msgid "Publications involving PhD students, by team and by year."
 msgstr "Publications involving PhD students, by team and by year."
 
-#: components/dashboard/dashboardNav.ts:103
+#: components/dashboard/dashboardNav.ts:104
 msgid "Steering"
 msgstr "Steering"
 
-#: components/dashboard/dashboardNav.ts:104
+#: components/dashboard/dashboardNav.ts:105
 msgid "Strategy and compliance: strategic axes, funding, publication charges, signature charter."
 msgstr "Strategy and compliance: strategic axes, funding, publication charges, signature charter."
 
-#: components/dashboard/dashboardNav.ts:106
+#: components/dashboard/dashboardNav.ts:107
 #: components/dashboard/report/reportCatalog.ts:82
 msgid "Strategic axes"
 msgstr "Strategic axes"
 
-#: components/dashboard/dashboardNav.ts:106
+#: components/dashboard/dashboardNav.ts:107
 msgid "Publications matched to the strategic axes of the structure."
 msgstr "Publications matched to the strategic axes of the structure."
 
-#: components/dashboard/dashboardNav.ts:107
+#: components/dashboard/dashboardNav.ts:108
 msgid "Funders and projects cited in the publications."
 msgstr "Funders and projects cited in the publications."
 
-#: components/dashboard/dashboardNav.ts:108
+#: components/dashboard/dashboardNav.ts:109
+msgid "European calls"
+msgstr "European calls"
+
+#: components/dashboard/dashboardNav.ts:109
+msgid "Horizon Europe topics and the researchers whose publications relate to them."
+msgstr "Horizon Europe topics and the researchers whose publications relate to them."
+
+#: components/dashboard/dashboardNav.ts:110
 #: components/dashboard/report/reportCatalog.ts:70
 msgid "APC monitoring"
 msgstr "APC monitoring"
 
-#: components/dashboard/dashboardNav.ts:108
+#: components/dashboard/dashboardNav.ts:110
 msgid "Article processing charges paid and publisher agreements."
 msgstr "Article processing charges paid and publisher agreements."
 
-#: components/dashboard/dashboardNav.ts:109
+#: components/dashboard/dashboardNav.ts:111
 #: components/dashboard/report/reportCatalog.ts:87
 #: components/dashboard/report/templates.ts:367
 msgid "Signature charter"
 msgstr "Signature charter"
 
-#: components/dashboard/dashboardNav.ts:109
+#: components/dashboard/dashboardNav.ts:111
 msgid "Compliance of the affiliations with the signature charter."
 msgstr "Compliance of the affiliations with the signature charter."
 
-#: components/dashboard/dashboardNav.ts:114
-#: components/dashboard/dashboardNav.ts:117
+#: components/dashboard/dashboardNav.ts:116
+#: components/dashboard/dashboardNav.ts:119
 msgid "Watch"
 msgstr "Watch"
 
-#: components/dashboard/dashboardNav.ts:115
+#: components/dashboard/dashboardNav.ts:117
 msgid "Live monitoring: new publications, media mentions, newsletter."
 msgstr "Live monitoring: new publications, media mentions, newsletter."
 
-#: components/dashboard/dashboardNav.ts:117
+#: components/dashboard/dashboardNav.ts:119
 msgid "New publications of the last weeks, media mentions and newsletter."
 msgstr "New publications of the last weeks, media mentions and newsletter."
 
@@ -10061,12 +10207,6 @@ msgstr "LDAP account"
 msgid "Validation"
 msgstr "Validation"
 
-#: components/researchers/FilterPanel.tsx:177
-#: components/researchers/FilterPanel.tsx:309
-#: components/researchers/GeneralTab.tsx:358
-msgid "Cluster"
-msgstr "Cluster"
-
 #: components/researchers/FilterPanel.tsx:178
 #: components/researchers/ResearcherTable.tsx:89
 #: lib/importConflicts.ts:97
@@ -12454,16 +12594,8 @@ msgid "Ignore"
 msgstr "Ignore"
 
 #: components/researchers/alignAtoms.tsx:195
-msgid "strong"
-msgstr "strong"
-
-#: components/researchers/alignAtoms.tsx:195
 msgid "medium"
 msgstr "medium"
-
-#: components/researchers/alignAtoms.tsx:195
-msgid "weak"
-msgstr "weak"
 
 #: components/researchers/alignAtoms.tsx:198
 msgid "Nantes affiliation or the record’s lab found on the profile"
@@ -12628,10 +12760,6 @@ msgstr "Campus"
 #: components/structures/ClassificationTab.tsx:60
 msgid "e.g. Lombarderie campus"
 msgstr "e.g. Lombarderie campus"
-
-#: components/structures/ClassificationTab.tsx:69
-msgid "Topics"
-msgstr "Topics"
 
 #: components/structures/ClassificationTab.tsx:73
 msgid "ERC panel"
@@ -13120,563 +13248,583 @@ msgid "Unknown Druid instance for this host"
 msgstr "Unknown Druid instance for this host"
 
 #: lib/apiErrors.ts:39
+msgid "The European calls need the PostgreSQL storage"
+msgstr "The European calls need the PostgreSQL storage"
+
+#: lib/apiErrors.ts:40
+msgid "Invalid topic id"
+msgstr "Invalid topic id"
+
+#: lib/apiErrors.ts:41
+msgid "Invalid pair id"
+msgstr "Invalid pair id"
+
+#: lib/apiErrors.ts:42
+msgid "Invalid verdict"
+msgstr "Invalid verdict"
+
+#: lib/apiErrors.ts:43
+msgid "Unknown pair"
+msgstr "Unknown pair"
+
+#: lib/apiErrors.ts:45
 msgid "ILAAS_API_KEY not configured (druid service env)"
 msgstr "ILAAS_API_KEY not configured (druid service env)"
 
-#: lib/apiErrors.ts:40
+#: lib/apiErrors.ts:46
 msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 
-#: lib/apiErrors.ts:41
+#: lib/apiErrors.ts:47
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID not configured"
 
-#: lib/apiErrors.ts:42
+#: lib/apiErrors.ts:48
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY not configured"
 
-#: lib/apiErrors.ts:43
+#: lib/apiErrors.ts:49
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY not configured on Cloudflare"
 
-#: lib/apiErrors.ts:44
+#: lib/apiErrors.ts:50
 msgid "HYPERDRIVE binding not configured on Cloudflare"
 msgstr "HYPERDRIVE binding not configured on Cloudflare"
 
-#: lib/apiErrors.ts:46
+#: lib/apiErrors.ts:52
 msgid "Unknown API route"
 msgstr "Unknown API route"
 
-#: lib/apiErrors.ts:47
+#: lib/apiErrors.ts:53
 msgid "Directory storage unavailable"
 msgstr "Directory storage unavailable"
 
-#: lib/apiErrors.ts:48
+#: lib/apiErrors.ts:54
 msgid "Another record already holds this value"
 msgstr "Another record already holds this value"
 
-#: lib/apiErrors.ts:49
+#: lib/apiErrors.ts:55
 msgid "API v1 unavailable"
 msgstr "API v1 unavailable"
 
-#: lib/apiErrors.ts:50
+#: lib/apiErrors.ts:56
 msgid "Grist proxy removed: use /api/v1"
 msgstr "Grist proxy removed: use /api/v1"
 
-#: lib/apiErrors.ts:51
+#: lib/apiErrors.ts:57
 msgid "Not available on the PostgreSQL storage yet"
 msgstr "Not available on the PostgreSQL storage yet"
 
-#: lib/apiErrors.ts:52
+#: lib/apiErrors.ts:58
 msgid "Invalid record"
 msgstr "Invalid record"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:59
 msgid "Invalid lab"
 msgstr "Invalid lab"
 
-#: lib/apiErrors.ts:54
+#: lib/apiErrors.ts:60
 msgid "Invalid import file"
 msgstr "Invalid import file"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:61
 msgid "Replaced IdRef record not found"
 msgstr "Replaced IdRef record not found"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:62
 msgid "Review table missing, run the alignment script first"
 msgstr "Review table missing, run the alignment script first"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:63
 msgid "Grist error (partial write)"
 msgstr "Grist error (partial write)"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:64
 msgid "Qualification: primary row required"
 msgstr "Qualification: primary row required"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:65
 msgid "Invalid LDAP uid"
 msgstr "Invalid LDAP uid"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:66
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "This uid already has a directory record, merge the two records instead"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:67
 msgid "Record not found in Grist"
 msgstr "Record not found in Grist"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:68
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:69
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Merge: one of the rows no longer exists in Grist"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:70
 msgid "Grist error (writing the kept row)"
 msgstr "Grist error (writing the kept row)"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:71
 msgid "Grist error (deleting the absorbed row)"
 msgstr "Grist error (deleting the absorbed row)"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:72
 msgid "Merge not found"
 msgstr "Merge not found"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:73
 msgid "Merge already restored"
 msgstr "Merge already restored"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:74
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Row re-created but merge log not updated, do not restart the restoration"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:75
 msgid "Row re-created but kept row not restored"
 msgstr "Row re-created but kept row not restored"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:76
 msgid "The acronym / short name is required"
 msgstr "The acronym / short name is required"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:77
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "A team must be included in a lab (Memberships tab)"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:78
 msgid "A structure with this acronym already exists"
 msgstr "A structure with this acronym already exists"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:79
 msgid "local_id already used"
 msgstr "local_id already used"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:80
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:82
 msgid "The institution name is required"
 msgstr "The institution name is required"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:83
 msgid "The institution name is too long"
 msgstr "The institution name is too long"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:84
 msgid "Invalid UAI code"
 msgstr "Invalid UAI code"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:85
 msgid "Invalid ROR identifier"
 msgstr "Invalid ROR identifier"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:86
 msgid "Invalid IdRef PPN"
 msgstr "Invalid IdRef PPN"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:87
 msgid "An institution with this name already exists"
 msgstr "An institution with this name already exists"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:88
 msgid "An institution with this UAI already exists"
 msgstr "An institution with this UAI already exists"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:89
 msgid "Institutions require the institution right"
 msgstr "Institutions require the institution right"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:90
 msgid "Institution not found"
 msgstr "Institution not found"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:91
 #: lib/gristService.ts:139
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "Invalid Grist ID (gristRowId missing)"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:92
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:93
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:94
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:95
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:96
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "No OpenAlex identifier configured for this structure"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:97
 msgid "No dashboard data for this structure"
 msgstr "No dashboard data for this structure"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:99
 msgid "messages[] required"
 msgstr "messages[] required"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:100
 msgid "Assistant unavailable"
 msgstr "Assistant unavailable"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:101
 msgid "Help assistant not configured"
 msgstr "Help assistant not configured"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:102
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:103
 msgid "Generation interrupted"
 msgstr "Generation interrupted"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:104
 msgid "Generation failed"
 msgstr "Generation failed"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:105
 msgid "Analysis failed"
 msgstr "Analysis failed"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:106
 msgid "Missing theme"
 msgstr "Missing theme"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:107
 msgid "No publication to analyze"
 msgstr "No publication to analyze"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:108
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex unreachable"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:110
 msgid "Report not found"
 msgstr "Report not found"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:111
 msgid "Not allowed on this report"
 msgstr "Not allowed on this report"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:112
 msgid "Invalid report definition"
 msgstr "Invalid report definition"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:113
 msgid "Report changed since it was loaded"
 msgstr "Report changed since it was loaded"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:114
 msgid "Invalid report share"
 msgstr "Invalid report share"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:115
 msgid "Invalid report generation"
 msgstr "Invalid report generation"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:116
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Read-only instance: reports are kept in the browser"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:117
 msgid "Invalid AI task"
 msgstr "Invalid AI task"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:118
 msgid "PDF archiving is not configured on this instance"
 msgstr "PDF archiving is not configured on this instance"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:119
 msgid "Invalid PDF"
 msgstr "Invalid PDF"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:120
 msgid "Generation not found"
 msgstr "Generation not found"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:121
 msgid "PDF not archived"
 msgstr "PDF not archived"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:123
 msgid "Invalid record key"
 msgstr "Invalid record key"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:124
 msgid "Career path not computed yet for this record"
 msgstr "Career path not computed yet for this record"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:125
 msgid "Grist unreachable"
 msgstr "Grist unreachable"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:126
 msgid "No Annuaire record for this key"
 msgstr "No Annuaire record for this key"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:127
 msgid "Refresh outside your scope"
 msgstr "Refresh outside your scope"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:128
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Too many refreshes in progress, retry in a minute"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:129
 msgid "Career-path computation failed"
 msgstr "Career-path computation failed"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:130
 msgid "No usable identifier for this record"
 msgstr "No usable identifier for this record"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:131
 msgid "Unknown suggestion"
 msgstr "Unknown suggestion"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:133
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:134
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:135
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:136
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:137
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:138
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:139
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:140
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:142
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:143
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:144
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:145
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:146
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:147
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:148
 msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
 msgstr "Identifier removals could not be sent to the CRISalid graph, try again later"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:149
 msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 msgstr "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:150
 msgid "Cannot send the identifier removals to the CRISalid graph"
 msgstr "Cannot send the identifier removals to the CRISalid graph"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:151
 msgid "Cannot read the removals sent to the CRISalid graph"
 msgstr "Cannot read the removals sent to the CRISalid graph"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:152
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:153
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:155
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:156
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:157
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:158
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:159
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:160
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:161
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:162
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:163
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:164
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:165
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:166
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:167
 msgid "Writes require an authenticated user (Cloudflare Access)"
 msgstr "Writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:168
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:169
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:170
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:171
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:172
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:174
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:175
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:176
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:177
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:178
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:179
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:180
 msgid "No alignment running"
 msgstr "No alignment running"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:181
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:183
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:178
+#: lib/apiErrors.ts:184
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:179
+#: lib/apiErrors.ts:185
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:180
+#: lib/apiErrors.ts:186
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:182
+#: lib/apiErrors.ts:188
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:184
+#: lib/apiErrors.ts:190
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:185
+#: lib/apiErrors.ts:191
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:186
+#: lib/apiErrors.ts:192
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:187
+#: lib/apiErrors.ts:193
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:189
+#: lib/apiErrors.ts:195
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:190
+#: lib/apiErrors.ts:196
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:191
+#: lib/apiErrors.ts:197
 msgid "Load failed"
 msgstr "Load failed"
 

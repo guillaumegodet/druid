@@ -1,0 +1,77 @@
+{
+  "run_id": "20261014T000000-test01",
+  "cluster": "CL9",
+  "started_at": "2026-10-14T00:00:00+00:00",
+  "settings": {"model": "test-model", "min_score": 0.35, "max_researchers": 15},
+  "duration_seconds": 12.5,
+  "topics": [
+    {
+      "topic_id": "HORIZON-CL9-2026-01-TEST-01",
+      "title": "Producing   battery-grade materia ls\nfor electrodes",
+      "cluster": "CL9",
+      "call_id": "HORIZON-CL9-2026-01",
+      "deadlines": ["2026-09-15"],
+      "destination": "Destination Test",
+      "summary": "Research on sustainable electrode materials.",
+      "queries": ["q1", "q2"],
+      "researchers": [
+        {
+          "pair_id": "HORIZON-CL9-2026-01-TEST-01|local-exemple-a",
+          "person_uid": "local-exemple-a",
+          "name": "Alice Exemple",
+          "units": ["Laboratoire Exemple (LEX)"],
+          "score": 1.0,
+          "raw_score": 2.31,
+          "overall": "strong",
+          "justification": "Several publications on organic electrodes.",
+          "publications": [
+            {"uid": "doc-1", "title": "Organic electrodes", "year": 2022, "score": 0.9, "relevant": true, "reason": "Direct match."},
+            {"uid": "doc-2", "title": "Unrelated work", "year": 2010, "score": 0.4, "relevant": false, "reason": "Off topic."}
+          ]
+        },
+        {
+          "pair_id": "HORIZON-CL9-2026-01-TEST-01|local-exemple-b",
+          "person_uid": "local-exemple-b",
+          "name": "Bob Exemple",
+          "units": [],
+          "score": 0.42,
+          "raw_score": 0.97,
+          "overall": "surprising",
+          "justification": "",
+          "publications": []
+        }
+      ],
+      "error": null,
+      "warnings": [],
+      "duration_seconds": 7.1
+    },
+    {
+      "topic_id": "HORIZON-CL9-2027-02-TEST-02",
+      "title": "Two-stage topic",
+      "cluster": "CL9",
+      "call_id": "HORIZON-CL9-2027-02",
+      "deadlines": ["2027-03-31", "2027-10-07"],
+      "destination": "Destination Test",
+      "summary": "",
+      "researchers": [],
+      "error": null,
+      "warnings": [],
+      "duration_seconds": 5.4
+    },
+    {
+      "topic_id": "HORIZON-CL9-2026-03-TEST-03",
+      "title": "Failed topic",
+      "cluster": "CL9",
+      "call_id": null,
+      "deadlines": [],
+      "destination": null,
+      "researchers": [
+        {"pair_id": "HORIZON-CL9-2026-03-TEST-03|local-exemple-c", "person_uid": "local-exemple-c", "name": "Carol", "units": [], "score": 0.5, "raw_score": 1, "overall": "weak", "justification": "", "publications": []}
+      ],
+      "error": "EmbeddingServiceError: Embedding service timed out",
+      "warnings": [],
+      "duration_seconds": 0
+    }
+  ],
+  "errors": [{"topic_id": "HORIZON-CL9-2026-03-TEST-03", "error": "EmbeddingServiceError: Embedding service timed out"}]
+}

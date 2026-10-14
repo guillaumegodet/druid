@@ -17,7 +17,9 @@ const { resolveInstance, resolveForHost } = await import('../../functions/_lib/i
 const { parseInstanceConfig, buildRegistry } = createRequire(import.meta.url)('../../scripts/instances/instanceConfig.cjs');
 
 const DOC = 'docA';
-const demoRaw = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
+// The demo of this repository is on PostgreSQL (lot 10 c); the Grist cases keep a copy of it on a public document.
+const demoFile = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
+const demoRaw = { ...demoFile, storage: 'grist', grist: { docId: 'docDemoPublic01', publicRead: true } };
 const demoReg = parseInstanceConfig(demoRaw).config;
 const demo2Reg = parseInstanceConfig({ ...demoRaw, slug: 'demo-2', label: 'Démo 2', domains: ['demo-2.example.org'], grist: { docId: 'docDemo20002', publicRead: true } }).config;
 const privReg = parseInstanceConfig({
@@ -28,7 +30,7 @@ const privReg = parseInstanceConfig({
 }).config;
 const multiReg = buildRegistry([demoReg, demo2Reg], { mode: 'multi' }).registry;
 // The demo on PostgreSQL (lot 10 a): same instance, no document, Hyperdrive binding instead of a key.
-const pgReg = parseInstanceConfig({ ...demoRaw, grist: undefined, storage: 'postgres' }).config;
+const pgReg = parseInstanceConfig(demoFile).config;
 const pgDemo = resolveInstance({}, pgReg);
 const d2 = resolveForHost('demo-2.example.org', { GRIST_API_KEY: 'common' }, multiReg);
 const ecoleShared = resolveInstance({}, privReg, { shared: true });
