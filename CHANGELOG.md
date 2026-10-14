@@ -17,6 +17,10 @@ données à exécuter au déploiement).
   et une liaison Hyperdrive `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` sur un déploiement partagé) remplacent le document Grist
   et sa clé ; les Functions `/api/v1`, rapports, actualités et newsletter lisent la base de l'instance par la même
   fabrique de stockage que le serveur Node (`lib/directory/pg/storage.ts`). Sans liaison, `/api/v1` répond 500.
+- **Seed PostgreSQL des instances de démonstration** (lot 10 b du plan de migration) : `npm run seed:demo -- --instance
+  demo|demo-2 [--apply]` charge les données fictives de `instances/<slug>/demo-data.mjs` dans une base migrée par la
+  même voie que l'import Grist ; `npm run build` le relance à chaque build de production Cloudflare Pages quand le
+  secret de build `DEMO_DATABASE_URL` est présent (jamais sur une prévisualisation).
 
 ### Corrigé
 - **Équipes d'une appartenance** : un libellé d'équipe n'est plus relié à une équipe d'un autre labo. Les codes

@@ -15,6 +15,25 @@ labs LIRA / BIOS / LMD, teams IA-Démo / Net-Démo / Gen-Démo.
 `dashboard-data/` and `demo-*_cache.json` are copied into `public/` on a Cloudflare build
 (`scripts/prepare-cloudflare-assets.cjs`, `DRUID_INSTANCE=demo`).
 
+## PostgreSQL database (lot 10 of the PostgreSQL migration plan)
+
+The demo can run on a PostgreSQL database instead of the Grist doc (`storage: "postgres"` in `instance.json`,
+Hyperdrive binding `HYPERDRIVE` on the Pages project, see `../README.md`). Its rows come from `demo-data.mjs`
+through the same transformation as a Grist document (`lib/migration/demoSeed.ts`, `scripts/seed_demo_pg.ts`):
+
+```bash
+# dry run by default (loaded then rolled back); --apply commits. DATABASE_URL = owner of a migrated database.
+docker run --rm -v "$PWD":/app -w /app -e DATABASE_URL=postgres://druid_owner:…/druid \
+  node:20-slim sh -c 'npm run -s seed:demo -- --instance demo --apply'
+```
+
+**Reloaded at each production deployment**: the last step of `npm run build`, `scripts/seed_demo_on_pages.cjs`,
+runs the migrations (dbmate) then the seed when the build is a Cloudflare Pages production build (`CF_PAGES=1`,
+`CF_PAGES_BRANCH=main`) and the build secret `DEMO_DATABASE_URL` (role `druid_owner`) is set — a preview build never
+touches the database. `DRUID_SEED_DEMO=1` forces it elsewhere (GitHub Actions of a shared deployment, with
+`DRUID_SEED_INSTANCES=demo,demo-2` and `DEMO_DATABASE_URL__DEMO`, `DEMO_DATABASE_URL__DEMO_2`). Edits made through
+the API between two deployments are lost by design (the instance is read-only anyway).
+
 ## Grist doc
 
 `eXbcyqzLmE1tsRo12WjGyY` (« Druid — démo », personal Grist space of the maintainer), created on 2026-09-24.
