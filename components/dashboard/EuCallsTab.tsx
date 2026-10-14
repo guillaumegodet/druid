@@ -8,6 +8,9 @@ import { AlertCircle, Check, ChevronDown, ChevronRight, ExternalLink, RefreshCw,
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { i18n } from '@lingui/core';
 import type { Researcher } from '../../types';
+import type { DashboardPublication } from './types';
+import { normTitle } from '../../lib/normalize';
+import { doiUrl } from '../../lib/doi';
 import { apiErrorText } from '../../lib/apiErrors';
 import {
   matchesByResearcher, topicsWithMatches, uidsOf,
@@ -18,8 +21,26 @@ import type { MatchOverall } from '../../lib/euCalls/trm';
 type View = 'topics' | 'researchers';
 
 const PORTAL = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
+const OPENALEX_SEARCH = 'https://openalex.org/works?filter=default.search:';
+
+/** Link of a publication named by the batch (graph uid, title, year): its DOI when the dashboard knows the publication
+ * by its title, else a search on OpenAlex. The batch does not carry the DOI. */
+type PublicationLinks = Map<string, string>;
+const publicationLinksOf = (pubs: DashboardPublication[] | undefined): PublicationLinks => {
+  const map: PublicationLinks = new Map();
+  for (const p of pubs ?? []) {
+    const key = normTitle(p.title);
+    const url = doiUrl(p.doi);
+    if (key && url && !map.has(key)) map.set(key, url);
+  }
+  return map;
+};
+const linkOf = (links: PublicationLinks, title: string): string =>
+  links.get(normTitle(title)) ?? `${OPENALEX_SEARCH}${encodeURIComponent(title)}`;
 
 const today = () => new Date().toISOString().slice(0, 10);
+/** The French rendering when the interface is French and the text was translated, else the English original. */
+const localized = (en: string, fr?: string): string => (i18n.locale === 'fr' && fr ? fr : en);
 const fmtDate = (d: string) => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? new Date(`${d}T00:00:00`).toLocaleDateString(i18n.locale) : d);
 
 const OVERALL_STYLE: Record<MatchOverall, string> = {
@@ -29,12 +50,19 @@ const OVERALL_STYLE: Record<MatchOverall, string> = {
   none: 'bg-stone-200 text-stone-700 dark:bg-white/10 dark:text-[#c3beb0]',
 };
 
+/** Strength assessed by the model (the badge), and beside it the relative score within the topic as a thin bar: the
+ * best candidate of a topic always scores 1, whatever the model thinks of it, so the number alone misled. */
 const OverallBadge: React.FC<{ overall: MatchOverall; score: number }> = ({ overall, score }) => {
   const { t } = useLingui();
-  const label: Record<MatchOverall, string> = { strong: t`strong`, plausible: t`plausible`, weak: t`weak`, none: t`unrated` };
+  const label: Record<MatchOverall, string> = { strong: t`strong match`, plausible: t`plausible match`, weak: t`weak match`, none: t`unrated` };
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold ${OVERALL_STYLE[overall]}`} title={t`Match strength assessed by the language model, score normalised within the topic`}>
-      {label[overall]} · {Math.round(score * 100)}
+    <span className="inline-flex items-center gap-2">
+      <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold ${OVERALL_STYLE[overall]}`} title={t`Strength of the match as assessed by the language model from the publications`}>
+        {label[overall]}
+      </span>
+      <span className="inline-block w-12 h-1.5 rounded-full bg-ink/10 dark:bg-white/10 overflow-hidden" title={t`Relative score within the topic: the best candidate of the topic is at 100 %, the others in proportion`} aria-label={t`Relative score ${Math.round(score * 100)} %`}>
+        <span className="block h-full bg-ink/50 dark:bg-[#f5f2ea]/60" style={{ width: `${Math.round(score * 100)}%` }} />
+      </span>
     </span>
   );
 };
@@ -76,8 +104,9 @@ const FeedbackButtons: React.FC<{ match: EuMatch; onFeedback: (pairId: string, v
 
 const MatchCard: React.FC<{
   match: EuMatch; researcher?: Researcher | null; onOpenResearcher?: (r: Researcher) => void;
-  onFeedback: (pairId: string, verdict: FeedbackVerdict) => void; busy: boolean; showName?: boolean;
-}> = ({ match, researcher, onOpenResearcher, onFeedback, busy, showName = true }) => {
+  onFeedback: (pairId: string, verdict: FeedbackVerdict) => void; busy: boolean; showName?: boolean; links: PublicationLinks;
+}> = ({ match, researcher, onOpenResearcher, onFeedback, busy, showName = true, links }) => {
+  const { t } = useLingui();
   const [open, setOpen] = useState(false);
   const relevant = match.publications.filter((p) => p.relevant);
   const shown = open ? relevant : relevant.slice(0, 3);
@@ -96,13 +125,22 @@ const MatchCard: React.FC<{
         </div>
         <FeedbackButtons match={match} onFeedback={onFeedback} busy={busy} />
       </div>
-      {match.justification && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{match.justification}</p>}
+      {match.justification && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{localized(match.justification, match.justificationFr)}</p>}
       {relevant.length > 0 && (
         <ul className="text-[12.5px] space-y-1">
           {shown.map((p) => (
             <li key={p.uid} className="flex gap-2">
               <span className="shrink-0 text-muted-lighter dark:text-[#8f897c] tabular-nums">{p.year ?? '—'}</span>
-              <span className="text-ink dark:text-[#f5f2ea]">{p.title}</span>
+              <a
+                href={linkOf(links, p.title)}
+                target="_blank"
+                rel="noreferrer"
+                className="text-ink dark:text-[#f5f2ea] hover:underline inline-flex items-start gap-1"
+                title={links.has(normTitle(p.title)) ? t`Open the publication (DOI)` : t`Search this title on OpenAlex (DOI unknown)`}
+              >
+                <span>{p.title}</span>
+                <ExternalLink className="w-3 h-3 mt-1 shrink-0 opacity-60" />
+              </a>
             </li>
           ))}
           {relevant.length > 3 && (
@@ -120,8 +158,8 @@ const MatchCard: React.FC<{
 
 const TopicRow: React.FC<{
   topic: TopicWithMatches; byUid: Map<string, Researcher>; onOpenResearcher?: (r: Researcher) => void;
-  onFeedback: (pairId: string, verdict: FeedbackVerdict) => void; busy: boolean;
-}> = ({ topic, byUid, onOpenResearcher, onFeedback, busy }) => {
+  onFeedback: (pairId: string, verdict: FeedbackVerdict) => void; busy: boolean; links: PublicationLinks;
+}> = ({ topic, byUid, onOpenResearcher, onFeedback, busy, links }) => {
   const [open, setOpen] = useState(false);
   const { t } = useLingui();
   const strong = topic.matches.filter((m) => m.overall === 'strong').length;
@@ -148,7 +186,7 @@ const TopicRow: React.FC<{
       </button>
       {open && (
         <div className="px-4 pb-4 space-y-3">
-          {topic.summary && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{topic.summary}</p>}
+          {topic.summary && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{localized(topic.summary, topic.summaryFr)}</p>}
           <div className="flex flex-wrap gap-3 text-[12px] text-muted dark:text-[#c3beb0]">
             {topic.callId && <span><Trans>Call</Trans> {topic.callId}</span>}
             {topic.deadlines.length > 0 && <span><Trans>Deadlines</Trans> {topic.deadlines.map(fmtDate).join(', ')}</span>}
@@ -161,7 +199,7 @@ const TopicRow: React.FC<{
           ) : (
             <div className="space-y-2">
               {topic.matches.map((m) => (
-                <MatchCard key={m.pairId} match={m} researcher={byUid.get(m.uid)} onOpenResearcher={onOpenResearcher} onFeedback={onFeedback} busy={busy} />
+                <MatchCard key={m.pairId} match={m} researcher={byUid.get(m.uid)} onOpenResearcher={onOpenResearcher} onFeedback={onFeedback} busy={busy} links={links} />
               ))}
             </div>
           )}
@@ -195,8 +233,10 @@ export const EuCallsTab: React.FC<{
   /** Directory records of the structure shown; null = no directory for this structure (every match of the scope). */
   researchers: Researcher[] | null;
   structureLabel: string;
+  /** Publications of the dashboard: give the publications named by the batch their DOI link (title match). */
+  publications?: DashboardPublication[];
   onOpenResearcher?: (r: Researcher) => void;
-}> = ({ researchers, structureLabel, onOpenResearcher }) => {
+}> = ({ researchers, structureLabel, publications, onOpenResearcher }) => {
   const { t } = useLingui();
   const [view, setView] = useState<View>('topics');
   const [topics, setTopics] = useState<EuTopic[] | null>(null);
@@ -220,6 +260,7 @@ export const EuCallsTab: React.FC<{
   }, []);
 
   const uids = useMemo(() => (researchers ? uidsOf(researchers) : null), [researchers]);
+  const links = useMemo(() => publicationLinksOf(publications), [publications]);
   const byUid = useMemo(() => new Map((researchers ?? []).filter((r) => r.uid).map((r) => [r.uid!, r])), [researchers]);
   const clusters = useMemo(() => [...new Set((topics ?? []).map((tp) => tp.cluster))].sort(), [topics]);
 
@@ -333,7 +374,7 @@ export const EuCallsTab: React.FC<{
           <p className="text-[13px] text-muted-lighter dark:text-[#8f897c]"><Trans>No topic matches these filters.</Trans></p>
         ) : (
           <div className="space-y-2">
-            {topicRows.map((tp) => <TopicRow key={tp.topicId} topic={tp} byUid={byUid} onOpenResearcher={onOpenResearcher} onFeedback={onFeedback} busy={busy} />)}
+            {topicRows.map((tp) => <TopicRow key={tp.topicId} topic={tp} byUid={byUid} onOpenResearcher={onOpenResearcher} onFeedback={onFeedback} busy={busy} links={links} />)}
           </div>
         )
       ) : researcherRows.length === 0 ? (
@@ -360,7 +401,7 @@ export const EuCallsTab: React.FC<{
                         <span className="text-muted dark:text-[#c3beb0]">{m.topic.topicId}</span>
                         {m.topic.deadlines.length > 0 && <span className="text-muted dark:text-[#c3beb0] tabular-nums">{m.topic.deadlines.map(fmtDate).join(', ')}</span>}
                       </div>
-                      <MatchCard match={m} researcher={record} onFeedback={onFeedback} busy={busy} showName={false} />
+                      <MatchCard match={m} researcher={record} onFeedback={onFeedback} busy={busy} showName={false} links={links} />
                     </div>
                   ))}
                 </div>
