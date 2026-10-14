@@ -20,6 +20,8 @@ type View = 'topics' | 'researchers';
 const PORTAL = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
 
 const today = () => new Date().toISOString().slice(0, 10);
+/** The French rendering when the interface is French and the text was translated, else the English original. */
+const localized = (en: string, fr?: string): string => (i18n.locale === 'fr' && fr ? fr : en);
 const fmtDate = (d: string) => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? new Date(`${d}T00:00:00`).toLocaleDateString(i18n.locale) : d);
 
 const OVERALL_STYLE: Record<MatchOverall, string> = {
@@ -103,7 +105,7 @@ const MatchCard: React.FC<{
         </div>
         <FeedbackButtons match={match} onFeedback={onFeedback} busy={busy} />
       </div>
-      {match.justification && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{match.justification}</p>}
+      {match.justification && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{localized(match.justification, match.justificationFr)}</p>}
       {relevant.length > 0 && (
         <ul className="text-[12.5px] space-y-1">
           {shown.map((p) => (
@@ -155,7 +157,7 @@ const TopicRow: React.FC<{
       </button>
       {open && (
         <div className="px-4 pb-4 space-y-3">
-          {topic.summary && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{topic.summary}</p>}
+          {topic.summary && <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">{localized(topic.summary, topic.summaryFr)}</p>}
           <div className="flex flex-wrap gap-3 text-[12px] text-muted dark:text-[#c3beb0]">
             {topic.callId && <span><Trans>Call</Trans> {topic.callId}</span>}
             {topic.deadlines.length > 0 && <span><Trans>Deadlines</Trans> {topic.deadlines.map(fmtDate).join(', ')}</span>}

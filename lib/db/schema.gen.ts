@@ -101,6 +101,7 @@ export interface EuTopic {
   deadlines: Generated<string[]>;
   destination: Generated<string>;
   summary: Generated<string>;
+  summary_fr: Generated<string>;
   title: string;
   topic_id: string;
   updated_at: Generated<Timestamp>;
@@ -117,6 +118,7 @@ export interface EuTopicFeedback {
 
 export interface EuTopicMatch {
   justification: Generated<string>;
+  justification_fr: Generated<string>;
   overall: string;
   pair_id: string;
   person_name: Generated<string>;

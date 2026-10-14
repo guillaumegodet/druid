@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Appels européens en français** : les résumés des topics et les justifications des appariements, écrits en anglais par
+  le batch, sont traduits une fois à l'import par le modèle de l'instance (`import_trm.cjs --translate-only` pour les
+  données déjà importées) et affichés en français quand l'interface est en français (migration
+  `20261015110000_eu_calls_fr.sql`).
+
 ### Corrigé
 - **Appels européens** : les titres des topics viennent désormais du portail Funding & Tenders (titre officiel et échéances),
   à l'import et par `import_trm.cjs --refresh-titles` — l'extraction des PDF coupait des mots (« Ne xt generation ») ;

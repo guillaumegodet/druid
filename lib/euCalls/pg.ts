@@ -124,6 +124,7 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
   const topics = async (): Promise<EuTopic[]> =>
     (await db.selectFrom('eu_topic').selectAll().orderBy('cluster').orderBy('topic_id').execute()).map((t) => ({
       topicId: t.topic_id, cluster: t.cluster, title: t.title, callId: t.call_id, destination: t.destination, deadlines: t.deadlines, summary: t.summary,
+      summaryFr: t.summary_fr,
     }));
 
   const matches = async (query: MatchesQuery): Promise<EuMatch[]> => {
@@ -147,7 +148,7 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
     }
     return rows.map((r) => ({
       pairId: r.pair_id, topicId: r.topic_id, uid: r.uid, personName: r.person_name, units: r.units, score: r.score,
-      overall: r.overall as MatchOverall, justification: r.justification,
+      overall: r.overall as MatchOverall, justification: r.justification, justificationFr: r.justification_fr,
       publications: (Array.isArray(r.publications) ? r.publications : []) as EuMatch['publications'],
       feedback: counts.get(r.pair_id) ?? {}, mine: mine.get(r.pair_id) ?? null,
     }));
@@ -184,6 +185,19 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
     return changed;
   };
 
+  /** English texts without a French translation yet (summaries of the topics, justifications of the matches). */
+  const pendingTranslations = async () => ({
+    topics: (await db.selectFrom('eu_topic').select(['topic_id', 'summary']).where('summary', '<>', '').where('summary_fr', '=', '').execute())
+      .map((r) => ({ topicId: r.topic_id, text: r.summary })),
+    matches: (await db.selectFrom('eu_topic_match').select(['pair_id', 'justification']).where('justification', '<>', '').where('justification_fr', '=', '').execute())
+      .map((r) => ({ pairId: r.pair_id, text: r.justification })),
+  });
+
+  const saveTranslations = async (topics: { topicId: string; fr: string }[], matches: { pairId: string; fr: string }[]): Promise<void> => {
+    for (const t of topics) if (t.fr) await db.updateTable('eu_topic').set({ summary_fr: t.fr }).where('topic_id', '=', t.topicId).execute();
+    for (const m of matches) if (m.fr) await db.updateTable('eu_topic_match').set({ justification_fr: m.fr }).where('pair_id', '=', m.pairId).execute();
+  };
+
   /** Every opinion given, for the evaluation of the batch (CSV export of the administration). */
   const feedbackRows = async () =>
     (await db.selectFrom('eu_topic_feedback as f')
@@ -192,7 +206,7 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
       .orderBy('f.created_at').execute())
       .map((r) => ({ ...r, created_at: iso(r.created_at) }));
 
-  return { importRun, overview, topics, matches, saveFeedback, feedbackRows, topicIds, updateTopicsFromPortal };
+  return { importRun, overview, topics, matches, saveFeedback, feedbackRows, topicIds, updateTopicsFromPortal, pendingTranslations, saveTranslations };
 };
 
 export type EuCallsStore = ReturnType<typeof createEuCallsStore>;
