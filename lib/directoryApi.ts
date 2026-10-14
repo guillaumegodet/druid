@@ -64,9 +64,10 @@ export const DirectoryApi = {
     fetchItems<AxisCorrectionRow>(`axis-corrections/${encodeURIComponent(slug)}`),
   /** Axis reviews of a structure (docs/plan-axes-embeddings.md lot 2); null on an instance without PostgreSQL (404). */
   axisReviews: async (slug: string): Promise<AxisReview[] | null> => {
-    const resp = await fetch(`${DIRECTORY_API_BASE}/axis-reviews/${encodeURIComponent(slug)}`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    const resource = 'axis-reviews';
+    const resp = await fetch(`${DIRECTORY_API_BASE}/${resource}/${encodeURIComponent(slug)}`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
     if (resp.status === 404) return null;
-    if (!resp.ok) throw new Error(t`Directory unavailable (${'axis-reviews'}, HTTP ${resp.status}).`);
+    if (!resp.ok) throw new Error(t`Directory unavailable (${resource}, HTTP ${resp.status}).`);
     const body = await resp.json();
     return Array.isArray(body?.items) ? body.items : [];
   },

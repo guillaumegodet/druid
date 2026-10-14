@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { shareByCategory } from './phase4Aggregates';
 import { Check, Pencil, RefreshCw, Search } from 'lucide-react';
 import { DashboardDataset, DashboardPublication } from './types';
 import { YearRange } from './overviewAggregates';
@@ -302,6 +303,7 @@ export const AxesTab: React.FC<{
   const axes = useMemo(() => dataset.strategicAxes.map((a) => a.name), [dataset.strategicAxes]);
   const hasAxes = axes.length > 0 && dataset.publications.some((p) => p.chosenAxe);
   const corrections = useAxesCorrections(dataset.slug, hasAxes);
+  const [teamMode, setTeamMode] = useState<'count' | 'share'>('count');
   // Axis reviews (PostgreSQL instances, docs/plan-axes-embeddings.md lot 3): the curation of the automatic
   // classification; a review takes precedence over the Grist correction and the ETL.
   const reviews = useAxisReviews(dataset.slug, hasAxes);
@@ -386,6 +388,36 @@ export const AxesTab: React.FC<{
         height={Math.max(320, agg.byType.categories.length * 30 + 90)}
         onSelect={onOpenList ? (axe, type) => onOpenList(type ? { axe, pubType: type } : { axe }) : undefined}
       />
+
+      {/* ── Axes by team: how each team spreads over the axes (and its share of unclassified, theoretical work) ── */}
+      {agg.byTeam.categories.length > 0 && (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-end gap-1 px-1">
+            {([['count', tr`Publications`], ['share', tr`Share (%)`]] as const).map(([k, label]) => (
+              <button
+                key={k}
+                type="button"
+                onClick={() => setTeamMode(k)}
+                className={`px-3 py-1 rounded-full text-[12px] font-semibold border transition-colors ${
+                  teamMode === k
+                    ? 'bg-ink text-white border-ink dark:bg-[#f5f2ea] dark:text-[#1c1a14] dark:border-[#f5f2ea]'
+                    : 'bg-white/60 dark:bg-white/10 border-ink/10 dark:border-white/15 text-muted dark:text-[#c3beb0] hover:text-ink dark:hover:text-[#f5f2ea]'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <StackedBarHChart
+            title={teamMode === 'share' ? tr`Strategic axes by team (share of each team's publications)` : tr`Strategic axes by team`}
+            exportName="axes-equipes"
+            data={teamMode === 'share' ? shareByCategory(agg.byTeam) : agg.byTeam}
+            colors={seriesColors}
+            height={Math.max(260, agg.byTeam.categories.length * 34 + 90)}
+            onSelect={onOpenList ? (team, axe) => onOpenList(team ? { axe, team } : { axe }) : undefined}
+          />
+        </div>
+      )}
 
       {/* ── Keywords per axis ── */}
       <div className="glass-card p-5 flex flex-col gap-2">

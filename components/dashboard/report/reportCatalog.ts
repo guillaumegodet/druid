@@ -80,7 +80,7 @@ export const REPORT_SECTIONS: ReportSection[] = [
   {
     tab: 'themes',
     title: msg`Strategic axes`,
-    ids: ['axes-repartition', 'axes-barres', 'axes-evolution', 'axes-types'],
+    ids: ['axes-repartition', 'axes-barres', 'axes-evolution', 'axes-types', 'axes-equipes'],
   },
   {
     tab: 'charte',

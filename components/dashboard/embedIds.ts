@@ -39,7 +39,7 @@ export const EMBEDDABLE_IDS = new Set<string>([
   'funders-top', 'funders-categories', 'funders-par-labo', 'funders-evolution',
   // Keywords / Axes
   'top-mots-cles', 'top-sous-domaines',
-  'axes-repartition', 'axes-barres', 'axes-evolution', 'axes-types',
+  'axes-repartition', 'axes-barres', 'axes-evolution', 'axes-types', 'axes-equipes',
   // Signature charter
   'charte-conformite', 'charte-scores', 'charte-evolution', 'charte-criteres',
   'charte-equipes',
