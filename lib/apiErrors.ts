@@ -35,6 +35,12 @@ export const API_ERRORS = [
   msg`Not found`,
   msg`Unknown structure`,
   msg`Unknown Druid instance for this host`,
+  // European calls (docs/plan-eu-calls.md)
+  msg`The European calls need the PostgreSQL storage`,
+  msg`Invalid topic id`,
+  msg`Invalid pair id`,
+  msg`Invalid verdict`,
+  msg`Unknown pair`,
   // configuration
   msg`ILAAS_API_KEY not configured (druid service env)`,
   msg`ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)`,

@@ -79,6 +79,53 @@ export interface Establishment {
   updated_at: Generated<Timestamp>;
 }
 
+export interface EuTopic {
+  call_id: Generated<string>;
+  cluster: string;
+  deadlines: Generated<string[]>;
+  destination: Generated<string>;
+  summary: Generated<string>;
+  title: string;
+  topic_id: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface EuTopicFeedback {
+  author: string;
+  comment: Generated<string>;
+  created_at: Generated<Timestamp>;
+  id: Generated<Int8>;
+  pair_id: string;
+  verdict: string;
+}
+
+export interface EuTopicMatch {
+  justification: Generated<string>;
+  overall: string;
+  pair_id: string;
+  person_name: Generated<string>;
+  person_uid: string;
+  publications: Generated<Json>;
+  raw_score: Generated<number>;
+  run_id: string;
+  score: number;
+  topic_id: string;
+  uid: string;
+  units: Generated<string[]>;
+}
+
+export interface EuTopicMatchRun {
+  cluster: string;
+  failed_topics: Generated<number>;
+  imported_at: Generated<Timestamp>;
+  imported_by: Generated<string>;
+  model: Generated<string>;
+  run_id: string;
+  settings: Generated<Json>;
+  started_at: Timestamp;
+  topics: Generated<number>;
+}
+
 export interface GraphAction {
   action_type: string;
   actor: string | null;
@@ -398,6 +445,10 @@ export interface DB {
   audit_log: AuditLog;
   benchmark_peer_group: BenchmarkPeerGroup;
   establishment: Establishment;
+  eu_topic: EuTopic;
+  eu_topic_feedback: EuTopicFeedback;
+  eu_topic_match: EuTopicMatch;
+  eu_topic_match_run: EuTopicMatchRun;
   graph_action: GraphAction;
   graph_identifier_state: GraphIdentifierState;
   identifier_conflict: IdentifierConflict;

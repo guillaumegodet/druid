@@ -16,6 +16,7 @@ import { NetworkTab } from './dashboard/NetworkTab';
 import { JournalsTab } from './dashboard/JournalsTab';
 import { ApcTab } from './dashboard/ApcTab';
 import { FundersTab } from './dashboard/FundersTab';
+import { EuCallsTab } from './dashboard/EuCallsTab';
 import { AxesTab } from './dashboard/AxesTab';
 import { BenchmarkTab } from './dashboard/BenchmarkTab';
 import { CharteTab } from './dashboard/CharteTab';
@@ -103,6 +104,15 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // Tabs hidden per structure (druid_tabs_hidden in config.yaml, read live
   // by the server) — editable from the admin without regenerating the data.
   const [tabsHiddenBySlug, setTabsHiddenBySlug] = useState<Record<string, string[]>>({});
+  // « European calls »: shown once a Topic-to-Researcher Match report is imported (/api/eu-calls/overview; 501 on
+  // an instance without PostgreSQL, 404 on an instance without the server).
+  const [hasEuCalls, setHasEuCalls] = useState(false);
+  useEffect(() => {
+    fetch('/api/eu-calls/overview', { cache: 'no-store' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((o) => setHasEuCalls(Array.isArray(o?.runs) && o.runs.length > 0))
+      .catch(() => setHasEuCalls(false));
+  }, []);
   const [slug, setSlug] = useState<string | null>(struct ?? null);
   const [tab, setTab] = useState<DashboardTab>('overview');
   const [linkCopied, setLinkCopied] = useState(false);
@@ -241,10 +251,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const families = useMemo(() => {
     const keys = visibleTabKeys(
       DASHBOARD_TABS.map(({ key }) => key),
-      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff },
+      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff, hasEuCalls },
     );
     return visibleFamilies(keys);
-  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff]);
+  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff, hasEuCalls]);
   const visibleKeys = useMemo(() => new Set(families.flatMap((f) => f.tabs.map((x) => x.key))), [families]);
   useEffect(() => {
     if (data && !visibleKeys.has(tab)) goTo('overview');
@@ -577,6 +587,13 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               )}
               {tab === 'apc' && <ApcTab dataset={scopedData} range={range} />}
               {tab === 'funders' && <FundersTab dataset={scopedData} range={range} />}
+              {tab === 'eu-calls' && (
+                <EuCallsTab
+                  researchers={staffResearchers}
+                  structureLabel={scopedData.lab}
+                  onOpenResearcher={onOpenResearcher}
+                />
+              )}
               {tab === 'themes' && <AxesTab dataset={scopedData} range={range} onOpenList={openList} />}
               {tab === 'benchmark' && <BenchmarkTab dataset={scopedData} range={range} />}
               {tab === 'charte' && <CharteTab dataset={scopedData} range={range} onOpenList={openList} />}

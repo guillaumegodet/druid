@@ -18,6 +18,18 @@ données à exécuter au déploiement).
   déploiement de production, secret de build `DEMO_DATABASE_URL`). Le document Grist public n'est plus lu.
 
 ### Ajouté
+- **Tableau de bord › Pilotage › Appels européens** : topics du programme de travail Horizon Europe 2026-2027 appariés
+  aux chercheurs de la structure par le batch *Topic-to-Researcher Match* de crisalid-agents, en deux vues (par topic
+  avec échéances, appel et lien vers le portail Funding & Tenders ; par chercheur), avec les avis des utilisateurs
+  (« Pertinent », « Non pertinent », « Déjà en montage ») renvoyés au batch pour son évaluation (`/api/eu-calls/*`,
+  export CSV des avis pour les droits établissement). L'onglet n'apparaît qu'une fois un rapport importé ; PostgreSQL
+  seulement.
+
+### Migration
+- `db/migrations/20261015090000_eu_calls.sql` (tables `eu_topic`, `eu_topic_match_run`, `eu_topic_match`,
+  `eu_topic_feedback`), puis `node scripts/.build/import_trm.cjs --file=<rapport TRM .json>` par cluster.
+
+### Ajouté
 - **Instances Cloudflare sur PostgreSQL** (lot 10 a du plan de migration) : `storage: "postgres"` dans `instance.json`
   et une liaison Hyperdrive `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` sur un déploiement partagé) remplacent le document Grist
   et sa clé ; les Functions `/api/v1`, rapports, actualités et newsletter lisent la base de l'instance par la même
