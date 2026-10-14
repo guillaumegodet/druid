@@ -24,6 +24,7 @@ function serverLiterals(): { file: string; text: string; raw: string; head?: str
   const files = [join(ROOT, 'server.cjs'), join(ROOT, 'scripts/lib/reports_store.cjs'), join(ROOT, 'scripts/lib/reports_ai.cjs')];
   const walk = (dir: string) => {
     for (const name of readdirSync(dir)) {
+      if (name === '_generated') continue;   // written by a build (registry, bundled driver): not Druid messages
       const p = join(dir, name);
       if (statSync(p).isDirectory()) walk(p);
       else if (/\.(js|ts)$/.test(name)) files.push(p);
