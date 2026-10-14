@@ -12,6 +12,9 @@ if (!fs.existsSync(GENERATED)) {
   fs.mkdirSync(new URL('.', GENERATED), { recursive: true });
   fs.writeFileSync(GENERATED, '// Written by lib/__tests__/functionsApiV1.test.ts: no instance.json.\nexport default null;\n');
 }
+// The driver bundle of the Functions (functions/_generated/pg.js, written by a Cloudflare build): built when absent.
+const PG_BUNDLE = new URL('../../functions/_generated/pg.js', import.meta.url);
+if (!fs.existsSync(PG_BUNDLE)) await createRequire(import.meta.url)('../../scripts/functions_pg_bundle.cjs').buildFunctionsPg();
 const { onRequest } = await import('../../functions/api/v1/[[path]].js');
 const { resolveInstance, resolveForHost } = await import('../../functions/_lib/instance.js');
 const { parseInstanceConfig, buildRegistry } = createRequire(import.meta.url)('../../scripts/instances/instanceConfig.cjs');

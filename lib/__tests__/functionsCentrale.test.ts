@@ -2,6 +2,7 @@
 // through the storage of the instance (functions/_lib/storage.js, druid-internal docs/plan-migration-postgresql.md,
 // lot 3 d). Moved from scripts/tests/functions-guards.mjs, which runs in plain Node (no TypeScript import).
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import { describe, it, expect, beforeEach } from 'vitest';
 
 // The Functions import the registry written by a Cloudflare build (ignored by git): created empty when absent.
@@ -10,6 +11,9 @@ if (!fs.existsSync(GENERATED)) {
   fs.mkdirSync(new URL('.', GENERATED), { recursive: true });
   fs.writeFileSync(GENERATED, '// Written by lib/__tests__/functionsCentrale.test.ts: no instance.json.\nexport default null;\n');
 }
+// The driver bundle of the Functions (functions/_generated/pg.js, written by a Cloudflare build): built when absent.
+const PG_BUNDLE = new URL('../../functions/_generated/pg.js', import.meta.url);
+if (!fs.existsSync(PG_BUNDLE)) await createRequire(import.meta.url)('../../scripts/functions_pg_bundle.cjs').buildFunctionsPg();
 const { onRequestGet: news } = await import('../../functions/api/news/[slug].js');
 const { onRequestPost: newsletterGenerate } = await import('../../functions/api/newsletter/generate.js');
 const { onRequestPost: newsletterPost } = await import('../../functions/api/newsletter/post.js');

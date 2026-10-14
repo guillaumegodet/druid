@@ -35,8 +35,10 @@ docs/plan-migration-postgresql.md, lot 10):
   binding of the Pages project named `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` on a shared deployment, like the secrets),
   with the connection string of the `druid_app` role. No `grist` block, no `GRIST_API_KEY`; the `newsletter` feature
   is not available yet (its table still lives in a document, lot 10 d). The Functions open one database client per
-  request (Hyperdrive keeps the pool) and need the `nodejs_compat` flag of the project (default for a compatibility
-  date from 2026-08-04). On target `docker` the server reads `DRUID_STORAGE` instead; the field only documents it.
+  request (Hyperdrive keeps the pool) and need the Node.js compatibility of the project at runtime (`nodejs_compat`,
+  Settings › Runtime, default for a compatibility date from 2026-08-04); the driver is bundled by the build with its
+  Node built-ins as `node:*` (`functions/_generated/pg.js`), since the Pages build system compiles the Functions without
+  that flag. On target `docker` the server reads `DRUID_STORAGE` instead; the field only documents it.
 The private repository also describes the Docker instance of Nantes (not read by `server.cjs`: inventory
 and drift check only).
 

@@ -243,3 +243,7 @@ if (registry) {
   }
 }
 copyInstanceFiles(instance, srcDir, publicDir);
+
+// The driver bundle of the Functions (functions/_lib/storage.js, scripts/functions_pg_bundle.cjs): last, asynchronous.
+require('./functions_pg_bundle.cjs').buildFunctionsPg()
+  .then(() => console.log('[prepare-cloudflare-assets] functions/_generated/pg.js written'), (err) => { console.error(err); process.exit(1); });

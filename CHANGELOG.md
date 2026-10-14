@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Build Cloudflare Pages des instances PostgreSQL** : la compilation des Functions par le build system échouait
+  (« Could not resolve "events" », 24 erreurs) même avec le flag `nodejs_compat` posé sur le projet. Le pilote
+  node-postgres est désormais pré-assemblé par le build (`functions/_generated/pg.js`) avec ses modules Node en
+  `node:*`, acceptés sans flag ; `lib/db/core.ts` porte la création Kysely commune au serveur et aux Functions.
+
 ### Modifié
 - **Démo publique sur PostgreSQL** (lot 10 c) : `instances/demo/instance.json` passe en `storage: "postgres"` ; l'instance
   lit une base Neon par la liaison Hyperdrive `HYPERDRIVE` du projet Pages (rechargée depuis `demo-data.mjs` à chaque
