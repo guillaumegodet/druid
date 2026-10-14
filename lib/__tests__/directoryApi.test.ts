@@ -191,9 +191,50 @@ describe('createDirectoryApi', () => {
     newsletterWorkIds: vi.fn(async () => new Set<string>()),
     addNewsletterItem: vi.fn(async () => null),
     updateAxisCorrection: vi.fn(async () => ({ table: 't' })),
+    axisReviewsSupported: true,
+    axisReviews: vi.fn(async () => []),
+    saveAxisReview: vi.fn(async (_slug: string, input: any, actor: string) => ({ ...input, doi: '', title: '', axes: input.axes ?? [], autoAxis: '', autoConfidence: null, author: actor, note: '', updatedAt: '' })),
+    deleteAxisReview: vi.fn(async (_slug: string, workKey: string) => workKey === 'doi:10.1/known'),
   });
-  const call = (path: string, bindings: any, method = 'GET') =>
-    createDirectoryApi().fetch(new Request(`http://druid.test${path}`, { method }), { publications: stubPublications(), ...bindings });
+  const call = (path: string, bindings: any, method = 'GET', body?: unknown) =>
+    createDirectoryApi().fetch(new Request(`http://druid.test${path}`, {
+      method, ...(body === undefined ? {} : { body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' } }),
+    }), { publications: stubPublications(), ...bindings });
+
+  describe('axis reviews (docs/plan-axes-embeddings.md, lot 2)', () => {
+    const LAB = { all: false, labAnchors: ['imn'] };
+    const bindings = (publications: Partial<PublicationsStore> = {}) =>
+      ({ repository: stubRepository(), commands: {}, scope: LAB, actor: 'user1', publications: { ...stubPublications(), ...publications } });
+
+    it('answers 404 on a storage without reviews', async () => {
+      expect((await call('/api/v1/axis-reviews/imn', bindings({ axisReviewsSupported: false }))).status).toBe(404);
+      expect((await call('/api/v1/axis-reviews/imn', bindings({ axisReviewsSupported: false }), 'PUT', { workKey: 'k', decision: 'confirmed' })).status).toBe(404);
+    });
+
+    it('lists the reviews of a structure for any authenticated user', async () => {
+      const resp = await call('/api/v1/axis-reviews/other-lab', bindings());
+      expect(resp.status).toBe(200);
+      expect(await resp.json()).toEqual({ items: [] });
+    });
+
+    it('writes within the scope only, with a valid body, under the actor', async () => {
+      const b = bindings();
+      const ok = await call('/api/v1/axis-reviews/imn', b, 'PUT', { workKey: 'doi:10.1/x', decision: 'corrected', axes: ['Énergie'], note: 'n' });
+      expect(ok.status).toBe(200);
+      expect((await ok.json()).item).toMatchObject({ workKey: 'doi:10.1/x', decision: 'corrected', axes: ['Énergie'], author: 'user1' });
+      expect(ok.headers.get('X-Druid-Audit')).toContain('axis_review');
+      expect((await call('/api/v1/axis-reviews/other-lab', bindings(), 'PUT', { workKey: 'k', decision: 'confirmed' })).status).toBe(403);
+      expect((await call('/api/v1/axis-reviews/imn', bindings(), 'PUT', { workKey: 'k', decision: 'corrected', axes: [] })).status).toBe(400);
+      expect((await call('/api/v1/axis-reviews/imn', bindings(), 'PUT', { workKey: 'k', decision: 'maybe' })).status).toBe(400);
+    });
+
+    it('deletes a review by its key', async () => {
+      expect((await call('/api/v1/axis-reviews/imn?workKey=doi%3A10.1%2Fknown', bindings(), 'DELETE')).status).toBe(200);
+      expect((await call('/api/v1/axis-reviews/imn?workKey=doi%3A10.1%2Funknown', bindings(), 'DELETE')).status).toBe(404);
+      expect((await call('/api/v1/axis-reviews/imn', bindings(), 'DELETE')).status).toBe(400);
+      expect((await call('/api/v1/axis-reviews/other-lab?workKey=k', bindings(), 'DELETE')).status).toBe(403);
+    });
+  });
 
   it('refuses a request without an authenticated user', async () => {
     const resp = await call('/api/v1/people', { repository: stubRepository(), scope: null });

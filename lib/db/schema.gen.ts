@@ -57,6 +57,22 @@ export interface AuditLog {
   table_name: string;
 }
 
+export interface AxisReview {
+  author: Generated<string>;
+  auto_axis: Generated<string>;
+  auto_confidence: number | null;
+  axes: Generated<string[]>;
+  created_at: Generated<Timestamp>;
+  decision: string;
+  doi: Generated<string>;
+  id: Generated<Int8>;
+  note: Generated<string>;
+  slug: string;
+  title: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  work_key: string;
+}
+
 export interface BenchmarkPeerGroup {
   id: Generated<Int8>;
   legacy_grist_id: number | null;
@@ -396,6 +412,7 @@ export interface TaskEvent {
 export interface DB {
   alignment_candidate: AlignmentCandidate;
   audit_log: AuditLog;
+  axis_review: AxisReview;
   benchmark_peer_group: BenchmarkPeerGroup;
   establishment: Establishment;
   graph_action: GraphAction;

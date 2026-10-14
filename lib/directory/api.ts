@@ -52,6 +52,7 @@ import { z } from 'zod';
 import { normalizeAcronym } from '../normalize';
 import type { DirectoryRepository, DirectoryScope } from './repository';
 import { DocumentNotAllowedError, PublicationsStore } from '../publications/store';
+import { AXIS_REVIEW_DECISIONS, normalizeReviewInput } from '../publications/axisReviews';
 import { AXES_GRIST } from '../publications/axes';
 import type { CommandContext, DirectoryCommands, WriteAudit } from './commands';
 import type { LdapCommands } from './ldapCommands';
@@ -131,6 +132,11 @@ const NewsletterPatchBody = z.object({
   }).strict().refine((f) => Object.keys(f).length > 0),
 });
 const AxisPatchBody = z.object({ axe: z.string().max(500) });
+const AxisReviewBody = z.object({
+  workKey: z.string().min(1).max(600), doi: z.string().max(300).optional(), title: z.string().max(2000).optional(),
+  decision: z.enum(AXIS_REVIEW_DECISIONS), axes: z.array(z.string().max(300)).max(10).optional(),
+  autoAxis: z.string().max(300).optional(), autoConfidence: z.number().min(0).max(1).nullable().optional(), note: z.string().max(2000).optional(),
+});
 const SiteImportPreviewBody = z.object({ document: SiteImportDocumentSchema });
 const SiteImportApplyBody = z.object({ document: SiteImportDocumentSchema, selection: SiteImportSelectionSchema });
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
@@ -191,6 +197,13 @@ export const createDirectoryApi = (): Hono<Env> => {
     const items = await c.env.publications.axisCorrections(slug);
     if (items === null) return c.json({ error: 'Not found' }, 404, NO_STORE);
     return c.json({ items }, 200, NO_STORE);
+  });
+
+  // Axis reviews (druid-internal docs/plan-axes-embeddings.md, lot 2): PostgreSQL instances only (404 elsewhere).
+  // Reads open to every authenticated user, like the corrections; writes within the structure's own right.
+  app.get('/axis-reviews/:slug', async (c) => {
+    if (!c.env.publications.axisReviewsSupported) return c.json({ error: 'Not found' }, 404, NO_STORE);
+    return c.json({ items: await c.env.publications.axisReviews(c.req.param('slug')) }, 200, NO_STORE);
   });
 
   app.get('/people/columns', async (c) => {
@@ -403,6 +416,28 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!scopeAllowsSlug(c.env.scope!, slug)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
     const { table } = await c.env.publications.updateAxisCorrection(slug, rowId, body.axe);
     c.get('audit').push({ table, kind: 'update', rows: [rowId], fields: [AXES_GRIST[slug].field], count: 1 });
+    return c.json({ ok: true }, 200, NO_STORE);
+  });
+  writes.put('/axis-reviews/:slug', async (c) => {
+    const slug = c.req.param('slug');
+    if (!c.env.publications.axisReviewsSupported) return c.json({ error: 'Not found' }, 404, NO_STORE);
+    const body = await bodyOf(c, AxisReviewBody);
+    const input = body && normalizeReviewInput(body);
+    if (!input) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    if (!scopeAllowsSlug(c.env.scope!, slug)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    const review = await c.env.publications.saveAxisReview(slug, input, c.env.actor || 'druid');
+    c.get('audit').push({ table: 'axis_review', kind: 'update', fields: ['decision', 'axes'], count: 1 });
+    return c.json({ item: review }, 200, NO_STORE);
+  });
+  writes.delete('/axis-reviews/:slug', async (c) => {
+    const slug = c.req.param('slug');
+    if (!c.env.publications.axisReviewsSupported) return c.json({ error: 'Not found' }, 404, NO_STORE);
+    const workKey = c.req.query('workKey') || '';
+    if (!workKey) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    if (!scopeAllowsSlug(c.env.scope!, slug)) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    const deleted = await c.env.publications.deleteAxisReview(slug, workKey, c.env.actor || 'druid');
+    if (!deleted) return c.json({ error: 'Not found' }, 404, NO_STORE);
+    c.get('audit').push({ table: 'axis_review', kind: 'delete', count: 1 });
     return c.json({ ok: true }, 200, NO_STORE);
   });
   // Import of a lab website directory (lot 8 d): file exported by druid-biblio's sync-annuaire-grist skill. Institution

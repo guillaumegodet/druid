@@ -14,3 +14,13 @@ export const normalizeAcronym = (s: string): string =>
     .normalize('NFD')
     .replace(/\p{M}/gu, '')
     .replace(/[^a-z0-9]/g, '');
+
+/** Title normalisation for matching publications across sources (lowercase, no accent, letters and digits only):
+ * the rule of the Grist axis corrections, now of the axis reviews (lib/publications/axisReviews.ts). */
+export function normTitle(s: string | null | undefined): string {
+  return (s ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}

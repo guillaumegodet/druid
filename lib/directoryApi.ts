@@ -13,6 +13,7 @@ import type { AbesExportMark, Institution, MergeLogEntry } from './directory/gri
 import type { NewsletterItem } from './publications/newsletter';
 import type { NewsletterEditableField } from './publications/store';
 import type { AxisCorrectionRow } from './publications/axes';
+import type { AxisReview, AxisReviewInput } from './publications/axisReviews';
 import type { SiteImportPlan, SiteImportResult, SiteImportSelection } from './directory/siteImport';
 
 export const DIRECTORY_API_BASE = '/api/v1';
@@ -35,11 +36,11 @@ async function fetchJson<T>(path: string): Promise<T> {
 }
 
 /** Write request (JSON body); an error answer throws its `error` text, translated by apiErrorText. */
-async function send<T>(method: 'POST' | 'PUT' | 'PATCH', path: string, body: unknown): Promise<T> {
+async function send<T>(method: 'POST' | 'PUT' | 'PATCH' | 'DELETE', path: string, body?: unknown): Promise<T> {
   const resp = await fetch(`${DIRECTORY_API_BASE}/${path}`, {
     method,
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify(body),
+    ...(body === undefined ? {} : { body: JSON.stringify(body) }),
   });
   const payload = await resp.json().catch(() => null);
   const resource = path.split(/[/?]/)[0];
@@ -61,6 +62,14 @@ export const DirectoryApi = {
     fetchItems<NewsletterItem>(`newsletter?slug=${encodeURIComponent(slug)}`),
   axisCorrections: (slug: string): Promise<AxisCorrectionRow[]> =>
     fetchItems<AxisCorrectionRow>(`axis-corrections/${encodeURIComponent(slug)}`),
+  /** Axis reviews of a structure (docs/plan-axes-embeddings.md lot 2); null on an instance without PostgreSQL (404). */
+  axisReviews: async (slug: string): Promise<AxisReview[] | null> => {
+    const resp = await fetch(`${DIRECTORY_API_BASE}/axis-reviews/${encodeURIComponent(slug)}`, { headers: { Accept: 'application/json' }, cache: 'no-store' });
+    if (resp.status === 404) return null;
+    if (!resp.ok) throw new Error(t`Directory unavailable (${'axis-reviews'}, HTTP ${resp.status}).`);
+    const body = await resp.json();
+    return Array.isArray(body?.items) ? body.items : [];
+  },
   annuaireColumns: (): Promise<AnnuaireColumnMeta[]> => fetchItems<AnnuaireColumnMeta>('people/columns'),
   /** Labs of the directory rows already carrying this uid (within the user's labs). */
   labsOfUid: (uid: string): Promise<string[]> => fetchItems<string>(`people/uid/${encodeURIComponent(uid)}/labs`),
@@ -110,6 +119,11 @@ export const DirectoryApi = {
     send<{ ok: true }>('PATCH', `newsletter/${id}`, { fields }),
   updateAxisCorrection: (slug: string, rowId: number, axe: string) =>
     send<{ ok: true }>('PATCH', `axis-corrections/${encodeURIComponent(slug)}/${rowId}`, { axe }),
+  /** Records the review of the current user on a publication (one per publication and structure). */
+  saveAxisReview: async (slug: string, input: AxisReviewInput): Promise<AxisReview> =>
+    (await send<{ item: AxisReview }>('PUT', `axis-reviews/${encodeURIComponent(slug)}`, input)).item,
+  deleteAxisReview: (slug: string, workKey: string) =>
+    send<{ ok: true }>('DELETE', `axis-reviews/${encodeURIComponent(slug)}?workKey=${encodeURIComponent(workKey)}`),
   createStructure: async (structure: Structure): Promise<string> => (await send<{ id: string }>('POST', 'structures', structure)).id,
   updateStructure: (recordId: number, structure: Structure): Promise<unknown> => send('PUT', `structures/${recordId}`, structure),
   // Employing institutions (Administration › Institutions): institution right.

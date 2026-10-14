@@ -13,6 +13,15 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Revues des axes stratégiques** (`/api/v1/axis-reviews/:slug`, PostgreSQL seulement) : décision d'un utilisateur sur
+  la classification automatique d'une publication — confirmée, corrigée (un ou plusieurs axes), hors axes, incertaine —
+  une par publication et structure, signée et journalisée ; socle de l'écran de curation de l'onglet Axes stratégiques
+  (druid-internal `docs/plan-axes-embeddings.md`, lot 2). Les corrections Grist de Centrale restent lues comme avant.
+
+### Migration
+- `db/migrations/20261015100000_axis_review.sql` (table `axis_review`).
+
+### Ajouté
 - **Instances Cloudflare sur PostgreSQL** (lot 10 a du plan de migration) : `storage: "postgres"` dans `instance.json`
   et une liaison Hyperdrive `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` sur un déploiement partagé) remplacent le document Grist
   et sa clé ; les Functions `/api/v1`, rapports, actualités et newsletter lisent la base de l'instance par la même
