@@ -44,6 +44,6 @@ describe('parseTrmReport', () => {
 
   it('keeps a uid of another scheme as is', () => {
     expect(directoryUidOf('local-dupont-j')).toBe('dupont-j');
-    expect(directoryUidOf('orcid-0000-0001-2345-6789')).toBe('orcid-0000-0001-2345-6789');
+    expect(directoryUidOf('orcid-0000-0001-2345-6780')).toBe('orcid-0000-0001-2345-6780');
   });
 });
