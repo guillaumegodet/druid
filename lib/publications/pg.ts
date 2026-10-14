@@ -3,6 +3,7 @@
 // in the Grist document of the structure (Centrale) until lot 10: delegated to the Grist store.
 import { sql, type Kysely, type Selectable, type Transaction } from 'kysely';
 import { withActor, type DB } from '../db/client';
+import { ApiError } from '../directory/errors';
 import type { NewsletterItem as NewsletterItemRow } from '../db/schema.gen';
 import { mapNewsletterRecords, type NewsletterNewItem } from './newsletter';
 import type { PublicationsStore } from './store';
@@ -33,8 +34,8 @@ const recordOf = (r: Selectable<NewsletterItemRow>) => ({
 
 export interface PgPublicationsStoreOptions {
   db: Queryable;
-  /** Grist store of the instance: axis corrections. */
-  grist: PublicationsStore;
+  /** Grist store of the instance: axis corrections. Absent (Cloudflare, lot 10 a): no structure has axes. */
+  grist?: PublicationsStore;
 }
 
 export const createPgPublicationsStore = ({ db, grist }: PgPublicationsStoreOptions): PublicationsStore => ({
@@ -43,7 +44,7 @@ export const createPgPublicationsStore = ({ db, grist }: PgPublicationsStoreOpti
     const rows = await db.selectFrom('newsletter_item').selectAll().where('slug', '=', slug).orderBy('id').execute();
     return mapNewsletterRecords(rows.map(recordOf) as Parameters<typeof mapNewsletterRecords>[0]);
   },
-  axisCorrections: (slug) => grist.axisCorrections(slug),
+  axisCorrections: (slug) => (grist ? grist.axisCorrections(slug) : Promise.resolve(null)),
   async newsletterSlugOf(id) {
     const row = await db.selectFrom('newsletter_item').select('slug').where('id', '=', String(id)).executeTakeFirst();
     return row ? row.slug : null;
@@ -64,5 +65,8 @@ export const createPgPublicationsStore = ({ db, grist }: PgPublicationsStoreOpti
       .returning('id').executeTakeFirst());
     return row ? Number(row.id) : null;
   },
-  updateAxisCorrection: (slug, rowId, axe) => grist.updateAxisCorrection(slug, rowId, axe),
+  updateAxisCorrection: (slug, rowId, axe) => {
+    if (!grist) throw new ApiError(404, `No axis corrections for structure: ${slug}`);
+    return grist.updateAxisCorrection(slug, rowId, axe);
+  },
 });

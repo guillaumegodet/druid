@@ -32,14 +32,14 @@ const r2Blobs = (bucket, prefix) => ({
 
 export async function onRequest(context) {
   const { request, env, params } = context;
-  const { instance, apiKey, store: storage } = storageOf(context);
+  const { instance, store: storage, missing, release } = storageOf(context);
   if (instance.readOnly) return json(403, { error: 'Read-only instance: reports are kept in the browser' });
 
   const email = request.headers.get('Cf-Access-Authenticated-User-Email');
   const anonymousAllowed = !instance.shared && env.ALLOW_ANONYMOUS_WRITES === 'true';
   if (!email && !anonymousAllowed) return json(401, { error: 'Unauthorized' });
 
-  if (!apiKey) return json(500, { error: 'GRIST_API_KEY not configured on Cloudflare' });
+  if (missing) return json(500, { error: missing });
 
   let body;
   if (!['GET', 'HEAD'].includes(request.method)) {
@@ -56,8 +56,10 @@ export async function onRequest(context) {
       }
     }
   }
+  // Tables of the reports: the Grist document, or the migrated tables of the database (lib/directory/pg/tableClient.ts).
+  const tablesKey = storage.kind === 'postgres' ? `postgres:${instance.slug}` : `${instance.grist.apiBase}/${instance.grist.docId}`;
   const store = reportsStore.createReportsStore(
-    reportsStore.storageClient(storage.grist, `${instance.grist.apiBase}/${instance.grist.docId}`),
+    reportsStore.storageClient(storage.tables, tablesKey),
     { blobs: env.REPORT_PDFS ? r2Blobs(env.REPORT_PDFS, instance.slug) : null },
   );
   const user = {
@@ -65,7 +67,12 @@ export async function onRequest(context) {
     isSuperAdmin: !!email && instance.admins.includes(email.toLowerCase()),
   };
   const segments = Array.isArray(params.path) ? params.path : [params.path].filter(Boolean);
-  const out = await reportsStore.routeReports(store, user, { method: request.method, segments, body });
+  let out;
+  try {
+    out = await reportsStore.routeReports(store, user, { method: request.method, segments, body });
+  } finally {
+    await release();
+  }
   if (out.binary) {
     return new Response(out.binary, {
       status: out.status,

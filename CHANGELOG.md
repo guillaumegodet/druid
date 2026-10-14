@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Instances Cloudflare sur PostgreSQL** (lot 10 a du plan de migration) : `storage: "postgres"` dans `instance.json`
+  et une liaison Hyperdrive `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` sur un déploiement partagé) remplacent le document Grist
+  et sa clé ; les Functions `/api/v1`, rapports, actualités et newsletter lisent la base de l'instance par la même
+  fabrique de stockage que le serveur Node (`lib/directory/pg/storage.ts`). Sans liaison, `/api/v1` répond 500.
+
 ### Corrigé
 - **Équipes d'une appartenance** : un libellé d'équipe n'est plus relié à une équipe d'un autre labo. Les codes
   génériques des annuaires de labos (E1, E2…) existent dans plusieurs labos, et le seul labo qui les déclarait comme

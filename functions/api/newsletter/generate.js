@@ -184,7 +184,7 @@ export async function onRequestPost(context) {
   const chars = Math.min(1000, Math.max(300, parseInt(body.chars, 10) || 300))
 
   // Storage client of the instance (functions/_lib/storage.js).
-  const { grist } = storageOf(context).store
+  const { tables: grist } = storageOf(context).store
 
   try {
     // 1. Briefs already in the table (any status) → a work_id is never regenerated.

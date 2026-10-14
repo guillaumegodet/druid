@@ -49,7 +49,27 @@ const docker = () => ({
   secrets: ['GRIST_API_KEY', 'LDAP_BIND_PASSWORD'],
 });
 
+// PostgreSQL instance (druid-internal docs/plan-migration-postgresql.md, lot 10 a): no Grist block at all.
+const postgresDemo = () => ({ ...publicDemo(), grist: undefined, storage: 'postgres' });
+
 // ── valid configurations ─────────────────────────────────────────────────────
+{
+  const r = parseInstanceConfig(postgresDemo(), { folder: 'demo' });
+  check('PostgreSQL demo is valid', r.ok, true);
+  check('PostgreSQL demo: storage, no grist block', [r.config.storage, r.config.grist], ['postgres', null]);
+  check('PostgreSQL demo passes the public rules', publicRepoErrors(postgresDemo()), []);
+  check('PostgreSQL demo: no Vite variable', viteEnvFromConfig(r.config), {});
+  check('PostgreSQL demo: Pages variables of a document are compared to empty', compareEnvWithConfig(r.config, { VITE_GRIST_DOC_ID: 'x', GRIST_API_BASE: '' }).map((c) => [c.name, c.status]), [['VITE_GRIST_DOC_ID', 'differs']]);
+  check('default storage is grist', parseInstanceConfig(publicDemo()).config.storage, 'grist');
+}
+check('storage grist needs the grist block', rejects({ ...publicDemo(), grist: undefined }, 'storage "grist" needs the grist block'), true);
+check('storage postgres excludes the grist block', rejects({ ...publicDemo(), storage: 'postgres' }, 'excludes the grist block'), true);
+check('storage postgres has no Grist key', rejects({ ...postgresDemo(), secrets: ['GRIST_API_KEY'] }, 'does not use the GRIST_API_KEY secret'), true);
+check('storage postgres: newsletter still needs a document', rejects({ ...privateCloudflare(), grist: undefined, storage: 'postgres', secrets: ['ILAAS_API_KEY'], features: { news: true, newsletter: true } }, 'features.newsletter still reads'), true);
+check('storage postgres: private writable instance is valid', parseInstanceConfig({ ...privateCloudflare(), grist: undefined, storage: 'postgres', secrets: ['ILAAS_API_KEY'], features: { news: true, newsletter: false } }).ok, true);
+check('unknown storage is rejected', rejects({ ...publicDemo(), storage: 'sqlite' }, 'storage'), true);
+check('public repository: a Grist instance still needs a public doc', publicRepoErrors({ ...publicDemo(), grist: { docId: 'AAAAAAAAAAAAAAAAAAAAAA' } }).length, 1);
+
 {
   const r = parseInstanceConfig(publicDemo(), { folder: 'demo' });
   check('public demo is valid', r.ok, true);

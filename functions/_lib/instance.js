@@ -8,7 +8,8 @@
 //    instance (pages.dev, branch previews, custom domain); Pages variables still override the
 //    registry field by field when present and non-empty (transition of lot 5):
 //      DRUID_INSTANCE, INSTANCE_LABEL, READ_ONLY, SHOW_STATUS_VALIDATION, ADMIN_EMAILS,
-//      OPENALEX_MAILTO, GRIST_DOC_ID / VITE_GRIST_DOC_ID, GRIST_API_BASE, VITE_GRIST_PUBLIC_BASE_URL;
+//      OPENALEX_MAILTO, GRIST_DOC_ID / VITE_GRIST_DOC_ID, GRIST_API_BASE, VITE_GRIST_PUBLIC_BASE_URL,
+//      DRUID_STORAGE (grist | postgres, druid-internal docs/plan-migration-postgresql.md, lot 10);
 //  - mode "multi" (one deployment for several instances, DRUID_DEPLOYMENT or DRUID_INSTANCES): the instance is the one
 //    declaring the request host in its `domains`; an unknown host gets no instance (404). No
 //    variable overrides an instance, and secrets are only read per instance (see secretOf).
@@ -21,6 +22,10 @@ export const DEFAULT_SLUG = 'centrale';
 export const DEFAULT_GRIST_API_BASE = 'https://grist.numerique.gouv.fr/api';
 // Secrets an instance can hold. In "multi" mode they are named <NAME>__<SLUG> (see secretOf).
 export const INSTANCE_SECRETS = ['GRIST_API_KEY', 'ILAAS_API_KEY', 'OPENALEX_API_KEY'];
+// Hyperdrive binding of an instance on PostgreSQL (storage "postgres"): HYPERDRIVE, or HYPERDRIVE__<SLUG> on a shared
+// deployment — resolved like a secret (secretOf), never borrowed from another instance.
+export const HYPERDRIVE_BINDING = 'HYPERDRIVE';
+export const STORAGE_KINDS = ['grist', 'postgres'];
 
 const isSet = (v) => v !== undefined && v !== null && String(v).trim() !== '';
 const isTrue = (v) => String(v || '').trim().toLowerCase() === 'true';
@@ -39,6 +44,8 @@ export const resolveInstance = (env = {}, reg = null, { shared = false } = {}) =
   const e = shared ? {} : env;
   const slug = (isSet(e.DRUID_INSTANCE) ? String(e.DRUID_INSTANCE).trim() : reg?.slug) || DEFAULT_SLUG;
   const envBool = (name, fallback) => (isSet(e[name]) ? isTrue(e[name]) : fallback);
+  const storageRaw = String(isSet(e.DRUID_STORAGE) ? e.DRUID_STORAGE : (reg?.storage || 'grist')).trim().toLowerCase();
+  const storage = STORAGE_KINDS.includes(storageRaw) ? storageRaw : 'grist';
   const docId = [e.GRIST_DOC_ID, e.VITE_GRIST_DOC_ID, reg?.grist?.docId].find(isSet) || '';
   const apiBase = String([e.GRIST_API_BASE, reg?.grist?.apiBase].find(isSet) || DEFAULT_GRIST_API_BASE).trim().replace(/\/$/, '');
   // Public doc read directly by the browser (read-only instance): its API base, else null (proxy).
@@ -50,6 +57,8 @@ export const resolveInstance = (env = {}, reg = null, { shared = false } = {}) =
     label: String([e.INSTANCE_LABEL, reg?.label].find(isSet) || 'Centrale Nantes'),
     readOnly: envBool('READ_ONLY', !!reg?.readOnly),
     statusValidation: envBool('SHOW_STATUS_VALIDATION', !!reg?.capabilities?.HAS_STATUS_VALIDATION),
+    storage,
+    // Document of a Grist instance; on PostgreSQL the ids stay empty (no « open in Grist » link, no key).
     grist: { docId: String(docId).trim(), apiBase, publicBaseUrl },
     // Without registry, news and newsletter keep their historical rule: Centrale only.
     features: {
@@ -123,4 +132,5 @@ export const publicInstanceInfo = (instance) => ({
   gristDocId: instance.grist.docId,
   gristPublicBaseUrl: instance.grist.publicBaseUrl,
   gristUiUrl: instance.grist.apiBase.replace(/\/api$/, ''),
+  storage: instance.storage,
 });

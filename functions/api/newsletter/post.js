@@ -163,7 +163,7 @@ export async function onRequestPost(context) {
       if (r.ok) abstract = abstractOf(await r.json())
     }
     // Authors' LinkedIn accounts (Annuaire profile record) → @vanity mentions.
-    const mentions = await resolveAuthorMentions(env, storageOf(context).store.grist, body.authorNames)
+    const mentions = await resolveAuthorMentions(env, storageOf(context).store.tables, body.authorNames)
     const post = await generateSocialPost(env, {
       title: String(body.title || ''),
       abstract,

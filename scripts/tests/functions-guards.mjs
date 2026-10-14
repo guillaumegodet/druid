@@ -49,7 +49,7 @@ check('anonymous, default instance label', w.name, 'Centrale Nantes');
 // Instance settings: registry absent = Pages variables and historical defaults
 const pick = (i) => ({ slug: i.slug, label: i.label, readOnly: i.readOnly });
 check('no registry: defaults', resolveInstance({}), {
-  slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false,
+  slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false, storage: 'grist',
   grist: { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null },
   features: { news: true, newsletter: true }, admins: [], openalexMailto: null, fromRegistry: false, shared: false,
 });
@@ -94,13 +94,22 @@ check('registry + VITE_GRIST_PUBLIC_BASE_URL: public base overridden',
 // Instance block of /api/me (front runtime settings, lot 6 a): nothing private, same for anonymous
 check('publicInstanceInfo demo', publicInstanceInfo(demo), {
   slug: 'demo', label: demoReg.label, gristDocId: demoReg.grist.docId,
-  gristPublicBaseUrl: 'https://grist.numerique.gouv.fr/api', gristUiUrl: 'https://grist.numerique.gouv.fr',
+  gristPublicBaseUrl: 'https://grist.numerique.gouv.fr/api', gristUiUrl: 'https://grist.numerique.gouv.fr', storage: 'grist',
 });
 check('publicInstanceInfo private instance: proxy, UI of its Grist', publicInstanceInfo(ecole),
-  { slug: 'ecole', label: 'École fictive', gristDocId: 'docEcole0001', gristPublicBaseUrl: null, gristUiUrl: 'https://grist.example.org' });
+  { slug: 'ecole', label: 'École fictive', gristDocId: 'docEcole0001', gristPublicBaseUrl: null, gristUiUrl: 'https://grist.example.org', storage: 'grist' });
 check('buildUser carries the instance block (user and anonymous)',
   [buildUser('a@example.org', [], undefined, ecole).instance?.gristDocId, buildUser(null, [], undefined, ecole).instance?.gristDocId, Object.keys(buildUser(null, []).instance)],
-  ['docEcole0001', 'docEcole0001', ['slug', 'label', 'gristDocId', 'gristPublicBaseUrl', 'gristUiUrl']]);
+  ['docEcole0001', 'docEcole0001', ['slug', 'label', 'gristDocId', 'gristPublicBaseUrl', 'gristUiUrl', 'storage']]);
+
+// Storage of the instance (druid-internal docs/plan-migration-postgresql.md, lot 10 a): registry, DRUID_STORAGE override
+const pgReg = parseInstanceConfig({ ...demoRaw, grist: undefined, storage: 'postgres' }).config;
+const pgDemo = resolveInstance({}, pgReg);
+check('registry: PostgreSQL instance has no document', [pgDemo.storage, pgDemo.grist, publicInstanceInfo(pgDemo).gristDocId, publicInstanceInfo(pgDemo).storage],
+  ['postgres', { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null }, '', 'postgres']);
+check('no registry: DRUID_STORAGE variable, unknown value ignored',
+  [resolveInstance({}).storage, resolveInstance({ DRUID_STORAGE: 'postgres' }).storage, resolveInstance({ DRUID_STORAGE: 'sqlite' }).storage], ['grist', 'postgres', 'grist']);
+check('shared: DRUID_STORAGE overrides nothing', resolveInstance({ DRUID_STORAGE: 'postgres' }, demoReg, { shared: true }).storage, 'grist');
 check('registry + variables: READ_ONLY=false overrides readOnly true', resolveInstance({ READ_ONLY: 'false' }, demoReg).readOnly, false);
 const blank = resolveInstance({ INSTANCE_LABEL: '', READ_ONLY: ' ', ADMIN_EMAILS: '', VITE_GRIST_DOC_ID: '' }, privReg);
 check('registry + empty variables: registry kept', [blank.label, blank.readOnly, blank.admins, blank.grist.docId], ['École fictive', false, ['admin@example.org'], 'docEcole0001']);

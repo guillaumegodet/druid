@@ -18,11 +18,25 @@ time with the `INSTANCES_REPO_TOKEN` secret when `instances/<slug>/` is absent h
 
 Every instance folder holds an `instance.json` describing the instance (docs/plan-architecture-multi-instances.md,
 lot 5): display name, target (`cloudflare` | `docker`), domains, access (`public` | `cloudflare-access` |
-`keycloak`), read-only flag, Grist doc, settable capabilities, `news`/`newsletter` features, admins,
-OpenAlex contact, the **names** of the secrets it needs — never a secret value — and, optionally, the shared
-deployment that serves it (`deployment`, see below). Schema and rules:
+`keycloak`), read-only flag, storage (`grist` with the Grist doc, or `postgres`, see below), settable
+capabilities, `news`/`newsletter` features, admins, OpenAlex contact, the **names** of the secrets it needs — never
+a secret value — and, optionally, the shared deployment that serves it (`deployment`, see below). Schema and rules:
 `scripts/instances/instanceConfig.cjs`. The public repository only accepts read-only instances with
-public access, a public doc and no admins (also enforced by `scripts/publication/check_public_tree.mjs`).
+public access, no admins and public data (a public doc, or a PostgreSQL database of fictitious rows) — also
+enforced by `scripts/publication/check_public_tree.mjs`.
+
+### Storage: Grist document or PostgreSQL database
+
+`storage` (default `grist`) says where the directory of the instance lives (druid-internal
+docs/plan-migration-postgresql.md, lot 10):
+- `grist`: the document of the `grist` block (`docId`, `apiBase`, `publicRead`), read with the `GRIST_API_KEY` secret
+  unless the doc is public;
+- `postgres`: a PostgreSQL database (schema `db/migrations`, roles `db/roles.sql`) reached through a **Hyperdrive**
+  binding of the Pages project named `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` on a shared deployment, like the secrets),
+  with the connection string of the `druid_app` role. No `grist` block, no `GRIST_API_KEY`; the `newsletter` feature
+  is not available yet (its table still lives in a document, lot 10 d). The Functions open one database client per
+  request (Hyperdrive keeps the pool) and need the `nodejs_compat` flag of the project (default for a compatibility
+  date from 2026-08-04). On target `docker` the server reads `DRUID_STORAGE` instead; the field only documents it.
 The private repository also describes the Docker instance of Nantes (not read by `server.cjs`: inventory
 and drift check only).
 
