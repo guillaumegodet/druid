@@ -12,6 +12,20 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **Appels à projets (ex-« Appels européens »)** : l'onglet du tableau de bord devient générique pour accueillir tous les
+  guichets de financement (druid-internal `docs/plan-funding-calls.md`, lot 1) — modèle financeur → programme → appel →
+  appariement (tables `funder`, `funding_programme`, `funding_call`, `call_match_run`, `call_match`, `call_feedback` à la
+  place des `eu_*`), filtres par financeur, programme et sous-ensemble (cluster, axe, panel), routes `/api/calls/*`,
+  clé d'onglet `calls` (les liens `?tab=eu-calls` sont redirigés). Le script d'import s'appelle désormais
+  `scripts/.build/import_calls.cjs` (`npm run build:calls`) : `--perimeter=` remplace `--scope=` (toujours accepté),
+  `--subset=` remplace `--cluster=`, `--programme=` (défaut `horizon-europe`).
+
+### Migration
+- `20261015150000_funding_calls.sql` : crée les tables génériques, y reporte les topics, runs, appariements et avis
+  Horizon Europe déjà importés, puis supprime les tables `eu_*` (retour arrière possible : la migration `down` les
+  reconstitue depuis le programme `horizon-europe`).
+
 ## [2.6.0] — 2026-10-15
 
 ### Ajouté

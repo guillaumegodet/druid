@@ -12,8 +12,8 @@ export interface TabVisibilityInput {
   /** Druid directory records matched to the structure (« Directory » view, decision D3 of
    *  docs/archive/plan-tableau-de-bord-familles.md). Missing = the caller has no directory at all. */
   hasStaff?: boolean;
-  /** A Topic-to-Researcher Match report was imported (« European calls », docs/plan-eu-calls.md). */
-  hasEuCalls?: boolean;
+  /** Calls for proposals were imported with their matches (« Calls for proposals », docs/plan-funding-calls.md). */
+  hasCalls?: boolean;
 }
 
 /**
@@ -28,5 +28,5 @@ export function visibleTabKeys<T extends string>(tabs: readonly T[], input: TabV
       && (key !== 'themes' || input.hasAxes)
       && (key !== 'benchmark' || input.hasBenchmark)
       && (key !== 'staff' || input.hasStaff === true)
-      && (key !== 'eu-calls' || input.hasEuCalls === true)));
+      && (key !== 'calls' || input.hasCalls === true)));
 }

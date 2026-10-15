@@ -24,7 +24,7 @@ export type DashboardTab =
   | 'list'
   | 'news'
   | 'sources'
-  | 'eu-calls';
+  | 'calls';
 
 export type DashboardFamily =
   | 'overview'
@@ -106,7 +106,7 @@ export const DASHBOARD_FAMILIES: DashboardFamilyDef[] = [
     tabs: [
       { key: 'themes', label: msg`Strategic axes`, hint: msg`Publications matched to the strategic axes of the structure.` },
       { key: 'funders', label: msg`Funding`, hint: msg`Funders and projects cited in the publications.` },
-      { key: 'eu-calls', label: msg`European calls`, hint: msg`Horizon Europe topics and the researchers whose publications relate to them.` },
+      { key: 'calls', label: msg`Calls for proposals`, hint: msg`Calls of the funding programmes (Horizon Europe, ANR…) and the researchers whose publications relate to them.` },
       { key: 'apc', label: msg`APC monitoring`, hint: msg`Article processing charges paid and publisher agreements.` },
       { key: 'charte', label: msg`Signature charter`, hint: msg`Compliance of the affiliations with the signature charter.` },
     ],

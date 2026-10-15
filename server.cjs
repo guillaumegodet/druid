@@ -2237,24 +2237,25 @@ app.post('/api/mentions/:id/review', (req, res) => {
   });
 });
 
-// ── « European calls » tab (druid-internal docs/plan-eu-calls.md, lot 2) ──────────────
-// Horizon Europe work programme topics matched to the researchers by the Topic-to-Researcher Match batch of
-// crisalid-agents, imported by scripts/import_trm.ts (PostgreSQL only, storage().euCalls). Reads are open to any
+// ── « Calls for proposals » tab (druid-internal docs/plan-funding-calls.md, lot 1) ──────────────
+// Calls of the funding programmes (Horizon Europe topics first) matched to the researchers by the engines of
+// crisalid-agents, imported by scripts/import_calls.ts (PostgreSQL only, storage().calls). Reads are open to any
 // logged-in user within their scope: a lab scope only sees the matches of the directory records of its labs (the
-// topics themselves are public data). The feedback goes back to the batch for its evaluation (CSV, establishment).
-const EU_FEEDBACK_VERDICTS = ['relevant', 'not_relevant', 'already_applying'];
-const withEuCalls = (handler) => async (req, res) => {
-  const store = storage().euCalls;
-  if (!store) return res.status(501).json({ error: 'The European calls need the PostgreSQL storage' });
+// calls themselves are public data). The feedback goes back to the engines for their evaluation (CSV, establishment).
+const CALL_FEEDBACK_VERDICTS = ['relevant', 'not_relevant', 'already_applying'];
+const CALL_ID = /^[A-Za-z0-9._-]{1,120}$/;
+const withCalls = (handler) => async (req, res) => {
+  const store = storage().calls;
+  if (!store) return res.status(501).json({ error: 'The calls for proposals need the PostgreSQL storage' });
   try {
     await handler(req, res, store);
   } catch (e) {
-    console.error('[eu-calls]', e.message);
+    console.error('[calls]', e.message);
     res.status(500).json({ error: e.message });
   }
 };
 /** Directory uids the session may see: undefined = every match (institution scope), [] = none. */
-const euCallsUidsOf = async (req) => {
+const callsUidsOf = async (req) => {
   const access = req.session?.user?.access;
   if (!access) return [];
   if (access.allSlugs) return undefined;
@@ -2262,35 +2263,36 @@ const euCallsUidsOf = async (req) => {
   const { items } = await storage().repository.people({ all: false, labAnchors: access.labAnchors });
   return items.map((r) => r.uid).filter(Boolean);
 };
-app.get('/api/eu-calls/overview', withEuCalls(async (req, res, store) => res.json(await store.overview())));
-app.get('/api/eu-calls/topics', withEuCalls(async (req, res, store) => res.json({ items: await store.topics(), scopes: await store.scopes() })));
-app.get('/api/eu-calls/matches', withEuCalls(async (req, res, store) => {
-  const topicId = typeof req.query.topic === 'string' ? req.query.topic : undefined;
-  if (topicId && !/^[A-Za-z0-9-]{1,80}$/.test(topicId)) return res.status(400).json({ error: 'Invalid topic id' });
-  const uids = await euCallsUidsOf(req);
-  res.json({ items: await store.matches({ uids, topicId, viewer: req.session.user.preferred_username }) });
+app.get('/api/calls/overview', withCalls(async (req, res, store) => res.json(await store.overview())));
+app.get('/api/calls/programmes', withCalls(async (req, res, store) => res.json({ items: await store.programmes() })));
+app.get('/api/calls/calls', withCalls(async (req, res, store) => res.json({ items: await store.calls(), perimeters: await store.perimeters() })));
+app.get('/api/calls/matches', withCalls(async (req, res, store) => {
+  const callId = typeof req.query.call === 'string' ? req.query.call : undefined;
+  if (callId && !CALL_ID.test(callId)) return res.status(400).json({ error: 'Invalid call id' });
+  const uids = await callsUidsOf(req);
+  res.json({ items: await store.matches({ uids, callId, viewer: req.session.user.preferred_username }) });
 }));
-app.post('/api/eu-calls/feedback', withEuCalls(async (req, res, store) => {
+app.post('/api/calls/feedback', withCalls(async (req, res, store) => {
   const { pairId, verdict } = req.body || {};
   const comment = typeof req.body?.comment === 'string' ? req.body.comment.slice(0, 2000) : '';
-  if (typeof pairId !== 'string' || !/^[A-Za-z0-9-]{1,80}\|[^|]{1,200}$/.test(pairId)) return res.status(400).json({ error: 'Invalid pair id' });
-  if (!EU_FEEDBACK_VERDICTS.includes(verdict)) return res.status(400).json({ error: 'Invalid verdict' });
+  if (typeof pairId !== 'string' || !/^[A-Za-z0-9._-]{1,120}\|[^|]{1,200}$/.test(pairId)) return res.status(400).json({ error: 'Invalid pair id' });
+  if (!CALL_FEEDBACK_VERDICTS.includes(verdict)) return res.status(400).json({ error: 'Invalid verdict' });
   // The pair must be visible to its author (same rule as the reads).
-  const uids = await euCallsUidsOf(req);
+  const uids = await callsUidsOf(req);
   const uid = pairId.split('|')[1].replace(/^local-/, '');
   if (uids && !uids.includes(uid)) return res.status(403).json({ error: 'Forbidden' });
   const saved = await store.saveFeedback({ pairId, author: req.session.user.preferred_username, verdict, comment });
   if (!saved) return res.status(404).json({ error: 'Unknown pair' });
   res.json({ ok: true });
 }));
-app.get('/api/eu-calls/feedback.csv', requireEstablishmentScope, withEuCalls(async (req, res, store) => {
+app.get('/api/calls/feedback.csv', requireEstablishmentScope, withCalls(async (req, res, store) => {
   const rows = await store.feedbackRows();
   const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-  const head = ['pair_id', 'topic_id', 'person_uid', 'overall', 'score', 'verdict', 'comment', 'author', 'created_at'];
+  const head = ['pair_id', 'programme_id', 'engine', 'call_id', 'person_uid', 'overall', 'score', 'verdict', 'comment', 'author', 'created_at'];
   const lines = [head.join(';'), ...rows.map((r) => head.map((k) => cell(r[k])).join(';'))];
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="eu-calls-feedback.csv"');
-  res.send(`﻿${lines.join('\r\n')}\r\n`);
+  res.setHeader('Content-Disposition', 'attachment; filename="calls-feedback.csv"');
+  res.send(`\ufeff${lines.join('\r\n')}\r\n`);
 }));
 
 // ── Administration of the media monitoring sources (Sources page of the

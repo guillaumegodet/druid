@@ -35,9 +35,9 @@ export const API_ERRORS = [
   msg`Not found`,
   msg`Unknown structure`,
   msg`Unknown Druid instance for this host`,
-  // European calls (docs/plan-eu-calls.md)
-  msg`The European calls need the PostgreSQL storage`,
-  msg`Invalid topic id`,
+  // Calls for proposals (docs/plan-funding-calls.md)
+  msg`The calls for proposals need the PostgreSQL storage`,
+  msg`Invalid call id`,
   msg`Invalid pair id`,
   msg`Invalid verdict`,
   msg`Unknown pair`,

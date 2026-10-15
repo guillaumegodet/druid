@@ -24,7 +24,7 @@ import type { StorageKind } from '../lib/directory/jobStorage';
 import { graphActionsOverview, recordPeopleCsvExport } from '../lib/graph/pg';
 import { prepareGraphForPeopleCsv, type GraphActionsMode } from '../lib/graph/publisher';
 import { connectGraphBus } from '../lib/graph/bus';
-import { createEuCallsStore } from '../lib/euCalls/pg';
+import { createCallsStore } from '../lib/calls/pg';
 import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
@@ -195,9 +195,9 @@ export const createServerStorage = (options: ApiV1Options) => {
       graphOverview: options.graphActions && options.graphActions !== 'off'
         ? () => graphActionsOverview(db, options.graphAcceptedTypes) : null,
       graphMode: options.graphActions || 'off',
-      /** « European calls » tab: Horizon Europe topics matched to the researchers (druid-internal
-       * docs/plan-eu-calls.md, lot 2), PostgreSQL only. */
-      euCalls: createEuCallsStore(db),
+      /** « Calls for proposals » tab: calls of the funding programmes matched to the researchers (druid-internal
+       * docs/plan-funding-calls.md, lot 1), PostgreSQL only. */
+      calls: createCallsStore(db),
     };
   }
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
@@ -210,7 +210,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     graph: null,
     graphOverview: null,
     graphMode: 'off' as GraphActionsMode,
-    euCalls: null,
+    calls: null,
   };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;
