@@ -38,6 +38,9 @@ export const API_ERRORS = [
   // Calls for proposals (docs/plan-funding-calls.md)
   msg`The calls for proposals need the PostgreSQL storage`,
   msg`Invalid call id`,
+  msg`Invalid programme id`,
+  msg`Invalid programme state`,
+  msg`Unknown programme`,
   msg`Invalid pair id`,
   msg`Invalid verdict`,
   msg`Unknown pair`,

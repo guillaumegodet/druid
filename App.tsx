@@ -310,7 +310,7 @@ function App() {
     const tab = params.get('tab');
     const legacyAdminTab: AdminTab | null =
       tab === 'console' || tab === 'streamlit' ? 'console' : tab === 'rights' ? 'rights' : null;
-    if (page === ViewState.ADMIN && (tab === 'console' || tab === 'rights' || tab === 'media')) {
+    if (page === ViewState.ADMIN && (tab === 'console' || tab === 'rights' || tab === 'media' || tab === 'institutions' || tab === 'calls')) {
       setAdminTab(tab);
       setAdminStruct(params.get('struct'));
     } else if (page === ViewState.DASHBOARD && legacyAdminTab) {

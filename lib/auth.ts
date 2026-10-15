@@ -60,6 +60,9 @@ export interface DruidCapabilities {
   /** « À traiter › Tâches » tab, « Report a correction » button
    * (docs/plan-chantiers-taches.md): /api/tasks routes of server.cjs — false on Cloudflare. */
   HAS_TASKS: boolean;
+  /** « Calls for proposals » tab and its administration (docs/plan-funding-calls.md): PostgreSQL storage of
+   * server.cjs — false on Grist storage and on Cloudflare. */
+  HAS_CALLS: boolean;
   /** Public read-only instance (demo on Cloudflare, docs/plan-instance-demo-cloudflare.md):
    * the Grist proxy refuses every write and the UI hides editing. Unlike the HAS_* flags it
    * removes features; false everywhere except where READ_ONLY=true is configured. */
@@ -95,6 +98,7 @@ const EMPTY_CAPABILITIES: DruidCapabilities = {
   HAS_QUALINKA: false,
   HAS_STATUS_VALIDATION: false,
   HAS_TASKS: false,
+  HAS_CALLS: false,
   READ_ONLY: false,
 };
 
@@ -185,7 +189,7 @@ export const isMediaAdmin = (): boolean => _userInfo?.access.isMediaAdmin ?? fal
 export const canAdminMediaSources = (): boolean => isSuperAdmin() || isMediaAdmin();
 
 /** Tabs of the Administration section available to the user (display order). */
-export type AdminTab = 'console' | 'rights' | 'media' | 'institutions';
+export type AdminTab = 'console' | 'rights' | 'media' | 'institutions' | 'calls';
 export const adminTabsFor = (): AdminTab[] => {
   const tabs: AdminTab[] = [];
   // console/rights assume a server (ETL relay, Keycloak admin API): absent on
@@ -195,6 +199,7 @@ export const adminTabsFor = (): AdminTab[] => {
   if (isSuperAdmin() && hasCapability('HAS_KEYCLOAK_ADMIN')) tabs.push('rights');
   if (canAdminMediaSources()) tabs.push('media');           // media monitoring sources
   if (canUseEstablishmentTools() && canWrite()) tabs.push('institutions');   // employing institutions (dropdown of the record form)
+  if (canUseEstablishmentTools() && hasCapability('HAS_CALLS')) tabs.push('calls');   // programmes of the calls for proposals and their collections
   return tabs;
 };
 /** The « Administration » entry of the bar is visible as soon as one tab is available. */

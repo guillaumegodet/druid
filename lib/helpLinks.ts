@@ -72,6 +72,7 @@ export const ADMIN_TAB_HELP: Record<AdminTab, string> = {
   rights: '/guides/administration/donner-des-droits/',
   media: '/guides/veille/sources-medias/',
   institutions: '/guides/administration/etablissements/',
+  calls: '/guides/tableau-de-bord/appels-europeens/',
 };
 
 /**

@@ -12,6 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Collecte des appels du portail Funding & Tenders** (druid-internal `docs/plan-funding-calls.md`, lot 2) :
+  `scripts/.build/collect_calls.cjs --source=ft-portal` lit en flux le fichier de référence public du portail (tous les
+  topics, 130 Mo) et le texte de chaque topic nouveau ou modifié (objectifs, périmètre, budget, dates), pour les
+  programmes actifs : Horizon Europe (clusters), ERC, MSCA, EIC, missions, infrastructures, Widening ; Euratom, Digital
+  Europe, LIFE, FED, EU4Health, CEF, Erasmus+, Europe créative, CERV, écosystèmes d'innovation et entreprises communes
+  déclarés mais inactifs. Migration `20261016090000_call_collections.sql` (journal `call_collection`,
+  `funding_programme.last_collected_at`). **Administration › Appels à projets** (droit établissement, capacité
+  `HAS_CALLS`) : programmes par financeur, activation, nombre d'appels et d'appariements, dernière collecte, journal
+  des collectes. Le job nocturne est à déclarer dans ofelia (voir le plan).
+
 ### Modifié
 - **Appels à projets (ex-« Appels européens »)** : l'onglet du tableau de bord devient générique pour accueillir tous les
   guichets de financement (druid-internal `docs/plan-funding-calls.md`, lot 1) — modèle financeur → programme → appel →

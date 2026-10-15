@@ -120,6 +120,9 @@ const CAPABILITIES = {
   // « À traiter › Tâches » (docs/plan-chantiers-taches.md): /api/tasks routes of this server,
   // backed by Grist with the server key — absent on Cloudflare Functions (functions/api/me.js).
   HAS_TASKS: !!GRIST_API_KEY,
+  // « Calls for proposals » (docs/plan-funding-calls.md): PostgreSQL tables of the calls, their matches and the
+  // collectors — absent on Grist storage and on Cloudflare Functions.
+  HAS_CALLS: STORAGE_KIND === 'postgres',
   // Public read-only instance: Cloudflare only (functions/api/me.js, READ_ONLY=true) — the write
   // routes of this server are not guarded by it.
   READ_ONLY: false,
@@ -2293,6 +2296,21 @@ app.get('/api/calls/feedback.csv', requireEstablishmentScope, withCalls(async (r
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="calls-feedback.csv"');
   res.send(`\ufeff${lines.join('\r\n')}\r\n`);
+}));
+
+// Administration › Calls for proposals (docs/plan-funding-calls.md, lot 2): programmes of the collectors (activate /
+// deactivate) and the log of the collections. Institution right, like the other administration tabs; the programmes
+// declared in the code are aligned with the table on each read, so that a new release shows its new programmes.
+app.get('/api/calls/admin/programmes', requireEstablishmentScope, withCalls(async (req, res, store) => {
+  await store.syncProgrammes();
+  res.json({ items: await store.programmesAdmin(), collections: await store.collections(20) });
+}));
+app.post('/api/calls/admin/programmes/:id', requireEstablishmentScope, withCalls(async (req, res, store) => {
+  const id = String(req.params.id || '');
+  if (!/^[a-z0-9-]{1,60}$/.test(id)) return res.status(400).json({ error: 'Invalid programme id' });
+  if (typeof req.body?.active !== 'boolean') return res.status(400).json({ error: 'Invalid programme state' });
+  if (!(await store.setProgrammeActive(id, req.body.active))) return res.status(404).json({ error: 'Unknown programme' });
+  res.json({ ok: true });
 }));
 
 // ── Administration of the media monitoring sources (Sources page of the
