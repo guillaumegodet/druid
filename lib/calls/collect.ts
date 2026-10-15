@@ -16,7 +16,8 @@ export interface StoredCallSummary {
   deadlines: string[];
   openingDate: string | null;
   status: CallStatus;
-  /** The text of the call is stored (a call whose portal page had none is read again until it has one). */
+  /** The text of the call is stored, objectives or scope (a call whose portal page had none is read again until it has
+   * one; ERC and EIC topics only have a scope). */
   hasText: boolean;
 }
 

@@ -23,7 +23,7 @@ class MemoryStore implements CollectorStore {
     for (const s of stored) this.calls.set(s.callId, { ...collectedCallOf({ identifier: s.callId, title: s.title, callIdentifier: '', callTitle: '', framework: 'HORIZON', divisions: [], status: s.status, deadlines: s.deadlines, openingDate: s.openingDate, keywords: [], typesOfAction: [] }, { programmeId: s.programmeId, subset: '', scheme: '' }, null), objectives: 'stored text' });
   }
   async storedCalls(programmeIds: string[]) {
-    return [...this.calls.values()].filter((c) => programmeIds.includes(c.programmeId)).map((c) => ({ callId: c.callId, programmeId: c.programmeId, title: c.title, deadlines: c.deadlines, openingDate: c.openingDate, status: c.status, hasText: c.objectives !== '' }));
+    return [...this.calls.values()].filter((c) => programmeIds.includes(c.programmeId)).map((c) => ({ callId: c.callId, programmeId: c.programmeId, title: c.title, deadlines: c.deadlines, openingDate: c.openingDate, status: c.status, hasText: c.objectives !== '' || c.scope !== '' }));
   }
   async upsertCall(call: CollectedCall) {
     const existed = this.calls.has(call.callId);
@@ -95,10 +95,17 @@ describe('collectFromPortal', () => {
 
   it('reads again a stored call that has no text yet', async () => {
     const store = new MemoryStore([{ callId: 'HORIZON-CL4-2026-01-A', programmeId: 'horizon-europe', title: 'Title HORIZON-CL4-2026-01-A', deadlines: ['2026-11-26'], openingDate: '2026-08-25', status: 'open' }]);
-    store.calls.set('HORIZON-CL4-2026-01-A', { ...store.calls.get('HORIZON-CL4-2026-01-A')!, objectives: '' });
+    store.calls.set('HORIZON-CL4-2026-01-A', { ...store.calls.get('HORIZON-CL4-2026-01-A')!, objectives: '', scope: '' });
     const stats = await collectFromPortal({ programmes, today: '2026-10-15', store, listing: chunks(listing([topic('HORIZON-CL4-2026-01-A')])), fetchDetails: async (id) => details(id) });
     expect(stats).toMatchObject({ updated: 1, detailsFetched: 1, unchanged: 0 });
     expect(store.calls.get('HORIZON-CL4-2026-01-A')?.objectives).toBe('Outcome of HORIZON-CL4-2026-01-A');
+  });
+
+  it('counts a call with a scope only (ERC, EIC) as having its text', async () => {
+    const store = new MemoryStore([{ callId: 'ERC-2027-COG', programmeId: 'erc', title: 'Title ERC-2027-COG', deadlines: ['2026-11-26'], openingDate: '2026-08-25', status: 'open' }]);
+    store.calls.set('ERC-2027-COG', { ...store.calls.get('ERC-2027-COG')!, objectives: '', scope: 'Consolidator grants support…' });
+    const stats = await collectFromPortal({ programmes, today: '2026-10-15', store, listing: chunks(listing([topic('ERC-2027-COG')])), fetchDetails: async (id) => details(id) });
+    expect(stats).toMatchObject({ unchanged: 1, detailsFetched: 0 });
   });
 
   it('counts an error of a topic without stopping the run', async () => {
