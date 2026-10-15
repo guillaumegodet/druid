@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.6.0] — 2026-10-15
+
 ### Ajouté
 - **Appels européens : périmètre du calcul** : l'import d'un rapport TRM enregistre le périmètre sur lequel le batch a
   tourné (`import_trm.cjs --scope=<libellé>`, les structures dont les publications portent des vecteurs) ; l'onglet
@@ -21,35 +23,12 @@ données à exécuter au déploiement).
   le batch, sont traduits une fois à l'import par le modèle de l'instance (`import_trm.cjs --translate-only` pour les
   données déjà importées) et affichés en français quand l'interface est en français (migration
   `20261015110000_eu_calls_fr.sql`).
-
-### Corrigé
-- **Build Cloudflare Pages des instances PostgreSQL** : la compilation des Functions par le build system échouait
-  (« Could not resolve "events" », 24 erreurs) même avec le flag `nodejs_compat` posé sur le projet. Le pilote
-  node-postgres est désormais pré-assemblé par `npm run build` (`functions/_generated/pg.js`) avec ses modules Node en
-  `node:*`, acceptés sans flag ; `lib/db/core.ts` porte la création Kysely commune au serveur et aux Functions.
-- **Appels européens** : les titres des topics viennent désormais du portail Funding & Tenders (titre officiel et échéances),
-  à l'import et par `import_trm.cjs --refresh-titles` — l'extraction des PDF coupait des mots (« Ne xt generation ») ;
-  l'indice d'un appariement montre la force évaluée par le modèle (forte / plausible / faible) et, à part, le score relatif
-  au sein du topic sous forme de barre : le meilleur candidat d'un topic valait toujours « 100 », même jugé faible.
-
-### Modifié
-- **Démo publique sur PostgreSQL** (lot 10 c) : `instances/demo/instance.json` passe en `storage: "postgres"` ; l'instance
-  lit une base Neon par la liaison Hyperdrive `HYPERDRIVE` du projet Pages (rechargée depuis `demo-data.mjs` à chaque
-  déploiement de production, secret de build `DEMO_DATABASE_URL`). Le document Grist public n'est plus lu.
-
-### Ajouté
 - **Tableau de bord › Pilotage › Appels européens** : topics du programme de travail Horizon Europe 2026-2027 appariés
   aux chercheurs de la structure par le batch *Topic-to-Researcher Match* de crisalid-agents, en deux vues (par topic
   avec échéances, appel et lien vers le portail Funding & Tenders ; par chercheur), avec les avis des utilisateurs
   (« Pertinent », « Non pertinent », « Déjà en montage ») renvoyés au batch pour son évaluation (`/api/eu-calls/*`,
   export CSV des avis pour les droits établissement). L'onglet n'apparaît qu'une fois un rapport importé ; PostgreSQL
   seulement.
-
-### Migration
-- `db/migrations/20261015090000_eu_calls.sql` (tables `eu_topic`, `eu_topic_match_run`, `eu_topic_match`,
-  `eu_topic_feedback`), puis `node scripts/.build/import_trm.cjs --file=<rapport TRM .json>` par cluster.
-
-### Ajouté
 - **Tableau de bord › Pilotage › Axes stratégiques : curation** (instances PostgreSQL) : chaque publication de la période
   avec son axe automatique, sa confiance, ses axes secondaires et la motivation du classement (druid-biblio, axes par
   embeddings + modèle), et les décisions des relecteurs — Confirmer, Corriger (un ou plusieurs axes, note), Hors axes,
@@ -60,11 +39,6 @@ données à exécuter au déploiement).
   la classification automatique d'une publication — confirmée, corrigée (un ou plusieurs axes), hors axes, incertaine —
   une par publication et structure, signée et journalisée ; socle de l'écran de curation de l'onglet Axes stratégiques
   (druid-internal `docs/plan-axes-embeddings.md`, lot 2). Les corrections Grist de Centrale restent lues comme avant.
-
-### Migration
-- `db/migrations/20261015100000_axis_review.sql` (table `axis_review`).
-
-### Ajouté
 - **Instances Cloudflare sur PostgreSQL** (lot 10 a du plan de migration) : `storage: "postgres"` dans `instance.json`
   et une liaison Hyperdrive `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` sur un déploiement partagé) remplacent le document Grist
   et sa clé ; les Functions `/api/v1`, rapports, actualités et newsletter lisent la base de l'instance par la même
@@ -74,13 +48,29 @@ données à exécuter au déploiement).
   même voie que l'import Grist ; `npm run build` le relance à chaque build de production Cloudflare Pages quand le
   secret de build `DEMO_DATABASE_URL` est présent (jamais sur une prévisualisation).
 
+### Modifié
+- **Démo publique sur PostgreSQL** (lot 10 c) : `instances/demo/instance.json` passe en `storage: "postgres"` ; l'instance
+  lit une base Neon par la liaison Hyperdrive `HYPERDRIVE` du projet Pages (rechargée depuis `demo-data.mjs` à chaque
+  déploiement de production, secret de build `DEMO_DATABASE_URL`). Le document Grist public n'est plus lu.
+
 ### Corrigé
+- **Build Cloudflare Pages des instances PostgreSQL** : la compilation des Functions par le build system échouait
+  (« Could not resolve "events" », 24 erreurs) même avec le flag `nodejs_compat` posé sur le projet. Le pilote
+  node-postgres est désormais pré-assemblé par `npm run build` (`functions/_generated/pg.js`) avec ses modules Node en
+  `node:*`, acceptés sans flag ; `lib/db/core.ts` porte la création Kysely commune au serveur et aux Functions.
+- **Appels européens** : les titres des topics viennent désormais du portail Funding & Tenders (titre officiel et échéances),
+  à l'import et par `import_trm.cjs --refresh-titles` — l'extraction des PDF coupait des mots (« Ne xt generation ») ;
+  l'indice d'un appariement montre la force évaluée par le modèle (forte / plausible / faible) et, à part, le score relatif
+  au sein du topic sous forme de barre : le meilleur candidat d'un topic valait toujours « 100 », même jugé faible.
 - **Équipes d'une appartenance** : un libellé d'équipe n'est plus relié à une équipe d'un autre labo. Les codes
   génériques des annuaires de labos (E1, E2…) existent dans plusieurs labos, et le seul labo qui les déclarait comme
   structures recevait les membres des autres (à Nantes : 628 liens faux vers les équipes du CRCI2NA, dans 12 labos).
   Une équipe n'est reliée que sous le labo de l'appartenance ; sans labo résolu, seulement si l'acronyme est unique.
 
 ### Migration
+- `db/migrations/20261015090000_eu_calls.sql` (tables `eu_topic`, `eu_topic_match_run`, `eu_topic_match`,
+  `eu_topic_feedback`), puis `node scripts/.build/import_trm.cjs --file=<rapport TRM .json>` par cluster.
+- `db/migrations/20261015100000_axis_review.sql` (table `axis_review`).
 - `20261014120000_team_links_under_lab` (appliquée par `druid-migrate`) : supprime les liens d'équipe dont l'équipe
   n'est pas sous le labo de l'appartenance ; les libellés `team_labels` sont conservés et seront reliés à la création
   des équipes du labo (fait pour l'IMN le 2026-10-14).
