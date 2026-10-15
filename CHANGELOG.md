@@ -13,6 +13,10 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Appels européens : périmètre du calcul** : l'import d'un rapport TRM enregistre le périmètre sur lequel le batch a
+  tourné (`import_trm.cjs --scope=<libellé>`, les structures dont les publications portent des vecteurs) ; l'onglet
+  l'affiche et avertit quand la structure consultée est hors de ce périmètre (ses chercheurs n'y apparaissent qu'en
+  cosignataires). Page du centre d'aide « Appels européens » (lecture d'un indice, avis, limites).
 - **Appels européens en français** : les résumés des topics et les justifications des appariements, écrits en anglais par
   le batch, sont traduits une fois à l'import par le modèle de l'instance (`import_trm.cjs --translate-only` pour les
   données déjà importées) et affichés en français quand l'interface est en français (migration

@@ -8,7 +8,9 @@
  * graph, the uids are matched to the directory by the tab, not here.
  *
  * Usage (env DRUID_STORAGE=postgres, DRUID_DATABASE_URL):
- *   node scripts/.build/import_trm.cjs --file=<report.json> [--file=<other report.json>…] [--by=<who>] [--merge] [--no-portal]
+ *   node scripts/.build/import_trm.cjs --file=<report.json> [--file=<other report.json>…] [--by=<who>] [--merge] [--no-portal] [--scope=<label>]
+ * `--scope`: the perimeter the batch was run on (the structures whose publications carry vectors, e.g. « IMN »), shown
+ * by the tab so that nobody reads the matches of another structure as a coverage of that structure.
  *   node scripts/.build/import_trm.cjs --refresh-titles [--cluster=CL4]
  *   node scripts/.build/import_trm.cjs --translate-only
  * `--merge`: the report completes the run already imported for its cluster (topics replayed after a failure of the
@@ -33,6 +35,7 @@ const args = process.argv.slice(2);
 const FILES = args.filter((a) => a.startsWith('--file=')).map((a) => a.slice('--file='.length));
 const BY = args.find((a) => a.startsWith('--by='))?.slice('--by='.length) || 'import_trm';
 const MERGE = args.includes('--merge');
+const SCOPE = args.find((a) => a.startsWith('--scope='))?.slice('--scope='.length) || '';
 const PORTAL = !args.includes('--no-portal');
 const REFRESH = args.includes('--refresh-titles');
 const TRANSLATE = !args.includes('--no-translate');
@@ -71,6 +74,7 @@ async function main() {
   }
   for (const file of FILES) {
     const run = parseTrmReport(readFileSync(file, 'utf8'));
+    if (SCOPE) run.settings = { ...run.settings, scope: SCOPE };
     const report = await store.importRun(run, BY, { merge: MERGE });
     const covered = new Set(run.matches.map((m) => m.topicId)).size;
     console.log(`${file}: run ${report.runId} (${report.cluster}, model ${run.model || '?'}) — ${report.topics} topics `

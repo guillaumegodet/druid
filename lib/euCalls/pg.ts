@@ -13,6 +13,8 @@ export const FEEDBACK_VERDICTS: readonly FeedbackVerdict[] = ['relevant', 'not_r
 export interface EuCallsRunSummary {
   runId: string;
   cluster: string;
+  /** Perimeter of the batch (structures whose publications carried vectors), '' when not recorded. */
+  scope: string;
   startedAt: string;
   model: string;
   topics: number;
@@ -106,15 +108,16 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
   const overview = async (): Promise<EuCallsOverview> => {
     const runs = await db.selectFrom('eu_topic_match_run as r')
       .leftJoin('eu_topic_match as m', 'm.run_id', 'r.run_id')
-      .select(['r.run_id', 'r.cluster', 'r.started_at', 'r.model', 'r.topics', 'r.failed_topics', 'r.imported_at'])
+      .select(['r.run_id', 'r.cluster', 'r.started_at', 'r.model', 'r.topics', 'r.failed_topics', 'r.imported_at', 'r.settings'])
       .select((eb) => eb.fn.count<string>('m.pair_id').as('matches'))
-      .groupBy(['r.run_id', 'r.cluster', 'r.started_at', 'r.model', 'r.topics', 'r.failed_topics', 'r.imported_at'])
+      .groupBy(['r.run_id', 'r.cluster', 'r.started_at', 'r.model', 'r.topics', 'r.failed_topics', 'r.imported_at', 'r.settings'])
       .orderBy('r.cluster').execute();
     const topics = await db.selectFrom('eu_topic').select((eb) => eb.fn.countAll<string>().as('n')).executeTakeFirstOrThrow();
     return {
       runs: runs.map((r) => ({
         runId: r.run_id, cluster: r.cluster, startedAt: iso(r.started_at), model: r.model, topics: r.topics, failedTopics: r.failed_topics,
         matches: Number(r.matches), importedAt: iso(r.imported_at),
+        scope: String((r.settings as { scope?: unknown } | null)?.scope ?? ''),
       })),
       topics: Number(topics.n),
       matches: runs.reduce((n, r) => n + Number(r.matches), 0),
@@ -126,6 +129,11 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
       topicId: t.topic_id, cluster: t.cluster, title: t.title, callId: t.call_id, destination: t.destination, deadlines: t.deadlines, summary: t.summary,
       summaryFr: t.summary_fr,
     }));
+
+  /** Perimeters of the imported runs (distinct, in cluster order), for the banner of the tab. */
+  const scopes = async (): Promise<string[]> =>
+    [...new Set((await db.selectFrom('eu_topic_match_run').select('settings').orderBy('cluster').execute())
+      .map((r) => String((r.settings as { scope?: unknown } | null)?.scope ?? '')).filter(Boolean))];
 
   const matches = async (query: MatchesQuery): Promise<EuMatch[]> => {
     if (query.uids && query.uids.length === 0) return [];
@@ -206,7 +214,7 @@ export const createEuCallsStore = (db: Kysely<DB>) => {
       .orderBy('f.created_at').execute())
       .map((r) => ({ ...r, created_at: iso(r.created_at) }));
 
-  return { importRun, overview, topics, matches, saveFeedback, feedbackRows, topicIds, updateTopicsFromPortal, pendingTranslations, saveTranslations };
+  return { importRun, overview, topics, matches, saveFeedback, feedbackRows, topicIds, updateTopicsFromPortal, pendingTranslations, saveTranslations, scopes };
 };
 
 export type EuCallsStore = ReturnType<typeof createEuCallsStore>;

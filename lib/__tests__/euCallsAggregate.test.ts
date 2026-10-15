@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { matchesByResearcher, nextDeadlineOf, topicsWithMatches, uidsOf, type EuMatch, type EuTopic } from '../euCalls/aggregate';
+import { inScope, matchesByResearcher, nextDeadlineOf, topicsWithMatches, uidsOf, type EuMatch, type EuTopic } from '../euCalls/aggregate';
 
 const topic = (topicId: string, deadlines: string[], title = topicId): EuTopic =>
   ({ topicId, cluster: 'CL9', title, callId: '', destination: '', deadlines, summary: '' });
@@ -50,5 +50,21 @@ describe('matchesByResearcher', () => {
 describe('uidsOf', () => {
   it('ignores records without uid', () => {
     expect([...uidsOf([{ uid: 'a' }, {}, { uid: '' }, { uid: 'b' }])]).toEqual(['a', 'b']);
+  });
+});
+
+describe('inScope', () => {
+  it('is true without a recorded perimeter', () => {
+    expect(inScope([], { slug: 'xyz', label: 'Any lab' })).toBe(true);
+  });
+  it('matches the slug or acronym regardless of case and accents', () => {
+    expect(inScope(['IMN'], { slug: 'imn', label: 'Institut des matériaux Jean Rouxel' })).toBe(true);
+    expect(inScope(['CRCI2NA'], { slug: 'crci²na', label: 'Centre de recherche' })).toBe(true);
+  });
+  it('matches a scope contained in the label', () => {
+    expect(inScope(['Nantes Université'], { slug: 'nu', label: 'Nantes Université — tout périmètre' })).toBe(true);
+  });
+  it('is false for another structure', () => {
+    expect(inScope(['IMN'], { slug: 'lppl', label: 'Laboratoire de psychologie' })).toBe(false);
   });
 });

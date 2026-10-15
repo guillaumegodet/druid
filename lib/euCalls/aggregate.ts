@@ -1,6 +1,7 @@
 // Client-side grouping of the matches of the « European calls » tab (druid-internal docs/plan-eu-calls.md,
 // lot 3): by topic for the « Topics » view, by researcher for the « Researchers » view. Pure, shared with the tests.
 import type { MatchOverall } from './trm';
+import { normalizeAcronym } from '../normalize';
 
 export type FeedbackVerdict = 'relevant' | 'not_relevant' | 'already_applying';
 
@@ -96,3 +97,11 @@ export function matchesByResearcher(topics: EuTopic[], matches: EuMatch[], uids?
 /** Directory uids of the researchers shown (records without uid are outside the graph, hence never matched). */
 export const uidsOf = (researchers: { uid?: string }[]): Set<string> =>
   new Set(researchers.map((r) => r.uid).filter((u): u is string => !!u));
+
+/**
+ * Whether the structure shown belongs to the perimeter the batch was run on (the `scope` recorded at import, e.g.
+ * « IMN »): a scope equal to its slug or acronym, or contained in its label. No recorded scope = no perimeter known.
+ */
+export const inScope = (scopes: string[], structure: { slug: string; label: string }): boolean =>
+  scopes.length === 0 || scopes.some((s) =>
+    normalizeAcronym(s) === normalizeAcronym(structure.slug) || structure.label.toLowerCase().includes(s.toLowerCase()));

@@ -15,6 +15,7 @@ import { apiErrorText } from '../../lib/apiErrors';
 import {
   matchesByResearcher, topicsWithMatches, uidsOf,
   type EuMatch, type EuTopic, type FeedbackVerdict, type TopicWithMatches,
+  inScope,
 } from '../../lib/euCalls/aggregate';
 import type { MatchOverall } from '../../lib/euCalls/trm';
 
@@ -233,13 +234,16 @@ export const EuCallsTab: React.FC<{
   /** Directory records of the structure shown; null = no directory for this structure (every match of the scope). */
   researchers: Researcher[] | null;
   structureLabel: string;
+  /** druid-biblio slug of the structure shown (acronym), matched against the perimeter of the batch. */
+  slug: string;
   /** Publications of the dashboard: give the publications named by the batch their DOI link (title match). */
   publications?: DashboardPublication[];
   onOpenResearcher?: (r: Researcher) => void;
-}> = ({ researchers, structureLabel, publications, onOpenResearcher }) => {
+}> = ({ researchers, structureLabel, slug, publications, onOpenResearcher }) => {
   const { t } = useLingui();
   const [view, setView] = useState<View>('topics');
   const [topics, setTopics] = useState<EuTopic[] | null>(null);
+  const [scopes, setScopes] = useState<string[]>([]);
   const [matches, setMatches] = useState<EuMatch[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cluster, setCluster] = useState<string>('');
@@ -254,7 +258,7 @@ export const EuCallsTab: React.FC<{
       fetch('/api/eu-calls/topics', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))),
       fetch('/api/eu-calls/matches', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : Promise.reject(new Error(`HTTP ${r.status}`)))),
     ])
-      .then(([tp, mt]) => { if (!cancelled) { setTopics(tp.items ?? []); setMatches(mt.items ?? []); } })
+      .then(([tp, mt]) => { if (!cancelled) { setTopics(tp.items ?? []); setScopes(Array.isArray(tp.scopes) ? tp.scopes : []); setMatches(mt.items ?? []); } })
       .catch((e) => { if (!cancelled) setError(apiErrorText(e)); });
     return () => { cancelled = true; };
   }, []);
@@ -289,6 +293,8 @@ export const EuCallsTab: React.FC<{
   }, [topics, matches, uids, cluster, includePast, query, byUid]);
 
   const matchedUids = useMemo(() => new Set(matches.filter((m) => !uids || uids.has(m.uid)).map((m) => m.uid)), [matches, uids]);
+  // Outside the perimeter of the batch: the matches shown say nothing about the coverage of this structure.
+  const outsideScope = !!researchers && !inScope(scopes, { slug, label: structureLabel });
 
   const onFeedback = async (pairId: string, verdict: FeedbackVerdict) => {
     setBusy(true);
@@ -338,6 +344,14 @@ export const EuCallsTab: React.FC<{
           <Plural value={matchedUids.size} _0="No researcher retained yet." one="# researcher retained on at least one topic." other="# researchers retained on at least one topic." />
         </span>
       </p>
+      {scopes.length > 0 && (
+        <p className={`text-[13px] rounded-2xl px-4 py-2 ${outsideScope ? 'bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-100' : 'bg-white/60 dark:bg-white/5 text-muted dark:text-[#c3beb0]'}`}>
+          <Trans>Matching computed on the publications of: {scopes.join(', ')}.</Trans>
+          {outsideScope && (
+            <> <Trans>{structureLabel} is outside this perimeter: only its researchers who co-signed publications of that perimeter can appear here, which says nothing about its own coverage.</Trans></>
+          )}
+        </p>
+      )}
 
       <div className="flex flex-wrap items-center gap-3">
         <ViewSwitch view={view} onChange={setView} />
