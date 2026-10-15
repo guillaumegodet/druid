@@ -24,7 +24,7 @@
     "migrate:grist-to-pg": "npm run -s build:migrate && node scripts/.build/migrate_grist_to_pg.cjs",
     "seed:demo": "npm run -s build:seed && node scripts/.build/seed_demo_pg.cjs",
     "build:copy": "mkdir -p scripts/.build && esbuild scripts/copy_pg_to_grist.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/copy_pg_to_grist.cjs --log-level=warning",
-    "build:eu-calls": "mkdir -p scripts/.build && esbuild scripts/import_trm.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_trm.cjs --log-level=warning",
+    "build:calls": "mkdir -p scripts/.build && esbuild scripts/import_calls.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_calls.cjs --log-level=warning",
     "build:publications": "mkdir -p scripts/.build && esbuild scripts/import_newsletter.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_newsletter.cjs --log-level=warning",
     "build:graph": "mkdir -p scripts/.build && esbuild scripts/import_graph_snapshot.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_graph_snapshot.cjs --log-level=warning && esbuild scripts/graph_publish.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/graph_publish.cjs --log-level=warning",
     "build:functions-pg": "node scripts/functions_pg_bundle.cjs",

@@ -1,7 +1,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { describe, expect, it } from 'vitest';
-import { directoryUidOf, parseTrmReport } from '../euCalls/trm';
+import { directoryUidOf, parseTrmReport } from '../calls/trm';
 
 const sample = () => readFileSync(join(__dirname, 'fixtures/trm-sample.json'), 'utf8');
 
@@ -9,7 +9,8 @@ describe('parseTrmReport', () => {
   it('reads the run, its topics and its matches', () => {
     const run = parseTrmReport(sample());
     expect(run.runId).toBe('20261014T000000-test01');
-    expect(run.cluster).toBe('CL9');
+    expect(run.programmeId).toBe('horizon-europe');
+    expect(run.subset).toBe('CL9');
     expect(run.model).toBe('test-model');
     expect(run.topics.map((t) => t.topicId)).toEqual(['HORIZON-CL9-2026-01-TEST-01', 'HORIZON-CL9-2027-02-TEST-02']);
     expect(run.matches).toHaveLength(2);
@@ -36,6 +37,11 @@ describe('parseTrmReport', () => {
     expect(bob.overall).toBe('none');
     expect(bob.units).toEqual([]);
     expect(bob.justification).toBe('');
+  });
+
+  it('binds the report to the programme given', () => {
+    expect(parseTrmReport(sample(), 'horizon-europe-2028').programmeId).toBe('horizon-europe-2028');
+    expect(parseTrmReport(sample()).topics[0].subset).toBe('CL9');
   });
 
   it('refuses a document that is not a report', () => {

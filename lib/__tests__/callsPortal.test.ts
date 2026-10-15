@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fetchPortalTopics, parsePortalTopic } from '../euCalls/portal';
+import { fetchPortalTopics, parsePortalTopic } from '../calls/portal';
 
 describe('parsePortalTopic', () => {
   it('reads the title, the call and the deadlines of the portal answer', () => {

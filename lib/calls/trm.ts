@@ -1,6 +1,9 @@
 // Reading of a Topic-to-Researcher Match report (crisalid-agents trm/report.py, `trm-<cluster>-<date>.json`): the
-// JSON written by the batch becomes the rows of eu_topic, eu_topic_match_run and eu_topic_match (druid-internal
-// docs/plan-eu-calls.md, lot 2). Pure: shared by the import script and its tests.
+// JSON written by the batch becomes calls, a run and matches of the « Calls for proposals » tab (druid-internal
+// docs/plan-funding-calls.md, lot 1; formerly the eu_* tables of docs/plan-eu-calls.md). The report is bound
+// to one programme (Horizon Europe unless told otherwise) and its `cluster` is the subset of the run. Pure: shared by
+// the import script and its tests.
+import { HORIZON_EUROPE } from './programmes';
 
 export type MatchOverall = 'strong' | 'plausible' | 'weak' | 'none';
 
@@ -13,11 +16,15 @@ export interface TrmPublication {
   reason: string;
 }
 
+/** A topic of the report: a call of the programme. */
 export interface TrmTopic {
+  /** Identifier of the topic (HORIZON-CL4-2026-…), the call id of the tab. */
   topicId: string;
-  cluster: string;
+  /** Cluster of the topic, the subset of the programme. */
+  subset: string;
   title: string;
-  callId: string;
+  /** Identifier of the call of the work programme the topic belongs to (several topics share one). */
+  callIdentifier: string;
   destination: string;
   deadlines: string[];
   summary: string;
@@ -41,7 +48,9 @@ export interface TrmMatch {
 
 export interface TrmRun {
   runId: string;
-  cluster: string;
+  programmeId: string;
+  /** Cluster of the report. */
+  subset: string;
   startedAt: string;
   model: string;
   settings: Record<string, unknown>;
@@ -79,11 +88,11 @@ const publication = (p: Record<string, unknown>): TrmPublication => ({
  * Parses the JSON text of a report. Throws on a report without run id or cluster; a topic in error is listed in
  * `failedTopics` and has no match; a match whose overall is unknown is kept as `none`.
  */
-export const parseTrmReport = (text: string): TrmRun => {
+export const parseTrmReport = (text: string, programmeId: string = HORIZON_EUROPE.programmeId): TrmRun => {
   const raw = JSON.parse(text) as Record<string, unknown>;
   const runId = str(raw.run_id);
-  const cluster = str(raw.cluster);
-  if (!runId || !cluster) throw new Error('not a TRM report: run_id and cluster are required');
+  const subset = str(raw.cluster);
+  if (!runId || !subset) throw new Error('not a TRM report: run_id and cluster are required');
   const settings = (raw.settings && typeof raw.settings === 'object' ? raw.settings : {}) as Record<string, unknown>;
   const topics: TrmTopic[] = [];
   const failedTopics: TrmRun['failedTopics'] = [];
@@ -97,9 +106,9 @@ export const parseTrmReport = (text: string): TrmRun => {
     }
     topics.push({
       topicId,
-      cluster: str(t.cluster, cluster) || cluster,
+      subset: str(t.cluster, subset) || subset,
       title: cleanText(t.title),
-      callId: str(t.call_id),
+      callIdentifier: str(t.call_id),
       destination: cleanText(t.destination),
       deadlines: strings(t.deadlines),
       summary: cleanText(t.summary),
@@ -126,6 +135,6 @@ export const parseTrmReport = (text: string): TrmRun => {
     }
   }
   return {
-    runId, cluster, startedAt: str(raw.started_at), model: str(settings.model), settings, topics, failedTopics, matches,
+    runId, programmeId, subset, startedAt: str(raw.started_at), model: str(settings.model), settings, topics, failedTopics, matches,
   };
 };

@@ -82,6 +82,48 @@ export interface BenchmarkPeerGroup {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface CallFeedback {
+  author: string;
+  comment: Generated<string>;
+  created_at: Generated<Timestamp>;
+  id: Generated<Int8>;
+  pair_id: string;
+  verdict: string;
+}
+
+export interface CallMatch {
+  call_id: string;
+  eligibility_reasons: Generated<string[]>;
+  eligible: boolean | null;
+  justification: Generated<string>;
+  justification_fr: Generated<string>;
+  overall: string;
+  pair_id: string;
+  person_name: Generated<string>;
+  person_uid: string;
+  publications: Generated<Json>;
+  raw_score: Generated<number>;
+  run_id: string;
+  score: number;
+  uid: string;
+  units: Generated<string[]>;
+}
+
+export interface CallMatchRun {
+  calls: Generated<number>;
+  engine: Generated<string>;
+  failed_calls: Generated<number>;
+  imported_at: Generated<Timestamp>;
+  imported_by: Generated<string>;
+  model: Generated<string>;
+  perimeter: Generated<string>;
+  programme_id: string;
+  run_id: string;
+  settings: Generated<Json>;
+  started_at: Timestamp;
+  subset: Generated<string>;
+}
+
 export interface Establishment {
   created_at: Generated<Timestamp>;
   extra: Generated<Json>;
@@ -95,53 +137,49 @@ export interface Establishment {
   updated_at: Generated<Timestamp>;
 }
 
-export interface EuTopic {
-  call_id: Generated<string>;
-  cluster: string;
+export interface Funder {
+  category: string;
+  country: Generated<string>;
+  funder_id: string;
+  name: string;
+  url: Generated<string>;
+}
+
+export interface FundingCall {
+  budget: Generated<Json>;
+  call_id: string;
+  content_hash: Generated<string>;
   deadlines: Generated<string[]>;
-  destination: Generated<string>;
+  eligibility: Generated<Json>;
+  lang: Generated<string>;
+  objectives: Generated<string>;
+  opening_date: string | null;
+  programme_id: string;
+  review_status: Generated<string>;
+  scheme: Generated<string>;
+  scope: Generated<string>;
+  status: Generated<string>;
+  subset: Generated<string>;
   summary: Generated<string>;
   summary_fr: Generated<string>;
+  taxonomy: Generated<Json>;
   title: string;
-  topic_id: string;
+  title_fr: Generated<string>;
   updated_at: Generated<Timestamp>;
+  url: Generated<string>;
 }
 
-export interface EuTopicFeedback {
-  author: string;
-  comment: Generated<string>;
-  created_at: Generated<Timestamp>;
-  id: Generated<Int8>;
-  pair_id: string;
-  verdict: string;
-}
-
-export interface EuTopicMatch {
-  justification: Generated<string>;
-  justification_fr: Generated<string>;
-  overall: string;
-  pair_id: string;
-  person_name: Generated<string>;
-  person_uid: string;
-  publications: Generated<Json>;
-  raw_score: Generated<number>;
-  run_id: string;
-  score: number;
-  topic_id: string;
-  uid: string;
-  units: Generated<string[]>;
-}
-
-export interface EuTopicMatchRun {
-  cluster: string;
-  failed_topics: Generated<number>;
-  imported_at: Generated<Timestamp>;
-  imported_by: Generated<string>;
-  model: Generated<string>;
-  run_id: string;
-  settings: Generated<Json>;
-  started_at: Timestamp;
-  topics: Generated<number>;
+export interface FundingProgramme {
+  active: Generated<boolean>;
+  funder_id: string;
+  kind: Generated<string>;
+  name: string;
+  programme_id: string;
+  refresh: Generated<string>;
+  source: Generated<string>;
+  subset_label: Generated<string>;
+  updated_at: Generated<Timestamp>;
+  url: Generated<string>;
 }
 
 export interface GraphAction {
@@ -463,11 +501,13 @@ export interface DB {
   audit_log: AuditLog;
   axis_review: AxisReview;
   benchmark_peer_group: BenchmarkPeerGroup;
+  call_feedback: CallFeedback;
+  call_match: CallMatch;
+  call_match_run: CallMatchRun;
   establishment: Establishment;
-  eu_topic: EuTopic;
-  eu_topic_feedback: EuTopicFeedback;
-  eu_topic_match: EuTopicMatch;
-  eu_topic_match_run: EuTopicMatchRun;
+  funder: Funder;
+  funding_call: FundingCall;
+  funding_programme: FundingProgramme;
   graph_action: GraphAction;
   graph_identifier_state: GraphIdentifierState;
   identifier_conflict: IdentifierConflict;

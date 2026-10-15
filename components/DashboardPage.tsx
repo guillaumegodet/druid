@@ -16,7 +16,7 @@ import { NetworkTab } from './dashboard/NetworkTab';
 import { JournalsTab } from './dashboard/JournalsTab';
 import { ApcTab } from './dashboard/ApcTab';
 import { FundersTab } from './dashboard/FundersTab';
-import { EuCallsTab } from './dashboard/EuCallsTab';
+import { CallsTab } from './dashboard/CallsTab';
 import { AxesTab } from './dashboard/AxesTab';
 import { BenchmarkTab } from './dashboard/BenchmarkTab';
 import { CharteTab } from './dashboard/CharteTab';
@@ -104,14 +104,14 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // Tabs hidden per structure (druid_tabs_hidden in config.yaml, read live
   // by the server) — editable from the admin without regenerating the data.
   const [tabsHiddenBySlug, setTabsHiddenBySlug] = useState<Record<string, string[]>>({});
-  // « European calls »: shown once a Topic-to-Researcher Match report is imported (/api/eu-calls/overview; 501 on
-  // an instance without PostgreSQL, 404 on an instance without the server).
-  const [hasEuCalls, setHasEuCalls] = useState(false);
+  // « Calls for proposals »: shown once calls and their matches are imported (/api/calls/overview; 501 on an
+  // instance without PostgreSQL, 404 on an instance without the server).
+  const [hasCalls, setHasCalls] = useState(false);
   useEffect(() => {
-    fetch('/api/eu-calls/overview', { cache: 'no-store' })
+    fetch('/api/calls/overview', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((o) => setHasEuCalls(Array.isArray(o?.runs) && o.runs.length > 0))
-      .catch(() => setHasEuCalls(false));
+      .then((o) => setHasCalls(Array.isArray(o?.runs) && o.runs.length > 0))
+      .catch(() => setHasCalls(false));
   }, []);
   const [slug, setSlug] = useState<string | null>(struct ?? null);
   const [tab, setTab] = useState<DashboardTab>('overview');
@@ -137,6 +137,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     // The former console/streamlit/rights tabs live in the Administration
     // section: App.tsx redirects those links before reaching this point.
     if (isDashboardTab(requested)) goTo(requested);
+    // The former « European calls » key still opens the tab, renamed « Calls for proposals » (docs/plan-funding-calls.md, lot 1).
+    else if (requested === 'eu-calls') goTo('calls');
     const from = Number(p.get('from'));
     const to = Number(p.get('to'));
     if (Number.isFinite(from) && Number.isFinite(to) && from > 0 && to >= from) {
@@ -251,10 +253,10 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const families = useMemo(() => {
     const keys = visibleTabKeys(
       DASHBOARD_TABS.map(({ key }) => key),
-      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff, hasEuCalls },
+      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff, hasCalls },
     );
     return visibleFamilies(keys);
-  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff, hasEuCalls]);
+  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff, hasCalls]);
   const visibleKeys = useMemo(() => new Set(families.flatMap((f) => f.tabs.map((x) => x.key))), [families]);
   useEffect(() => {
     if (data && !visibleKeys.has(tab)) goTo('overview');
@@ -587,8 +589,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               )}
               {tab === 'apc' && <ApcTab dataset={scopedData} range={range} />}
               {tab === 'funders' && <FundersTab dataset={scopedData} range={range} />}
-              {tab === 'eu-calls' && (
-                <EuCallsTab
+              {tab === 'calls' && (
+                <CallsTab
                   researchers={staffResearchers}
                   structureLabel={scopedData.lab}
                   slug={scopedData.slug}

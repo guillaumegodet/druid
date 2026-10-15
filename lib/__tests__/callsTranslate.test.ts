@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BATCH_SIZE, parseTranslations, translateTexts, translatorFromEnv } from '../euCalls/translate';
+import { BATCH_SIZE, parseTranslations, translateTexts, translatorFromEnv } from '../calls/translate';
 
 describe('parseTranslations', () => {
   it('accepts the object or array shape, with or without a code fence, and refuses a count mismatch', () => {
