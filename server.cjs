@@ -2263,7 +2263,7 @@ const euCallsUidsOf = async (req) => {
   return items.map((r) => r.uid).filter(Boolean);
 };
 app.get('/api/eu-calls/overview', withEuCalls(async (req, res, store) => res.json(await store.overview())));
-app.get('/api/eu-calls/topics', withEuCalls(async (req, res, store) => res.json({ items: await store.topics() })));
+app.get('/api/eu-calls/topics', withEuCalls(async (req, res, store) => res.json({ items: await store.topics(), scopes: await store.scopes() })));
 app.get('/api/eu-calls/matches', withEuCalls(async (req, res, store) => {
   const topicId = typeof req.query.topic === 'string' ? req.query.topic : undefined;
   if (topicId && !/^[A-Za-z0-9-]{1,80}$/.test(topicId)) return res.status(400).json({ error: 'Invalid topic id' });

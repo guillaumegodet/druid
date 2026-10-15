@@ -1066,7 +1066,7 @@ msgid "All supervising bodies"
 msgstr "All supervising bodies"
 
 #: components/StructureList.tsx:395
-#: components/dashboard/EuCallsTab.tsx:359
+#: components/dashboard/EuCallsTab.tsx:373
 msgid "All clusters"
 msgstr "All clusters"
 
@@ -3285,165 +3285,174 @@ msgstr "filters:"
 msgid "Source: Druid / druid-biblio (CRISalid, OpenAlex, HAL, BSO)"
 msgstr "Source: Druid / druid-biblio (CRISalid, OpenAlex, HAL, BSO)"
 
-#: components/dashboard/EuCallsTab.tsx:57
+#: components/dashboard/EuCallsTab.tsx:58
 msgid "strong match"
 msgstr "strong match"
 
-#: components/dashboard/EuCallsTab.tsx:57
+#: components/dashboard/EuCallsTab.tsx:58
 msgid "plausible match"
 msgstr "plausible match"
 
-#: components/dashboard/EuCallsTab.tsx:57
+#: components/dashboard/EuCallsTab.tsx:58
 msgid "weak match"
 msgstr "weak match"
 
-#: components/dashboard/EuCallsTab.tsx:57
+#: components/dashboard/EuCallsTab.tsx:58
 msgid "unrated"
 msgstr "unrated"
 
-#: components/dashboard/EuCallsTab.tsx:60
+#: components/dashboard/EuCallsTab.tsx:61
 msgid "Strength of the match as assessed by the language model from the publications"
 msgstr "Strength of the match as assessed by the language model from the publications"
 
-#: components/dashboard/EuCallsTab.tsx:63
+#: components/dashboard/EuCallsTab.tsx:64
 msgid "Relative score within the topic: the best candidate of the topic is at 100 %, the others in proportion"
 msgstr "Relative score within the topic: the best candidate of the topic is at 100 %, the others in proportion"
 
 #. placeholder {0}: Math.round(score * 100)
-#: components/dashboard/EuCallsTab.tsx:63
+#: components/dashboard/EuCallsTab.tsx:64
 msgid "Relative score {0} %"
 msgstr "Relative score {0} %"
 
-#: components/dashboard/EuCallsTab.tsx:73
+#: components/dashboard/EuCallsTab.tsx:74
 msgid "Relevant"
 msgstr "Relevant"
 
-#: components/dashboard/EuCallsTab.tsx:74
+#: components/dashboard/EuCallsTab.tsx:75
 msgid "Not relevant"
 msgstr "Not relevant"
 
-#: components/dashboard/EuCallsTab.tsx:75
+#: components/dashboard/EuCallsTab.tsx:76
 msgid "Already applying"
 msgstr "Already applying"
 
-#: components/dashboard/EuCallsTab.tsx:93
+#: components/dashboard/EuCallsTab.tsx:94
 msgid "Your opinion on this match (one per person, the last one wins)"
 msgstr "Your opinion on this match (one per person, the last one wins)"
 
-#: components/dashboard/EuCallsTab.tsx:139
+#: components/dashboard/EuCallsTab.tsx:140
 msgid "Open the publication (DOI)"
 msgstr "Open the publication (DOI)"
 
-#: components/dashboard/EuCallsTab.tsx:139
+#: components/dashboard/EuCallsTab.tsx:140
 msgid "Search this title on OpenAlex (DOI unknown)"
 msgstr "Search this title on OpenAlex (DOI unknown)"
 
-#: components/dashboard/EuCallsTab.tsx:149
+#: components/dashboard/EuCallsTab.tsx:150
 msgid "Fewer publications"
 msgstr "Fewer publications"
 
 #. placeholder {0}: relevant.length - 3
-#: components/dashboard/EuCallsTab.tsx:149
+#: components/dashboard/EuCallsTab.tsx:150
 msgid "{0, plural, one {# more publication} other {# more publications}}"
 msgstr "{0, plural, one {# more publication} other {# more publications}}"
 
-#: components/dashboard/EuCallsTab.tsx:179
+#: components/dashboard/EuCallsTab.tsx:180
 #: components/dashboard/NewsTab.tsx:735
 #: components/researchers/TasksPage.tsx:161
 msgid "Closed"
 msgstr "Closed"
 
 #. placeholder {0}: fmtDate(topic.nextDeadline)
-#: components/dashboard/EuCallsTab.tsx:179
+#: components/dashboard/EuCallsTab.tsx:180
 msgid "Deadline {0}"
 msgstr "Deadline {0}"
 
-#: components/dashboard/EuCallsTab.tsx:179
+#: components/dashboard/EuCallsTab.tsx:180
 msgid "No deadline"
 msgstr "No deadline"
 
 #. placeholder {0}: topic.matches.length
-#: components/dashboard/EuCallsTab.tsx:182
+#: components/dashboard/EuCallsTab.tsx:183
 msgid "{0, plural, =0 {No researcher} one {# researcher} other {# researchers}}"
 msgstr "{0, plural, =0 {No researcher} one {# researcher} other {# researchers}}"
 
-#: components/dashboard/EuCallsTab.tsx:183
+#: components/dashboard/EuCallsTab.tsx:184
 msgid "{strong, plural, one {# strong} other {# strong}}"
 msgstr "{strong, plural, one {# strong} other {# strong}}"
 
-#: components/dashboard/EuCallsTab.tsx:191
+#: components/dashboard/EuCallsTab.tsx:192
 msgid "Call"
 msgstr "Call"
 
-#: components/dashboard/EuCallsTab.tsx:192
+#: components/dashboard/EuCallsTab.tsx:193
 msgid "Deadlines"
 msgstr "Deadlines"
 
-#: components/dashboard/EuCallsTab.tsx:194
+#: components/dashboard/EuCallsTab.tsx:195
 msgid "Funding & Tenders portal"
 msgstr "Funding & Tenders portal"
 
-#: components/dashboard/EuCallsTab.tsx:198
+#: components/dashboard/EuCallsTab.tsx:199
 msgid "No researcher of this structure was retained for this topic."
 msgstr "No researcher of this structure was retained for this topic."
 
-#: components/dashboard/EuCallsTab.tsx:216
+#: components/dashboard/EuCallsTab.tsx:217
 #: components/structures/ClassificationTab.tsx:69
 msgid "Topics"
 msgstr "Topics"
 
-#: components/dashboard/EuCallsTab.tsx:216
+#: components/dashboard/EuCallsTab.tsx:217
 #: components/dashboard/dashboardNav.ts:97
 #: components/dashboard/report/reportCatalog.ts:105
 msgid "Researchers"
 msgstr "Researchers"
 
-#: components/dashboard/EuCallsTab.tsx:323
+#: components/dashboard/EuCallsTab.tsx:329
 msgid "Loading the European calls…"
 msgstr "Loading the European calls…"
 
-#: components/dashboard/EuCallsTab.tsx:332
+#: components/dashboard/EuCallsTab.tsx:338
 msgid "Horizon Europe work programme topics matched automatically to the researchers of {structureLabel} from the publications known to the CRISalid graph (partial coverage). Your opinion on each match helps improve the matching."
 msgstr "Horizon Europe work programme topics matched automatically to the researchers of {structureLabel} from the publications known to the CRISalid graph (partial coverage). Your opinion on each match helps improve the matching."
 
 #. placeholder {0}: matchedUids.size
-#: components/dashboard/EuCallsTab.tsx:338
+#: components/dashboard/EuCallsTab.tsx:344
 msgid "{0, plural, =0 {No researcher retained yet.} one {# researcher retained on at least one topic.} other {# researchers retained on at least one topic.}}"
 msgstr "{0, plural, =0 {No researcher retained yet.} one {# researcher retained on at least one topic.} other {# researchers retained on at least one topic.}}"
 
+#. placeholder {0}: scopes.join(', ')
 #: components/dashboard/EuCallsTab.tsx:349
+msgid "Matching computed on the publications of: {0}."
+msgstr "Matching computed on the publications of: {0}."
+
+#: components/dashboard/EuCallsTab.tsx:351
+msgid "{structureLabel} is outside this perimeter: only its researchers who co-signed publications of that perimeter can appear here, which says nothing about its own coverage."
+msgstr "{structureLabel} is outside this perimeter: only its researchers who co-signed publications of that perimeter can appear here, which says nothing about its own coverage."
+
+#: components/dashboard/EuCallsTab.tsx:363
 msgid "Search a topic…"
 msgstr "Search a topic…"
 
-#: components/dashboard/EuCallsTab.tsx:349
+#: components/dashboard/EuCallsTab.tsx:363
 msgid "Search a researcher…"
 msgstr "Search a researcher…"
 
-#: components/dashboard/EuCallsTab.tsx:357
+#: components/dashboard/EuCallsTab.tsx:371
 #: components/researchers/FilterPanel.tsx:177
 #: components/researchers/FilterPanel.tsx:309
 #: components/researchers/GeneralTab.tsx:358
 msgid "Cluster"
 msgstr "Cluster"
 
-#: components/dashboard/EuCallsTab.tsx:363
+#: components/dashboard/EuCallsTab.tsx:377
 msgid "Include closed calls"
 msgstr "Include closed calls"
 
-#: components/dashboard/EuCallsTab.tsx:367
+#: components/dashboard/EuCallsTab.tsx:381
 msgid "Topics with researchers only"
 msgstr "Topics with researchers only"
 
-#: components/dashboard/EuCallsTab.tsx:374
+#: components/dashboard/EuCallsTab.tsx:388
 msgid "No topic matches these filters."
 msgstr "No topic matches these filters."
 
-#: components/dashboard/EuCallsTab.tsx:381
+#: components/dashboard/EuCallsTab.tsx:395
 msgid "No researcher matches these filters."
 msgstr "No researcher matches these filters."
 
 #. placeholder {0}: r.matches.length
-#: components/dashboard/EuCallsTab.tsx:394
+#: components/dashboard/EuCallsTab.tsx:408
 msgid "{0, plural, one {# topic} other {# topics}}"
 msgstr "{0, plural, one {# topic} other {# topics}}"
 
