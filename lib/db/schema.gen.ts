@@ -82,6 +82,21 @@ export interface BenchmarkPeerGroup {
   updated_at: Generated<Timestamp | null>;
 }
 
+export interface CallCollection {
+  calls_new: Generated<number>;
+  calls_seen: Generated<number>;
+  calls_updated: Generated<number>;
+  details_fetched: Generated<number>;
+  error: Generated<string>;
+  finished_at: Timestamp | null;
+  id: Generated<Int8>;
+  programme_ids: Generated<string[]>;
+  source: string;
+  started_at: Generated<Timestamp>;
+  started_by: Generated<string>;
+  status: Generated<string>;
+}
+
 export interface CallFeedback {
   author: string;
   comment: Generated<string>;
@@ -173,6 +188,7 @@ export interface FundingProgramme {
   active: Generated<boolean>;
   funder_id: string;
   kind: Generated<string>;
+  last_collected_at: Timestamp | null;
   name: string;
   programme_id: string;
   refresh: Generated<string>;
@@ -501,6 +517,7 @@ export interface DB {
   audit_log: AuditLog;
   axis_review: AxisReview;
   benchmark_peer_group: BenchmarkPeerGroup;
+  call_collection: CallCollection;
   call_feedback: CallFeedback;
   call_match: CallMatch;
   call_match_run: CallMatchRun;

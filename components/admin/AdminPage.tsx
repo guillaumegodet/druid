@@ -11,6 +11,7 @@ import { ADMIN_TAB_HELP } from '../../lib/helpLinks';
 import { numberLocale } from '../../lib/i18n';
 import { GraphActionsPanel } from './GraphActionsPanel';
 import { InstitutionsAdmin } from './InstitutionsAdmin';
+import { CallsProgrammesAdmin } from './CallsProgrammesAdmin';
 
 export type { AdminTab };
 
@@ -82,6 +83,7 @@ export const AdminPage: React.FC<{
     rights: <Trans>Access rights</Trans>,
     media: <Trans>Media sources</Trans>,
     institutions: <Trans>Institutions</Trans>,
+    calls: <Trans>Calls for proposals</Trans>,
   };
   const tabBtn = (active: boolean) =>
     `pill px-4 py-1.5 text-[13px] transition-colors cursor-pointer ${
@@ -149,6 +151,11 @@ export const AdminPage: React.FC<{
       {tab === 'institutions' && (
         <div className="max-w-5xl">
           <InstitutionsAdmin researchers={researchers} />
+        </div>
+      )}
+      {tab === 'calls' && (
+        <div className="max-w-6xl">
+          <CallsProgrammesAdmin />
         </div>
       )}
     </div>

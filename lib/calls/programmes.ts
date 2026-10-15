@@ -42,15 +42,45 @@ export const EU_FUNDER: Funder = {
   url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/',
 };
 
-/** Horizon Europe, fed by the Topic-to-Researcher Match reports of crisalid-agents (lib/calls/trm.ts). */
-export const HORIZON_EUROPE: Programme = {
-  programmeId: 'horizon-europe', funderId: 'eu', name: 'Horizon Europe', kind: 'thematic',
-  url: 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/programmes/horizon',
-  source: 'trm-report', refresh: 'manual', subsetLabel: 'cluster', active: true,
-};
+const PORTAL_PROGRAMMES = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/programmes/';
+/** Source of every programme of the Funding & Tenders portal (lib/calls/ftPortal.ts). */
+export const FT_PORTAL_SOURCE = 'ft-portal';
+const portal = (programmeId: string, name: string, slug: string, subsetLabel: string, active: boolean, kind: ProgrammeKind = 'thematic'): Programme => ({
+  programmeId, funderId: EU_FUNDER.funderId, name, kind, url: `${PORTAL_PROGRAMMES}${slug}`, source: FT_PORTAL_SOURCE, refresh: 'daily', subsetLabel, active,
+});
+
+/** Horizon Europe pillar 2 (clusters CL1-CL6): calls from the portal, matches from the Topic-to-Researcher Match
+ * reports of crisalid-agents (lib/calls/trm.ts). */
+export const HORIZON_EUROPE: Programme = portal('horizon-europe', 'Horizon Europe', 'horizon', 'cluster', true);
+
+/**
+ * Programmes of the Funding & Tenders portal, recognised by lib/calls/ftPortal.ts (programmeOfPortalTopic). Active by
+ * default: the first wave of docs/plan-funding-calls.md (D1); the others wait for the administrator (Administration ›
+ * Calls for proposals). `active` is the initial value only: the table keeps the administrator's choice.
+ */
+export const PORTAL_PROGRAMMES_BUILT_IN: readonly Programme[] = [
+  HORIZON_EUROPE,
+  portal('erc', 'ERC — European Research Council', 'horizon', 'scheme', true, 'mixed'),
+  portal('msca', 'MSCA — Marie Skłodowska-Curie Actions', 'horizon', 'scheme', true, 'mixed'),
+  portal('eic', 'EIC — European Innovation Council', 'horizon', 'scheme', true),
+  portal('horizon-missions', 'Horizon Europe — Missions', 'horizon', 'mission', true),
+  portal('horizon-infra', 'Horizon Europe — Research infrastructures', 'horizon', 'destination', true),
+  portal('horizon-widera', 'Horizon Europe — Widening participation and ERA', 'horizon', 'destination', true),
+  portal('horizon-eie', 'Horizon Europe — European innovation ecosystems', 'horizon', '', false),
+  portal('horizon-ju', 'Horizon Europe — Joint undertakings (institutionalised partnerships)', 'horizon', 'partnership', false),
+  portal('euratom', 'Euratom', 'euratom', '', false),
+  portal('digital-europe', 'Digital Europe', 'digital', '', false),
+  portal('life', 'LIFE', 'life', '', false),
+  portal('edf', 'European Defence Fund', 'edf', '', false),
+  portal('eu4health', 'EU4Health', 'eu4health', '', false),
+  portal('cef', 'Connecting Europe Facility', 'cef', '', false),
+  portal('erasmus-plus', 'Erasmus+', 'erasmus', '', false),
+  portal('creative-europe', 'Creative Europe', 'crea', '', false),
+  portal('cerv', 'Citizens, Equality, Rights and Values', 'cerv', '', false),
+];
 
 export const BUILT_IN_FUNDERS: readonly Funder[] = [EU_FUNDER];
-export const BUILT_IN_PROGRAMMES: readonly Programme[] = [HORIZON_EUROPE];
+export const BUILT_IN_PROGRAMMES: readonly Programme[] = PORTAL_PROGRAMMES_BUILT_IN;
 
 /** Page of a topic on the Funding & Tenders portal. */
 export const PORTAL_TOPIC_PAGE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';

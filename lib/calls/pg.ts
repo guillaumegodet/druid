@@ -4,7 +4,8 @@
 import { sql, type Kysely, type Transaction } from 'kysely';
 import type { DB } from '../db/schema.gen';
 import type { Call, CallMatch, FeedbackVerdict, ProgrammeView } from './aggregate';
-import { BUILT_IN_FUNDERS, BUILT_IN_PROGRAMMES, portalTopicUrl, statusFromDeadlines, type Funder, type FunderCategory, type MatchEngine, type Programme, type ProgrammeKind, type CallStatus } from './programmes';
+import { BUILT_IN_FUNDERS, BUILT_IN_PROGRAMMES, portalTopicUrl, statusFromDeadlines, type Funder, type FunderCategory, type MatchEngine, type Programme, type ProgrammeKind, type ProgrammeRefresh, type CallStatus } from './programmes';
+import type { CollectedCall, CollectorStore, StoredCallSummary } from './collect';
 import type { MatchOverall, TrmRun } from './trm';
 
 type Queryable = Kysely<DB> | Transaction<DB>;
@@ -61,6 +62,32 @@ export interface MatchesQuery {
   viewer: string;
 }
 
+/** A programme as the administration lists it: every programme, active or not, with its counts. */
+export interface ProgrammeAdminView extends ProgrammeView {
+  source: string;
+  refresh: ProgrammeRefresh;
+  active: boolean;
+  calls: number;
+  openCalls: number;
+  matches: number;
+  lastCollectedAt: string | null;
+}
+
+export interface CollectionView {
+  id: number;
+  source: string;
+  programmeIds: string[];
+  startedAt: string;
+  finishedAt: string | null;
+  status: 'running' | 'done' | 'failed';
+  callsSeen: number;
+  callsNew: number;
+  callsUpdated: number;
+  detailsFetched: number;
+  error: string;
+  startedBy: string;
+}
+
 const iso = (v: Date | string | null | undefined): string => (v instanceof Date ? v.toISOString() : v ?? '');
 const dateOnly = (v: Date | string | null | undefined): string | null => (v ? iso(v).slice(0, 10) : null);
 const today = () => new Date().toISOString().slice(0, 10);
@@ -79,6 +106,21 @@ export const createCallsStore = (db: Kysely<DB>) => {
       programme_id: programme.programmeId, funder_id: programme.funderId, name: programme.name, kind: programme.kind, url: programme.url,
       source: programme.source, refresh: programme.refresh, subset_label: programme.subsetLabel, active: programme.active,
     }).onConflict((oc) => oc.column('programme_id').doNothing()).execute();
+  };
+
+  /** Aligns the funders and programmes declared in the code with the table: new ones are inserted with their initial
+   * `active`, known ones get their name, kind, url, source, refresh and subset label refreshed — never their `active`,
+   * which belongs to the administrator. */
+  const syncProgrammes = async (programmes: readonly Programme[] = BUILT_IN_PROGRAMMES, funders: readonly Funder[] = BUILT_IN_FUNDERS): Promise<void> => {
+    for (const f of funders) {
+      await db.insertInto('funder').values({ funder_id: f.funderId, name: f.name, country: f.country, category: f.category, url: f.url })
+        .onConflict((oc) => oc.column('funder_id').doUpdateSet({ name: f.name, country: f.country, category: f.category, url: f.url })).execute();
+    }
+    for (const p of programmes) {
+      const fields = { funder_id: p.funderId, name: p.name, kind: p.kind, url: p.url, source: p.source, refresh: p.refresh, subset_label: p.subsetLabel };
+      await db.insertInto('funding_programme').values({ programme_id: p.programmeId, ...fields, active: p.active })
+        .onConflict((oc) => oc.column('programme_id').doUpdateSet({ ...fields, updated_at: sql`now()` })).execute();
+    }
   };
 
   const importRun = async (run: TrmRun, importedBy: string, options: ImportOptions = {}): Promise<ImportReport> =>
@@ -164,7 +206,8 @@ export const createCallsStore = (db: Kysely<DB>) => {
       }));
 
   const calls = async (): Promise<Call[]> =>
-    (await db.selectFrom('funding_call').selectAll().where('review_status', 'in', ['imported', 'validated']).orderBy('programme_id').orderBy('subset').orderBy('call_id').execute()).map((c) => ({
+    (await db.selectFrom('funding_call as c').innerJoin('funding_programme as p', 'p.programme_id', 'c.programme_id').selectAll('c')
+      .where('p.active', '=', true).where('c.review_status', 'in', ['imported', 'validated']).orderBy('c.programme_id').orderBy('c.subset').orderBy('c.call_id').execute()).map((c) => ({
       callId: c.call_id, programmeId: c.programme_id, subset: c.subset, scheme: c.scheme, title: c.title, titleFr: c.title_fr,
       summary: c.summary, summaryFr: c.summary_fr, taxonomy: taxonomyOf(c.taxonomy), openingDate: dateOnly(c.opening_date),
       deadlines: c.deadlines, url: c.url, status: c.status as CallStatus,
@@ -256,9 +299,98 @@ export const createCallsStore = (db: Kysely<DB>) => {
       .orderBy('f.created_at').execute())
       .map((r) => ({ ...r, created_at: iso(r.created_at) }));
 
+  // ── Administration (Administration › Calls for proposals) ─────────────────────────────────────────────────────────
+  const programmesAdmin = async (): Promise<ProgrammeAdminView[]> => {
+    const rows = await db.selectFrom('funding_programme as p').innerJoin('funder as f', 'f.funder_id', 'p.funder_id')
+      .select(['p.programme_id', 'p.name', 'p.kind', 'p.subset_label', 'p.url', 'p.source', 'p.refresh', 'p.active', 'p.last_collected_at', 'f.funder_id', 'f.name as funder_name', 'f.category'])
+      .orderBy('f.category').orderBy('f.name').orderBy('p.name').execute();
+    const counts = await db.selectFrom('funding_call').select(['programme_id'])
+      .select((eb) => eb.fn.countAll<string>().as('n'))
+      .select((eb) => eb.fn.count<string>(eb.case().when('status', 'in', ['open', 'forthcoming']).then(1).end()).as('open'))
+      .groupBy('programme_id').execute();
+    const matches = await db.selectFrom('call_match as m').innerJoin('call_match_run as r', 'r.run_id', 'm.run_id')
+      .select('r.programme_id').select((eb) => eb.fn.countAll<string>().as('n')).groupBy('r.programme_id').execute();
+    const countOf = new Map(counts.map((c) => [c.programme_id, { calls: Number(c.n), open: Number(c.open) }]));
+    const matchesOf = new Map(matches.map((m) => [m.programme_id, Number(m.n)]));
+    return rows.map((p) => ({
+      programmeId: p.programme_id, name: p.name, kind: p.kind as ProgrammeKind, subsetLabel: p.subset_label, url: p.url,
+      funderId: p.funder_id, funderName: p.funder_name, category: p.category as FunderCategory,
+      source: p.source, refresh: p.refresh as ProgrammeRefresh, active: p.active,
+      calls: countOf.get(p.programme_id)?.calls ?? 0, openCalls: countOf.get(p.programme_id)?.open ?? 0, matches: matchesOf.get(p.programme_id) ?? 0,
+      lastCollectedAt: p.last_collected_at ? iso(p.last_collected_at) : null,
+    }));
+  };
+
+  /** Activates or deactivates a programme; false when unknown. */
+  const setProgrammeActive = async (programmeId: string, active: boolean): Promise<boolean> => {
+    const r = await db.updateTable('funding_programme').set({ active, updated_at: sql`now()` }).where('programme_id', '=', programmeId).executeTakeFirst();
+    return Number(r.numUpdatedRows) > 0;
+  };
+
+  /** Active programmes of a source (what a collector works on), or those named. */
+  const programmesOfSource = async (source: string, programmeIds?: string[]): Promise<Programme[]> => {
+    let q = db.selectFrom('funding_programme').selectAll().where('source', '=', source);
+    q = programmeIds?.length ? q.where('programme_id', 'in', programmeIds) : q.where('active', '=', true);
+    return (await q.orderBy('programme_id').execute()).map((p) => ({
+      programmeId: p.programme_id, funderId: p.funder_id, name: p.name, kind: p.kind as ProgrammeKind, url: p.url, source: p.source,
+      refresh: p.refresh as ProgrammeRefresh, subsetLabel: p.subset_label, active: p.active,
+    }));
+  };
+
+  const startCollection = async (source: string, programmeIds: string[], startedBy: string): Promise<number> => {
+    const r = await db.insertInto('call_collection').values({ source, programme_ids: programmeIds, started_by: startedBy }).returning('id').executeTakeFirstOrThrow();
+    return Number(r.id);
+  };
+
+  const finishCollection = async (id: number, result: { status: 'done' | 'failed'; seen: number; new: number; updated: number; detailsFetched: number; error: string }, programmeIds: string[]): Promise<void> => {
+    await db.updateTable('call_collection').set({
+      finished_at: sql`now()`, status: result.status, calls_seen: result.seen, calls_new: result.new, calls_updated: result.updated,
+      details_fetched: result.detailsFetched, error: result.error.slice(0, 4000),
+    }).where('id', '=', String(id)).execute();
+    if (result.status === 'done' && programmeIds.length) {
+      await db.updateTable('funding_programme').set({ last_collected_at: sql`now()` }).where('programme_id', 'in', programmeIds).execute();
+    }
+  };
+
+  const collections = async (limit = 20): Promise<CollectionView[]> =>
+    (await db.selectFrom('call_collection').selectAll().orderBy('started_at', 'desc').limit(limit).execute()).map((c) => ({
+      id: Number(c.id), source: c.source, programmeIds: c.programme_ids, startedAt: iso(c.started_at), finishedAt: c.finished_at ? iso(c.finished_at) : null,
+      status: c.status as CollectionView['status'], callsSeen: c.calls_seen, callsNew: c.calls_new, callsUpdated: c.calls_updated,
+      detailsFetched: c.details_fetched, error: c.error, startedBy: c.started_by,
+    }));
+
+  // ── Store of the collector (lib/calls/collect.ts) ───────────────────────────────────────────────────────────────────
+  const collectorStore: CollectorStore = {
+    storedCalls: async (programmeIds: string[]): Promise<StoredCallSummary[]> => {
+      if (!programmeIds.length) return [];
+      return (await db.selectFrom('funding_call').select(['call_id', 'programme_id', 'title', 'deadlines', 'opening_date', 'status'])
+        .select((eb) => eb.or([eb('objectives', '<>', ''), eb('scope', '<>', '')]).as('has_text'))
+        .where('programme_id', 'in', programmeIds).execute())
+        .map((c) => ({ callId: c.call_id, programmeId: c.programme_id, title: c.title, deadlines: c.deadlines, openingDate: dateOnly(c.opening_date), status: c.status as CallStatus, hasText: !!c.has_text }));
+    },
+    upsertCall: async (c: CollectedCall): Promise<'new' | 'updated'> => {
+      const existing = await db.selectFrom('funding_call').select('call_id').where('call_id', '=', c.callId).executeTakeFirst();
+      const fields = {
+        programme_id: c.programmeId, subset: c.subset, scheme: c.scheme, title: c.title, objectives: c.objectives, scope: c.scope,
+        taxonomy: JSON.stringify(c.taxonomy), opening_date: c.openingDate, deadlines: c.deadlines, budget: JSON.stringify(c.budget),
+        url: c.url, lang: c.lang, content_hash: c.contentHash, status: c.status,
+      };
+      if (existing) {
+        await db.updateTable('funding_call').set({ ...fields, updated_at: sql`now()` }).where('call_id', '=', c.callId).execute();
+        return 'updated';
+      }
+      await db.insertInto('funding_call').values({ call_id: c.callId, ...fields }).execute();
+      return 'new';
+    },
+    updateCallDates: async (callId, status, deadlines, openingDate) => {
+      await db.updateTable('funding_call').set({ status, deadlines, opening_date: openingDate, updated_at: sql`now()` }).where('call_id', '=', callId).execute();
+    },
+  };
+
   return {
     importRun, overview, programmes, calls, perimeters, matches, saveFeedback, feedbackRows, callIds, updateCallsFromSource,
-    pendingTranslations, saveTranslations,
+    pendingTranslations, saveTranslations, syncProgrammes, programmesAdmin, setProgrammeActive, programmesOfSource,
+    startCollection, finishCollection, collections, collectorStore,
   };
 };
 
