@@ -12,6 +12,11 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Fiche chercheur — thèse d'une fiche sans uid** : la thèse lue sur theses.fr ne s'affichait que pour les fiches
+  ayant un uid d'annuaire ; une fiche sans uid (identifiant `ext_…`) la retrouve maintenant par sa ligne d'annuaire
+  (`/api/researchers/by-row/:rowId/theses`), comme la vue Candidats.
+
 ## [2.8.0] — 2026-10-16
 
 ### Ajouté

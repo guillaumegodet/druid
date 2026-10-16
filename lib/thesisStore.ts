@@ -69,12 +69,10 @@ export const createThesisStore = (db: Kysely<DB>) => {
         .onConflict((oc) => oc.column('person_id').doUpdateSet(check)).execute();
     });
 
-  /** Theses of the person of a directory uid, and its last check; null when no person has this uid. */
-  const thesesOfUid = async (uid: string): Promise<{ theses: StoredThesis[]; check: ThesisCheckInfo | null } | null> => {
-    const person = await db.selectFrom('person').select('id').where('uid', '=', uid.toLowerCase()).executeTakeFirst();
-    if (!person) return null;
-    const rows = await db.selectFrom('person_thesis').selectAll().where('person_id', '=', person.id).orderBy('defended_on').execute();
-    const check = await db.selectFrom('person_thesis_check').selectAll().where('person_id', '=', person.id).executeTakeFirst();
+  /** Theses of a person and its last check. */
+  const thesesOfPerson = async (personId: string): Promise<{ theses: StoredThesis[]; check: ThesisCheckInfo | null }> => {
+    const rows = await db.selectFrom('person_thesis').selectAll().where('person_id', '=', personId).orderBy('defended_on').execute();
+    const check = await db.selectFrom('person_thesis_check').selectAll().where('person_id', '=', personId).executeTakeFirst();
     return {
       theses: rows.map((r) => ({
         nnt: r.nnt, title: r.title, defendedOn: r.defended_on, status: r.status as ThesisStatus, institution: r.institution,
@@ -82,6 +80,18 @@ export const createThesisStore = (db: Kysely<DB>) => {
       })),
       check: check ? { checkedAt: iso(check.checked_at), found: check.found, error: check.error } : null,
     };
+  };
+
+  /** Theses of the person of a directory uid; null when no person has this uid. */
+  const thesesOfUid = async (uid: string) => {
+    const person = await db.selectFrom('person').select('id').where('uid', '=', uid.toLowerCase()).executeTakeFirst();
+    return person ? thesesOfPerson(person.id) : null;
+  };
+
+  /** Theses of the person of a directory row (membership): the record of a person without uid has only its rows. */
+  const thesesOfRow = async (rowId: number) => {
+    const membership = await db.selectFrom('membership').select('person_id').where('id', '=', String(rowId)).executeTakeFirst();
+    return membership ? thesesOfPerson(membership.person_id) : null;
   };
 
   /** Coverage of the checks: people with an IdRef, checked, with a defended thesis. */
@@ -95,7 +105,7 @@ export const createThesisStore = (db: Kysely<DB>) => {
     return { withIdref: Number(row?.with_idref ?? 0), checked: Number(row?.checked ?? 0), withPhd: Number(row?.with_phd ?? 0) };
   };
 
-  return { due, saveCheck, thesesOfUid, coverage };
+  return { due, saveCheck, thesesOfUid, thesesOfRow, coverage };
 };
 
 export type ThesisStore = ReturnType<typeof createThesisStore>;
