@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.7.0] — 2026-10-16
+
 ### Ajouté
 - **Appariement de tous les programmes du portail** (druid-internal `docs/plan-funding-calls.md`, lot 3) :
   `scripts/.build/export_calls.cjs --programme=<id> --out=<dossier>` écrit les appels ouverts ou à venir d'un programme
