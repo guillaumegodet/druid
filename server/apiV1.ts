@@ -25,6 +25,7 @@ import { graphActionsOverview, recordPeopleCsvExport } from '../lib/graph/pg';
 import { prepareGraphForPeopleCsv, type GraphActionsMode } from '../lib/graph/publisher';
 import { connectGraphBus } from '../lib/graph/bus';
 import { createCallsStore } from '../lib/calls/pg';
+import { createThesisStore } from '../lib/thesisStore';
 import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
@@ -198,6 +199,8 @@ export const createServerStorage = (options: ApiV1Options) => {
       /** « Calls for proposals » tab: calls of the funding programmes matched to the researchers (druid-internal
        * docs/plan-funding-calls.md, lot 1), PostgreSQL only. */
       calls: createCallsStore(db),
+      /** Doctoral theses of the researchers, read from theses.fr (scripts/sync_theses.ts, plan-funding-calls lot 5). */
+      theses: createThesisStore(db),
     };
   }
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
@@ -211,6 +214,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     graphOverview: null,
     graphMode: 'off' as GraphActionsMode,
     calls: null,
+    theses: null,
   };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;

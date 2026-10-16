@@ -37,6 +37,8 @@ export const API_ERRORS = [
   msg`Unknown Druid instance for this host`,
   // Calls for proposals (docs/plan-funding-calls.md)
   msg`The calls for proposals need the PostgreSQL storage`,
+  msg`The theses need the PostgreSQL storage`,
+  msg`No person with this uid`,
   msg`Invalid call id`,
   msg`Invalid programme id`,
   msg`Invalid programme state`,

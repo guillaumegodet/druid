@@ -12,6 +12,19 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Thèse de doctorat des chercheurs** (druid-internal `docs/plan-funding-calls.md`, lot 5) :
+  `scripts/.build/sync_theses.cjs` lit sur theses.fr, par l'IdRef de chaque fiche, les thèses dont la personne est
+  l'auteur (NNT, titre, date de soutenance, établissement, discipline, statut soutenue / en cours) ; une fiche est
+  revérifiée après 180 jours ou quand son IdRef change. Tables `person_thesis` et `person_thesis_check` (migration
+  `20261016200000_person_thesis.sql`, PostgreSQL seulement) ; la fiche chercheur affiche la thèse sous la ligne HDR
+  (lien vers theses.fr). La date de la thèse sert à l'éligibilité aux dispositifs jeunes chercheurs.
+
+### Migration
+- `druid-migrate`, puis première synchronisation à la main (≈ 1 h pour 5 000 fiches) :
+  `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/sync_theses.cjs` ; job hebdomadaire à
+  déclarer dans ofelia (`druid-theses-sync`, voir le plan).
+
 ## [2.7.0] — 2026-10-16
 
 ### Ajouté

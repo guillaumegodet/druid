@@ -5353,7 +5353,7 @@ msgstr "Laboratoire"
 #: components/dashboard/PublicationsListTab.tsx:349
 #: components/researchers/FilterPanel.tsx:176
 #: components/researchers/FilterPanel.tsx:319
-#: components/researchers/GeneralTab.tsx:276
+#: components/researchers/GeneralTab.tsx:277
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Type d'emploi"
@@ -5730,7 +5730,7 @@ msgstr "Population"
 
 #: components/dashboard/StaffSection.tsx:295
 #: components/dashboard/StaffSection.tsx:311
-#: components/researchers/GeneralTab.tsx:323
+#: components/researchers/GeneralTab.tsx:324
 msgid "Research FTE"
 msgstr "ETP recherche"
 
@@ -10479,7 +10479,7 @@ msgstr "Validation"
 
 #: components/researchers/FilterPanel.tsx:177
 #: components/researchers/FilterPanel.tsx:309
-#: components/researchers/GeneralTab.tsx:358
+#: components/researchers/GeneralTab.tsx:360
 msgid "Cluster"
 msgstr "Pôle"
 
@@ -10577,133 +10577,133 @@ msgstr "AAAA-MM-JJ, AAAA-MM ou AAAA"
 msgid "Pick a full date from the calendar"
 msgstr "Choisir une date complète dans le calendrier"
 
-#: components/researchers/GeneralTab.tsx:83
+#: components/researchers/GeneralTab.tsx:84
 msgid "Researcher identifiers"
 msgstr "Identifiants chercheur"
 
-#: components/researchers/GeneralTab.tsx:135
+#: components/researchers/GeneralTab.tsx:136
 msgid "HAL numeric identifier (idHal_i)"
 msgstr "Identifiant numérique HAL (idHal_i)"
 
-#: components/researchers/GeneralTab.tsx:146
+#: components/researchers/GeneralTab.tsx:147
 msgid "Digits only, e.g. 123456"
 msgstr "Numérique, ex. 123456"
 
-#: components/researchers/GeneralTab.tsx:189
+#: components/researchers/GeneralTab.tsx:190
 msgid "Personal details"
 msgstr "État civil"
 
-#: components/researchers/GeneralTab.tsx:195
+#: components/researchers/GeneralTab.tsx:196
 msgctxt "honorific"
 msgid "Title"
 msgstr "Civilité"
 
-#: components/researchers/GeneralTab.tsx:203
+#: components/researchers/GeneralTab.tsx:204
 msgid "Last name"
 msgstr "Nom d'usage"
 
-#: components/researchers/GeneralTab.tsx:207
+#: components/researchers/GeneralTab.tsx:208
 msgid "First name"
 msgstr "Prénom"
 
-#: components/researchers/GeneralTab.tsx:211
+#: components/researchers/GeneralTab.tsx:212
 #: lib/importConflicts.ts:66
 msgid "Nationality"
 msgstr "Nationalité"
 
-#: components/researchers/GeneralTab.tsx:215
+#: components/researchers/GeneralTab.tsx:216
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date de naissance"
 
-#: components/researchers/GeneralTab.tsx:226
+#: components/researchers/GeneralTab.tsx:227
 #: components/researchers/LdapUidLookup.tsx:49
 msgid "UID (Dyna)"
 msgstr "UID (Dyna)"
 
-#: components/researchers/GeneralTab.tsx:239
+#: components/researchers/GeneralTab.tsx:240
 msgid "HR staff number (Mangue), from LDAP or the HR lists — read-only"
 msgstr "Numéro d'agent RH (Mangue), issu du LDAP ou des listes RH — non modifiable"
 
-#: components/researchers/GeneralTab.tsx:239
+#: components/researchers/GeneralTab.tsx:240
 msgid "Staff number"
 msgstr "N° agent"
 
-#: components/researchers/GeneralTab.tsx:248
+#: components/researchers/GeneralTab.tsx:249
 msgid "Employment & contract"
 msgstr "Emploi & contrat"
 
-#: components/researchers/GeneralTab.tsx:251
+#: components/researchers/GeneralTab.tsx:252
 msgid "Employing institution"
 msgstr "Établissement employeur"
 
-#: components/researchers/GeneralTab.tsx:257
+#: components/researchers/GeneralTab.tsx:258
 msgid "— None —"
 msgstr "— Aucun —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:259
+#: components/researchers/GeneralTab.tsx:260
 msgid "{0} (not in list)"
 msgstr "{0} (hors liste)"
 
-#: components/researchers/GeneralTab.tsx:267
+#: components/researchers/GeneralTab.tsx:268
 msgid "Grade / Rank"
 msgstr "Grade / Corps"
 
-#: components/researchers/GeneralTab.tsx:283
+#: components/researchers/GeneralTab.tsx:284
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Non défini —"
 
-#: components/researchers/GeneralTab.tsx:308
+#: components/researchers/GeneralTab.tsx:309
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Début d'emploi"
 
-#: components/researchers/GeneralTab.tsx:308
+#: components/researchers/GeneralTab.tsx:309
 msgid "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Dates du contrat / de l'emploi (colonnes Grist employment_*), distinctes des dates d'appartenance au labo saisies dans la carte Appartenances. Date imprécise acceptée : AAAA ou AAAA-MM."
 
-#: components/researchers/GeneralTab.tsx:312
+#: components/researchers/GeneralTab.tsx:313
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Fin d'emploi"
 
-#: components/researchers/GeneralTab.tsx:312
+#: components/researchers/GeneralTab.tsx:313
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Fin de contrat / d'emploi (AAAA, AAAA-MM ou AAAA-MM-JJ). Pour une fiche externe (sans état LDAP), une date passée fait passer le statut à « Parti » ; avec une fin d'appartenance passée aussi, « Parti » s'applique même à une fiche validée."
 
-#: components/researchers/GeneralTab.tsx:319
+#: components/researchers/GeneralTab.tsx:320
 msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 msgstr "Part d'un temps plein (0 à 1, ex. 0,5). Vide = non renseigné."
 
-#: components/researchers/GeneralTab.tsx:319
+#: components/researchers/GeneralTab.tsx:320
 msgid "FTE (working time)"
 msgstr "ETP (quotité)"
 
-#: components/researchers/GeneralTab.tsx:323
+#: components/researchers/GeneralTab.tsx:324
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Équivalent temps plein recherche (0 à 1) : en général 0,5 pour un enseignant-chercheur, 1 pour un chercheur à temps plein. Vide = non renseigné (le tableau de bord appliquera une valeur par défaut selon le grade) ; 0 = aucun temps de recherche."
 
-#: components/researchers/GeneralTab.tsx:337
+#: components/researchers/GeneralTab.tsx:338
 msgid "Accredited to supervise research (HDR)"
 msgstr "Habilité à diriger des recherches (HDR)"
 
-#: components/researchers/GeneralTab.tsx:342
+#: components/researchers/GeneralTab.tsx:343
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "Année HDR"
 
-#: components/researchers/GeneralTab.tsx:362
+#: components/researchers/GeneralTab.tsx:364
 msgid "Faculty"
 msgstr "Composante"
 
-#: components/researchers/GeneralTab.tsx:366
+#: components/researchers/GeneralTab.tsx:368
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "ED de rattachement"
 
-#: components/researchers/GeneralTab.tsx:370
+#: components/researchers/GeneralTab.tsx:372
 msgid "Location (site)"
 msgstr "Localisation (site)"
 
@@ -12327,6 +12327,32 @@ msgstr "Email au chercheur"
 msgid "Mark as sent (task on hold)"
 msgstr "Marquer envoyé (tâche en attente)"
 
+#: components/researchers/ThesisInfo.tsx:50
+msgid "Doctoral thesis"
+msgstr "Thèse de doctorat"
+
+#. placeholder {0}: current.defendedOn ? fmtFuzzy(current.defendedOn) : ''
+#: components/researchers/ThesisInfo.tsx:54
+msgid "Defended {0}"
+msgstr "Soutenue {0}"
+
+#: components/researchers/ThesisInfo.tsx:55
+#: lib/tasks.ts:89
+msgid "In progress"
+msgstr "En cours"
+
+#: components/researchers/ThesisInfo.tsx:60
+msgid "Open the thesis on theses.fr"
+msgstr "Ouvrir la thèse sur theses.fr"
+
+#: components/researchers/ThesisInfo.tsx:67
+msgid "theses.fr could not be read at the last check."
+msgstr "theses.fr n’a pas pu être lu lors de la dernière vérification."
+
+#: components/researchers/ThesisInfo.tsx:67
+msgid "No thesis found on theses.fr for the IdRef of the record."
+msgstr "Aucune thèse trouvée sur theses.fr pour l’IdRef de la fiche."
+
 #: components/researchers/TodoPage.tsx:66
 msgid "Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands"
 msgstr "Corrections à réaliser hors Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, RH) — qui fait quoi, et où ça en est"
@@ -13531,591 +13557,599 @@ msgid "The calls for proposals need the PostgreSQL storage"
 msgstr "Les appels à projets nécessitent le stockage PostgreSQL"
 
 #: lib/apiErrors.ts:40
+msgid "The theses need the PostgreSQL storage"
+msgstr "Les thèses nécessitent le stockage PostgreSQL"
+
+#: lib/apiErrors.ts:41
+msgid "No person with this uid"
+msgstr "Aucune personne avec cet uid"
+
+#: lib/apiErrors.ts:42
 msgid "Invalid call id"
 msgstr "Identifiant d'appel invalide"
 
-#: lib/apiErrors.ts:41
+#: lib/apiErrors.ts:43
 msgid "Invalid programme id"
 msgstr "Identifiant de programme invalide"
 
-#: lib/apiErrors.ts:42
+#: lib/apiErrors.ts:44
 msgid "Invalid programme state"
 msgstr "État de programme invalide"
 
-#: lib/apiErrors.ts:43
+#: lib/apiErrors.ts:45
 msgid "Unknown programme"
 msgstr "Programme inconnu"
 
-#: lib/apiErrors.ts:44
+#: lib/apiErrors.ts:46
 msgid "Invalid pair id"
 msgstr "Identifiant de paire invalide"
 
-#: lib/apiErrors.ts:45
+#: lib/apiErrors.ts:47
 msgid "Invalid verdict"
 msgstr "Avis invalide"
 
-#: lib/apiErrors.ts:46
+#: lib/apiErrors.ts:48
 msgid "Unknown pair"
 msgstr "Paire inconnue"
 
-#: lib/apiErrors.ts:48
+#: lib/apiErrors.ts:50
 msgid "ILAAS_API_KEY not configured (druid service env)"
 msgstr "ILAAS_API_KEY non configurée (env du service druid)"
 
-#: lib/apiErrors.ts:49
+#: lib/apiErrors.ts:51
 msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY non configurée côté Cloudflare (secret + redéploiement)"
 
-#: lib/apiErrors.ts:50
+#: lib/apiErrors.ts:52
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID non configurée"
 
-#: lib/apiErrors.ts:51
+#: lib/apiErrors.ts:53
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY non configurée"
 
-#: lib/apiErrors.ts:52
+#: lib/apiErrors.ts:54
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY non configurée côté Cloudflare"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:55
 msgid "HYPERDRIVE binding not configured on Cloudflare"
 msgstr "Liaison HYPERDRIVE non configurée sur Cloudflare"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:57
 msgid "Unknown API route"
 msgstr "Route d'API inconnue"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:58
 msgid "Directory storage unavailable"
 msgstr "Stockage de l'annuaire indisponible"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:59
 msgid "Another record already holds this value"
 msgstr "Une autre fiche porte déjà cette valeur"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:60
 msgid "API v1 unavailable"
 msgstr "API v1 indisponible sur ce serveur"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:61
 msgid "Grist proxy removed: use /api/v1"
 msgstr "Proxy Grist supprimé : utilisez /api/v1"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:62
 msgid "Not available on the PostgreSQL storage yet"
 msgstr "Pas encore disponible avec le stockage PostgreSQL"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:63
 msgid "Invalid record"
 msgstr "Fiche invalide"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:64
 msgid "Invalid lab"
 msgstr "Laboratoire invalide"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:65
 msgid "Invalid import file"
 msgstr "Fichier d’import invalide"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:66
 msgid "Replaced IdRef record not found"
 msgstr "Notice IdRef remplacée introuvable"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:67
 msgid "Review table missing, run the alignment script first"
 msgstr "Table de revue absente, lancez d'abord l'alignement de cette source"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:68
 msgid "Grist error (partial write)"
 msgstr "Erreur Grist (écriture partielle)"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:69
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:70
 msgid "Invalid LDAP uid"
 msgstr "uid LDAP invalide"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:71
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "Cet uid a déjà une fiche dans l'annuaire, fusionnez plutôt les deux fiches"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:72
 msgid "Record not found in Grist"
 msgstr "Fiche introuvable dans Grist"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:73
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:74
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:75
 msgid "Grist error (writing the kept row)"
 msgstr "Erreur Grist (écriture de la ligne conservée)"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:76
 msgid "Grist error (deleting the absorbed row)"
 msgstr "Erreur Grist (suppression de la ligne absorbée)"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:77
 msgid "Merge not found"
 msgstr "Fusion introuvable"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:78
 msgid "Merge already restored"
 msgstr "Fusion déjà restaurée"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:79
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Ligne recréée mais journal des fusions non mis à jour, ne relancez pas la restauration"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:80
 msgid "Row re-created but kept row not restored"
 msgstr "Ligne recréée mais ligne conservée non restaurée"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:81
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:82
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:83
 msgid "A structure with this acronym already exists"
 msgstr "Une structure porte déjà ce sigle"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:84
 msgid "local_id already used"
 msgstr "local_id déjà utilisé"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:85
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Code d'entité invalide (lettres, chiffres, « - », « _ » ou « . » seulement)"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:87
 msgid "The institution name is required"
 msgstr "Le nom de l'établissement est obligatoire"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:88
 msgid "The institution name is too long"
 msgstr "Le nom de l'établissement est trop long"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:89
 msgid "Invalid UAI code"
 msgstr "Code UAI invalide"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:90
 msgid "Invalid ROR identifier"
 msgstr "Identifiant ROR invalide"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:91
 msgid "Invalid IdRef PPN"
 msgstr "PPN IdRef invalide"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:92
 msgid "An institution with this name already exists"
 msgstr "Un établissement porte déjà ce nom"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:93
 msgid "An institution with this UAI already exists"
 msgstr "Un établissement porte déjà cet UAI"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:94
 msgid "Institutions require the institution right"
 msgstr "Les établissements demandent le droit établissement"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:95
 msgid "Institution not found"
 msgstr "Établissement introuvable"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:96
 #: lib/gristService.ts:139
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:97
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:98
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:99
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne « groupes » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:100
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne « openalex_author_id » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:101
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "Pas d'identifiant OpenAlex configuré pour cette structure"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:102
 msgid "No dashboard data for this structure"
 msgstr "Aucune donnée de tableau de bord pour cette structure"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:104
 msgid "messages[] required"
 msgstr "messages[] requis"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:105
 msgid "Assistant unavailable"
 msgstr "Assistant indisponible"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:106
 msgid "Help assistant not configured"
 msgstr "Assistant d'aide non configuré"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:107
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "La newsletter n'est disponible que pour les structures avec un identifiant OpenAlex (pas les groupes)"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:108
 msgid "Generation interrupted"
 msgstr "Génération interrompue"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:109
 msgid "Generation failed"
 msgstr "Échec de la génération"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:110
 msgid "Analysis failed"
 msgstr "Échec de l'analyse"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:111
 msgid "Missing theme"
 msgstr "Thématique manquante"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:112
 msgid "No publication to analyze"
 msgstr "Aucune publication à analyser"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:113
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex injoignable"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:115
 msgid "Report not found"
 msgstr "Rapport introuvable"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:116
 msgid "Not allowed on this report"
 msgstr "Action non autorisée sur ce rapport"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:117
 msgid "Invalid report definition"
 msgstr "Définition de rapport invalide"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:118
 msgid "Report changed since it was loaded"
 msgstr "Le rapport a été modifié depuis son chargement"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:119
 msgid "Invalid report share"
 msgstr "Partage de rapport invalide"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:120
 msgid "Invalid report generation"
 msgstr "Génération de rapport invalide"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:121
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Instance en lecture seule : les rapports sont conservés dans le navigateur"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:122
 msgid "Invalid AI task"
 msgstr "Tâche IA invalide"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:123
 msgid "PDF archiving is not configured on this instance"
 msgstr "L'archivage des PDF n'est pas configuré sur cette instance"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:124
 msgid "Invalid PDF"
 msgstr "PDF invalide"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:125
 msgid "Generation not found"
 msgstr "Génération introuvable"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:126
 msgid "PDF not archived"
 msgstr "PDF non archivé"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:128
 msgid "Invalid record key"
 msgstr "Clé de fiche invalide"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:129
 msgid "Career path not computed yet for this record"
 msgstr "Parcours pas encore calculé pour cette fiche"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:130
 msgid "Grist unreachable"
 msgstr "Grist injoignable"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:131
 msgid "No Annuaire record for this key"
 msgstr "Aucune fiche de l’Annuaire pour cette clé"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:132
 msgid "Refresh outside your scope"
 msgstr "Recalcul hors de votre périmètre"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:133
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Trop de recalculs en cours, réessayez dans une minute"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:134
 msgid "Career-path computation failed"
 msgstr "Le calcul du parcours a échoué"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:135
 msgid "No usable identifier for this record"
 msgstr "Aucun identifiant exploitable pour cette fiche"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:136
 msgid "Unknown suggestion"
 msgstr "Suggestion inconnue"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:138
 msgid "Task not found"
 msgstr "Tâche introuvable"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:139
 msgid "Unknown event action"
 msgstr "Action d’événement inconnue"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:140
 msgid "Empty comment"
 msgstr "Commentaire vide"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:141
 msgid "Nothing to update"
 msgstr "Rien à mettre à jour"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:142
 msgid "Unknown task type"
 msgstr "Type de tâche inconnu"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:143
 msgid "Unknown status"
 msgstr "Statut inconnu"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:144
 msgid "Transition not allowed"
 msgstr "Transition non autorisée"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:145
 msgid "Task detection already running"
 msgstr "Détection des tâches déjà en cours"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:147
 msgid "Name required"
 msgstr "Nom requis"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:148
 msgid "Empty list"
 msgstr "Liste vide"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:149
 msgid "List of identifiers expected"
 msgstr "Liste d'identifiants attendue"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:150
 msgid "Invalid mention identifier"
 msgstr "Identifiant de mention invalide"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:151
 msgid "Invalid source identifier"
 msgstr "Identifiant de source invalide"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:152
 msgid "researchers and structures arrays required"
 msgstr "Tableaux researchers et structures requis"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:153
 msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
 msgstr "Les retraits d'identifiants n'ont pas pu partir vers le graphe CRISalid, réessayez plus tard"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:154
 msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 msgstr "Trop de retraits d'identifiants à envoyer d'un coup au graphe CRISalid, un administrateur doit les vérifier"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:155
 msgid "Cannot send the identifier removals to the CRISalid graph"
 msgstr "Impossible d'envoyer les retraits d'identifiants au graphe CRISalid"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:156
 msgid "Cannot read the removals sent to the CRISalid graph"
 msgstr "Impossible de lire les retraits envoyés au graphe CRISalid"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:157
 msgid "Keycloak admin API unreachable"
 msgstr "API d'administration Keycloak injoignable"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:158
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "API ETL (druid-etl-api) injoignable"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:160
 msgid "Grist path not allowed by the proxy"
 msgstr "Chemin Grist non autorisé par le proxy"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:161
 msgid "Writing to the document root is refused"
 msgstr "Écriture sur la racine du document refusée"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:162
 msgid "Writing to the table definition is refused"
 msgstr "Écriture sur la définition de la table refusée"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:163
 msgid "Method not relayed"
 msgstr "Méthode non relayée"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:164
 msgid "Method not relayed on /tables"
 msgstr "Méthode non relayée sur /tables"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:165
 msgid "Table creation not allowed"
 msgstr "Création de table non autorisée"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:166
 msgid "Table not writable through the proxy"
 msgstr "Table non modifiable via le proxy"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:167
 msgid "Write outside scope"
 msgstr "Écriture hors périmètre"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:168
 msgid "Creation outside scope"
 msgstr "Création hors périmètre"
 
-#: lib/apiErrors.ts:167
+#: lib/apiErrors.ts:169
 msgid "Rows outside scope or unknown"
 msgstr "Ligne(s) hors périmètre ou inconnue(s)"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:170
 msgid "Scope check failed"
 msgstr "Vérification du périmètre impossible"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:171
 msgid "Grist writes require the institution right"
 msgstr "Écriture Grist réservée au droit établissement"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:172
 msgid "Writes require an authenticated user (Cloudflare Access)"
 msgstr "Écriture réservée aux utilisateurs identifiés (Cloudflare Access)"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:173
 msgid "Read-only instance: writes are disabled"
 msgstr "Instance en lecture seule : les modifications sont désactivées"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:174
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter indisponible sur cette instance"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:175
 msgid "Missing id for PATCH"
 msgstr "id manquant pour PATCH"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:176
 msgid "Invalid Grist identifiers"
 msgstr "Identifiants Grist invalides"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:177
 msgid "Body with a records array expected"
 msgstr "Corps avec un tableau records attendu"
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:179
 msgid "An LDAP synchronization is already running"
 msgstr "Une synchronisation LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:178
+#: lib/apiErrors.ts:180
 msgid "An LDAP structures synchronization is already running"
 msgstr "Une synchronisation LDAP structures est déjà en cours"
 
-#: lib/apiErrors.ts:179
+#: lib/apiErrors.ts:181
 msgid "An LDAP search is already running"
 msgstr "Une recherche LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:180
+#: lib/apiErrors.ts:182
 msgid "An IdRef alignment is already running"
 msgstr "Un alignement IdRef est déjà en cours"
 
-#: lib/apiErrors.ts:181
+#: lib/apiErrors.ts:183
 msgid "Alignment already running"
 msgstr "Un alignement est déjà en cours"
 
-#: lib/apiErrors.ts:182
+#: lib/apiErrors.ts:184
 msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
-#: lib/apiErrors.ts:183
+#: lib/apiErrors.ts:185
 msgid "No alignment running"
 msgstr "Aucun alignement en cours"
 
-#: lib/apiErrors.ts:184
+#: lib/apiErrors.ts:186
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:186
+#: lib/apiErrors.ts:188
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:187
+#: lib/apiErrors.ts:189
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:188
+#: lib/apiErrors.ts:190
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:189
+#: lib/apiErrors.ts:191
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:191
+#: lib/apiErrors.ts:193
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: lib/apiErrors.ts:193
+#: lib/apiErrors.ts:195
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:194
+#: lib/apiErrors.ts:196
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:195
+#: lib/apiErrors.ts:197
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:196
+#: lib/apiErrors.ts:198
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:198
+#: lib/apiErrors.ts:200
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:199
+#: lib/apiErrors.ts:201
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:200
+#: lib/apiErrors.ts:202
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
@@ -14521,10 +14555,6 @@ msgstr "Interne (Druid)"
 #: lib/tasks.ts:88
 msgid "To do"
 msgstr "À faire"
-
-#: lib/tasks.ts:89
-msgid "In progress"
-msgstr "En cours"
 
 #: lib/tasks.ts:90
 msgid "Waiting"

@@ -386,6 +386,26 @@ export interface PersonIdentifierCheck {
   scheme: string;
 }
 
+export interface PersonThesis {
+  defended_on: string | null;
+  discipline: Generated<string>;
+  institution: Generated<string>;
+  nnt: string;
+  person_id: string;
+  source: Generated<string>;
+  status: string;
+  title: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface PersonThesisCheck {
+  checked_at: Generated<Timestamp>;
+  error: Generated<string>;
+  found: Generated<number>;
+  idref: string;
+  person_id: string;
+}
+
 export interface PersonLink {
   created_at: Generated<Timestamp>;
   id: ColumnType<string, never, never>;
@@ -538,6 +558,8 @@ export interface DB {
   person_identifier: PersonIdentifier;
   person_identifier_check: PersonIdentifierCheck;
   person_link: PersonLink;
+  person_thesis: PersonThesis;
+  person_thesis_check: PersonThesisCheck;
   ref_corps_grade: RefCorpsGrade;
   report: Report;
   report_generation: ReportGeneration;

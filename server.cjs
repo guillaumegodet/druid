@@ -2838,6 +2838,25 @@ app.post('/api/researchers/:key/affiliation-history/refresh', async (req, res) =
   res.json({ entry, run: ahRunInfo() });
 });
 
+// ── Doctoral theses of a researcher (druid-internal docs/plan-funding-calls.md, lot 5) ──────────────────────────
+// Read from theses.fr by scripts/sync_theses.cjs (weekly job), PostgreSQL only; every authenticated right reads them,
+// as the record. The key is the directory uid (a record without uid has no thesis lookup).
+app.get('/api/researchers/:key/theses', async (req, res) => {
+  if (!hasAnyRight(req.session.user?.access)) return res.status(403).json({ error: 'Forbidden' });
+  const store = storage().theses;
+  if (!store) return res.status(501).json({ error: 'The theses need the PostgreSQL storage' });
+  const key = String(req.params.key || '');
+  if (!/^[a-z0-9][a-z0-9._-]{0,63}$/i.test(key)) return res.status(400).json({ error: 'Invalid record key' });
+  try {
+    const found = await store.thesesOfUid(key);
+    if (!found) return res.status(404).json({ error: 'No person with this uid' });
+    res.json(found);
+  } catch (e) {
+    console.error('[theses]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
 // ── « Suggestions de l'établissement » of a record (docs/plan-parcours-affiliations.md, lot 5) ─────
 // Computed server-side by scripts/lib/suggestions.cjs from the Annuaire rows, the career-path entry, the
 // alignment caches (bind-mounted at the app root), the detection rules of sync_tasks.cjs and the tasks
