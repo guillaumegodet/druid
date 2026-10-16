@@ -40,6 +40,7 @@ export const API_ERRORS = [
   msg`The theses need the PostgreSQL storage`,
   msg`No person with this uid`,
   msg`Invalid call id`,
+  msg`Unknown call`,
   msg`Invalid programme id`,
   msg`Invalid programme state`,
   msg`Unknown programme`,

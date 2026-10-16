@@ -19,11 +19,21 @@ données à exécuter au déploiement).
   revérifiée après 180 jours ou quand son IdRef change. Tables `person_thesis` et `person_thesis_check` (migration
   `20261016200000_person_thesis.sql`, PostgreSQL seulement) ; la fiche chercheur affiche la thèse sous la ligne HDR
   (lien vers theses.fr). La date de la thèse sert à l'éligibilité aux dispositifs jeunes chercheurs.
+- **Candidats aux appels réservés par étape de carrière** (même lot, décision D5) : `scripts/.build/compute_eligibility.cjs`
+  lit la règle de chaque appel ouvert ou à venir dans son texte collecté — fenêtre de soutenance de la thèse des ERC
+  Starting et Consolidator, propre à chaque édition (2027 : StG = thèse de 2017 à 2026, CoG = de 2012 à 2021) — et
+  classe les chercheurs présents ayant une thèse soutenue : éligible, à vérifier (date connue à l'année à une borne,
+  ou thèse juste avant la fenêtre, que l'ERC prolonge pour maternité, congé parental, maladie, service national,
+  formation clinique), les non-éligibles n'étant pas gardés. Vue **Candidats** de l'onglet Appels à projets, réservée
+  au droit établissement : règle et phrase de l'appel, filtres verdict et grade, lien vers la fiche, export CSV.
+  Migration `20261016210000_call_eligibility.sql` (`call_eligibility_rule`, `call_eligibility`).
 
 ### Migration
 - `druid-migrate`, puis première synchronisation à la main (≈ 1 h pour 5 000 fiches) :
   `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/sync_theses.cjs` ; job hebdomadaire à
   déclarer dans ofelia (`druid-theses-sync`, voir le plan).
+- Calcul des candidats après la première synchronisation des thèses :
+  `docker exec crisalid-druid-1 node scripts/.build/compute_eligibility.cjs` ; job nocturne `druid-calls-eligibility`.
 
 ## [2.7.0] — 2026-10-16
 

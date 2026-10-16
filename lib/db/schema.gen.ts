@@ -97,6 +97,29 @@ export interface CallCollection {
   status: Generated<string>;
 }
 
+export interface CallEligibility {
+  call_id: string;
+  computed_at: Generated<Timestamp>;
+  grade: Generated<string>;
+  person_id: string;
+  person_name: Generated<string>;
+  phd_on: string | null;
+  reasons: Generated<string[]>;
+  uid: Generated<string>;
+  units: Generated<string[]>;
+  verdict: string;
+}
+
+export interface CallEligibilityRule {
+  call_id: string;
+  computed_at: Generated<Timestamp>;
+  extension_years: Generated<number>;
+  phd_from: string;
+  phd_to: string;
+  scheme: Generated<string>;
+  source_text: Generated<string>;
+}
+
 export interface CallFeedback {
   author: string;
   comment: Generated<string>;
@@ -538,6 +561,8 @@ export interface DB {
   axis_review: AxisReview;
   benchmark_peer_group: BenchmarkPeerGroup;
   call_collection: CallCollection;
+  call_eligibility: CallEligibility;
+  call_eligibility_rule: CallEligibilityRule;
   call_feedback: CallFeedback;
   call_match: CallMatch;
   call_match_run: CallMatchRun;
