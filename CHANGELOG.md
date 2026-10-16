@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.8.0] — 2026-10-16
+
 ### Ajouté
 - **Collecte des appels de l'ANR** (druid-internal `docs/plan-funding-calls.md`, lot 4) :
   `scripts/.build/collect_calls.cjs --source=anr` lit la liste des appels ouverts ou annoncés d'anr.fr et la page de
