@@ -20,8 +20,10 @@ import {
 import type { MatchOverall } from '../../lib/calls/trm';
 import type { FunderCategory } from '../../lib/calls/programmes';
 import { FUNDER_CATEGORY_LABELS } from './fundersAggregates';
+import { CallCandidates } from './CallCandidates';
+import { canUseEstablishmentTools } from '../../lib/auth';
 
-type View = 'calls' | 'researchers';
+type View = 'calls' | 'researchers' | 'candidates';
 
 const OPENALEX_SEARCH = 'https://openalex.org/works?filter=default.search:';
 
@@ -223,11 +225,14 @@ const CallRow: React.FC<{
   );
 };
 
-const ViewSwitch: React.FC<{ view: View; onChange: (v: View) => void }> = ({ view, onChange }) => {
+const ViewSwitch: React.FC<{ view: View; onChange: (v: View) => void; withCandidates: boolean }> = ({ view, onChange, withCandidates }) => {
   const { t } = useLingui();
+  const views: [View, string][] = [['calls', t`Calls`], ['researchers', t`Researchers`]];
+  // Candidates by career stage (lot 5): institution right only (D5).
+  if (withCandidates) views.push(['candidates', t`Candidates`]);
   return (
     <div className="flex items-center gap-1 p-1 rounded-full bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/15 shadow-soft w-fit">
-      {([['calls', t`Calls`], ['researchers', t`Researchers`]] as const).map(([k, label]) => (
+      {views.map(([k, label]) => (
         <button
           key={k}
           type="button"
@@ -403,7 +408,8 @@ export const CallsTab: React.FC<{
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        <ViewSwitch view={view} onChange={setView} />
+        <ViewSwitch view={view} onChange={setView} withCandidates={canUseEstablishmentTools()} />
+        {view !== 'candidates' && (<>
         <label className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-lighter dark:text-[#8f897c]" />
           <input
@@ -454,9 +460,12 @@ export const CallsTab: React.FC<{
             <input type="checkbox" checked={onlyMatched} onChange={(e) => setOnlyMatched(e.target.checked)} /> <Trans>Calls with researchers only</Trans>
           </label>
         )}
+        </>)}
       </div>
 
-      {view === 'calls' ? (
+      {view === 'candidates' ? (
+        <CallCandidates researchers={researchers} onOpenResearcher={onOpenResearcher} />
+      ) : view === 'calls' ? (
         callRows.length === 0 ? (
           <p className="text-[13px] text-muted-lighter dark:text-[#8f897c]"><Trans>No call matches these filters.</Trans></p>
         ) : (

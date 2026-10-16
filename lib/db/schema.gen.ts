@@ -97,6 +97,30 @@ export interface CallCollection {
   status: Generated<string>;
 }
 
+export interface CallEligibility {
+  call_id: string;
+  computed_at: Generated<Timestamp>;
+  grade: Generated<string>;
+  person_id: string;
+  person_name: Generated<string>;
+  phd_on: string | null;
+  reasons: Generated<string[]>;
+  row_ids: Generated<string[]>;
+  uid: Generated<string>;
+  units: Generated<string[]>;
+  verdict: string;
+}
+
+export interface CallEligibilityRule {
+  call_id: string;
+  computed_at: Generated<Timestamp>;
+  extension_years: Generated<number>;
+  phd_from: string;
+  phd_to: string;
+  scheme: Generated<string>;
+  source_text: Generated<string>;
+}
+
 export interface CallFeedback {
   author: string;
   comment: Generated<string>;
@@ -386,6 +410,26 @@ export interface PersonIdentifierCheck {
   scheme: string;
 }
 
+export interface PersonThesis {
+  defended_on: string | null;
+  discipline: Generated<string>;
+  institution: Generated<string>;
+  nnt: string;
+  person_id: string;
+  source: Generated<string>;
+  status: string;
+  title: Generated<string>;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface PersonThesisCheck {
+  checked_at: Generated<Timestamp>;
+  error: Generated<string>;
+  found: Generated<number>;
+  idref: string;
+  person_id: string;
+}
+
 export interface PersonLink {
   created_at: Generated<Timestamp>;
   id: ColumnType<string, never, never>;
@@ -518,6 +562,8 @@ export interface DB {
   axis_review: AxisReview;
   benchmark_peer_group: BenchmarkPeerGroup;
   call_collection: CallCollection;
+  call_eligibility: CallEligibility;
+  call_eligibility_rule: CallEligibilityRule;
   call_feedback: CallFeedback;
   call_match: CallMatch;
   call_match_run: CallMatchRun;
@@ -538,6 +584,8 @@ export interface DB {
   person_identifier: PersonIdentifier;
   person_identifier_check: PersonIdentifierCheck;
   person_link: PersonLink;
+  person_thesis: PersonThesis;
+  person_thesis_check: PersonThesisCheck;
   ref_corps_grade: RefCorpsGrade;
   report: Report;
   report_generation: ReportGeneration;

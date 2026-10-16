@@ -2298,6 +2298,39 @@ app.get('/api/calls/feedback.csv', requireEstablishmentScope, withCalls(async (r
   res.send(`\ufeff${lines.join('\r\n')}\r\n`);
 }));
 
+// Candidates of the calls reserved by career stage (docs/plan-funding-calls.md, lot 5, decision D5): the rule each call
+// states and the researchers it makes eligible, computed by scripts/compute_eligibility.cjs. Institution right only:
+// a career-based list is not shown to the lab rights.
+const withEligibility = (handler) => async (req, res) => {
+  const store = storage().eligibility;
+  if (!store) return res.status(501).json({ error: 'The calls for proposals need the PostgreSQL storage' });
+  try {
+    await handler(req, res, store);
+  } catch (e) {
+    console.error('[eligibility]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+};
+app.get('/api/calls/eligibility', requireEstablishmentScope, withEligibility(async (req, res, store) => {
+  res.json({ rules: await store.rules() });
+}));
+app.get('/api/calls/eligibility/:callId', requireEstablishmentScope, withEligibility(async (req, res, store) => {
+  const callId = String(req.params.callId || '');
+  if (!/^[A-Za-z0-9._-]{1,120}$/.test(callId)) return res.status(400).json({ error: 'Invalid call id' });
+  const rule = (await store.rules()).find((r) => r.callId === callId);
+  if (!rule) return res.status(404).json({ error: 'Unknown call' });
+  const candidates = await store.candidates(callId);
+  if (req.query.format === 'csv') {
+    const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const head = ['call_id', 'uid', 'name', 'units', 'grade', 'phd', 'verdict', 'reasons'];
+    const lines = [head.join(';'), ...candidates.map((c) => [c.callId, c.uid, c.personName, c.units.join(' | '), c.grade, c.phdOn, c.verdict, c.reasons.join(' ')].map(cell).join(';'))];
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="candidates-${callId.toLowerCase()}.csv"`);
+    return res.send(`\ufeff${lines.join('\r\n')}\r\n`);
+  }
+  res.json({ rule, candidates });
+}));
+
 // Administration › Calls for proposals (docs/plan-funding-calls.md, lot 2): programmes of the collectors (activate /
 // deactivate) and the log of the collections. Institution right, like the other administration tabs; the programmes
 // declared in the code are aligned with the table on each read, so that a new release shows its new programmes.
@@ -2836,6 +2869,25 @@ app.post('/api/researchers/:key/affiliation-history/refresh', async (req, res) =
   const entry = AH_STORE.readEntry(AFFILIATION_HISTORY_DIR, key);
   if (!entry) return res.status(404).json({ error: 'No usable identifier for this record' });
   res.json({ entry, run: ahRunInfo() });
+});
+
+// ── Doctoral theses of a researcher (druid-internal docs/plan-funding-calls.md, lot 5) ──────────────────────────
+// Read from theses.fr by scripts/sync_theses.cjs (weekly job), PostgreSQL only; every authenticated right reads them,
+// as the record. The key is the directory uid (a record without uid has no thesis lookup).
+app.get('/api/researchers/:key/theses', async (req, res) => {
+  if (!hasAnyRight(req.session.user?.access)) return res.status(403).json({ error: 'Forbidden' });
+  const store = storage().theses;
+  if (!store) return res.status(501).json({ error: 'The theses need the PostgreSQL storage' });
+  const key = String(req.params.key || '');
+  if (!/^[a-z0-9][a-z0-9._-]{0,63}$/i.test(key)) return res.status(400).json({ error: 'Invalid record key' });
+  try {
+    const found = await store.thesesOfUid(key);
+    if (!found) return res.status(404).json({ error: 'No person with this uid' });
+    res.json(found);
+  } catch (e) {
+    console.error('[theses]', e.message);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ── « Suggestions de l'établissement » of a record (docs/plan-parcours-affiliations.md, lot 5) ─────

@@ -7,6 +7,7 @@ import { FuzzyDateInput } from './FuzzyDateInput';
 import { FteInput } from './FteInput';
 import { useFteColumns } from '../../hooks/useFteColumns';
 import { LdapUidLookup, LdapLookupOutcome } from './LdapUidLookup';
+import { ThesisInfo } from './ThesisInfo';
 import { Trans, useLingui } from '@lingui/react/macro';
 
 const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean }> = ({ label, fromLdap }) => (
@@ -344,6 +345,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                  </div>
                )}
              </div>
+             <ThesisInfo uid={researcher.uid || ''} labelClassName={secLabel} />
           </div>
        </div>
 
