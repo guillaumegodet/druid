@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.8.1] — 2026-10-16
+
 ### Corrigé
 - **Fiche chercheur — thèse d'une fiche sans uid** : la thèse lue sur theses.fr ne s'affichait que pour les fiches
   ayant un uid d'annuaire ; une fiche sans uid (identifiant `ext_…`) la retrouve maintenant par sa ligne d'annuaire
