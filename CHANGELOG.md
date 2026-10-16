@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.7.0] — 2026-10-16
+
 ### Ajouté
 - **Appariement de tous les programmes du portail** (druid-internal `docs/plan-funding-calls.md`, lot 3) :
   `scripts/.build/export_calls.cjs --programme=<id> --out=<dossier>` écrit les appels ouverts ou à venir d'un programme
@@ -49,6 +51,12 @@ données à exécuter au déploiement).
 - `20261015150000_funding_calls.sql` : crée les tables génériques, y reporte les topics, runs, appariements et avis
   Horizon Europe déjà importés, puis supprime les tables `eu_*` (retour arrière possible : la migration `down` les
   reconstitue depuis le programme `horizon-europe`).
+- `20261016090000_call_collections.sql` : journal `call_collection` et `funding_programme.last_collected_at`.
+- Après le déploiement (instances PostgreSQL) : première collecte du portail
+  `NODE_USE_ENV_PROXY=1 node scripts/.build/collect_calls.cjs --source=ft-portal` (≈ 400 textes par passage, relancer
+  jusqu'à « 0 new »), puis job nocturne ofelia `collect_calls.cjs --source=ft-portal` (snippet dans druid-internal
+  `docs/plan-funding-calls.md`) ; réimport des rapports d'appariement par `import_calls.cjs` (`--perimeter=`,
+  `--programme=` hors Horizon Europe) — `import_trm.cjs` n'existe plus.
 
 ### Corrigé
 - **Appels à projets — filtre de sous-ensemble sans libellé** : le second filtre de l'onglet (clusters, missions,
