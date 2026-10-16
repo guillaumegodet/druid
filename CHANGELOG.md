@@ -51,6 +51,10 @@ données à exécuter au déploiement).
   reconstitue depuis le programme `horizon-europe`).
 
 ### Corrigé
+- **Appels à projets — doublons du portail** : le portail Funding & Tenders liste certains topics une seconde fois sous
+  un identifiant sans année (`HORIZON-EIC-PATHFINDERCHALLENGES-01-01` à côté de `HORIZON-EIC-2026-…`), même titre,
+  mêmes dates, en « à venir » et sans sous-ensemble : la collecte écarte cette copie et supprime celles qu'une collecte
+  précédente avait enregistrées (sauf si un run les a appariées).
 - **Appels à projets** : l'avertissement « hors de ce périmètre » ne s'affiche plus pour une structure contenue dans le
   périmètre du calcul — un labo ou une équipe pour un run sur tout l'établissement (« Nantes Université »), une équipe
   pour un run sur son labo.

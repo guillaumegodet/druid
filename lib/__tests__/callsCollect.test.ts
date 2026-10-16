@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { collectFromPortal, collectedCallOf, contentHashOf, listingChanged, type CollectedCall, type CollectorStore, type StoredCallSummary } from '../calls/collect';
+import { collectFromPortal, collectedCallOf, contentHashOf, listingChanged, undatedIdentifier, undatedTwins, type CollectedCall, type CollectorStore, type StoredCallSummary } from '../calls/collect';
 import type { PortalTopic } from '../calls/portal';
 import { PORTAL_PROGRAMMES_BUILT_IN } from '../calls/programmes';
 
@@ -19,6 +19,8 @@ const details = (id: string): PortalTopic => ({
 class MemoryStore implements CollectorStore {
   calls = new Map<string, CollectedCall>();
   dates: { callId: string; status: string }[] = [];
+  /** Calls a run matched: never deleted. */
+  matched = new Set<string>();
   constructor(stored: Omit<StoredCallSummary, 'hasText'>[] = []) {
     for (const s of stored) this.calls.set(s.callId, { ...collectedCallOf({ identifier: s.callId, title: s.title, callIdentifier: '', callTitle: '', framework: 'HORIZON', divisions: [], status: s.status, deadlines: s.deadlines, openingDate: s.openingDate, keywords: [], typesOfAction: [] }, { programmeId: s.programmeId, subset: '', scheme: '' }, null), objectives: 'stored text' });
   }
@@ -34,6 +36,11 @@ class MemoryStore implements CollectorStore {
     this.dates.push({ callId, status });
     const c = this.calls.get(callId);
     if (c) this.calls.set(callId, { ...c, status, deadlines, openingDate });
+  }
+  async removeCalls(callIds: string[]) {
+    const removable = callIds.filter((id) => this.calls.has(id) && !this.matched.has(id));
+    for (const id of removable) this.calls.delete(id);
+    return removable.length;
   }
 }
 
@@ -119,10 +126,48 @@ describe('collectFromPortal', () => {
     expect(stats.errors).toEqual(['HORIZON-CL4-2026-01-A: boom']);
   });
 
+  it('leaves out the undated copy of a dated topic and deletes the copy stored by an earlier run', async () => {
+    const eic = PORTAL_PROGRAMMES_BUILT_IN.filter((p) => p.programmeId === 'eic');
+    const store = new MemoryStore([
+      { callId: 'HORIZON-EIC-PATHFINDERCHALLENGES-01-01', programmeId: 'eic', title: 'Title HORIZON-EIC-PATHFINDERCHALLENGES-01-01', deadlines: ['2026-11-26'], openingDate: '2026-08-25', status: 'forthcoming' },
+      { callId: 'HORIZON-EIC-PATHFINDERCHALLENGES-01-02', programmeId: 'eic', title: 'Title HORIZON-EIC-PATHFINDERCHALLENGES-01-02', deadlines: ['2026-11-26'], openingDate: '2026-08-25', status: 'forthcoming' },
+    ]);
+    store.matched.add('HORIZON-EIC-PATHFINDERCHALLENGES-01-02');
+    const fetched: string[] = [];
+    const stats = await collectFromPortal({
+      programmes: eic, today: '2026-10-15', store,
+      listing: chunks(listing([
+        topic('HORIZON-EIC-PATHFINDERCHALLENGES-01-01', 'Forthcoming'), topic('HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-01'),
+        topic('HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-02'), topic('HORIZON-EIC-PATHFINDERCHALLENGES-01-02', 'Forthcoming'),
+        topic('HORIZON-EIC-PATHFINDERCHALLENGES-01-04', 'Forthcoming'),
+      ])),
+      fetchDetails: async (id) => { fetched.push(id); return details(id); },
+    });
+    expect(stats).toMatchObject({ seen: 3, new: 3, skippedTwins: 2, removedTwins: 1, errors: [] });
+    expect(fetched.sort()).toEqual(['HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-01', 'HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-02', 'HORIZON-EIC-PATHFINDERCHALLENGES-01-04']);
+    expect([...store.calls.keys()].sort()).toEqual([
+      'HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-01', 'HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-02',
+      // Matched by a run: kept, and left alone (neither refreshed nor closed).
+      'HORIZON-EIC-PATHFINDERCHALLENGES-01-02', 'HORIZON-EIC-PATHFINDERCHALLENGES-01-04',
+    ]);
+    expect(store.dates).toEqual([]);
+    expect(store.calls.get('HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-01')).toMatchObject({ subset: 'Pathfinder' });
+  });
+
   it('does nothing without an active programme', async () => {
     const store = new MemoryStore();
     const stats = await collectFromPortal({ programmes: [], today: '2026-10-15', store, listing: chunks(listing([topic('ERC-2027-COG')])), fetchDetails: async () => null });
     expect(stats.seen).toBe(0);
+  });
+});
+
+describe('undatedTwins', () => {
+  it('finds the identifiers that are a dated one without its year', () => {
+    expect(undatedIdentifier('HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-01')).toBe('HORIZON-EIC-PATHFINDERCHALLENGES-01-01');
+    expect(undatedIdentifier('ERC-2027-COG')).toBe('ERC-COG');
+    expect(undatedIdentifier('HORIZON-EIC-PATHFINDERCHALLENGES-01-01')).toBe('HORIZON-EIC-PATHFINDERCHALLENGES-01-01');
+    expect([...undatedTwins(['HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-01', 'HORIZON-EIC-PATHFINDERCHALLENGES-01-01', 'HORIZON-EIC-PATHFINDERCHALLENGES-01-04', 'ERC-2027-COG'])])
+      .toEqual(['HORIZON-EIC-PATHFINDERCHALLENGES-01-01']);
   });
 });
 

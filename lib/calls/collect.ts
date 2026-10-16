@@ -46,6 +46,8 @@ export interface CollectorStore {
   upsertCall(call: CollectedCall): Promise<'new' | 'updated'>;
   /** Status and dates of a call known from the listing alone (its text did not change). */
   updateCallDates(callId: string, status: CallStatus, deadlines: string[], openingDate: string | null): Promise<void>;
+  /** Deletes calls that no run matched yet; returns how many were deleted (the others are left in place). */
+  removeCalls(callIds: string[]): Promise<number>;
 }
 
 export interface CollectStats {
@@ -54,6 +56,9 @@ export interface CollectStats {
   updated: number;
   unchanged: number;
   skippedClosed: number;
+  /** Undated copies of a dated topic left out (undatedTwins), and how many of them were deleted from the store. */
+  skippedTwins: number;
+  removedTwins: number;
   detailsFetched: number;
   errors: string[];
 }
@@ -109,16 +114,35 @@ export const collectedCallOf = (topic: PortalListingTopic, match: { programmeId:
   };
 };
 
+/** Identifier of a topic without its year: `HORIZON-EIC-2026-PATHFINDERCHALLENGES-01-01` → `HORIZON-EIC-PATHFINDERCHALLENGES-01-01`. */
+export const undatedIdentifier = (id: string): string => id.replace(/-(?:19|20)\d{2}-/, '-');
+
+/**
+ * Topics of the listing that are an undated copy of a dated one: the portal also lists some topics of a work
+ * programme without their year (EIC Pathfinder Challenges 2026), same title, dates and text, as forthcoming, so that
+ * the call would show twice. The dated identifier is the one of the call.
+ */
+export const undatedTwins = (identifiers: Iterable<string>): Set<string> => {
+  const ids = new Set(identifiers);
+  const twins = new Set<string>();
+  for (const id of ids) {
+    const undated = undatedIdentifier(id);
+    if (undated !== id && ids.has(undated)) twins.add(undated);
+  }
+  return twins;
+};
+
 /** Runs one collection; never throws for a single topic (errors are counted and reported). */
 export async function collectFromPortal(options: CollectOptions): Promise<CollectStats> {
   const log = options.log ?? (() => {});
-  const stats: CollectStats = { seen: 0, new: 0, updated: 0, unchanged: 0, skippedClosed: 0, detailsFetched: 0, errors: [] };
+  const stats: CollectStats = { seen: 0, new: 0, updated: 0, unchanged: 0, skippedClosed: 0, skippedTwins: 0, removedTwins: 0, detailsFetched: 0, errors: [] };
   const active = new Set(options.programmes.map((p) => p.programmeId));
   if (!active.size) return stats;
   const stored = new Map((await options.store.storedCalls([...active])).map((c) => [c.callId, c]));
   const seen = new Set<string>();
   const toFetch: { topic: PortalListingTopic; match: { programmeId: string; subset: string; scheme: string }; isNew: boolean }[] = [];
 
+  const listed: { topic: PortalListingTopic; match: { programmeId: string; subset: string; scheme: string } }[] = [];
   for await (const text of portalListingObjects(options.listing)) {
     let topic: PortalListingTopic | null;
     try {
@@ -129,7 +153,18 @@ export async function collectFromPortal(options: CollectOptions): Promise<Collec
     }
     if (!topic) continue;
     const match = programmeOfPortalTopic(topic);
-    if (!match || !active.has(match.programmeId)) continue;
+    if (match && active.has(match.programmeId)) listed.push({ topic, match });
+  }
+  // Undated copies: never imported, deleted when an earlier collection stored them (unless a run matched them).
+  const twins = undatedTwins(listed.map((l) => l.topic.identifier));
+  const storedTwins = [...twins].filter((id) => stored.has(id));
+  if (storedTwins.length) {
+    stats.removedTwins = await options.store.removeCalls(storedTwins);
+    for (const id of storedTwins) stored.delete(id);
+  }
+
+  for (const { topic, match } of listed) {
+    if (twins.has(topic.identifier)) { stats.skippedTwins++; continue; }
     stats.seen++;
     seen.add(topic.identifier);
     const existing = stored.get(topic.identifier);
@@ -175,6 +210,6 @@ export async function collectFromPortal(options: CollectOptions): Promise<Collec
       stats.updated++;
     }
   }
-  log(`portal: ${stats.seen} topics of the active programmes, ${stats.new} new, ${stats.updated} updated, ${stats.unchanged} unchanged, ${stats.skippedClosed} closed skipped, ${stats.detailsFetched} texts fetched, ${stats.errors.length} error(s)`);
+  log(`portal: ${stats.seen} topics of the active programmes, ${stats.new} new, ${stats.updated} updated, ${stats.unchanged} unchanged, ${stats.skippedClosed} closed skipped, ${stats.skippedTwins} undated copies skipped (${stats.removedTwins} deleted), ${stats.detailsFetched} texts fetched, ${stats.errors.length} error(s)`);
   return stats;
 }

@@ -413,6 +413,13 @@ export const createCallsStore = (db: Kysely<DB>) => {
     updateCallDates: async (callId, status, deadlines, openingDate) => {
       await db.updateTable('funding_call').set({ status, deadlines, opening_date: openingDate, updated_at: sql`now()` }).where('call_id', '=', callId).execute();
     },
+    removeCalls: async (callIds: string[]): Promise<number> => {
+      if (!callIds.length) return 0;
+      const deleted = await db.deleteFrom('funding_call').where('call_id', 'in', callIds)
+        .where(({ not, exists, selectFrom }) => not(exists(selectFrom('call_match').select('pair_id').whereRef('call_match.call_id', '=', 'funding_call.call_id'))))
+        .executeTakeFirst();
+      return Number(deleted.numDeletedRows);
+    },
   };
 
   return {
