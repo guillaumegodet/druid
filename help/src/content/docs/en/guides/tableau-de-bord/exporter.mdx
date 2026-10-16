@@ -1,6 +1,6 @@
 ---
 title: "Export data and reports"
-description: "Export as CSV, Excel, PNG or PDF: lists, records, charts, publications and reports."
+description: "Export as CSV, Excel, PNG, SVG or PDF: lists, records, charts and their data, publications and reports."
 sidebar:
   order: 6
 ---
@@ -22,7 +22,7 @@ people, a record, a chart, a list of publications or a complete report.
 | Staff list | **People › Export** | CSV, Excel (.xlsx), PDF |
 | A researcher record | Record › **Export PDF** | PDF |
 | File for ABES | **People › Export › ABES export (IdRef)** | Excel, see [Export a file for ABES](/en/guides/identifiants/export-abes/) |
-| A chart | Chart toolbar › **Download as PNG** | PNG |
+| A chart and its data | Chart toolbar › **Download** | PNG, SVG, PDF, CSV |
 | A list of publications | **Publication list › Export as CSV (filtered results)** | CSV |
 | A report (charts, key figures, texts) | **My reports** › a report › **Generate the PDF** | PDF, see [Create a report](/en/guides/rapports/creer-un-rapport/) |
 
@@ -37,7 +37,12 @@ The file contains the people **on display**, with their name, e-mail, status and
 
 Each chart of the dashboard has a toolbar, at the top right:
 
-- **Download as PNG**: the image of the chart, for a presentation;
+- **Download** opens a menu:
+  - **PNG image**: the image of the chart, for a presentation;
+  - **SVG image (vector)** and **PDF (vector)**: the chart as paths and text, sharp at any
+    size, for a paper, a poster or a LaTeX document (`pdflatex` takes the PDF directly);
+  - **Data (CSV)**: the table of the plotted values, for a spreadsheet (`;` separator,
+    decimal comma). A network gives two files, the nodes and the links;
 - **Full screen**;
 - **Share (public link / iframe)**: to embed the chart in a website (see
   [Embed a chart in a website](/en/guides/tableau-de-bord/integrer-une-dataviz/));
@@ -60,6 +65,13 @@ history.
 
 ## Known limitations
 
+- **A chart's CSV holds what the chart shows**: same groupings, same « Others », same top N.
+  For the publications themselves, use the **Publication list**. It is also offered on charts
+  embedded in a website.
+- **The SVG and PDF exports keep the displayed state** (series hidden in the legend, map zoom,
+  network layout) in the current theme: switch to the light theme for a white background. EPS
+  is not offered; the vector PDF replaces it for most journals and for LaTeX, and software such
+  as Inkscape converts the SVG to EPS if needed.
 - **An export reflects the display**: current filters, period and scope. Check them before
   exporting.
 - **The staff list export is brief** (name, e-mail, status, laboratory): for other columns,

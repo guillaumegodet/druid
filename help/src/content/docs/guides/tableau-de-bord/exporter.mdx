@@ -1,6 +1,6 @@
 ---
 title: "Exporter des données et des rapports"
-description: "Exporter en CSV, Excel, PNG ou PDF : listes, fiches, graphiques, publications et rapports."
+description: "Exporter en CSV, Excel, PNG, SVG ou PDF : listes, fiches, graphiques et leurs données, publications et rapports."
 sidebar:
   order: 6
 ---
@@ -22,7 +22,7 @@ de personnes, une fiche, un graphique, une liste de publications ou un rapport c
 | Liste des personnels | **Personnel › Exporter** | CSV, Excel (.xlsx), PDF |
 | Une fiche chercheur | Fiche › **Export PDF** | PDF |
 | Fichier pour l'ABES | **Personnel › Exporter › Export ABES (IdRef)** | Excel, voir [Exporter un fichier pour l'ABES](/guides/identifiants/export-abes/) |
-| Un graphique | Barre d'outils du graphique › **Télécharger en PNG** | PNG |
+| Un graphique et ses données | Barre d'outils du graphique › **Télécharger** | PNG, SVG, PDF, CSV |
 | Une liste de publications | **Liste des publications › Exporter en CSV (résultats filtrés)** | CSV |
 | Un rapport (graphiques, chiffres clés, textes) | **Mes rapports** › un rapport › **Générer le PDF** | PDF, voir [Créer un rapport](/guides/rapports/creer-un-rapport/) |
 
@@ -38,7 +38,13 @@ leur laboratoire.
 
 Chaque graphique du tableau de bord a une barre d'outils, en haut à droite :
 
-- **Télécharger en PNG** : l'image du graphique, pour une présentation ;
+- **Télécharger** ouvre un menu :
+  - **Image PNG** : l'image du graphique, pour une présentation ;
+  - **Image SVG (vectorielle)** et **PDF (vectoriel)** : le graphique en tracés et en texte,
+    net à toutes les tailles, pour un article, une affiche ou un document LaTeX (`pdflatex`
+    accepte le PDF directement) ;
+  - **Données (CSV)** : le tableau des valeurs dessinées, à ouvrir dans un tableur (séparateur
+    `;`, virgule décimale). Un réseau donne deux fichiers, les nœuds et les liens ;
 - **Plein écran** ;
 - **Partager (lien public / iframe)** : pour intégrer le graphique sur un site (voir
   [Intégrer une dataviz sur un site](/guides/tableau-de-bord/integrer-une-dataviz/)) ;
@@ -61,6 +67,13 @@ PDF peut être archivé dans son historique.
 
 ## Limites connues
 
+- **Le CSV d'un graphique contient ce que le graphique montre** : mêmes regroupements, même
+  « Autres », même top N. Pour les publications elles-mêmes, passez par la **Liste des
+  publications**. Il est aussi proposé sur les graphiques intégrés à un site.
+- **Les exports SVG et PDF reprennent l'état affiché** (séries masquées dans la légende, zoom
+  d'une carte, disposition d'un réseau) avec le thème en cours : passez en thème clair pour un
+  fond blanc. Le format EPS n'est pas proposé ; le PDF vectoriel le remplace dans la plupart
+  des revues et dans LaTeX, et un logiciel comme Inkscape convertit le SVG en EPS si besoin.
 - **Un export reflète l'affichage** : filtres, période et périmètre en cours. Vérifiez-les
   avant d'exporter.
 - **L'export de la liste des personnels est succinct** (nom, e-mail, statut, laboratoire) :

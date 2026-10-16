@@ -77,8 +77,8 @@ Si des corrections importantes sont faites (dépôts HAL, affiliations OpenAlex)
   inutiles, ajoutez vos textes, puis **Générer le PDF** (voir
   [Créer un rapport](/guides/rapports/creer-un-rapport/)). Le rapport reste dans **Mes
   rapports** : l'an prochain, changez la période et régénérez-le.
-- **Graphiques isolés** : **Télécharger en PNG** depuis la barre d'outils de chaque
-  graphique, pour les insérer dans le rapport.
+- **Graphiques isolés** : **Télécharger** depuis la barre d'outils de chaque graphique, en
+  PNG, en SVG ou PDF vectoriel pour les insérer dans le rapport, ou leurs données en CSV.
 - **Liste des publications** : le CSV de l'étape 4, relu.
 
 ## Étape 6 — Documenter

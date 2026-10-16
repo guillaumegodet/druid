@@ -512,7 +512,7 @@ msgid "Copied!"
 msgstr "Copied!"
 
 #: components/DashboardPage.tsx:452
-#: components/dashboard/EChartCard.tsx:362
+#: components/dashboard/EChartCard.tsx:337
 #: components/reports/ShareDialog.tsx:188
 msgid "Copy link"
 msgstr "Copy link"
@@ -838,6 +838,7 @@ msgstr "Scope"
 #: components/admin/CallsProgrammesAdmin.tsx:107
 #: components/admin/CallsProgrammesAdmin.tsx:155
 #: components/researchers/AlignLaunchModal.tsx:128
+#: lib/chartExport.ts:214
 msgid "Source"
 msgstr "Source"
 
@@ -972,6 +973,10 @@ msgstr "Acronym"
 #: components/researchers/LdapMovesPanel.tsx:167
 #: components/researchers/LdapMovesPanel.tsx:222
 #: components/researchers/ListHeader.tsx:48
+#: lib/chartExport.ts:134
+#: lib/chartExport.ts:153
+#: lib/chartExport.ts:169
+#: lib/chartExport.ts:227
 msgid "Name"
 msgstr "Name"
 
@@ -1043,7 +1048,7 @@ msgid "Open full screen / regenerate from the current structures.csv"
 msgstr "Open full screen / regenerate from the current structures.csv"
 
 #: components/StructureList.tsx:336
-#: components/dashboard/EChartCard.tsx:558
+#: components/dashboard/EChartCard.tsx:619
 msgid "Full screen"
 msgstr "Full screen"
 
@@ -1225,13 +1230,13 @@ msgid "thematic + eligibility"
 msgstr "thematic + eligibility"
 
 #: components/admin/CallsProgrammesAdmin.tsx:68
-msgid "TRM reports"
-msgstr "TRM reports"
-
-#: components/admin/CallsProgrammesAdmin.tsx:68
 #: components/dashboard/CallsTab.tsx:207
 msgid "Funding & Tenders portal"
 msgstr "Funding & Tenders portal"
+
+#: components/admin/CallsProgrammesAdmin.tsx:68
+msgid "TRM reports"
+msgstr "TRM reports"
 
 #: components/admin/CallsProgrammesAdmin.tsx:72
 msgid "Loading the programmes…"
@@ -1341,15 +1346,15 @@ msgstr "running"
 msgid "failed"
 msgstr "failed"
 
-#. placeholder {0}: c.error.split('\n').length
-#: components/admin/CallsProgrammesAdmin.tsx:177
-msgid "{0, plural, one {# error} other {# errors}}"
-msgstr "{0, plural, one {# error} other {# errors}}"
-
 #: components/admin/CallsProgrammesAdmin.tsx:177
 #: components/researchers/UnifiedAlignPage.tsx:608
 msgid "done"
 msgstr "done"
+
+#. placeholder {0}: c.error.split('\n').length
+#: components/admin/CallsProgrammesAdmin.tsx:177
+msgid "{0, plural, one {# error} other {# errors}}"
+msgstr "{0, plural, one {# error} other {# errors}}"
 
 #: components/admin/GraphActionsPanel.tsx:80
 msgid "Identifier removals sent to the CRISalid graph"
@@ -1990,6 +1995,7 @@ msgstr "Publication types by strategic axis"
 #: components/dashboard/NewsTab.tsx:585
 #: components/dashboard/StaffSection.tsx:254
 #: components/dashboard/StaffSection.tsx:379
+#: components/dashboard/charts/WorldChoroplethChart.tsx:58
 #: components/dashboard/charts/YearlyEvolutionChart.tsx:41
 #: components/dashboard/dashboardNav.ts:64
 #: components/dashboard/kpiItems.ts:35
@@ -3486,12 +3492,12 @@ msgstr "{0} co-publications acknowledge at least one funder ({1}): {2} a funder 
 msgid "Other countries and languages"
 msgstr "Other countries and languages"
 
-#: components/dashboard/EChartCard.tsx:282
+#: components/dashboard/EChartCard.tsx:257
 msgid "About “{title}”"
 msgstr "About “{title}”"
 
-#: components/dashboard/EChartCard.tsx:288
-#: components/dashboard/EChartCard.tsx:353
+#: components/dashboard/EChartCard.tsx:263
+#: components/dashboard/EChartCard.tsx:328
 #: components/dashboard/NetworkTab.tsx:356
 #: components/dashboard/NewsTab.tsx:815
 #: components/dashboard/NewsletterPanel.tsx:435
@@ -3510,66 +3516,96 @@ msgstr "About “{title}”"
 msgid "Close"
 msgstr "Close"
 
-#: components/dashboard/EChartCard.tsx:295
+#: components/dashboard/EChartCard.tsx:270
 #: components/researchers/TaskForm.tsx:147
 #: components/structures/IdentificationTab.tsx:57
 msgid "Description"
 msgstr "Description"
 
-#: components/dashboard/EChartCard.tsx:299
+#: components/dashboard/EChartCard.tsx:274
 #: components/dashboard/StaffSection.tsx:281
 #: components/dashboard/StaffSection.tsx:414
 #: components/dashboard/report/pdfDoc.ts:359
 msgid "Method"
 msgstr "Method"
 
-#: components/dashboard/EChartCard.tsx:304
+#: components/dashboard/EChartCard.tsx:279
 #: components/dashboard/report/pdfDoc.ts:360
 msgid "Limitations"
 msgstr "Limitations"
 
-#: components/dashboard/EChartCard.tsx:347
+#: components/dashboard/EChartCard.tsx:322
 msgid "Share “{title}”"
 msgstr "Share “{title}”"
 
-#: components/dashboard/EChartCard.tsx:350
+#: components/dashboard/EChartCard.tsx:325
 msgid "Public link: accessible without authentication, with the current filters (structure and year range)."
 msgstr "Public link: accessible without authentication, with the current filters (structure and year range)."
 
-#: components/dashboard/EChartCard.tsx:359
+#: components/dashboard/EChartCard.tsx:334
 msgid "Direct link"
 msgstr "Direct link"
 
-#: components/dashboard/EChartCard.tsx:365
+#: components/dashboard/EChartCard.tsx:340
 msgid "Open in a new tab"
 msgstr "Open in a new tab"
 
-#: components/dashboard/EChartCard.tsx:372
+#: components/dashboard/EChartCard.tsx:347
 msgid "Iframe embed"
 msgstr "Iframe embed"
 
-#: components/dashboard/EChartCard.tsx:383
+#: components/dashboard/EChartCard.tsx:358
 msgid "Copy the embed code"
 msgstr "Copy the embed code"
 
-#: components/dashboard/EChartCard.tsx:531
+#: components/dashboard/EChartCard.tsx:519
+msgid "The export failed. Try the PNG format."
+msgstr "The export failed. Try the PNG format."
+
+#: components/dashboard/EChartCard.tsx:549
 msgid "Methodology (description, method, limitations)"
 msgstr "Methodology (description, method, limitations)"
 
-#: components/dashboard/EChartCard.tsx:541
+#: components/dashboard/EChartCard.tsx:559
 #: components/reports/AddToReportDialog.tsx:119
 msgid "Add to a report"
 msgstr "Add to a report"
 
-#: components/dashboard/EChartCard.tsx:548
+#: components/dashboard/EChartCard.tsx:566
 msgid "Share (public link / iframe)"
 msgstr "Share (public link / iframe)"
 
-#: components/dashboard/EChartCard.tsx:552
-msgid "Download as PNG"
-msgstr "Download as PNG"
+#: components/dashboard/EChartCard.tsx:574
+msgid "Download (image or data)"
+msgstr "Download (image or data)"
 
-#: components/dashboard/EChartCard.tsx:558
+#: components/dashboard/EChartCard.tsx:590
+msgid "PNG image"
+msgstr "PNG image"
+
+#: components/dashboard/EChartCard.tsx:593
+msgid "SVG image (vector)"
+msgstr "SVG image (vector)"
+
+#: components/dashboard/EChartCard.tsx:596
+msgid "PDF (vector)"
+msgstr "PDF (vector)"
+
+#. placeholder {0}: tables.map((tb) => tb.name).join(', ')
+#: components/dashboard/EChartCard.tsx:606
+msgid "One file per table: {0}"
+msgstr "One file per table: {0}"
+
+#. placeholder {0}: tables.length
+#: components/dashboard/EChartCard.tsx:608
+msgid "Data (CSV, {0} files)"
+msgstr "Data (CSV, {0} files)"
+
+#: components/dashboard/EChartCard.tsx:608
+msgid "Data (CSV)"
+msgstr "Data (CSV)"
+
+#: components/dashboard/EChartCard.tsx:619
 msgid "Exit full screen"
 msgstr "Exit full screen"
 
@@ -3729,6 +3765,8 @@ msgstr "Project title"
 #: components/dashboard/StaffSection.tsx:105
 #: components/researchers/LdapMovesPanel.tsx:168
 #: components/researchers/LdapMovesPanel.tsx:227
+#: lib/chartExport.ts:103
+#: lib/chartExport.ts:227
 msgid "Category"
 msgstr "Category"
 
@@ -4008,6 +4046,7 @@ msgid "Top 25 keywords"
 msgstr "Top 25 keywords"
 
 #: components/dashboard/MarketShareSection.tsx:23
+#: components/dashboard/charts/WorldChoroplethChart.tsx:58
 #: components/reports/NewReportDialog.tsx:264
 msgid "Country"
 msgstr "Country"
@@ -6480,12 +6519,16 @@ msgstr "Top partner organisations"
 msgid "Co-signing foreign organisations (number of publications)"
 msgstr "Co-signing foreign organisations (number of publications)"
 
-#: components/dashboard/charts/WorldChoroplethChart.tsx:63
+#: components/dashboard/charts/WorldChoroplethChart.tsx:58
+msgid "ISO code"
+msgstr "ISO code"
+
+#: components/dashboard/charts/WorldChoroplethChart.tsx:74
 #: components/dashboard/embedRegistry.tsx:324
 msgid "Map of partner countries"
 msgstr "Map of partner countries"
 
-#: components/dashboard/charts/WorldChoroplethChart.tsx:64
+#: components/dashboard/charts/WorldChoroplethChart.tsx:75
 msgid "Number of co-signed publications by country (France excluded)"
 msgstr "Number of co-signed publications by country (France excluded)"
 
@@ -14005,6 +14048,79 @@ msgstr "NetworkError when attempting to fetch resource."
 #: lib/apiErrors.ts:200
 msgid "Load failed"
 msgstr "Load failed"
+
+#: lib/chartExport.ts:60
+#: lib/chartExport.ts:116
+#: lib/chartExport.ts:153
+#: lib/chartExport.ts:169
+#: lib/chartExport.ts:183
+#: lib/chartExport.ts:214
+#: lib/chartExport.ts:227
+#: lib/chartExport.ts:251
+msgid "Value"
+msgstr "Value"
+
+#. placeholder {0}: i + 1
+#: lib/chartExport.ts:60
+#: lib/chartExport.ts:263
+msgid "Series {0}"
+msgstr "Series {0}"
+
+#: lib/chartExport.ts:116
+msgid "Row"
+msgstr "Row"
+
+#: lib/chartExport.ts:116
+msgid "Column"
+msgstr "Column"
+
+#. placeholder {0}: i + 3
+#: lib/chartExport.ts:131
+msgid "Value {0}"
+msgstr "Value {0}"
+
+#: lib/chartExport.ts:134
+#: lib/chartExport.ts:153
+#: lib/chartExport.ts:169
+msgid "Series"
+msgstr "Series"
+
+#: lib/chartExport.ts:169
+msgid "Longitude"
+msgstr "Longitude"
+
+#: lib/chartExport.ts:169
+msgid "Latitude"
+msgstr "Latitude"
+
+#: lib/chartExport.ts:183
+msgid "From longitude"
+msgstr "From longitude"
+
+#: lib/chartExport.ts:183
+msgid "From latitude"
+msgstr "From latitude"
+
+#: lib/chartExport.ts:183
+msgid "To longitude"
+msgstr "To longitude"
+
+#: lib/chartExport.ts:183
+msgid "To latitude"
+msgstr "To latitude"
+
+#: lib/chartExport.ts:214
+msgid "Target"
+msgstr "Target"
+
+#. placeholder {0}: i + 1
+#: lib/chartExport.ts:251
+msgid "Level {0}"
+msgstr "Level {0}"
+
+#: lib/chartExport.ts:263
+msgid "Indicator"
+msgstr "Indicator"
 
 #. placeholder {0}: resp.status
 #: lib/directoryApi.ts:25
