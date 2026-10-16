@@ -472,10 +472,10 @@ export const EChartCard: React.FC<EChartCardProps> = ({
 
   const [exportOpen, setExportOpen] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
-  // Data export of public embeds: off — an embed shows the chart, not its table.
+  // Offered on public embeds too: the table holds only what the chart already shows.
   const tables = useMemo(
-    () => (exportOpen && !embedMode ? (exportTables ?? (() => chartTables(option)))() : []),
-    [exportOpen, embedMode, exportTables, option],
+    () => (exportOpen ? (exportTables ?? (() => chartTables(option)))() : []),
+    [exportOpen, exportTables, option],
   );
 
   useEffect(() => {

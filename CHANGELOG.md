@@ -22,7 +22,7 @@ données à exécuter au déploiement).
   (légende, zoom, disposition d'un réseau) dans une instance ECharts SVG hors écran, le PDF par svg2pdf.js avec les
   polices de la charte ; le CSV (`;`, virgule décimale, BOM) est relu dans l'option ECharts (`lib/chartExport.ts` :
   catégories × séries, nom / valeur, cellules de heatmap, points de carte, nœuds + liens, niveaux d'un sunburst,
-  indicateurs d'un radar), non proposé sur les graphiques intégrés (`/embed`), journalisé comme les autres exports.
+  indicateurs d'un radar), proposé aussi sur les graphiques intégrés (`/embed`), journalisé comme les autres exports.
 - **Collecte des appels du portail Funding & Tenders** (druid-internal `docs/plan-funding-calls.md`, lot 2) :
   `scripts/.build/collect_calls.cjs --source=ft-portal` lit en flux le fichier de référence public du portail (tous les
   topics, 130 Mo) et le texte de chaque topic nouveau ou modifié (objectifs, périmètre, budget, dates), pour les
