@@ -12,6 +12,22 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Collecte des appels de l'ANR** (druid-internal `docs/plan-funding-calls.md`, lot 4) :
+  `scripts/.build/collect_calls.cjs --source=anr` lit la liste des appels ouverts ou annoncés d'anr.fr et la page de
+  chacun (titre, état pré-annonce / ouvert / clos, dates de la frise, texte), pour deux programmes : **ANR — Appels
+  spécifiques** (partenariats européens, réseaux…) et **France 2030** (PEPR, AMI opérés par l'ANR) ; un appel qui
+  quitte la liste passe à clos. **AAPG** : les axes de recherche de la dernière édition publiée (57 en 2027) sont lus
+  dans le PDF du texte de l'appel (description, mots-clés, panels ERC, ODD) et deviennent chacun un appel du programme
+  `anr-aapg`, rangé par domaine disciplinaire (nouveau filtre « Domaine » de l'onglet), gardé après la clôture jusqu'à
+  l'édition suivante. Nouvelle dépendance `unpdf` (pdf.js, sans dépendance système). L'import des rapports
+  d'appariement ne relit plus le portail Funding & Tenders pour un programme qui n'en vient pas.
+
+### Migration
+- Job hebdomadaire de collecte ANR à déclarer dans ofelia (`druid-calls-collect-anr`, voir le plan) ; première
+  collecte à la main : `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/collect_calls.cjs --source=anr`.
+  Sortie par le proxy obligatoire : en accès direct, le pare-feu du réseau intercepte le TLS d'anr.fr.
+
 ## [2.7.0] — 2026-10-16
 
 ### Ajouté
