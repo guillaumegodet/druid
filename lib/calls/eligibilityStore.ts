@@ -63,7 +63,8 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
     const rows = await db.selectFrom('person as p')
       .innerJoin('membership as m', 'm.person_id', 'p.id')
       .innerJoin('person_thesis as t', 't.person_id', 'p.id')
-      .select(['p.id', 'p.uid', 'p.first_name', 'p.last_name', 'p.corps_grade', 'm.lab_label', 't.status', 't.defended_on'])
+      .leftJoin('structure as s', 's.id', 'm.structure_id')
+      .select(['p.id', 'p.uid', 'p.first_name', 'p.last_name', 'p.corps_grade', 'm.lab_label', 's.acronym', 't.status', 't.defended_on'])
       .where((eb) => eb.or([eb('p.presence_status', 'is', null), eb('p.presence_status', '<>', 'PARTI')]))
       .where((eb) => eb.or([eb('m.end_upper', 'is', null), eb('m.end_upper', '>=', today)]))
       .where('t.status', '=', 'defended')
@@ -71,7 +72,9 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
     const byPerson = new Map<string, { row: (typeof rows)[number]; units: Set<string>; theses: { status: 'defended'; defendedOn: string | null }[] }>();
     for (const r of rows) {
       const e = byPerson.get(r.id) ?? { row: r, units: new Set<string>(), theses: [] };
-      if (r.lab_label) e.units.add(r.lab_label);
+      // The lab of a membership is its structure; the label typed in the record when it has none.
+      const unit = r.acronym || r.lab_label;
+      if (unit) e.units.add(unit);
       e.theses.push({ status: 'defended', defendedOn: r.defended_on });
       byPerson.set(r.id, e);
     }
