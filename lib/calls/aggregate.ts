@@ -150,8 +150,14 @@ export const programmesOfCategory = (programmes: ProgrammeView[], category: Fund
 
 /**
  * Whether the structure shown belongs to the perimeter an engine was run on (the `perimeter` recorded at import, e.g.
- * « IMN »): a perimeter equal to its slug or acronym, or contained in its label. No recorded perimeter = none known.
+ * « IMN », or « Nantes Université » for a run on the whole graph): a perimeter equal to the slug or acronym of the
+ * structure or of a structure enclosing it (its lab, pole, the institution of the instance), or contained in one of
+ * their labels. No recorded perimeter = none known.
  */
-export const inPerimeter = (perimeters: string[], structure: { slug: string; label: string }): boolean =>
-  perimeters.length === 0 || perimeters.some((s) =>
-    normalizeAcronym(s) === normalizeAcronym(structure.slug) || structure.label.toLowerCase().includes(s.toLowerCase()));
+export const inPerimeter = (
+  perimeters: string[],
+  structure: { slug: string; label: string },
+  enclosing: readonly { slug: string; label: string }[] = [],
+): boolean =>
+  perimeters.length === 0 || perimeters.some((s) => [structure, ...enclosing].some((e) =>
+    (!!e.slug && normalizeAcronym(s) === normalizeAcronym(e.slug)) || (!!e.label && e.label.toLowerCase().includes(s.toLowerCase()))));

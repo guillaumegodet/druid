@@ -259,10 +259,13 @@ export const CallsTab: React.FC<{
   structureLabel: string;
   /** druid-biblio slug of the structure shown (acronym), matched against the perimeter of the engines. */
   slug: string;
+  /** Structures enclosing the one shown (its lab, pole, the institution of the instance), nearest first: a structure
+   * is inside the perimeter of a run on one of them. */
+  enclosing?: readonly { slug: string; label: string }[];
   /** Publications of the dashboard: give the publications named by the batch their DOI link (title match). */
   publications?: DashboardPublication[];
   onOpenResearcher?: (r: Researcher) => void;
-}> = ({ researchers, structureLabel, slug, publications, onOpenResearcher }) => {
+}> = ({ researchers, structureLabel, slug, enclosing, publications, onOpenResearcher }) => {
   const { t } = useLingui();
   const [view, setView] = useState<View>('calls');
   const [calls, setCalls] = useState<Call[] | null>(null);
@@ -330,7 +333,7 @@ export const CallsTab: React.FC<{
 
   const matchedUids = useMemo(() => new Set(matches.filter((m) => !uids || uids.has(m.uid)).map((m) => m.uid)), [matches, uids]);
   // Outside the perimeter of the engines: the matches shown say nothing about the coverage of this structure.
-  const outsidePerimeter = !!researchers && !inPerimeter(perimeters, { slug, label: structureLabel });
+  const outsidePerimeter = !!researchers && !inPerimeter(perimeters, { slug, label: structureLabel }, enclosing);
 
   const onFeedback = async (pairId: string, verdict: FeedbackVerdict) => {
     setBusy(true);
