@@ -79,8 +79,30 @@ export const PORTAL_PROGRAMMES_BUILT_IN: readonly Programme[] = [
   portal('cerv', 'Citizens, Equality, Rights and Values', 'cerv', '', false),
 ];
 
-export const BUILT_IN_FUNDERS: readonly Funder[] = [EU_FUNDER];
-export const BUILT_IN_PROGRAMMES: readonly Programme[] = PORTAL_PROGRAMMES_BUILT_IN;
+export const ANR_FUNDER: Funder = {
+  funderId: 'anr', name: 'Agence nationale de la recherche', country: 'FR', category: 'ANR', url: 'https://anr.fr/',
+};
+/** Source of the programmes read from the website of the ANR (lib/calls/anr.ts). */
+export const ANR_SOURCE = 'anr';
+const anr = (programmeId: string, name: string, url: string, kind: ProgrammeKind, subsetLabel: string): Programme => ({
+  programmeId, funderId: ANR_FUNDER.funderId, name, kind, url, source: ANR_SOURCE, refresh: 'weekly', subsetLabel, active: true,
+});
+
+/**
+ * Programmes of the ANR (docs/plan-funding-calls.md, lot 4): the generic call, one call per research axis (an axis is
+ * evaluated by its own committee; subset = disciplinary domain), matched by the profile of the researchers and the
+ * young researcher rules (JCJC); the specific calls (European partnerships, networks…) and the France 2030 calls the
+ * ANR operates (PEPR, AMI), each a thematic text.
+ */
+export const ANR_AAPG: Programme = anr('anr-aapg', 'ANR — Generic call for proposals (AAPG)', 'https://anr.fr/fr/appels/', 'mixed', 'domain');
+export const ANR_PROGRAMMES_BUILT_IN: readonly Programme[] = [
+  ANR_AAPG,
+  anr('anr-specific', 'ANR — Specific calls', 'https://anr.fr/fr/appels/', 'thematic', ''),
+  anr('france-2030', 'France 2030 — calls operated by the ANR', 'https://anr.fr/fr/france-2030/france2030/', 'thematic', ''),
+];
+
+export const BUILT_IN_FUNDERS: readonly Funder[] = [EU_FUNDER, ANR_FUNDER];
+export const BUILT_IN_PROGRAMMES: readonly Programme[] = [...PORTAL_PROGRAMMES_BUILT_IN, ...ANR_PROGRAMMES_BUILT_IN];
 
 /** Page of a topic on the Funding & Tenders portal. */
 export const PORTAL_TOPIC_PAGE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';

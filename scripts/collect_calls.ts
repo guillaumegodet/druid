@@ -1,15 +1,19 @@
 /**
  * Collects the calls for proposals of a source into the tables of the « Calls for proposals » tab (druid-internal
- * docs/plan-funding-calls.md, lot 2). Source `ft-portal` (the only one so far): the Funding & Tenders portal of the
- * European Commission — its public reference file lists every grant topic (identifier, title, call, programme, status,
- * dates), streamed and filtered on the active programmes (lib/calls/programmes.ts, Administration › Calls for
- * proposals); the text of a new or changed topic is read from the public JSON of the topic (lib/calls/portal.ts).
- * Closed topics unknown to the store are not imported. Every run is logged (call_collection) and shown by the
- * administration. Refused unless the instance runs on PostgreSQL.
+ * docs/plan-funding-calls.md, lots 2 and 4). Sources:
+ * - `ft-portal`: the Funding & Tenders portal of the European Commission — its public reference file lists every grant
+ *   topic (identifier, title, call, programme, status, dates), streamed and filtered on the active programmes
+ *   (lib/calls/programmes.ts, Administration › Calls for proposals); the text of a new or changed topic is read from
+ *   the public JSON of the topic (lib/calls/portal.ts). Closed topics unknown to the store are not imported.
+ * - `anr`: the website of the ANR (lib/calls/collectAnr.ts) — the specific and France 2030 calls open or announced, one
+ *   page each, and the research axes of the latest generic call (AAPG), read from the PDF of its text.
+ * Every run is logged (call_collection) and shown by the administration. Refused unless the instance runs on
+ * PostgreSQL.
  *
  * Usage (env DRUID_STORAGE=postgres, DRUID_DATABASE_URL):
  *   node scripts/.build/collect_calls.cjs --source=ft-portal [--programme=erc,msca] [--details-limit=300]
  *        [--listing-file=<grantsTenders.json>] [--by=<who>]
+ *   node scripts/.build/collect_calls.cjs --source=anr [--programme=anr-aapg] [--by=<who>]
  * `--programme`: collect these programmes even when inactive (default: the active programmes of the source).
  * `--details-limit`: at most this many topic texts fetched in one run (default 400; a changed topic beyond the limit
  * still gets its dates and status, a new one waits for the next run). `--listing-file`: read the listing from a local
@@ -20,10 +24,12 @@ import { createReadStream } from 'fs';
 import { Readable } from 'stream';
 import { closeDatabases, databaseFromEnv, storageKindFromEnv } from '../lib/directory/jobStorage';
 import { createCallsStore } from '../lib/calls/pg';
-import { collectFromPortal } from '../lib/calls/collect';
+import { collectFromPortal, type CollectStats } from '../lib/calls/collect';
+import { collectFromAnr } from '../lib/calls/collectAnr';
 import { PORTAL_LISTING_URL } from '../lib/calls/ftPortal';
+import { pdfToText } from '../lib/calls/pdfText';
 import { fetchPortalTopic } from '../lib/calls/portal';
-import { FT_PORTAL_SOURCE } from '../lib/calls/programmes';
+import { ANR_SOURCE, FT_PORTAL_SOURCE } from '../lib/calls/programmes';
 
 const args = process.argv.slice(2);
 const option = (name: string): string | undefined => args.find((a) => a.startsWith(`--${name}=`))?.slice(name.length + 3);
@@ -32,6 +38,8 @@ const PROGRAMMES = (option('programme') || '').split(',').map((s) => s.trim()).f
 const DETAILS_LIMIT = Number(option('details-limit') || 400);
 const LISTING_FILE = option('listing-file');
 const BY = option('by') || 'collect_calls';
+const SOURCES = [FT_PORTAL_SOURCE, ANR_SOURCE];
+const USER_AGENT = 'Druid (calls for proposals collector; https://github.com/guillaumegodet/druid)';
 
 /** The listing as a stream of text chunks, from the portal or a local file. */
 async function* listingChunks(): AsyncGenerator<string | Uint8Array> {
@@ -44,9 +52,23 @@ async function* listingChunks(): AsyncGenerator<string | Uint8Array> {
   for await (const chunk of Readable.fromWeb(res.body as import('stream/web').ReadableStream<Uint8Array>)) yield chunk as Uint8Array;
 }
 
+/** HTML of a page of anr.fr; null on 404. The site answers a plain client with a cookie banner only, no challenge. */
+async function fetchAnrPage(url: string): Promise<string | null> {
+  const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT, Accept: 'text/html' } });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+  return res.text();
+}
+
+async function fetchPdfText(url: string): Promise<string> {
+  const res = await fetch(url, { headers: { 'User-Agent': USER_AGENT } });
+  if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`);
+  return pdfToText(new Uint8Array(await res.arrayBuffer()));
+}
+
 async function main() {
   if (storageKindFromEnv(process.env) !== 'postgres') throw new Error('DRUID_STORAGE is not postgres: the calls for proposals need the PostgreSQL storage');
-  if (SOURCE !== FT_PORTAL_SOURCE) throw new Error(`unknown source ${SOURCE} (sources: ${FT_PORTAL_SOURCE})`);
+  if (!SOURCES.includes(SOURCE)) throw new Error(`unknown source ${SOURCE} (sources: ${SOURCES.join(', ')})`);
   const db = databaseFromEnv(process.env);
   const store = createCallsStore(db);
   await store.syncProgrammes();
@@ -56,10 +78,14 @@ async function main() {
   console.log(`${SOURCE}: collecting ${ids.join(', ')}${LISTING_FILE ? ` from ${LISTING_FILE}` : ''}`);
   const collectionId = await store.startCollection(SOURCE, ids, BY);
   try {
-    const stats = await collectFromPortal({
-      programmes, listing: listingChunks(), fetchDetails: (id) => fetchPortalTopic(id), store: store.collectorStore,
-      today: new Date().toISOString().slice(0, 10), detailsLimit: DETAILS_LIMIT, log: (m) => console.log(m),
-    });
+    const today = new Date().toISOString().slice(0, 10);
+    const log = (m: string) => console.log(m);
+    const stats: CollectStats = SOURCE === ANR_SOURCE
+      ? await collectFromAnr({ programmes, fetchPage: fetchAnrPage, fetchPdfText, store: store.collectorStore, today, log })
+      : await collectFromPortal({
+        programmes, listing: listingChunks(), fetchDetails: (id) => fetchPortalTopic(id), store: store.collectorStore,
+        today, detailsLimit: DETAILS_LIMIT, log,
+      });
     for (const e of stats.errors.slice(0, 20)) console.log(`  ${e}`);
     await store.finishCollection(collectionId, {
       status: 'done', seen: stats.seen, new: stats.new, updated: stats.updated, detailsFetched: stats.detailsFetched, error: stats.errors.join('\n'),

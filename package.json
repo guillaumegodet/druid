@@ -26,7 +26,7 @@
     "build:copy": "mkdir -p scripts/.build && esbuild scripts/copy_pg_to_grist.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/copy_pg_to_grist.cjs --log-level=warning",
     "build:calls": "mkdir -p scripts/.build && esbuild scripts/import_calls.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_calls.cjs --log-level=warning",
     "build:export-calls": "mkdir -p scripts/.build && esbuild scripts/export_calls.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/export_calls.cjs --log-level=warning",
-    "build:collect": "mkdir -p scripts/.build && esbuild scripts/collect_calls.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/collect_calls.cjs --log-level=warning",
+    "build:collect": "mkdir -p scripts/.build && esbuild scripts/collect_calls.ts --bundle --platform=node --format=cjs --external:pg-native --external:unpdf --outfile=scripts/.build/collect_calls.cjs --log-level=warning",
     "build:publications": "mkdir -p scripts/.build && esbuild scripts/import_newsletter.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_newsletter.cjs --log-level=warning",
     "build:graph": "mkdir -p scripts/.build && esbuild scripts/import_graph_snapshot.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/import_graph_snapshot.cjs --log-level=warning && esbuild scripts/graph_publish.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/graph_publish.cjs --log-level=warning",
     "build:functions-pg": "node scripts/functions_pg_bundle.cjs",
@@ -53,6 +53,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "svg2pdf.js": "^2.8.1",
+    "unpdf": "1.8.1",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz",
     "zod": "^4.6.5"
   },

@@ -20,7 +20,7 @@
  *   node scripts/.build/import_calls.cjs --translate-only
  * `--merge`: the report completes the run already imported for its subset (topics replayed after a failure of the
  * batch, `topic_researcher_match.py --topic … --out <other directory>`) instead of replacing it.
- * The titles parsed from the PDFs carry word splits: after an import (unless `--no-portal`), and with
+ * The titles parsed from the PDFs carry word splits: after an import of a portal programme (unless `--no-portal`), and with
  * `--refresh-titles` alone, the official title and deadlines of every topic are read from the Funding & Tenders
  * portal (lib/calls/portal.ts); topics the portal does not know keep the parsed title.
  * After an import (unless `--no-translate`), and with `--translate-only` alone, the English summaries and justifications
@@ -34,7 +34,7 @@ import { closeDatabases, databaseFromEnv, storageKindFromEnv } from '../lib/dire
 import { createCallsStore } from '../lib/calls/pg';
 import { parseTrmReport } from '../lib/calls/trm';
 import { fetchPortalTopics } from '../lib/calls/portal';
-import { HORIZON_EUROPE } from '../lib/calls/programmes';
+import { BUILT_IN_PROGRAMMES, FT_PORTAL_SOURCE, HORIZON_EUROPE } from '../lib/calls/programmes';
 import { translateTexts, translatorFromEnv } from '../lib/calls/translate';
 
 const args = process.argv.slice(2);
@@ -44,7 +44,9 @@ const BY = option('by') || 'import_calls';
 const MERGE = args.includes('--merge');
 const PERIMETER = option('perimeter') || option('scope') || '';
 const PROGRAMME = option('programme') || HORIZON_EUROPE.programmeId;
-const PORTAL = !args.includes('--no-portal');
+// Titles and deadlines are refreshed from the Funding & Tenders portal for its programmes only (an ANR call is not there).
+const PORTAL = !args.includes('--no-portal')
+  && (BUILT_IN_PROGRAMMES.find((p) => p.programmeId === PROGRAMME)?.source ?? FT_PORTAL_SOURCE) === FT_PORTAL_SOURCE;
 const REFRESH = args.includes('--refresh-titles');
 const TRANSLATE = !args.includes('--no-translate');
 const TRANSLATE_ONLY = args.includes('--translate-only');

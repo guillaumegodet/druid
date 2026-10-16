@@ -306,8 +306,10 @@ export const createCallsStore = (db: Kysely<DB>) => {
   };
 
   /** English texts without a French translation yet (summaries of the calls, justifications of the matches). */
+  // The summary is written by the matching batch, in English whatever the language of the call (an ANR call is in
+  // French): every summary without its French version is pending.
   const pendingTranslations = async () => ({
-    calls: (await db.selectFrom('funding_call').select(['call_id', 'summary']).where('summary', '<>', '').where('summary_fr', '=', '').where('lang', '<>', 'fr').execute())
+    calls: (await db.selectFrom('funding_call').select(['call_id', 'summary']).where('summary', '<>', '').where('summary_fr', '=', '').execute())
       .map((r) => ({ callId: r.call_id, text: r.summary })),
     matches: (await db.selectFrom('call_match').select(['pair_id', 'justification']).where('justification', '<>', '').where('justification_fr', '=', '').execute())
       .map((r) => ({ pairId: r.pair_id, text: r.justification })),
@@ -391,10 +393,10 @@ export const createCallsStore = (db: Kysely<DB>) => {
   const collectorStore: CollectorStore = {
     storedCalls: async (programmeIds: string[]): Promise<StoredCallSummary[]> => {
       if (!programmeIds.length) return [];
-      return (await db.selectFrom('funding_call').select(['call_id', 'programme_id', 'title', 'deadlines', 'opening_date', 'status'])
+      return (await db.selectFrom('funding_call').select(['call_id', 'programme_id', 'title', 'deadlines', 'opening_date', 'status', 'content_hash'])
         .select((eb) => eb.or([eb('objectives', '<>', ''), eb('scope', '<>', '')]).as('has_text'))
         .where('programme_id', 'in', programmeIds).execute())
-        .map((c) => ({ callId: c.call_id, programmeId: c.programme_id, title: c.title, deadlines: c.deadlines, openingDate: dateOnly(c.opening_date), status: c.status as CallStatus, hasText: !!c.has_text }));
+        .map((c) => ({ callId: c.call_id, programmeId: c.programme_id, title: c.title, deadlines: c.deadlines, openingDate: dateOnly(c.opening_date), status: c.status as CallStatus, hasText: !!c.has_text, contentHash: c.content_hash }));
     },
     upsertCall: async (c: CollectedCall): Promise<'new' | 'updated'> => {
       const existing = await db.selectFrom('funding_call').select('call_id').where('call_id', '=', c.callId).executeTakeFirst();

@@ -19,6 +19,8 @@ export interface StoredCallSummary {
   /** The text of the call is stored, objectives or scope (a call whose portal page had none is read again until it has
    * one; ERC and EIC topics only have a scope). */
   hasText: boolean;
+  /** Hash of the stored text (contentHashOf), when the store gives it: the ANR collector compares it. */
+  contentHash?: string;
 }
 
 export interface CollectedCall {
