@@ -105,6 +105,7 @@ export interface CallEligibility {
   person_name: Generated<string>;
   phd_on: string | null;
   reasons: Generated<string[]>;
+  row_ids: Generated<string[]>;
   uid: Generated<string>;
   units: Generated<string[]>;
   verdict: string;

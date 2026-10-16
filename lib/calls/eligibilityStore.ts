@@ -22,6 +22,8 @@ export interface EligibilityPerson {
   units: string[];
   /** Corps_grade of the record (MCF, CRCN, IR, POST-DOC…), '' when unknown. */
   grade: string;
+  /** Current memberships (directory row ids): the record of a person without uid is found by them. */
+  rowIds: number[];
   /** Fuzzy date of the PhD (first defended thesis). */
   phdOn: string;
 }
@@ -32,6 +34,7 @@ export interface Candidate {
   personName: string;
   units: string[];
   grade: string;
+  rowIds: number[];
   verdict: EligibilityVerdict;
   reasons: EligibilityReason[];
   phdOn: string | null;
@@ -64,14 +67,15 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
       .innerJoin('membership as m', 'm.person_id', 'p.id')
       .innerJoin('person_thesis as t', 't.person_id', 'p.id')
       .leftJoin('structure as s', 's.id', 'm.structure_id')
-      .select(['p.id', 'p.uid', 'p.first_name', 'p.last_name', 'p.corps_grade', 'm.lab_label', 's.acronym', 't.status', 't.defended_on'])
+      .select(['p.id', 'p.uid', 'p.first_name', 'p.last_name', 'p.corps_grade', 'm.id as membership_id', 'm.lab_label', 's.acronym', 't.status', 't.defended_on'])
       .where((eb) => eb.or([eb('p.presence_status', 'is', null), eb('p.presence_status', '<>', 'PARTI')]))
       .where((eb) => eb.or([eb('m.end_upper', 'is', null), eb('m.end_upper', '>=', today)]))
       .where('t.status', '=', 'defended')
       .execute();
-    const byPerson = new Map<string, { row: (typeof rows)[number]; units: Set<string>; theses: { status: 'defended'; defendedOn: string | null }[] }>();
+    const byPerson = new Map<string, { row: (typeof rows)[number]; units: Set<string>; rowIds: Set<number>; theses: { status: 'defended'; defendedOn: string | null }[] }>();
     for (const r of rows) {
-      const e = byPerson.get(r.id) ?? { row: r, units: new Set<string>(), theses: [] };
+      const e = byPerson.get(r.id) ?? { row: r, units: new Set<string>(), rowIds: new Set<number>(), theses: [] };
+      e.rowIds.add(Number(r.membership_id));
       // The lab of a membership is its structure; the label typed in the record when it has none.
       const unit = r.acronym || r.lab_label;
       if (unit) e.units.add(unit);
@@ -84,7 +88,7 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
       if (!phd?.defendedOn) continue;
       out.push({
         personId, uid: e.row.uid ?? '', name: [e.row.first_name, e.row.last_name].filter(Boolean).join(' '), units: [...e.units].sort(),
-        grade: e.row.corps_grade ?? '', phdOn: phd.defendedOn,
+        grade: e.row.corps_grade ?? '', rowIds: [...e.rowIds].sort((a, b) => a - b), phdOn: phd.defendedOn,
       });
     }
     return out;
@@ -100,6 +104,7 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
       for (let i = 0; i < rows.length; i += 500) {
         await trx.insertInto('call_eligibility').values(rows.slice(i, i + 500).map((r) => ({
           call_id: rule.callId, person_id: r.person.personId, uid: r.person.uid, person_name: r.person.name, units: r.person.units, grade: r.person.grade,
+          row_ids: r.person.rowIds.map(String),
           verdict: r.verdict, reasons: r.reasons, phd_on: r.person.phdOn,
         }))).execute();
       }
@@ -128,14 +133,16 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
     })).sort((a, b) => (a.deadlines[0] ?? '9999').localeCompare(b.deadlines[0] ?? '9999'));
   };
 
-  /** Candidates of a call, eligible first, then by lab and name. */
+  /** Candidates of a call, eligible first, then by lab (without lab last) and name. */
   const candidates = async (callId: string): Promise<Candidate[]> =>
     (await db.selectFrom('call_eligibility').selectAll().where('call_id', '=', callId).execute())
       .map((r) => ({
-        callId: r.call_id, uid: r.uid, personName: r.person_name, units: r.units, grade: r.grade, verdict: r.verdict as EligibilityVerdict,
+        callId: r.call_id, uid: r.uid, personName: r.person_name, units: r.units, grade: r.grade, rowIds: r.row_ids.map(Number),
+        verdict: r.verdict as EligibilityVerdict,
         reasons: r.reasons as EligibilityReason[], phdOn: r.phd_on,
       }))
       .sort((a, b) => (a.verdict === b.verdict ? 0 : a.verdict === 'eligible' ? -1 : 1)
+        || (a.units.length ? 0 : 1) - (b.units.length ? 0 : 1)
         || (a.units[0] ?? '').localeCompare(b.units[0] ?? '') || a.personName.localeCompare(b.personName));
 
   return { openCalls, people, saveCall, dropRulesExcept, rules, candidates };

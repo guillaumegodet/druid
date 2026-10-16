@@ -23,6 +23,8 @@ CREATE TABLE call_eligibility (
   -- Labs of the current memberships, grade (Corps_grade): the institution filters the candidates by position.
   units        text[] NOT NULL DEFAULT '{}',
   grade        text NOT NULL DEFAULT '',
+  -- Directory rows (memberships) of the person: the record of a person without uid is found by them.
+  row_ids      bigint[] NOT NULL DEFAULT '{}',
   verdict      text NOT NULL CHECK (verdict IN ('eligible', 'check')),
   reasons      text[] NOT NULL DEFAULT '{}',
   phd_on       fuzzy_date,

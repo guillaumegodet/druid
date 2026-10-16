@@ -27,6 +27,7 @@ interface CandidateView {
   personName: string;
   units: string[];
   grade: string;
+  rowIds: number[];
   verdict: EligibilityVerdict;
   reasons: EligibilityReason[];
   phdOn: string | null;
@@ -81,10 +82,22 @@ export const CallCandidates: React.FC<{
     return () => { cancelled = true; };
   }, [callId]);
 
+  // A candidate is found among the records shown by its uid, or by its directory rows when it has none.
   const byUid = useMemo(() => new Map((researchers ?? []).filter((r) => r.uid).map((r) => [r.uid!.toLowerCase(), r])), [researchers]);
+  const byRow = useMemo(() => {
+    const m = new Map<number, Researcher>();
+    for (const r of researchers ?? []) {
+      if (r.gristRowId) m.set(r.gristRowId, r);
+      for (const a of r.affiliations ?? []) if (a.gristRowId) m.set(a.gristRowId, r);
+    }
+    return m;
+  }, [researchers]);
+  const recordOf = (c: CandidateView): Researcher | undefined =>
+    (c.uid ? byUid.get(c.uid.toLowerCase()) : undefined) ?? c.rowIds.map((id) => byRow.get(id)).find(Boolean);
   const inStructure = useMemo(
-    () => (candidates ?? []).filter((c) => researchers === null || byUid.has(c.uid.toLowerCase())),
-    [candidates, researchers, byUid],
+    () => (candidates ?? []).filter((c) => researchers === null || !!recordOf(c)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [candidates, researchers, byUid, byRow],
   );
   const grades = useMemo(() => [...new Set(inStructure.map((c) => c.grade).filter(Boolean))].sort(), [inStructure]);
   const rows = inStructure.filter((c) => (!verdict || c.verdict === verdict) && (!grade || c.grade === grade));
@@ -162,9 +175,9 @@ export const CallCandidates: React.FC<{
               </thead>
               <tbody>
                 {rows.map((c) => {
-                  const record = byUid.get(c.uid.toLowerCase());
+                  const record = recordOf(c);
                   return (
-                    <tr key={c.uid || c.personName} className="border-t border-black/5 dark:border-white/10 align-top">
+                    <tr key={c.uid || c.rowIds.join('-') || c.personName} className="border-t border-black/5 dark:border-white/10 align-top">
                       <td className="px-3 py-2">
                         {record && onOpenResearcher
                           ? <button type="button" onClick={() => onOpenResearcher(record)} className="font-semibold text-ink dark:text-[#f5f2ea] hover:underline text-left">{c.personName}</button>

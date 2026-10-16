@@ -199,8 +199,8 @@ msgstr "Chargement du tableau de bord…"
 
 #: App.tsx:1023
 #: App.tsx:1035
-#: components/dashboard/CallCandidates.tsx:108
-#: components/dashboard/CallCandidates.tsx:146
+#: components/dashboard/CallCandidates.tsx:121
+#: components/dashboard/CallCandidates.tsx:159
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:360
 #: components/dashboard/NewsletterPanel.tsx:277
@@ -2804,90 +2804,90 @@ msgstr "Aucun chapitre, monographie ou direction d'ouvrage sur la période."
 msgid "Book types"
 msgstr "Types d'ouvrages"
 
-#: components/dashboard/CallCandidates.tsx:52
+#: components/dashboard/CallCandidates.tsx:53
 msgid "PhD within the window of the call"
 msgstr "Thèse dans la fenêtre de l’appel"
 
-#: components/dashboard/CallCandidates.tsx:53
+#: components/dashboard/CallCandidates.tsx:54
 msgid "PhD date known to the year only, at a bound of the window"
 msgstr "Date de thèse connue à l’année seulement, à une borne de la fenêtre"
 
-#: components/dashboard/CallCandidates.tsx:54
+#: components/dashboard/CallCandidates.tsx:55
 msgid "PhD just before the window: eligible only with a documented extension (maternity, parental leave, illness, national service, clinical training)"
 msgstr "Thèse juste avant la fenêtre : éligible seulement avec une prolongation justifiée (maternité, congé parental, maladie, service national, formation clinique)"
 
-#: components/dashboard/CallCandidates.tsx:55
+#: components/dashboard/CallCandidates.tsx:56
 msgid "PhD before the window"
 msgstr "Thèse avant la fenêtre"
 
-#: components/dashboard/CallCandidates.tsx:56
+#: components/dashboard/CallCandidates.tsx:57
 msgid "PhD after the window"
 msgstr "Thèse après la fenêtre"
 
-#: components/dashboard/CallCandidates.tsx:112
+#: components/dashboard/CallCandidates.tsx:125
 msgid "No open call states an eligibility rule by career stage yet (ERC Starting and Consolidator Grants, ANR JCJC…)."
 msgstr "Aucun appel ouvert n’énonce encore de règle d’éligibilité liée à la carrière (ERC Starting et Consolidator, ANR JCJC…)."
 
-#: components/dashboard/CallCandidates.tsx:119
+#: components/dashboard/CallCandidates.tsx:132
 #: components/dashboard/CallsTab.tsx:204
 msgid "Call"
 msgstr "Appel"
 
-#: components/dashboard/CallCandidates.tsx:122
-#: components/dashboard/CallCandidates.tsx:160
+#: components/dashboard/CallCandidates.tsx:135
+#: components/dashboard/CallCandidates.tsx:173
 msgid "Verdict"
 msgstr "Verdict"
 
-#: components/dashboard/CallCandidates.tsx:123
+#: components/dashboard/CallCandidates.tsx:136
 msgid "Eligible and to check"
 msgstr "Éligibles et à vérifier"
 
-#: components/dashboard/CallCandidates.tsx:124
-#: components/dashboard/CallCandidates.tsx:178
+#: components/dashboard/CallCandidates.tsx:137
+#: components/dashboard/CallCandidates.tsx:191
 msgid "Eligible"
 msgstr "Éligible"
 
-#: components/dashboard/CallCandidates.tsx:125
-#: components/dashboard/CallCandidates.tsx:178
+#: components/dashboard/CallCandidates.tsx:138
+#: components/dashboard/CallCandidates.tsx:191
 msgid "To check"
 msgstr "À vérifier"
 
-#: components/dashboard/CallCandidates.tsx:128
-#: components/dashboard/CallCandidates.tsx:158
+#: components/dashboard/CallCandidates.tsx:141
+#: components/dashboard/CallCandidates.tsx:171
 #: components/researchers/FilterPanel.tsx:256
 #: lib/importConflicts.ts:63
 msgid "Grade"
 msgstr "Corps-grade"
 
-#: components/dashboard/CallCandidates.tsx:129
+#: components/dashboard/CallCandidates.tsx:142
 msgid "All grades"
 msgstr "Tous les grades"
 
 #. placeholder {0}: fmtDate(rule.phdFrom)
 #. placeholder {1}: fmtDate(rule.phdTo)
-#: components/dashboard/CallCandidates.tsx:139
+#: components/dashboard/CallCandidates.tsx:152
 msgid "PhD defended between {0} and {1}"
 msgstr "Thèse soutenue entre le {0} et le {1}"
 
 #. placeholder {0}: fmtDate(call.nextDeadline)
 #. placeholder {0}: rule.deadlines.map(fmtDate).join(', ')
-#: components/dashboard/CallCandidates.tsx:140
+#: components/dashboard/CallCandidates.tsx:153
 #: components/dashboard/CallsTab.tsx:192
 msgid "Deadline {0}"
 msgstr "Échéance {0}"
 
-#: components/dashboard/CallCandidates.tsx:142
+#: components/dashboard/CallCandidates.tsx:155
 msgid "From the date of the PhD on theses.fr only: the other conditions of the call (previous grants, host institution, time in Europe) are not checked."
 msgstr "D’après la seule date de thèse sur theses.fr : les autres conditions de l’appel (bourses déjà obtenues, établissement d’accueil, temps passé en Europe) ne sont pas vérifiées."
 
-#: components/dashboard/CallCandidates.tsx:148
+#: components/dashboard/CallCandidates.tsx:161
 msgid "No candidate matches these filters."
 msgstr "Aucun candidat ne correspond à ces filtres."
 
 #. placeholder {0}: a.candidateIds.length
 #. placeholder {0}: a.candidates.length
 #. placeholder {0}: cell.ambiguous.candidates.length
-#: components/dashboard/CallCandidates.tsx:151
+#: components/dashboard/CallCandidates.tsx:164
 #: components/researchers/LdapCandidatesPage.tsx:255
 #: components/researchers/UnifiedAlignPage.tsx:128
 #: components/researchers/UnifiedAlignPage.tsx:268
@@ -2895,20 +2895,20 @@ msgstr "Aucun candidat ne correspond à ces filtres."
 msgid "{0, plural, one {# candidate} other {# candidates}}"
 msgstr "{0, plural, one {# candidat} other {# candidats}}"
 
-#: components/dashboard/CallCandidates.tsx:156
+#: components/dashboard/CallCandidates.tsx:169
 #: components/researchers/TaskForm.tsx:101
 #: components/researchers/TasksPage.tsx:173
 msgid "Researcher"
 msgstr "Chercheur"
 
-#: components/dashboard/CallCandidates.tsx:157
+#: components/dashboard/CallCandidates.tsx:170
 #: components/dashboard/CollaborationsTab.tsx:357
 #: components/dashboard/CollaborationsTab.tsx:369
 #: components/dashboard/report/reportTables.ts:49
 msgid "Labs"
 msgstr "Labos"
 
-#: components/dashboard/CallCandidates.tsx:159
+#: components/dashboard/CallCandidates.tsx:172
 msgid "PhD"
 msgstr "Thèse"
 
