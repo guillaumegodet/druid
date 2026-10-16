@@ -44,6 +44,11 @@ données à exécuter au déploiement).
   Horizon Europe déjà importés, puis supprime les tables `eu_*` (retour arrière possible : la migration `down` les
   reconstitue depuis le programme `horizon-europe`).
 
+### Corrigé
+- **Appels à projets** : l'avertissement « hors de ce périmètre » ne s'affiche plus pour une structure contenue dans le
+  périmètre du calcul — un labo ou une équipe pour un run sur tout l'établissement (« Nantes Université »), une équipe
+  pour un run sur son labo.
+
 ## [2.6.0] — 2026-10-15
 
 ### Ajouté

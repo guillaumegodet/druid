@@ -37,6 +37,9 @@ const has = <K extends keyof InstanceInfo>(key: K): boolean => !!runtime && key 
 export const gristDocId = (): string =>
   (has('gristDocId') ? runtime!.gristDocId : import.meta.env.VITE_GRIST_DOC_ID) || '';
 
+/** Name of the instance (« Nantes Université »), '' when the server does not send it. */
+export const instanceLabel = (): string => (has('label') ? runtime!.label : '') || '';
+
 /** Link to the doc in the Grist web interface, or null without a doc. */
 export const gristUiDocUrl = (): string | null => {
   const doc = gristDocId();

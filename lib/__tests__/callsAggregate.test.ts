@@ -100,4 +100,14 @@ describe('inPerimeter', () => {
   it('is false for another structure', () => {
     expect(inPerimeter(['IMN'], { slug: 'lppl', label: 'Laboratoire de psychologie' })).toBe(false);
   });
+  it('is true for a structure inside an enclosing structure of the perimeter', () => {
+    const lemna = { slug: 'lemna', label: "Laboratoire d'économie et de management de Nantes Atlantique" };
+    expect(inPerimeter(['Nantes Université'], lemna, [{ slug: '', label: 'Nantes Université' }])).toBe(true);
+    expect(inPerimeter(['Nantes Université'], lemna, [{ slug: '', label: 'Nantes Université — TEST' }])).toBe(true);
+    expect(inPerimeter(['IMN'], { slug: 'st2e', label: 'ST2E' }, [{ slug: 'IMN', label: 'Institut des matériaux' }, { slug: '', label: 'Nantes Université' }])).toBe(true);
+    expect(inPerimeter(['IMN'], lemna, [{ slug: '', label: 'Nantes Université' }])).toBe(false);
+  });
+  it('ignores the empty slug and label of an enclosing structure', () => {
+    expect(inPerimeter(['IMN'], { slug: 'lppl', label: 'Laboratoire de psychologie' }, [{ slug: '', label: '' }])).toBe(false);
+  });
 });

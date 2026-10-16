@@ -37,6 +37,8 @@ import { NewReportDialog } from './reports/NewReportDialog';
 import { reportsBackend } from './dashboard/report/reportsApi';
 import { hasStaffAttributes } from './dashboard/staffAggregates';
 import { getRoles } from '../lib/auth';
+import { instanceLabel } from '../lib/instanceRuntime';
+import { withDerivedParents } from '../lib/structureHierarchy';
 import { Researcher, Structure, ViewState } from '../types';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { numberLocale } from '../lib/i18n';
@@ -235,6 +237,26 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
     const target = normalizeAcronym(slug);
     return (structures ?? []).find((s) => s.acronym && normalizeAcronym(s.acronym) === target) ?? null;
   }, [slug, structures]);
+  // Structures enclosing the one shown (lab of a team, pole of a lab…, then the institution of the instance), nearest
+  // first: the « Calls » tab tells whether the structure is inside the perimeter of the matching runs.
+  const enclosingStructures = useMemo(() => {
+    const chain: { slug: string; label: string }[] = [];
+    if (staffStructure && structures?.length) {
+      const all = withDerivedParents(structures);
+      const byAcronym = new Map(all.filter((s) => s.acronym).map((s) => [normalizeAcronym(s.acronym), s]));
+      const seen = new Set<string>([normalizeAcronym(staffStructure.acronym)]);
+      let parent = all.find((s) => s.id === staffStructure.id)?.parentStructure;
+      while (parent && !seen.has(normalizeAcronym(parent))) {
+        seen.add(normalizeAcronym(parent));
+        const p = byAcronym.get(normalizeAcronym(parent));
+        chain.push({ slug: p?.acronym || parent, label: p?.officialName || parent });
+        parent = p?.parentStructure;
+      }
+    }
+    const institution = instanceLabel();
+    if (institution) chain.push({ slug: '', label: institution });
+    return chain;
+  }, [staffStructure, structures]);
   const staffResearchers = useMemo(() => {
     if (!slug || !researchers?.length) return null;
     const matched = researchersOfSlug(slug, structures ?? [], researchers);
@@ -594,6 +616,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                   researchers={staffResearchers}
                   structureLabel={scopedData.lab}
                   slug={scopedData.slug}
+                  enclosing={enclosingStructures}
                   publications={scopedData.publications}
                   onOpenResearcher={onOpenResearcher}
                 />
