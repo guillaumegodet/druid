@@ -10,6 +10,9 @@
  * Usage (env DRUID_STORAGE=postgres, DRUID_DATABASE_URL):
  *   node scripts/.build/import_calls.cjs --file=<report.json> [--file=<other report.json>…] [--by=<who>] [--merge]
  *        [--no-portal] [--perimeter=<label>] [--programme=horizon-europe]
+ * `--programme`: programme of the report, Horizon Europe by default; a report of a topics file written by
+ * export_calls.cjs (lot 3) is imported with the programme of that file. A call collected from its source keeps its
+ * texts, subset and classification: the report only adds its summary and the matches.
  * `--perimeter`: the perimeter the batch was run on (the structures whose publications carry vectors, e.g. « IMN »),
  * shown by the tab so that nobody reads the matches of another structure as a coverage of that structure (`--scope` is
  * accepted as a synonym, name of the former import_trm.cjs).

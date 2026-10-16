@@ -7,6 +7,7 @@ import type { Call, CallMatch, FeedbackVerdict, ProgrammeView } from './aggregat
 import { BUILT_IN_FUNDERS, BUILT_IN_PROGRAMMES, portalTopicUrl, statusFromDeadlines, type Funder, type FunderCategory, type MatchEngine, type Programme, type ProgrammeKind, type ProgrammeRefresh, type CallStatus } from './programmes';
 import type { CollectedCall, CollectorStore, StoredCallSummary } from './collect';
 import type { MatchOverall, TrmRun } from './trm';
+import type { CallForMatching } from './trmExport';
 
 type Queryable = Kysely<DB> | Transaction<DB>;
 
@@ -135,14 +136,27 @@ export const createCallsStore = (db: Kysely<DB>) => {
       const merge = !!options.merge && !!previous;
       if (previous && !merge) await trx.deleteFrom('call_match_run').where('run_id', '=', previous.run_id).execute();
       const now = today();
+      // A call collected from its source (it has a text) keeps what the collector wrote: the report only brings the
+      // summary of the batch. A call known from the report alone (topics parsed from the work programme PDFs) is
+      // written from the report.
+      const topicIds = run.topics.map((t) => t.topicId);
+      const collected = new Set(topicIds.length ? (await trx.selectFrom('funding_call').select('call_id').where('call_id', 'in', topicIds)
+        .where((eb) => eb.or([eb('objectives', '<>', ''), eb('scope', '<>', '')])).execute()).map((r) => r.call_id) : []);
       for (const t of run.topics) {
+        // A new summary makes the previous translation stale.
+        const summaryFr = sql<string>`CASE WHEN funding_call.summary = ${t.summary} THEN funding_call.summary_fr ELSE '' END`;
+        if (collected.has(t.topicId)) {
+          await trx.updateTable('funding_call').set({ summary: t.summary, summary_fr: summaryFr, updated_at: sql`now()` })
+            .where('call_id', '=', t.topicId).execute();
+          continue;
+        }
         const taxonomy = JSON.stringify({ ...(t.destination ? { destination: t.destination } : {}), ...(t.callIdentifier ? { call: t.callIdentifier } : {}) });
         const values = {
           programme_id: run.programmeId, subset: t.subset, title: t.title, summary: t.summary, taxonomy, deadlines: t.deadlines,
           url: portalTopicUrl(t.topicId), status: statusFromDeadlines(t.deadlines, now),
         };
         await trx.insertInto('funding_call').values({ call_id: t.topicId, ...values })
-          .onConflict((oc) => oc.column('call_id').doUpdateSet({ ...values, updated_at: sql`now()` }))
+          .onConflict((oc) => oc.column('call_id').doUpdateSet({ ...values, summary_fr: summaryFr, updated_at: sql`now()` }))
           .execute();
       }
       let runId = run.runId;
@@ -260,6 +274,20 @@ export const createCallsStore = (db: Kysely<DB>) => {
     let q = db.selectFrom('funding_call').select('call_id').where('programme_id', '=', programmeId);
     if (subset) q = q.where('subset', '=', subset);
     return (await q.execute()).map((r) => r.call_id);
+  };
+
+  /** Calls of a programme (and subset) with the given statuses, with their texts: input of the topics file of the
+   * matching batch (lib/calls/trmExport.ts). Calls waiting for a validation or rejected are left out. */
+  const callsForMatching = async (programmeId: string, options: { subset?: string; statuses?: readonly CallStatus[] } = {}): Promise<CallForMatching[]> => {
+    let q = db.selectFrom('funding_call')
+      .select(['call_id', 'subset', 'title', 'objectives', 'scope', 'taxonomy', 'opening_date', 'deadlines', 'status'])
+      .where('programme_id', '=', programmeId).where('review_status', 'in', ['imported', 'validated']);
+    if (options.subset !== undefined) q = q.where('subset', '=', options.subset);
+    if (options.statuses?.length) q = q.where('status', 'in', [...options.statuses]);
+    return (await q.orderBy('call_id').execute()).map((c) => ({
+      callId: c.call_id, subset: c.subset, title: c.title, objectives: c.objectives, scope: c.scope, taxonomy: taxonomyOf(c.taxonomy),
+      openingDate: dateOnly(c.opening_date), deadlines: c.deadlines, status: c.status as CallStatus,
+    }));
   };
 
   /** Replaces the title (and the deadlines when the source gives some) of the calls; returns the number changed. */
@@ -388,7 +416,7 @@ export const createCallsStore = (db: Kysely<DB>) => {
   };
 
   return {
-    importRun, overview, programmes, calls, perimeters, matches, saveFeedback, feedbackRows, callIds, updateCallsFromSource,
+    importRun, overview, programmes, calls, perimeters, matches, saveFeedback, feedbackRows, callIds, callsForMatching, updateCallsFromSource,
     pendingTranslations, saveTranslations, syncProgrammes, programmesAdmin, setProgrammeActive, programmesOfSource,
     startCollection, finishCollection, collections, collectorStore,
   };
