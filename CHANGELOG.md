@@ -51,6 +51,9 @@ données à exécuter au déploiement).
   reconstitue depuis le programme `horizon-europe`).
 
 ### Corrigé
+- **Appels à projets — filtre de sous-ensemble sans libellé** : le second filtre de l'onglet (clusters, missions,
+  dispositifs…) affichait une première option vide ; ses libellés sont maintenant extraits et traduits (« Toutes les
+  missions », « Tous les dispositifs », « Toutes les destinations »…), distincts des pôles de l'annuaire.
 - **Appels à projets — doublons du portail** : le portail Funding & Tenders liste certains topics une seconde fois sous
   un identifiant sans année (`HORIZON-EIC-PATHFINDERCHALLENGES-01-01` à côté de `HORIZON-EIC-2026-…`), même titre,
   mêmes dates, en « à venir » et sans sous-ensemble : la collecte écarte cette copie et supprime celles qu'une collecte
