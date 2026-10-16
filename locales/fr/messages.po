@@ -4309,7 +4309,7 @@ msgstr "Audition"
 #: components/dashboard/NewsTab.tsx:126
 #: components/dashboard/StaffTab.tsx:151
 #: components/dashboard/fundersAggregates.ts:42
-#: lib/tasks.ts:70
+#: lib/tasks.ts:72
 msgid "Other"
 msgstr "Autre"
 
@@ -9933,7 +9933,7 @@ msgid "Person"
 msgstr "Personne"
 
 #: components/researchers/AbesExportModal.tsx:231
-#: lib/tasks.ts:112
+#: lib/tasks.ts:114
 msgid "Comment"
 msgstr "Commentaire"
 
@@ -12280,7 +12280,7 @@ msgid "Assigned"
 msgstr "Assigné"
 
 #: components/researchers/TasksPage.tsx:178
-#: lib/tasks.ts:103
+#: lib/tasks.ts:105
 msgid "Created"
 msgstr "Créée"
 
@@ -12313,7 +12313,7 @@ msgid "Resume"
 msgstr "Reprendre"
 
 #: components/researchers/TasksPage.tsx:271
-#: lib/tasks.ts:106
+#: lib/tasks.ts:108
 msgid "Put on hold"
 msgstr "Mettre en attente"
 
@@ -12412,7 +12412,7 @@ msgid "Add a comment…"
 msgstr "Ajouter un commentaire…"
 
 #: components/researchers/TasksPage.tsx:441
-#: lib/tasks.ts:82
+#: lib/tasks.ts:84
 msgid "Email to the researcher"
 msgstr "Email au chercheur"
 
@@ -12430,7 +12430,7 @@ msgid "Defended {0}"
 msgstr "Soutenue {0}"
 
 #: components/researchers/ThesisInfo.tsx:57
-#: lib/tasks.ts:89
+#: lib/tasks.ts:91
 msgid "In progress"
 msgstr "En cours"
 
@@ -14633,77 +14633,85 @@ msgstr "Annuaire — employeur à renseigner (fiche validée « externe »)"
 msgid "Directory — hosted LDAP account closing: probable departure?"
 msgstr "Annuaire — compte LDAP hébergé en fermeture : départ probable ?"
 
-#: lib/tasks.ts:80
+#: lib/tasks.ts:70
+msgid "Directory — PhD student who defended the thesis: update the status"
+msgstr "Annuaire — doctorant ayant soutenu sa thèse : mettre à jour le statut"
+
+#: lib/tasks.ts:71
+msgid "Directory — PhD student with an old thesis on the IdRef: namesake?"
+msgstr "Annuaire — doctorant avec une thèse ancienne sur son IdRef : homonyme ?"
+
+#: lib/tasks.ts:82
 msgid "Authorities correspondent (IdRef)"
 msgstr "Correspondante autorités (IdRef)"
 
-#: lib/tasks.ts:81
+#: lib/tasks.ts:83
 msgid "ABES batch (export)"
 msgstr "Lot ABES (export)"
 
-#: lib/tasks.ts:83
+#: lib/tasks.ts:85
 msgid "External support (provider)"
 msgstr "Support externe (fournisseur)"
 
-#: lib/tasks.ts:84
+#: lib/tasks.ts:86
 msgid "Internal (Druid)"
 msgstr "Interne (Druid)"
 
-#: lib/tasks.ts:88
+#: lib/tasks.ts:90
 msgid "To do"
 msgstr "À faire"
 
-#: lib/tasks.ts:90
+#: lib/tasks.ts:92
 msgid "Waiting"
 msgstr "En attente"
 
-#: lib/tasks.ts:91
-#: lib/tasks.ts:107
+#: lib/tasks.ts:93
+#: lib/tasks.ts:109
 msgid "Done"
 msgstr "Fait"
 
-#: lib/tasks.ts:92
-#: lib/tasks.ts:108
+#: lib/tasks.ts:94
+#: lib/tasks.ts:110
 msgid "Dropped"
 msgstr "Abandonnée"
 
-#: lib/tasks.ts:93
+#: lib/tasks.ts:95
 msgid "Resolved (verified)"
 msgstr "Résolue (vérifiée)"
 
-#: lib/tasks.ts:97
+#: lib/tasks.ts:99
 msgid "Low"
 msgstr "Basse"
 
-#: lib/tasks.ts:98
+#: lib/tasks.ts:100
 msgid "Normal"
 msgstr "Normale"
 
-#: lib/tasks.ts:99
+#: lib/tasks.ts:101
 msgid "High"
 msgstr "Haute"
 
-#: lib/tasks.ts:104
+#: lib/tasks.ts:106
 msgid "Taken over"
 msgstr "Prise en charge"
 
-#: lib/tasks.ts:105
+#: lib/tasks.ts:107
 msgid "Email prepared"
 msgstr "Email préparé"
 
-#: lib/tasks.ts:109
+#: lib/tasks.ts:111
 msgid "Reopened"
 msgstr "Réouverte"
 
-#: lib/tasks.ts:110
+#: lib/tasks.ts:112
 msgid "Reassigned"
 msgstr "Réassignée"
 
-#: lib/tasks.ts:111
+#: lib/tasks.ts:113
 msgid "Edited"
 msgstr "Modifiée"
 
-#: lib/tasks.ts:113
+#: lib/tasks.ts:115
 msgid "Resolved automatically"
 msgstr "Résolue automatiquement"
 

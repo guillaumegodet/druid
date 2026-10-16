@@ -44,6 +44,11 @@
  *   parcours_statut_incoherent  ended record still publishing locally / with an open ORCID position there
  *   parcours_identifiant_suspect  identifiers whose publications / Scopus profile never mention the
  *                    institution (alignment control)
+ *   doctorant_these  record still a PhD student (TYPE_EMPLOI or Corps_grade DOCTORANT, not gone) whose IdRef has a
+ *                    defended thesis on theses.fr (table Theses, PostgreSQL instances, scripts/sync_theses.ts):
+ *                    annuaire_doctorant_docteur when the thesis is recent (status, employment or end to update;
+ *                    closed once the record no longer says PhD student), annuaire_doctorant_these_ancienne when it
+ *                    is older than a PhD lasts (IdRef of a namesake, or a second doctorate: to check)
  *   abes_orcid       Annuaire ORCID missing from the IdRef record (lot ABES channel)
  *   abes_idhal       Annuaire IdHAL missing from the IdRef record (lot ABES channel)
  *
@@ -65,7 +70,7 @@ const schema = require('./lib/tasks_schema.cjs');
 const APPLY = common.hasFlag('apply');
 const AUTHOR = 'druid:regles';
 const PROGRESS_PATH = common.getArg('progress', 'tasks_detect_progress.json');
-const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect'];
+const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these'];
 const RULES_ARG = String(common.getArg('rules', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
@@ -342,6 +347,17 @@ function endsByKey(annuaire) {
   for (const v of out.values()) v.ended = !!v.employmentEnd || (v.memberships.length > 0 && v.memberships.every(Boolean));
   return out;
 }
+/** A thesis defended more than this many years ago does not belong to a current PhD student (a PhD lasts 3 to 6). */
+const PHD_RECENT_YEARS = 6;
+const isPhdStudent = (f) => [f.TYPE_EMPLOI, f.Corps_grade].some((v) => String(v || '').trim().toUpperCase() === 'DOCTORANT');
+/** Thesis of each directory row, from the table Theses (one row per person, `annuaire_rows` = its rows). */
+const thesesByRow = (rows) => {
+  const out = {};
+  for (const r of rows || []) for (const id of r.fields.annuaire_rows || []) out[id] = r.fields;
+  return out;
+};
+const frDate = (d) => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d);
+const thesisUrl = (nnt) => `https://theses.fr/${encodeURIComponent(nnt)}`;
 const sourcesFr = (list) => (list || []).map((x) => (x === 'orcid' ? 'ORCID' : x === 'scopus' ? 'Scopus' : 'les publications')).join(' + ');
 function departDescription(sig) {
   const dest = sig.destination ? `, pour ${sig.destination}` : '';
@@ -582,6 +598,39 @@ const RULES = {
       return out;
     },
   },
+  doctorant_these: {
+    type: 'annuaire_doctorant_docteur',
+    types: ['annuaire_doctorant_docteur', 'annuaire_doctorant_these_ancienne'],
+    sources: ['theses'],
+    detect(ctx) {
+      const out = [];
+      const recentFrom = `${Number(today.slice(0, 4)) - PHD_RECENT_YEARS}${today.slice(4)}`;
+      for (const rec of ctx.annuaire) {
+        const f = rec.fields;
+        const t = ctx.theses[rec.id];
+        if (!t || !isPhdStudent(f)) continue;
+        if (/^PARTI$/i.test(String(f.validated_status || '').trim())) continue;   // gone: nothing to update
+        const when = `${frDate(String(t.defended_on))}${t.institution ? ` (${t.institution})` : ''}`;
+        const recent = String(t.defended_on) >= recentFrom.slice(0, String(t.defended_on).length);
+        out.push(recent ? {
+          key: rec.key, rec, type: 'annuaire_doctorant_docteur',
+          description: [
+            `Thèse soutenue le ${when}, NNT ${t.nnt} (theses.fr, par l’IdRef de la fiche) ; la fiche indique toujours « doctorant ».`,
+            'À faire : mettre à jour le type d’emploi et le grade (post-doctorant, ATER, MCF…), ou, si la personne est partie, saisir la fin d’emploi et valider la présence « parti ». La tâche se ferme seule quand la fiche ne dit plus « doctorant » ou que la personne est validée partie.',
+          ].join('\n'),
+          lien: druidRecordUrl(rec.key),
+        } : {
+          key: rec.key, rec, type: 'annuaire_doctorant_these_ancienne',
+          description: [
+            `L’IdRef de la fiche porte une thèse soutenue le ${when}, NNT ${t.nnt}, il y a plus de ${PHD_RECENT_YEARS} ans, alors que la fiche indique « doctorant ».`,
+            'IdRef d’un homonyme ? (ou seconde thèse) À faire : vérifier l’IdRef dans l’alignement IdRef, le corriger le cas échéant ; sinon abandonner la tâche.',
+          ].join('\n'),
+          lien: thesisUrl(t.nnt),
+        });
+      }
+      return out;
+    },
+  },
   abes_orcid: {
     type: 'idref_ajouter_orcid',
     sources: ['idref'],
@@ -636,6 +685,10 @@ async function main() {
       .then((records) => Object.fromEntries((records || []).map((r) => [r.id, r.fields])))
       .catch((e) => { console.warn(`[tasks] Etablissements unreadable (${e.message})`); return {}; }),
     parcours: loadJson(PARCOURS_INDEX),
+    // PhD of the people (doctorant_these): PostgreSQL instances only; elsewhere empty ⇒ the rule is skipped.
+    theses: await common.gristRecords('Theses')
+      .then(thesesByRow)
+      .catch(() => ({})),
   };
   let existing = [];
   try { existing = (await common.gristRecords(schema.TASKS_TABLE)) || []; }
@@ -733,7 +786,7 @@ async function main() {
   writeProgress({ running: false, total: rules.length, done, ...stats, startedAt: nowIso, finishedAt: new Date().toISOString() });
 }
 
-module.exports = { RULES, DEFAULT_RULES, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
+module.exports = { RULES, DEFAULT_RULES, thesesByRow, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
 
 if (require.main === module) {
   main().catch((e) => {

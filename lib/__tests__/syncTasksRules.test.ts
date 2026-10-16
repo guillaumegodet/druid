@@ -3,17 +3,45 @@ import { createRequire } from 'node:module';
 
 // The rules live in the CommonJS script (run by the server and by ofelia); requiring it only
 // defines them (main() runs under require.main === module).
-const { RULES, DEFAULT_RULES, openNantesAffiliations, nameMatch, sharedIdentifierGroups, endsByKey } = createRequire(import.meta.url)('../../scripts/sync_tasks.cjs');
+const { RULES, DEFAULT_RULES, thesesByRow, openNantesAffiliations, nameMatch, sharedIdentifierGroups, endsByKey } = createRequire(import.meta.url)('../../scripts/sync_tasks.cjs');
 
 const rec = (id: number, fields: Record<string, unknown>) => ({ id, key: (fields.uid_dyna as string) || `g${id}`, fields });
 const cand = (extra: Record<string, unknown>) => ({ nameMatch: 'exact', score: 'moyen', evidence: ['site (Nantes Université)'], ...extra });
-const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours' | 'etablissements', unknown>>) =>
-  ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, parcours: {}, etablissements: {}, ...over });
+const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours' | 'etablissements' | 'theses', unknown>>) =>
+  ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, parcours: {}, etablissements: {}, theses: {}, ...over });
 
 describe('scripts/sync_tasks.cjs rules (docs/plan-chantiers-taches.md, lot 5)', () => {
   it('default rules exclude the ABES ones (handled by the batch export)', () => {
-    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect']);
+    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these']);
     expect(Object.keys(RULES)).toContain('abes_orcid');
+  });
+
+  it('doctorant_these: PhD student with a recent defended thesis ⇒ status to update; an old one ⇒ IdRef to check', () => {
+    const year = Number(new Date().toISOString().slice(0, 4));
+    const theses = thesesByRow([
+      { id: 1, fields: { annuaire_rows: [10, 11], nnt: `${year - 1}NANT1001`, defended_on: `${year - 1}-06-30`, institution: 'Nantes' } },
+      { id: 2, fields: { annuaire_rows: [20], nnt: '2004LYO10001', defended_on: '2004', institution: 'Lyon 1' } },
+      { id: 3, fields: { annuaire_rows: [30], nnt: `${year - 2}REN10001`, defended_on: `${year - 2}`, institution: 'Rennes 1' } },
+      { id: 4, fields: { annuaire_rows: [40], nnt: `${year - 2}BRES0001`, defended_on: `${year - 2}`, institution: 'Brest' } },
+    ]);
+    const out = RULES.doctorant_these.detect(ctx({
+      annuaire: [
+        rec(10, { uid_dyna: 'durand-l', TYPE_EMPLOI: 'DOCTORANT', Corps_grade: 'DOCTORANT', LABO: 'LS2N' }),
+        rec(11, { uid_dyna: 'durand-l', TYPE_EMPLOI: 'DOCTORANT', LABO: 'IETR' }),   // second row of the same person
+        rec(20, { uid_dyna: 'petit-m', TYPE_EMPLOI: 'CDD UNIVERSITE', Corps_grade: 'Doctorant' }),
+        rec(30, { uid_dyna: 'roux-a', TYPE_EMPLOI: 'CDD UNIVERSITE', Corps_grade: 'POST-DOC' }),   // no longer a PhD student
+        rec(40, { uid_dyna: 'blanc-c', TYPE_EMPLOI: 'DOCTORANT', validated_status: 'PARTI' }),   // gone
+        rec(50, { uid_dyna: 'noir-e', TYPE_EMPLOI: 'DOCTORANT' }),   // no thesis known
+      ],
+      theses,
+    }));
+    expect(out.map((x: { key: string; type: string }) => `${x.key}:${x.type}`)).toEqual([
+      'durand-l:annuaire_doctorant_docteur', 'durand-l:annuaire_doctorant_docteur', 'petit-m:annuaire_doctorant_these_ancienne',
+    ]);
+    expect(out[0].description).toContain(`NNT ${year - 1}NANT1001`);
+    expect(out[0].lien).toBe('/?page=RESEARCHER_DETAIL&id=durand-l');
+    expect(out[2].description).toContain('homonyme');
+    expect(out[2].lien).toBe('https://theses.fr/2004LYO10001');
   });
 
   it('orcid_deux_ids: two Nantes-affiliated exact-name profiles, or Annuaire ≠ IdRef record', () => {
@@ -67,7 +95,7 @@ describe('rule sources', () => {
   it('every rule declares the caches it reads (empty cache ⇒ rule skipped, no false auto-resolution)', () => {
     for (const [name, rule] of Object.entries(RULES) as [string, { sources: string[] }][]) {
       expect(rule.sources.length, name).toBeGreaterThan(0);
-      for (const s of rule.sources) expect(['orcid', 'hal', 'scopus', 'idref', 'ldap', 'annuaire', 'parcours', 'etablissements']).toContain(s);
+      for (const s of rule.sources) expect(['orcid', 'hal', 'scopus', 'idref', 'ldap', 'annuaire', 'parcours', 'etablissements', 'theses']).toContain(s);
     }
   });
 });

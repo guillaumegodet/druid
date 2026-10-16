@@ -12,6 +12,14 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **À traiter — doctorants ayant soutenu leur thèse** : nouvelle règle `doctorant_these` de la détection nocturne
+  (`scripts/sync_tasks.cjs`, instances PostgreSQL) : une fiche encore « doctorant » (type d'emploi ou grade) dont l'IdRef
+  porte une thèse soutenue sur theses.fr donne une tâche « Doctorant ayant soutenu sa thèse : mettre à jour le statut »
+  (fermée seule quand la fiche ne dit plus « doctorant » ou que la personne est validée partie) ; une thèse de plus de
+  six ans donne plutôt « Doctorant avec une thèse ancienne sur son IdRef : homonyme ? » (lien vers theses.fr). Les
+  thèses sont lues par la table `Theses` de la façade PostgreSQL des jobs (`person_thesis`).
+
 ## [2.8.1] — 2026-10-16
 
 ### Corrigé

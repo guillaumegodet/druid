@@ -67,6 +67,8 @@ export const TASK_TYPES = {
   sovisu_ancienne_personne: { base: 'Annuaire', canal: 'interne', email: false, label: msg`SoVisu+ — remove the identifiers of the former person (uid changed)` },
   annuaire_employeur_a_renseigner: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — employer to enter (record validated « external »)` },
   annuaire_hebergement_fin: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — hosted LDAP account closing: probable departure?` },
+  annuaire_doctorant_docteur: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — PhD student who defended the thesis: update the status` },
+  annuaire_doctorant_these_ancienne: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — PhD student with an old thesis on the IdRef: namesake?` },
   autre: { base: 'Autre', canal: 'interne', email: false, label: msg`Other` },
 } as const satisfies Record<string, TaskTypeMeta>;
 
