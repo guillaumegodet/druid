@@ -34,6 +34,9 @@ n'existent que sur les instances qui en disposent (voir
   présence), effectif, ETP recherche, **taux de publication par ETP recherche et par tranche
   d'âge**, pyramide des âges, publications par membre, tableau exportable en CSV. Voir
   [Lire les effectifs et le taux de publication par ETP](/guides/tableau-de-bord/chercheurs-effectifs/).
+- **Exporter un graphique en SVG, en PDF vectoriel ou ses données en CSV** : le bouton
+  **Télécharger** de chaque graphique ouvre un menu (PNG, SVG, PDF, CSV), pour un article, une
+  affiche ou un tableur. Voir [Exporter un graphique](/guides/tableau-de-bord/exporter/#exporter-un-graphique).
 
 ### Rapports
 

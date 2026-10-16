@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
 import {
   EChartCard,
@@ -50,6 +50,17 @@ export const WorldChoroplethChart: React.FC<{ data: CountryItem[] }> = ({ data }
     };
   }, [data, t, tr]);
 
+  // CSV: country names as displayed elsewhere (the map polygons carry English names), and
+  // every country, including those too small to have a polygon.
+  const exportTables = useCallback(
+    () => [{
+      name: 'data',
+      columns: [tr`Country`, tr`ISO code`, tr`Publications`],
+      rows: data.map((d) => [d.fr, d.iso2, d.count]),
+    }],
+    [data, tr],
+  );
+
   if (!ready) {
     return (
       <div className="glass-card h-[480px] flex items-center justify-center text-sm text-muted-light dark:text-[#8f897c]">
@@ -65,6 +76,7 @@ export const WorldChoroplethChart: React.FC<{ data: CountryItem[] }> = ({ data }
       option={option}
       exportName="carte-monde"
       height={440}
+      exportTables={exportTables}
     />
   );
 };

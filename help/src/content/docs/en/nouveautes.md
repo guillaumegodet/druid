@@ -33,6 +33,9 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
   headcount, research FTE, **publication rate per research FTE and per age bracket**, age
   pyramid, publications per member, table exportable as CSV. See
   [Read the staff and the publication rate per FTE](/en/guides/tableau-de-bord/chercheurs-effectifs/).
+- **Export a chart as SVG, as vector PDF or its data as CSV**: the **Download** button of each
+  chart opens a menu (PNG, SVG, PDF, CSV), for a paper, a poster or a spreadsheet. See
+  [Export a chart](/en/guides/tableau-de-bord/exporter/#export-a-chart).
 
 ### Reports
 

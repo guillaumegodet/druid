@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { copyToClipboard } from '../../lib/clipboard';
 import { embedStateParams } from './embedState';
 import type { PubFilters } from './publicationFilters';
@@ -30,10 +30,12 @@ import {
 } from 'echarts/components';
 import { RadarComponent } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
-import { Download, Maximize2, Minimize2, Share2, Copy, Check, ExternalLink, X, Info, FilePlus2 } from 'lucide-react';
+import { Download, Maximize2, ChevronDown, Minimize2, Share2, Copy, Check, ExternalLink, X, Info, FilePlus2 } from 'lucide-react';
 import { chartDoc } from './report/chartDocs';
 import { VIZ_DARK, VIZ_LIGHT, VizTheme } from './palette';
 import { EMBEDDABLE_IDS } from './embedIds';
+import { downloadBlob, renderChartSvg, svgToPdf, toStaticOption } from './chartFileExport';
+import { chartTables, toCsv, type DataTable } from '../../lib/chartExport';
 import { Trans, useLingui } from '@lingui/react/macro';
 
 echarts.use([
@@ -68,36 +70,6 @@ export interface ReportCapture {
   unregister: (id: string) => void;
 }
 export const ReportCaptureContext = React.createContext<ReportCapture | null>(null);
-
-/**
- * Static variant of an ECharts option for PDF report capture:
- * no animations nor effects. Essential for mass off-screen rendering
- * — the animated force layout starts on NaN positions and the effect
- * layers (motion blur of `lines`, ripple of `effectScatter`) crash
- * during concurrent resize/dispose (« can't access property 0 »,
- * « drawImage: canvas is empty ») when a whole section is mounted at
- * once. Incidentally, the force layout is computed in one pass
- * (layoutAnimation: false): the `finished` event arrives right away instead
- * of the ReportRenderer's 6 s cap per chart.
- */
-function toStaticOption(option: EChartsCoreOption): EChartsCoreOption {
-  const rawSeries = (option as { series?: unknown }).series;
-  if (rawSeries == null) return { ...option, animation: false };
-  const series = (Array.isArray(rawSeries) ? rawSeries : [rawSeries]).map((s) => {
-    if (!s || typeof s !== 'object') return s;
-    const serie = s as Record<string, unknown>;
-    const out: Record<string, unknown> = { ...serie, animation: false };
-    if (serie.type === 'graph' && serie.layout === 'force') {
-      out.force = { ...(serie.force as object), layoutAnimation: false };
-    }
-    if (serie.type === 'lines') {
-      out.effect = { ...(serie.effect as object), show: false };
-    }
-    if (serie.type === 'effectScatter') out.type = 'scatter';
-    return out;
-  });
-  return { ...option, animation: false, series };
-}
 
 /**
  * Sharing scope provided by DashboardPage (current structure + year
@@ -235,7 +207,7 @@ interface EChartCardProps {
   subtitle?: string;
   option: EChartsCoreOption;
   /**
-   * File name (without extension) of the PNG export. Also serves as identifier
+   * File name (without extension) of the exports (PNG, SVG, PDF, CSV). Also serves as identifier
    * in the embed registry (embedRegistry) for the Share button.
    */
   exportName: string;
@@ -246,6 +218,9 @@ interface EChartCardProps {
   toolbar?: React.ReactNode;
   /** Replaces the chart with this message (empty state / waiting for input). */
   emptyMessage?: string;
+  /** Tables of the CSV export, when the generic reading of the option (lib/chartExport.ts) is not
+   * the right one (display names, identifiers). */
+  exportTables?: () => DataTable[];
   /** Disables the Share button (chart outside the embed registry). */
   shareable?: boolean;
   /** Click on a series element (bar, donut slice…) — lets the
@@ -394,7 +369,7 @@ const ShareDialog: React.FC<{ url: string; title: string; onClose: () => void }>
 
 /**
  * Shared chart card of the dashboard: « glass-card » chrome of the
- * 2026 redesign, display title, toolbar (PNG export, full screen).
+ * 2026 redesign, display title, toolbar (PNG / SVG / PDF / CSV export, full screen).
  * Druid equivalent of the EChart wrapper of the SoVisu+ mockups (without the iframe
  * sharing, which assumes a public route — see phase 4).
  */
@@ -408,6 +383,7 @@ export const EChartCard: React.FC<EChartCardProps> = ({
   toolbar,
   emptyMessage,
   shareable = true,
+  exportTables,
   onSeriesClick,
 }) => {
   const { t } = useLingui();
@@ -494,16 +470,58 @@ export const EChartCard: React.FC<EChartCardProps> = ({
     return () => window.removeEventListener('keydown', onKey);
   }, [fullscreen]);
 
-  const downloadPng = () => {
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
+  // Data export of public embeds: off — an embed shows the chart, not its table.
+  const tables = useMemo(
+    () => (exportOpen && !embedMode ? (exportTables ?? (() => chartTables(option)))() : []),
+    [exportOpen, embedMode, exportTables, option],
+  );
+
+  useEffect(() => {
+    if (!exportOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExportOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [exportOpen]);
+
+  const runExport = async (format: 'png' | 'svg' | 'pdf' | 'csv') => {
+    setExportOpen(false);
+    setExportError(null);
     const chart = chartRef.current;
     if (!chart) return;
-    const url = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: theme.tooltipBg });
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${exportName}.png`;
-    a.click();
+    try {
+      if (format === 'png') {
+        const a = document.createElement('a');
+        a.href = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: theme.tooltipBg });
+        a.download = `${exportName}.png`;
+        a.click();
+      } else if (format === 'csv') {
+        // UTF-8 BOM: Excel (fr) then opens accented characters correctly and honors the « ; » separator.
+        for (const table of tables) {
+          const name = tables.length > 1 ? `${exportName}-${table.name}` : exportName;
+          downloadBlob(new Blob(['\ufeff' + toCsv(table)], { type: 'text/csv;charset=utf-8' }), `${name}.csv`);
+        }
+        const rows = tables.reduce((n, tb) => n + tb.rows.length, 0);
+        void import('../../lib/exportService').then((m) => m.reportExport('csv', exportName, rows));
+      } else {
+        const svg = renderChartSvg(chart, theme.tooltipBg);
+        if (format === 'svg') {
+          downloadBlob(new Blob([svg], { type: 'image/svg+xml;charset=utf-8' }), `${exportName}.svg`);
+        } else {
+          downloadBlob(await svgToPdf(svg, chart.getWidth(), chart.getHeight()), `${exportName}.pdf`);
+        }
+      }
+    } catch (e) {
+      console.error('Chart export failed', e);
+      setExportError(t`The export failed. Try the PNG format.`);
+    }
   };
 
+  const menuItem =
+    'w-full text-left px-3.5 py-2 rounded-xl text-[13px] font-semibold text-ink dark:text-[#f5f2ea] hover:bg-accent/10 transition-colors';
   const toolbarBtn =
     'p-1.5 rounded-lg text-muted-light dark:text-[#8f897c] hover:text-ink dark:hover:text-[#f5f2ea] hover:bg-ink/5 dark:hover:bg-white/10 transition-colors';
 
@@ -549,9 +567,52 @@ export const EChartCard: React.FC<EChartCardProps> = ({
               <Share2 className="w-4 h-4" />
             </button>
           )}
-          <button type="button" onClick={downloadPng} title={t`Download as PNG`} className={toolbarBtn}>
-            <Download className="w-4 h-4" />
-          </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setExportOpen((o) => !o)}
+              title={t`Download (image or data)`}
+              aria-haspopup="menu"
+              aria-expanded={exportOpen}
+              className={`${toolbarBtn} flex items-center`}
+            >
+              <Download className="w-4 h-4" />
+              <ChevronDown className="w-3 h-3 -ml-0.5" />
+            </button>
+            {exportOpen && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setExportOpen(false)} />
+                <div
+                  role="menu"
+                  className="absolute right-0 top-full mt-1 w-60 rounded-2xl bg-cream-100 dark:bg-[#201e1a] border border-white/60 dark:border-white/10 shadow-soft-lg z-40 p-1.5"
+                >
+                  <button type="button" role="menuitem" onClick={() => runExport('png')} className={menuItem}>
+                    <Trans>PNG image</Trans>
+                  </button>
+                  <button type="button" role="menuitem" onClick={() => runExport('svg')} className={menuItem}>
+                    <Trans>SVG image (vector)</Trans>
+                  </button>
+                  <button type="button" role="menuitem" onClick={() => runExport('pdf')} className={menuItem}>
+                    <Trans>PDF (vector)</Trans>
+                  </button>
+                  {tables.length > 0 && (
+                    <>
+                      <div className="my-1 border-t border-ink/10 dark:border-white/10" />
+                      <button
+                        type="button"
+                        role="menuitem"
+                        onClick={() => runExport('csv')}
+                        className={menuItem}
+                        title={tables.length > 1 ? t`One file per table: ${tables.map((tb) => tb.name).join(', ')}` : undefined}
+                      >
+                        {tables.length > 1 ? <Trans>Data (CSV, {tables.length} files)</Trans> : <Trans>Data (CSV)</Trans>}
+                      </button>
+                    </>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
           <button
             type="button"
             onClick={() => setFullscreen((f) => !f)}
@@ -563,6 +624,9 @@ export const EChartCard: React.FC<EChartCardProps> = ({
         </div>
       </div>
       {toolbar && <div className="px-5 pb-2">{toolbar}</div>}
+      {exportError && (
+        <div className="px-5 pb-2 text-xs text-red-600 dark:text-red-400" role="alert">{exportError}</div>
+      )}
       {emptyMessage && (
         <div className="px-5 pb-5 pt-2 text-sm text-muted-light dark:text-[#8f897c]">{emptyMessage}</div>
       )}

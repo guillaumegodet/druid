@@ -74,8 +74,8 @@ If major corrections are made (HAL deposits, OpenAlex affiliations), the dashboa
   the chosen period and scope, remove the sections you do not need, add your texts, then
   **Generate the PDF** (see [Create a report](/en/guides/rapports/creer-un-rapport/)). The
   report stays in **My reports**: next year, change the period and generate it again.
-- **Individual charts**: **Download as PNG** from each chart's toolbar, to insert them into
-  the report.
+- **Individual charts**: **Download** from each chart's toolbar, as PNG, as vector SVG or PDF
+  to insert them into the report, or their data as CSV.
 - **List of publications**: the reviewed CSV from step 4.
 
 ## Step 6 — Document
