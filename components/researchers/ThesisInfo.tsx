@@ -24,23 +24,25 @@ const fmtFuzzy = (d: string): string => (/^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split
 /**
  * Doctoral thesis of the record, read from theses.fr by the weekly sync (druid-internal docs/plan-funding-calls.md,
  * lot 5): the PhD (date, institution, discipline, link) or the thesis in progress, « not found » once checked without
- * result, nothing before the first check. Read-only; PostgreSQL instances only (capability HAS_CALLS).
+ * result, nothing before the first check. Read-only; PostgreSQL instances only (capability HAS_CALLS). A record
+ * without uid is looked up by its directory row.
  */
-export const ThesisInfo: React.FC<{ uid: string; labelClassName: string }> = ({ uid, labelClassName }) => {
+export const ThesisInfo: React.FC<{ uid: string; rowId?: number; labelClassName: string }> = ({ uid, rowId, labelClassName }) => {
   const { t } = useLingui();
   const [data, setData] = useState<ThesesAnswer | null>(null);
-  const enabled = hasCapability('HAS_CALLS') && !!uid;
+  const url = uid ? `/api/researchers/${encodeURIComponent(uid)}/theses` : rowId ? `/api/researchers/by-row/${rowId}/theses` : '';
+  const enabled = hasCapability('HAS_CALLS') && !!url;
 
   useEffect(() => {
     if (!enabled) return;
     let cancelled = false;
     setData(null);
-    fetch(`/api/researchers/${encodeURIComponent(uid)}/theses`, { cache: 'no-store' })
+    fetch(url, { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => { if (!cancelled) setData(d); })
       .catch(() => { if (!cancelled) setData(null); });
     return () => { cancelled = true; };
-  }, [uid, enabled]);
+  }, [url, enabled]);
 
   if (!enabled || !data || (!data.check && !data.theses.length)) return null;
   const phd = phdOf(data.theses);

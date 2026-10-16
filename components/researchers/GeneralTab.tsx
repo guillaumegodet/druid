@@ -345,7 +345,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                  </div>
                )}
              </div>
-             <ThesisInfo uid={researcher.uid || ''} labelClassName={secLabel} />
+             <ThesisInfo uid={researcher.uid || ''} rowId={researcher.gristRowId} labelClassName={secLabel} />
           </div>
        </div>
 

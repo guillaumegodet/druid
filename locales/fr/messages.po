@@ -12420,29 +12420,29 @@ msgstr "Email au chercheur"
 msgid "Mark as sent (task on hold)"
 msgstr "Marquer envoyé (tâche en attente)"
 
-#: components/researchers/ThesisInfo.tsx:50
+#: components/researchers/ThesisInfo.tsx:52
 msgid "Doctoral thesis"
 msgstr "Thèse de doctorat"
 
 #. placeholder {0}: current.defendedOn ? fmtFuzzy(current.defendedOn) : ''
-#: components/researchers/ThesisInfo.tsx:54
+#: components/researchers/ThesisInfo.tsx:56
 msgid "Defended {0}"
 msgstr "Soutenue {0}"
 
-#: components/researchers/ThesisInfo.tsx:55
+#: components/researchers/ThesisInfo.tsx:57
 #: lib/tasks.ts:89
 msgid "In progress"
 msgstr "En cours"
 
-#: components/researchers/ThesisInfo.tsx:60
+#: components/researchers/ThesisInfo.tsx:62
 msgid "Open the thesis on theses.fr"
 msgstr "Ouvrir la thèse sur theses.fr"
 
-#: components/researchers/ThesisInfo.tsx:67
+#: components/researchers/ThesisInfo.tsx:69
 msgid "theses.fr could not be read at the last check."
 msgstr "theses.fr n’a pas pu être lu lors de la dernière vérification."
 
-#: components/researchers/ThesisInfo.tsx:67
+#: components/researchers/ThesisInfo.tsx:69
 msgid "No thesis found on theses.fr for the IdRef of the record."
 msgstr "Aucune thèse trouvée sur theses.fr pour l’IdRef de la fiche."
 
