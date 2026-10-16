@@ -249,7 +249,7 @@ const ViewSwitch: React.FC<{ view: View; onChange: (v: View) => void; withCandid
 };
 
 /**
- * Kind of subset of the selected programmes (their `subsetLabel`: cluster, scheme, mission, destination, axis, panel),
+ * Kind of subset of the selected programmes (their `subsetLabel`: cluster, scheme, mission, destination, axis, panel, domain),
  * '' when they differ: names the subset filter.
  */
 const subsetKindOf = (programmes: ProgrammeView[], selected: Set<string>): string => {
@@ -323,6 +323,7 @@ export const CallsTab: React.FC<{
     destination: { all: t({ message: 'All destinations', context: 'funding calls' }), one: t({ message: 'Destination', context: 'funding calls' }) },
     axis: { all: t({ message: 'All axes', context: 'funding calls' }), one: t({ message: 'Axis', context: 'funding calls' }) },
     panel: { all: t({ message: 'All panels', context: 'funding calls' }), one: t({ message: 'Panel', context: 'funding calls' }) },
+    domain: { all: t({ message: 'All domains', context: 'funding calls' }), one: t({ message: 'Domain', context: 'funding calls' }) },
   } as Record<string, { all: string; one: string }>)[subsetKindOf(programmes, programmeIds)]
     ?? { all: t({ message: 'All subsets', context: 'funding calls' }), one: t({ message: 'Subset', context: 'funding calls' }) };
   const showProgramme = programmesWithCalls.length > 1 && !programmeId;

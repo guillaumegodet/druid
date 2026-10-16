@@ -144,7 +144,7 @@ export const programmeOfPortalTopic = (t: { identifier: string; framework: strin
   return programmeId ? { programmeId, subset: '', scheme: '' } : null;
 };
 
-const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', rsquo: '’', lsquo: '‘', ldquo: '“', rdquo: '”', hellip: '…', eacute: 'é', egrave: 'è', agrave: 'à', ccedil: 'ç' };
+const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', ndash: '–', mdash: '—', rsquo: '’', lsquo: '‘', ldquo: '“', rdquo: '”', hellip: '…', eacute: 'é', egrave: 'è', agrave: 'à', ccedil: 'ç', ecirc: 'ê', oelig: 'œ', laquo: '«', raquo: '»' };
 const decodeEntities = (s: string): string =>
   s.replace(/&(#x?[0-9a-f]+|[a-z]+);/gi, (all, code: string) => {
     if (code[0] === '#') {

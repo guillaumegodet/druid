@@ -13,6 +13,16 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Collecte des appels de l'ANR** (druid-internal `docs/plan-funding-calls.md`, lot 4) :
+  `scripts/.build/collect_calls.cjs --source=anr` lit la liste des appels ouverts ou annoncés d'anr.fr et la page de
+  chacun (titre, état pré-annonce / ouvert / clos, dates de la frise, texte), pour deux programmes : **ANR — Appels
+  spécifiques** (partenariats européens, réseaux…) et **France 2030** (PEPR, AMI opérés par l'ANR) ; un appel qui
+  quitte la liste passe à clos. **AAPG** : les axes de recherche de la dernière édition publiée (57 en 2027) sont lus
+  dans le PDF du texte de l'appel (description, mots-clés, panels ERC, ODD) et deviennent chacun un appel du programme
+  `anr-aapg`, rangé par domaine disciplinaire (nouveau filtre « Domaine » de l'onglet), gardé après la clôture jusqu'à
+  l'édition suivante. Nouvelle dépendance `unpdf` (pdf.js, sans dépendance système). L'import des rapports
+  d'appariement ne relit plus le portail Funding & Tenders pour un programme qui n'en vient pas, et traduit le résumé
+  (en anglais) d'un appel en français, auparavant laissé en anglais.
 - **Thèse de doctorat des chercheurs** (druid-internal `docs/plan-funding-calls.md`, lot 5) :
   `scripts/.build/sync_theses.cjs` lit sur theses.fr, par l'IdRef de chaque fiche, les thèses dont la personne est
   l'auteur (NNT, titre, date de soutenance, établissement, discipline, statut soutenue / en cours) ; une fiche est
@@ -29,6 +39,9 @@ données à exécuter au déploiement).
   Migration `20261016210000_call_eligibility.sql` (`call_eligibility_rule`, `call_eligibility`).
 
 ### Migration
+- Job hebdomadaire de collecte ANR à déclarer dans ofelia (`druid-calls-collect-anr`, voir le plan) ; première
+  collecte à la main : `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/collect_calls.cjs --source=anr`.
+  Sortie par le proxy obligatoire : en accès direct, le pare-feu du réseau intercepte le TLS d'anr.fr.
 - `druid-migrate`, puis première synchronisation à la main (≈ 1 h pour 5 000 fiches) :
   `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/sync_theses.cjs` ; job hebdomadaire à
   déclarer dans ofelia (`druid-theses-sync`, voir le plan).
