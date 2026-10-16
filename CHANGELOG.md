@@ -13,6 +13,10 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Appariement de tous les programmes du portail** (druid-internal `docs/plan-funding-calls.md`, lot 3) :
+  `scripts/.build/export_calls.cjs --programme=<id> --out=<dossier>` écrit les appels ouverts ou à venir d'un programme
+  (EIC, MSCA, missions, ERC…), un fichier par sous-ensemble, au format des topics de crisalid-agents
+  (`topic_researcher_match.py --topics-file`) ; les rapports se réimportent par `import_calls.cjs --programme=<id>`.
 - **Collecte des appels du portail Funding & Tenders** (druid-internal `docs/plan-funding-calls.md`, lot 2) :
   `scripts/.build/collect_calls.cjs --source=ft-portal` lit en flux le fichier de référence public du portail (tous les
   topics, 130 Mo) et le texte de chaque topic nouveau ou modifié (objectifs, périmètre, budget, dates), pour les
@@ -24,6 +28,9 @@ données à exécuter au déploiement).
   des collectes. Le job nocturne est à déclarer dans ofelia (voir le plan).
 
 ### Modifié
+- **Import des rapports d'appariement** : un appel collecté sur son portail garde ses textes, son sous-ensemble et
+  sa classification ; le rapport n'apporte que son résumé (dont la traduction est refaite s'il change) et les
+  appariements.
 - **Appels à projets (ex-« Appels européens »)** : l'onglet du tableau de bord devient générique pour accueillir tous les
   guichets de financement (druid-internal `docs/plan-funding-calls.md`, lot 1) — modèle financeur → programme → appel →
   appariement (tables `funder`, `funding_programme`, `funding_call`, `call_match_run`, `call_match`, `call_feedback` à la
