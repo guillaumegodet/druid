@@ -306,8 +306,10 @@ export const createCallsStore = (db: Kysely<DB>) => {
   };
 
   /** English texts without a French translation yet (summaries of the calls, justifications of the matches). */
+  // The summary is written by the matching batch, in English whatever the language of the call (an ANR call is in
+  // French): every summary without its French version is pending.
   const pendingTranslations = async () => ({
-    calls: (await db.selectFrom('funding_call').select(['call_id', 'summary']).where('summary', '<>', '').where('summary_fr', '=', '').where('lang', '<>', 'fr').execute())
+    calls: (await db.selectFrom('funding_call').select(['call_id', 'summary']).where('summary', '<>', '').where('summary_fr', '=', '').execute())
       .map((r) => ({ callId: r.call_id, text: r.summary })),
     matches: (await db.selectFrom('call_match').select(['pair_id', 'justification']).where('justification', '<>', '').where('justification_fr', '=', '').execute())
       .map((r) => ({ pairId: r.pair_id, text: r.justification })),

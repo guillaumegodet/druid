@@ -21,7 +21,8 @@ données à exécuter au déploiement).
   dans le PDF du texte de l'appel (description, mots-clés, panels ERC, ODD) et deviennent chacun un appel du programme
   `anr-aapg`, rangé par domaine disciplinaire (nouveau filtre « Domaine » de l'onglet), gardé après la clôture jusqu'à
   l'édition suivante. Nouvelle dépendance `unpdf` (pdf.js, sans dépendance système). L'import des rapports
-  d'appariement ne relit plus le portail Funding & Tenders pour un programme qui n'en vient pas.
+  d'appariement ne relit plus le portail Funding & Tenders pour un programme qui n'en vient pas, et traduit le résumé
+  (en anglais) d'un appel en français, auparavant laissé en anglais.
 
 ### Migration
 - Job hebdomadaire de collecte ANR à déclarer dans ofelia (`druid-calls-collect-anr`, voir le plan) ; première
