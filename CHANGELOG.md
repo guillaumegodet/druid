@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.8.0] — 2026-10-16
+
 ### Ajouté
 - **Collecte des appels de l'ANR** (druid-internal `docs/plan-funding-calls.md`, lot 4) :
   `scripts/.build/collect_calls.cjs --source=anr` lit la liste des appels ouverts ou annoncés d'anr.fr et la page de
@@ -39,14 +41,20 @@ données à exécuter au déploiement).
   Migration `20261016210000_call_eligibility.sql` (`call_eligibility_rule`, `call_eligibility`).
 
 ### Migration
-- Job hebdomadaire de collecte ANR à déclarer dans ofelia (`druid-calls-collect-anr`, voir le plan) ; première
-  collecte à la main : `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/collect_calls.cjs --source=anr`.
-  Sortie par le proxy obligatoire : en accès direct, le pare-feu du réseau intercepte le TLS d'anr.fr.
-- `druid-migrate`, puis première synchronisation à la main (≈ 1 h pour 5 000 fiches) :
-  `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/sync_theses.cjs` ; job hebdomadaire à
-  déclarer dans ofelia (`druid-theses-sync`, voir le plan).
-- Calcul des candidats après la première synchronisation des thèses :
-  `docker exec crisalid-druid-1 node scripts/.build/compute_eligibility.cjs` ; job nocturne `druid-calls-eligibility`.
+- `20261016200000_person_thesis.sql` : tables `person_thesis` et `person_thesis_check` (thèses lues sur theses.fr).
+- `20261016210000_call_eligibility.sql` : tables `call_eligibility_rule` et `call_eligibility` (candidats).
+- Instances PostgreSQL, dans l'ordre : sauvegarde de la base (`deploy.sh` ne sauvegarde que le document Grist), puis
+  `druid-migrate` ; première collecte ANR
+  `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/collect_calls.cjs --source=anr` (sortie par
+  le proxy obligatoire : en accès direct, le pare-feu du réseau intercepte le TLS d'anr.fr) ; première synchronisation
+  des thèses `docker exec -e NODE_USE_ENV_PROXY=1 crisalid-druid-1 node scripts/.build/sync_theses.cjs` (≈ 1 h pour
+  5 000 fiches à IdRef) ; puis le calcul des candidats
+  `docker exec crisalid-druid-1 node scripts/.build/compute_eligibility.cjs`.
+- Jobs ofelia à déclarer (snippets dans druid-internal `docs/plan-funding-calls.md`) : `druid-calls-collect-anr`
+  (hebdomadaire, `--source=anr`), `druid-theses-sync` (hebdomadaire), `druid-calls-eligibility` (nocturne, après la
+  collecte des appels).
+- Appariement des appels ANR thématiques : `export_calls.cjs --programme=anr-specific` / `france-2030`, run TRM, puis
+  `import_calls.cjs --programme=…` (le titre n'est plus relu sur le portail Funding & Tenders pour ces programmes).
 
 ## [2.7.0] — 2026-10-16
 

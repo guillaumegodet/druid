@@ -5,6 +5,14 @@
 
 import type { ColumnType } from "kysely";
 
+export type ArrayType<T> = ArrayTypeImpl<T> extends (infer U)[]
+  ? U[]
+  : ArrayTypeImpl<T>;
+
+export type ArrayTypeImpl<T> = T extends ColumnType<infer S, infer I, infer U>
+  ? ColumnType<S[], I[], U[]>
+  : T[];
+
 export type Generated<T> = T extends ColumnType<infer S, infer I, infer U>
   ? ColumnType<S, I | undefined, U>
   : ColumnType<T, T | undefined, T>;
@@ -105,7 +113,7 @@ export interface CallEligibility {
   person_name: Generated<string>;
   phd_on: string | null;
   reasons: Generated<string[]>;
-  row_ids: Generated<string[]>;
+  row_ids: Generated<ArrayType<Int8>>;
   uid: Generated<string>;
   units: Generated<string[]>;
   verdict: string;
@@ -410,6 +418,14 @@ export interface PersonIdentifierCheck {
   scheme: string;
 }
 
+export interface PersonLink {
+  created_at: Generated<Timestamp>;
+  id: ColumnType<string, never, never>;
+  kind: string;
+  person_id: string;
+  url: string;
+}
+
 export interface PersonThesis {
   defended_on: string | null;
   discipline: Generated<string>;
@@ -428,14 +444,6 @@ export interface PersonThesisCheck {
   found: Generated<number>;
   idref: string;
   person_id: string;
-}
-
-export interface PersonLink {
-  created_at: Generated<Timestamp>;
-  id: ColumnType<string, never, never>;
-  kind: string;
-  person_id: string;
-  url: string;
 }
 
 export interface RefCorpsGrade {
