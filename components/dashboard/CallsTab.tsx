@@ -243,14 +243,13 @@ const ViewSwitch: React.FC<{ view: View; onChange: (v: View) => void }> = ({ vie
   );
 };
 
-/** Label of the subset filter of a programme (its `subsetLabel`: cluster, axis, panel). */
-const subsetLabelOf = (programmes: ProgrammeView[], selected: Set<string>, t: (d: TemplateStringsArray) => string): { all: string; one: string } => {
-  const labels = new Set(programmes.filter((p) => selected.size === 0 || selected.has(p.programmeId)).map((p) => p.subsetLabel).filter(Boolean));
-  const label = labels.size === 1 ? [...labels][0] : '';
-  if (label === 'cluster') return { all: t`All clusters`, one: t`Cluster` };
-  if (label === 'axis') return { all: t`All axes`, one: t`Axis` };
-  if (label === 'panel') return { all: t`All panels`, one: t`Panel` };
-  return { all: t`All groups`, one: t`Group` };
+/**
+ * Kind of subset of the selected programmes (their `subsetLabel`: cluster, scheme, mission, destination, axis, panel),
+ * '' when they differ: names the subset filter.
+ */
+const subsetKindOf = (programmes: ProgrammeView[], selected: Set<string>): string => {
+  const kinds = new Set(programmes.filter((p) => selected.size === 0 || selected.has(p.programmeId)).map((p) => p.subsetLabel).filter(Boolean));
+  return kinds.size === 1 ? [...kinds][0] : '';
 };
 
 export const CallsTab: React.FC<{
@@ -310,7 +309,17 @@ export const CallsTab: React.FC<{
   // Programmes kept by the filters: the one selected, else every programme of the category, else all.
   const programmeIds = useMemo(() => new Set(programmeId ? [programmeId] : programmeOptions.map((p) => p.programmeId)), [programmeId, programmeOptions]);
   const subsets = useMemo(() => subsetsOf(calls ?? [], programmeIds), [calls, programmeIds]);
-  const subsetLabels = subsetLabelOf(programmes, programmeIds, t);
+  // Labels written here so that the macro extracts them (a `t` passed as an argument is not the macro); the context
+  // keeps them apart from the clusters and groups of the directory.
+  const subsetLabels = ({
+    cluster: { all: t({ message: 'All clusters', context: 'funding calls' }), one: t({ message: 'Cluster', context: 'funding calls' }) },
+    scheme: { all: t({ message: 'All schemes', context: 'funding calls' }), one: t({ message: 'Scheme', context: 'funding calls' }) },
+    mission: { all: t({ message: 'All missions', context: 'funding calls' }), one: t({ message: 'Mission', context: 'funding calls' }) },
+    destination: { all: t({ message: 'All destinations', context: 'funding calls' }), one: t({ message: 'Destination', context: 'funding calls' }) },
+    axis: { all: t({ message: 'All axes', context: 'funding calls' }), one: t({ message: 'Axis', context: 'funding calls' }) },
+    panel: { all: t({ message: 'All panels', context: 'funding calls' }), one: t({ message: 'Panel', context: 'funding calls' }) },
+  } as Record<string, { all: string; one: string }>)[subsetKindOf(programmes, programmeIds)]
+    ?? { all: t({ message: 'All subsets', context: 'funding calls' }), one: t({ message: 'Subset', context: 'funding calls' }) };
   const showProgramme = programmesWithCalls.length > 1 && !programmeId;
 
   const filters = useMemo(() => ({ uids, today: today(), includePast, programmeIds, subset }), [uids, includePast, programmeIds, subset]);
