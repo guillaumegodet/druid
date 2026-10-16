@@ -83,6 +83,10 @@ const TASK_TYPES = {
   annuaire_employeur_a_renseigner: { base: 'Annuaire', canal: 'interne', email: false },
   // Hosted LDAP account of another employer closing (D3): the presence does not follow it, a person checks.
   annuaire_hebergement_fin: { base: 'Annuaire', canal: 'interne', email: false },
+  // PhD student whose IdRef has a defended thesis on theses.fr (docs/plan-funding-calls.md, lot 5): status to update,
+  // or, the thesis being too old for a current PhD student, an IdRef to check.
+  annuaire_doctorant_docteur: { base: 'Annuaire', canal: 'interne', email: false },
+  annuaire_doctorant_these_ancienne: { base: 'Annuaire', canal: 'interne', email: false },
   autre: { base: 'Autre', canal: 'interne', email: false },
 };
 
@@ -132,6 +136,8 @@ const TITLES_FR = {
   sovisu_ancienne_personne: 'SoVisu+ : retirer les identifiants de l’ancienne personne (uid changé)',
   annuaire_employeur_a_renseigner: 'Employeur à renseigner (fiche validée « externe »)',
   annuaire_hebergement_fin: 'Compte LDAP hébergé en fermeture : départ probable ?',
+  annuaire_doctorant_docteur: 'Doctorant ayant soutenu sa thèse : mettre à jour le statut',
+  annuaire_doctorant_these_ancienne: 'Doctorant avec une thèse ancienne sur son IdRef : homonyme ?',
   autre: 'Autre',
 };
 

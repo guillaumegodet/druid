@@ -7,6 +7,8 @@
 //   Structures            V2 fields (structures.ts): read, added, patched
 //   Alignement_<source>   alignment reviews (review.ts): read, added, patched, deleted
 //   Taches / Taches_evenements, Rapports*, Arbitrage_*, BenchmarkPeerGroups   work ports (lib/work/pg)
+//   Theses                PhD of the people (person_thesis, read only): one row per person with a defended thesis,
+//                         `annuaire_rows` = its directory rows (the detection rules of sync_tasks match them)
 // Any other table, or a write these tables do not take, is refused (404 / 501) rather than lost; the schema is the
 // migrations' own (adding tables or columns is a no-op). Every write is one transaction, audited under `actor`.
 import { sql, type Transaction } from 'kysely';
@@ -78,8 +80,28 @@ export const createPgTableClient = ({ db, actor = '' }: PgTableClientOptions): G
     return filtered(await readRecords(db, await q.execute()), filter);
   };
   const tableIds = async () => [
-    'Annuaire', 'Etablissements', 'Structures', ...Object.keys(REVIEW_TABLES), ...WORK_TABLES, ...await work.conflicts.tables(),
+    'Annuaire', 'Etablissements', 'Structures', 'Theses', ...Object.keys(REVIEW_TABLES), ...WORK_TABLES, ...await work.conflicts.tables(),
   ];
+  /** PhD (first defended thesis) of every person that has one, with the directory rows of the person. */
+  const theses = async (): Promise<GristRecord[]> => {
+    const rows = await db.selectFrom('person_thesis as t').innerJoin('membership as m', 'm.person_id', 't.person_id')
+      .select(['t.person_id', 't.nnt', 't.title', 't.defended_on', 't.institution', 't.discipline', 'm.id as row_id'])
+      .where('t.status', '=', 'defended').where('t.defended_on', 'is not', null)
+      .orderBy('t.person_id').orderBy('t.defended_on').execute();
+    const byPerson = new Map<string, { t: (typeof rows)[number]; rows: Set<number> }>();
+    for (const r of rows) {
+      const e = byPerson.get(r.person_id) ?? { t: r, rows: new Set<number>() };
+      e.rows.add(Number(r.row_id));
+      byPerson.set(r.person_id, e);
+    }
+    return [...byPerson.values()].map((e, i) => ({
+      id: i + 1,
+      fields: {
+        annuaire_rows: [...e.rows].sort((a, b) => a - b), nnt: e.t.nnt, title: e.t.title, defended_on: e.t.defended_on,
+        institution: e.t.institution, discipline: e.t.discipline,
+      },
+    }));
+  };
   const notFound = (table: string) => new ApiError(404, `Table not found on PostgreSQL: ${table}`);
   const refused = (table: string, what: string) => new ApiError(501, `${what} not supported on PostgreSQL for ${table}`);
 
@@ -87,6 +109,7 @@ export const createPgTableClient = ({ db, actor = '' }: PgTableClientOptions): G
     if (table === 'Annuaire') return annuaire(filter);
     if (table === 'Etablissements') return filtered(await establishmentRecords(db), filter);
     if (table === 'Structures') return filtered(await readStructureRecords(db), filter);
+    if (table === 'Theses') return filtered(await theses(), filter);
     if (REVIEW_TABLES[table]) return filtered(await readReviewRecords(db, REVIEW_TABLES[table]), filter);
     if (table === 'Taches') return filtered(await work.tasks.tasks(), filter);
     if (table === 'Taches_evenements') {
