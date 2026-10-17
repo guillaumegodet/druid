@@ -28,7 +28,7 @@ import {
 } from './alignAtoms';
 
 /**
- * Unified alignment view (docs/plan-alignement-unifie.md): one row per Annuaire record with
+ * Unified alignment view (docs/archive/plan-alignement-unifie.md): one row per Annuaire record with
  * something to do, one badge per authority source (IdRef/ORCID/HAL/OpenAlex), detail drawer
  * on click. Consumes `computeUnifiedAlignDiff` and only aggregates/displays what the per-source pages
  * already produce — the candidate rendering, the name-mismatch arbitration card and the
@@ -336,7 +336,7 @@ interface UnifiedAlignPageProps {
   progress?: Partial<Record<UnifiedAlignSource, UnifiedRunProgress>> | null;
   applying?: boolean;
   /** Scoped to the filtered lab/group; `choice` = sources, full rerun and caps picked in the launch
-   * window (docs/plan-recherche-alignement-maitrisee.md, lot 2). */
+   * window (docs/archive/plan-recherche-alignement-maitrisee.md, lot 2). */
   onRerunAll: (mode: AlignMode, labo?: string, group?: AlignGroup, choice?: AlignLaunchChoice) => void;
   /** « Stop » of one source's run: records in progress finish, what was found is kept. */
   onStop?: (src: UnifiedAlignSource) => Promise<void>;

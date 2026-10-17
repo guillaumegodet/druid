@@ -1,9 +1,9 @@
 #!/usr/bin/env node
-// Draft of a monthly « Nouveautés » section from the git history (plan-documentation-utilisateur.md,
+// Draft of a monthly « Nouveautés » section from the git history (docs/archive/plan-documentation-utilisateur.md,
 // lot 7). Lists the user-visible commits (feat/fix) of a month, grouped by help section, with their
 // hash: a starting point to rewrite in plain French in src/content/docs/nouveautes.md — never paste
 // it as is (commit subjects are technical and mostly English). The English page
-// (src/content/docs/en/nouveautes.md, docs/plan-aide-anglais.md) gets the same section, translated.
+// (src/content/docs/en/nouveautes.md, docs/archive/plan-aide-anglais.md) gets the same section, translated.
 //
 // Usage (from the repository root or help/): node help/scripts/nouveautes-draft.mjs [YYYY-MM]
 // Default month: the previous calendar month.

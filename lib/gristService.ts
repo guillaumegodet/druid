@@ -283,7 +283,7 @@ export const GristService = {
   fetchAnnuaireRows: (rowIds: number[]): Promise<{ rowId: number; fields: Record<string, any> }[]> => DirectoryApi.recordRows(rowIds),
 
   /**
-   * Moves a record to its LDAP uid (`annuaire_uid_ldap` task, docs/plan-statut-employeur-ldap.md,
+   * Moves a record to its LDAP uid (`annuaire_uid_ldap` task, docs/archive/plan-statut-employeur-ldap.md,
    * lot 2): every row of `fromUid` (or the single row `rowId` of a record without uid) gets
    * `uid_dyna = toUid`, with a dated line in Commentaires keeping the former uid. Refused when a row
    * already carries `toUid` — that case is a merge.

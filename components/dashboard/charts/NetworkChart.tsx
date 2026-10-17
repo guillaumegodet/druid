@@ -4,7 +4,7 @@ import { NetworkData } from '../networkAggregates';
 import { useLingui } from '@lingui/react/macro';
 
 /**
- * Inter-lab rendering (docs/plan-reseau-inter-labos.md, lots 3 and 4): colour = lab, aggregated
+ * Inter-lab rendering (docs/archive/plan-reseau-inter-labos.md, lots 3 and 4): colour = lab, aggregated
  * lab nodes drawn as diamonds, authors of several labs outlined, cross-lab links emphasized.
  */
 export interface InterLabRendering {

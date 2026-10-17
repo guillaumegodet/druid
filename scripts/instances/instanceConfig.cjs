@@ -29,7 +29,7 @@ const DEFAULT_GRIST_API_BASE = 'https://grist.numerique.gouv.fr/api';
 
 const capabilitiesSchema = z.strictObject(Object.fromEntries(ALL_CAPABILITIES.map((k) => [k, z.boolean().optional()])));
 
-// Career path (docs/plan-parcours-affiliations.md, decision D2): which organizations count as the
+// Career path (docs/archive/plan-parcours-affiliations.md, decision D2): which organizations count as the
 // instance itself. Identifiers by type (openalex I…, ror, hal docid, scopus afid, ringgold, rnsr, grid)
 // and names; the Structures table of the instance is always added by the job.
 const ORG_ID_TYPES = ['openalex', 'ror', 'hal', 'scopus', 'ringgold', 'rnsr', 'grid'];
@@ -128,7 +128,7 @@ const parseInstanceConfig = (raw, opts = {}) => {
 
 /**
  * Extra rules for an instance.json stored in the PUBLIC repository: nothing that identifies a real
- * person or a private doc may be published (docs/plan-instance-demo-cloudflare.md, lot B2).
+ * person or a private doc may be published (docs/archive/plan-instance-demo-cloudflare.md, lot B2).
  */
 const publicRepoErrors = (raw) => {
   const errors = [];

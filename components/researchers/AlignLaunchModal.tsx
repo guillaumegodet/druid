@@ -33,7 +33,7 @@ interface Props {
 type Scope = 'never' | 'all';
 
 /**
- * Launch window of « Search everywhere » (docs/plan-recherche-alignement-maitrisee.md, lot 2): per
+ * Launch window of « Search everywhere » (docs/archive/plan-recherche-alignement-maitrisee.md, lot 2): per
  * source, the records the run would process, a cap and the cost; for Scopus, the Elsevier calls
  * still available this week. A source whose run exceeds that budget is unchecked (decision D4:
  * warn, never block); Scopus is capped at 500 records by default (D3).

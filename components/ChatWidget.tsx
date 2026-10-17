@@ -11,7 +11,7 @@ import { hasCapability } from '../lib/auth';
  * - « Données CRISalid » (HAS_PIPELINES_CHAT): the LangGraph agent of the Open WebUI
  *   pipelines, through the streaming relay /api/chat of server.cjs;
  * - « Aide Druid » (HAS_HELP_CHAT): answers from the help centre pages through ILAAS,
- *   /api/help-chat (docs/plan-documentation-utilisateur.md, lot 8).
+ *   /api/help-chat (docs/archive/plan-documentation-utilisateur.md, lot 8).
  * Both stream OpenAI-format SSE. Each mode keeps its own conversation in sessionStorage:
  * kept across navigation and reloads, forgotten when the tab is closed.
  */

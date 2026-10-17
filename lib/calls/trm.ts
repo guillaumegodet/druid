@@ -1,6 +1,6 @@
 // Reading of a Topic-to-Researcher Match report (crisalid-agents trm/report.py, `trm-<cluster>-<date>.json`): the
 // JSON written by the batch becomes calls, a run and matches of the « Calls for proposals » tab (druid-internal
-// docs/plan-funding-calls.md, lot 1; formerly the eu_* tables of docs/plan-eu-calls.md). The report is bound
+// docs/plan-funding-calls.md, lot 1; formerly the eu_* tables of docs/archive/plan-eu-calls.md). The report is bound
 // to one programme (Horizon Europe unless told otherwise) and its `cluster` is the subset of the run. Pure: shared by
 // the import script and its tests.
 import { HORIZON_EUROPE } from './programmes';

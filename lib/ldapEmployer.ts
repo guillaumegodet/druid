@@ -10,7 +10,7 @@
  * - `dynaCategorie`: TITULAIRE, CDD UNIVERSITE, DOCTORANT, CNRS-INSERM…
  *
  * Measured on the Annuaire records whose employer was already known (2026-10-07,
- * docs/plan-statut-employeur-ldap.md, lot 1): the « home » rule is right 95 % of the time, the
+ * docs/archive/plan-statut-employeur-ldap.md, lot 1): the « home » rule is right 95 % of the time, the
  * CNRS rule 89 %. The PU-PH / MCU-PH corps (324, 325: hospital-university, employer recorded as
  * CHU as often as university) and the H0x contract corps (half hosted) are left undecided.
  *

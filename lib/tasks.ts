@@ -1,5 +1,5 @@
 /**
- * « À traiter › Tâches » (docs/plan-chantiers-taches.md): tasks to carry out outside Druid
+ * « À traiter › Tâches » (docs/archive/plan-chantiers-taches.md): tasks to carry out outside Druid
  * (IdRef, ORCID, HAL, OpenAlex, Scopus, HR events), stored in the Grist tables `Taches` /
  * `Taches_evenements` and served by the /api/tasks routes of server.cjs.
  *

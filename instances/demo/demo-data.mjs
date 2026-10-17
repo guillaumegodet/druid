@@ -1,4 +1,4 @@
-// Fictitious data of the public demo instance (docs/plan-instance-demo-cloudflare.md, lot A3).
+// Fictitious data of the public demo instance (docs/archive/plan-instance-demo-cloudflare.md, lot A3).
 //
 // A fictitious university with three labs (LIRA, BIOS, LMD) and three teams (see STRUCTURES) —
 // the universe of the former demo fork (docker/druid-demo), in the Grist schema of the Centrale

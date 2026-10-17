@@ -1,7 +1,7 @@
 /**
  * sync_scopus.cjs — Alignment of the Annuaire records on Scopus Author IDs (Elsevier APIs).
  *
- * Plan: docs/plan-alignement-scopus.md. Foundation: scripts/lib/align_common.cjs.
+ * Plan: docs/archive/plan-alignement-scopus.md. Foundation: scripts/lib/align_common.cjs.
  * Same pattern as sync_orcid.cjs (cache, scoring, Grist review table, Valider/Rejeter buttons):
  * single-valued target `ID_SCOPUS` (Numeric column), filled only when empty.
  *
@@ -575,7 +575,7 @@ async function main() {
   let push = null;
   // Push into Alignement_Scopus only on explicit request (push mode): validation is done in Druid,
   // the table only serves as a blacklist (« Rejeté » / « Identité mêlée ») — decision of 2026-09-21,
-  // see docs/plan-alignement-unifie.md lot 6.
+  // see docs/archive/plan-alignement-unifie.md lot 6.
   if (MODE === 'push') {
     const rejected = await loadRejected(REVIEW_TABLE, 'Scopus_candidat', digits);
     const { desired, found, ambiguous } = buildReviewRows(cache, all, rejected);

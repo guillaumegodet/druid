@@ -1,6 +1,6 @@
 // French translation of the English texts of the European calls (topic summaries, match justifications) with the
 // language model of the instance (ILaaS, OpenAI-compatible chat completions), a few texts per request, at import time
-// (docs/plan-eu-calls.md, recette of 2026-10-14). Pure parsing kept apart for the tests.
+// (docs/archive/plan-eu-calls.md, recette of 2026-10-14). Pure parsing kept apart for the tests.
 
 export interface TranslatorSettings {
   apiBase: string;

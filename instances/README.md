@@ -1,7 +1,7 @@
 # Cloudflare Pages instances
 
 One Druid repository, several Cloudflare Pages projects: each project builds this repository
-and picks its instance with environment variables (docs/plan-instance-demo-cloudflare.md).
+and picks its instance with environment variables (docs/archive/plan-instance-demo-cloudflare.md).
 `instances/<slug>/` holds the static assets of instance `<slug>`, copied into `public/` by
 `scripts/prepare-cloudflare-assets.cjs` only on a Cloudflare build (`CF_PAGES=1`). The Docker
 build (Nantes) never copies anything. Instances with personal data are NOT in this repository:

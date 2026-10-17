@@ -1,6 +1,6 @@
 /**
  * affiliation_history.cjs — pure core of a researcher's « career path »
- * (docs/plan-parcours-affiliations.md, lot 1). No I/O: the readers of scripts/lib/affiliation_sources.cjs
+ * (docs/archive/plan-parcours-affiliations.md, lot 1). No I/O: the readers of scripts/lib/affiliation_sources.cjs
  * turn each source into the normalized shapes below, this module classifies, merges, aggregates and
  * computes the departure signals.
  *

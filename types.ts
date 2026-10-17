@@ -36,7 +36,7 @@ export enum ResearcherStatus {
 }
 
 /** Presence in the unit — with the employer and the LDAP account, replaces ResearcherStatus
- * (lib/presence.ts, docs/plan-statut-employeur-ldap.md). Also the values of `validated_status`. */
+ * (lib/presence.ts, docs/archive/plan-statut-employeur-ldap.md). Also the values of `validated_status`. */
 export enum Presence {
   PRESENT = 'PRESENT',
   DEPART = 'DEPART',   // end announced: LDAP account closing, or employment end within DEPARTURE_NOTICE_MONTHS
@@ -126,7 +126,7 @@ export interface Researcher {
   status: ResearcherStatus;
   /** Status derived from the sources (LDAP / dates), BEFORE the validation layer — used to flag a conflict. */
   derivedStatus?: ResearcherStatus;
-  /** Three axes replacing `status` (lib/presence.ts, docs/plan-statut-employeur-ldap.md). `status` is
+  /** Three axes replacing `status` (lib/presence.ts, docs/archive/plan-statut-employeur-ldap.md). `status` is
    * kept, computed from them, until every screen has moved. */
   presence?: Presence;
   /** Presence before the validation layer (conflict badge). */

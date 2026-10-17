@@ -1,6 +1,6 @@
 /**
  * @file suggestions.ts
- * @description « Suggestions de l'établissement » of a researcher record (docs/plan-parcours-affiliations.md,
+ * @description « Suggestions de l'établissement » of a researcher record (docs/archive/plan-parcours-affiliations.md,
  * lot 5): types and API client of /api/researchers/:key/suggestions (computed server-side by
  * scripts/lib/suggestions.cjs), official links of each action and the detail handed to the email
  * template. The texts themselves live in components/researchers/SuggestionsSection.tsx (Lingui).

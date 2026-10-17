@@ -3,7 +3,7 @@
 // build, only when Cloudflare Pages is doing the build (CF_PAGES=1, set automatically by
 // Cloudflare). The instance is chosen by DRUID_INSTANCE (Pages build variable, default
 // `centrale` so that the existing Centrale project needs no change); its files live under
-// instances/<slug>/ (docs/plan-instance-demo-cloudflare.md, lot A1):
+// instances/<slug>/ (docs/archive/plan-instance-demo-cloudflare.md, lot A1):
 //  - the alignment caches (instances/<slug>/<slug>-*_cache.json);
 //  - the dashboard exports (instances/<slug>/dashboard-data/ → public/dashboard-data/,
 //    read by lib/dashboardSource.ts when /api/dashboard-* does not exist — no druid-biblio
@@ -30,7 +30,7 @@
 // Instances with personal data (Centrale) are not in this repository: when instances/<slug>/
 // does not exist here, the folder <slug>/ of the PRIVATE repository INSTANCES_REPO (default
 // guillaumegodet/druid-instances) is shallow-cloned with the INSTANCES_REPO_TOKEN build secret
-// (fine-grained token, read-only Contents on that repository) — docs/plan-instance-demo-cloudflare.md,
+// (fine-grained token, read-only Contents on that repository) — docs/archive/plan-instance-demo-cloudflare.md,
 // lot B1. The demo (fictitious data) stays in instances/demo/.
 // Centrale files contain real PII (names/PPN/ORCID, named staff in dashboard.json):
 // never copy them for a Docker build (Nantes), which would otherwise serve them as a

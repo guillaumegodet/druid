@@ -1,4 +1,4 @@
-// Inter-lab mode of the « Réseau » tab (docs/plan-reseau-inter-labos.md, lots 3 and 4):
+// Inter-lab mode of the « Réseau » tab (docs/archive/plan-reseau-inter-labos.md, lots 3 and 4):
 // client of /api/network/:slug (server.cjs + scripts/lib/co_network.cjs), fed by the
 // university-wide network.json of druid-biblio.
 

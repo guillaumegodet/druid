@@ -1,6 +1,6 @@
 /**
  * align_targets.cjs — which Annuaire records an alignment run processes, per source
- * (docs/plan-recherche-alignement-maitrisee.md, lot 2). One definition shared by the five scripts
+ * (docs/archive/plan-recherche-alignement-maitrisee.md, lot 2). One definition shared by the five scripts
  * (sync_idref_qualinka, sync_orcid, sync_hal, sync_openalex, sync_scopus) and by the estimate
  * route of server.cjs (/api/align/estimate): the launch window counts exactly what a run does.
  *

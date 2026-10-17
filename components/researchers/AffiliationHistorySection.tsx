@@ -10,7 +10,7 @@ import {
 } from '../../lib/affiliationHistory';
 import { AffiliationTimelineChart } from './AffiliationTimelineChart';
 
-// « Parcours » block of the researcher record (docs/plan-parcours-affiliations.md, lot 3): affiliations
+// « Parcours » block of the researcher record (docs/archive/plan-parcours-affiliations.md, lot 3): affiliations
 // observed in the publications (CRISalid graph, OpenAlex, Scopus), positions declared in ORCID and the
 // Scopus profile, computed weekly by scripts/sync_affiliation_history.cjs and served by
 // /api/researchers/:key/affiliation-history. The date buttons only fill the employment fields of the

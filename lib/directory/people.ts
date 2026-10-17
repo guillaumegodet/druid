@@ -169,7 +169,7 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
       ? (employerId === 0 ? '' : (employers.get(employerId)?.name || `ID: ${employerId}`))
       : (employerId || '');
 
-    // Three axes (lib/presence.ts, docs/plan-statut-employeur-ldap.md): employer, LDAP account and
+    // Three axes (lib/presence.ts, docs/archive/plan-statut-employeur-ldap.md): employer, LDAP account and
     // presence. The uid only says whether there is an LDAP account to read (`ext_` = none).
     const employerUai = (typeof employerId === 'number') ? employers.get(employerId)?.uai : '';
     // Known employer ≠ Nantes Université (INSERM, CNRS, Centrale…): the LDAP account is a hosted one —

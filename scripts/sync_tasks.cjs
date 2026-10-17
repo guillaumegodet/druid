@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * sync_tasks.cjs — detection rules of the « À traiter › Tâches » tab
- * (docs/plan-chantiers-taches.md, lot 5). Reads the Annuaire and the alignment
+ * (docs/archive/plan-chantiers-taches.md, lot 5). Reads the Annuaire and the alignment
  * caches already produced by the sync_* scripts (no external API call), and
  * keeps the Grist table `Taches` in step with what they show:
  *
@@ -30,17 +30,17 @@
  *                    (two people: fix the identifier); key = the sorted uids joined by « + »
  *   uid_ldap_disponible  ext_ record (or record without uid) whose HR staff number is the supannEmpId of
  *                    an LDAP account no Annuaire record carries: switch the record to that uid
- *                    (docs/plan-statut-employeur-ldap.md, lot 2); key = `<current key>><LDAP uid>`.
+ *                    (docs/archive/plan-statut-employeur-ldap.md, lot 2); key = `<current key>><LDAP uid>`.
  *                    When a record already carries that uid, annuaire_ids_partages proposes the merge.
  *   hebergement_fin  record employed by another institution (CNRS, INSERM…) whose hosted LDAP account is
  *                    closing (dynaEtat D): the presence does not follow a hosted account
- *                    (docs/plan-statut-employeur-ldap.md, D3), a person checks; closed once an end
+ *                    (docs/archive/plan-statut-employeur-ldap.md, D3), a person checks; closed once an end
  *                    date is entered or the account is active again.
  *   parcours_depart  probable departure of a record without end date, from the career-path job
  *                    (affiliation_history/_index.json of scripts/sync_affiliation_history.cjs): one task per
  *                    record, typed by the strongest signal — parcours_depart_confirme (several sources),
  *                    parcours_depart_declare (ORCID), parcours_depart_observe (publications); closed as soon
- *                    as an end date is entered (docs/plan-parcours-affiliations.md, lot 4)
+ *                    as an end date is entered (docs/archive/plan-parcours-affiliations.md, lot 4)
  *   parcours_statut_incoherent  ended record still publishing locally / with an open ORCID position there
  *   parcours_identifiant_suspect  identifiers whose publications / Scopus profile never mention the
  *                    institution (alignment control)
@@ -245,7 +245,7 @@ const SHARED_ID_ACTIONS = {
   distinct: 'À faire : retirer l’identifiant de la fiche qui ne le porte pas à juste titre (vérifier sur le lien du profil).',
 };
 
-// ── LDAP uid of an ext_ record (docs/plan-statut-employeur-ldap.md, lot 2) ─────────
+// ── LDAP uid of an ext_ record (docs/archive/plan-statut-employeur-ldap.md, lot 2) ─────────
 const HR_ID_COL = 'N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_';
 /** HR staff number: digits without leading zeros nor « .0 » ('' when empty, 0 or not a number) — lib/hrId.ts. */
 const normHrId = (v) => {
@@ -323,7 +323,7 @@ const isExternalEmployerRef = (ref, etablissements) => {
 
 // ── Rules: detect(ctx) → [{ key, rec, description, lien, type? }] ─────────────────
 
-// ── Career path (docs/plan-parcours-affiliations.md, lot 4) ────────────────────────
+// ── Career path (docs/archive/plan-parcours-affiliations.md, lot 4) ────────────────────────
 const PARCOURS_INDEX = common.getArg('parcours-index', 'affiliation_history/_index.json');
 /** Strongest departure signal → task type (a person gets one departure task at a time). */
 const PARCOURS_DEPART = [

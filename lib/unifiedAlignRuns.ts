@@ -1,5 +1,5 @@
 /**
- * Orchestration of parallel alignment runs (docs/plan-alignement-unifie.md, lot 1).
+ * Orchestration of parallel alignment runs (docs/archive/plan-alignement-unifie.md, lot 1).
  * Invents no route: IdRef goes through /api/sync-idref-trigger|progress (legacy route,
  * mode `align` = Qualinka engine), the 3 others through /api/align/:source/trigger|progress —
  * same routes and same contract as runAlign/rerunIdref in App.tsx (trigger, 409 = already

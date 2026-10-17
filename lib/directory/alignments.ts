@@ -93,7 +93,7 @@ export interface IdrefUpdate {
 // OpenAlex differs: MULTI-VALUED target (OpenAlex_ids, pipe-separated A-ids) → a non-empty target is not
 // a conflict, we ADD; a profile already in the list is never proposed again.
 
-// Scopus (docs/plan-alignement-scopus.md): single-valued Numeric target `ID_SCOPUS`, same contract as
+// Scopus (docs/archive/plan-alignement-scopus.md): single-valued Numeric target `ID_SCOPUS`, same contract as
 // ORCID (filled only when empty; an explicit text such as « absent » counts as filled).
 
 export type AlignSource = 'orcid' | 'hal' | 'openalex' | 'scopus';
@@ -171,7 +171,7 @@ export const parseOpenalexIds = (v: any): string[] => {
   return out;
 };
 
-// --- Unified alignment view (docs/plan-alignement-unifie.md, lot 0) ------------------------------
+// --- Unified alignment view (docs/archive/plan-alignement-unifie.md, lot 0) ------------------------------
 // Pivots the per-source diffs (IdRef/ORCID/HAL/OpenAlex, each keyed on the same Annuaire record)
 // into one row per person. Does not touch the scoring engines (sync_*.cjs): only aggregates
 // what computeAlignDiff / computeIdrefAlignDiff already produce. IdRef is only covered in

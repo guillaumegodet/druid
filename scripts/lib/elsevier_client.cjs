@@ -1,7 +1,7 @@
 /**
  * elsevier_client.cjs — shared client of the Elsevier (Scopus) APIs: per-pool throttle, weekly quota
  * tracking, run abort. Extracted from scripts/sync_scopus.cjs on 2026-09-30 without behavior change,
- * so that the career-path job (scripts/sync_affiliation_history.cjs, docs/plan-parcours-affiliations.md)
+ * so that the career-path job (scripts/sync_affiliation_history.cjs, docs/archive/plan-parcours-affiliations.md)
  * uses the same rules.
  *
  * The APIs answer ONLY through the university proxy (the direct route gets 401: the proxy IP carries

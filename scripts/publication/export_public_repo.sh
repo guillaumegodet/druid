@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the first commit of the public repository from the COMMITTED state of this one
-# (docs/plan-instance-demo-cloudflare.md, lot B3 — decision: fresh history, the private
+# (docs/archive/plan-instance-demo-cloudflare.md, lot B3 — decision: fresh history, the private
 # history stays in the archived repository):
 #   1. `git archive HEAD` into TARGET (uncommitted changes are never exported);
 #   2. removes the paths of scripts/publication/public-exclude.txt;

@@ -36,7 +36,7 @@ export interface DruidCapabilities {
   /** Chat widget backed by Pipelines/ILAAS (CRISalid assistant). */
   HAS_PIPELINES_CHAT: boolean;
   /** « Aide Druid » tab of the assistant: answers from the help centre pages through ILAAS
-   * (/api/help-chat, docs/plan-documentation-utilisateur.md lot 8). */
+   * (/api/help-chat, docs/archive/plan-documentation-utilisateur.md lot 8). */
   HAS_HELP_CHAT: boolean;
   /** Export to the SoVisu+/cdb directory bridge (structures.csv, people.csv). */
   HAS_SOVISU_EXPORT: boolean;
@@ -47,7 +47,7 @@ export interface DruidCapabilities {
   /** Benchmark module (external collaboration) — not merged yet (lot 3 of the plan). */
   HAS_BENCHMARK: boolean;
   /** Inter-lab mode of the « Réseau » tab: /api/network of server.cjs, fed by the network.json of
-   * druid-biblio (docs/plan-reseau-inter-labos.md) — false on Cloudflare. */
+   * druid-biblio (docs/archive/plan-reseau-inter-labos.md) — false on Cloudflare. */
   HAS_NETWORK_API: boolean;
   /** IdRef alignment enriched by the Neo4j context (scripts/sync_idref_qualinka.cjs,
    * `align` mode of /api/sync-idref-trigger) — without it, IdRef alignment remains available
@@ -58,12 +58,12 @@ export interface DruidCapabilities {
    * that only enters its internal researchers and has no need to validate (Centrale). */
   HAS_STATUS_VALIDATION: boolean;
   /** « À traiter › Tâches » tab, « Report a correction » button
-   * (docs/plan-chantiers-taches.md): /api/tasks routes of server.cjs — false on Cloudflare. */
+   * (docs/archive/plan-chantiers-taches.md): /api/tasks routes of server.cjs — false on Cloudflare. */
   HAS_TASKS: boolean;
   /** « Calls for proposals » tab and its administration (docs/plan-funding-calls.md): PostgreSQL storage of
    * server.cjs — false on Grist storage and on Cloudflare. */
   HAS_CALLS: boolean;
-  /** Public read-only instance (demo on Cloudflare, docs/plan-instance-demo-cloudflare.md):
+  /** Public read-only instance (demo on Cloudflare, docs/archive/plan-instance-demo-cloudflare.md):
    * the Grist proxy refuses every write and the UI hides editing. Unlike the HAS_* flags it
    * removes features; false everywhere except where READ_ONLY=true is configured. */
   READ_ONLY: boolean;

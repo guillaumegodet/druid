@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * add_tasks_tables.cjs — provisions the `Taches` and `Taches_evenements` tables
- * (« À traiter › Tâches », docs/plan-chantiers-taches.md, lot 1). Schema in
+ * (« À traiter › Tâches », docs/archive/plan-chantiers-taches.md, lot 1). Schema in
  * scripts/lib/tasks_schema.cjs (shared with server.cjs, which also creates the
  * tables on first use).
  *

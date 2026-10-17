@@ -1,6 +1,6 @@
 /**
  * suggestions.cjs — « Suggestions de l'établissement » of a researcher record
- * (docs/plan-parcours-affiliations.md, lot 5). Pure: server.cjs gathers the inputs (Annuaire rows,
+ * (docs/archive/plan-parcours-affiliations.md, lot 5). Pure: server.cjs gathers the inputs (Annuaire rows,
  * career-path entry, alignment caches, detection rules of sync_tasks.cjs, tasks of the person) and
  * this module decides which actions to suggest, in which order. Texts live in the front
  * (lib/suggestions.ts, Lingui): a suggestion is an id + the data its text needs.

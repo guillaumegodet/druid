@@ -18,7 +18,7 @@ interface Props {
 
 const MAX_SUGGESTIONS = 8;
 
-/** Modal « New task » (docs/plan-chantiers-taches.md, lot 2): the type prefills the base and
+/** Modal « New task » (docs/archive/plan-chantiers-taches.md, lot 2): the type prefills the base and
  * the channel; the researcher is picked from the loaded Directory (Grist row id + uid + lab
  * copied on the task, never a formula on the name as the legacy table did). */
 export const TaskForm: React.FC<Props> = ({ researchers, initialResearcher = null, onClose, onSubmit }) => {

@@ -20,7 +20,7 @@ const truncate = (s: string, n = 34) => (s.length > n ? `${s.slice(0, n - 1)}…
 const escapeHtml = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 
 /**
- * « Parcours » timeline (docs/plan-parcours-affiliations.md, lot 3): one row per establishment, years on
+ * « Parcours » timeline (docs/archive/plan-parcours-affiliations.md, lot 3): one row per establishment, years on
  * the x axis. Publications = dots sized by the count of the year; ORCID periods = thin bars (dashed when
  * ongoing); the employment period entered in Druid = grey band behind. Emphasis form: local in the
  * green slot, elsewhere in the blue slot, neutral organisms in the muted ink (validated palette of

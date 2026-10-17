@@ -1,6 +1,6 @@
 -- migrate:up
 -- « Calls for proposals » tab (druid-internal docs/plan-funding-calls.md, lot 1): the tables of the « European
--- calls » (eu_*, Horizon Europe only, docs/plan-eu-calls.md) become a generic model funder → programme → call →
+-- calls » (eu_*, Horizon Europe only, docs/archive/plan-eu-calls.md) become a generic model funder → programme → call →
 -- match, so that the same tab serves every funding source (ANR, ERC, MSCA, regional schemes…). The Horizon Europe
 -- data already imported is carried over, then the eu_* tables are dropped.
 

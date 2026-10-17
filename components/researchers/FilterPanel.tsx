@@ -35,7 +35,7 @@ interface FilterPanelProps {
   onContractTypeChange: (vals: string[]) => void;
   filterPoles: string[];
   onPoleChange: (vals: string[]) => void;
-  /** « Career path » filter (docs/plan-parcours-affiliations.md, lot 4); counts null = hidden. */
+  /** « Career path » filter (docs/archive/plan-parcours-affiliations.md, lot 4); counts null = hidden. */
   filterParcours?: string[];
   onParcoursChange?: (vals: string[]) => void;
   parcoursCount?: Record<string, number> | null;

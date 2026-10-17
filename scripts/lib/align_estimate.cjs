@@ -1,6 +1,6 @@
 /**
  * align_estimate.cjs — cost of an alignment run and Elsevier quota left, for the launch window of
- * the unified alignment page (docs/plan-recherche-alignement-maitrisee.md, lot 2). Pure: the route
+ * the unified alignment page (docs/archive/plan-recherche-alignement-maitrisee.md, lot 2). Pure: the route
  * /api/align/estimate of server.cjs reads the Annuaire, the caches and the progress files.
  */
 'use strict';

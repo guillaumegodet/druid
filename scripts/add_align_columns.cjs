@@ -12,7 +12,7 @@
  *     `openalex` column of people.csv; distinct from `openalex_author_id` (isolated manual choice
  *     of the group dashboards, add_groups_column.cjs);
  *   - OpenAlex_derniere_maj / OpenAlex_champs_modifies: traceability.
- * And those of the Scopus alignment (docs/plan-alignement-scopus.md): Scopus_derniere_maj /
+ * And those of the Scopus alignment (docs/archive/plan-alignement-scopus.md): Scopus_derniere_maj /
  * Scopus_champs_modifies (the target ID_SCOPUS, Numeric, predates the alignment).
  *
  * Idempotent: only adds the missing columns. DRY-RUN by default; `--apply` to write.
@@ -37,7 +37,7 @@ const COLUMNS = [
   { id: 'OpenAlex_ids',             label: 'OpenAlex ids (A-ids, |)',     type: 'Text' },
   { id: 'OpenAlex_derniere_maj',    label: 'OpenAlex dernière MAJ',       type: 'Text' },
   { id: 'OpenAlex_champs_modifies', label: 'OpenAlex champs modifiés',    type: 'Text' },
-  // Scopus alignment (docs/plan-alignement-scopus.md): the target ID_SCOPUS already exists (Numeric).
+  // Scopus alignment (docs/archive/plan-alignement-scopus.md): the target ID_SCOPUS already exists (Numeric).
   { id: 'Scopus_derniere_maj',      label: 'Scopus dernière MAJ',         type: 'Text' },
   { id: 'Scopus_champs_modifies',   label: 'Scopus champs modifiés',      type: 'Text' },
 ];

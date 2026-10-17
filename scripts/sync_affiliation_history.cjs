@@ -1,5 +1,5 @@
 /**
- * sync_affiliation_history.cjs — career path of the researchers (docs/plan-parcours-affiliations.md, lot 1).
+ * sync_affiliation_history.cjs — career path of the researchers (docs/archive/plan-parcours-affiliations.md, lot 1).
  *
  * For every Annuaire record with at least one usable identifier, gathers:
  *   - the publications with the affiliations of THIS person: CRISalid graph (uid), OpenAlex works
