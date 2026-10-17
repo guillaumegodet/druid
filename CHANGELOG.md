@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.9.0] — 2026-10-17
+
 ### Ajouté
 - **À traiter — doctorants ayant soutenu leur thèse** : nouvelle règle `doctorant_these` de la détection nocturne
   (`scripts/sync_tasks.cjs`, instances PostgreSQL) : une fiche encore « doctorant » (type d'emploi ou grade) dont l'IdRef

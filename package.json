@@ -1,7 +1,7 @@
 {
   "name": "druid-admin",
   "private": true,
-  "version": "2.8.1",
+  "version": "2.9.0",
   "license": "CECILL-2.1",
   "type": "module",
   "scripts": {
