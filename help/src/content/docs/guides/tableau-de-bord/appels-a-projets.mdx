@@ -50,13 +50,14 @@ Le bandeau en haut de la vue indique **sur quelles structures** le calcul a port
 consultée est hors de ce périmètre, un avertissement le dit : ses chercheurs n'y apparaissent qu'en
 cosignataires de publications du périmètre, ce qui ne dit rien de sa propre couverture.
 
-## Les trois vues
+## Les vues
 
 | Vue | Ce qu'elle montre |
 |---|---|
 | **Appels** | Un appel par ligne : titre, identifiant, programme, prochaine échéance, nombre de chercheurs retenus (dont les appariements **forts**). Dépliez la ligne pour lire le résumé, l'appel, les dates, ouvrir la page officielle (portail *Funding & Tenders*, site de l'ANR ou page de l'appel) et voir les chercheurs. |
 | **Chercheurs** | Un chercheur par bloc, avec les appels où il ressort. C'est la vue à montrer à un chercheur : « voilà où vos travaux apparaissent ». |
 | **Candidats** | Réservée aux droits établissement : pour un appel réservé à une étape de carrière, les chercheurs éligibles ou à vérifier. |
+| **Mon projet** | Décrivez un projet : l'assistant cherche les appels ouverts qui lui correspondent (voir plus bas). |
 
 Les filtres s'appliquent aux vues **Appels** et **Chercheurs** :
 
@@ -114,6 +115,28 @@ direction de la recherche. Seule la date de thèse est contrôlée : les autres 
 (financement antérieur, établissement d'accueil, temps passé en Europe…) restent à vérifier avec la
 personne.
 
+## Trouver des appels pour un projet
+
+La vue **Mon projet** part de l'autre bout : vous décrivez un projet en quelques phrases (objectifs,
+méthodes, champ d'application), en français ou en anglais, et l'assistant cherche les appels
+**ouverts ou annoncés** qui lui correspondent, dans tous les programmes suivis — Europe, ANR,
+France 2030, appels saisis à la main. La conversation s'ouvre dans l'assistant (bouton en bas à
+droite, onglet **Mon projet**), où vous pouvez préciser le projet ou poser une question sur un appel.
+
+Comment il procède : le modèle de langue reformule le projet en quelques requêtes (en anglais et en
+français, les appels européens étant rédigés en anglais) ; chaque requête est comparée par
+**similarité sémantique** aux passages des textes d'appels (résumé, objectifs, périmètre) ; les
+appels les plus proches sont confiés au modèle, qui en retient cinq au plus, les classe et dit en
+une phrase pourquoi chacun convient — ou qu'il ne s'agit que d'un **rapprochement lointain**. La
+liste des appels examinés suit la réponse, avec un lien vers leur page.
+
+- L'assistant ne voit que des **extraits** des textes : vérifiez toujours les conditions, le budget
+  et les dates sur la page de l'appel.
+- Il ne tranche pas l'**éligibilité** (pour les appels réservés à une étape de carrière, voir la
+  vue Candidats).
+- Un appel ajouté ou modifié est pris en compte après la vectorisation de la nuit qui suit sa
+  collecte ou sa validation.
+
 ## Sur la fiche d'un chercheur
 
 La fiche d'un chercheur porte une carte **Appels à projets** dès qu'il a été retenu sur au moins
@@ -147,6 +170,8 @@ fiche — le pendant, personne par personne, de la vue Candidats.
 - **Les axes de l'AAPG** sont gardés après la clôture de l'étape 1 : ils décrivent le profil d'un
   projet jusqu'à l'édition suivante.
 - La vue Candidats ne lit pour l'instant que les règles fondées sur la **date de thèse** (ERC).
+- **Mon projet** compare des textes : un projet décrit en deux mots, ou un appel dont le texte
+  collecté se limite au titre, donne des rapprochements peu fiables.
 
 ## Voir aussi
 
