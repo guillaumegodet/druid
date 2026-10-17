@@ -19,6 +19,7 @@ import {
 } from '../../lib/calls/aggregate';
 import type { MatchOverall } from '../../lib/calls/trm';
 import type { FunderCategory } from '../../lib/calls/programmes';
+import { MANUAL_SOURCE } from '../../lib/calls/manual';
 import { FUNDER_CATEGORY_LABELS } from './fundersAggregates';
 import { CallCandidates } from './CallCandidates';
 import { canUseEstablishmentTools } from '../../lib/auth';
@@ -334,10 +335,11 @@ export const CallsTab: React.FC<{
     if (!calls) return [];
     const q = query.trim().toLowerCase();
     return callsWithMatches(calls, matches, filters)
-      .filter((c) => !onlyMatched || c.matches.length > 0)
+      // A call added by hand is shown before any matching ran on its programme: it was added for this institution.
+      .filter((c) => !onlyMatched || c.matches.length > 0 || programmeOf.get(c.programmeId)?.source === MANUAL_SOURCE)
       .filter((c) => !q || c.title.toLowerCase().includes(q) || (c.titleFr ?? '').toLowerCase().includes(q) || c.callId.toLowerCase().includes(q)
         || Object.values(c.taxonomy).some((v) => v.toLowerCase().includes(q)));
-  }, [calls, matches, filters, onlyMatched, query]);
+  }, [calls, matches, filters, onlyMatched, query, programmeOf]);
 
   const researcherRows = useMemo(() => {
     if (!calls) return [];

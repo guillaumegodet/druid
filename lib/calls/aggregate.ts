@@ -17,6 +17,8 @@ export interface ProgrammeView {
   funderName: string;
   category: FunderCategory;
   url: string;
+  /** Collector of the programme (ft-portal, anr…; `manual` for the calls added by hand). */
+  source?: string;
 }
 
 export interface Call {

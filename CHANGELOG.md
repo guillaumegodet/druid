@@ -24,7 +24,8 @@ données à exécuter au déploiement).
   depuis l'adresse de leur page, leur PDF, une page enregistrée (intranet) ou leur texte collé ; le serveur lit le texte
   et le modèle de langue de l'instance (ILaaS) propose intitulé, financeur, programme, dates, objectifs, périmètre,
   éligibilité et budget, que la personne relit avant d'enregistrer. Un appel reste « à valider » jusqu'à sa validation ;
-  seuls les appels validés apparaissent dans l'onglet. Financeurs et programmes (source `manual`) sont créés à la volée
+  seuls les appels validés apparaissent dans l'onglet,
+  même avant tout appariement (le filtre « avec chercheurs » ne les masque pas). Financeurs et programmes (source `manual`) sont créés à la volée
   et réutilisés par leur nom ; les doublons d'adresse sont signalés. Import d'un catalogue CSV ou Excel (aperçu puis
   import, une colonne « Référence » pour mettre à jour) et de l'export RTF d'une recherche ResearchConnect (un appel par
   fiche, source `researchconnect`). L'adresse lue doit être un site public (garde contre les adresses internes).
