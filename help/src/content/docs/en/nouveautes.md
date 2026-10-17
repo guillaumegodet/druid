@@ -37,6 +37,22 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
   chart opens a menu (PNG, SVG, PDF, CSV), for a paper, a poster or a spreadsheet. See
   [Export a chart](/en/guides/tableau-de-bord/exporter/#export-a-chart).
 
+### Calls for proposals
+
+- **The « European calls » view becomes « Calls for proposals »** (Steering) and covers every
+  funder: the Funding & Tenders European portal (Horizon Europe, ERC, MSCA, EIC, Missions…) read
+  every night, the ANR website (generic call axis by axis, specific calls, France 2030) every
+  week. **Funder**, **programme** and subset (cluster, mission, domain…) filters. See
+  [Spot calls for proposals](/en/guides/tableau-de-bord/appels-a-projets/).
+- **Candidates view** (institution right): for the ERC *Starting* and *Consolidator* grants, the
+  researchers who are eligible or to check from their PhD date, read on theses.fr; CSV export.
+  See [Spot eligible candidates](/en/guides/tableau-de-bord/appels-a-projets/#spot-eligible-candidates).
+- **Calls added by hand**: Administration › Calls for proposals takes the calls no collector reads
+  (Region, foundations, labex, internal calls…), added from their address, their PDF, a saved
+  intranet page or their pasted text; the language model proposes the fields, you review and
+  validate. Import of a CSV or Excel catalogue and of the RTF export of a ResearchConnect search.
+  See [Manage calls for proposals](/en/guides/administration/appels-a-projets/).
+
 ### Reports
 
 - **New « Collaboration with a country » template**: the full review of a collaboration with one
@@ -57,6 +73,10 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
   certain: the institution's staff, CNRS accounts.
 - New **tasks**: switch an `ext_…` record to its LDAP uid (found by the staff number), hosted
   LDAP account closing, employer to enter.
+- **PhD on the record**, under the HDR line: defended thesis read on theses.fr through the IdRef
+  (year, institution, discipline).
+- New **PhD student tasks**: a record still « PhD student » whose IdRef carries a defended thesis
+  (status to update), or a thesis older than six years (IdRef of a namesake?).
 
 ## September 2026
 

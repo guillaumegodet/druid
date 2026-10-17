@@ -38,6 +38,23 @@ n'existent que sur les instances qui en disposent (voir
   **Télécharger** de chaque graphique ouvre un menu (PNG, SVG, PDF, CSV), pour un article, une
   affiche ou un tableur. Voir [Exporter un graphique](/guides/tableau-de-bord/exporter/#exporter-un-graphique).
 
+### Appels à projets
+
+- **La vue « Appels européens » devient « Appels à projets »** (Pilotage) et couvre tous les
+  financeurs : portail européen Funding & Tenders (Horizon Europe, ERC, MSCA, EIC, Missions…)
+  relu chaque nuit, site de l'ANR (appel générique axe par axe, appels spécifiques, France 2030)
+  chaque semaine. Filtres **financeur**, **programme** et sous-ensemble (cluster, mission,
+  domaine…). Voir [Repérer les appels à projets](/guides/tableau-de-bord/appels-a-projets/).
+- **Vue Candidats** (droit établissement) : pour les bourses ERC *Starting* et *Consolidator*, les
+  chercheurs éligibles ou à vérifier d'après leur date de thèse, lue sur theses.fr ; export CSV.
+  Voir [Repérer les candidats éligibles](/guides/tableau-de-bord/appels-a-projets/#repérer-les-candidats-éligibles).
+- **Appels saisis à la main** : Administration › Appels à projets accueille les appels qu'aucun
+  collecteur ne lit (Région, fondations, labex, appels internes…), ajoutés depuis leur adresse,
+  leur PDF, une page de l'intranet enregistrée ou leur texte collé ; le modèle de langue propose
+  les champs, vous relisez et validez. Import d'un catalogue CSV ou Excel et de l'export RTF
+  d'une recherche ResearchConnect. Voir
+  [Gérer les appels à projets](/guides/administration/appels-a-projets/).
+
 ### Rapports
 
 - **Nouveau modèle « Collaboration avec un pays »** : le bilan complet d'une collaboration avec un
@@ -58,6 +75,10 @@ n'existent que sur les instances qui en disposent (voir
   c'est sûr : personnel de l'établissement, comptes CNRS.
 - Nouvelles **tâches** : passer une fiche `ext_…` sur son uid LDAP (repérée par le n° agent),
   compte LDAP hébergé en fermeture, employeur à renseigner.
+- **Thèse sur la fiche**, sous la ligne HDR : thèse soutenue lue sur theses.fr par l'IdRef (année,
+  établissement, discipline).
+- Nouvelles **tâches doctorants** : fiche encore « doctorant » dont l'IdRef porte une thèse
+  soutenue (statut à mettre à jour), ou une thèse de plus de six ans (IdRef d'un homonyme ?).
 
 ## Septembre 2026
 

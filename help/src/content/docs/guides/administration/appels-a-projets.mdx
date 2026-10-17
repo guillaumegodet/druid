@@ -1,0 +1,126 @@
+---
+title: "Gérer les appels à projets"
+description: "Choisir les programmes collectés, ajouter un appel depuis son adresse, son PDF ou une page enregistrée, valider les appels, importer un catalogue ou un export ResearchConnect."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs et services centraux (droit établissement)"
+	menu="Administration › Appels à projets"
+	disponibilite="instances sur PostgreSQL ; proposition des champs par le modèle de langue : instances où il est configuré"
+/>
+
+Cette page règle ce que montre la vue [Appels à projets](/guides/tableau-de-bord/appels-a-projets/)
+du tableau de bord : quels programmes sont collectés automatiquement, et quels appels sont ajoutés
+à la main, depuis leur page, leur PDF, un catalogue ou un export ResearchConnect.
+
+## Programmes collectés
+
+Le tableau liste les programmes connus de l'instance, par financeur : mode d'appariement
+(thématique, axes, éligibilité), source, nombre d'appels ouverts ou annoncés sur le total, nombre
+d'appariements et date de la dernière collecte.
+
+- La case **Actif** décide si un programme est collecté : un programme actif voit ses appels
+  relus chaque nuit (portail Funding & Tenders) ou chaque semaine (site de l'ANR) et affichés dans
+  la vue. **Désactiver** un programme masque ses appels sans les supprimer.
+- Le tableau **Collectes** retrace les derniers passages : appels vus, nouveaux, mis à jour,
+  textes relus, et les erreurs éventuelles (au survol).
+
+L'appariement des appels aux chercheurs ne se lance pas ici : il tourne à part, programme par
+programme.
+
+## Appels saisis à la main
+
+Pour les financeurs qu'aucun collecteur ne lit : Région, fondations, labex, autres opérateurs de
+France 2030, appels internes… Chaque appel saisi est rangé dans un **programme** d'un **financeur**,
+créés au besoin et réutilisés ensuite par leur nom.
+
+### Ajouter un appel
+
+Cliquez sur **Ajouter un appel**, puis donnez à Druid le texte de l'appel de l'une de ces façons :
+
+| Entrée | Quand l'utiliser |
+|---|---|
+| **Adresse** de la page, puis **Lire** | page publique d'un financeur ; si l'adresse mène à un PDF, il est lu aussi |
+| **PDF de l'appel** | texte de l'appel ou règlement d'intervention téléchargé |
+| **Page enregistrée (HTML)** | page que le serveur ne peut pas joindre, comme l'**intranet** : ouvrez-la dans votre navigateur, **Fichier › Enregistrer sous** (page HTML), puis déposez le fichier |
+| **Coller le texte** | texte copié depuis un courriel ou un document |
+| **Saisir à la main** | aucun texte sous la main |
+
+Druid lit le texte et le **modèle de langue de l'instance** propose les champs : intitulé,
+financeur, programme, langue, ouverture, dates limites, synthèse, objectifs, périmètre et thèmes,
+éligibilité, budget. Comptez quelques secondes à une minute. **Rien n'est enregistré avant votre
+relecture** : vérifiez chaque champ sur l'appel, en particulier les dates (un règlement
+d'intervention n'en donne souvent aucune) et l'intitulé.
+
+- **Financeur** et **Programme** : choisissez un financeur et un programme existants, ou
+  **Nouveau financeur…** (nom et catégorie) et **Nouveau programme…**. Druid reconnaît un financeur
+  déjà connu sous le même nom. Un programme collecté automatiquement (portail européen, ANR) n'est
+  pas proposé : sa collecte clôturerait l'appel.
+- **Périmètre et thèmes** : c'est le texte que lit le traitement automatique pour trouver les
+  chercheurs concernés ; gardez les termes scientifiques de l'appel.
+- **Date limite** : une par étape, jusqu'à quatre (**Autre étape**). L'état de l'appel (annoncé,
+  ouvert, clos) se déduit de l'ouverture et des dates limites.
+
+Enregistrez avec **Enregistrer et valider** (l'appel apparaît aussitôt dans la vue) ou **Enregistrer
+à valider** (il attend une relecture). Si un appel à la même adresse est déjà connu, Druid l'indique
+et propose d'enregistrer quand même.
+
+Sans modèle de langue configuré sur l'instance, le formulaire s'ouvre directement vide, à remplir
+d'après l'appel.
+
+### Valider, écarter, corriger
+
+La liste des appels saisis se filtre par état : **À valider**, **Validés**, **Écartés**, **Tous**.
+Pour chaque appel :
+
+- **Valider** : l'appel apparaît dans la vue Appels à projets ;
+- **Écarter** : il en disparaît, sans être supprimé ;
+- **Modifier** : rouvre le formulaire ; enregistrer « à valider » renvoie l'appel en relecture ;
+- la **corbeille** supprime un appel auquel aucun chercheur n'a encore été apparié (sinon,
+  écartez-le).
+
+Un appel saisi apparaît dans la vue même tant que le traitement automatique n'est pas passé sur son
+programme : il affiche alors « Aucun chercheur ».
+
+## Importer un catalogue
+
+**Importer un catalogue** charge plusieurs appels d'un coup depuis un fichier **CSV** (UTF-8) ou
+**Excel**, un appel par ligne, la première ligne nommant les colonnes. Druid reconnaît les noms en
+français ou en anglais, sans tenir compte des accents ni des majuscules :
+
+| Colonne | Contenu |
+|---|---|
+| **Titre** (obligatoire) | intitulé de l'appel |
+| Financeur, Catégorie, Programme | rangement de l'appel ; sans catégorie, Druid la devine d'après le nom du financeur |
+| URL | page de l'appel |
+| Langue | français par défaut, `en` ou « anglais » pour un texte anglais |
+| Ouverture, Date limite, Date limite 2 | jours écrits `2027-01-31` ou `31/01/2027` |
+| Résumé, Objectifs, Périmètre, Éligibilité, Budget | textes de l'appel |
+| Référence | identifiant de la ligne dans votre catalogue |
+| Source | origine du catalogue, gardée sur chaque appel |
+
+Les autres colonnes sont ignorées. Druid affiche d'abord un **aperçu** : les colonnes reconnues et,
+pour chaque ligne, **nouveau**, **mise à jour** ou **erreur** (avec la raison). Rien n'est écrit tant
+que vous n'avez pas cliqué sur **Importer N appels**. Cochez ou non **Importer les appels comme
+validés**.
+
+Réimporter le catalogue met à jour les appels déjà importés : une ligne de même **Référence** (ou,
+sans référence, de mêmes financeur, programme, adresse et titre) remplace l'appel importé
+auparavant. Tenez donc une colonne Référence si les titres de votre catalogue évoluent.
+
+### Export ResearchConnect
+
+L'export **RTF** d'une recherche enregistrée sur ResearchConnect se dépose au même endroit : Druid le
+lit dans votre navigateur et en tire un appel par fiche (financeur, résumé, description, critères
+d'éligibilité, montant, dates des prochains appels, lien utile), avec la source
+`researchconnect` et la référence `RC-<Fund ID>`. Réimporter un export plus récent met à jour les
+fiches déjà importées. Ces appels restent dans votre instance.
+
+## Voir aussi
+
+- [Repérer les appels à projets](/guides/tableau-de-bord/appels-a-projets/)
+- [Donner des droits](/guides/administration/donner-des-droits/)

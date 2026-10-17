@@ -88,6 +88,8 @@ D'autres règles portent sur l'annuaire (voir [Statuts des personnes](/donnees/s
 | **Compte LDAP trouvé par le n° agent : passer à l'uid LDAP** | La fiche est en `ext_…` (ou sans uid) alors que son n° agent est celui d'un compte LDAP qu'aucune fiche ne porte. Vérifiez les avertissements (uid qui ne ressemble pas au nom : n° agent sans doute erroné), puis **Passer à l'uid LDAP**. Pour une ancienne fiche `ext_…`, une tâche **SoVisu+ : retirer les identifiants de l'ancienne personne** est créée : sans cela, SoVisu+ refuse le nouvel uid. |
 | **Compte LDAP hébergé en fermeture : départ probable ?** | Personne employée par un autre organisme dont le compte hébergé ferme. Druid n'en déduit pas un départ : vérifiez auprès du laboratoire, puis saisissez les dates de fin (la tâche se ferme seule) ou abandonnez la tâche. |
 | **Employeur à renseigner** | Fiche validée « externe » avant octobre 2026 sans employeur : renseignez l'employeur (CNRS, Inserm, CHU…). |
+| **Doctorant ayant soutenu sa thèse : mettre à jour le statut** | La fiche dit encore « doctorant » (type d'emploi ou grade) alors que son IdRef porte une thèse soutenue sur theses.fr. Mettez à jour l'emploi (post-doctorat, départ…) : la tâche se ferme seule quand la fiche ne dit plus « doctorant » ou que la personne est validée partie. |
+| **Doctorant avec une thèse ancienne sur son IdRef : homonyme ?** | La thèse trouvée a plus de six ans : l'IdRef de la fiche est sans doute celui d'un homonyme. Vérifiez sur theses.fr (lien de la tâche) et corrigez l'IdRef. |
 
 ## Ce qui se passe ensuite
 
