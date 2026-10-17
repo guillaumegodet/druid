@@ -19,6 +19,19 @@ données à exécuter au déploiement).
   (fermée seule quand la fiche ne dit plus « doctorant » ou que la personne est validée partie) ; une thèse de plus de
   six ans donne plutôt « Doctorant avec une thèse ancienne sur son IdRef : homonyme ? » (lien vers theses.fr). Les
   thèses sont lues par la table `Theses` de la façade PostgreSQL des jobs (`person_thesis`).
+- **Appels à projets — appels saisis à la main** (Administration › Appels à projets, droit établissement) : les appels
+  qu'aucun collecteur ne lit (Région, fondations, labex, autres opérateurs de France 2030, appels internes…) s'ajoutent
+  depuis l'adresse de leur page, leur PDF, une page enregistrée (intranet) ou leur texte collé ; le serveur lit le texte
+  et le modèle de langue de l'instance (ILaaS) propose intitulé, financeur, programme, dates, objectifs, périmètre,
+  éligibilité et budget, que la personne relit avant d'enregistrer. Un appel reste « à valider » jusqu'à sa validation ;
+  seuls les appels validés apparaissent dans l'onglet. Financeurs et programmes (source `manual`) sont créés à la volée
+  et réutilisés par leur nom ; les doublons d'adresse sont signalés. Import d'un catalogue CSV ou Excel (aperçu puis
+  import, une colonne « Référence » pour mettre à jour) et de l'export RTF d'une recherche ResearchConnect (un appel par
+  fiche, source `researchconnect`). L'adresse lue doit être un site public (garde contre les adresses internes).
+
+### Migration
+- `20261017090000_call_manual.sql` : colonnes `added_by`, `reviewed_by`, `reviewed_at` de `funding_call` (appels saisis
+  à la main). Aucune reprise de données.
 
 ## [2.8.1] — 2026-10-16
 

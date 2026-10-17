@@ -65,7 +65,7 @@ export const CallsProgrammesAdmin: React.FC = () => {
   const kindLabel: Record<ProgrammeAdminView['kind'], string> = {
     thematic: t`thematic`, open: t`axes / panels`, eligibility: t`eligibility`, mixed: t`thematic + eligibility`,
   };
-  const sourceLabel = (source: string) => (source === 'ft-portal' ? t`Funding & Tenders portal` : source === 'anr' ? t`ANR website` : source === 'trm-report' ? t`TRM reports` : source);
+  const sourceLabel = (source: string) => (source === 'ft-portal' ? t`Funding & Tenders portal` : source === 'anr' ? t`ANR website` : source === 'trm-report' ? t`TRM reports` : source === 'manual' ? t`added by hand` : source);
 
   if (loading && !items) {
     return (

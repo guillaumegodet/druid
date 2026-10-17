@@ -27,6 +27,10 @@ import { connectGraphBus } from '../lib/graph/bus';
 import { createCallsStore } from '../lib/calls/pg';
 import { createThesisStore } from '../lib/thesisStore';
 import { createEligibilityStore } from '../lib/calls/eligibilityStore';
+import { createManualCallsStore } from '../lib/calls/manualStore';
+import { extractCallFields, fetchCallDocument, htmlDocument, pdfDocument, textDocument, type CallDocument } from '../lib/calls/callDocument';
+import { translatorFromEnv } from '../lib/calls/translate';
+import { validateManualCall, type ManualCallInput } from '../lib/calls/manual';
 import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
@@ -136,6 +140,22 @@ const toWebRequest = (req: NodeRequest): Request => {
  * Directory storage of the server: Grist clients, repository, publications store and domain commands, created once and
  * shared by `/api/v1` and the other routes of server.cjs (druid-internal docs/plan-migration-postgresql.md, lot 3 c).
  */
+const manualCallsOf = (db: Parameters<typeof createManualCallsStore>[0]) => {
+  const llm = translatorFromEnv(process.env);
+  return {
+    ...createManualCallsStore(db),
+    readUrl: (url: string) => fetchCallDocument(url),
+    readPdf: (data: Uint8Array) => pdfDocument(data),
+    /** A page saved by the person (a website the server cannot reach, such as an intranet) or a pasted text. */
+    readHtml: (html: string) => htmlDocument(html),
+    readText: (text: string) => textDocument(text),
+    /** Whether the language model of the instance is configured (ILAAS_API_KEY). */
+    canExtract: !!llm,
+    extract: (doc: CallDocument) => (llm ? extractCallFields(doc, llm) : Promise.resolve(null)),
+    validate: (input: ManualCallInput) => validateManualCall(input, new Date().toISOString().slice(0, 10)),
+  };
+};
+
 export const createServerStorage = (options: ApiV1Options) => {
   if (!options.gristDocId) throw new Error('VITE_GRIST_DOC_ID is not set: no directory document to serve');
   const readers = new Map<string, GristClient>();
@@ -204,6 +224,8 @@ export const createServerStorage = (options: ApiV1Options) => {
       theses: createThesisStore(db),
       /** Candidates of the calls reserved by career stage (lib/calls/eligibility.ts), institution right only. */
       eligibility: createEligibilityStore(db),
+      /** Calls added by hand (plan-funding-calls lot 6): store, reading of a URL or a PDF, fields proposed by ILaaS. */
+      manualCalls: manualCallsOf(db),
     };
   }
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
@@ -219,6 +241,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     calls: null,
     theses: null,
     eligibility: null,
+    manualCalls: null,
   };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;

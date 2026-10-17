@@ -2346,6 +2346,91 @@ app.post('/api/calls/admin/programmes/:id', requireEstablishmentScope, withCalls
   res.json({ ok: true });
 }));
 
+// Calls added by hand (docs/plan-funding-calls.md, lot 6): the research office gives the URL or the PDF of a call that no
+// collector reads (Region, foundations, other France 2030 operators…), the server reads its text and the language model
+// of the instance proposes the fields; the person reviews them and saves the call, validated or waiting for a
+// validation (only validated calls reach the tab). A catalogue (CSV or spreadsheet, read by the browser) is imported the
+// same way, previewed first. Institution right, like the rest of the administration of the calls.
+const withManualCalls = (handler) => async (req, res) => {
+  const store = storage().manualCalls;
+  if (!store) return res.status(501).json({ error: 'The calls for proposals need the PostgreSQL storage' });
+  try {
+    await handler(req, res, store);
+  } catch (e) {
+    // ManualCallError / CallDocumentError carry the HTTP status of their cause (unknown programme, page not found…).
+    if (typeof e?.status === 'number' && e.status >= 400 && e.status < 600) return res.status(e.status).json({ error: e.message });
+    console.error('[calls/manual]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+};
+const MANUAL_REVIEW_STATUSES = ['to_validate', 'validated', 'rejected'];
+app.get('/api/calls/admin/manual', requireEstablishmentScope, withManualCalls(async (req, res, store) => {
+  res.json({ items: await store.list(), programmes: await store.programmes(), funders: await store.funders(), canExtract: store.canExtract });
+}));
+// Text of a call → proposed fields: JSON { url } or { text } (pasted), or the bytes of a PDF (application/pdf) or of a
+// page saved from a website the server cannot reach, such as the intranet (text/html).
+app.post('/api/calls/admin/manual/read', requireEstablishmentScope,
+  express.raw({ type: ['application/pdf', 'text/html'], limit: '15mb' }),
+  withManualCalls(async (req, res, store) => {
+    let doc;
+    if (Buffer.isBuffer(req.body)) {
+      doc = /pdf/i.test(req.get('content-type') || '') ? await store.readPdf(new Uint8Array(req.body)) : store.readHtml(req.body.toString('utf8'));
+    } else if (typeof req.body?.text === 'string' && req.body.text.trim()) {
+      doc = store.readText(req.body.text.slice(0, 200000));
+    } else if (typeof req.body?.url === 'string' && req.body.url.trim()) {
+      doc = await store.readUrl(req.body.url.trim().slice(0, 1000));
+    } else {
+      return res.status(400).json({ error: 'Give the URL of the call or its PDF' });
+    }
+    const extracted = await store.extract(doc);
+    res.json({
+      document: { kind: doc.kind, url: doc.url, chars: doc.text.length },
+      extracted: !!extracted,
+      draft: extracted ?? { title: doc.title },
+      duplicates: await store.duplicatesOf(doc.url),
+    });
+  }));
+// Saves a call (new, or edited with callId): { call, callId?, validate, force? }. A new call whose URL is already known
+// is refused (409, the duplicates in the answer) unless `force`.
+app.post('/api/calls/admin/manual', requireEstablishmentScope, withManualCalls(async (req, res, store) => {
+  const body = req.body || {};
+  const callId = typeof body.callId === 'string' && body.callId ? body.callId : undefined;
+  if (callId && !CALL_ID.test(callId)) return res.status(400).json({ error: 'Invalid call id' });
+  const { call, errors } = store.validate(body.call || {});
+  if (!call) return res.status(400).json({ error: errors[0], errors });
+  if (!body.force && call.url) {
+    const duplicates = await store.duplicatesOf(call.url, callId);
+    if (duplicates.length) return res.status(409).json({ error: 'A call with this URL is already known', duplicates });
+  }
+  const saved = await store.save(call, { callId, reviewStatus: body.validate ? 'validated' : 'to_validate', user: req.session.user.preferred_username });
+  res.json(saved);
+}));
+app.post('/api/calls/admin/manual/:id/review', requireEstablishmentScope, withManualCalls(async (req, res, store) => {
+  const callId = String(req.params.id || '');
+  if (!CALL_ID.test(callId)) return res.status(400).json({ error: 'Invalid call id' });
+  if (!MANUAL_REVIEW_STATUSES.includes(req.body?.status)) return res.status(400).json({ error: 'Invalid review status' });
+  if (!(await store.setReview(callId, req.body.status, req.session.user.preferred_username))) return res.status(404).json({ error: 'Unknown call' });
+  res.json({ ok: true });
+}));
+app.delete('/api/calls/admin/manual/:id', requireEstablishmentScope, withManualCalls(async (req, res, store) => {
+  const callId = String(req.params.id || '');
+  if (!CALL_ID.test(callId)) return res.status(400).json({ error: 'Invalid call id' });
+  const result = await store.remove(callId);
+  if (result === 'unknown') return res.status(404).json({ error: 'Unknown call' });
+  if (result === 'matched') return res.status(409).json({ error: 'Researchers were matched to this call: reject it instead' });
+  res.json({ ok: true });
+}));
+// Catalogue: { headers, rows, apply, validate } — rows as the spreadsheet reader of the browser gives them.
+app.post('/api/calls/admin/manual/catalogue', requireEstablishmentScope, withManualCalls(async (req, res, store) => {
+  const { headers, rows } = req.body || {};
+  if (!Array.isArray(headers) || !Array.isArray(rows) || headers.some((h) => typeof h !== 'string') || rows.some((r) => !r || typeof r !== 'object')) {
+    return res.status(400).json({ error: 'Invalid catalogue' });
+  }
+  res.json(await store.importCatalogue(rows, headers, {
+    apply: !!req.body.apply, validate: !!req.body.validate, user: req.session.user.preferred_username, today: new Date().toISOString().slice(0, 10),
+  }));
+}));
+
 // ── Administration of the media monitoring sources (Sources page of the
 // « Veille > Médias » tab) — media_admin role or super admin, NOT open to any
 // logged-in user like /api/mentions above: it writes to the registry of
