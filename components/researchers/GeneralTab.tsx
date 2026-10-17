@@ -8,6 +8,7 @@ import { FteInput } from './FteInput';
 import { useFteColumns } from '../../hooks/useFteColumns';
 import { LdapUidLookup, LdapLookupOutcome } from './LdapUidLookup';
 import { ThesisInfo } from './ThesisInfo';
+import { halIdNumSearchUrl, promoteHalIdNum, secondaryHalIdNums } from '../../lib/halIds';
 import { Trans, useLingui } from '@lingui/react/macro';
 
 const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean }> = ({ label, fromLdap }) => (
@@ -74,6 +75,13 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 }) => {
   const { t } = useLingui();
   const showFte = useFteColumns();
+  const secondaryHalIds = secondaryHalIdNums(researcher.identifiers.halIdNum, researcher.identifiers.halIdNumSecondary);
+  /** Swaps a secondary HAL identifier with the primary one (decision D1: the person may change it by hand). */
+  const promoteSecondaryHalId = (id: string) => {
+    const next = promoteHalIdNum(researcher.identifiers.halIdNum, researcher.identifiers.halIdNumSecondary, id);
+    onUpdateField('halIdNum', next.primary, 'identifiers');
+    onUpdateField('halIdNumSecondary', next.secondaries, 'identifiers');
+  };
   return (
     // `contents`: the cards become items of the 2-column grid defined
     // in ResearcherDetail (left col. 300px: photo + identifiers; right col.:
@@ -135,7 +143,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                   <div className="flex items-center justify-between mb-0.5">
                     <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]" title={t`HAL numeric identifier (idHal_i)`}>IdHAL_i</span>
                     {researcher.identifiers.halIdNum && (
-                      <a href={`https://hal.science/search/index/q/*/authIdHal_i/${researcher.identifiers.halIdNum}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-muted dark:text-[#8f897c] hover:underline">
+                      <a href={halIdNumSearchUrl(researcher.identifiers.halIdNum)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-muted dark:text-[#8f897c] hover:underline">
                         <ExternalLink className="w-3 h-3" /> hal.science
                       </a>
                     )}
@@ -149,6 +157,38 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                     onChange={(e) => onUpdateField('halIdNum', e.target.value.replace(/\D/g, ''), 'identifiers')}
                     className={idInput}
                   />
+                  {/* Other HAL persons of the researcher: kept, never exported (only the primary one is harvested) — lib/halIds.ts */}
+                  <div className="mt-2">
+                    <span className="block text-[11px] text-muted-lighter dark:text-[#8f897c] mb-0.5" title={t`Only the primary IdHAL_i is sent to CRISalid and harvested`}>
+                      <Trans>Other IdHAL_i (not harvested)</Trans>
+                    </span>
+                    <input
+                      type="text"
+                      placeholder={t`e.g. 123456|654321`}
+                      value={researcher.identifiers.halIdNumSecondary || ''}
+                      onChange={(e) => onUpdateField('halIdNumSecondary', e.target.value.replace(/[^\d|,; ]/g, ''), 'identifiers')}
+                      className={idInput}
+                    />
+                    {secondaryHalIds.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                        {secondaryHalIds.map((id) => (
+                          <span key={id} className="inline-flex items-center gap-1 rounded-lg bg-cream-100 dark:bg-white/10 px-1.5 py-0.5 text-[11px] font-semibold text-ink dark:text-[#e7e2d6]">
+                            <a href={halIdNumSearchUrl(id)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 hover:underline">
+                              <ExternalLink className="w-3 h-3" /> {id}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => promoteSecondaryHalId(id)}
+                              className="ml-0.5 text-primary dark:text-primary-light hover:underline"
+                              title={t`Make it the primary IdHAL_i (the one harvested by CRISalid)`}
+                            >
+                              <Trans>make primary</Trans>
+                            </button>
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
              </div>
              {/* Scopus */}

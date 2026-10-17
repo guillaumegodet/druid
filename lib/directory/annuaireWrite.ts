@@ -9,6 +9,7 @@ import { normalizeFuzzyDate, fuzzyDateLowerBound, fuzzyDateUpperBound, isFuzzyDa
 import { validationToGristFields } from '../validation';
 import { fteGristFields } from '../fte';
 import { HR_ID_COLUMN, hrIdCell } from '../hrId';
+import { HAL_ID_NUM_SECONDARY_COLUMN, joinHalIdNums, secondaryHalIdNums } from '../halIds';
 import { STATUT_DYNA_MAP } from '../ldapCodes';
 import {
   AFFILIATION_END_COL, AFFILIATION_START_COL, Institution, MEMBERSHIP_TYPE_COL, RATTACHEMENT_COL, RattachementRole,
@@ -127,6 +128,12 @@ export const directoryUrlFieldsFor = (columns: AnnuaireColumnMeta[] | null, url?
   return value && columns?.some((c) => c.id === 'annuaire_url') ? { 'annuaire_url': value } : {};
 };
 
+/** Secondary HAL identifiers (lib/halIds.ts), only when the Annuaire has the column and the record carries the field. */
+export const halIdNumSecondaryFieldsFor = (columns: AnnuaireColumnMeta[] | null, primary?: string, secondary?: string | null): Record<string, string | null> => {
+  if (secondary === undefined || secondary === null || !columns?.some((c) => c.id === HAL_ID_NUM_SECONDARY_COLUMN)) return {};
+  return { [HAL_ID_NUM_SECONDARY_COLUMN]: joinHalIdNums(secondaryHalIdNums(primary, secondary)) || null };
+};
+
 /** HR staff number cell, only when the Annuaire has the column (instances without HR data do not). */
 export const hrIdFieldsFor = (columns: AnnuaireColumnMeta[] | null, hrId?: string): Record<string, number> => {
   const cell = hrIdCell(hrId || '');
@@ -170,6 +177,7 @@ export function researcherCreateFields(researcher: Researcher, ctx: AnnuaireWrit
     'IdRef': researcher.identifiers.idref,
     'IdHAL': researcher.identifiers.halId,
     'IdHAL_i': researcher.identifiers.halIdNum?.replace(/\D/g, '') || null,
+    ...halIdNumSecondaryFieldsFor(ctx.columns, researcher.identifiers.halIdNum, researcher.identifiers.halIdNumSecondary),
     'ID_SCOPUS': researcher.identifiers.scopusId,
     'photo_url': researcher.photoUrl?.trim() || null,
     // Declared public social media accounts (tracked by media monitoring).
@@ -222,6 +230,7 @@ export function researcherUpdateFields(researcher: Researcher, plan: Affiliation
     'IdRef': researcher.identifiers.idref || null,
     'IdHAL': researcher.identifiers.halId || null,
     'IdHAL_i': researcher.identifiers.halIdNum?.replace(/\D/g, '') || null,   // entered in the record or by sync_hal (verify)
+    ...halIdNumSecondaryFieldsFor(ctx.columns, researcher.identifiers.halIdNum, researcher.identifiers.halIdNumSecondary),
     'ID_SCOPUS': researcher.identifiers.scopusId || null,
     'photo_url': researcher.photoUrl?.trim() || null,   // editable from the record's tile
     ...directoryUrlFieldsFor(ctx.columns, researcher.annuaireUrl),

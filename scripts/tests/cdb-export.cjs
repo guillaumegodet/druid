@@ -51,6 +51,13 @@ const baseResearcher = (over = {}) => ({
   check('people.csv: duplicated uid → 1 row, dedup=1', { count, dedup }, { count: 1, dedup: 1 });
 }
 {
+  // Secondary HAL identifiers are never exported: idhali = the primary one only (docs/plan-alignement-idhal-i.md, D3).
+  const { csv } = buildPeopleCsv([baseResearcher({ identifiers: { halIdNum: '100001', halIdNumSecondary: '200003|300002' } })], STRUCTURES);
+  const row = csv.trim().split('\n')[1];
+  check('people.csv: idhali = primary IdHAL_i', row.split(',')[CSV_INDEX('idhali')], '100001');
+  check('people.csv: secondary IdHAL_i absent', /200003|300002/.test(row), false);
+}
+{
   // hdr: true -> 'yes'; absent/false -> '' (never 'no' — cdb only accepts yes/no, empty = unknown).
   const withHdr = buildPeopleCsv([baseResearcher({ uid: 'u2', nuFields: { hdr: true } })], STRUCTURES);
   const withoutHdr = buildPeopleCsv([baseResearcher({ uid: 'u3', nuFields: {} })], STRUCTURES);

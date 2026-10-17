@@ -13,6 +13,7 @@ import { normStatus, parseValidationScope } from '../../validation';
 import { HR_ID_COLUMN, normalizeHrId } from '../../hrId';
 import { parseFteCell, FTE_COLUMNS } from '../../fte';
 import { fromGristDate, fromGristFuzzyDate } from '../gristMapping';
+import { HAL_ID_NUM_SECONDARY_COLUMN, joinHalIdNums, normalizeHalIdNum, secondaryHalIdNums, sortHalIdNums } from '../../halIds';
 import { toGristEpoch } from '../annuaireWrite';
 import type { PgIdentifier, PgLink } from './directoryRows';
 
@@ -83,6 +84,7 @@ export const readRecordFields = (p: Record<string, any>, m: Record<string, any>,
   }
   const primary = (scheme: string) => parts.identifiers.find((i) => i.scheme === scheme && i.is_primary)?.value ?? '';
   for (const [field, scheme] of Object.entries(IDENTIFIER_FIELDS)) out[field] = primary(scheme);
+  out[HAL_ID_NUM_SECONDARY_COLUMN] = joinHalIdNums(sortHalIdNums(parts.identifiers.filter((i) => i.scheme === 'idhal_i' && !i.is_primary).map((i) => i.value)));
   const scopus = primary('scopus');
   out.ID_SCOPUS = has(e, 'ID_SCOPUS') ? e.ID_SCOPUS : scopus ? Number(scopus) : parts.scopusAbsent ? 'absent' : 0;
   out.OpenAlex_ids = has(e, 'OpenAlex_ids') ? e.OpenAlex_ids
@@ -101,6 +103,17 @@ export const readRecordFields = (p: Record<string, any>, m: Record<string, any>,
   out.rattachement = raw('rattachement') ?? (m.role ?? '');
   out.doublon_decision = m.duplicate_decision ?? '';
   return out;
+};
+
+/** Replaces the secondary HAL identifiers of a person (`idhal_i` rows without `is_primary`; `ids` exclude the primary one). */
+export const writeHalIdNumSecondaries = async (trx: Transaction<DB>, personId: string, ids: string[]): Promise<void> => {
+  let stale = trx.deleteFrom('person_identifier').where('person_id', '=', personId).where('scheme', '=', 'idhal_i').where('is_primary', '=', false);
+  if (ids.length) stale = stale.where('value', 'not in', ids);
+  await stale.execute();
+  for (const v of ids) {
+    await trx.insertInto('person_identifier').values({ person_id: personId, scheme: 'idhal_i', value: v, is_primary: false, source: 'record' })
+      .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: false })).execute();
+  }
 };
 
 /** Loads the parts of a set of people (identifiers, absence checks, links, sync traces). */
@@ -228,6 +241,17 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
             .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: i === 0, source: OPENALEX_LIST_SOURCE })).execute();
         }
         if (list.join('|') === String(value ?? '')) done(field); else keep(field, blank(value) ? '' : value);
+        continue;
+      }
+      case HAL_ID_NUM_SECONDARY_COLUMN: {
+        // Non-primary `idhal_i` rows (lib/halIds.ts). The primary one is never among them: the IdHAL_i written by the
+        // same patch, else the current one. Either order with IdHAL_i works: a former primary listed here is demoted
+        // (so the IdHAL_i case no longer deletes it), a promoted secondary is dropped here and inserted as primary there.
+        const primaryValue = has(fields, 'IdHAL_i') ? normalizeHalIdNum(fields.IdHAL_i)
+          : (await trx.selectFrom('person_identifier').select('value').where('person_id', '=', personId).where('scheme', '=', 'idhal_i')
+            .where('is_primary', '=', true).executeTakeFirst())?.value ?? '';
+        await writeHalIdNumSecondaries(trx, personId, secondaryHalIdNums(primaryValue, value));
+        done(field);
         continue;
       }
       case 'openalex_author_id': {

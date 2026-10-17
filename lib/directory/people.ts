@@ -55,7 +55,7 @@ export interface DirectoryRow {
   membershipType: MembershipType | undefined;
   role: RattachementRole | '';
   groups: string[];
-  identifiers: { orcid: string; idref: string; halId: string; halIdNum: string; scopusId: string; openalexId: string; openalexIds: string };
+  identifiers: { orcid: string; idref: string; halId: string; halIdNum: string; halIdNumSecondary: string; scopusId: string; openalexId: string; openalexIds: string };
   socials: { bluesky: string; mastodon: string; youtube: string; podcast: string; blog: string; linkedin: string };
   profiles: { cvInstitutionnel: string; cvSiteLabo: string; cvPdf: string; cvHal: string; academia: string; researchgate: string; googleScholar: string; website: string };
   /** HDR as stored (« OUI »…) and its year as stored. */

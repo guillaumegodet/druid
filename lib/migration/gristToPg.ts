@@ -123,7 +123,7 @@ const PERSON_COLUMNS = [
 /** Merged over the rows of a person (not compared). */
 const MERGED_COLUMNS = ['Commentaires', 'Data_source'] as const;
 const IDENTIFIER_COLUMNS: Record<string, string> = {
-  IdRef: 'idref', IdRef_nom_valide: 'idref_name_validated', IdHAL: 'idhal', IdHAL_i: 'idhal_i', ORCID: 'orcid',
+  IdRef: 'idref', IdRef_nom_valide: 'idref_name_validated', IdHAL: 'idhal', IdHAL_i: 'idhal_i', IdHAL_i_secondaires: 'idhal_i', ORCID: 'orcid',
   ID_SCOPUS: 'scopus', OpenAlex_ids: 'openalex', openalex_author_id: 'openalex', Bluesky: 'bluesky', Mastodon: 'mastodon',
 };
 const LINK_COLUMNS = ['CV_institutionnel', 'CV_site_labo', 'CV_pdf_docx_', 'CV_HAL', 'Academia', 'Researchgate', 'Profil_GS',
@@ -422,14 +422,15 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
           if (typeof raw === 'string' && raw.trim().toLowerCase() === 'absent') { scopusAbsent = true; continue; }
           if (typeof raw !== 'number' && !/^\d+$/.test(String(raw).trim())) { if (fromKept) keepRaw(col, raw); continue; }
         }
-        const values = col === 'OpenAlex_ids' ? splitList(raw, /[|,;\s]+/)
+        // Lists: OpenAlex_ids (the first A-id is the primary one), IdHAL_i_secondaires (never primary, lib/halIds.ts).
+        const values = col === 'OpenAlex_ids' || col === 'IdHAL_i_secondaires' ? splitList(raw, /[|,;\s]+/)
           : [typeof raw === 'number' ? String(Math.round(raw)) : String(raw).trim()];
-        if (fromKept && typeof raw === 'string' && col !== 'OpenAlex_ids' && raw !== raw.trim()) issue('identifier_trimmed', 'Annuaire', [r.id], [col]);
+        if (fromKept && typeof raw === 'string' && col !== 'OpenAlex_ids' && col !== 'IdHAL_i_secondaires' && raw !== raw.trim()) issue('identifier_trimmed', 'Annuaire', [r.id], [col]);
         values.forEach((value, i) => {
           const k = `${scheme}|${value}`;
           if (seen.has(k)) return;
           seen.add(k);
-          const primary = fromKept && (col !== 'OpenAlex_ids' || i === 0) && col !== 'openalex_author_id';
+          const primary = fromKept && (col !== 'OpenAlex_ids' || i === 0) && col !== 'openalex_author_id' && col !== 'IdHAL_i_secondaires';
           if (!fromKept) issue('identifier_from_other_row', 'Annuaire', [r.id, kept.id], [col]);
           identifierRows.push({ person_id: id, scheme, value, is_primary: primary, source: `grist:${col}` });
         });

@@ -91,6 +91,14 @@ const STEPS: [string, Step][] = [
       validation: { validated: false, validationScope: [] },
     } as any, ctxOf());
   }],
+  ['secondary HAL identifiers: the primary one typed among them is dropped (IdHAL_i plan, lot 1)', (s, people) => {
+    const r = people.find((p) => p.gristRowId === 104)!;
+    return s.commands.updatePerson(104, { ...r, identifiers: { ...r.identifiers, halIdNum: '400004', halIdNumSecondary: '300002| 400004 ,200003' } } as any, ctxOf());
+  }],
+  ['secondary HAL identifiers: one made primary, the former primary becomes a secondary', (s, people) => {
+    const r = people.find((p) => p.gristRowId === 104)!;
+    return s.commands.updatePerson(104, { ...r, identifiers: { ...r.identifiers, halIdNum: '300002', halIdNumSecondary: '200003|400004' } } as any, ctxOf());
+  }],
   ['add a secondary membership to the qualified record (reuses its SECONDAIRE row, creates another)', (s, people) => {
     const r = people.find((p) => p.gristRowId === 101)!;
     return s.commands.updatePerson(101, {
@@ -246,5 +254,35 @@ describe.skipIf(!url)('PostgreSQL commands: what differs from Grist by design', 
     // One person (its fields unchanged), two memberships: a duplicate group to qualify or merge on the Doublons page.
     expect(got.people).toEqual([{ uid: 'Petit-D', last_name: 'Petit', n: '2' }]);
     expect(got.group).toEqual([[105, 'LAB2'], [got.recordId, 'zzz']]);
+  });
+
+  it('secondary HAL identifiers are idhal_i rows without is_primary, swapped with the primary one in place (IdHAL_i plan, lot 1)', async () => {
+    const directory = transformDirectory(gristDirectoryFixture());
+    const got: Record<string, unknown> = {};
+    await expect(db!.transaction().execute(async (trx) => {
+      await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
+      await loadDirectory(trx, directory.rows, directory.report);
+      const repo = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository: repo, today: TODAY });
+      const rows = async () => (await sql<{ value: string; is_primary: boolean }>`SELECT i.value, i.is_primary FROM person_identifier i
+        JOIN membership m ON m.person_id = i.person_id WHERE m.id = 104 AND i.scheme = 'idhal_i' ORDER BY i.value`.execute(trx)).rows;
+      const record = async () => (await repo.people(ALL)).items.find((p) => p.gristRowId === 104)!;
+      let r = await record();
+      await commands.updatePerson(104, { ...r, identifiers: { ...r.identifiers, halIdNum: '400004', halIdNumSecondary: '300002|400004|200003' } } as any, ctxOf());
+      got.set = await rows();
+      r = await record();
+      got.read = r.identifiers.halIdNumSecondary;
+      await commands.updatePerson(104, { ...r, identifiers: { ...r.identifiers, halIdNum: '300002', halIdNumSecondary: '200003|400004' } } as any, ctxOf());
+      got.promoted = await rows();
+      // A record without the field (site import) leaves the secondaries alone.
+      r = await record();
+      await commands.updatePerson(104, { ...r, identifiers: { ...r.identifiers, halIdNumSecondary: undefined } } as any, ctxOf());
+      got.untouched = await rows();
+      throw new Rollback();
+    })).rejects.toBeInstanceOf(Rollback);
+    expect(got.set).toEqual([{ value: '200003', is_primary: false }, { value: '300002', is_primary: false }, { value: '400004', is_primary: true }]);
+    expect(got.read).toBe('200003|300002');
+    expect(got.promoted).toEqual([{ value: '200003', is_primary: false }, { value: '300002', is_primary: true }, { value: '400004', is_primary: false }]);
+    expect(got.untouched).toEqual(got.promoted);
   });
 });

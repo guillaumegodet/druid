@@ -81,6 +81,7 @@ export const FIELD_LABELS: Record<string, MessageDescriptor> = {
   IdRef: msg`IdRef`,
   IdHAL: msg`IdHAL`,
   IdHAL_i: msg`IdHAL (numeric)`,
+  IdHAL_i_secondaires: msg`Other IdHAL (numeric)`,
   ID_SCOPUS: msg`Scopus Author ID`,
   OpenAlex_ids: msg`OpenAlex ids`,
   openalex_author_id: msg`OpenAlex author`,
