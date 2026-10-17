@@ -14,6 +14,7 @@ import { GeneralTab } from './researchers/GeneralTab';
 import { MediaPresenceSection } from './researchers/MediaPresenceSection';
 import { AffiliationHistorySection } from './researchers/AffiliationHistorySection';
 import { SuggestionsSection } from './researchers/SuggestionsSection';
+import { CallsSection } from './researchers/CallsSection';
 import { ValidationMark, LdapAccountMark } from './researchers/PresenceBadge';
 import { Presence } from '../lib/presence';
 import { HelpButton } from './HelpButton';
@@ -396,6 +397,12 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
           {hasCapability('HAS_SERVER_JOBS') && !researcher.id.startsWith('NEW-') && (
             <div className="mt-4 lg:col-span-2 lg:col-start-1 empty:hidden">
               <SuggestionsSection researcher={localResearcher} />
+            </div>
+          )}
+          {/* « Calls for proposals » (docs/plan-funding-calls.md, lot 7): hidden when the person was never matched. */}
+          {!researcher.id.startsWith('NEW-') && (
+            <div className="mt-4 lg:col-span-2 lg:col-start-1 empty:hidden">
+              <CallsSection researcher={localResearcher} />
             </div>
           )}
           {hasCapability('HAS_SERVER_JOBS') && !researcher.id.startsWith('NEW-') && (

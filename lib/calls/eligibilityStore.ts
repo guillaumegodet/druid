@@ -49,6 +49,23 @@ export interface EligibilityRuleView extends EligibilityRule {
   computedAt: string;
 }
 
+/** A call a given person may apply to, with the rule that makes them eligible (block of the record). */
+export interface PersonEligibility {
+  callId: string;
+  programmeId: string;
+  scheme: string;
+  title: string;
+  titleFr: string;
+  deadlines: string[];
+  url: string;
+  phdFrom: string;
+  phdTo: string;
+  sourceText: string;
+  verdict: EligibilityVerdict;
+  reasons: EligibilityReason[];
+  phdOn: string | null;
+}
+
 const iso = (v: unknown): string => (v instanceof Date ? v.toISOString() : String(v ?? ''));
 
 export const createEligibilityStore = (db: Kysely<DB>) => {
@@ -145,7 +162,30 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
         || (a.units.length ? 0 : 1) - (b.units.length ? 0 : 1)
         || (a.units[0] ?? '').localeCompare(b.units[0] ?? '') || a.personName.localeCompare(b.personName));
 
-  return { openCalls, people, saveCall, dropRulesExcept, rules, candidates };
+  /**
+   * Calls a person may apply to (eligible or to check), for the block of their record (lot 7): the person is the one
+   * of the directory uid, or of the directory row (membership) for a record without uid. Deadline first.
+   */
+  const ofPerson = async (key: { uid: string } | { rowId: number }): Promise<PersonEligibility[]> => {
+    const person = 'uid' in key
+      ? await db.selectFrom('person').select('id').where('uid', '=', key.uid).executeTakeFirst()
+      : await db.selectFrom('membership').select('person_id as id').where('id', '=', String(key.rowId)).executeTakeFirst();
+    if (!person) return [];
+    const rows = await db.selectFrom('call_eligibility as e')
+      .innerJoin('call_eligibility_rule as r', 'r.call_id', 'e.call_id')
+      .innerJoin('funding_call as c', 'c.call_id', 'e.call_id')
+      .select(['e.call_id', 'e.verdict', 'e.reasons', 'e.phd_on', 'r.scheme', 'r.phd_from', 'r.phd_to', 'r.source_text',
+        'c.programme_id', 'c.title', 'c.title_fr', 'c.deadlines', 'c.url'])
+      .where('e.person_id', '=', person.id)
+      .execute();
+    return rows.map((r) => ({
+      callId: r.call_id, programmeId: r.programme_id, scheme: r.scheme, title: r.title, titleFr: r.title_fr, deadlines: r.deadlines,
+      url: r.url, phdFrom: r.phd_from, phdTo: r.phd_to, sourceText: r.source_text,
+      verdict: r.verdict as EligibilityVerdict, reasons: r.reasons as EligibilityReason[], phdOn: r.phd_on,
+    })).sort((a, b) => (a.deadlines[0] ?? '9999').localeCompare(b.deadlines[0] ?? '9999') || a.title.localeCompare(b.title));
+  };
+
+  return { openCalls, people, saveCall, dropRulesExcept, rules, candidates, ofPerson };
 };
 
 export type EligibilityStore = ReturnType<typeof createEligibilityStore>;

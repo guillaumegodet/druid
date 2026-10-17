@@ -36,6 +36,18 @@ interface CandidateView {
 const SELECT_CLASS = 'px-3 py-1.5 rounded-full text-[13px] bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/15 text-ink dark:text-[#f5f2ea]';
 const fmtDate = (d: string): string => (/^\d{4}-\d{2}-\d{2}/.test(d) ? d.slice(0, 10).split('-').reverse().join('/') : d);
 
+/** Sentence of a reason of the eligibility engine (also used by the block of the researcher record). */
+export const useEligibilityReasonLabel = (): ((r: EligibilityReason) => string) => {
+  const { t } = useLingui();
+  return (r) => ({
+    'phd-in-window': t`PhD within the window of the call`,
+    'phd-year-at-bound': t`PhD date known to the year only, at a bound of the window`,
+    'phd-before-window-extension': t`PhD just before the window: eligible only with a documented extension (maternity, parental leave, illness, national service, clinical training)`,
+    'phd-before-window': t`PhD before the window`,
+    'phd-after-window': t`PhD after the window`,
+  } as Record<EligibilityReason, string>)[r] ?? r;
+};
+
 export const CallCandidates: React.FC<{
   /** Directory records of the structure shown; null = every candidate (institution view). */
   researchers: Researcher[] | null;
@@ -49,13 +61,7 @@ export const CallCandidates: React.FC<{
   const [verdict, setVerdict] = useState<EligibilityVerdict | ''>('');
   const [grade, setGrade] = useState('');
 
-  const reasonLabel = (r: EligibilityReason): string => ({
-    'phd-in-window': t`PhD within the window of the call`,
-    'phd-year-at-bound': t`PhD date known to the year only, at a bound of the window`,
-    'phd-before-window-extension': t`PhD just before the window: eligible only with a documented extension (maternity, parental leave, illness, national service, clinical training)`,
-    'phd-before-window': t`PhD before the window`,
-    'phd-after-window': t`PhD after the window`,
-  } as Record<EligibilityReason, string>)[r] ?? r;
+  const reasonLabel = useEligibilityReasonLabel();
 
   useEffect(() => {
     let cancelled = false;
