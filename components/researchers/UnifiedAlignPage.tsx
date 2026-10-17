@@ -35,8 +35,8 @@ import {
  * « identités mêlées » section are those of these pages (exported components), not copies.
  *
  * Deliberate simplifications (see plan §4):
- * - Arbitrating an ambiguous case only writes the source's target column (no secondary field
- * such as IdHAL_i on an arbitrated HAL on the AlignPage side) — see buildUnifiedUpdates.
+ * - Arbitrating an ambiguous case only writes the source's target column — except HAL (person: IdHAL_i, and its
+ * IdHAL), see buildUnifiedUpdates / halCheckedFields.
  * - No card-by-card « triage » view (IdrefAlignPage): the per-person list stands in for it.
  * - No push to Grist review: validation happens here, the Alignement_<SOURCE> tables
  * now only serve as a blacklist (decision of 2026-09-21).
@@ -64,6 +64,15 @@ const CandidateLink: React.FC<{ src: UnifiedAlignSource; c: Candidate }> = ({ sr
     <Link2 className="w-3 h-3" /> {unifiedCandidateId(src, c)}
   </a>
 );
+
+/** HAL: what a checked person will become (lib/halIds.ts) — only the primary IdHAL_i is harvested by CRISalid. */
+const HalRolePill: React.FC<{ role: 'primary' | 'secondary' | null }> = ({ role }) => {
+  const { t } = useLingui();
+  if (!role) return null;
+  return role === 'primary'
+    ? <span className="self-center shrink-0 px-2 py-0.5 rounded-full bg-ink text-white dark:bg-[#f5f2ea] dark:text-ink text-[10.5px] font-bold" title={t`Primary IdHAL_i: the one harvested by CRISalid`}><Trans>primary</Trans></span>
+    : <span className="self-center shrink-0 px-2 py-0.5 rounded-full border border-ink/20 dark:border-white/20 text-[10.5px] font-bold text-muted dark:text-[#8f897c]" title={t`Secondary IdHAL_i: kept in the record, not harvested`}><Trans>secondary</Trans></span>;
+};
 
 const isStrongScore = (f: NonNullable<PersonAlignCell['fill']>[number]) => !!(f.matchedIds?.length || f.score === 'fort');
 const isActionableCell = (c?: PersonAlignCell) =>
@@ -221,6 +230,20 @@ const SourceDrawer: React.FC<DrawerProps> = ({ src, row, cell, selected, onToggl
   const fill = cell.fill || [];
   const ambKey = unifiedAmbigKey(row.id, src);
   const chosenIds = (chosen[ambKey] || '').split('|').filter(Boolean);
+  // HAL: role of each checked person, as halCheckedFields will write it (first IdHAL_i proposal = primary).
+  const halRole = (candId: string): 'primary' | 'secondary' | null => {
+    if (src !== 'hal') return null;
+    const order: string[] = [];
+    const secondaries: string[] = [];
+    for (const f of fill) {
+      const id = unifiedCandidateId(src, f.candidate);
+      if (!selected.has(unifiedFillKey(row.id, src, id))) continue;
+      if (f.proposals.some((p) => p.field === 'IdHAL_i')) order.push(id); else secondaries.push(id);
+    }
+    order.push(...chosenIds);
+    if (order[0] === candId) return 'primary';
+    return order.includes(candId) || secondaries.includes(candId) ? 'secondary' : null;
+  };
   const actions = (c: Candidate, nb: number) => (onReject || onMixed) && (
     <span className="self-center flex items-center gap-1 shrink-0">
       {onMixed && <MixedBtn onClick={() => onMixed(c, nb)} compact />}
@@ -251,6 +274,7 @@ const SourceDrawer: React.FC<DrawerProps> = ({ src, row, cell, selected, onToggl
                       <CandidateView src={src} c={f.candidate} />
                     </div>
                   </label>
+                  <HalRolePill role={halRole(unifiedCandidateId(src, f.candidate))} />
                   {actions(f.candidate, 1)}
                 </div>
                 <div className="pl-6 mt-1 space-y-1">
@@ -278,6 +302,7 @@ const SourceDrawer: React.FC<DrawerProps> = ({ src, row, cell, selected, onToggl
                     : <input type="radio" name={`amb-${ambKey}`} checked={isChosen} onChange={() => onChoose(ambKey, candId, false)} className="mt-0.5 accent-[#1c1b19] dark:accent-[#f4d24a]" />}
                   <CandidateView src={src} c={c} />
                 </label>
+                <HalRolePill role={halRole(candId)} />
                 {actions(c, cell.ambiguous!.candidates.length)}
               </div>
             );

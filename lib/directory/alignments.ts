@@ -8,7 +8,7 @@ import type { AlignTexts } from './alignTexts';
 import type { GristRecord } from './gristMapping';
 import type { AnnuaireColumnMeta } from './annuaireWrite';
 import { toGristEpoch } from './annuaireWrite';
-import { halIdNumSearchUrl } from '../halIds';
+import { HAL_ID_NUM_SECONDARY_COLUMN, halIdNumSearchUrl, normalizeHalIdNum, parseHalIdNums, secondaryHalIdNums, sortHalIdNums } from '../halIds';
 
 // --- IdRef alignment (idref_align_cache.json cache produced by scripts/sync_idref.cjs) ---
 
@@ -102,7 +102,7 @@ export type AlignMode = 'search' | 'verify';
 
 /** Remote candidate (ORCID profile, HAL author profile or OpenAlex author profile), common shape for the UI. */
 export interface AlignCandidate {
-  /** Target identifier: ORCID (0000-…), idHal_s (slug) or OpenAlex A-id. */
+  /** Target identifier: ORCID (0000-…), HAL person (idHal_i), OpenAlex A-id or Scopus Author ID. */
   id: string;
   url: string;
   fullName: string;
@@ -122,7 +122,7 @@ export interface AlignCandidate {
 }
 
 export interface AlignFieldProposal {
-  field: 'ORCID' | 'ID_SCOPUS' | 'IdHAL' | 'IdHAL_i' | 'IdRef' | 'OpenAlex_ids';
+  field: 'ORCID' | 'ID_SCOPUS' | 'IdHAL' | 'IdHAL_i' | 'IdHAL_i_secondaires' | 'IdRef' | 'OpenAlex_ids';
   label: string;
   after: string;
 }
@@ -152,7 +152,8 @@ export interface AlignDiff {
 export const ALIGN_SOURCE_META: Record<AlignSource, { label: string; table: string; idColumn: string; targetField: 'ORCID' | 'IdHAL' | 'OpenAlex_ids' | 'ID_SCOPUS'; multi?: boolean; cache: string; url: (id: string) => string }> = {
   orcid: { label: 'ORCID', table: 'Alignement_ORCID', idColumn: 'ORCID_candidat', targetField: 'ORCID', cache: '/orcid_align_cache.json', url: (id) => `https://orcid.org/${id}` },
   // A HAL candidate is a person, IdHAL or not: its id is the idHal_i (blacklist key, decision D4 of docs/plan-alignement-idhal-i.md).
-  hal: { label: 'HAL', table: 'Alignement_HAL', idColumn: 'IdHAL_i_candidat', targetField: 'IdHAL', cache: '/hal_align_cache.json', url: (id) => halIdNumSearchUrl(id) },   // not cv.hal.science: only authors who created a HAL CV have a page there
+  // Multi-valued: one researcher, several HAL persons — the first checked one is the primary IdHAL_i, the others secondary.
+  hal: { label: 'HAL', table: 'Alignement_HAL', idColumn: 'IdHAL_i_candidat', targetField: 'IdHAL', multi: true, cache: '/hal_align_cache.json', url: (id) => halIdNumSearchUrl(id) },   // not cv.hal.science: only authors who created a HAL CV have a page there
   openalex: { label: 'OpenAlex', table: 'Alignement_OpenAlex', idColumn: 'OpenAlex_candidat', targetField: 'OpenAlex_ids', multi: true, cache: '/openalex_align_cache.json', url: (id) => `https://openalex.org/${id}` },
   scopus: { label: 'Scopus', table: 'Alignement_Scopus', idColumn: 'Scopus_candidat', targetField: 'ID_SCOPUS', cache: '/scopus_align_cache.json', url: (id) => `https://www.scopus.com/authid/detail.uri?authorId=${id}` },
 };
@@ -236,7 +237,7 @@ export interface UnifiedAlignDiff {
 const UNIFIED_EXISTING_READERS: Record<UnifiedAlignSource, (f: any) => string[]> = {
   idref: (f) => (String(f['IdRef'] || '').trim() ? [String(f['IdRef']).trim()] : []),
   orcid: (f) => (String(f['ORCID'] || '').trim() ? [String(f['ORCID']).trim()] : []),
-  hal: (f) => (String(f['IdHAL'] || '').trim() ? [String(f['IdHAL']).trim()] : []),
+  hal: (f) => [...new Set([String(f['IdHAL'] || '').trim(), normalizeHalIdNum(f['IdHAL_i']), ...parseHalIdNums(f['IdHAL_i_secondaires'])].filter(Boolean))],
   openalex: (f) => parseOpenalexIds(f['OpenAlex_ids']),
   scopus: (f) => (scopusIdOf(f['ID_SCOPUS']) ? [scopusIdOf(f['ID_SCOPUS'])] : []),
 };
@@ -386,9 +387,8 @@ export interface PersonAlignUpdate {
 /**
  * Groups by Grist record the checked cells (`selected`, strong candidates) and arbitrated
  * ones (`chosen`, ambiguous) into `PersonAlignUpdate[]`. Deliberate simplification for the
- * arbitration of an ambiguous case: only writes the source's target column (`unifiedTargetField`) —
- * unlike `AlignPage` (e.g. an arbitrated HAL also writes `IdHAL_i` when known), no secondary field
- * here (see plan §4 « limites assumées »; to revisit if it turns out to be missing in practice).
+ * arbitration of an ambiguous case: only writes the source's target column (`unifiedTargetField`), no
+ * secondary field (see plan §4 « limites assumées ») — except HAL, whose persons are merged by halCheckedFields.
  */
 /** Decision on an IdRef name mismatch (verify mode): confirm = same person (writes
  * IdRef_nom_valide + the additions from the record), detach = wrong IdRef (clears the column). */
@@ -427,6 +427,7 @@ export function buildUnifiedUpdates(
     for (const src of diff.sources) {
       const cell = row.sources[src];
       if (!cell) continue;
+      if (src === 'hal') { addFields(row, src, halCheckedFields(row, cell, selected, chosen)); continue; }
       if (cell.status === 'strong') {
         const fields: Record<string, string> = {};
         for (const f of cell.fill || []) {
@@ -454,6 +455,64 @@ export function buildUnifiedUpdates(
     }
   }
   return [...byRow.values()];
+}
+
+/**
+ * HAL fields of the persons checked for one record (docs/plan-alignement-idhal-i.md, lot 3), in display order: strong
+ * persons (primary first, D1), then the arbitrated ones. The first person with an IdHAL_i proposal gives every field
+ * (IdHAL_i, its IdHAL, ORCID, IdRef); the next ones only become secondary IdHAL_i — their IdHAL is another person's.
+ * Secondaries proposed by the verification are added as they are. The current record is taken into account at write
+ * time (halPatchFields).
+ */
+export function halCheckedFields(row: PersonAlignRow, cell: PersonAlignCell, selected: ReadonlySet<string>, chosen: Readonly<Record<string, string>>): Record<string, string> {
+  const checked: (AlignFieldProposal | IdrefFieldProposal)[][] = [];
+  for (const f of cell.fill || []) {
+    if (selected.has(unifiedFillKey(row.id, 'hal', unifiedCandidateId('hal', f.candidate)))) checked.push(f.proposals);
+  }
+  const chosenIds = (chosen[unifiedAmbigKey(row.id, 'hal')] || '').split('|').filter(Boolean);
+  for (const c of (cell.ambiguous?.candidates || []) as AlignCandidate[]) {
+    if (!chosenIds.includes(c.id)) continue;
+    checked.push([{ field: 'IdHAL_i', label: 'IdHAL_i', after: c.id }, ...(c.ids.idhal ? [{ field: 'IdHAL' as const, label: 'IdHAL', after: c.ids.idhal }] : [])]);
+  }
+  const fields: Record<string, string> = {};
+  const secondaries: string[] = [];
+  for (const proposals of checked) {
+    const own = proposals.find((p) => p.field === 'IdHAL_i');
+    if (own && fields.IdHAL_i && fields.IdHAL_i !== own.after) { secondaries.push(own.after); continue; }
+    for (const p of proposals) {
+      if (p.field === 'IdHAL_i_secondaires') secondaries.push(p.after);
+      else if (!fields[p.field]) fields[p.field] = p.after;
+    }
+  }
+  const list = secondaryHalIdNums(fields.IdHAL_i, secondaries.join('|'));
+  if (list.length) fields[HAL_ID_NUM_SECONDARY_COLUMN] = list.join('|');
+  return fields;
+}
+
+/**
+ * HAL fields of a record checked in the unified view, against its current values — never an overwrite: a primary
+ * IdHAL_i already there (written in the meantime) keeps its place and the checked one becomes secondary (without its
+ * IdHAL); an IdHAL already there is kept; the secondaries are added to the current ones. Without the column (Grist
+ * document that does not have it yet) the secondaries are left out.
+ */
+export function halPatchFields(cur: Record<string, any>, want: Record<string, string>, cols: AnnuaireColumnMeta[]): Record<string, string> {
+  const out: Record<string, string> = { ...want };
+  const curPrimary = normalizeHalIdNum(cur['IdHAL_i']);
+  const curSecondaries = parseHalIdNums(cur[HAL_ID_NUM_SECONDARY_COLUMN]);
+  const secondaries = parseHalIdNums(want[HAL_ID_NUM_SECONDARY_COLUMN]);
+  const wantPrimary = normalizeHalIdNum(want['IdHAL_i']);
+  if (wantPrimary && curPrimary) {
+    if (wantPrimary !== curPrimary) { secondaries.push(wantPrimary); delete out.IdHAL; }
+    delete out.IdHAL_i;
+  }
+  if (out.IdHAL && String(cur['IdHAL'] || '').trim()) delete out.IdHAL;
+  const primary = out.IdHAL_i || curPrimary;
+  const added = secondaries.filter((s) => s !== primary && !curSecondaries.includes(s));
+  delete out[HAL_ID_NUM_SECONDARY_COLUMN];
+  if (added.length && cols.some((c) => c.id === HAL_ID_NUM_SECONDARY_COLUMN)) {
+    out[HAL_ID_NUM_SECONDARY_COLUMN] = sortHalIdNums([...curSecondaries.filter((s) => s !== primary), ...added]).join('|');
+  }
+  return out;
 }
 
 /** Grist table for the collaborative review of IdRef suggestions (created on the fly by pushIdrefReview). */
@@ -1186,6 +1245,20 @@ export function computeAlignDiffFrom(source: AlignSource, mode: AlignMode, input
       const cands: any[] = (entry.candidates || []).filter((c: any) => !rejected.has(`${key}::${normId(candId(c))}`));
       if (entry.status === 'error') { conflits.push({ id, uid, displayName, labo, group, reason: texts.searchError(), detail: texts.apiUnreachable() }); continue; }
       if (!cands.length) { nonTrouves.push({ uid, displayName, labo, group }); continue; }
+      // HAL: every strong person of the researcher (primary first, docs/plan-alignement-idhal-i.md D1) is checkable — one
+      // row per person, id `G-<row>#<idHal_i>` like OpenAlex; the other candidates are arbitrated with checkboxes.
+      if (source === 'hal') {
+        const strongIds = entry.status === 'found' ? [String(entry.best), ...(entry.others || []).map(String)] : [];
+        for (const raw of strongIds.map((sid) => cands.find((c) => candId(c) === sid)).filter(Boolean)) {
+          const cand = toCand(raw);
+          const { proposals, conflicts, matched } = compare(f, cand, true);
+          if (proposals.length) aRenseigner.push({ id: `${id}#${cand.id}`, uid, displayName, labo, group, candidate: cand, proposals, matchedIds: matched, score: cand.score });
+          if (conflicts.length) conflits.push({ id, uid, displayName, labo, group, reason: texts.identifierMismatch(), detail: conflicts.join(' · '), candidate: cand });
+        }
+        const rest = cands.filter((c) => !strongIds.includes(candId(c)));
+        if (rest.length) ambigus.push({ id, uid, displayName, labo, group, candidates: rest.map(toCand) });
+        continue;
+      }
       const bestRaw = entry.status === 'found' ? cands.find((c) => candId(c) === String(entry.best)) : null;
       if (bestRaw) {
         const cand = toCand(bestRaw);
@@ -1208,6 +1281,16 @@ export function computeAlignDiffFrom(source: AlignSource, mode: AlignMode, input
       }
       if (entry.status === 'error') { conflits.push({ id, uid, displayName, labo, group, reason: texts.verificationError(), detail: texts.apiUnreachable() }); continue; }
       if (entry.status !== 'checked' || !entry.candidate) continue;
+      // HAL: other persons of the researcher proposed by the script (decision D6) → secondary IdHAL_i, one row each.
+      if (source === 'hal') {
+        const known = new Set([normalizeHalIdNum(f['IdHAL_i']), ...parseHalIdNums(f['IdHAL_i_secondaires'])]);
+        for (const s of entry.secondaries || []) {
+          const sec = toCand(s);
+          if (!sec.id || known.has(sec.id) || rejected.has(`${key}::${sec.id}`)) continue;
+          aEnrichir.push({ id: `${id}#${sec.id}`, uid, displayName, labo, group, candidate: sec,
+            proposals: [{ field: 'IdHAL_i_secondaires', label: HAL_ID_NUM_SECONDARY_COLUMN, after: sec.id }], matchedIds: sec.matchedIds, score: sec.score });
+        }
+      }
       const cand = toCand({ ...entry.candidate, score: undefined });
       if (entry.affiliation === 'aucune') sansAffiliation++;
       // Scopus merged the profile into another one: the Annuaire still holds the old id (never rewritten silently).
@@ -1291,6 +1374,7 @@ export function unifiedUpdatePatches(updates: PersonAlignUpdate[], byId: Record<
         const add = wantIds.filter((id) => !curIds.includes(id));
         srcFields = add.length ? { ...srcFields, [target]: [...curIds, ...add].join('|') } : {};
       }
+      if (src === 'hal') srcFields = halPatchFields(cur, srcFields, cols);
       if (!Object.keys(srcFields).length) continue;   // nothing new for this source (e.g. OpenAlex already up to date in the meantime)
       Object.assign(fields, srcFields);
       labels.push(label);
