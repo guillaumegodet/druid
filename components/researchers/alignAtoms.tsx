@@ -8,7 +8,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
  * @description Rendering atoms shared by the alignment pages (unified identifier alignment,
  * LDAP alignment, duplicates): stat cards, buttons, candidate lines, arbitration card, mixed
  * identities section. Extracted from the former per-source pages (IdrefAlignPage, AlignPage)
- * when those were removed on 2026-09-23 (docs/plan-alignement-unifie.md, lot 7).
+ * when those were removed on 2026-09-23 (docs/archive/plan-alignement-unifie.md, lot 7).
  */
 
 export type Decision = 'confirm' | 'detach' | 'ignore';

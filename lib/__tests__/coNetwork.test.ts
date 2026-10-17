@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 
-// Inter-lab co-authorship graph (scripts/lib/co_network.cjs, docs/plan-reseau-inter-labos.md lots 2 and 4).
+// Inter-lab co-authorship graph (scripts/lib/co_network.cjs, docs/archive/plan-reseau-inter-labos.md lots 2 and 4).
 const { buildInterLabNetwork, commonPublications, OTHER_LABS_CATEGORY } = createRequire(import.meta.url)(
   '../../scripts/lib/co_network.cjs',
 );

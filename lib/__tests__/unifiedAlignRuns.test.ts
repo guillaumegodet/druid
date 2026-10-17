@@ -9,7 +9,7 @@ const jsonResponse = (body: any, ok = true, status = ok ? 200 : 500) => ({
   ok, status, json: async () => body,
 });
 
-describe('runUnifiedAlign (docs/plan-alignement-unifie.md, lot 1)', () => {
+describe('runUnifiedAlign (docs/archive/plan-alignement-unifie.md, lot 1)', () => {
   let calls: string[];
   beforeEach(() => { calls = []; });
 

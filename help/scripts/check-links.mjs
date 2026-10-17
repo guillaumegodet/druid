@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Broken-link check of the built help centre (plan-documentation-utilisateur.md, lot 7): every
+// Broken-link check of the built help centre (docs/archive/plan-documentation-utilisateur.md, lot 7): every
 // internal link (`href="/…"` or `href="#…"`) of every page in dist/ must point to an existing page
 // and, when it has one, to an existing anchor. Runs after `astro build` (npm run build), so a broken
 // link fails the Cloudflare build instead of reaching users. External links are not checked.
@@ -30,7 +30,7 @@ const targetFile = (sitePath) => {
 	return candidates.find((c) => existsSync(c) && statSync(c).isFile()) ?? null;
 };
 
-// Untranslated page served under /en/ with French content (Starlight fallback, docs/plan-aide-anglais.md):
+// Untranslated page served under /en/ with French content (Starlight fallback, docs/archive/plan-aide-anglais.md):
 // its anchors are the French ones, so an English link to one of its sections is only checkable once
 // the page is translated. Not an error while the translation is in progress; counted in the summary.
 const FALLBACK_NOTICE = 'This content is not available in your language yet.';

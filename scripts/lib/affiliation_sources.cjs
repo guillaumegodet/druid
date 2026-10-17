@@ -1,5 +1,5 @@
 /**
- * affiliation_sources.cjs — readers of the career-path sources (docs/plan-parcours-affiliations.md, lot 1).
+ * affiliation_sources.cjs — readers of the career-path sources (docs/archive/plan-parcours-affiliations.md, lot 1).
  * Each reader returns the normalized shapes of scripts/lib/affiliation_history.cjs, or throws (the job
  * then leaves the person's previous entry untouched: an entry is only rewritten from a complete fetch).
  *
@@ -233,7 +233,7 @@ async function orcidSection(orcid, section, key, kind) {
   return out;
 }
 /** Types of the external identifiers linked to an ORCID (« Scopus Author ID », « ResearcherID »…):
- * the « link your identifiers » suggestion of the record (docs/plan-parcours-affiliations.md, lot 5). */
+ * the « link your identifiers » suggestion of the record (docs/archive/plan-parcours-affiliations.md, lot 5). */
 async function orcidExternalTypes(orcid) {
   if (!orcid) return [];
   let d;

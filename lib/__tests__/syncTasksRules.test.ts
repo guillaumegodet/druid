@@ -10,7 +10,7 @@ const cand = (extra: Record<string, unknown>) => ({ nameMatch: 'exact', score: '
 const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours' | 'etablissements' | 'theses', unknown>>) =>
   ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, parcours: {}, etablissements: {}, theses: {}, ...over });
 
-describe('scripts/sync_tasks.cjs rules (docs/plan-chantiers-taches.md, lot 5)', () => {
+describe('scripts/sync_tasks.cjs rules (docs/archive/plan-chantiers-taches.md, lot 5)', () => {
   it('default rules exclude the ABES ones (handled by the batch export)', () => {
     expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these']);
     expect(Object.keys(RULES)).toContain('abes_orcid');
@@ -186,7 +186,7 @@ describe('annuaire_ids_partages — records with different uid sharing an export
     expect(out[0].description).toContain('ORCID 0000-0001-0000-0002 (faure-a, roux-m)');
   });
 
-  describe('uid_ldap_disponible — ext_ record whose staff number is an LDAP account (docs/plan-statut-employeur-ldap.md, lot 2)', () => {
+  describe('uid_ldap_disponible — ext_ record whose staff number is an LDAP account (docs/archive/plan-statut-employeur-ldap.md, lot 2)', () => {
     const HR = 'N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_';
     const ldap = {
       'leroux-c': { etat: 'N', categorie: 'CNRS-INSERM', empId: '12345', birthDate: '1980-01-15' },
@@ -249,7 +249,7 @@ describe('annuaire_ids_partages — records with different uid sharing an export
     });
   });
 
-  describe('career path rules (docs/plan-parcours-affiliations.md, lot 4)', () => {
+  describe('career path rules (docs/archive/plan-parcours-affiliations.md, lot 4)', () => {
     const line = (signals: unknown[]) => ({ computedAt: '2026-09-30', signals });
     const confirmed = { type: 'depart_confirme', date: '2021-08', sources: ['orcid', 'publications'], destination: 'Université Beta' };
     const observed = { type: 'depart_observe', date: '2020', count: 4, destination: 'Université Beta' };

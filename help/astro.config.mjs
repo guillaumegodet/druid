@@ -16,7 +16,7 @@ export default defineConfig({
 				"Centre d'aide de Druid : annuaire des personnels et des structures de recherche, alignement des identifiants, tableau de bord bibliométrique.",
 			logo: { src: './src/assets/druid-logo.png', alt: 'Druid' },
 			favicon: '/favicon.png',
-			// French at the root, English under /en/ (docs/plan-aide-anglais.md): translated pages live
+			// French at the root, English under /en/ (docs/archive/plan-aide-anglais.md): translated pages live
 			// under src/content/docs/en/ with the same file paths; untranslated ones fall back to French.
 			defaultLocale: 'root',
 			locales: {

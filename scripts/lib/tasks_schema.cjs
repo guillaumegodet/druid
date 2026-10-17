@@ -1,6 +1,6 @@
 /**
  * tasks_schema.cjs — Grist schema of the « À traiter › Tâches » feature
- * (docs/plan-chantiers-taches.md, lot 1): tables `Taches` (one row per task to
+ * (docs/archive/plan-chantiers-taches.md, lot 1): tables `Taches` (one row per task to
  * carry out outside Druid — IdRef, ORCID, HAL, OpenAlex, Scopus, HR events) and
  * `Taches_evenements` (append-only log, the thread of a task).
  *
@@ -56,7 +56,7 @@ const TASK_TYPES = {
   openalex_deux_auteurs: { base: 'OpenAlex', canal: 'email_chercheur', email: true },
   openalex_affiliation: { base: 'OpenAlex', canal: 'interne', email: false },
   scopus_deux_ids: { base: 'Scopus', canal: 'support_externe', email: true },
-  // « Suggestions de l'établissement » of the record (docs/plan-parcours-affiliations.md, lot 5).
+  // « Suggestions de l'établissement » of the record (docs/archive/plan-parcours-affiliations.md, lot 5).
   orcid_ajouter_poste: { base: 'ORCID', canal: 'email_chercheur', email: true },
   orcid_relier_scopus: { base: 'ORCID', canal: 'email_chercheur', email: true },
   scopus_profil_errone: { base: 'Scopus', canal: 'email_chercheur', email: true },
@@ -68,13 +68,13 @@ const TASK_TYPES = {
   annuaire_doublon: { base: 'Annuaire', canal: 'interne', email: false },
   annuaire_doublon_a_verifier: { base: 'Annuaire', canal: 'interne', email: false },
   annuaire_identifiant_partage: { base: 'Annuaire', canal: 'interne', email: false },
-  // Career path (docs/plan-parcours-affiliations.md, lot 4): signals of scripts/sync_affiliation_history.cjs.
+  // Career path (docs/archive/plan-parcours-affiliations.md, lot 4): signals of scripts/sync_affiliation_history.cjs.
   parcours_depart_confirme: { base: 'Annuaire', canal: 'interne', email: false },
   parcours_depart_declare: { base: 'Annuaire', canal: 'interne', email: false },
   parcours_depart_observe: { base: 'Annuaire', canal: 'interne', email: false },
   parcours_statut_incoherent: { base: 'Annuaire', canal: 'interne', email: false },
   parcours_identifiant_suspect: { base: 'Annuaire', canal: 'interne', email: false },
-  // ext_ record of a person who has an LDAP account (docs/plan-statut-employeur-ldap.md, lot 2), and the
+  // ext_ record of a person who has an LDAP account (docs/archive/plan-statut-employeur-ldap.md, lot 2), and the
   // SoVisu+ follow-up once the record has switched to the LDAP uid.
   annuaire_uid_ldap: { base: 'Annuaire', canal: 'interne', email: false },
   sovisu_ancienne_personne: { base: 'Annuaire', canal: 'interne', email: false },
@@ -232,7 +232,7 @@ function applyTransition(fields, to, { author, nowIso = new Date().toISOString()
 }
 
 /**
- * ABES export (docs/plan-chantiers-taches.md, lot 6): open `lot_abes` tasks covered by the rows
+ * ABES export (docs/archive/plan-chantiers-taches.md, lot 6): open `lot_abes` tasks covered by the rows
  * just marked as sent are closed as done. `items` = [{ rowId, uid, types }] where `types` lists
  * the task types an exported row covers (lib/abesExport.ts abesTaskTypes). A task matches on the
  * Annuaire row id first, then on uid_dyna. Returns the Taches patches and the log events.

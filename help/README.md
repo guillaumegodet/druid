@@ -2,7 +2,7 @@
 
 Site statique [Starlight](https://starlight.astro.build) (Astro), indépendant de l'application :
 son propre `package.json`, exclu de l'image Docker (`.dockerignore`), de `tsc` et de Lingui.
-Plan : `../docs/plan-documentation-utilisateur.md` ; profils, capacités, règles métier et
+Plan : `../docs/archive/plan-documentation-utilisateur.md` ; profils, capacités, règles métier et
 glossaire à exploiter : `../docs/documentation-utilisateur-inventaire.md`.
 
 ## Arborescence

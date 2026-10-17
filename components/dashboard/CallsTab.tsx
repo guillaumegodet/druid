@@ -1,5 +1,5 @@
 // « Calls for proposals » tab of the dashboard (druid-internal docs/plan-funding-calls.md, lot 1; formerly the
-// « European calls » of docs/plan-eu-calls.md): the calls of the funding programmes (Horizon Europe topics first)
+// « European calls » of docs/archive/plan-eu-calls.md): the calls of the funding programmes (Horizon Europe topics first)
 // matched to the researchers of the structure by the engines of crisalid-agents (imported by scripts/import_calls.ts),
 // in two views — by call, by researcher — with the opinion of the users on each pair, filtered by funder category,
 // programme and subset (cluster, axis…). The server already limits the matches to the scope of the user; the structure

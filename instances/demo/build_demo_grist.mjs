@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Creates or refreshes the Grist doc of a fictitious public instance: the demo
-// (docs/plan-instance-demo-cloudflare.md, lot A3) or demo-2 (docs/plan-architecture-multi-instances.md,
+// (docs/archive/plan-instance-demo-cloudflare.md, lot A3) or demo-2 (docs/plan-architecture-multi-instances.md,
 // lot 6 c), chosen with --instance (default demo); its data comes from instances/<slug>/demo-data.mjs.
 //
 //  - tables and columns: schema of the Centrale doc (instances/demo/schema.json), so the same

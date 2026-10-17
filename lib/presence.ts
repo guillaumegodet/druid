@@ -1,7 +1,7 @@
 /**
  * @file presence.ts
  * @description The three axes that replace the INTERNE / EXTERNE / DEPART / PARTI status
- * (docs/plan-statut-employeur-ldap.md, decisions of 2026-10-07):
+ * (docs/archive/plan-statut-employeur-ldap.md, decisions of 2026-10-07):
  *
  * - **employer** — who pays: the home institution, another one, or not filled in (Grist `Employeur`);
  * - **presence** — is the person still in the unit: PRESENT, DEPART (end announced), PARTI;
@@ -66,7 +66,7 @@ export interface PresenceInput {
 }
 
 /**
- * Presence in the unit. Order (docs/plan-statut-employeur-ldap.md § 2):
+ * Presence in the unit. Order (docs/archive/plan-statut-employeur-ldap.md § 2):
  * 1. employment end AND membership end past ⇒ PARTI, above everything (rule of 2026-09-22);
  * 2. validation by a reliable list ⇒ its value;
  * 3. retired without emeritus status ⇒ PARTI;

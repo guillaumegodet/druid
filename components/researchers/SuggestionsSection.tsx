@@ -9,7 +9,7 @@ import { buildTaskEmail, mailtoUrl } from '../../lib/taskEmailTemplates';
 import { copyToClipboard } from '../../lib/clipboard';
 import { getUserInfo } from '../../lib/auth';
 
-// « Suggestions de l'établissement » of the researcher record (docs/plan-parcours-affiliations.md, lot 5):
+// « Suggestions de l'établissement » of the researcher record (docs/archive/plan-parcours-affiliations.md, lot 5):
 // at most five concrete actions on the researcher's identifiers, computed server-side from the record, the
 // career path and the alignment caches. Decisions S1-S4: the team sees « Prepare the email / Create a
 // task / Hide »; the researcher reading their own record sees the same suggestions in the second person,

@@ -18,7 +18,7 @@ import { hasCapability } from '../../lib/auth';
 import { doiUrl } from '../../lib/doi';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 
-// URL parameters of the inter-lab mode (shareable link, docs/plan-reseau-inter-labos.md lot 3).
+// URL parameters of the inter-lab mode (shareable link, docs/archive/plan-reseau-inter-labos.md lot 3).
 const URL_KEYS = ['labs', 'others', 'cross', 'large'] as const;
 const readUrlState = () => {
   const p = new URLSearchParams(window.location.search);
@@ -44,7 +44,7 @@ const writeUrlState = (s: { labs: string[]; aggregateOthers: boolean; crossOnly:
 /**
  * « Réseau » tab — co-authorships of the lab, with an adjustable publication threshold.
  * Inter-lab mode (HAS_NETWORK_API): other labs of the university can be added, from the
- * university-wide network computed by the server (/api/network, plan-reseau-inter-labos.md).
+ * university-wide network computed by the server (/api/network, docs/archive/plan-reseau-inter-labos.md).
  */
 export const NetworkTab: React.FC<{ dataset: DashboardDataset; range: YearRange; slug: string | null }> = ({
   dataset,

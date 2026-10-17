@@ -1,5 +1,5 @@
 -- migrate:up
--- « European calls » tab (druid-internal docs/plan-eu-calls.md, lot 2): Horizon Europe work programme topics
+-- « European calls » tab (druid-internal docs/archive/plan-eu-calls.md, lot 2): Horizon Europe work programme topics
 -- matched to the researchers of the directory by the Topic-to-Researcher Match batch of CRISalid agents
 -- (crisalid-agents trm/, one JSON report per cluster), imported by scripts/import_trm.ts. Druid adds the feedback of
 -- its users on each pair, which goes back to the batch for its evaluation.

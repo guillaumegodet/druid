@@ -31,7 +31,7 @@ interface Props {
 }
 
 /**
- * « À traiter » section of the Personnel tab (docs/plan-chantiers-taches.md, lot 2): what is
+ * « À traiter » section of the Personnel tab (docs/archive/plan-chantiers-taches.md, lot 2): what is
  * left to do: the uid_dyna duplicates (DuplicatesPage, unchanged), the tasks to carry out
  * outside Druid (TasksPage) and the directory-import conflicts (ImportConflictsPage, when an
  * `Arbitrage_*` table exists). The read-only « OpenAlex affiliations » tab (lot 6) was dropped on

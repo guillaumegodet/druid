@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Guard before publishing this repository (docs/plan-instance-demo-cloudflare.md, lot B2): scans
+// Guard before publishing this repository (docs/archive/plan-instance-demo-cloudflare.md, lot B2): scans
 // the files git tracks or would add (untracked, not ignored), minus scripts/publication/public-exclude.txt, for what must never reach
 // the public repository — personal data of researchers and internal infrastructure details.
 //

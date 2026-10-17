@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Fictitious alignment caches of a fictitious instance — the demo (docs/plan-instance-demo-cloudflare.md,
+// Fictitious alignment caches of a fictitious instance — the demo (docs/archive/plan-instance-demo-cloudflare.md,
 // lot A4) or demo-2 (--instance demo-2, docs/plan-architecture-multi-instances.md, lot 6) — read by the unified view « Alignement des identifiants chercheurs » in search mode:
 //   demo-idref_align_cache.json           IdRef   (computeIdrefDiff: mode 'search', generic pipeline —
 //                                         the demo has no Qualinka engine, HAS_QUALINKA false)

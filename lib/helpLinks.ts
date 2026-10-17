@@ -2,13 +2,13 @@
  * @file helpLinks.ts
  * @description Context help: which page of the user help centre (help/, published on the
  * « druid-aide » Cloudflare Worker) answers each Druid view, dashboard tab, « À traiter » tab
- * and Administration tab (docs/plan-documentation-utilisateur.md, lot 4).
+ * and Administration tab (docs/archive/plan-documentation-utilisateur.md, lot 4).
  *
  * The tables are `Record`s keyed by the view / tab unions: adding a view or a tab without a
  * help link fails the type check. lib/__tests__/helpLinks.test.ts checks that every target
  * page (and anchor) exists in help/src/content/docs, in French and in English.
  *
- * Paths and anchors are the French ones. The English help (docs/plan-aide-anglais.md) lives under
+ * Paths and anchors are the French ones. The English help (docs/archive/plan-aide-anglais.md) lives under
  * /en/ with the same paths but translated headings: helpUrl() maps the anchors through EN_ANCHORS.
  */
 import { ViewState } from '../types';

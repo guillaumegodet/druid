@@ -64,7 +64,7 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
   onImportValidation, onImportSite, onMergeResearchers, onOpenStaffDashboard,
 }) => {
   const { t } = useLingui();
-  // Career-path signals (docs/plan-parcours-affiliations.md, lot 4): server job only; a failure just
+  // Career-path signals (docs/archive/plan-parcours-affiliations.md, lot 4): server job only; a failure just
   // hides the « Career path » filter.
   const [parcoursSignals, setParcoursSignals] = useState<AhSignalsByKey | null>(null);
   useEffect(() => {

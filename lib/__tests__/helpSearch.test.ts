@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 
-// « Aide Druid » assistant retrieval (scripts/lib/help_search.cjs, plan-documentation-utilisateur.md lot 8),
+// « Aide Druid » assistant retrieval (scripts/lib/help_search.cjs, docs/archive/plan-documentation-utilisateur.md lot 8),
 // run against the real help centre pages: a question from the reference set must bring its page first.
 const { loadHelpIndex, searchHelp, buildHelpSystemPrompt, tokenize } = createRequire(import.meta.url)(
   '../../scripts/lib/help_search.cjs',

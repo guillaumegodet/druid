@@ -168,7 +168,7 @@ describe('planAffiliationRows', () => {
   });
 });
 
-describe('pivotUnifiedAlignDiffs (docs/plan-alignement-unifie.md, lot 0)', () => {
+describe('pivotUnifiedAlignDiffs (docs/archive/plan-alignement-unifie.md, lot 0)', () => {
   // Minimal Annuaire record (same keys as rec.fields on the Grist side).
   const rec = (id: number, fields: Record<string, any> = {}) => ({ id, fields: { Nom: 'DUPONT', Prenom: 'Jean', uid_dyna: `u${id}`, ...fields } });
 
@@ -284,7 +284,7 @@ describe('pivotUnifiedAlignDiffs (docs/plan-alignement-unifie.md, lot 0)', () =>
   });
 });
 
-describe('buildUnifiedUpdates (docs/plan-alignement-unifie.md, lot 2)', () => {
+describe('buildUnifiedUpdates (docs/archive/plan-alignement-unifie.md, lot 2)', () => {
   const row = (over: Partial<PersonAlignRow> = {}): PersonAlignRow => ({
     id: 'G-1', uid: 'u1', displayName: 'DUPONT Jean', labo: 'GEPEA', ...over, sources: over.sources || {},
   });

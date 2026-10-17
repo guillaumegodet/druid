@@ -1,11 +1,11 @@
 /**
  * help_search.cjs — Retrieval over the user help centre for the « Aide Druid » assistant
- * (docs/plan-documentation-utilisateur.md, lot 8).
+ * (docs/archive/plan-documentation-utilisateur.md, lot 8).
  *
  * The help pages (help/src/content/docs/**.md|.mdx, copied into the Docker image) are split into
  * sections (one per `##` heading, `###` kept inside), indexed with BM25 over accent-folded tokens,
  * and the best sections of a question are handed to the LLM as the only allowed source. One index
- * per language: French pages at the root, English ones under en/ (docs/plan-aide-anglais.md).
+ * per language: French pages at the root, English ones under en/ (docs/archive/plan-aide-anglais.md).
  * Pure apart from the file reads of loadHelpIndex(): no network, testable offline.
  */
 const fs = require('fs');

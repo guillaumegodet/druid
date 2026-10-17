@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * One-shot codemod (docs/plan-langue-source-en.md, lot A1): switch the Lingui source
+ * One-shot codemod (docs/archive/plan-langue-source-en.md, lot A1): switch the Lingui source
  * locale from French to English by rewriting every macro call site with the English
  * translation already present in locales/en/messages.po.
  *

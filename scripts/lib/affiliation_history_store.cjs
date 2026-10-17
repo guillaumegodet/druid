@@ -1,5 +1,5 @@
 /**
- * affiliation_history_store.cjs — storage of the career path (docs/plan-parcours-affiliations.md, lots 1-2),
+ * affiliation_history_store.cjs — storage of the career path (docs/archive/plan-parcours-affiliations.md, lots 1-2),
  * shared by the job (scripts/sync_affiliation_history.cjs) and the API (server.cjs).
  *
  * One directory (cache-data/affiliation_history in Docker, bind-mounted as a whole):

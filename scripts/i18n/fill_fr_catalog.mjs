@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * One-shot helper (docs/plan-langue-source-en.md, lot A1): after switching the Lingui source
+ * One-shot helper (docs/archive/plan-langue-source-en.md, lot A1): after switching the Lingui source
  * locale to English, fill locales/fr/messages.po with the former French source strings, using
  * the {english msgid (with "context\u0004" prefix when any): french msgid} mapping written by
  * switch_source_locale.mjs. Usage: node scripts/i18n/fill_fr_catalog.mjs mapping.json

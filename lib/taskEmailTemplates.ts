@@ -1,6 +1,6 @@
 /**
  * Ready-to-copy researcher emails for the « À traiter › Tâches » tab
- * (docs/plan-chantiers-taches.md, lot 3). One French template per task type flagged
+ * (docs/archive/plan-chantiers-taches.md, lot 3). One French template per task type flagged
  * `email: true` in lib/tasks.ts (the email goes to a Nantes Université researcher, like the
  * newsletter review request of NewsletterPanel.validationMailto — the text is content, not
  * UI, hence French strings outside Lingui). Nothing is sent by Druid: the text is copied or
@@ -125,7 +125,7 @@ const TEMPLATES: Partial<Record<TaskType, (c: TaskEmailContext) => TaskEmail>> =
       '', closing(c),
     ].join('\n'),
   }),
-  // « Suggestions de l'établissement » of the record (docs/plan-parcours-affiliations.md, lot 5).
+  // « Suggestions de l'établissement » of the record (docs/archive/plan-parcours-affiliations.md, lot 5).
   orcid_ajouter_poste: (c) => ({
     subject: 'Votre profil ORCID — ajouter votre poste à Nantes Université',
     body: [

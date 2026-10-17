@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-// Storage of the career path (scripts/lib/affiliation_history_store.cjs, docs/plan-parcours-affiliations.md lot 2).
+// Storage of the career path (scripts/lib/affiliation_history_store.cjs, docs/archive/plan-parcours-affiliations.md lot 2).
 const S = createRequire(import.meta.url)('../../scripts/lib/affiliation_history_store.cjs');
 const norm = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, '');
 

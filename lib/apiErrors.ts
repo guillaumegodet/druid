@@ -3,7 +3,7 @@
  * @description Translation of error messages produced outside the React tree: the `error`
  * field of the API JSON responses (`server.cjs`, `functions/`), the `error` text of the
  * progress files written by the alignment scripts, and native errors (`Failed to fetch`).
- * Those messages are English in the code (docs/plan-langue-source-en.md, chantier C); the
+ * Those messages are English in the code (docs/archive/plan-langue-source-en.md, chantier C); the
  * French rendering lives in `locales/fr/messages.po` like any UI string.
  *
  * How it works: every server message is declared below as a `msg` descriptor so that
@@ -161,7 +161,7 @@ export const API_ERRORS = [
   msg`Invalid PDF`,
   msg`Generation not found`,
   msg`PDF not archived`,
-  // career path of a researcher (docs/plan-parcours-affiliations.md, lot 2)
+  // career path of a researcher (docs/archive/plan-parcours-affiliations.md, lot 2)
   msg`Invalid record key`,
   msg`Career path not computed yet for this record`,
   msg`Grist unreachable`,
@@ -171,7 +171,7 @@ export const API_ERRORS = [
   msg`Career-path computation failed`,
   msg`No usable identifier for this record`,
   msg`Unknown suggestion`,
-  // tasks (« À traiter › Tâches », docs/plan-chantiers-taches.md)
+  // tasks (« À traiter › Tâches », docs/archive/plan-chantiers-taches.md)
   msg`Task not found`,
   msg`Unknown event action`,
   msg`Empty comment`,
@@ -228,7 +228,7 @@ export const API_ERRORS = [
   msg`LDAP directory unreachable`,
   // LDAP arrivals and departures since a date
   msg`Invalid date`,
-  // inter-lab « Réseau » (docs/plan-reseau-inter-labos.md)
+  // inter-lab « Réseau » (docs/archive/plan-reseau-inter-labos.md)
   msg`No network data`,
   msg`Unreadable network data`,
   msg`Structure not in the university network`,

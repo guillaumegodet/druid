@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fictitious bibliometric dashboards of the fictitious instances (demo, demo-2).
 
-docs/plan-instance-demo-cloudflare.md, lot A4. The demo runs on Cloudflare Pages without the
+docs/archive/plan-instance-demo-cloudflare.md, lot A4. The demo runs on Cloudflare Pages without the
 druid-biblio backend: /api/dashboard/:slug/publications does not exist and the frontend reads
 the static exports of public/dashboard-data/ (lib/dashboardSource.ts), copied there from
 instances/demo/dashboard-data/ by scripts/prepare-cloudflare-assets.cjs.

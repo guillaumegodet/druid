@@ -1,4 +1,4 @@
-// Guards the API error translation mechanism (docs/plan-langue-source-en.md, chantier C):
+// Guards the API error translation mechanism (docs/archive/plan-langue-source-en.md, chantier C):
 // every `error: '…'` literal sent by server.cjs and functions/ must be declared in
 // lib/apiErrors.ts (as a `msg` descriptor, so that Lingui extracts it and locales/fr can
 // translate it), and translateApiError() must resolve them through the real French catalog.

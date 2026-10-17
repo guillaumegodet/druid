@@ -532,7 +532,7 @@ async function main() {
   let push = null;
   // Push into Alignement_ORCID only on explicit request (push mode): validation is done
   // in Druid, the table now only serves as a blacklist (« Rejeté » / « Identité mêlée ») — decision of
-  // 2026-09-21, see docs/plan-alignement-unifie.md lot 6.
+  // 2026-09-21, see docs/archive/plan-alignement-unifie.md lot 6.
   if (MODE === 'push') {
     const rejected = await loadRejected(REVIEW_TABLE, 'ORCID_candidat', extractOrcid);
     const { desired, found, ambiguous } = buildReviewRows(cache, all, rejected);

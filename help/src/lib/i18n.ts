@@ -1,4 +1,4 @@
-// Strings of the help centre's own components, per content language (docs/plan-aide-anglais.md).
+// Strings of the help centre's own components, per content language (docs/archive/plan-aide-anglais.md).
 // Starlight's built-in UI (search, table of contents…) is translated by Starlight itself.
 
 export type HelpLang = 'fr' | 'en';

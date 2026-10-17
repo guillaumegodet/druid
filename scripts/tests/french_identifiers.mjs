@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Inventory of French identifiers declared in the TypeScript sources (docs/plan-langue-source-en.md,
+ * Inventory of French identifiers declared in the TypeScript sources (docs/archive/plan-langue-source-en.md,
  * chantier B, lot B0). For every declared name (variables, functions, parameters, properties,
  * interface members, types, enums, JSX props) whose camelCase/snake_case words contain a French
  * word, the report says where it is declared and whether the same name crosses the client

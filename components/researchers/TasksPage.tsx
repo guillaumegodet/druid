@@ -44,7 +44,7 @@ const STATUS_TONE: Record<TaskStatus, string> = {
 
 const fmtDate = (iso: string): string => (iso ? new Date(iso).toLocaleString(numberLocale(), { dateStyle: 'short', timeStyle: 'short' }) : '');
 
-/** « À traiter › Tâches » tab (docs/plan-chantiers-taches.md, lot 2): filters, table, inline detail
+/** « À traiter › Tâches » tab (docs/archive/plan-chantiers-taches.md, lot 2): filters, table, inline detail
  * with the event log and the workflow actions. Statuses come from lib/tasks (same table as the
  * server: a forbidden transition is refused there too). */
 export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge, onUidSwitched }) => {
@@ -275,7 +275,7 @@ const TaskDetail: React.FC<{
     return i18n._(STATUS_LABELS[s]);
   };
   const needsText = (s: TaskStatus) => s === 'en_attente' || s === 'fait' || s === 'abandonnee';
-  // « Switch to the LDAP uid » (annuaire_uid_ldap, docs/plan-statut-employeur-ldap.md, lot 2): rewrites
+  // « Switch to the LDAP uid » (annuaire_uid_ldap, docs/archive/plan-statut-employeur-ldap.md, lot 2): rewrites
   // uid_dyna on every row of the record, opens the SoVisu+ follow-up when the former uid was exported
   // (ext_…), then closes the task.
   const uidSwitch = isOpenStatus(task.statut) ? uidSwitchOf(task) : null;

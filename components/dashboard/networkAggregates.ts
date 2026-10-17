@@ -11,7 +11,7 @@ export interface NetworkNode {
   name: string;
   value: number; // number of publications
   category: number;
-  /** Inter-lab mode: `lab` = aggregated node of a lab not expanded (plan-reseau-inter-labos.md, lot 4). */
+  /** Inter-lab mode: `lab` = aggregated node of a lab not expanded (docs/archive/plan-reseau-inter-labos.md, lot 4). */
   kind?: 'author' | 'lab';
   /** Inter-lab mode: labs of the author (several = a bridge between labs). */
   labs?: string[];

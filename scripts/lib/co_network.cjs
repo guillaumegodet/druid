@@ -1,6 +1,6 @@
 /**
  * co_network.cjs — Inter-lab co-authorship graph of the « Réseau » tab
- * (docs/plan-reseau-inter-labos.md, lots 2 and 4).
+ * (docs/archive/plan-reseau-inter-labos.md, lots 2 and 4).
  *
  * Input: the network.json of a composite structure (druid-biblio
  * biblio_etl/network_export.py): authors resolved to their lab(s) with per-year publication

@@ -1,6 +1,6 @@
 /**
  * @file affiliationHistory.ts
- * @description Career path of a researcher (docs/plan-parcours-affiliations.md, lot 3): types of the entry
+ * @description Career path of a researcher (docs/archive/plan-parcours-affiliations.md, lot 3): types of the entry
  * computed by scripts/sync_affiliation_history.cjs, API client (server.cjs, lot 2) and pure helpers used
  * by the « Parcours » block of the record (components/researchers/AffiliationHistorySection.tsx).
  */

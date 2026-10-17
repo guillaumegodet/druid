@@ -144,7 +144,7 @@ async function main() {
     const flagged = await commands.markAbesSent(entries, today, jobContext());
     console.log(`✓ ${flagged} records flagged as sent (${today})`);
 
-    // « À traiter › Tâches » (docs/plan-chantiers-taches.md, lot 6): the open « lot ABES » tasks
+    // « À traiter › Tâches » (docs/archive/plan-chantiers-taches.md, lot 6): the open « lot ABES » tasks
     // covered by these rows are done. No Taches table yet ⇒ nothing to close.
     const items = diff.enrichissements
       .map((row) => ({ rowId: rowIdByUid.get(row.id_local) || 0, uid: row.id_local, types: abesTaskTypes(row) }))

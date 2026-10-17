@@ -49,7 +49,7 @@ interface ResearcherDetailProps {
   /** « Ajouter une équipe… » in the Team menu: opens the creation of a team attached to this lab. */
   onCreateTeam?: (structureName: string) => void;
   /** « Report a correction »: opens the « À traiter › Tâches » form with this researcher
-   * prefilled (docs/plan-chantiers-taches.md, lot 2). Admins only — undefined hides the button. */
+   * prefilled (docs/archive/plan-chantiers-taches.md, lot 2). Admins only — undefined hides the button. */
   onReportTask?: (researcher: Researcher) => void;
   /** Record opened by « Create » of the LDAP arrivals: « Fill from LDAP » runs once on opening. */
   autoLdapLookup?: boolean;
@@ -390,7 +390,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
             onLdapLookup={onSave && localResearcher.id.startsWith('NEW-') && hasCapability('HAS_LDAP') && canUseEstablishmentTools() ? handleLdapLookup : undefined}
             ldapAutoRun={autoLookup}
           />
-          {/* Career path (docs/plan-parcours-affiliations.md, lot 3): affiliations of the publications,
+          {/* Career path (docs/archive/plan-parcours-affiliations.md, lot 3): affiliations of the publications,
               ORCID positions, Scopus profile — full width. Needs the server job (Docker instances). */}
           {/* « Suggestions de l'établissement » (lot 5): hidden when there is nothing to suggest. */}
           {hasCapability('HAS_SERVER_JOBS') && !researcher.id.startsWith('NEW-') && (

@@ -95,7 +95,7 @@ const LAB_VIEWER_GROUP = process.env.KEYCLOAK_LAB_VIEWER_GROUP || 'labo_viewer';
 // (functions/api/me.js, Centrale repo) hard-codes everything to false: that runtime
 // structurally cannot host these integrations (no LDAP, no child_process).
 // Pages of the user help centre (help/src/content/docs, copied into the image by the Dockerfile):
-// source of the « Aide Druid » assistant (/api/help-chat, docs/plan-documentation-utilisateur.md lot 8).
+// source of the « Aide Druid » assistant (/api/help-chat, docs/archive/plan-documentation-utilisateur.md lot 8).
 const HELP_DOCS_DIR = process.env.HELP_DOCS_DIR || path.join(__dirname, 'help', 'src', 'content', 'docs');
 // Public URL of the help centre, for the links cited in the answers (same default as lib/helpLinks.ts).
 const HELP_SITE_URL = (process.env.HELP_SITE_URL || 'https://druid-aide.guillaumegodet.workers.dev').replace(/\/+$/, '');
@@ -110,14 +110,14 @@ const CAPABILITIES = {
   HAS_SOVISU_EXPORT: fs.existsSync(path.dirname(process.env.CDB_STRUCT_PATH || '/cdb-data/structures.csv')),
   HAS_SERVER_JOBS: true,
   HAS_BENCHMARK: false,
-  // Inter-lab mode of the « Réseau » tab (/api/network, docs/plan-reseau-inter-labos.md): reads the
+  // Inter-lab mode of the « Réseau » tab (/api/network, docs/archive/plan-reseau-inter-labos.md): reads the
   // network.json files of druid-biblio — absent on Cloudflare Functions.
   HAS_NETWORK_API: true,
   HAS_QUALINKA: !!process.env.NEO4J_HTTP_URL,
   // Internal/external status + manual validation: enabled by default here (Nantes); an instance
   // that only manages its internal staff disables it with HIDE_STATUS_VALIDATION=true (see lib/auth.ts).
   HAS_STATUS_VALIDATION: process.env.HIDE_STATUS_VALIDATION !== 'true',
-  // « À traiter › Tâches » (docs/plan-chantiers-taches.md): /api/tasks routes of this server,
+  // « À traiter › Tâches » (docs/archive/plan-chantiers-taches.md): /api/tasks routes of this server,
   // backed by Grist with the server key — absent on Cloudflare Functions (functions/api/me.js).
   HAS_TASKS: !!GRIST_API_KEY,
   // « Calls for proposals » (docs/plan-funding-calls.md): PostgreSQL tables of the calls, their matches and the
@@ -931,7 +931,7 @@ app.get('/api/dashboard/:slug/publications', (req, res) =>
 app.get('/api/public/dashboard/:slug/publications', (req, res) =>
   sendDashboardJson(req, res, 'public, max-age=3600', true));
 
-// ── « Réseau » tab, inter-lab mode (docs/plan-reseau-inter-labos.md, lots 2 and 4) ─────────
+// ── « Réseau » tab, inter-lab mode (docs/archive/plan-reseau-inter-labos.md, lots 2 and 4) ─────────
 // Reads the network.json of a composite structure (druid-biblio biblio_etl/network_export.py):
 // the structure's own file when it is a composite (univ-nantes, pole-st), otherwise the
 // university-wide one (NETWORK_SOURCE_SLUG). Graph computed by scripts/lib/co_network.cjs.
@@ -1258,13 +1258,13 @@ const ILAAS_API_BASE = (process.env.ILAAS_API_BASE || 'https://llm.ilaas.fr/v1')
 const ILAAS_MODEL = process.env.ILAAS_MODEL || 'mistral-small-4-119b';
 const GRIST_API_BASE = 'https://grist.numerique.gouv.fr/api';
 
-// ── « Aide Druid » assistant (docs/plan-documentation-utilisateur.md, lot 8) ─────────────────
+// ── « Aide Druid » assistant (docs/archive/plan-documentation-utilisateur.md, lot 8) ─────────────────
 // Retrieval over the help centre pages (scripts/lib/help_search.cjs, BM25 by section), then ILAAS
 // answers from the retrieved excerpts only and cites them; the list of the pages consulted is
 // always appended to the stream, so the sources show even if the model forgets to cite them.
 // Same OpenAI-format SSE as /api/chat, so the ChatWidget reads both the same way.
 // One index per language: the interface language picks it (English pages under en/, falling back to
-// French when they are absent — docs/plan-aide-anglais.md).
+// French when they are absent — docs/archive/plan-aide-anglais.md).
 const helpSearch = require('./scripts/lib/help_search.cjs');
 const helpIndexes = {};
 const getHelpIndex = (lang) => {
@@ -2124,7 +2124,7 @@ app.post('/api/report-ai', async (req, res) => {
   res.status(out.status).json(out.body);
 });
 
-// Detection rules (docs/plan-chantiers-taches.md, lot 5): scripts/sync_tasks.cjs reads the
+// Detection rules (docs/archive/plan-chantiers-taches.md, lot 5): scripts/sync_tasks.cjs reads the
 // alignment caches + the Annuaire and creates / verifies / auto-resolves the rule-generated
 // tasks. Same background-run contract as the alignments (progress file, 409 while running).
 // Also scheduled daily by ofelia (docker/ofelia/config.ini, job druid-tasks-detect).
@@ -2150,7 +2150,7 @@ app.get('/api/tasks/detect/progress', requireSuperAdmin, (req, res) => {
   }
 });
 
-// ABES export marked as sent (docs/plan-chantiers-taches.md, lot 6): closes the open `lot_abes`
+// ABES export marked as sent (docs/archive/plan-chantiers-taches.md, lot 6): closes the open `lot_abes`
 // tasks covered by the exported rows. Body { date, items: [{ rowId, uid, types }] } built by
 // AbesExportModal from lib/abesExport.ts abesTaskTypes; matching in tasks_schema.abesSentPatches.
 app.post('/api/tasks/abes-sent', requireSuperAdmin, withTasks(async (req, res, tasks) => {
@@ -2863,7 +2863,7 @@ app.get('/api/ldap/moves', requireEstablishmentScope, async (req, res) => {
   }
 });
 
-// ── Career path of a researcher (docs/plan-parcours-affiliations.md, lot 2) ──────
+// ── Career path of a researcher (docs/archive/plan-parcours-affiliations.md, lot 2) ──────
 // Output of scripts/sync_affiliation_history.cjs (weekly ofelia job): one file per person in
 // AFFILIATION_HISTORY_DIR (bind-mounted cache-data/affiliation_history). Reading follows the record's
 // scope (every authenticated right reads the Annuaire); a live refresh calls the external APIs
@@ -2984,7 +2984,7 @@ app.get('/api/researchers/by-row/:rowId/theses', sendTheses(async (req, res, sto
   return store.thesesOfRow(rowId);
 }));
 
-// ── « Suggestions de l'établissement » of a record (docs/plan-parcours-affiliations.md, lot 5) ─────
+// ── « Suggestions de l'établissement » of a record (docs/archive/plan-parcours-affiliations.md, lot 5) ─────
 // Computed server-side by scripts/lib/suggestions.cjs from the Annuaire rows, the career-path entry, the
 // alignment caches (bind-mounted at the app root), the detection rules of sync_tasks.cjs and the tasks
 // of the person. Read: every right that reads the record (the researcher on their own record included,
@@ -3216,7 +3216,7 @@ app.get('/api/sync-idref-trigger', requireEstablishmentScope, (req, res) => {
   // « Doctorants » (TYPE_EMPLOI=DOCTORANT) and « Sans obligation de recherche » (LIB_TYPE_EMPLOI
   // « …n'ayant pas d'obligation statutaire de recherche ») are isolated low priorities;
   // « Personnel » = the rest. Incremental whatever the scope (decision D2 of 2026-09-30,
-  // docs/plan-recherche-alignement-maitrisee.md): ?force=1 to reprocess the cached records.
+  // docs/archive/plan-recherche-alignement-maitrisee.md): ?force=1 to reprocess the cached records.
   const group = ALIGN_GROUPS.includes(req.query.group) ? req.query.group : '';
   // Refuse if a run is already in progress (unreadable progress: start anyway)
   const running = runningProgress(IDREF_PROGRESS_PATH);
@@ -3267,7 +3267,7 @@ app.get('/api/sync-idref-progress', requireEstablishmentScope, (req, res) => {
 // cache <source>_align_cache.json served from the app root (see static routes below), suggestions
 // pushed to the Grist tables Alignement_ORCID / Alignement_HAL / Alignement_OpenAlex / Alignement_Scopus.
 // mode=push = re-pushes the cache without API calls (« Envoyer en revue Grist » button). See
-// docs/archive/plan-alignement-orcid-hal.md, docs/archive/plan-alignement-openalex.md and docs/plan-alignement-scopus.md.
+// docs/archive/plan-alignement-orcid-hal.md, docs/archive/plan-alignement-openalex.md and docs/archive/plan-alignement-scopus.md.
 const ALIGN_SOURCES = {
   orcid: { script: 'scripts/sync_orcid.cjs', progress: 'orcid_align_progress.json', label: 'ORCID' },
   hal: { script: 'scripts/sync_hal.cjs', progress: 'hal_align_progress.json', label: 'HAL' },
@@ -3302,7 +3302,7 @@ app.get('/api/align/:source/trigger', requireEstablishmentScope, (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-// Launch window of the unified alignment page (docs/plan-recherche-alignement-maitrisee.md, lot 2):
+// Launch window of the unified alignment page (docs/archive/plan-recherche-alignement-maitrisee.md, lot 2):
 // per source, records of the scope lacking (search) or carrying (verify) the identifier, of which
 // never processed; cost per record; for Scopus, the Elsevier calls the alignment may still spend this
 // week (key 1 keeps its share for the SoVisu+ harvester). Same selection as the scripts
@@ -3340,7 +3340,7 @@ app.get('/api/align/estimate', requireEstablishmentScope, async (req, res) => {
   }
 });
 
-// « Stop » button of the unified alignment page (docs/plan-recherche-alignement-maitrisee.md, lot 1).
+// « Stop » button of the unified alignment page (docs/archive/plan-recherche-alignement-maitrisee.md, lot 1).
 app.post('/api/align/:source/stop', requireEstablishmentScope, (req, res) => {
   const src = ALIGN_SOURCES[req.params.source];
   if (!src) return res.status(404).json({ error: `Unknown alignment source: ${req.params.source}` });

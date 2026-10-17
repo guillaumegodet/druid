@@ -449,7 +449,7 @@ export const computeAbesDiff = (
 
 /** Preset « ABES — Nantes U validés » (docs/plan-export-abes-idref.md §6). */
 /**
- * Task types (« À traiter › Tâches », docs/plan-chantiers-taches.md, lot 6) that an exported row
+ * Task types (« À traiter › Tâches », docs/archive/plan-chantiers-taches.md, lot 6) that an exported row
  * covers: once the row is marked as sent, the open `lot_abes` tasks of these types for the same
  * person are closed (scripts/lib/tasks_schema.cjs abesSentPatches).
  */

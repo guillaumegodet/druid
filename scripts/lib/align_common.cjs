@@ -46,7 +46,7 @@ function commonOptions({ modes = ['search', 'verify'], concurrency = 6 } = {}) {
     pushGrist: (getArg('push-grist', 'true') || 'true').toLowerCase() !== 'false',
     force: hasFlag('force'),
     // `--record=<Grist row>`: one record only, searched again even if already processed (« Search this
-    // record » in the drawer of the unified page, docs/plan-recherche-alignement-maitrisee.md, lot 3).
+    // record » in the drawer of the unified page, docs/archive/plan-recherche-alignement-maitrisee.md, lot 3).
     record: parseInt(getArg('record', '0'), 10) || 0,
   };
 }

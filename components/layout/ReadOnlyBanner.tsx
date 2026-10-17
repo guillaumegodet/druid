@@ -4,7 +4,7 @@ import { Trans } from '@lingui/react/macro';
 
 /**
  * Permanent notice of a read-only instance (capability READ_ONLY, public demo —
- * docs/plan-instance-demo-cloudflare.md, lot A2): the data are fictitious and nothing is saved.
+ * docs/archive/plan-instance-demo-cloudflare.md, lot A2): the data are fictitious and nothing is saved.
  */
 export const ReadOnlyBanner: React.FC = () => (
   <div

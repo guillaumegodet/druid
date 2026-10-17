@@ -5,7 +5,7 @@ import {
   type AhEntry, type AhSignalsByKey,
 } from '../affiliationHistory';
 
-// « Parcours » block helpers (lib/affiliationHistory.ts, docs/plan-parcours-affiliations.md lot 3). Fictitious data.
+// « Parcours » block helpers (lib/affiliationHistory.ts, docs/archive/plan-parcours-affiliations.md lot 3). Fictitious data.
 const entry = (): AhEntry => ({
   computedAt: '2026-09-30T10:00:00Z',
   ids: { uid: 'martin-p', orcid: '', openalex: [], scopus: [] },

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 
-// « Suggestions de l'établissement » (scripts/lib/suggestions.cjs, docs/plan-parcours-affiliations.md lot 5).
+// « Suggestions de l'établissement » (scripts/lib/suggestions.cjs, docs/archive/plan-parcours-affiliations.md lot 5).
 const { computeSuggestions, scopusLooksMerged, SUGGESTION_TASK_TYPES } = createRequire(import.meta.url)('../../scripts/lib/suggestions.cjs');
 const schema = createRequire(import.meta.url)('../../scripts/lib/tasks_schema.cjs');
 

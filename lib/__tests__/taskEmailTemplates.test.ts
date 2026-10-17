@@ -4,7 +4,7 @@ import { TASK_TYPES, TASK_TYPE_IDS } from '../tasks';
 
 const ctx = { civility: 'Mme', firstName: 'Jeanne', lastName: 'Dupont', labo: 'CREN', orcid: '0000-0001-9900-9046', halId: 'j-dupont', scopusId: '123', description: 'Second ORCID : 0009-0000-0000-0001', senderName: 'J. Durand' };
 
-describe('lib/taskEmailTemplates (docs/plan-chantiers-taches.md, lot 3)', () => {
+describe('lib/taskEmailTemplates (docs/archive/plan-chantiers-taches.md, lot 3)', () => {
   it('every type flagged email:true has a template, the others none', () => {
     for (const id of TASK_TYPE_IDS) {
       expect(hasTaskEmail(id), id).toBe(TASK_TYPES[id].email);

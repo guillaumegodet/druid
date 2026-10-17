@@ -174,7 +174,7 @@ check('public repo: non-object refused', publicRepoErrors(null), ['not a JSON ob
   check('deployment: non-object instance.json ignored', selectDeploymentInstances([saas('demo'), { folder: 'y', source: 'instances/', raw: null }], 'druid-saas').slugs, ['demo']);
 }
 
-// ── career path (affiliationHistory, docs/plan-parcours-affiliations.md D2) ──────
+// ── career path (affiliationHistory, docs/archive/plan-parcours-affiliations.md D2) ──────
 {
   check('affiliationHistory: null by default', parseInstanceConfig(docker()).config.affiliationHistory, null);
   const ah = { local: { ids: { openalex: ['I100'], ror: ['0abcdef00'] }, names: ['University'] }, site: { names: ['University Hospital'] }, area: { cities: ['Univtown'] } };

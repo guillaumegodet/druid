@@ -1,7 +1,7 @@
 /**
  * @file readOnly.ts
  * @description Client-side guard of a read-only instance (capability READ_ONLY, public demo on
- * Cloudflare — docs/plan-instance-demo-cloudflare.md, lot A2).
+ * Cloudflare — docs/archive/plan-instance-demo-cloudflare.md, lot A2).
  *
  * The real enforcement is server-side (the domain API of functions/api/v1 answers 403 to every write);
  * this guard only makes the refusal immediate and uniform: every write request of the app —

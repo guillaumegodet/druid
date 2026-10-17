@@ -6,7 +6,7 @@ import { TASK_TYPES, TASK_TYPE_IDS, TRANSITIONS, TASK_STATUSES, TASK_BASES, CANA
 // The server validates with the CommonJS schema; the UI labels with the TS twin.
 const schema = createRequire(import.meta.url)('../../scripts/lib/tasks_schema.cjs');
 
-describe('lib/tasks ↔ scripts/lib/tasks_schema.cjs (docs/plan-chantiers-taches.md, lot 1)', () => {
+describe('lib/tasks ↔ scripts/lib/tasks_schema.cjs (docs/archive/plan-chantiers-taches.md, lot 1)', () => {
   it('same task types, with the same base / default channel', () => {
     expect(TASK_TYPE_IDS.sort()).toEqual(Object.keys(schema.TASK_TYPES).sort());
     for (const id of TASK_TYPE_IDS) {

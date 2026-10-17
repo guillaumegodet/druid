@@ -3,7 +3,7 @@ import { TasksApi, countOpenTasks, type Task, type TaskCreateInput, type TaskPat
 import { apiErrorText } from '../lib/apiErrors';
 
 /**
- * State of the « À traiter › Tâches » tab (docs/plan-chantiers-taches.md, lot 2): the task
+ * State of the « À traiter › Tâches » tab (docs/archive/plan-chantiers-taches.md, lot 2): the task
  * list lives in App (the « À traiter (n) » pill of the Personnel header counts the open ones),
  * every mutation goes through /api/tasks and replaces the row in place from the server answer.
  * `enabled` = false (not an admin) → nothing is fetched (the routes answer 403 anyway).

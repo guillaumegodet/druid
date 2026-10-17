@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 
-// Researcher career path (scripts/lib/affiliation_history.cjs, docs/plan-parcours-affiliations.md lot 1).
+// Researcher career path (scripts/lib/affiliation_history.cjs, docs/archive/plan-parcours-affiliations.md lot 1).
 const AH = createRequire(import.meta.url)('../../scripts/lib/affiliation_history.cjs');
 const { makeOrg, createMatcher, emptyHierarchy, classifyOrg, mergePublications, aggregate, classifyPeriods, computeSignals, normDoi } = AH;
 

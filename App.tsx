@@ -109,7 +109,7 @@ function App() {
     }
   };
   const [structDiff, setStructDiff] = useState<StructuresLdapDiff | null>(null);
-  // Unified alignment page (docs/plan-alignement-unifie.md): aggregates IdRef/ORCID/HAL/OpenAlex
+  // Unified alignment page (docs/archive/plan-alignement-unifie.md): aggregates IdRef/ORCID/HAL/OpenAlex
   // into one view per person — state separate from the 4 legacy pages (kept, see plan §5).
   const [unifiedDiff, setUnifiedDiff] = useState<UnifiedAlignDiff | null>(null);
   const [unifiedMode, setUnifiedMode] = useState<AlignMode>('search');
@@ -162,7 +162,7 @@ function App() {
     for (const c of seen.values()) if (c > 1) n++;
     return n;
   }, [researchers]);
-  // « À traiter » section (docs/plan-chantiers-taches.md, lot 2): duplicates + tasks tabs, admin-only.
+  // « À traiter » section (docs/archive/plan-chantiers-taches.md, lot 2): duplicates + tasks tabs, admin-only.
   // The task list is loaded once for admins (the pill counts the open ones); `?tab=` in the URL.
   const tasksEnabled = isSuperAdmin() && hasCapability('HAS_TASKS');
   const tasksState = useTasks(tasksEnabled);
@@ -746,7 +746,7 @@ function App() {
   };
   /** « Rechercher partout »: runs runUnifiedAlign (lot 1) on the 4 sources in parallel, tracks
    *  the aggregated progress, reloads the diff at the end. `labo`/`group`: always provided by
-   *  UnifiedAlignPage (never a global run, see docs/plan-alignement-unifie.md §5). */
+   *  UnifiedAlignPage (never a global run, see docs/archive/plan-alignement-unifie.md §5). */
   const rerunUnifiedAlign = async (mode: AlignMode, labo?: string, group?: AlignGroup, choice?: AlignLaunchChoice) => {
     if (!hasCapability('HAS_SERVER_JOBS')) {
       setError(t`Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed.`);
