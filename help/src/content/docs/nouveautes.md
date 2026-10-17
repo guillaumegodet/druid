@@ -40,6 +40,10 @@ n'existent que sur les instances qui en disposent (voir
 
 ### Appels à projets
 
+- **Mon projet** : décrivez un projet, l'assistant cherche les appels ouverts de tous les
+  financeurs suivis qui lui correspondent et dit pourquoi, avec un lien vers chaque appel. Vue
+  « Mon projet » de l'onglet et onglet du même nom dans l'assistant. Voir
+  [Trouver des appels pour un projet](/guides/tableau-de-bord/appels-a-projets/#trouver-des-appels-pour-un-projet).
 - **La vue « Appels européens » devient « Appels à projets »** (Pilotage) et couvre tous les
   financeurs : portail européen Funding & Tenders (Horizon Europe, ERC, MSCA, EIC, Missions…)
   relu chaque nuit, site de l'ANR (appel générique axe par axe, appels spécifiques, France 2030)

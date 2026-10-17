@@ -13,6 +13,15 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Appels à projets — « Mon projet »** : un chercheur décrit un projet (français ou anglais) et l'assistant présente
+  les appels ouverts ou annoncés qui lui correspondent, tous programmes confondus (Europe, ANR, France 2030, appels
+  saisis à la main), avec l'échéance, le lien vers la page et une phrase sur l'adéquation (rapprochement lointain
+  signalé). Le modèle ILaaS écrit 6 requêtes (anglais et français), comparées par similarité bge-m3 aux passages des
+  appels (résumé, objectifs, périmètre ; fusion des rangs), puis présente 5 appels au plus parmi les 12 plus proches.
+  Vue « Mon projet » de l'onglet et onglet du même nom dans l'assistant (`openChat`) ; route
+  `POST /api/calls/project-chat` (SSE, comme l'aide), capacité `HAS_CALLS_CHAT`. Vecteurs dans la table
+  `call_passage`, écrits par `scripts/embed_calls.ts` (passage revectorisé seulement si son texte ou le modèle change,
+  passages des appels clos supprimés). Lot 7 du plan `plan-funding-calls.md`.
 - **Fiche chercheur — carte « Appels à projets »** : les appels où l'appariement a retenu la personne (force,
   justification, publications, boutons d'avis ; appels clos masqués par défaut) et, pour le droit établissement
   seulement, les appels réservés à une étape de carrière où sa date de thèse la rend éligible ou à vérifier (fenêtre
@@ -42,6 +51,10 @@ données à exécuter au déploiement).
   l'IdHAL à l'IdHAL_i comme clé (2 lignes en prod Nantes). À appliquer avec les migrations (`druid-migrate`).
 - Instances sur Grist (Centrale) : avant de remplir des IdHAL_i secondaires, créer la colonne avec
   `node scripts/add_align_columns.cjs --apply` (sur PostgreSQL, rien à faire pour ce champ).
+- `20261017150000_call_passage.sql` (« Mon projet ») : passages vectorisés des appels ouverts. Variables
+  `EMBEDDING_API_URL`, `EMBEDDING_API_KEY`, `EMBEDDING_API_MODEL` (service bge-m3 des agents CRISalid) dans
+  l'environnement du service druid ; sans elles l'assistant reste masqué. Première vectorisation
+  `node scripts/.build/embed_calls.cjs` (≈ 3 min pour 342 appels, 2 041 passages), puis job ofelia après la collecte.
 
 ## [2.9.0] — 2026-10-17
 

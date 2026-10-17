@@ -31,6 +31,9 @@ import { createManualCallsStore } from '../lib/calls/manualStore';
 import { extractCallFields, fetchCallDocument, htmlDocument, pdfDocument, textDocument, type CallDocument } from '../lib/calls/callDocument';
 import { translatorFromEnv } from '../lib/calls/translate';
 import { validateManualCall, type ManualCallInput } from '../lib/calls/manual';
+import { embedderFromEnv } from '../lib/calls/embeddings';
+import { createCallPassageStore } from '../lib/calls/passageStore';
+import { createProjectChat } from '../lib/calls/projectChat';
 import type { GraphIdentifier, GraphIdentifierType } from '../lib/graph/identifierActions';
 
 /** The parts of an Express request / response used here (no dependency on the Express typings). */
@@ -156,6 +159,12 @@ const manualCallsOf = (db: Parameters<typeof createManualCallsStore>[0]) => {
   };
 };
 
+const projectChatOf = (db: Parameters<typeof createCallPassageStore>[0]) => {
+  const llm = translatorFromEnv(process.env);
+  const embedder = embedderFromEnv(process.env);
+  return llm && embedder ? createProjectChat({ store: createCallPassageStore(db), embedder, llm }) : null;
+};
+
 export const createServerStorage = (options: ApiV1Options) => {
   if (!options.gristDocId) throw new Error('VITE_GRIST_DOC_ID is not set: no directory document to serve');
   const readers = new Map<string, GristClient>();
@@ -226,6 +235,8 @@ export const createServerStorage = (options: ApiV1Options) => {
       eligibility: createEligibilityStore(db),
       /** Calls added by hand (plan-funding-calls lot 6): store, reading of a URL or a PDF, fields proposed by ILaaS. */
       manualCalls: manualCallsOf(db),
+      /** « My project » assistant (plan-funding-calls lot 7): null without an embedding service or a language model. */
+      projectChat: projectChatOf(db),
     };
   }
   const repository = createGristDirectoryRepository({ grist: main, loadLdapCache: ldapStatus });
@@ -242,6 +253,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     theses: null,
     eligibility: null,
     manualCalls: null,
+    projectChat: null,
   };
 };
 export type ServerStorage = ReturnType<typeof createServerStorage>;

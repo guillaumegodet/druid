@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Check, CircleHelp, MessageCircle, RotateCcw, Send, Sparkles, Square, Wrench, X } from 'lucide-react';
+import { Check, CircleHelp, Lightbulb, MessageCircle, RotateCcw, Send, Sparkles, Square, Wrench, X } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
@@ -7,12 +7,14 @@ import { hasCapability } from '../lib/auth';
 
 /**
  * « Assistant CRISalid » chat widget — floating button at the bottom right,
- * expandable panel, two modes (tabs) depending on the instance capabilities:
+ * expandable panel, up to three modes (tabs) depending on the instance capabilities:
  * - « Données CRISalid » (HAS_PIPELINES_CHAT): the LangGraph agent of the Open WebUI
  *   pipelines, through the streaming relay /api/chat of server.cjs;
  * - « Aide Druid » (HAS_HELP_CHAT): answers from the help centre pages through ILAAS,
- *   /api/help-chat (docs/archive/plan-documentation-utilisateur.md, lot 8).
- * Both stream OpenAI-format SSE. Each mode keeps its own conversation in sessionStorage:
+ *   /api/help-chat (docs/archive/plan-documentation-utilisateur.md, lot 8);
+ * - « Mon projet » (HAS_CALLS_CHAT): the open calls for proposals that fit a project described by the user,
+ *   /api/calls/project-chat (docs/plan-funding-calls.md, lot 7); opened with a project by openChat() from the tab.
+ * All stream OpenAI-format SSE. Each mode keeps its own conversation in sessionStorage:
  * kept across navigation and reloads, forgotten when the tab is closed.
  */
 
@@ -21,12 +23,17 @@ interface ChatMessage {
   content: string;
 }
 
-type ChatMode = 'data' | 'help';
+export type ChatMode = 'data' | 'help' | 'calls';
 
 const STORAGE_KEY = 'druid-chat-messages';
 /** The data mode keeps the historical key, so ongoing conversations survive the update. */
-const storageKey = (mode: ChatMode) => (mode === 'data' ? STORAGE_KEY : `${STORAGE_KEY}-help`);
-const ENDPOINT: Record<ChatMode, string> = { data: '/api/chat', help: '/api/help-chat' };
+const storageKey = (mode: ChatMode) => (mode === 'data' ? STORAGE_KEY : `${STORAGE_KEY}-${mode}`);
+const ENDPOINT: Record<ChatMode, string> = { data: '/api/chat', help: '/api/help-chat', calls: '/api/calls/project-chat' };
+
+const OPEN_EVENT = 'druid:open-chat';
+/** Opens the assistant on `mode` and, with a `message`, sends it (a project described in the « Calls » tab). */
+export const openChat = (mode: ChatMode, message?: string) =>
+  window.dispatchEvent(new CustomEvent(OPEN_EVENT, { detail: { mode, message } }));
 
 // Starter questions (sent as-is to the agent, in the UI language).
 const SUGGESTIONS = [
@@ -42,6 +49,13 @@ const HELP_SUGGESTIONS = [
   msg`What does the “Left” status mean?`,
   msg`How do I add an ORCID to a researcher?`,
   msg`What is the difference between the Affiliation and Headcount scopes?`,
+];
+
+// Starter projects of the « Mon projet » mode (calls for proposals).
+const CALLS_SUGGESTIONS = [
+  msg`Sodium-ion batteries for the stationary storage of renewable energy`,
+  msg`Detecting depression from speech with machine learning`,
+  msg`Adapting coastal towns to erosion and sea-level rise`,
 ];
 
 // ── <details> blocks of the OpenWebUI protocol ──────────────────────────────
@@ -188,6 +202,7 @@ export const ChatWidget: React.FC = () => {
   const modes: ChatMode[] = [
     ...(hasCapability('HAS_PIPELINES_CHAT') ? (['data'] as const) : []),
     ...(hasCapability('HAS_HELP_CHAT') ? (['help'] as const) : []),
+    ...(hasCapability('HAS_CALLS_CHAT') ? (['calls'] as const) : []),
   ];
   const [mode, setMode] = useState<ChatMode>(modes[0] ?? 'data');
   const [open, setOpen] = useState(false);
@@ -199,6 +214,8 @@ export const ChatWidget: React.FC = () => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   // Auto-scroll only if the user has not scrolled up the thread
   const stickToBottom = useRef(true);
+  // Message sent by openChat(), once the widget shows its mode.
+  const [pending, setPending] = useState<{ mode: ChatMode; message: string } | null>(null);
 
   useEffect(() => {
     try {
@@ -239,8 +256,8 @@ export const ChatWidget: React.FC = () => {
             role,
             content: role === 'assistant' ? parseAssistant(c).text : c,
           })),
-          // The help assistant searches and answers in the interface language.
-          ...(mode === 'help' ? { lang: i18n.locale } : {}),
+          // The help and project assistants search and answer in the interface language.
+          ...(mode !== 'data' ? { lang: i18n.locale } : {}),
         }),
         signal: controller.signal,
       });
@@ -307,6 +324,25 @@ export const ChatWidget: React.FC = () => {
     inputRef.current?.focus();
   };
 
+  useEffect(() => {
+    const onOpen = (e: Event) => {
+      const { mode: next, message } = (e as CustomEvent<{ mode: ChatMode; message?: string }>).detail ?? {};
+      if (!next || !modes.includes(next)) return;
+      setOpen(true);
+      if (next !== mode) switchMode(next);
+      if (message?.trim()) setPending({ mode: next, message });
+    };
+    window.addEventListener(OPEN_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_EVENT, onOpen);
+  });
+
+  useEffect(() => {
+    if (pending && pending.mode === mode && !streaming) {
+      setPending(null);
+      send(pending.message);
+    }
+  });
+
   const onScroll = () => {
     const el = scrollRef.current;
     if (el) stickToBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
@@ -334,16 +370,18 @@ export const ChatWidget: React.FC = () => {
       {/* Header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-ink/10 dark:border-white/10">
         <span className="w-9 h-9 shrink-0 rounded-full bg-accent text-ink flex items-center justify-center">
-          {mode === 'help' ? <CircleHelp size={18} /> : <Sparkles size={18} />}
+          {mode === 'help' ? <CircleHelp size={18} /> : mode === 'calls' ? <Lightbulb size={18} /> : <Sparkles size={18} />}
         </span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-bold leading-tight font-disp">
-            {mode === 'help' ? <Trans>Druid help assistant</Trans> : <Trans>CRISalid Research Assistant</Trans>}
+            {mode === 'help' ? <Trans>Druid help assistant</Trans> : mode === 'calls' ? <Trans>Calls for my project</Trans> : <Trans>CRISalid Research Assistant</Trans>}
           </p>
           <p className="text-[11px] text-muted-light dark:text-[#8f897c] truncate">
             {mode === 'help'
               ? <Trans>how to use Druid, answers from the help centre</Trans>
-              : <Trans>publications, laboratories, areas of expertise</Trans>}
+              : mode === 'calls'
+                ? <Trans>open calls for proposals that fit a project</Trans>
+                : <Trans>publications, laboratories, areas of expertise</Trans>}
           </p>
         </div>
         <button
@@ -377,7 +415,7 @@ export const ChatWidget: React.FC = () => {
                   : 'bg-white/60 dark:bg-white/10 text-ink dark:text-[#f5f2ea] hover:bg-white dark:hover:bg-white/15'
               }`}
             >
-              {m === 'help' ? <Trans>Druid help</Trans> : <Trans>CRISalid data</Trans>}
+              {m === 'help' ? <Trans>Druid help</Trans> : m === 'calls' ? <Trans>My project</Trans> : <Trans>CRISalid data</Trans>}
             </button>
           ))}
         </div>
@@ -396,6 +434,11 @@ export const ChatWidget: React.FC = () => {
                 <Trans>
                   Ask how to do something in Druid: the answer comes from the help centre, with links to the pages used.
                 </Trans>
+              ) : mode === 'calls' ? (
+                <Trans>
+                  Describe your project in a few sentences (objectives, methods, field of application): the assistant looks for
+                  the open calls for proposals that fit it, among those followed by the institution.
+                </Trans>
               ) : (
                 <Trans>
                   Ask your questions about research at Nantes Université: publications, laboratories, areas of expertise…
@@ -403,7 +446,7 @@ export const ChatWidget: React.FC = () => {
               )}
             </p>
             <div className="flex flex-wrap gap-1.5">
-              {(mode === 'help' ? HELP_SUGGESTIONS : SUGGESTIONS).map((s) => t(s)).map((s) => (
+              {(mode === 'help' ? HELP_SUGGESTIONS : mode === 'calls' ? CALLS_SUGGESTIONS : SUGGESTIONS).map((s) => t(s)).map((s) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
@@ -449,7 +492,9 @@ export const ChatWidget: React.FC = () => {
                   ) : streaming && i === lastIdx ? (
                     <span className="inline-flex items-center gap-2 text-muted-light dark:text-[#8f897c]">
                       <span className="w-3.5 h-3.5 border-2 border-ink dark:border-accent border-t-transparent rounded-full animate-spin" />
-                      {mode === 'help' ? <Trans>Searching the help centre…</Trans> : <Trans>The assistant is querying the graph…</Trans>}
+                      {mode === 'help'
+                        ? <Trans>Searching the help centre…</Trans>
+                        : mode === 'calls' ? <Trans>Searching the open calls…</Trans> : <Trans>The assistant is querying the graph…</Trans>}
                     </span>
                   ) : parsed.tools.length === 0 ? null : (
                     <span className="text-muted-light dark:text-[#8f897c]"><Trans>(no text answer)</Trans></span>
