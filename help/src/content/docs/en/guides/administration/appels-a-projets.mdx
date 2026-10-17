@@ -1,0 +1,122 @@
+---
+title: "Manage calls for proposals"
+description: "Choose the collected programmes, add a call from its address, its PDF or a saved page, validate calls, import a catalogue or a ResearchConnect export."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrators and central services (institution right)"
+	menu="Administration › Calls for proposals"
+	disponibilite="PostgreSQL instances; fields proposed by the language model: instances where it is configured"
+/>
+
+This page sets what the [Calls for proposals](/en/guides/tableau-de-bord/appels-a-projets/) view of
+the dashboard shows: which programmes are collected automatically, and which calls are added by
+hand, from their page, their PDF, a catalogue or a ResearchConnect export.
+
+## Collected programmes
+
+The table lists the programmes known to the instance, by funder: matching mode (thematic, axes,
+eligibility), source, number of open or announced calls out of the total, number of matches and
+date of the last collection.
+
+- The **Active** box decides whether a programme is collected: an active programme has its calls
+  read again every night (Funding & Tenders portal) or every week (ANR website) and shown in the
+  view. **Deactivating** a programme hides its calls without deleting them.
+- The **Collections** table traces the last runs: calls seen, new, updated, texts read, and the
+  errors if any (on hover).
+
+Matching the calls to the researchers is not started here: it runs apart, programme by programme.
+
+## Calls added by hand
+
+For the funders no collector reads: Region, foundations, labex, other France 2030 operators,
+internal calls… Each call added is filed under a **programme** of a **funder**, created when needed
+and reused afterwards by their name.
+
+### Add a call
+
+Click **Add a call**, then give Druid the text of the call in one of these ways:
+
+| Input | When to use it |
+|---|---|
+| **Address** of the page, then **Read** | public page of a funder; if the address leads to a PDF, it is read too |
+| **PDF of the call** | text of the call or funding rules downloaded |
+| **Saved page (HTML)** | page the server cannot reach, such as the **intranet**: open it in your browser, **File › Save as** (HTML page), then drop the file |
+| **Paste the text** | text copied from an e-mail or a document |
+| **Fill in by hand** | no text at hand |
+
+Druid reads the text and the **language model of the instance** proposes the fields: title, funder,
+programme, language, opening, deadlines, summary, objectives, scope and topics, eligibility,
+budget. Allow a few seconds to a minute. **Nothing is saved before your review**: check each field
+against the call, especially the dates (funding rules often give none) and the title.
+
+- **Funder** and **Programme**: choose an existing funder and programme, or **New funder…** (name
+  and category) and **New programme…**. Druid recognises a funder already known under the same
+  name. A programme collected automatically (European portal, ANR) is not offered: its collection
+  would close the call.
+- **Scope and topics**: this is the text the automatic process reads to find the researchers
+  concerned; keep the scientific terms of the call.
+- **Deadline**: one per stage, up to four (**Another stage**). The state of the call (announced,
+  open, closed) follows from the opening and the deadlines.
+
+Save with **Save and validate** (the call appears in the view at once) or **Save to validate
+later** (it waits for a review). If a call with the same address is already known, Druid says so
+and offers to save anyway.
+
+Without a language model configured on the instance, the form opens empty at once, to fill in from
+the call.
+
+### Validate, reject, fix
+
+The list of calls added by hand is filtered by state: **To validate**, **Validated**, **Rejected**,
+**All**. For each call:
+
+- **Validate**: the call appears in the Calls for proposals view;
+- **Reject**: it disappears from it, without being deleted;
+- **Edit**: reopens the form; saving « to validate later » sends the call back to review;
+- the **bin** deletes a call no researcher has been matched to yet (otherwise, reject it).
+
+A call added by hand appears in the view even before the automatic process has run on its
+programme: it then shows « No researcher ».
+
+## Import a catalogue
+
+**Import a catalogue** loads several calls at once from a **CSV** (UTF-8) or **Excel** file, one
+call per row, the first row naming the columns. Druid recognises French or English names,
+whatever their accents and case:
+
+| Column | Content |
+|---|---|
+| **Title** (required) | title of the call |
+| Funder, Category, Programme | where the call is filed; without a category, Druid guesses it from the name of the funder |
+| URL | page of the call |
+| Language | French by default, `en` or « English » for an English text |
+| Opening, Deadline, Deadline 2 | days written `2027-01-31` or `31/01/2027` |
+| Summary, Objectives, Scope, Eligibility, Budget | texts of the call |
+| Reference | identifier of the row in your catalogue |
+| Source | origin of the catalogue, kept on each call |
+
+The other columns are ignored. Druid first shows a **preview**: the columns recognised and, for
+each row, **new**, **update** or **error** (with the reason). Nothing is written until you click
+**Import N calls**. Tick or not **Import the calls as validated**.
+
+Importing the catalogue again updates the calls already imported: a row with the same **Reference**
+(or, without one, the same funder, programme, address and title) replaces the call imported before.
+Keep a Reference column if the titles of your catalogue change.
+
+### ResearchConnect export
+
+The **RTF** export of a saved search on ResearchConnect is dropped in the same place: Druid reads it
+in your browser and makes one call per fund (funder, summary, description, eligibility criteria,
+value, dates of the coming calls, useful link), with the source `researchconnect` and the reference
+`RC-<Fund ID>`. Importing a more recent export updates the funds already imported. These calls stay
+in your instance.
+
+## See also
+
+- [Spot calls for proposals](/en/guides/tableau-de-bord/appels-a-projets/)
+- [Give rights to a user](/en/guides/administration/donner-des-droits/)

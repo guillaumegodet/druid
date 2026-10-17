@@ -45,7 +45,7 @@ export const DASHBOARD_TAB_HELP: Record<DashboardTab, string> = {
   journals: '/donnees/indicateurs/#quartiles-des-revues',
   apc: '/donnees/indicateurs/#apc',
   funders: '/donnees/indicateurs/',
-  calls: '/guides/tableau-de-bord/appels-europeens/',
+  calls: '/guides/tableau-de-bord/appels-a-projets/',
   themes: '/donnees/indicateurs/',
   benchmark: '/donnees/indicateurs/',
   charte: '/donnees/publications-attribution/#charte-de-signature',
@@ -72,7 +72,7 @@ export const ADMIN_TAB_HELP: Record<AdminTab, string> = {
   rights: '/guides/administration/donner-des-droits/',
   media: '/guides/veille/sources-medias/',
   institutions: '/guides/administration/etablissements/',
-  calls: '/guides/tableau-de-bord/appels-europeens/',
+  calls: '/guides/administration/appels-a-projets/',
 };
 
 /**

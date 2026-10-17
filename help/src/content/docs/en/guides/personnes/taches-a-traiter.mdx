@@ -86,6 +86,8 @@ Other rules deal with the directory (see [Statuses of people](/en/donnees/statut
 | **LDAP account found by the staff number: switch to the LDAP uid** | The record has an `ext_…` uid (or none) while its staff number is that of an LDAP account carried by no record. Check the warnings (a uid that does not look like the name: the staff number is probably wrong), then **Switch to the LDAP uid**. For a former `ext_…` record, a **SoVisu+: remove the identifiers of the former person** task is created: without it, SoVisu+ refuses the new uid. |
 | **Hosted LDAP account closing: probable departure?** | A person employed by another organisation whose hosted account is closing. Druid does not infer a departure from it: check with the laboratory, then fill in the end dates (the task closes by itself) or drop the task. |
 | **Employer to enter** | A record validated “external” before October 2026 without an employer: fill in the employer (CNRS, Inserm, university hospital…). |
+| **PhD student who defended the thesis: update the status** | The record still says « PhD student » (employment type or grade) while its IdRef carries a defended thesis on theses.fr. Update the employment (postdoc, departure…): the task closes by itself once the record no longer says « PhD student » or the person is validated as left. |
+| **PhD student with an old thesis on the IdRef: namesake?** | The thesis found is more than six years old: the IdRef of the record is probably that of a namesake. Check on theses.fr (link of the task) and fix the IdRef. |
 
 ## What happens next
 

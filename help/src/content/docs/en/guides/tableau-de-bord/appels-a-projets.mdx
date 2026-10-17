@@ -1,0 +1,142 @@
+---
+title: "Spot calls for proposals"
+description: "Read the Calls for proposals view: calls of every funder, matched researchers, strength of a match, eligible candidates, opinions and limits."
+sidebar:
+  order: 8
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure (Candidates view: institution right)"
+	menu="Dashboard › Steering › Calls for proposals"
+	disponibilite="PostgreSQL instances"
+/>
+
+The **Calls for proposals** view (**Steering** family) gathers the open or announced calls of the
+programmes the institution follows and brings them together with the researchers of the
+structure, from their publications. It does not replace the monitoring of the research office or
+of the Europe office: it points out where the work of a team *appears* close to a call, and who
+may apply, as a basis for discussion.
+
+## Where the calls come from
+
+| Source | Programmes | Update |
+|---|---|---|
+| **Funding & Tenders portal** of the European Commission | Horizon Europe (clusters), ERC, MSCA, EIC, Missions, Infrastructures, Widening… | every night |
+| **ANR website** | generic call (AAPG, one call per research axis), specific calls, France 2030 calls operated by the ANR | every week |
+| **Added by hand** | Region, foundations, labex, other France 2030 operators, internal calls, ResearchConnect export… | on demand |
+
+The collected programmes are chosen in **Administration › Calls for proposals**, which is also
+where a call no collector reads is added (see
+[Manage calls for proposals](/en/guides/administration/appels-a-projets/)). A call added by hand
+only appears here once **validated**.
+
+## Where the matches come from
+
+For **thematic calls** (a Horizon Europe cluster, a mission, a specific ANR call, a regional
+call…), an automatic process (the CRISalid *Topic-to-Researcher Match* batch) reads the text of
+each call: a language model writes queries, looks for the closest publications in the CRISalid
+graph of the institution, checks the candidates and writes a **justification**. Druid imports the
+result and crosses it with its directory: only researchers known to Druid are shown, with a link
+to their record.
+
+Calls **open to any subject** (ERC, Marie Skłodowska-Curie actions, EIC Accelerator, AAPG axes…)
+have no theme to match: they get no thematic match. For those reserved to a career stage, the
+**Candidates** view lists the eligible people (see below).
+
+The banner at the top of the view says **which structures** the computation covered. When the
+structure you are looking at is outside that perimeter, a warning says so: its researchers only
+appear as co-authors of publications of the perimeter, which says nothing about its own coverage.
+
+## The three views
+
+| View | What it shows |
+|---|---|
+| **Calls** | One call per row: title, identifier, programme, next deadline, number of researchers retained (including the **strong** matches). Unfold the row to read the summary, the call, the dates, open the official page (*Funding & Tenders* portal, ANR website or page of the call) and see the researchers. |
+| **Researchers** | One block per researcher, with the calls where they come up. This is the view to show a researcher: « here is where your work shows up ». |
+| **Candidates** | Institution right only: for a call reserved to a career stage, the researchers who are eligible or to check. |
+
+The filters apply to the **Calls** and **Researchers** views:
+
+- **free search** on the title, identifier and classification of the call;
+- **funder** (category: Europe, ANR, Regional, Private / foundations, International…), then
+  **programme**;
+- **subset** of the programme, named after the chosen programme: Horizon Europe cluster, mission,
+  scheme (ERC, MSCA), AAPG domain…;
+- **Include closed calls**: by default, only calls with a deadline ahead are listed;
+- **Calls with researchers only** (Calls view, ticked by default): hides the calls without any
+  researcher retained. Calls **added by hand** stay shown even before the automatic process has
+  run on their programme.
+
+## Read a match
+
+Each match card carries:
+
+- a **strength** assessed by the model from the publications: **strong**, **plausible** or
+  **weak**;
+- a **relative score bar**: the best candidate of the call is at 100 %, the others in proportion.
+  It ranks researchers *within a call* and cannot be compared across calls: a candidate at 100 %
+  may be rated weak;
+- the **justification** written by the model (translated into French when the interface is);
+- the **publications** that led to the match (the first three, then « N more publications »), with
+  the DOI link when Druid knows it, otherwise a search on OpenAlex.
+
+## Give your opinion
+
+Under each match, three buttons: **Relevant**, **Not relevant**, **Already applying**. One opinion
+per person and per match, the last one replaces the previous; the count of opinions is shown next
+to each button. These opinions are used to assess and improve the automatic process (they can be
+exported for the CRISalid team): give some even on obvious matches.
+
+## Spot eligible candidates
+
+The **Candidates** view is about calls reserved to a career stage, such as the ERC *Starting* and
+*Consolidator* grants. Druid reads the rule **in the text of the call** (for instance « successful
+defence of PhD between 1 January 2017 and 31 December 2026 »): it changes from one edition to the
+next and is never hard-coded. Choose the call; the view recalls the rule, the sentence of the text
+it comes from and the deadlines, then lists the people of the structure.
+
+The **PhD year** comes from [theses.fr](https://theses.fr), read through the **IdRef** of the
+record (checked again every six months, or as soon as the IdRef changes): without an IdRef, or for
+a thesis missing from theses.fr (foreign, old thesis), the person does not appear. The thesis found
+is also shown on the record, under the HDR line.
+
+| Verdict | Meaning |
+|---|---|
+| **Eligible** | PhD defended within the window of the call |
+| **To check** | date known to the year only and falling on a bound of the window, or PhD just before the window: eligible only with a documented extension (maternity or parental leave, illness, national service, clinical training) |
+
+Filter by verdict and grade, and export the list as **CSV** for the Europe office or the research
+office. Only the PhD date is checked: the other conditions of the call (previous grants, host
+institution, time spent in Europe…) remain to be checked with the person.
+
+## Who sees what
+
+- With a right on **the whole institution**, the matches of every structure and the
+  **Candidates** view.
+- With a right limited to **your lab**, the matches of its researchers only; no Candidates view,
+  which crosses careers.
+- Every signed-in user can give an opinion; exporting the opinions is reserved to institution
+  rights.
+
+## Known limits
+
+- **Only the publications known to the CRISalid graph**: a researcher whose publications are not
+  there, or not vectorised yet, shows up on no call. The perimeter banner says which structures
+  the computation covered.
+- **One computation per programme, at a given date**: the matches are not recomputed when the
+  directory or the publications change, and a call added since the last computation has no
+  researchers yet.
+- **The dates come from the source** at collection time: check them on the official page of the
+  call before committing.
+- **The AAPG axes** are kept after stage 1 closes: they describe the profile of a project until
+  the next edition.
+- The Candidates view only reads rules based on the **PhD date** for now (ERC).
+
+## See also
+
+- [Manage calls for proposals](/en/guides/administration/appels-a-projets/)
+- [Choose a structure, a period, a perimeter](/en/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Read a record](/en/guides/personnes/lire-une-fiche/)
+- [Data sources](/en/donnees/sources-des-donnees/)

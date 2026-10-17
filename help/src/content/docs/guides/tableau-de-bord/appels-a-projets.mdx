@@ -1,0 +1,145 @@
+---
+title: "Repérer les appels à projets"
+description: "Lire la vue Appels à projets : appels de tous les financeurs, chercheurs appariés, force d'un appariement, candidats éligibles, avis et limites."
+sidebar:
+  order: 8
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure (vue Candidats : droit établissement)"
+	menu="Tableau de bord › Pilotage › Appels à projets"
+	disponibilite="instances sur PostgreSQL"
+/>
+
+La vue **Appels à projets** (famille **Pilotage**) rassemble les appels ouverts ou annoncés des
+programmes suivis par l'établissement et les rapproche des chercheurs de la structure, d'après
+leurs publications. Elle ne remplace pas la veille de la direction de la recherche ou du service
+Europe : elle signale où les travaux d'une équipe *apparaissent* proches d'un appel, et qui peut y
+prétendre, pour en discuter.
+
+## D'où viennent les appels
+
+| Source | Programmes | Mise à jour |
+|---|---|---|
+| **Portail Funding & Tenders** de la Commission européenne | Horizon Europe (clusters), ERC, MSCA, EIC, Missions, Infrastructures, Élargissement… | chaque nuit |
+| **Site de l'ANR** | appel générique (AAPG, un appel par axe de recherche), appels spécifiques, appels France 2030 opérés par l'ANR | chaque semaine |
+| **Saisie à la main** | Région, fondations, labex, autres opérateurs de France 2030, appels internes, export ResearchConnect… | à la demande |
+
+Les programmes collectés se choisissent dans **Administration › Appels à projets**, et c'est là
+aussi qu'on ajoute un appel qu'aucun collecteur ne lit (voir
+[Gérer les appels à projets](/guides/administration/appels-a-projets/)). Un appel saisi à la main
+n'apparaît ici qu'une fois **validé**.
+
+## D'où viennent les appariements
+
+Pour les **appels thématiques** (un cluster d'Horizon Europe, une mission, un appel spécifique de
+l'ANR, un appel régional…), un traitement automatique (le batch *Topic-to-Researcher Match* de
+CRISalid) lit le texte de chaque appel : un modèle de langage formule des requêtes, cherche les
+publications les plus proches dans le graphe CRISalid de l'établissement, vérifie les candidats et
+rédige une **justification**. Druid importe le résultat et le croise avec son annuaire : seuls les
+chercheurs connus de Druid sont affichés, avec le lien vers leur fiche.
+
+Les appels **ouverts à tous les sujets** (ERC, actions Marie Skłodowska-Curie, EIC Accelerator,
+axes de l'AAPG…) n'ont pas de thème à rapprocher : ils ne reçoivent pas d'appariement thématique.
+Pour ceux qui sont réservés à une étape de carrière, la vue **Candidats** dresse la liste des
+personnes éligibles (voir plus bas).
+
+Le bandeau en haut de la vue indique **sur quelles structures** le calcul a porté. Quand la structure
+consultée est hors de ce périmètre, un avertissement le dit : ses chercheurs n'y apparaissent qu'en
+cosignataires de publications du périmètre, ce qui ne dit rien de sa propre couverture.
+
+## Les trois vues
+
+| Vue | Ce qu'elle montre |
+|---|---|
+| **Appels** | Un appel par ligne : titre, identifiant, programme, prochaine échéance, nombre de chercheurs retenus (dont les appariements **forts**). Dépliez la ligne pour lire le résumé, l'appel, les dates, ouvrir la page officielle (portail *Funding & Tenders*, site de l'ANR ou page de l'appel) et voir les chercheurs. |
+| **Chercheurs** | Un chercheur par bloc, avec les appels où il ressort. C'est la vue à montrer à un chercheur : « voilà où vos travaux apparaissent ». |
+| **Candidats** | Réservée aux droits établissement : pour un appel réservé à une étape de carrière, les chercheurs éligibles ou à vérifier. |
+
+Les filtres s'appliquent aux vues **Appels** et **Chercheurs** :
+
+- **recherche libre** sur le titre, l'identifiant et la classification de l'appel ;
+- **financeur** (catégorie : Europe, ANR, Régional, Privé / fondations, International…) puis
+  **programme** ;
+- **sous-ensemble** du programme, dont le nom suit le programme choisi : cluster d'Horizon
+  Europe, mission, dispositif (ERC, MSCA), domaine de l'AAPG… ;
+- **Inclure les appels clos** : par défaut, seuls les appels dont une échéance est à venir sont
+  listés ;
+- **Appels avec chercheurs seulement** (vue Appels, coché par défaut) : masque les appels sans
+  chercheur retenu. Les appels **saisis à la main** restent affichés même tant que le traitement
+  automatique n'est pas passé sur leur programme.
+
+## Lire un appariement
+
+Chaque carte d'appariement porte :
+
+- une **force** évaluée par le modèle à partir des publications : **forte**, **plausible** ou
+  **faible** ;
+- une **barre de score relatif** : le meilleur candidat de l'appel est à 100 %, les autres en
+  proportion. Elle classe les chercheurs *au sein d'un appel* et ne se compare pas d'un appel à
+  l'autre : un candidat à 100 % peut être jugé faible ;
+- la **justification** rédigée par le modèle (traduite en français quand l'interface l'est) ;
+- les **publications** qui ont motivé l'appariement (les trois premières, puis « N autres
+  publications »), avec le lien DOI quand Druid le connaît, sinon une recherche sur OpenAlex.
+
+## Donner son avis
+
+Sous chaque appariement, trois boutons : **Pertinent**, **Non pertinent**, **Déjà en montage**.
+Un avis par personne et par appariement, le dernier remplace le précédent ; le compte des avis
+s'affiche à côté de chaque bouton. Ces avis servent à évaluer et améliorer le traitement automatique
+(ils sont exportables pour l'équipe CRISalid) : donnez-en même sur les appariements évidents.
+
+## Repérer les candidats éligibles
+
+La vue **Candidats** concerne les appels réservés à une étape de carrière, comme les bourses ERC
+*Starting* et *Consolidator*. Druid lit la règle **dans le texte de l'appel** (par exemple « thèse
+soutenue entre le 1er janvier 2017 et le 31 décembre 2026 ») : elle change d'une édition à l'autre
+et n'est jamais écrite en dur. Choisissez l'appel ; la vue rappelle la règle, la phrase du texte
+dont elle est tirée et les échéances, puis liste les personnes de la structure.
+
+L'**année de thèse** vient de [theses.fr](https://theses.fr), lue par l'**IdRef** de la fiche
+(revérifiée tous les six mois, ou dès que l'IdRef change) : sans IdRef, ou pour une thèse absente
+de theses.fr (thèse étrangère, ancienne), la personne n'apparaît pas. La thèse trouvée s'affiche
+aussi sur la fiche, sous la ligne HDR.
+
+| Verdict | Signification |
+|---|---|
+| **Éligible** | thèse soutenue dans la fenêtre de l'appel |
+| **À vérifier** | date connue à l'année seulement et tombant sur une borne de la fenêtre, ou thèse juste avant la fenêtre : éligible seulement avec une prolongation justifiée (congé maternité ou parental, maladie, service national, formation clinique) |
+
+Filtrez par verdict et par grade, et exportez la liste en **CSV** pour le service Europe ou la
+direction de la recherche. Seule la date de thèse est contrôlée : les autres conditions de l'appel
+(financement antérieur, établissement d'accueil, temps passé en Europe…) restent à vérifier avec la
+personne.
+
+## Qui voit quoi
+
+- Avec un droit sur **tout l'établissement**, les appariements de toutes les structures et la vue
+  **Candidats**.
+- Avec un droit limité à **votre labo**, les appariements de ses chercheurs seulement ; pas de vue
+  Candidats, qui croise les carrières.
+- Tout utilisateur connecté peut donner un avis ; l'export des avis est réservé aux droits
+  établissement.
+
+## Limites connues
+
+- **Les publications connues du graphe CRISalid seulement** : un chercheur dont les publications
+  n'y sont pas, ou pas encore vectorisées, n'apparaît sur aucun appel. Le bandeau de périmètre
+  indique les structures couvertes par le calcul.
+- **Un calcul par programme, à une date donnée** : les appariements ne se recalculent pas quand
+  l'annuaire ou les publications changent, et un appel ajouté depuis le dernier calcul n'a pas
+  encore de chercheurs.
+- **Les dates viennent de la source** au moment de la collecte : vérifiez-les sur la page
+  officielle de l'appel avant de vous engager.
+- **Les axes de l'AAPG** sont gardés après la clôture de l'étape 1 : ils décrivent le profil d'un
+  projet jusqu'à l'édition suivante.
+- La vue Candidats ne lit pour l'instant que les règles fondées sur la **date de thèse** (ERC).
+
+## Voir aussi
+
+- [Gérer les appels à projets](/guides/administration/appels-a-projets/)
+- [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Lire une fiche](/guides/personnes/lire-une-fiche/)
+- [Sources des données](/donnees/sources-des-donnees/)

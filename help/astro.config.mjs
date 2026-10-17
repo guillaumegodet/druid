@@ -9,6 +9,11 @@ const site = process.env.HELP_SITE_URL || 'https://druid-aide.guillaumegodet.wor
 
 export default defineConfig({
 	site,
+	// Pages renamed: the old addresses (links shared, help links of older releases) lead to the new ones.
+	redirects: {
+		'/guides/tableau-de-bord/appels-europeens': '/guides/tableau-de-bord/appels-a-projets/',
+		'/en/guides/tableau-de-bord/appels-europeens': '/en/guides/tableau-de-bord/appels-a-projets/',
+	},
 	integrations: [
 		starlight({
 			title: { fr: 'Aide Druid', en: 'Druid Help' },
