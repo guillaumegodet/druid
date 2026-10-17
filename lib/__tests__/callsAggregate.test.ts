@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  callsWithMatches, inPerimeter, isOpenAt, matchesByResearcher, nextDeadlineOf, programmesOfCategory, subsetsOf, uidsOf,
+  callsWithMatches, inPerimeter, isOpenAt, matchesByResearcher, nextDeadlineOf, programmesOfCategory, subsetsOf, uidsOf, withMyFeedback,
   type Call, type CallMatch, type ProgrammeView,
 } from '../calls/aggregate';
 
@@ -77,6 +77,15 @@ describe('subsetsOf / programmesOfCategory', () => {
   it('keeps the programmes of a category, all without category', () => {
     expect(programmesOfCategory(programmes, 'ANR').map((p) => p.programmeId)).toEqual(['anr-aapg']);
     expect(programmesOfCategory(programmes, '')).toHaveLength(2);
+  });
+});
+
+describe('withMyFeedback', () => {
+  it('counts the opinion of the user and withdraws their previous one', () => {
+    const first = withMyFeedback(match('T-OPEN', 'a', 'strong', 1), 'relevant');
+    expect(first).toMatchObject({ feedback: { relevant: 1 }, mine: 'relevant' });
+    const changed = withMyFeedback({ ...first, feedback: { relevant: 3 } }, 'not_relevant');
+    expect(changed).toMatchObject({ feedback: { relevant: 2, not_relevant: 1 }, mine: 'not_relevant' });
   });
 });
 

@@ -2984,6 +2984,30 @@ app.get('/api/researchers/by-row/:rowId/theses', sendTheses(async (req, res, sto
   return store.thesesOfRow(rowId);
 }));
 
+// ── Calls for proposals of a researcher (druid-internal docs/plan-funding-calls.md, lot 7) ───────────────────────────
+// Block of the record: the calls where the engines retained the person (same rule as the tab: a lab scope sees the
+// matches of its labs' records, the researcher their own) and, for the institution right only (D5), the calls their
+// career makes them eligible to. The key is the directory uid, or g<rowId> for a record without uid (never matched:
+// the matches carry the uid; their eligibility is found by the membership).
+app.get('/api/researchers/:key/calls', withCalls(async (req, res, store) => {
+  const access = req.session.user?.access;
+  if (!hasAnyRight(access)) return res.status(403).json({ error: 'Forbidden' });
+  const key = String(req.params.key || '');
+  if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
+  const byRow = /^g(\d+)$/.exec(key);
+  const uids = byRow ? [] : await callsUidsOf(req);
+  const matches = byRow || (uids && !uids.includes(key)) ? [] : await store.matches({ uids: [key], viewer: req.session.user.preferred_username });
+  const eligibilityStore = access.allSlugs ? storage().eligibility : null;
+  const eligibility = eligibilityStore ? await eligibilityStore.ofPerson(byRow ? { rowId: Number(byRow[1]) } : { uid: key }) : null;
+  const callIds = new Set(matches.map((m) => m.callId));
+  res.json({
+    calls: callIds.size ? (await store.calls()).filter((c) => callIds.has(c.callId)) : [],
+    programmes: await store.programmes(),
+    matches,
+    eligibility,
+  });
+}));
+
 // ── « Suggestions de l'établissement » of a record (docs/archive/plan-parcours-affiliations.md, lot 5) ─────
 // Computed server-side by scripts/lib/suggestions.cjs from the Annuaire rows, the career-path entry, the
 // alignment caches (bind-mounted at the app root), the detection rules of sync_tasks.cjs and the tasks

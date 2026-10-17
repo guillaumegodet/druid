@@ -13,6 +13,12 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Fiche chercheur — carte « Appels à projets »** : les appels où l'appariement a retenu la personne (force,
+  justification, publications, boutons d'avis ; appels clos masqués par défaut) et, pour le droit établissement
+  seulement, les appels réservés à une étape de carrière où sa date de thèse la rend éligible ou à vérifier (fenêtre
+  de l'appel, thèse de la fiche). Mêmes règles de visibilité que l'onglet (un droit labo voit les fiches de ses labos,
+  le chercheur la sienne). Route `/api/researchers/:key/calls` ; carte masquée quand il n'y a rien. Lot 7 du plan
+  `plan-funding-calls.md`.
 - **Fiche chercheur — IdHAL_i secondaires** : sous l'IdHAL_i, un champ « Autres IdHAL_i (non moissonnés) » garde les
   autres personnes HAL du chercheur (un même chercheur en a souvent plusieurs, avec ou sans IdHAL), avec un lien vers
   leurs dépôts et un bouton « définir comme principal » qui échange un secondaire avec le principal. Seul l'IdHAL_i

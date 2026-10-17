@@ -77,6 +77,14 @@ const OVERALL_RANK: Record<MatchOverall, number> = { strong: 0, plausible: 1, we
 export const compareMatches = (a: CallMatch, b: CallMatch): number =>
   OVERALL_RANK[a.overall] - OVERALL_RANK[b.overall] || b.score - a.score || a.personName.localeCompare(b.personName);
 
+/** The match once `verdict` is the opinion of the current user (their previous opinion, if any, withdrawn). */
+export const withMyFeedback = (m: CallMatch, verdict: FeedbackVerdict): CallMatch => {
+  const feedback = { ...m.feedback };
+  if (m.mine) feedback[m.mine] = Math.max(0, (feedback[m.mine] ?? 1) - 1);
+  feedback[verdict] = (feedback[verdict] ?? 0) + 1;
+  return { ...m, feedback, mine: verdict };
+};
+
 export const nextDeadlineOf = (deadlines: string[], today: string): string | null =>
   [...deadlines].sort().find((d) => d >= today) ?? null;
 

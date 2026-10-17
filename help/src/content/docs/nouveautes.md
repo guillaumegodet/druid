@@ -48,6 +48,9 @@ n'existent que sur les instances qui en disposent (voir
 - **Vue Candidats** (droit établissement) : pour les bourses ERC *Starting* et *Consolidator*, les
   chercheurs éligibles ou à vérifier d'après leur date de thèse, lue sur theses.fr ; export CSV.
   Voir [Repérer les candidats éligibles](/guides/tableau-de-bord/appels-a-projets/#repérer-les-candidats-éligibles).
+- **Carte « Appels à projets » sur la fiche** : les appels où le chercheur ressort, avec les
+  boutons d'avis, et (droit établissement) ceux auxquels sa date de thèse le rend éligible. Voir
+  [Sur la fiche d'un chercheur](/guides/tableau-de-bord/appels-a-projets/#sur-la-fiche-dun-chercheur).
 - **Appels saisis à la main** : Administration › Appels à projets accueille les appels qu'aucun
   collecteur ne lit (Région, fondations, labex, appels internes…), ajoutés depuis leur adresse,
   leur PDF, une page de l'intranet enregistrée ou leur texte collé ; le modèle de langue propose
