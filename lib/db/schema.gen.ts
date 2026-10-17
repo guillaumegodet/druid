@@ -193,6 +193,7 @@ export interface Funder {
 }
 
 export interface FundingCall {
+  added_by: Generated<string>;
   budget: Generated<Json>;
   call_id: string;
   content_hash: Generated<string>;
@@ -203,6 +204,8 @@ export interface FundingCall {
   opening_date: string | null;
   programme_id: string;
   review_status: Generated<string>;
+  reviewed_at: Timestamp | null;
+  reviewed_by: Generated<string>;
   scheme: Generated<string>;
   scope: Generated<string>;
   status: Generated<string>;

@@ -12,6 +12,7 @@ import { numberLocale } from '../../lib/i18n';
 import { GraphActionsPanel } from './GraphActionsPanel';
 import { InstitutionsAdmin } from './InstitutionsAdmin';
 import { CallsProgrammesAdmin } from './CallsProgrammesAdmin';
+import { ManualCallsAdmin } from './ManualCallsAdmin';
 
 export type { AdminTab };
 
@@ -154,8 +155,9 @@ export const AdminPage: React.FC<{
         </div>
       )}
       {tab === 'calls' && (
-        <div className="max-w-6xl">
+        <div className="max-w-6xl space-y-8">
           <CallsProgrammesAdmin />
+          <ManualCallsAdmin />
         </div>
       )}
     </div>

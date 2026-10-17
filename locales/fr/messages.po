@@ -239,7 +239,7 @@ msgid "Unknown"
 msgstr "Inconnu"
 
 #: components/AccountMenu.tsx:100
-#: components/admin/AdminPage.tsx:108
+#: components/admin/AdminPage.tsx:109
 msgid "Administration"
 msgstr "Administration"
 
@@ -574,6 +574,7 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/ResearcherDetail.tsx:476
 #: components/ResearcherDetail.tsx:579
 #: components/admin/InstitutionsAdmin.tsx:223
+#: components/admin/ManualCallsAdmin.tsx:328
 #: components/dashboard/AxisReviewTable.tsx:263
 #: components/reports/AddToReportDialog.tsx:195
 #: components/reports/HistoryDialog.tsx:136
@@ -876,6 +877,7 @@ msgid "Revalidate"
 msgstr "Revalider"
 
 #: components/ResearcherDetail.tsx:587
+#: components/admin/ManualCallsAdmin.tsx:636
 #: components/dashboard/MediaMentionsPanel.tsx:317
 #: components/dashboard/NewsletterPanel.tsx:388
 #: components/researchers/GroupModal.tsx:65
@@ -1158,60 +1160,60 @@ msgstr "Précédent"
 msgid "Next"
 msgstr "Suivant"
 
-#: components/admin/AdminPage.tsx:82
+#: components/admin/AdminPage.tsx:83
 msgid "ETL console"
 msgstr "Console ETL"
 
-#: components/admin/AdminPage.tsx:83
+#: components/admin/AdminPage.tsx:84
 msgid "Access rights"
 msgstr "Gestion des droits"
 
-#: components/admin/AdminPage.tsx:84
+#: components/admin/AdminPage.tsx:85
 msgid "Media sources"
 msgstr "Sources médias"
 
-#: components/admin/AdminPage.tsx:85
+#: components/admin/AdminPage.tsx:86
 msgid "Institutions"
 msgstr "Établissements"
 
-#: components/admin/AdminPage.tsx:86
+#: components/admin/AdminPage.tsx:87
 #: components/dashboard/dashboardNav.ts:109
 msgid "Calls for proposals"
 msgstr "Appels à projets"
 
-#: components/admin/AdminPage.tsx:98
+#: components/admin/AdminPage.tsx:99
 msgid "Section reserved for administrators."
 msgstr "Rubrique réservée aux administrateurs."
 
-#: components/admin/AdminPage.tsx:120
+#: components/admin/AdminPage.tsx:121
 msgid "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
 msgstr "Régénère structures.csv (depuis Grist) puis people.csv pour cdb / SoVisu+ — flux sortant, aucune écriture dans l'Annuaire"
 
-#: components/admin/AdminPage.tsx:123
+#: components/admin/AdminPage.tsx:124
 msgid "Synchronise with SoVisu+"
 msgstr "Synchroniser avec SoVisu+"
 
-#: components/admin/AdminPage.tsx:130
+#: components/admin/AdminPage.tsx:131
 msgid "Last export to SoVisu+:"
 msgstr "Dernier export vers SoVisu+ :"
 
 #. placeholder {0}: exportStatus.structures.count
 #. placeholder {1}: formatStatusDate(exportStatus.structures.updatedAt)
-#: components/admin/AdminPage.tsx:132
+#: components/admin/AdminPage.tsx:133
 msgid "structures.csv — {0} structures, {1}"
 msgstr "structures.csv — {0} structures, {1}"
 
-#: components/admin/AdminPage.tsx:133
+#: components/admin/AdminPage.tsx:134
 msgid "structures.csv — never generated"
 msgstr "structures.csv — jamais généré"
 
 #. placeholder {0}: exportStatus.people.count
 #. placeholder {1}: formatStatusDate(exportStatus.people.updatedAt)
-#: components/admin/AdminPage.tsx:136
+#: components/admin/AdminPage.tsx:137
 msgid "people.csv — {0} people, {1}"
 msgstr "people.csv — {0} personnes, {1}"
 
-#: components/admin/AdminPage.tsx:137
+#: components/admin/AdminPage.tsx:138
 msgid "people.csv — never generated"
 msgstr "people.csv — jamais généré"
 
@@ -1244,6 +1246,10 @@ msgstr "Site de l’ANR"
 msgid "TRM reports"
 msgstr "rapports TRM"
 
+#: components/admin/CallsProgrammesAdmin.tsx:68
+msgid "added by hand"
+msgstr "saisi à la main"
+
 #: components/admin/CallsProgrammesAdmin.tsx:72
 msgid "Loading the programmes…"
 msgstr "Chargement des programmes…"
@@ -1265,6 +1271,8 @@ msgid "Refresh"
 msgstr "Actualiser"
 
 #: components/admin/CallsProgrammesAdmin.tsx:105
+#: components/admin/ManualCallsAdmin.tsx:255
+#: components/admin/ManualCallsAdmin.tsx:445
 #: components/dashboard/CallsTab.tsx:438
 msgid "Programme"
 msgstr "Programme"
@@ -1279,6 +1287,7 @@ msgid "Calls"
 msgstr "Appels"
 
 #: components/admin/CallsProgrammesAdmin.tsx:109
+#: components/admin/ManualCallsAdmin.tsx:608
 msgid "Matches"
 msgstr "Appariements"
 
@@ -1341,6 +1350,7 @@ msgid "Texts fetched"
 msgstr "Textes lus"
 
 #: components/admin/CallsProgrammesAdmin.tsx:161
+#: components/admin/ManualCallsAdmin.tsx:446
 msgid "Result"
 msgstr "Résultat"
 
@@ -1548,6 +1558,7 @@ msgid "Records"
 msgstr "Fiches"
 
 #: components/admin/InstitutionsAdmin.tsx:254
+#: components/admin/ManualCallsAdmin.tsx:633
 #: components/researchers/ValidationImportReview.tsx:220
 msgid "Edit"
 msgstr "Modifier"
@@ -1559,6 +1570,410 @@ msgstr "Aucun établissement ne correspond."
 #: components/admin/InstitutionsAdmin.tsx:267
 msgid "Institutions are never deleted from here: directory records refer to them. « Records » counts the loaded records whose employer is this institution."
 msgstr "Les établissements ne se suppriment pas d'ici : des fiches de l'annuaire les référencent. « Fiches » compte les fiches chargées dont l'employeur est cet établissement."
+
+#: components/admin/ManualCallsAdmin.tsx:95
+msgid "A call with this URL is already known:"
+msgstr "Un appel à cette adresse est déjà connu :"
+
+#: components/admin/ManualCallsAdmin.tsx:138
+msgid "Fields proposed by the language model from the text ({chars} characters): check each of them against the call before saving."
+msgstr "Champs proposés par le modèle de langue à partir du texte ({chars} caractères) : vérifiez chacun d'eux sur l'appel avant d'enregistrer."
+
+#: components/admin/ManualCallsAdmin.tsx:139
+msgid "The language model gave no answer: fill in the fields from the call."
+msgstr "Le modèle de langue n'a pas répondu : remplissez les champs d'après l'appel."
+
+#: components/admin/ManualCallsAdmin.tsx:173
+msgid "Edit a call"
+msgstr "Modifier un appel"
+
+#: components/admin/ManualCallsAdmin.tsx:173
+#: components/admin/ManualCallsAdmin.tsx:573
+msgid "Add a call"
+msgstr "Ajouter un appel"
+
+#: components/admin/ManualCallsAdmin.tsx:175
+#: components/admin/ManualCallsAdmin.tsx:408
+#: components/dashboard/EChartCard.tsx:263
+#: components/dashboard/EChartCard.tsx:328
+#: components/dashboard/NetworkTab.tsx:356
+#: components/dashboard/NewsTab.tsx:815
+#: components/dashboard/NewsletterPanel.tsx:435
+#: components/dashboard/PublicationsListModal.tsx:67
+#: components/dashboard/report/ReportWizard.tsx:261
+#: components/reports/AddToReportDialog.tsx:122
+#: components/reports/ChartPicker.tsx:62
+#: components/reports/HistoryDialog.tsx:72
+#: components/reports/NewReportDialog.tsx:179
+#: components/reports/ShareDialog.tsx:94
+#: components/researchers/AffiliationHistorySection.tsx:100
+#: components/researchers/AlignLaunchModal.tsx:104
+#: components/researchers/SiteImportReview.tsx:110
+#: components/researchers/SiteImportReview.tsx:286
+#: components/researchers/UnifiedAlignPage.tsx:703
+msgid "Close"
+msgstr "Fermer"
+
+#: components/admin/ManualCallsAdmin.tsx:182
+msgid "Give the address of the page of the call, or its PDF: Druid reads the text and the language model of the instance proposes the fields. Nothing is saved before your review."
+msgstr "Donnez l'adresse de la page de l'appel, ou son PDF : Druid lit le texte et le modèle de langue de l'instance propose les champs. Rien n'est enregistré avant votre relecture."
+
+#: components/admin/ManualCallsAdmin.tsx:183
+msgid "The language model of the instance is not configured (ILAAS_API_KEY): fill in the fields by hand."
+msgstr "Le modèle de langue de l'instance n'est pas configuré (ILAAS_API_KEY) : remplissez les champs à la main."
+
+#: components/admin/ManualCallsAdmin.tsx:189
+msgid "Address of the call"
+msgstr "Adresse de l'appel"
+
+#: components/admin/ManualCallsAdmin.tsx:191
+msgid "Read"
+msgstr "Lire"
+
+#: components/admin/ManualCallsAdmin.tsx:195
+msgid "PDF of the call"
+msgstr "PDF de l'appel"
+
+#: components/admin/ManualCallsAdmin.tsx:199
+msgid "A page saved from your browser (File › Save as), for a website the server cannot reach such as the intranet"
+msgstr "Une page enregistrée depuis votre navigateur (Fichier › Enregistrer sous), pour un site que le serveur ne peut pas joindre, comme l'intranet"
+
+#: components/admin/ManualCallsAdmin.tsx:200
+msgid "Saved page (HTML)"
+msgstr "Page enregistrée (HTML)"
+
+#: components/admin/ManualCallsAdmin.tsx:204
+msgid "Paste the text"
+msgstr "Coller le texte"
+
+#: components/admin/ManualCallsAdmin.tsx:205
+msgid "Fill in by hand"
+msgstr "Saisir à la main"
+
+#: components/admin/ManualCallsAdmin.tsx:210
+msgid "Text of the call, copied from its page or document"
+msgstr "Texte de l'appel, copié depuis sa page ou son document"
+
+#: components/admin/ManualCallsAdmin.tsx:211
+msgid "Text of the call"
+msgstr "Texte de l'appel"
+
+#: components/admin/ManualCallsAdmin.tsx:213
+msgid "Read the text"
+msgstr "Lire le texte"
+
+#: components/admin/ManualCallsAdmin.tsx:217
+msgid "Reading the call and proposing the fields (up to a minute)…"
+msgstr "Lecture de l'appel et proposition des champs (jusqu'à une minute)…"
+
+#: components/admin/ManualCallsAdmin.tsx:233
+#: components/dashboard/CallsTab.tsx:427
+#: components/dashboard/FundersTab.tsx:353
+msgid "Funder"
+msgstr "Financeur"
+
+#: components/admin/ManualCallsAdmin.tsx:235
+msgid "New funder…"
+msgstr "Nouveau financeur…"
+
+#: components/admin/ManualCallsAdmin.tsx:242
+msgid "Name of the funder"
+msgstr "Nom du financeur"
+
+#: components/admin/ManualCallsAdmin.tsx:247
+#: components/dashboard/FundersTab.tsx:354
+#: components/dashboard/StaffSection.tsx:105
+#: components/researchers/LdapMovesPanel.tsx:168
+#: components/researchers/LdapMovesPanel.tsx:227
+#: lib/chartExport.ts:103
+#: lib/chartExport.ts:227
+msgid "Category"
+msgstr "Catégorie"
+
+#: components/admin/ManualCallsAdmin.tsx:257
+msgid "New programme…"
+msgstr "Nouveau programme…"
+
+#: components/admin/ManualCallsAdmin.tsx:263
+msgid "Name of the programme"
+msgstr "Nom du programme"
+
+#: components/admin/ManualCallsAdmin.tsx:269
+msgid "Title of the call"
+msgstr "Intitulé de l'appel"
+
+#: components/admin/ManualCallsAdmin.tsx:274
+#: components/dashboard/CallsTab.tsx:209
+msgid "Page of the call"
+msgstr "Page de l'appel"
+
+#: components/admin/ManualCallsAdmin.tsx:278
+msgid "Language of the text"
+msgstr "Langue du texte"
+
+#: components/admin/ManualCallsAdmin.tsx:280
+#: components/dashboard/labels.ts:12
+msgid "French"
+msgstr "Français"
+
+#: components/admin/ManualCallsAdmin.tsx:281
+#: components/dashboard/labels.ts:13
+msgid "English"
+msgstr "Anglais"
+
+#: components/admin/ManualCallsAdmin.tsx:285
+#: components/dashboard/CallsTab.tsx:205
+msgid "Opening"
+msgstr "Ouverture"
+
+#: components/admin/ManualCallsAdmin.tsx:292
+#: components/admin/ManualCallsAdmin.tsx:606
+msgid "Deadline"
+msgstr "Date limite"
+
+#. placeholder {0}: i + 1
+#: components/admin/ManualCallsAdmin.tsx:292
+msgid "Deadline (stage {0})"
+msgstr "Date limite (étape {0})"
+
+#: components/admin/ManualCallsAdmin.tsx:297
+msgid "Another stage"
+msgstr "Autre étape"
+
+#: components/admin/ManualCallsAdmin.tsx:300
+msgid "Budget"
+msgstr "Budget"
+
+#: components/admin/ManualCallsAdmin.tsx:301
+msgid "e.g. up to 200 k€ per project"
+msgstr "ex. jusqu'à 200 k€ par projet"
+
+#: components/admin/ManualCallsAdmin.tsx:305
+#: components/dashboard/report/templates.ts:191
+#: components/dashboard/report/templates.ts:267
+#: components/dashboard/report/templates.ts:326
+#: components/dashboard/report/templates.ts:357
+msgid "Summary"
+msgstr "Synthèse"
+
+#: components/admin/ManualCallsAdmin.tsx:309
+msgid "Objectives"
+msgstr "Objectifs"
+
+#: components/admin/ManualCallsAdmin.tsx:313
+msgid "Scope and topics"
+msgstr "Périmètre et thèmes"
+
+#: components/admin/ManualCallsAdmin.tsx:313
+msgid "the text read to find the researchers concerned"
+msgstr "le texte lu pour trouver les chercheurs concernés"
+
+#: components/admin/ManualCallsAdmin.tsx:317
+msgid "Eligibility"
+msgstr "Éligibilité"
+
+#: components/admin/ManualCallsAdmin.tsx:323
+msgid "Save and validate anyway"
+msgstr "Enregistrer et valider quand même"
+
+#: components/admin/ManualCallsAdmin.tsx:323
+msgid "Save and validate"
+msgstr "Enregistrer et valider"
+
+#: components/admin/ManualCallsAdmin.tsx:326
+msgid "Save to validate later anyway"
+msgstr "Enregistrer à valider quand même"
+
+#: components/admin/ManualCallsAdmin.tsx:326
+msgid "Save to validate later"
+msgstr "Enregistrer à valider"
+
+#: components/admin/ManualCallsAdmin.tsx:377
+msgid "This RTF file is not a ResearchConnect export"
+msgstr "Ce fichier RTF n'est pas un export ResearchConnect"
+
+#: components/admin/ManualCallsAdmin.tsx:397
+msgid "The file could not be read"
+msgstr "Le fichier n'a pas pu être lu"
+
+#: components/admin/ManualCallsAdmin.tsx:402
+#: components/researchers/UnifiedAlignPage.tsx:608
+msgid "error"
+msgstr "erreur"
+
+#: components/admin/ManualCallsAdmin.tsx:402
+#: components/researchers/DuplicatesPage.tsx:181
+msgid "new"
+msgstr "nouveau"
+
+#: components/admin/ManualCallsAdmin.tsx:402
+msgid "update"
+msgstr "mise à jour"
+
+#: components/admin/ManualCallsAdmin.tsx:407
+msgid "Import a catalogue of calls"
+msgstr "Importer un catalogue d'appels"
+
+#: components/admin/ManualCallsAdmin.tsx:411
+msgid "A CSV (UTF-8) or Excel file, one call per row, the first row naming the columns: Title (required), Funder, Category, Programme, URL, Language, Opening, Deadline, Deadline 2, Summary, Objectives, Scope, Eligibility, Budget, Reference. The days are written 2027-01-31 or 31/01/2027. A row with the same Reference (or, without one, the same funder, programme, URL and title) updates the call imported before. The other columns are ignored."
+msgstr "Un fichier CSV (UTF-8) ou Excel, un appel par ligne, la première ligne nommant les colonnes : Titre (obligatoire), Financeur, Catégorie, Programme, URL, Langue, Ouverture, Date limite, Date limite 2, Résumé, Objectifs, Périmètre, Éligibilité, Budget, Référence. Les jours s'écrivent 2027-01-31 ou 31/01/2027. Une ligne de même Référence (ou, sans référence, de mêmes financeur, programme, URL et titre) met à jour l'appel importé auparavant. Les autres colonnes sont ignorées."
+
+#: components/admin/ManualCallsAdmin.tsx:418
+msgid "The RTF export of a ResearchConnect search is read the same way (one call per fund, source « researchconnect »)."
+msgstr "L'export RTF d'une recherche ResearchConnect se lit de la même façon (un appel par fiche, source « researchconnect »)."
+
+#: components/admin/ManualCallsAdmin.tsx:422
+msgid "Choose a file"
+msgstr "Choisir un fichier"
+
+#: components/admin/ManualCallsAdmin.tsx:427
+msgid "Import the calls as validated (else they wait for a validation)"
+msgstr "Importer les appels comme validés (sinon ils attendent une validation)"
+
+#: components/admin/ManualCallsAdmin.tsx:435
+msgid "Columns read:"
+msgstr "Colonnes lues :"
+
+#: components/admin/ManualCallsAdmin.tsx:436
+msgid "ignored:"
+msgstr "ignorées :"
+
+#. placeholder {0}: report.truncated
+#: components/admin/ManualCallsAdmin.tsx:437
+msgid "{0, plural, one {# row beyond the limit left out} other {# rows beyond the limit left out}}"
+msgstr "{0, plural, one {# ligne au-delà de la limite écartée} other {# lignes au-delà de la limite écartées}}"
+
+#: components/admin/ManualCallsAdmin.tsx:443
+#: lib/chartExport.ts:116
+msgid "Row"
+msgstr "Ligne"
+
+#: components/admin/ManualCallsAdmin.tsx:444
+#: components/dashboard/AxesTab.tsx:213
+#: components/dashboard/AxisReviewTable.tsx:201
+#: components/dashboard/CharteTab.tsx:396
+#: components/dashboard/ImpactTab.tsx:210
+#: components/dashboard/MediaSourcesAdmin.tsx:384
+#: components/dashboard/NewsTab.tsx:690
+#: components/dashboard/PublicationsListTab.tsx:438
+#: components/dashboard/report/reportTables.ts:47
+#: lib/importConflicts.ts:62
+msgid "Title"
+msgstr "Titre"
+
+#. placeholder {0}: report.lines.filter((l) => l.callId && !l.errors.length).length
+#: components/admin/ManualCallsAdmin.tsx:465
+msgid "{0, plural, one {# call imported} other {# calls imported}}"
+msgstr "{0, plural, one {# appel importé} other {# appels importés}}"
+
+#: components/admin/ManualCallsAdmin.tsx:469
+msgid "{valid, plural, one {Import # call} other {Import # calls}}"
+msgstr "{valid, plural, one {Importer # appel} other {Importer # appels}}"
+
+#: components/admin/ManualCallsAdmin.tsx:548
+#: components/dashboard/MediaMentionsPanel.tsx:555
+#: components/researchers/MergeResearchersModal.tsx:186
+#: components/researchers/SiteImportReview.tsx:275
+msgid "validated"
+msgstr "validée"
+
+#: components/admin/ManualCallsAdmin.tsx:548
+msgid "to validate"
+msgstr "à valider"
+
+#: components/admin/ManualCallsAdmin.tsx:548
+msgid "rejected"
+msgstr "écarté"
+
+#: components/admin/ManualCallsAdmin.tsx:555
+#: components/dashboard/NewsletterPanel.tsx:32
+#: components/researchers/FilterPanel.tsx:143
+#: components/researchers/LdapVerifyPanel.tsx:136
+#: components/researchers/PresenceBadge.tsx:97
+msgid "Validated"
+msgstr "Validé"
+
+#: components/admin/ManualCallsAdmin.tsx:555
+msgid "To validate"
+msgstr "À valider"
+
+#: components/admin/ManualCallsAdmin.tsx:556
+#: components/dashboard/MediaMentionsPanel.tsx:508
+#: components/dashboard/NewsTab.tsx:207
+#: components/dashboard/NewsTab.tsx:639
+msgid "All"
+msgstr "Tous"
+
+#: components/admin/ManualCallsAdmin.tsx:556
+msgid "Rejected"
+msgstr "Écartés"
+
+#: components/admin/ManualCallsAdmin.tsx:563
+msgid "Calls added by hand"
+msgstr "Appels saisis à la main"
+
+#: components/admin/ManualCallsAdmin.tsx:565
+msgid "Calls of the funders that no collector reads (Region, foundations, other France 2030 operators, internal calls…). A call waits « to validate » until someone of the institution validates it; only validated calls appear in the « Calls for proposals » tab. The matching to the researchers runs apart, programme by programme, like for the collected calls."
+msgstr "Appels des financeurs qu'aucun collecteur ne lit (Région, fondations, autres opérateurs de France 2030, appels internes…). Un appel reste « à valider » jusqu'à ce qu'une personne de l'établissement le valide ; seuls les appels validés apparaissent dans l'onglet « Appels à projets ». L'appariement aux chercheurs se lance à part, programme par programme, comme pour les appels collectés."
+
+#: components/admin/ManualCallsAdmin.tsx:574
+msgid "Import a catalogue"
+msgstr "Importer un catalogue"
+
+#: components/admin/ManualCallsAdmin.tsx:587
+msgid "Loading the calls…"
+msgstr "Chargement des appels…"
+
+#: components/admin/ManualCallsAdmin.tsx:589
+msgid "No call added by hand yet."
+msgstr "Aucun appel saisi à la main pour l'instant."
+
+#: components/admin/ManualCallsAdmin.tsx:604
+#: components/dashboard/CallCandidates.tsx:132
+#: components/dashboard/CallsTab.tsx:204
+msgid "Call"
+msgstr "Appel"
+
+#: components/admin/ManualCallsAdmin.tsx:605
+msgid "Funder › programme"
+msgstr "Financeur › programme"
+
+#: components/admin/ManualCallsAdmin.tsx:607
+msgid "Review"
+msgstr "Relecture"
+
+#: components/admin/ManualCallsAdmin.tsx:619
+msgid "page"
+msgstr "page"
+
+#. placeholder {0}: c.addedBy
+#: components/admin/ManualCallsAdmin.tsx:620
+msgid "added by {0}"
+msgstr "ajouté par {0}"
+
+#. placeholder {0}: c.reviewedBy
+#. placeholder {0}: r.owner
+#: components/admin/ManualCallsAdmin.tsx:627
+#: components/reports/AddToReportDialog.tsx:153
+#: components/reports/ReportsPage.tsx:160
+msgid "by {0}"
+msgstr "par {0}"
+
+#: components/admin/ManualCallsAdmin.tsx:639
+#: components/dashboard/MediaMentionsPanel.tsx:323
+msgid "Reject"
+msgstr "Rejeter"
+
+#: components/admin/ManualCallsAdmin.tsx:643
+msgid "Confirm the deletion"
+msgstr "Confirmer la suppression"
+
+#: components/admin/ManualCallsAdmin.tsx:646
+#: components/reports/ReportEditor.tsx:463
+#: components/reports/ReportsPage.tsx:195
+#: components/reports/ReportsPage.tsx:200
+msgid "Delete"
+msgstr "Supprimer"
 
 #. placeholder {0}: d.year
 #. placeholder {1}: d.total.toLocaleString(numberLocale())
@@ -1930,18 +2345,6 @@ msgstr "Tous les axes"
 #: components/dashboard/AxisReviewTable.tsx:188
 msgid "Title, DOI or journal…"
 msgstr "Titre, DOI ou revue…"
-
-#: components/dashboard/AxesTab.tsx:213
-#: components/dashboard/AxisReviewTable.tsx:201
-#: components/dashboard/CharteTab.tsx:396
-#: components/dashboard/ImpactTab.tsx:210
-#: components/dashboard/MediaSourcesAdmin.tsx:384
-#: components/dashboard/NewsTab.tsx:690
-#: components/dashboard/PublicationsListTab.tsx:438
-#: components/dashboard/report/reportTables.ts:47
-#: lib/importConflicts.ts:62
-msgid "Title"
-msgstr "Titre"
 
 #: components/dashboard/AxesTab.tsx:214
 msgid "Selected axis"
@@ -2832,11 +3235,6 @@ msgstr "Thèse après la fenêtre"
 msgid "No open call states an eligibility rule by career stage yet (ERC Starting and Consolidator Grants, ANR JCJC…)."
 msgstr "Aucun appel ouvert n’énonce encore de règle d’éligibilité liée à la carrière (ERC Starting et Consolidator, ANR JCJC…)."
 
-#: components/dashboard/CallCandidates.tsx:132
-#: components/dashboard/CallsTab.tsx:204
-msgid "Call"
-msgstr "Appel"
-
 #: components/dashboard/CallCandidates.tsx:135
 #: components/dashboard/CallCandidates.tsx:173
 msgid "Verdict"
@@ -2997,17 +3395,9 @@ msgstr "{0, plural, =0 {Aucun chercheur} one {# chercheur} other {# chercheurs}}
 msgid "{strong, plural, one {# strong} other {# strong}}"
 msgstr "{strong, plural, one {# forte} other {# fortes}}"
 
-#: components/dashboard/CallsTab.tsx:205
-msgid "Opening"
-msgstr "Ouverture"
-
 #: components/dashboard/CallsTab.tsx:206
 msgid "Deadlines"
 msgstr "Échéances"
-
-#: components/dashboard/CallsTab.tsx:209
-msgid "Page of the call"
-msgstr "Page de l'appel"
 
 #: components/dashboard/CallsTab.tsx:214
 msgid "No researcher of this structure was retained for this call."
@@ -3132,11 +3522,6 @@ msgstr "Rechercher un appel…"
 #: components/dashboard/CallsTab.tsx:418
 msgid "Search a researcher…"
 msgstr "Rechercher un chercheur…"
-
-#: components/dashboard/CallsTab.tsx:427
-#: components/dashboard/FundersTab.tsx:353
-msgid "Funder"
-msgstr "Financeur"
 
 #: components/dashboard/CallsTab.tsx:429
 #: components/reports/NewReportDialog.tsx:248
@@ -3679,26 +4064,6 @@ msgstr "Autres pays et langues"
 msgid "About “{title}”"
 msgstr "À propos de « {title} »"
 
-#: components/dashboard/EChartCard.tsx:263
-#: components/dashboard/EChartCard.tsx:328
-#: components/dashboard/NetworkTab.tsx:356
-#: components/dashboard/NewsTab.tsx:815
-#: components/dashboard/NewsletterPanel.tsx:435
-#: components/dashboard/PublicationsListModal.tsx:67
-#: components/dashboard/report/ReportWizard.tsx:261
-#: components/reports/AddToReportDialog.tsx:122
-#: components/reports/ChartPicker.tsx:62
-#: components/reports/HistoryDialog.tsx:72
-#: components/reports/NewReportDialog.tsx:179
-#: components/reports/ShareDialog.tsx:94
-#: components/researchers/AffiliationHistorySection.tsx:100
-#: components/researchers/AlignLaunchModal.tsx:104
-#: components/researchers/SiteImportReview.tsx:110
-#: components/researchers/SiteImportReview.tsx:286
-#: components/researchers/UnifiedAlignPage.tsx:703
-msgid "Close"
-msgstr "Fermer"
-
 #: components/dashboard/EChartCard.tsx:270
 #: components/researchers/TaskForm.tsx:147
 #: components/structures/IdentificationTab.tsx:57
@@ -3943,15 +4308,6 @@ msgstr "Référence"
 #: components/dashboard/FundersTab.tsx:352
 msgid "Project title"
 msgstr "Intitulé du projet"
-
-#: components/dashboard/FundersTab.tsx:354
-#: components/dashboard/StaffSection.tsx:105
-#: components/researchers/LdapMovesPanel.tsx:168
-#: components/researchers/LdapMovesPanel.tsx:227
-#: lib/chartExport.ts:103
-#: lib/chartExport.ts:227
-msgid "Category"
-msgstr "Catégorie"
 
 #: components/dashboard/FundersTab.tsx:355
 #: components/dashboard/JournalsTab.tsx:204
@@ -4384,10 +4740,6 @@ msgstr "remise en attente"
 msgid "undo"
 msgstr "annuler"
 
-#: components/dashboard/MediaMentionsPanel.tsx:323
-msgid "Reject"
-msgstr "Rejeter"
-
 #: components/dashboard/MediaMentionsPanel.tsx:358
 msgid "Mentions"
 msgstr "Mentions"
@@ -4442,12 +4794,6 @@ msgstr "{d} jours"
 msgid "Media type"
 msgstr "Type de média"
 
-#: components/dashboard/MediaMentionsPanel.tsx:508
-#: components/dashboard/NewsTab.tsx:207
-#: components/dashboard/NewsTab.tsx:639
-msgid "All"
-msgstr "Tous"
-
 #: components/dashboard/MediaMentionsPanel.tsx:523
 msgid "No mention over the period. Collection is recent: the volume builds up night after night (and the review queue comes in phase 2)."
 msgstr "Aucune mention sur la période. La collecte est récente : le volume se construit au fil des nuits (et la file de validation arrive en phase 2)."
@@ -4456,12 +4802,6 @@ msgstr "Aucune mention sur la période. La collecte est récente : le volume se 
 #: components/dashboard/MediaMentionsPanel.tsx:553
 msgid "Matching confidence: {0}%"
 msgstr "Confiance d'appariement : {0} %"
-
-#: components/dashboard/MediaMentionsPanel.tsx:555
-#: components/researchers/MergeResearchersModal.tsx:186
-#: components/researchers/SiteImportReview.tsx:275
-msgid "validated"
-msgstr "validée"
 
 #. placeholder {0}: broken.length
 #: components/dashboard/MediaMentionsPanel.tsx:591
@@ -4989,13 +5329,6 @@ msgstr "Généré"
 #: components/dashboard/NewsletterPanel.tsx:31
 msgid "Under review"
 msgstr "En validation"
-
-#: components/dashboard/NewsletterPanel.tsx:32
-#: components/researchers/FilterPanel.tsx:143
-#: components/researchers/LdapVerifyPanel.tsx:136
-#: components/researchers/PresenceBadge.tsx:97
-msgid "Validated"
-msgstr "Validé"
 
 #: components/dashboard/NewsletterPanel.tsx:33
 msgid "Discarded"
@@ -7239,14 +7572,6 @@ msgstr "Chiffres clés — collaboration avec un pays"
 msgid "Key figures — impact of the collaboration with a country"
 msgstr "Chiffres clés — impact de la collaboration avec un pays"
 
-#: components/dashboard/labels.ts:12
-msgid "French"
-msgstr "Français"
-
-#: components/dashboard/labels.ts:13
-msgid "English"
-msgstr "Anglais"
-
 #: components/dashboard/labels.ts:14
 msgid "Spanish"
 msgstr "Espagnol"
@@ -8663,13 +8988,6 @@ msgstr "La référence d'impact est l'ensemble des autres co-publications intern
 msgid "Funders are those the publications acknowledge: they say neither who paid the research nor who holds the grant."
 msgstr "Les financeurs sont ceux que les publications remercient : ils ne disent ni qui a payé la recherche ni qui porte le financement."
 
-#: components/dashboard/report/templates.ts:191
-#: components/dashboard/report/templates.ts:267
-#: components/dashboard/report/templates.ts:326
-#: components/dashboard/report/templates.ts:357
-msgid "Summary"
-msgstr "Synthèse"
-
 #: components/dashboard/report/templates.ts:193
 #: components/dashboard/report/templates.ts:269
 #: components/dashboard/report/templates.ts:328
@@ -9285,12 +9603,6 @@ msgstr "Ouvrir le rapport"
 msgid "Loading your reports…"
 msgstr "Chargement de vos rapports…"
 
-#. placeholder {0}: r.owner
-#: components/reports/AddToReportDialog.tsx:153
-#: components/reports/ReportsPage.tsx:160
-msgid "by {0}"
-msgstr "par {0}"
-
 #: components/reports/AddToReportDialog.tsx:158
 #: components/reports/NewReportDialog.tsx:178
 #: components/reports/ReportsPage.tsx:110
@@ -9627,12 +9939,6 @@ msgstr "Afficher dans le PDF"
 #: components/reports/ReportEditor.tsx:460
 msgid "Hide from the PDF"
 msgstr "Masquer dans le PDF"
-
-#: components/reports/ReportEditor.tsx:463
-#: components/reports/ReportsPage.tsx:195
-#: components/reports/ReportsPage.tsx:200
-msgid "Delete"
-msgstr "Supprimer"
 
 #: components/reports/ReportEditor.tsx:488
 msgid "Add a first block with the buttons above."
@@ -10490,10 +10796,6 @@ msgstr "{newDuplicates, plural, one {# groupe de doublons est apparu depuis votr
 #: components/researchers/DuplicatesPage.tsx:164
 msgid "Open the records to decide, or click “Merge”: the assistant compares both rows field by field, logs the operation and keeps it restorable. Legitimate multiple affiliations should not be merged."
 msgstr "Ouvrez les fiches pour arbitrer, ou lancez « Fusionner » : l'assistant compare les deux lignes champ par champ, journalise et reste restaurable. Les multi-rattachements légitimes ne sont pas à fusionner."
-
-#: components/researchers/DuplicatesPage.tsx:181
-msgid "new"
-msgstr "nouveau"
 
 #. placeholder {0}: row.gristRowId
 #. placeholder {1}: row.dataSource || '—'
@@ -12688,10 +12990,6 @@ msgstr "Recherche en cours…"
 msgid "Search everywhere…"
 msgstr "Rechercher partout…"
 
-#: components/researchers/UnifiedAlignPage.tsx:608
-msgid "error"
-msgstr "erreur"
-
 #. placeholder {0}: p.done ?? 0
 #. placeholder {1}: p.total ?? '?'
 #: components/researchers/UnifiedAlignPage.tsx:608
@@ -13689,564 +13987,700 @@ msgstr "Avis invalide"
 msgid "Unknown pair"
 msgstr "Paire inconnue"
 
-#: lib/apiErrors.ts:51
+#: lib/apiErrors.ts:52
+msgid "Give the URL of the call or its PDF"
+msgstr "Donnez l'adresse de l'appel ou son PDF"
+
+#: lib/apiErrors.ts:53
+msgid "A call with this URL is already known"
+msgstr "Un appel à cette adresse est déjà connu"
+
+#: lib/apiErrors.ts:54
+msgid "Invalid review status"
+msgstr "État de relecture invalide"
+
+#: lib/apiErrors.ts:55
+msgid "Researchers were matched to this call: reject it instead"
+msgstr "Des chercheurs ont été appariés à cet appel : écartez-le plutôt"
+
+#: lib/apiErrors.ts:56
+msgid "Invalid catalogue"
+msgstr "Catalogue invalide"
+
+#: lib/apiErrors.ts:57
+msgid "This programme is collected automatically: add the call to a programme of its own"
+msgstr "Ce programme est collecté automatiquement : ajoutez l'appel à un programme qui lui est propre"
+
+#: lib/apiErrors.ts:58
+msgid "Unknown funder"
+msgstr "Financeur inconnu"
+
+#: lib/apiErrors.ts:59
+msgid "A collected programme already has this identifier"
+msgstr "Un programme collecté a déjà cet identifiant"
+
+#: lib/apiErrors.ts:60
+msgid "A collected call already has this identifier"
+msgstr "Un appel collecté a déjà cet identifiant"
+
+#: lib/apiErrors.ts:61
+msgid "No column of the file is a title (« Titre », « Title », « Intitulé »)"
+msgstr "Aucune colonne du fichier n'est un titre (« Titre », « Title », « Intitulé »)"
+
+#: lib/apiErrors.ts:62
+msgid "Invalid URL"
+msgstr "Adresse invalide"
+
+#: lib/apiErrors.ts:63
+msgid "Only http and https addresses are read"
+msgstr "Seules les adresses http et https sont lues"
+
+#: lib/apiErrors.ts:64
+msgid "Unknown host"
+msgstr "Hôte inconnu"
+
+#: lib/apiErrors.ts:65
+msgid "This address is not a public website"
+msgstr "Cette adresse n'est pas un site public"
+
+#: lib/apiErrors.ts:66
+msgid "The document is larger than 15 MB"
+msgstr "Le document dépasse 15 Mo"
+
+#: lib/apiErrors.ts:67
+msgid "The website did not answer in time"
+msgstr "Le site n'a pas répondu à temps"
+
+#: lib/apiErrors.ts:68
+msgid "The website could not be read"
+msgstr "Le site n'a pas pu être lu"
+
+#: lib/apiErrors.ts:69
+msgid "The PDF could not be read"
+msgstr "Le PDF n'a pas pu être lu"
+
+#: lib/apiErrors.ts:70
+msgid "The text is too short to describe a call"
+msgstr "Le texte est trop court pour décrire un appel"
+
+#: lib/apiErrors.ts:71
+msgid "The PDF has no text layer (scanned document?)"
+msgstr "Le PDF n'a pas de couche texte (document numérisé ?)"
+
+#: lib/apiErrors.ts:72
+msgid "Too many redirects"
+msgstr "Trop de redirections"
+
+#: lib/apiErrors.ts:73
+msgid "The page does not exist (404)"
+msgstr "La page n'existe pas (404)"
+
+#: lib/apiErrors.ts:74
+msgid "The website answered with an error"
+msgstr "Le site a répondu par une erreur"
+
+#: lib/apiErrors.ts:75
+msgid "Unsupported document"
+msgstr "Document non pris en charge"
+
+#: lib/apiErrors.ts:76
+msgid "The page has almost no text (built by JavaScript?): upload the PDF of the call instead"
+msgstr "La page n'a presque pas de texte (construite en JavaScript ?) : déposez plutôt le PDF de l'appel"
+
+#: lib/apiErrors.ts:77
+msgid "The title is missing"
+msgstr "L'intitulé manque"
+
+#: lib/apiErrors.ts:78
+msgid "The URL must start with http:// or https://"
+msgstr "L'adresse doit commencer par http:// ou https://"
+
+#: lib/apiErrors.ts:79
+msgid "The opening date is not a valid day (YYYY-MM-DD)"
+msgstr "La date d'ouverture n'est pas un jour valide (AAAA-MM-JJ)"
+
+#: lib/apiErrors.ts:80
+msgid "A deadline is not a valid day (YYYY-MM-DD)"
+msgstr "Une date limite n'est pas un jour valide (AAAA-MM-JJ)"
+
+#: lib/apiErrors.ts:81
+msgid "At most 4 deadlines"
+msgstr "Au plus 4 dates limites"
+
+#: lib/apiErrors.ts:82
+msgid "The deadline is before the opening date"
+msgstr "La date limite précède la date d'ouverture"
+
+#: lib/apiErrors.ts:83
+msgid "The programme is missing"
+msgstr "Le programme manque"
+
+#: lib/apiErrors.ts:84
+msgid "The name of the programme is missing"
+msgstr "Le nom du programme manque"
+
+#: lib/apiErrors.ts:85
+msgid "The funder is missing"
+msgstr "Le financeur manque"
+
+#: lib/apiErrors.ts:87
 msgid "ILAAS_API_KEY not configured (druid service env)"
 msgstr "ILAAS_API_KEY non configurée (env du service druid)"
 
-#: lib/apiErrors.ts:52
+#: lib/apiErrors.ts:88
 msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY non configurée côté Cloudflare (secret + redéploiement)"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:89
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID non configurée"
 
-#: lib/apiErrors.ts:54
+#: lib/apiErrors.ts:90
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY non configurée"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:91
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY non configurée côté Cloudflare"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:92
 msgid "HYPERDRIVE binding not configured on Cloudflare"
 msgstr "Liaison HYPERDRIVE non configurée sur Cloudflare"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:94
 msgid "Unknown API route"
 msgstr "Route d'API inconnue"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:95
 msgid "Directory storage unavailable"
 msgstr "Stockage de l'annuaire indisponible"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:96
 msgid "Another record already holds this value"
 msgstr "Une autre fiche porte déjà cette valeur"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:97
 msgid "API v1 unavailable"
 msgstr "API v1 indisponible sur ce serveur"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:98
 msgid "Grist proxy removed: use /api/v1"
 msgstr "Proxy Grist supprimé : utilisez /api/v1"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:99
 msgid "Not available on the PostgreSQL storage yet"
 msgstr "Pas encore disponible avec le stockage PostgreSQL"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:100
 msgid "Invalid record"
 msgstr "Fiche invalide"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:101
 msgid "Invalid lab"
 msgstr "Laboratoire invalide"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:102
 msgid "Invalid import file"
 msgstr "Fichier d’import invalide"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:103
 msgid "Replaced IdRef record not found"
 msgstr "Notice IdRef remplacée introuvable"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:104
 msgid "Review table missing, run the alignment script first"
 msgstr "Table de revue absente, lancez d'abord l'alignement de cette source"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:105
 msgid "Grist error (partial write)"
 msgstr "Erreur Grist (écriture partielle)"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:106
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:107
 msgid "Invalid LDAP uid"
 msgstr "uid LDAP invalide"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:108
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "Cet uid a déjà une fiche dans l'annuaire, fusionnez plutôt les deux fiches"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:109
 msgid "Record not found in Grist"
 msgstr "Fiche introuvable dans Grist"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:110
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:111
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:112
 msgid "Grist error (writing the kept row)"
 msgstr "Erreur Grist (écriture de la ligne conservée)"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:113
 msgid "Grist error (deleting the absorbed row)"
 msgstr "Erreur Grist (suppression de la ligne absorbée)"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:114
 msgid "Merge not found"
 msgstr "Fusion introuvable"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:115
 msgid "Merge already restored"
 msgstr "Fusion déjà restaurée"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:116
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Ligne recréée mais journal des fusions non mis à jour, ne relancez pas la restauration"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:117
 msgid "Row re-created but kept row not restored"
 msgstr "Ligne recréée mais ligne conservée non restaurée"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:118
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:119
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:120
 msgid "A structure with this acronym already exists"
 msgstr "Une structure porte déjà ce sigle"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:121
 msgid "local_id already used"
 msgstr "local_id déjà utilisé"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:122
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Code d'entité invalide (lettres, chiffres, « - », « _ » ou « . » seulement)"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:124
 msgid "The institution name is required"
 msgstr "Le nom de l'établissement est obligatoire"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:125
 msgid "The institution name is too long"
 msgstr "Le nom de l'établissement est trop long"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:126
 msgid "Invalid UAI code"
 msgstr "Code UAI invalide"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:127
 msgid "Invalid ROR identifier"
 msgstr "Identifiant ROR invalide"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:128
 msgid "Invalid IdRef PPN"
 msgstr "PPN IdRef invalide"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:129
 msgid "An institution with this name already exists"
 msgstr "Un établissement porte déjà ce nom"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:130
 msgid "An institution with this UAI already exists"
 msgstr "Un établissement porte déjà cet UAI"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:131
 msgid "Institutions require the institution right"
 msgstr "Les établissements demandent le droit établissement"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:132
 msgid "Institution not found"
 msgstr "Établissement introuvable"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:133
 #: lib/gristService.ts:139
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:134
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:135
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:136
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne « groupes » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:137
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne « openalex_author_id » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:138
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "Pas d'identifiant OpenAlex configuré pour cette structure"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:139
 msgid "No dashboard data for this structure"
 msgstr "Aucune donnée de tableau de bord pour cette structure"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:141
 msgid "messages[] required"
 msgstr "messages[] requis"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:142
 msgid "Assistant unavailable"
 msgstr "Assistant indisponible"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:143
 msgid "Help assistant not configured"
 msgstr "Assistant d'aide non configuré"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:144
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "La newsletter n'est disponible que pour les structures avec un identifiant OpenAlex (pas les groupes)"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:145
 msgid "Generation interrupted"
 msgstr "Génération interrompue"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:146
 msgid "Generation failed"
 msgstr "Échec de la génération"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:147
 msgid "Analysis failed"
 msgstr "Échec de l'analyse"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:148
 msgid "Missing theme"
 msgstr "Thématique manquante"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:149
 msgid "No publication to analyze"
 msgstr "Aucune publication à analyser"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:150
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex injoignable"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:152
 msgid "Report not found"
 msgstr "Rapport introuvable"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:153
 msgid "Not allowed on this report"
 msgstr "Action non autorisée sur ce rapport"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:154
 msgid "Invalid report definition"
 msgstr "Définition de rapport invalide"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:155
 msgid "Report changed since it was loaded"
 msgstr "Le rapport a été modifié depuis son chargement"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:156
 msgid "Invalid report share"
 msgstr "Partage de rapport invalide"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:157
 msgid "Invalid report generation"
 msgstr "Génération de rapport invalide"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:158
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Instance en lecture seule : les rapports sont conservés dans le navigateur"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:159
 msgid "Invalid AI task"
 msgstr "Tâche IA invalide"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:160
 msgid "PDF archiving is not configured on this instance"
 msgstr "L'archivage des PDF n'est pas configuré sur cette instance"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:161
 msgid "Invalid PDF"
 msgstr "PDF invalide"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:162
 msgid "Generation not found"
 msgstr "Génération introuvable"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:163
 msgid "PDF not archived"
 msgstr "PDF non archivé"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:165
 msgid "Invalid record key"
 msgstr "Clé de fiche invalide"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:166
 msgid "Career path not computed yet for this record"
 msgstr "Parcours pas encore calculé pour cette fiche"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:167
 msgid "Grist unreachable"
 msgstr "Grist injoignable"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:168
 msgid "No Annuaire record for this key"
 msgstr "Aucune fiche de l’Annuaire pour cette clé"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:169
 msgid "Refresh outside your scope"
 msgstr "Recalcul hors de votre périmètre"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:170
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Trop de recalculs en cours, réessayez dans une minute"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:171
 msgid "Career-path computation failed"
 msgstr "Le calcul du parcours a échoué"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:172
 msgid "No usable identifier for this record"
 msgstr "Aucun identifiant exploitable pour cette fiche"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:173
 msgid "Unknown suggestion"
 msgstr "Suggestion inconnue"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:175
 msgid "Task not found"
 msgstr "Tâche introuvable"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:176
 msgid "Unknown event action"
 msgstr "Action d’événement inconnue"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:177
 msgid "Empty comment"
 msgstr "Commentaire vide"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:178
 msgid "Nothing to update"
 msgstr "Rien à mettre à jour"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:179
 msgid "Unknown task type"
 msgstr "Type de tâche inconnu"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:180
 msgid "Unknown status"
 msgstr "Statut inconnu"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:181
 msgid "Transition not allowed"
 msgstr "Transition non autorisée"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:182
 msgid "Task detection already running"
 msgstr "Détection des tâches déjà en cours"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:184
 msgid "Name required"
 msgstr "Nom requis"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:185
 msgid "Empty list"
 msgstr "Liste vide"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:186
 msgid "List of identifiers expected"
 msgstr "Liste d'identifiants attendue"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:187
 msgid "Invalid mention identifier"
 msgstr "Identifiant de mention invalide"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:188
 msgid "Invalid source identifier"
 msgstr "Identifiant de source invalide"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:189
 msgid "researchers and structures arrays required"
 msgstr "Tableaux researchers et structures requis"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:190
 msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
 msgstr "Les retraits d'identifiants n'ont pas pu partir vers le graphe CRISalid, réessayez plus tard"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:191
 msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 msgstr "Trop de retraits d'identifiants à envoyer d'un coup au graphe CRISalid, un administrateur doit les vérifier"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:192
 msgid "Cannot send the identifier removals to the CRISalid graph"
 msgstr "Impossible d'envoyer les retraits d'identifiants au graphe CRISalid"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:193
 msgid "Cannot read the removals sent to the CRISalid graph"
 msgstr "Impossible de lire les retraits envoyés au graphe CRISalid"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:194
 msgid "Keycloak admin API unreachable"
 msgstr "API d'administration Keycloak injoignable"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:195
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "API ETL (druid-etl-api) injoignable"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:197
 msgid "Grist path not allowed by the proxy"
 msgstr "Chemin Grist non autorisé par le proxy"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:198
 msgid "Writing to the document root is refused"
 msgstr "Écriture sur la racine du document refusée"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:199
 msgid "Writing to the table definition is refused"
 msgstr "Écriture sur la définition de la table refusée"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:200
 msgid "Method not relayed"
 msgstr "Méthode non relayée"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:201
 msgid "Method not relayed on /tables"
 msgstr "Méthode non relayée sur /tables"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:202
 msgid "Table creation not allowed"
 msgstr "Création de table non autorisée"
 
-#: lib/apiErrors.ts:167
+#: lib/apiErrors.ts:203
 msgid "Table not writable through the proxy"
 msgstr "Table non modifiable via le proxy"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:204
 msgid "Write outside scope"
 msgstr "Écriture hors périmètre"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:205
 msgid "Creation outside scope"
 msgstr "Création hors périmètre"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:206
 msgid "Rows outside scope or unknown"
 msgstr "Ligne(s) hors périmètre ou inconnue(s)"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:207
 msgid "Scope check failed"
 msgstr "Vérification du périmètre impossible"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:208
 msgid "Grist writes require the institution right"
 msgstr "Écriture Grist réservée au droit établissement"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:209
 msgid "Writes require an authenticated user (Cloudflare Access)"
 msgstr "Écriture réservée aux utilisateurs identifiés (Cloudflare Access)"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:210
 msgid "Read-only instance: writes are disabled"
 msgstr "Instance en lecture seule : les modifications sont désactivées"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:211
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter indisponible sur cette instance"
 
-#: lib/apiErrors.ts:176
+#: lib/apiErrors.ts:212
 msgid "Missing id for PATCH"
 msgstr "id manquant pour PATCH"
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:213
 msgid "Invalid Grist identifiers"
 msgstr "Identifiants Grist invalides"
 
-#: lib/apiErrors.ts:178
+#: lib/apiErrors.ts:214
 msgid "Body with a records array expected"
 msgstr "Corps avec un tableau records attendu"
 
-#: lib/apiErrors.ts:180
+#: lib/apiErrors.ts:216
 msgid "An LDAP synchronization is already running"
 msgstr "Une synchronisation LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:181
+#: lib/apiErrors.ts:217
 msgid "An LDAP structures synchronization is already running"
 msgstr "Une synchronisation LDAP structures est déjà en cours"
 
-#: lib/apiErrors.ts:182
+#: lib/apiErrors.ts:218
 msgid "An LDAP search is already running"
 msgstr "Une recherche LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:183
+#: lib/apiErrors.ts:219
 msgid "An IdRef alignment is already running"
 msgstr "Un alignement IdRef est déjà en cours"
 
-#: lib/apiErrors.ts:184
+#: lib/apiErrors.ts:220
 msgid "Alignment already running"
 msgstr "Un alignement est déjà en cours"
 
-#: lib/apiErrors.ts:185
+#: lib/apiErrors.ts:221
 msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
-#: lib/apiErrors.ts:186
+#: lib/apiErrors.ts:222
 msgid "No alignment running"
 msgstr "Aucun alignement en cours"
 
-#: lib/apiErrors.ts:187
+#: lib/apiErrors.ts:223
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:189
+#: lib/apiErrors.ts:225
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:190
+#: lib/apiErrors.ts:226
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:191
+#: lib/apiErrors.ts:227
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:192
+#: lib/apiErrors.ts:228
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:194
+#: lib/apiErrors.ts:230
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: lib/apiErrors.ts:196
+#: lib/apiErrors.ts:232
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:197
+#: lib/apiErrors.ts:233
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:198
+#: lib/apiErrors.ts:234
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:199
+#: lib/apiErrors.ts:235
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:201
+#: lib/apiErrors.ts:237
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:202
+#: lib/apiErrors.ts:238
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:203
+#: lib/apiErrors.ts:239
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
@@ -14266,10 +14700,6 @@ msgstr "Valeur"
 #: lib/chartExport.ts:263
 msgid "Series {0}"
 msgstr "Série {0}"
-
-#: lib/chartExport.ts:116
-msgid "Row"
-msgstr "Ligne"
 
 #: lib/chartExport.ts:116
 msgid "Column"
