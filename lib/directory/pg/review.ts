@@ -9,7 +9,7 @@ import type { UnifiedAlignSource } from '../alignments';
 
 /** Candidate column of each review table. */
 export const REVIEW_ID_COLUMN: Record<UnifiedAlignSource, string> = {
-  idref: 'PPN_candidat', orcid: 'ORCID_candidat', hal: 'IdHAL_candidat', openalex: 'OpenAlex_candidat', scopus: 'Scopus_candidat',
+  idref: 'PPN_candidat', orcid: 'ORCID_candidat', hal: 'IdHAL_i_candidat', openalex: 'OpenAlex_candidat', scopus: 'Scopus_candidat',
 };
 /** Review fields with a column of their own (the others live in `payload`). */
 const MAPPED = new Set(['uid_dyna', 'Annuaire_id', 'Decision', 'Note', 'Pousse_le', 'Applique', 'Date_application']);

@@ -44,11 +44,11 @@ describe('Grist → PostgreSQL transformation of the work tables', () => {
     expect(rows.alignment_candidate.map((a) => [a.legacy_grist_id, a.person_id, a.source, a.candidate_id, a.decision, a.pushed_on, a.applied, a.applied_on])).toEqual([
       [30, alice, 'idref', '000000035', 'Rejeté', '2026-09-11', false, null],
       [31, bob, 'idref', '000000043', 'Validé', null, true, '2026-09-12'],
-      [40, alice, 'hal', 'alice-dupont', 'Identité mêlée', '2026-09-20', false, null],
+      [40, alice, 'hal', '100001', 'Identité mêlée', '2026-09-20', false, null],   // keyed by the HAL person (D4)
       [50, alice, 'orcid', '0000-0002-0000-0002', 'Rejeté', null, false, null],
     ]);
     expect([rows.alignment_candidate[0].payload, rows.alignment_candidate[2].payload, rows.alignment_candidate[3].payload])
-      .toEqual([{ Nom_notice: 'Dupont, A.' }, { Score: 'fort' }, { Pousse_le: 'n/a' }]);
+      .toEqual([{ Nom_notice: 'Dupont, A.' }, { IdHAL_candidat: 'alice-dupont', Score: 'fort' }, { Pousse_le: 'n/a' }]);
     expect(codes('work_person_by_uid').map((i) => i.rows)).toEqual([[30], [31]]);
     expect(codes('work_person_unresolved').map((i) => [i.table, i.rows])).toEqual([
       ['Taches', [3]], ['Fusions_log', [21]], ['Alignement_IdRef', [32]], ['Arbitrage_Centrale_2026_09', [2]],

@@ -5,7 +5,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-emma-caron",
+  "best": "901005",
   "candidates": [
    {
     "idhal": "demo2-emma-caron",
@@ -31,7 +31,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "maillard-i": {
   "mode": "search",
@@ -39,7 +41,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-ines-maillard",
+  "best": "901008",
   "candidates": [
    {
     "idhal": "demo2-ines-maillard",
@@ -65,7 +67,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "aubert-q": {
   "mode": "search",
@@ -73,7 +77,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-quentin-aubert",
+  "best": "901011",
   "candidates": [
    {
     "idhal": "demo2-quentin-aubert",
@@ -99,7 +103,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "carpentier-q": {
   "mode": "search",
@@ -107,7 +113,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-quentin-carpentier",
+  "best": "901012",
   "candidates": [
    {
     "idhal": "demo2-quentin-carpentier",
@@ -133,7 +139,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "quere-s": {
   "mode": "search",
@@ -141,7 +149,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-samuel-quere",
+  "best": "901013",
   "candidates": [
    {
     "idhal": "demo2-samuel-quere",
@@ -167,7 +175,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "quere-p": {
   "mode": "search",
@@ -175,7 +185,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-pauline-quere",
+  "best": "901016",
   "candidates": [
    {
     "idhal": "demo2-pauline-quere",
@@ -201,7 +211,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "gauthier-r": {
   "mode": "search",
@@ -209,7 +221,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-remi-gauthier",
+  "best": "901017",
   "candidates": [
    {
     "idhal": "demo2-remi-gauthier",
@@ -235,7 +247,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "riviere-s": {
   "mode": "search",
@@ -300,7 +314,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-olivier-quere",
+  "best": "901021",
   "candidates": [
    {
     "idhal": "demo2-olivier-quere",
@@ -326,7 +340,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "jacquet-m": {
   "mode": "search",
@@ -391,7 +407,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-maxime-gauthier",
+  "best": "901023",
   "candidates": [
    {
     "idhal": "demo2-maxime-gauthier",
@@ -417,7 +433,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "poirier-r": {
   "mode": "search",
@@ -434,7 +452,7 @@
   "checkedAt": "2026-09-24T06:00:00.000Z",
   "derivedFrom": [],
   "status": "found",
-  "best": "demo2-laure-jacquet",
+  "best": "901025",
   "candidates": [
    {
     "idhal": "demo2-laure-jacquet",
@@ -460,7 +478,9 @@
     "nameMatch": "exact",
     "suspect": []
    }
-  ]
+  ],
+  "others": [],
+  "direct": []
  },
  "dumont-y": {
   "mode": "search",

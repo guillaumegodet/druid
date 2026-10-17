@@ -48,6 +48,12 @@ describe('scripts/lib/align_targets.cjs — records an alignment run processes',
     expect(() => selectTargets('wos', all, {}, {})).toThrow(/Unknown alignment source/);
   });
 
+  it('HAL: a record with an IdHAL_i only (person without IdHAL) is verified, not searched', () => {
+    const hal = [person('a'), person('b', { idhal: 'jean-b' }), person('c', { idhalI: '100001' })];
+    expect(keys(selectTargets('hal', hal, {}, { mode: 'search' }).targets)).toEqual(['a']);
+    expect(keys(selectTargets('hal', hal, {}, { mode: 'verify' }).targets)).toEqual(['b', 'c']);
+  });
+
   it('identifier helpers moved from the scripts keep their behaviour', () => {
     expect(parseIds('https://openalex.org/A5012345678 | a5012345678 ;A5099999999')).toEqual(['A5012345678', 'A5099999999']);
     expect(scopusIdOf({ scopus: 12345678901 })).toBe('12345678901');
