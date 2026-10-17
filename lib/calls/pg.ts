@@ -212,11 +212,11 @@ export const createCallsStore = (db: Kysely<DB>) => {
   /** Active programmes with their funder, funders first by category then by name. */
   const programmes = async (): Promise<ProgrammeView[]> =>
     (await db.selectFrom('funding_programme as p').innerJoin('funder as f', 'f.funder_id', 'p.funder_id')
-      .select(['p.programme_id', 'p.name', 'p.kind', 'p.subset_label', 'p.url', 'f.funder_id', 'f.name as funder_name', 'f.category'])
+      .select(['p.programme_id', 'p.name', 'p.kind', 'p.subset_label', 'p.url', 'p.source', 'f.funder_id', 'f.name as funder_name', 'f.category'])
       .where('p.active', '=', true).orderBy('f.category').orderBy('f.name').orderBy('p.name').execute())
       .map((p) => ({
         programmeId: p.programme_id, name: p.name, kind: p.kind as ProgrammeKind, subsetLabel: p.subset_label, url: p.url,
-        funderId: p.funder_id, funderName: p.funder_name, category: p.category as FunderCategory,
+        funderId: p.funder_id, funderName: p.funder_name, category: p.category as FunderCategory, source: p.source,
       }));
 
   const calls = async (): Promise<Call[]> =>
