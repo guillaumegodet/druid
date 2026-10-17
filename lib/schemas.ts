@@ -63,6 +63,7 @@ export const ResearcherIdentifiersSchema = z.object({
   idref: z.string().optional().nullable(),
   halId: z.string().optional().nullable(),
   halIdNum: z.string().optional().nullable(),
+  halIdNumSecondary: z.string().optional().nullable(),
   scopusId: z.string().optional().nullable(),
   researcherId: z.string().optional().nullable(),
   openalexId: z.string().optional().nullable(),

@@ -12,6 +12,19 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Fiche chercheur — IdHAL_i secondaires** : sous l'IdHAL_i, un champ « Autres IdHAL_i (non moissonnés) » garde les
+  autres personnes HAL du chercheur (un même chercheur en a souvent plusieurs, avec ou sans IdHAL), avec un lien vers
+  leurs dépôts et un bouton « définir comme principal » qui échange un secondaire avec le principal. Seul l'IdHAL_i
+  principal part dans people.csv (`idhali`) et est moissonné par CRISalid. PostgreSQL : lignes `idhal_i` sans
+  `is_primary` ; Grist : colonne `IdHAL_i_secondaires`, écrite seulement si le document l'a. Les fusions de fiches
+  font l'union des secondaires, et la tâche « identifiants partagés » voit aussi un IdHAL_i secondaire porté par une
+  autre fiche. Premier lot de l'alignement des IdHAL_i (plan `plan-alignement-idhal-i.md`).
+
+### Migration
+- Instances sur Grist (Centrale) : avant de remplir des IdHAL_i secondaires, créer la colonne avec
+  `node scripts/add_align_columns.cjs --apply`. Rien à faire sur PostgreSQL.
+
 ## [2.9.0] — 2026-10-17
 
 ### Ajouté

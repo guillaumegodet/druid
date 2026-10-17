@@ -664,7 +664,7 @@ msgid "No result."
 msgstr "Aucun résultat."
 
 #: components/GroupList.tsx:318
-#: lib/importConflicts.ts:86
+#: lib/importConflicts.ts:87
 msgid "OpenAlex author"
 msgstr "Auteur OpenAlex"
 
@@ -1234,7 +1234,7 @@ msgid "thematic + eligibility"
 msgstr "thématique + éligibilité"
 
 #: components/admin/CallsProgrammesAdmin.tsx:68
-#: components/dashboard/CallsTab.tsx:209
+#: components/dashboard/CallsTab.tsx:210
 msgid "Funding & Tenders portal"
 msgstr "Portail Funding & Tenders"
 
@@ -1273,7 +1273,7 @@ msgstr "Actualiser"
 #: components/admin/CallsProgrammesAdmin.tsx:105
 #: components/admin/ManualCallsAdmin.tsx:255
 #: components/admin/ManualCallsAdmin.tsx:445
-#: components/dashboard/CallsTab.tsx:438
+#: components/dashboard/CallsTab.tsx:440
 msgid "Programme"
 msgstr "Programme"
 
@@ -1282,7 +1282,7 @@ msgid "Matching"
 msgstr "Appariement"
 
 #: components/admin/CallsProgrammesAdmin.tsx:108
-#: components/dashboard/CallsTab.tsx:230
+#: components/dashboard/CallsTab.tsx:231
 msgid "Calls"
 msgstr "Appels"
 
@@ -1667,7 +1667,7 @@ msgid "Reading the call and proposing the fields (up to a minute)…"
 msgstr "Lecture de l'appel et proposition des champs (jusqu'à une minute)…"
 
 #: components/admin/ManualCallsAdmin.tsx:233
-#: components/dashboard/CallsTab.tsx:427
+#: components/dashboard/CallsTab.tsx:429
 #: components/dashboard/FundersTab.tsx:353
 msgid "Funder"
 msgstr "Financeur"
@@ -1703,7 +1703,7 @@ msgid "Title of the call"
 msgstr "Intitulé de l'appel"
 
 #: components/admin/ManualCallsAdmin.tsx:274
-#: components/dashboard/CallsTab.tsx:209
+#: components/dashboard/CallsTab.tsx:210
 msgid "Page of the call"
 msgstr "Page de l'appel"
 
@@ -1722,7 +1722,7 @@ msgid "English"
 msgstr "Anglais"
 
 #: components/admin/ManualCallsAdmin.tsx:285
-#: components/dashboard/CallsTab.tsx:205
+#: components/dashboard/CallsTab.tsx:206
 msgid "Opening"
 msgstr "Ouverture"
 
@@ -1930,7 +1930,7 @@ msgstr "Aucun appel saisi à la main pour l'instant."
 
 #: components/admin/ManualCallsAdmin.tsx:604
 #: components/dashboard/CallCandidates.tsx:132
-#: components/dashboard/CallsTab.tsx:204
+#: components/dashboard/CallsTab.tsx:205
 msgid "Call"
 msgstr "Appel"
 
@@ -3274,7 +3274,7 @@ msgstr "Thèse soutenue entre le {0} et le {1}"
 #. placeholder {0}: fmtDate(call.nextDeadline)
 #. placeholder {0}: rule.deadlines.map(fmtDate).join(', ')
 #: components/dashboard/CallCandidates.tsx:153
-#: components/dashboard/CallsTab.tsx:192
+#: components/dashboard/CallsTab.tsx:193
 msgid "Deadline {0}"
 msgstr "Échéance {0}"
 
@@ -3314,242 +3314,242 @@ msgstr "Labos"
 msgid "PhD"
 msgstr "Thèse"
 
-#: components/dashboard/CallsTab.tsx:63
+#: components/dashboard/CallsTab.tsx:64
 msgid "strong match"
 msgstr "adéquation forte"
 
-#: components/dashboard/CallsTab.tsx:63
+#: components/dashboard/CallsTab.tsx:64
 msgid "plausible match"
 msgstr "adéquation plausible"
 
-#: components/dashboard/CallsTab.tsx:63
+#: components/dashboard/CallsTab.tsx:64
 msgid "weak match"
 msgstr "adéquation faible"
 
-#: components/dashboard/CallsTab.tsx:63
+#: components/dashboard/CallsTab.tsx:64
 msgid "unrated"
 msgstr "non évaluée"
 
-#: components/dashboard/CallsTab.tsx:66
+#: components/dashboard/CallsTab.tsx:67
 msgid "Strength of the match as assessed by the language model from the publications"
 msgstr "Force de l'adéquation évaluée par le modèle de langage d'après les publications"
 
-#: components/dashboard/CallsTab.tsx:69
+#: components/dashboard/CallsTab.tsx:70
 msgid "Relative score within the call: the best candidate of the call is at 100 %, the others in proportion"
 msgstr "Score relatif au sein de l'appel : le meilleur candidat de l'appel est à 100 %, les autres en proportion"
 
 #. placeholder {0}: Math.round(score * 100)
-#: components/dashboard/CallsTab.tsx:69
+#: components/dashboard/CallsTab.tsx:70
 msgid "Relative score {0} %"
 msgstr "Score relatif {0} %"
 
-#: components/dashboard/CallsTab.tsx:79
+#: components/dashboard/CallsTab.tsx:80
 msgid "Relevant"
 msgstr "Pertinent"
 
-#: components/dashboard/CallsTab.tsx:80
+#: components/dashboard/CallsTab.tsx:81
 msgid "Not relevant"
 msgstr "Non pertinent"
 
-#: components/dashboard/CallsTab.tsx:81
+#: components/dashboard/CallsTab.tsx:82
 msgid "Already applying"
 msgstr "Déjà en montage"
 
-#: components/dashboard/CallsTab.tsx:99
+#: components/dashboard/CallsTab.tsx:100
 msgid "Your opinion on this match (one per person, the last one wins)"
 msgstr "Votre avis sur cet appariement (un par personne, le dernier compte)"
 
-#: components/dashboard/CallsTab.tsx:145
+#: components/dashboard/CallsTab.tsx:146
 msgid "Open the publication (DOI)"
 msgstr "Ouvrir la publication (DOI)"
 
-#: components/dashboard/CallsTab.tsx:145
+#: components/dashboard/CallsTab.tsx:146
 msgid "Search this title on OpenAlex (DOI unknown)"
 msgstr "Rechercher ce titre sur OpenAlex (DOI inconnu)"
 
-#: components/dashboard/CallsTab.tsx:155
+#: components/dashboard/CallsTab.tsx:156
 msgid "Fewer publications"
 msgstr "Moins de publications"
 
 #. placeholder {0}: relevant.length - 3
-#: components/dashboard/CallsTab.tsx:155
+#: components/dashboard/CallsTab.tsx:156
 msgid "{0, plural, one {# more publication} other {# more publications}}"
 msgstr "{0, plural, one {# autre publication} other {# autres publications}}"
 
-#: components/dashboard/CallsTab.tsx:192
+#: components/dashboard/CallsTab.tsx:193
 #: components/dashboard/NewsTab.tsx:735
 #: components/researchers/TasksPage.tsx:161
 msgid "Closed"
 msgstr "Fermé"
 
-#: components/dashboard/CallsTab.tsx:192
+#: components/dashboard/CallsTab.tsx:193
 msgid "No deadline"
 msgstr "Sans échéance"
 
 #. placeholder {0}: call.matches.length
-#: components/dashboard/CallsTab.tsx:195
+#: components/dashboard/CallsTab.tsx:196
 msgid "{0, plural, =0 {No researcher} one {# researcher} other {# researchers}}"
 msgstr "{0, plural, =0 {Aucun chercheur} one {# chercheur} other {# chercheurs}}"
 
-#: components/dashboard/CallsTab.tsx:196
+#: components/dashboard/CallsTab.tsx:197
 msgid "{strong, plural, one {# strong} other {# strong}}"
 msgstr "{strong, plural, one {# forte} other {# fortes}}"
 
-#: components/dashboard/CallsTab.tsx:206
+#: components/dashboard/CallsTab.tsx:207
 msgid "Deadlines"
 msgstr "Échéances"
 
-#: components/dashboard/CallsTab.tsx:214
+#: components/dashboard/CallsTab.tsx:215
 msgid "No researcher of this structure was retained for this call."
 msgstr "Aucun chercheur de cette structure n'a été retenu pour cet appel."
 
-#: components/dashboard/CallsTab.tsx:230
+#: components/dashboard/CallsTab.tsx:231
 #: components/dashboard/dashboardNav.ts:97
 #: components/dashboard/report/reportCatalog.ts:105
 msgid "Researchers"
 msgstr "Chercheurs"
 
-#: components/dashboard/CallsTab.tsx:232
+#: components/dashboard/CallsTab.tsx:233
 msgid "Candidates"
 msgstr "Candidats"
 
-#: components/dashboard/CallsTab.tsx:320
+#: components/dashboard/CallsTab.tsx:321
 msgctxt "funding calls"
 msgid "All clusters"
 msgstr "Tous les clusters"
 
-#: components/dashboard/CallsTab.tsx:320
+#: components/dashboard/CallsTab.tsx:321
 msgctxt "funding calls"
 msgid "Cluster"
 msgstr "Cluster"
 
-#: components/dashboard/CallsTab.tsx:321
+#: components/dashboard/CallsTab.tsx:322
 msgctxt "funding calls"
 msgid "All schemes"
 msgstr "Tous les dispositifs"
 
-#: components/dashboard/CallsTab.tsx:321
+#: components/dashboard/CallsTab.tsx:322
 msgctxt "funding calls"
 msgid "Scheme"
 msgstr "Dispositif"
 
-#: components/dashboard/CallsTab.tsx:322
+#: components/dashboard/CallsTab.tsx:323
 msgctxt "funding calls"
 msgid "All missions"
 msgstr "Toutes les missions"
 
-#: components/dashboard/CallsTab.tsx:322
+#: components/dashboard/CallsTab.tsx:323
 msgctxt "funding calls"
 msgid "Mission"
 msgstr "Mission"
 
-#: components/dashboard/CallsTab.tsx:323
+#: components/dashboard/CallsTab.tsx:324
 msgctxt "funding calls"
 msgid "All destinations"
 msgstr "Toutes les destinations"
 
-#: components/dashboard/CallsTab.tsx:323
+#: components/dashboard/CallsTab.tsx:324
 msgctxt "funding calls"
 msgid "Destination"
 msgstr "Destination"
 
-#: components/dashboard/CallsTab.tsx:324
+#: components/dashboard/CallsTab.tsx:325
 msgctxt "funding calls"
 msgid "All axes"
 msgstr "Tous les axes"
 
-#: components/dashboard/CallsTab.tsx:324
+#: components/dashboard/CallsTab.tsx:325
 msgctxt "funding calls"
 msgid "Axis"
 msgstr "Axe"
 
-#: components/dashboard/CallsTab.tsx:325
+#: components/dashboard/CallsTab.tsx:326
 msgctxt "funding calls"
 msgid "All panels"
 msgstr "Tous les panels"
 
-#: components/dashboard/CallsTab.tsx:325
+#: components/dashboard/CallsTab.tsx:326
 msgctxt "funding calls"
 msgid "Panel"
 msgstr "Panel"
 
-#: components/dashboard/CallsTab.tsx:326
+#: components/dashboard/CallsTab.tsx:327
 msgctxt "funding calls"
 msgid "All domains"
 msgstr "Tous les domaines"
 
-#: components/dashboard/CallsTab.tsx:326
+#: components/dashboard/CallsTab.tsx:327
 msgctxt "funding calls"
 msgid "Domain"
 msgstr "Domaine"
 
-#: components/dashboard/CallsTab.tsx:328
+#: components/dashboard/CallsTab.tsx:329
 msgctxt "funding calls"
 msgid "All subsets"
 msgstr "Tous les sous-ensembles"
 
-#: components/dashboard/CallsTab.tsx:328
+#: components/dashboard/CallsTab.tsx:329
 msgctxt "funding calls"
 msgid "Subset"
 msgstr "Sous-ensemble"
 
-#: components/dashboard/CallsTab.tsx:383
+#: components/dashboard/CallsTab.tsx:385
 msgid "Loading the calls for proposals…"
 msgstr "Chargement des appels à projets…"
 
-#: components/dashboard/CallsTab.tsx:392
+#: components/dashboard/CallsTab.tsx:394
 msgid "Calls of the funding programmes matched automatically to the researchers of {structureLabel} from the publications known to the CRISalid graph (partial coverage). Your opinion on each match helps improve the matching."
 msgstr "Appels des programmes de financement rapprochés automatiquement des chercheurs de {structureLabel} d'après les publications connues du graphe CRISalid (couverture partielle). Votre avis sur chaque appariement aide à améliorer le rapprochement."
 
 #. placeholder {0}: matchedUids.size
-#: components/dashboard/CallsTab.tsx:398
+#: components/dashboard/CallsTab.tsx:400
 msgid "{0, plural, =0 {No researcher retained yet.} one {# researcher retained on at least one call.} other {# researchers retained on at least one call.}}"
 msgstr "{0, plural, =0 {Aucun chercheur retenu pour l'instant.} one {# chercheur retenu sur au moins un appel.} other {# chercheurs retenus sur au moins un appel.}}"
 
 #. placeholder {0}: perimeters.join(', ')
-#: components/dashboard/CallsTab.tsx:403
+#: components/dashboard/CallsTab.tsx:405
 msgid "Matching computed on the publications of: {0}."
 msgstr "Appariements calculés sur les publications de : {0}."
 
-#: components/dashboard/CallsTab.tsx:405
+#: components/dashboard/CallsTab.tsx:407
 msgid "{structureLabel} is outside this perimeter: only its researchers who co-signed publications of that perimeter can appear here, which says nothing about its own coverage."
 msgstr "{structureLabel} est hors de ce périmètre : seuls ses chercheurs ayant cosigné des publications de ce périmètre peuvent apparaître ici, ce qui ne dit rien de sa propre couverture."
 
-#: components/dashboard/CallsTab.tsx:418
+#: components/dashboard/CallsTab.tsx:420
 msgid "Search a call…"
 msgstr "Rechercher un appel…"
 
-#: components/dashboard/CallsTab.tsx:418
+#: components/dashboard/CallsTab.tsx:420
 msgid "Search a researcher…"
 msgstr "Rechercher un chercheur…"
 
-#: components/dashboard/CallsTab.tsx:429
+#: components/dashboard/CallsTab.tsx:431
 #: components/reports/NewReportDialog.tsx:248
 msgid "All funders"
 msgstr "Tous les financeurs"
 
-#: components/dashboard/CallsTab.tsx:440
+#: components/dashboard/CallsTab.tsx:442
 msgid "All programmes"
 msgstr "Tous les programmes"
 
-#: components/dashboard/CallsTab.tsx:456
+#: components/dashboard/CallsTab.tsx:458
 msgid "Include closed calls"
 msgstr "Inclure les appels clos"
 
-#: components/dashboard/CallsTab.tsx:460
+#: components/dashboard/CallsTab.tsx:462
 msgid "Calls with researchers only"
 msgstr "Appels avec chercheurs seulement"
 
-#: components/dashboard/CallsTab.tsx:470
+#: components/dashboard/CallsTab.tsx:472
 msgid "No call matches these filters."
 msgstr "Aucun appel ne correspond à ces filtres."
 
-#: components/dashboard/CallsTab.tsx:479
+#: components/dashboard/CallsTab.tsx:481
 msgid "No researcher matches these filters."
 msgstr "Aucun chercheur ne correspond à ces filtres."
 
 #. placeholder {0}: r.matches.length
-#: components/dashboard/CallsTab.tsx:492
+#: components/dashboard/CallsTab.tsx:494
 msgid "{0, plural, one {# call} other {# calls}}"
 msgstr "{0, plural, one {# appel} other {# appels}}"
 
@@ -5799,7 +5799,7 @@ msgstr "Laboratoire"
 #: components/dashboard/PublicationsListTab.tsx:349
 #: components/researchers/FilterPanel.tsx:176
 #: components/researchers/FilterPanel.tsx:319
-#: components/researchers/GeneralTab.tsx:277
+#: components/researchers/GeneralTab.tsx:317
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Type d'emploi"
@@ -6176,7 +6176,7 @@ msgstr "Population"
 
 #: components/dashboard/StaffSection.tsx:295
 #: components/dashboard/StaffSection.tsx:311
-#: components/researchers/GeneralTab.tsx:324
+#: components/researchers/GeneralTab.tsx:364
 msgid "Research FTE"
 msgstr "ETP recherche"
 
@@ -10894,13 +10894,13 @@ msgstr "Validation"
 
 #: components/researchers/FilterPanel.tsx:177
 #: components/researchers/FilterPanel.tsx:309
-#: components/researchers/GeneralTab.tsx:360
+#: components/researchers/GeneralTab.tsx:400
 msgid "Cluster"
 msgstr "Pôle"
 
 #: components/researchers/FilterPanel.tsx:178
 #: components/researchers/ResearcherTable.tsx:89
-#: lib/importConflicts.ts:97
+#: lib/importConflicts.ts:98
 msgid "Identifiers"
 msgstr "Identifiants"
 
@@ -10987,133 +10987,153 @@ msgstr "AAAA-MM-JJ, AAAA-MM ou AAAA"
 msgid "Pick a full date from the calendar"
 msgstr "Choisir une date complète dans le calendrier"
 
-#: components/researchers/GeneralTab.tsx:84
+#: components/researchers/GeneralTab.tsx:92
 msgid "Researcher identifiers"
 msgstr "Identifiants chercheur"
 
-#: components/researchers/GeneralTab.tsx:136
+#: components/researchers/GeneralTab.tsx:144
 msgid "HAL numeric identifier (idHal_i)"
 msgstr "Identifiant numérique HAL (idHal_i)"
 
-#: components/researchers/GeneralTab.tsx:147
+#: components/researchers/GeneralTab.tsx:155
 msgid "Digits only, e.g. 123456"
 msgstr "Numérique, ex. 123456"
 
-#: components/researchers/GeneralTab.tsx:190
+#: components/researchers/GeneralTab.tsx:162
+msgid "Only the primary IdHAL_i is sent to CRISalid and harvested"
+msgstr "Seul l’IdHAL_i principal est transmis à CRISalid et moissonné"
+
+#: components/researchers/GeneralTab.tsx:163
+msgid "Other IdHAL_i (not harvested)"
+msgstr "Autres IdHAL_i (non moissonnés)"
+
+#: components/researchers/GeneralTab.tsx:167
+msgid "e.g. 123456|654321"
+msgstr "ex. 123456|654321"
+
+#: components/researchers/GeneralTab.tsx:183
+msgid "Make it the primary IdHAL_i (the one harvested by CRISalid)"
+msgstr "En faire l’IdHAL_i principal (celui que CRISalid moissonne)"
+
+#: components/researchers/GeneralTab.tsx:185
+msgid "make primary"
+msgstr "définir comme principal"
+
+#: components/researchers/GeneralTab.tsx:230
 msgid "Personal details"
 msgstr "État civil"
 
-#: components/researchers/GeneralTab.tsx:196
+#: components/researchers/GeneralTab.tsx:236
 msgctxt "honorific"
 msgid "Title"
 msgstr "Civilité"
 
-#: components/researchers/GeneralTab.tsx:204
+#: components/researchers/GeneralTab.tsx:244
 msgid "Last name"
 msgstr "Nom d'usage"
 
-#: components/researchers/GeneralTab.tsx:208
+#: components/researchers/GeneralTab.tsx:248
 msgid "First name"
 msgstr "Prénom"
 
-#: components/researchers/GeneralTab.tsx:212
+#: components/researchers/GeneralTab.tsx:252
 #: lib/importConflicts.ts:66
 msgid "Nationality"
 msgstr "Nationalité"
 
-#: components/researchers/GeneralTab.tsx:216
+#: components/researchers/GeneralTab.tsx:256
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date de naissance"
 
-#: components/researchers/GeneralTab.tsx:227
+#: components/researchers/GeneralTab.tsx:267
 #: components/researchers/LdapUidLookup.tsx:49
 msgid "UID (Dyna)"
 msgstr "UID (Dyna)"
 
-#: components/researchers/GeneralTab.tsx:240
+#: components/researchers/GeneralTab.tsx:280
 msgid "HR staff number (Mangue), from LDAP or the HR lists — read-only"
 msgstr "Numéro d'agent RH (Mangue), issu du LDAP ou des listes RH — non modifiable"
 
-#: components/researchers/GeneralTab.tsx:240
+#: components/researchers/GeneralTab.tsx:280
 msgid "Staff number"
 msgstr "N° agent"
 
-#: components/researchers/GeneralTab.tsx:249
+#: components/researchers/GeneralTab.tsx:289
 msgid "Employment & contract"
 msgstr "Emploi & contrat"
 
-#: components/researchers/GeneralTab.tsx:252
+#: components/researchers/GeneralTab.tsx:292
 msgid "Employing institution"
 msgstr "Établissement employeur"
 
-#: components/researchers/GeneralTab.tsx:258
+#: components/researchers/GeneralTab.tsx:298
 msgid "— None —"
 msgstr "— Aucun —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:260
+#: components/researchers/GeneralTab.tsx:300
 msgid "{0} (not in list)"
 msgstr "{0} (hors liste)"
 
-#: components/researchers/GeneralTab.tsx:268
+#: components/researchers/GeneralTab.tsx:308
 msgid "Grade / Rank"
 msgstr "Grade / Corps"
 
-#: components/researchers/GeneralTab.tsx:284
+#: components/researchers/GeneralTab.tsx:324
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Non défini —"
 
-#: components/researchers/GeneralTab.tsx:309
+#: components/researchers/GeneralTab.tsx:349
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Début d'emploi"
 
-#: components/researchers/GeneralTab.tsx:309
+#: components/researchers/GeneralTab.tsx:349
 msgid "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Dates du contrat / de l'emploi (colonnes Grist employment_*), distinctes des dates d'appartenance au labo saisies dans la carte Appartenances. Date imprécise acceptée : AAAA ou AAAA-MM."
 
-#: components/researchers/GeneralTab.tsx:313
+#: components/researchers/GeneralTab.tsx:353
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Fin d'emploi"
 
-#: components/researchers/GeneralTab.tsx:313
+#: components/researchers/GeneralTab.tsx:353
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Fin de contrat / d'emploi (AAAA, AAAA-MM ou AAAA-MM-JJ). Pour une fiche externe (sans état LDAP), une date passée fait passer le statut à « Parti » ; avec une fin d'appartenance passée aussi, « Parti » s'applique même à une fiche validée."
 
-#: components/researchers/GeneralTab.tsx:320
+#: components/researchers/GeneralTab.tsx:360
 msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 msgstr "Part d'un temps plein (0 à 1, ex. 0,5). Vide = non renseigné."
 
-#: components/researchers/GeneralTab.tsx:320
+#: components/researchers/GeneralTab.tsx:360
 msgid "FTE (working time)"
 msgstr "ETP (quotité)"
 
-#: components/researchers/GeneralTab.tsx:324
+#: components/researchers/GeneralTab.tsx:364
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Équivalent temps plein recherche (0 à 1) : en général 0,5 pour un enseignant-chercheur, 1 pour un chercheur à temps plein. Vide = non renseigné (le tableau de bord appliquera une valeur par défaut selon le grade) ; 0 = aucun temps de recherche."
 
-#: components/researchers/GeneralTab.tsx:338
+#: components/researchers/GeneralTab.tsx:378
 msgid "Accredited to supervise research (HDR)"
 msgstr "Habilité à diriger des recherches (HDR)"
 
-#: components/researchers/GeneralTab.tsx:343
+#: components/researchers/GeneralTab.tsx:383
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "Année HDR"
 
-#: components/researchers/GeneralTab.tsx:364
+#: components/researchers/GeneralTab.tsx:404
 msgid "Faculty"
 msgstr "Composante"
 
-#: components/researchers/GeneralTab.tsx:368
+#: components/researchers/GeneralTab.tsx:408
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "ED de rattachement"
 
-#: components/researchers/GeneralTab.tsx:372
+#: components/researchers/GeneralTab.tsx:412
 msgid "Location (site)"
 msgstr "Localisation (site)"
 
@@ -11745,7 +11765,7 @@ msgid "https://…"
 msgstr "https://…"
 
 #: components/researchers/MediaPresenceSection.tsx:37
-#: lib/importConflicts.ts:91
+#: lib/importConflicts.ts:92
 msgid "LinkedIn"
 msgstr "LinkedIn"
 
@@ -11794,7 +11814,7 @@ msgid "https://…academia.edu/…"
 msgstr "https://…academia.edu/…"
 
 #: components/researchers/MediaPresenceSection.tsx:46
-#: lib/importConflicts.ts:92
+#: lib/importConflicts.ts:93
 msgid "ResearchGate"
 msgstr "ResearchGate"
 
@@ -11803,7 +11823,7 @@ msgid "https://researchgate.net/profile/…"
 msgstr "https://researchgate.net/profile/…"
 
 #: components/researchers/MediaPresenceSection.tsx:47
-#: lib/importConflicts.ts:90
+#: lib/importConflicts.ts:91
 msgid "Google Scholar"
 msgstr "Google Scholar"
 
@@ -12085,7 +12105,7 @@ msgid "Next"
 msgstr "Suiv."
 
 #: components/researchers/SiteImportReview.tsx:11
-#: lib/importConflicts.ts:88
+#: lib/importConflicts.ts:89
 msgid "Directory page"
 msgstr "Page d'annuaire"
 
@@ -12094,7 +12114,7 @@ msgid "Profile page"
 msgstr "Page de profil"
 
 #: components/researchers/SiteImportReview.tsx:12
-#: lib/importConflicts.ts:89
+#: lib/importConflicts.ts:90
 msgid "Photo"
 msgstr "Photo"
 
@@ -14794,22 +14814,26 @@ msgid "IdHAL (numeric)"
 msgstr "IdHAL (numérique)"
 
 #: lib/importConflicts.ts:84
+msgid "Other IdHAL (numeric)"
+msgstr "Autres IdHAL (numériques)"
+
+#: lib/importConflicts.ts:85
 msgid "Scopus Author ID"
 msgstr "Scopus Author ID"
 
-#: lib/importConflicts.ts:85
+#: lib/importConflicts.ts:86
 msgid "OpenAlex ids"
 msgstr "Ids OpenAlex"
 
-#: lib/importConflicts.ts:87
+#: lib/importConflicts.ts:88
 msgid "uid_dyna"
 msgstr "uid_dyna"
 
-#: lib/importConflicts.ts:96
+#: lib/importConflicts.ts:97
 msgid "HR"
 msgstr "RH"
 
-#: lib/importConflicts.ts:98
+#: lib/importConflicts.ts:99
 msgid "Links"
 msgstr "Liens"
 

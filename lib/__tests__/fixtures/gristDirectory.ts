@@ -30,7 +30,7 @@ export const gristDirectoryFixture = (): GristDirectoryInput => ({
   Annuaire: [
     // Same person on two rows (uid in mixed case): row 101 is PRINCIPAL, row 102 carries other values.
     row(101, { uid_dyna: 'dupont-a', Nom: 'Dupont', Prenom: 'Alice', Civilite: 'Mme', LABO: 'LAB1', team: 'TEAMA|Free team',
-      rattachement: 'PRINCIPAL', Employeur: 1, IdRef: '000000019', ORCID: '0000-0001-0000-0001', OpenAlex_ids: 'A1|A2',
+      rattachement: 'PRINCIPAL', Employeur: 1, IdRef: '000000019', ORCID: '0000-0001-0000-0001', OpenAlex_ids: 'A1|A2', IdHAL_i: '100001', IdHAL_i_secondaires: '200003|300002',
       ID_SCOPUS: 57193706000, N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_: 12345, validated: true, validated_status: 'INTERNE',
       validation_date: epoch('2026-09-01'), validation_scope: 'statut,rattachement', DATE_DE_NAISSANCE_JJ_MM_AAAA: epoch('1980-05-04'),
       employment_start_date: '2015', employment_end_date: '2030-06', affiliation_start_date: '2015-09', Data_source: 'LDAP|IDREF',

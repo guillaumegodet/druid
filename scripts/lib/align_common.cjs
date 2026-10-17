@@ -388,6 +388,7 @@ async function fetchAnnuaire() {
       orcid: f.ORCID || '',
       idhal: f.IdHAL || '',
       idhalI: f.IdHAL_i || '',
+      idhalISecondary: f.IdHAL_i_secondaires || '',   // other HAL persons, pipe-separated (lib/halIds.ts)
       idhalSelonIdref: f.IdHAL_selon_IdRef || '',
       scopus: f.ID_SCOPUS || '',
       // OpenAlex alignment (docs/archive/plan-alignement-openalex.md): reviewed list of A-ids (pipe-separated)

@@ -13,6 +13,7 @@ import { normalizeFuzzyDate } from '../dates';
 import { withDerivedParents } from '../structureHierarchy';
 import { FTE_COLUMNS, parseFteCell } from '../fte';
 import { HR_ID_COLUMN, normalizeHrId } from '../hrId';
+import { joinHalIdNums, secondaryHalIdNums } from '../halIds';
 import { getTutelleName } from '../uaiMapping';
 import { DirectoryRow, EmployerIndex, RattachementRole, mapDirectoryRows } from './people';
 
@@ -233,6 +234,7 @@ export function gristDirectoryRow(record: GristRecord): DirectoryRow {
       idref: fields['IdRef'] || '',
       halId: fields['IdHAL'] || '',
       halIdNum: fields['IdHAL_i'] ? String(fields['IdHAL_i']) : '',   // filled by scripts/sync_hal.cjs (verify) or the Grist review
+      halIdNumSecondary: joinHalIdNums(secondaryHalIdNums(fields['IdHAL_i'], fields['IdHAL_i_secondaires'])),   // other HAL persons (lib/halIds.ts)
       scopusId: fields['ID_SCOPUS'] ? String(fields['ID_SCOPUS']) : '',   // Numeric column in Grist → string (Zod schema)
       openalexId: fields['openalex_author_id'] || '',
       openalexIds: fields['OpenAlex_ids'] || '',   // reviewed list (scripts/sync_openalex.cjs + Grist review)

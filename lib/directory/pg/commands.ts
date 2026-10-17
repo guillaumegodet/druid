@@ -25,7 +25,8 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
-import { OPENALEX_AUTHOR_SOURCE, loadPersonParts, readRecordFields, resolveStructures, writeRecordFields } from './recordFields';
+import { OPENALEX_AUTHOR_SOURCE, loadPersonParts, readRecordFields, resolveStructures, writeHalIdNumSecondaries, writeRecordFields } from './recordFields';
+import { HAL_ID_NUM_SECONDARY_COLUMN, secondaryHalIdNums } from '../../halIds';
 import { insertStructure, writeStructure } from './structures';
 import type { CommandContext, DirectoryCommands } from '../commands';
 import type { DirectoryRepository, DirectoryScope } from '../repository';
@@ -49,7 +50,7 @@ const MEMBERSHIP_FIELDS = ['LABO', 'team', 'affiliation_start_date', 'affiliatio
 export const RECORD_FIELDS: AnnuaireColumnMeta[] = [
   ...['uid_dyna', 'Nom', 'Prenom', 'Civilite', 'Email', 'Nationalite', 'Corps_grade', 'TYPE_EMPLOI', 'LIB_TYPE_EMPLOI', 'HDR', 'ANNEE_HDR',
     'ED_de_rattachement', 'statut_dyna', 'photo_url', 'annuaire_url', 'LABO', 'team', 'rattachement', 'membership_type', 'groupes',
-    'ORCID', 'IdRef', 'IdRef_nom_valide', 'IdHAL', 'IdHAL_i', 'OpenAlex_ids', 'openalex_author_id', 'Bluesky', 'Mastodon', 'YouTube',
+    'ORCID', 'IdRef', 'IdRef_nom_valide', 'IdHAL', 'IdHAL_i', 'IdHAL_i_secondaires', 'OpenAlex_ids', 'openalex_author_id', 'Bluesky', 'Mastodon', 'YouTube',
     'Podcast_flux', 'Blog', 'LinkedIn', 'CV_institutionnel', 'CV_site_labo', 'CV_pdf_docx_', 'CV_HAL', 'Academia', 'Researchgate',
     'Profil_GS', 'Site_web', 'Commentaires', 'Data_source', 'validated_status', 'validation_source', 'validation_scope', 'validated_by',
     'doublon_decision', 'ABES_export_hash', 'ABES_export_date']
@@ -243,6 +244,13 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       }
       await trx.insertInto('person_identifier').values({ person_id: personId, scheme, value, is_primary: true, source: 'record' })
         .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: true })).execute();
+    }
+    // Secondary HAL identifiers, after the primary one (a promoted secondary is already primary). A record that does
+    // not carry the field (site import, creation from a list) leaves them as they are.
+    const secondary = r.identifiers?.halIdNumSecondary;
+    if (secondary !== undefined && secondary !== null) {
+      await writeHalIdNumSecondaries(trx, personId, secondaryHalIdNums(identifiersOf(r).idhal_i, secondary));
+      delete extra[HAL_ID_NUM_SECONDARY_COLUMN];
     }
   };
   const writeLinks = async (trx: Transaction<DB>, personId: string, r: Researcher, extra: Record<string, any>) => {

@@ -81,7 +81,8 @@ describe('Grist → PostgreSQL transformation', () => {
   it('identifiers: union of the rows, kept row primary, absence checks, shared values', () => {
     const a = person('dupont-a');
     expect(rows.person_identifier.filter((i) => i.person_id === a.id).map((i) => [i.scheme, i.value, i.is_primary])).toEqual([
-      ['idref', '000000019', true], ['orcid', '0000-0001-0000-0001', true], ['scopus', '57193706000', true],
+      ['idref', '000000019', true], ['idhal_i', '100001', true], ['idhal_i', '200003', false], ['idhal_i', '300002', false],
+      ['orcid', '0000-0001-0000-0001', true], ['scopus', '57193706000', true],
       ['openalex', 'A1', true], ['openalex', 'A2', false], ['idref', '000000027', false],
     ]);
     expect(codes('identifier_from_other_row').map((i) => i.columns)).toEqual([['IdRef']]);

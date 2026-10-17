@@ -27,6 +27,8 @@ export const PARKING_LABOS: ReadonlySet<string> = new Set(['zzz', '']);
 /** Columns merged by union (separator `|`, or line break for Commentaires). */
 export const MERGE_CONCAT_FIELDS: ReadonlySet<string> = new Set([
   'Data_source', 'Commentaires', 'LDAP_champs_modifies', 'IdRef_champs_modifies',
+  // Secondary HAL identifiers of the two records (the writer drops the one that is primary, lib/halIds.ts).
+  'IdHAL_i_secondaires',
 ]);
 
 /** Columns of the validation block, arbitrated together. */

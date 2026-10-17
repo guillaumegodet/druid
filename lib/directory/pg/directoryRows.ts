@@ -6,6 +6,7 @@
 import { MEMBERSHIP_TYPES, MembershipType } from '../../../types';
 import { fromGristDate, fromGristFuzzyDate } from '../gristMapping';
 import { normalizeHrId } from '../../hrId';
+import { joinHalIdNums, sortHalIdNums } from '../../halIds';
 import { parseFteCell } from '../../fte';
 import { validationInfo } from '../../validation';
 import type { DirectoryRow, EmployerIndex, RattachementRole } from '../people';
@@ -98,6 +99,7 @@ export const pgDirectoryRow = (p: PgPerson, m: PgMembership, x: PersonExtras): D
       idref: primary('idref'),
       halId: primary('idhal'),
       halIdNum: primary('idhal_i'),
+      halIdNumSecondary: joinHalIdNums(sortHalIdNums(ids.filter((i) => i.scheme === 'idhal_i' && !i.is_primary).map((i) => i.value))),
       scopusId: has(e, 'ID_SCOPUS') ? String(e.ID_SCOPUS) : (primary('scopus') || (x.scopusAbsent ? 'absent' : '')),
       openalexId: ids.find((i) => i.scheme === 'openalex' && i.source === 'grist:openalex_author_id')?.value ?? '',
       openalexIds: has(e, 'OpenAlex_ids') ? String(e.OpenAlex_ids)

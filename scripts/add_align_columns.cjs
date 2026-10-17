@@ -30,6 +30,8 @@ const APPLY = common.hasFlag('apply');
 
 const COLUMNS = [
   { id: 'IdHAL_i',               label: 'IdHAL_i (numérique)',        type: 'Text' },
+  // Other HAL persons of the researcher, never exported (docs/plan-alignement-idhal-i.md, lot 1).
+  { id: 'IdHAL_i_secondaires',   label: 'IdHAL_i secondaires (|)',     type: 'Text' },
   { id: 'HAL_derniere_maj',      label: 'HAL dernière MAJ',           type: 'Text' },
   { id: 'HAL_champs_modifies',   label: 'HAL champs modifiés',        type: 'Text' },
   { id: 'ORCID_derniere_maj',    label: 'ORCID dernière MAJ',         type: 'Text' },

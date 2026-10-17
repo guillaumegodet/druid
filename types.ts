@@ -144,6 +144,7 @@ export interface Researcher {
     idref?: string;        // ABES authority ID
     halId?: string;        // HAL author form ID
     halIdNum?: string;     // Numeric HAL idHal_i (Grist column IdHAL_i → `idhali` in people.csv for CRISalid)
+    halIdNumSecondary?: string; // Other HAL persons of the researcher, pipe-separated (IdHAL_i_secondaires, never exported — lib/halIds.ts)
     scopusId?: string;     // Elsevier ID
     researcherId?: string; // Web of Science ID
     openalexId?: string;   // OpenAlex author ID (resolved via ORCID or confirmed by hand)

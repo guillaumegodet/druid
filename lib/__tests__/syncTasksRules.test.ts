@@ -137,6 +137,17 @@ describe('annuaire_ids_partages — records with different uid sharing an export
     expect(out[1].description).toContain('Indice : l’IdHAL jean-petit correspond au nom de PETIT Jean (petit-j)');
   });
 
+  it('a secondary IdHAL_i shared with another record is one researcher on two records', () => {
+    const out = detect([
+      p(1, 'roux-e', 'ROUX', 'Emma', { IdHAL_i: 100001, IdHAL_i_secondaires: '200003|300002' }),
+      p(2, 'ext_roux-e', 'Roux', 'Emma', { IdHAL_i: '300002' }),
+      p(3, 'faure-l', 'FAURE', 'Leo', { IdHAL_i_secondaires: '400004' }),
+    ]);
+    expect(out.map((d: { type: string; key: string }) => `${d.type}:${d.key}`)).toEqual(['annuaire_doublon:ext_roux-e+roux-e']);
+    expect(out[0].description).toContain('300002');
+    expect(out[0].description).not.toContain('Attention');   // a value in common: no contradiction
+  });
+
   it('same names but two different IdRef: namesakes as often as duplicates ⇒ to check, with a warning', () => {
     const out = detect([
       p(1, 'bernard-l', 'BERNARD', 'Lucie', { IdRef: '111111111', ORCID: '0000-0001-0000-0003' }),
