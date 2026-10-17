@@ -8,6 +8,7 @@ import type { AlignTexts } from './alignTexts';
 import type { GristRecord } from './gristMapping';
 import type { AnnuaireColumnMeta } from './annuaireWrite';
 import { toGristEpoch } from './annuaireWrite';
+import { halIdNumSearchUrl } from '../halIds';
 
 // --- IdRef alignment (idref_align_cache.json cache produced by scripts/sync_idref.cjs) ---
 
@@ -150,7 +151,8 @@ export interface AlignDiff {
 /** Grist review table and identifier column per source (same names as in the scripts). */
 export const ALIGN_SOURCE_META: Record<AlignSource, { label: string; table: string; idColumn: string; targetField: 'ORCID' | 'IdHAL' | 'OpenAlex_ids' | 'ID_SCOPUS'; multi?: boolean; cache: string; url: (id: string) => string }> = {
   orcid: { label: 'ORCID', table: 'Alignement_ORCID', idColumn: 'ORCID_candidat', targetField: 'ORCID', cache: '/orcid_align_cache.json', url: (id) => `https://orcid.org/${id}` },
-  hal: { label: 'HAL', table: 'Alignement_HAL', idColumn: 'IdHAL_candidat', targetField: 'IdHAL', cache: '/hal_align_cache.json', url: (id) => `https://hal.science/search/index/q/*/authIdHal_s/${id}` },   // not cv.hal.science: only authors who created a HAL CV have a page there
+  // A HAL candidate is a person, IdHAL or not: its id is the idHal_i (blacklist key, decision D4 of docs/plan-alignement-idhal-i.md).
+  hal: { label: 'HAL', table: 'Alignement_HAL', idColumn: 'IdHAL_i_candidat', targetField: 'IdHAL', cache: '/hal_align_cache.json', url: (id) => halIdNumSearchUrl(id) },   // not cv.hal.science: only authors who created a HAL CV have a page there
   openalex: { label: 'OpenAlex', table: 'Alignement_OpenAlex', idColumn: 'OpenAlex_candidat', targetField: 'OpenAlex_ids', multi: true, cache: '/openalex_align_cache.json', url: (id) => `https://openalex.org/${id}` },
   scopus: { label: 'Scopus', table: 'Alignement_Scopus', idColumn: 'Scopus_candidat', targetField: 'ID_SCOPUS', cache: '/scopus_align_cache.json', url: (id) => `https://www.scopus.com/authid/detail.uri?authorId=${id}` },
 };
@@ -1020,9 +1022,9 @@ export function computeAlignDiffFrom(source: AlignSource, mode: AlignMode, input
   const ppnDigits = (v: any) => String(v || '').match(/([0-9]{6,}[0-9X])/i)?.[1]?.toUpperCase() || '';
   const digits = (v: any) => String(v || '').replace(/\D/g, '');
   const normOa = (v: any) => parseOpenalexIds(v)[0] || '';
-  const normId = source === 'orcid' ? normOrcid : source === 'openalex' ? normOa : source === 'scopus' ? digits : normIdhal;
+  const normId = source === 'orcid' ? normOrcid : source === 'openalex' ? normOa : digits;
   /** Identifier of a raw cached candidate (field name differs per script). */
-  const candId = (c: any): string => (source === 'orcid' ? c.orcid : source === 'scopus' ? String(c.id || '') : c.idhal);
+  const candId = (c: any): string => (source === 'orcid' ? c.orcid : source === 'scopus' ? String(c.id || '') : String(c.idhalI || ''));
 
   const rejected = new Set<string>();
   const melees: AlignDiff['melees'] = [];
@@ -1120,7 +1122,7 @@ export function computeAlignDiffFrom(source: AlignSource, mode: AlignMode, input
         ids: { scopus: String(c.id), orcid: c.orcid || '' },
       }
     : {
-        id: c.idhal, url: meta.url(c.idhal), fullName: c.fullName || c.idhal, forms: c.forms || [], score: c.score, evidence: c.evidence || [],
+        id: String(c.idhalI || ''), url: meta.url(String(c.idhalI || '')), fullName: c.fullName || c.idhal || String(c.idhalI || ''), forms: c.forms || [], score: c.score, evidence: c.evidence || [],
         matchedIds: c.matchedIds || [], details: [...(c.labs || []), ...(c.emailDomains || []).map((d: string) => `@${d}`)], suspect: c.suspect || [],
         ids: { idhal: c.idhal, idhalI: String(c.idhalI || ''), orcid: c.orcid || '', idref: c.idref || '' },
       };
@@ -1142,8 +1144,9 @@ export function computeAlignDiffFrom(source: AlignSource, mode: AlignMode, input
           { field: 'ORCID', label: 'ORCID', cand: cand.ids.orcid || '', cur: f['ORCID'] || '', eq: normOrcid(cand.ids.orcid) === normOrcid(f['ORCID']), primary: false },
         ]
       : [
-          { field: 'IdHAL', label: 'IdHAL', cand: cand.ids.idhal || '', cur: f['IdHAL'] || '', eq: normIdhal(cand.ids.idhal) === normIdhal(f['IdHAL']), primary: true },
-          { field: 'IdHAL_i', label: 'IdHAL_i', cand: cand.ids.idhalI || '', cur: f['IdHAL_i'] || '', eq: digits(cand.ids.idhalI) === digits(f['IdHAL_i']), primary: false },
+          // The identifier the record was verified by is the main one: its IdHAL, else its IdHAL_i (HAL person without IdHAL).
+          { field: 'IdHAL', label: 'IdHAL', cand: cand.ids.idhal || '', cur: f['IdHAL'] || '', eq: normIdhal(cand.ids.idhal) === normIdhal(f['IdHAL']), primary: !!normIdhal(f['IdHAL']) },
+          { field: 'IdHAL_i', label: 'IdHAL_i', cand: cand.ids.idhalI || '', cur: f['IdHAL_i'] || '', eq: digits(cand.ids.idhalI) === digits(f['IdHAL_i']), primary: !normIdhal(f['IdHAL']) },
           { field: 'ORCID', label: 'ORCID', cand: cand.ids.orcid || '', cur: f['ORCID'] || '', eq: normOrcid(cand.ids.orcid) === normOrcid(f['ORCID']), primary: false },
           { field: 'IdRef', label: 'IdRef', cand: cand.ids.idref || '', cur: f['IdRef'] || '', eq: ppnDigits(cand.ids.idref) === ppnDigits(f['IdRef']), primary: false },
         ];
@@ -1179,6 +1182,7 @@ export function computeAlignDiffFrom(source: AlignSource, mode: AlignMode, input
 
     if (mode === 'search') {
       if (String(f[meta.targetField] || '').trim()) continue;   // filled in the meantime
+      if (source === 'hal' && String(f['IdHAL_i'] || '').trim()) continue;   // HAL person known (written directly by the script, or by hand)
       const cands: any[] = (entry.candidates || []).filter((c: any) => !rejected.has(`${key}::${normId(candId(c))}`));
       if (entry.status === 'error') { conflits.push({ id, uid, displayName, labo, group, reason: texts.searchError(), detail: texts.apiUnreachable() }); continue; }
       if (!cands.length) { nonTrouves.push({ uid, displayName, labo, group }); continue; }
@@ -1329,9 +1333,7 @@ export function alignRejectWrites(
     ? (v: any) => String(v || '').match(/(\d{4}-\d{4}-\d{4}-\d{3}[\dX])/i)?.[1]?.toUpperCase() || ''
     : source === 'openalex'
       ? (v: any) => parseOpenalexIds(v)[0] || ''
-      : source === 'scopus'
-        ? (v: any) => String(v || '').replace(/\D/g, '')
-        : (v: any) => String(v || '').trim().replace(/\/+$/, '').split('/').pop()!.trim().toLowerCase();
+      : (v: any) => String(v || '').replace(/\D/g, '');   // Scopus id, HAL idHal_i
   const existing = new Map<string, { id: number; decision: string }>();
   for (const rec of revRecs) existing.set(`${rec.fields['uid_dyna'] || ''}::${normId(rec.fields[meta.idColumn])}`, { id: rec.id, decision: String(rec.fields['Decision'] || '') });
   const toCreate: Record<string, any>[] = [];
@@ -1345,7 +1347,7 @@ export function alignRejectWrites(
       Decision: decision, Applique: false, Date_application: today, Pousse_le: today, Note: note,
     };
     base[meta.idColumn] = it.candidate.id;
-    if (source === 'hal') base['IdHAL_i_candidat'] = it.candidate.ids.idhalI || '';
+    if (source === 'hal') base['IdHAL_candidat'] = it.candidate.ids.idhal || '';
     if (source === 'openalex') { base['ORCID_profil'] = it.candidate.ids.orcid || ''; base['Origine'] = 'Druid (mauvais candidat)'; }
     if (source === 'scopus') base['ORCID_candidat'] = it.candidate.ids.orcid || '';
     toCreate.push(base);

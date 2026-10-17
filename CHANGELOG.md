@@ -21,9 +21,21 @@ données à exécuter au déploiement).
   font l'union des secondaires, et la tâche « identifiants partagés » voit aussi un IdHAL_i secondaire porté par une
   autre fiche. Premier lot de l'alignement des IdHAL_i (plan `plan-alignement-idhal-i.md`).
 
+### Modifié
+- **Alignement HAL — personnes HAL sans IdHAL** (`scripts/sync_hal.cjs`) : un candidat est désormais une personne HAL
+  (IdHAL_i), avec ou sans IdHAL, et plus seulement un IdHAL. Recherche : fiches sans IdHAL ni IdHAL_i ; plusieurs
+  personnes fortes du même chercheur sont gardées ensemble, la principale choisie par IdHAL, puis dépôts sur le site,
+  puis dépôts. Une personne qui porte l'ORCID ou l'IdRef de la fiche, au nom concordant et sans suspicion, est écrite
+  directement (IdHAL_i, IdHAL_i secondaires, IdHAL s'il existe). Vérification : fiches avec IdHAL ou IdHAL_i ; propose
+  des IdHAL_i secondaires (même ORCID / IdRef, ou même nom avec des dépôts sur le site, jamais au-dessus de « moyen »).
+  Nouveau signal d'identité mêlée : la forme auteur qui rattache la fiche appartient aussi à une autre personne HAL.
+  Liste noire `Alignement_HAL` indexée par l'IdHAL_i. Lot 2 du plan `plan-alignement-idhal-i.md`.
+
 ### Migration
+- `20261017120000_hal_candidate_person.sql` : les décisions HAL (`alignment_candidate`, source `hal`) passent de
+  l'IdHAL à l'IdHAL_i comme clé (2 lignes en prod Nantes). À appliquer avec les migrations (`druid-migrate`).
 - Instances sur Grist (Centrale) : avant de remplir des IdHAL_i secondaires, créer la colonne avec
-  `node scripts/add_align_columns.cjs --apply`. Rien à faire sur PostgreSQL.
+  `node scripts/add_align_columns.cjs --apply` (sur PostgreSQL, rien à faire pour ce champ).
 
 ## [2.9.0] — 2026-10-17
 

@@ -29,7 +29,7 @@ export const gristWorkFixture = (): GristWorkInput => ({
     row(31, { uid_dyna: 'g103', PPN_candidat: '000000043', Decision: 'Validé', Applique: true, Date_application: '2026-09-12' }), // record without uid
     row(32, { uid_dyna: 'nobody', PPN_candidat: '000000051', Decision: 'Rejeté' }),
   ],
-  Alignement_HAL: [row(40, { uid_dyna: 'dupont-a', Annuaire_id: 102, IdHAL_candidat: 'alice-dupont', Score: 'fort', Decision: 'Identité mêlée', Pousse_le: '2026-09-20' })],
+  Alignement_HAL: [row(40, { uid_dyna: 'dupont-a', Annuaire_id: 102, IdHAL_candidat: 'alice-dupont', IdHAL_i_candidat: '100001', Score: 'fort', Decision: 'Identité mêlée', Pousse_le: '2026-09-20' })],
   Alignement_ORCID: [
     row(50, { uid_dyna: 'dupont-a', Annuaire_id: 101, ORCID_candidat: '0000-0002-0000-0002', Decision: 'Rejeté', Pousse_le: 'n/a' }),
     row(51, { uid_dyna: 'dupont-a', Annuaire_id: 101, ORCID_candidat: '0000-0002-0000-0002', Decision: 'Rejeté' }), // same key

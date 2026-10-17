@@ -55,7 +55,11 @@ const TARGET_SOURCES = {
   hal: {
     cachePath: 'hal_align_cache.json',
     modes: ['search', 'verify'],
-    eligible: (p, mode) => (mode === 'verify' ? !!String(p.idhal || '').trim() : !String(p.idhal || '').trim()),
+    // A record with an IdHAL_i only (HAL person without IdHAL) is verified, not searched (docs/plan-alignement-idhal-i.md).
+    eligible: (p, mode) => {
+      const known = !!String(p.idhal || '').trim() || !!String(p.idhalI || '').trim();
+      return mode === 'verify' ? known : !known;
+    },
     done: doneInMode,
   },
   openalex: {

@@ -73,7 +73,7 @@ export const isArbitrationTable = (t: string) => /^Arbitrage_[A-Za-z0-9_]+$/.tes
 
 const ALIGNMENT_SOURCES: Record<string, { source: string; candidate: string }> = {
   Alignement_IdRef: { source: 'idref', candidate: 'PPN_candidat' },
-  Alignement_HAL: { source: 'hal', candidate: 'IdHAL_candidat' },
+  Alignement_HAL: { source: 'hal', candidate: 'IdHAL_i_candidat' },   // the HAL person (docs/plan-alignement-idhal-i.md, D4)
   Alignement_ORCID: { source: 'orcid', candidate: 'ORCID_candidat' },
   Alignement_OpenAlex: { source: 'openalex', candidate: 'OpenAlex_candidat' },
   Alignement_Scopus: { source: 'scopus', candidate: 'Scopus_candidat' },

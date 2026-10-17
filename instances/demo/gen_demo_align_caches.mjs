@@ -96,7 +96,8 @@ researchers.forEach((r, i) => {
     const good = cand(fakeIdHal(r.Prenom, r.Nom, UNIVERSE.idhalPrefix), String(900000 + n), 'fort', [`mail @${EMAIL_DOMAIN}`, `labo ${r.LABO} (${3 + (n % 9)} publis)`], [r.LABO]);
     hal[uid] = {
       mode: 'search', queryName: displayName(r), checkedAt: CHECKED_AT, derivedFrom: [],
-      ...(c === 'found' ? { status: 'found', best: good.idhal, candidates: [good] }
+      // best = the HAL person (idHal_i), as sync_hal.cjs writes it (docs/plan-alignement-idhal-i.md, lot 2).
+      ...(c === 'found' ? { status: 'found', best: good.idhalI, others: [], direct: [], candidates: [good] }
         : c === 'ambiguous' ? { status: 'ambiguous', best: '', candidates: [{ ...good, score: 'moyen' }, cand(`${good.idhal}-1`, String(900000 + n + HOMONYM), 'faible', ['nom partiel'], ['Laboratoire Témoin'])] }
         : { status: 'not_found', best: '', candidates: [] }),
     };
