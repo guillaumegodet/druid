@@ -358,11 +358,15 @@ describe('buildUnifiedUpdates (docs/archive/plan-alignement-unifie.md, lot 2)', 
     expect(out[0].fields.OpenAlex_ids).toBe('A1|A2');
   });
 
-  it('arbitrated ambiguous case: writes the target column of the source', () => {
-    const r = row({ sources: { hal: { status: 'ambiguous', ambiguous: { candidates: [{ id: 'jdupont' } as any] } } } });
-    const chosen = { [unifiedAmbigKey('G-1', 'hal')]: 'jdupont' };
-    const out = buildUnifiedUpdates(unifiedDiff([r], ['hal']), new Set(), chosen);
-    expect(out).toEqual([{ id: 'G-1', uid: 'u1', displayName: 'DUPONT Jean', fields: { IdHAL: 'jdupont' }, fieldsBySource: { hal: { IdHAL: 'jdupont' } }, sources: ['hal'] }]);
+  it('arbitrated ambiguous case: writes the target column of the source (HAL: the person, and its IdHAL)', () => {
+    const r = row({ sources: {
+      orcid: { status: 'ambiguous', ambiguous: { candidates: [{ id: '0000-0001-0000-0001', ids: {} } as any] } },
+      hal: { status: 'ambiguous', ambiguous: { candidates: [{ id: '12345', ids: { idhal: 'jdupont', idhalI: '12345' } } as any] } },
+    } });
+    const chosen = { [unifiedAmbigKey('G-1', 'orcid')]: '0000-0001-0000-0001', [unifiedAmbigKey('G-1', 'hal')]: '12345' };
+    const out = buildUnifiedUpdates(unifiedDiff([r], ['orcid', 'hal']), new Set(), chosen);
+    expect(out).toEqual([{ id: 'G-1', uid: 'u1', displayName: 'DUPONT Jean', fields: { ORCID: '0000-0001-0000-0001', IdHAL_i: '12345', IdHAL: 'jdupont' },
+      fieldsBySource: { orcid: { ORCID: '0000-0001-0000-0001' }, hal: { IdHAL_i: '12345', IdHAL: 'jdupont' } }, sources: ['orcid', 'hal'] }]);
   });
 
   it('arbitrated OpenAlex ambiguous case (several chosen, multi-valued target): ids joined with "|"', () => {

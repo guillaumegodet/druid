@@ -22,6 +22,12 @@ données à exécuter au déploiement).
   autre fiche. Premier lot de l'alignement des IdHAL_i (plan `plan-alignement-idhal-i.md`).
 
 ### Modifié
+- **Alignement des identifiants — HAL multivalué** (vue unifiée) : chaque personne HAL forte d'un chercheur est
+  cochable (une ligne par personne, comme OpenAlex) et les autres candidats s'arbitrent par cases à cocher. La
+  première personne cochée devient l'IdHAL_i principal (avec son IdHAL et ses ORCID / IdRef), les suivantes des
+  IdHAL_i secondaires ; une pastille « principal » / « secondaire » le montre avant d'appliquer. En vérification, les
+  IdHAL_i secondaires proposés par le script apparaissent à cocher. L'écriture n'écrase jamais : un IdHAL_i principal
+  déjà présent reste principal, la personne cochée devient secondaire. Lot 3 du plan `plan-alignement-idhal-i.md`.
 - **Alignement HAL — personnes HAL sans IdHAL** (`scripts/sync_hal.cjs`) : un candidat est désormais une personne HAL
   (IdHAL_i), avec ou sans IdHAL, et plus seulement un IdHAL. Recherche : fiches sans IdHAL ni IdHAL_i ; plusieurs
   personnes fortes du même chercheur sont gardées ensemble, la principale choisie par IdHAL, puis dépôts sur le site,

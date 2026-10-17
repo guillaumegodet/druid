@@ -228,6 +228,8 @@ export const AlignCandidateLine: React.FC<{ c: AlignCandidate }> = ({ c }) => (
       <a href={c.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cream-50 dark:bg-white/10 border border-ink/10 dark:border-white/15 font-mono text-[11.5px] font-bold text-ink dark:text-[#e7e2d6] hover:border-accent-strong hover:underline">
         <Link2 className="w-3 h-3" /> {c.id}
       </a>
+      {/* HAL person: its IdHAL when it has one (the id shown is the idHal_i). */}
+      {!!c.ids?.idhal && c.ids.idhalI === c.id && <span className="px-2 py-0.5 rounded-full bg-cream-50 dark:bg-white/10 border border-ink/10 dark:border-white/15 font-mono text-[11px] text-ink dark:text-[#e7e2d6]">{c.ids.idhal}</span>}
       <span className="font-semibold text-ink dark:text-[#f5f2ea]">{c.fullName || '—'}</span>
       <ScoreBadge score={c.score} />
       <EmptyRecordBadge empty={c.emptyRecord} />
