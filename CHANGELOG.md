@@ -12,6 +12,18 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Journal d'audit (PostgreSQL)** : une mise à jour qui ne change que des colonnes de suivi (`updated_at`,
+  `verified_at` des tâches revérifiées chaque nuit, `checked_at` d'un identifiant) n'écrit plus de ligne, pas plus
+  qu'une fiche enregistrée sans changement. Mesuré à Nantes du 9 au 19 octobre : environ 70 % des lignes du journal
+  (10 566 revérifications de tâches, soit 22 Mo sur 33, et 1 906 enregistrements sans changement). Les changements
+  réels restent journalisés à l'identique, colonnes de suivi comprises dans leurs images.
+
+### Migration
+- `20261019150000_audit_skip_bookkeeping.sql` : nouvelle version de la fonction `audit_row()`, sans reprise de
+  données (les lignes déjà écrites restent). À appliquer avec les migrations (`druid-migrate` à Nantes, job `migrate`
+  du workflow `centrale-db` pour Centrale, hors des heures d'usage).
+
 ## [2.11.0] — 2026-10-19
 
 ### Ajouté
