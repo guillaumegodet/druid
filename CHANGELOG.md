@@ -12,6 +12,16 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Import d'un annuaire de site — équipes et type d'appartenance** : le fichier `druid-site-import` peut déclarer les
+  équipes (ou thèmes) du labo (`teams` : acronyme, nom, description, page) ; celles qui manquent sous le labo sont
+  proposées à la création (cochées), créées avant les fiches. Chaque personne peut porter son type d'appartenance
+  (`membershipType` : membre statutaire, associé, invité…), proposé en complément ou en différence comme les autres
+  champs et écrit à la création. Les libellés d'équipe du site sans équipe correspondante sont signalés. Champs
+  facultatifs : les fichiers existants restent valides.
+- **Nouvelle équipe sur PostgreSQL** : à sa création, une équipe est reliée aux appartenances de son labo qui portent
+  déjà son libellé (`membership_team`), sans réenregistrer chaque fiche.
+
 ### Modifié
 - **Instances Cloudflare sur PostgreSQL — newsletter et veille** : la génération des brèves
   (`/api/newsletter/generate`) écrit dans `newsletter_item` par le store des publications de l'instance au lieu de la

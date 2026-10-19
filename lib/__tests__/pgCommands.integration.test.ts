@@ -256,6 +256,33 @@ describe.skipIf(!url)('PostgreSQL commands: what differs from Grist by design', 
     expect(got.group).toEqual([[105, 'LAB2'], [got.recordId, 'zzz']]);
   });
 
+  it('a new team takes the members of its lab already labelled with it (plan-binomes-chercheurs D11)', async () => {
+    const directory = transformDirectory(gristDirectoryFixture());
+    const got: Record<string, unknown> = {};
+    await expect(db!.transaction().execute(async (trx) => {
+      await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
+      await loadDirectory(trx, directory.rows, directory.report);
+      const repo = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository: repo, today: TODAY });
+      const audits: unknown[] = [];
+      // Membership 101 (LAB1) is labelled « TEAMA|Free team »; no structure « Free team » exists yet.
+      const { id } = await commands.createStructure({ acronym: 'Free team', officialName: 'Équipe libre', level: '1', parentStructure: 'LAB1' } as any,
+        { ...ctxOf(), audit: (a) => audits.push(a) });
+      got.links = (await sql<{ membership_id: string }>`SELECT membership_id FROM membership_team WHERE team_structure_id = ${id.slice(2)}`.execute(trx)).rows;
+      got.audits = audits;
+      // A team no member names links nobody.
+      const other = await commands.createStructure({ acronym: 'EMPTY', level: '1', parentStructure: 'LAB1' } as any, ctxOf());
+      got.empty = (await sql`SELECT 1 FROM membership_team WHERE team_structure_id = ${other.id.slice(2)}`.execute(trx)).rows.length;
+      throw new Rollback();
+    })).rejects.toBeInstanceOf(Rollback);
+    expect(got.links).toEqual([{ membership_id: '101' }]);
+    expect(got.audits).toEqual([
+      expect.objectContaining({ table: 'Structures', kind: 'create' }),
+      { table: 'Annuaire', kind: 'update', rows: [101], fields: ['team'], count: 1 },
+    ]);
+    expect(got.empty).toBe(0);
+  });
+
   it('secondary HAL identifiers are idhal_i rows without is_primary, swapped with the primary one in place (IdHAL_i plan, lot 1)', async () => {
     const directory = transformDirectory(gristDirectoryFixture());
     const got: Record<string, unknown> = {};

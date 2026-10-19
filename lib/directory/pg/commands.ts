@@ -25,7 +25,7 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
-import { OPENALEX_AUTHOR_SOURCE, loadPersonParts, readRecordFields, resolveStructures, writeHalIdNumSecondaries, writeRecordFields } from './recordFields';
+import { OPENALEX_AUTHOR_SOURCE, linkTeamLabels, loadPersonParts, readRecordFields, resolveStructures, writeHalIdNumSecondaries, writeRecordFields } from './recordFields';
 import { HAL_ID_NUM_SECONDARY_COLUMN, secondaryHalIdNums } from '../../halIds';
 import { insertStructure, writeStructure } from './structures';
 import type { CommandContext, DirectoryCommands } from '../commands';
@@ -404,6 +404,9 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       assertStructureLabels(ctx.scope, [fields['short_labels']]);
       const id = await insertStructure(trx, fields);
       ctx.audit({ table: 'Structures', kind: 'create', rows: [id], count: 1 });
+      // A new team takes the lab's members already labelled with it (labels imported before the team existed).
+      const linked = await linkTeamLabels(trx, id);
+      if (linked.length) ctx.audit({ table: 'Annuaire', kind: 'update', rows: linked, fields: ['team'], count: linked.length });
       return { id: `S-${id}` };
     }),
 

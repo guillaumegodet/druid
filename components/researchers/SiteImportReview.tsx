@@ -1,15 +1,17 @@
 import React, { useMemo, useState } from 'react';
-import { Globe, X, Upload, AlertTriangle, UserPlus, PenLine, ShieldCheck, HelpCircle, UserMinus, CheckCircle2 } from 'lucide-react';
+import { Globe, X, Upload, AlertTriangle, UserPlus, PenLine, ShieldCheck, HelpCircle, UserMinus, CheckCircle2, Users } from 'lucide-react';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { DirectoryApi } from '../../lib/directoryApi';
 import { apiErrorText } from '../../lib/apiErrors';
 import type { SiteField, SiteImportPlan, SiteImportResult, SiteImportSelection } from '../../lib/directory/siteImport';
+import { MEMBERSHIP_LABELS } from '../../lib/researcherLabels';
+import type { MembershipType } from '../../types';
 
 const FIELD_LABELS: Record<SiteField, MessageDescriptor> = {
   email: msg`Email`, team: msg`Team`, profileUrl: msg`Profile page`, directoryUrl: msg`Directory page`,
-  grade: msg`Corps / grade`, photoUrl: msg`Photo`,
+  grade: msg`Corps / grade`, photoUrl: msg`Photo`, membershipType: msg`Membership type`,
 };
 
 interface SiteImportReviewProps {
@@ -38,6 +40,7 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<SiteImportResult | null>(null);
+  const [teams, setTeams] = useState<Set<string>>(new Set());
   const [creations, setCreations] = useState<Set<number>>(new Set());
   const [fields, setFields] = useState<Set<string>>(new Set());
   const [validate, setValidate] = useState<Set<number>>(new Set());
@@ -52,6 +55,7 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
     try {
       const p = await DirectoryApi.siteImportPreview(doc);
       setPlan(p);
+      setTeams(new Set(p.teams.toCreate.map((tm) => tm.acronym)));
       setCreations(new Set(p.creations.map((c) => c.index)));
       setFields(new Set(p.matches.flatMap((m) => m.complements.map((c) => fieldKey(m.index, c.field)))));
       setValidate(new Set());
@@ -82,11 +86,14 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
   };
 
   const selectedFields = [...fields].map((k) => { const [i, f] = k.split(':'); return { index: Number(i), field: f as SiteField }; });
-  const total = creations.size + new Set(selectedFields.map((f) => f.index)).size + validate.size;
+  const total = teams.size + creations.size + new Set(selectedFields.map((f) => f.index)).size + validate.size;
+  /** Value shown for a field: the membership type by its label, the others as written. */
+  const shown = (field: SiteField, value: string) =>
+    (field === 'membershipType' && MEMBERSHIP_LABELS[value as MembershipType] ? t(MEMBERSHIP_LABELS[value as MembershipType]) : value);
 
   const apply = async () => {
     if (!plan || !document) return;
-    const selection: SiteImportSelection = { creations: [...creations], fields: selectedFields, validate: [...validate], validateNew };
+    const selection: SiteImportSelection = { teams: [...teams], creations: [...creations], fields: selectedFields, validate: [...validate], validateNew };
     setBusy(true); setError('');
     try {
       setResult(await DirectoryApi.siteImportApply(document, selection));
@@ -131,6 +138,7 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
           {result && (
             <div className={`${panel} p-4 space-y-1 text-[13px] text-ink dark:text-[#f5f2ea]`}>
               <p className="flex items-center gap-1.5 font-semibold"><CheckCircle2 className="w-4 h-4 text-[#1f7a4d] dark:text-[#5fd39a]" /> <Trans>Import applied</Trans></p>
+              {result.teamsCreated > 0 && <p><Plural value={result.teamsCreated} one="# team created." other="# teams created." /></p>}
               <p><Trans>{result.created} created, {result.updated} updated, {result.validated} validated.</Trans></p>
               {result.stale > 0 && <p><Plural value={result.stale} one="# item skipped: the directory changed since the preview." other="# items skipped: the directory changed since the preview." /></p>}
               {result.errors.map((e) => <p key={`${e.index}-${e.name}`} className="text-[#b23b3b] dark:text-[#f08c8c]">{e.name} — {e.error}</p>)}
@@ -146,6 +154,35 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
                 {plan.source && <span className="inline-flex items-center h-7 px-3 rounded-full bg-cream-300/70 dark:bg-white/10 text-muted dark:text-[#a8a293]">{plan.source}</span>}
               </div>
 
+              {plan.teams.toCreate.length > 0 && (
+                <div className={panel}>
+                  <div className={`${panelHead} text-[#1f7a4d] dark:text-[#5fd39a] bg-[rgba(46,160,102,.12)]`}>
+                    <Users className="w-3.5 h-3.5" /> <Plural value={plan.teams.toCreate.length} one="# team to create" other="# teams to create" /> · {plan.lab}
+                  </div>
+                  <div className="max-h-48 overflow-auto divide-y divide-ink/5 dark:divide-white/5">
+                    {plan.teams.toCreate.map((tm) => (
+                      <label key={tm.acronym} className={`${row} cursor-pointer hover:bg-accent/10`}>
+                        <input type="checkbox" className={box} checked={teams.has(tm.acronym)} onChange={() => toggle(teams, tm.acronym, setTeams)} />
+                        <span className="flex-1">
+                          <span className="font-semibold">{tm.acronym}</span>
+                          {tm.name && tm.name !== tm.acronym && <span className="text-muted dark:text-[#a8a293]"> · {tm.name}</span>}
+                          {tm.url && <a href={tm.url} target="_blank" rel="noreferrer" className="ml-2 text-[12px] underline text-muted dark:text-[#a8a293]" onClick={(e) => e.stopPropagation()}><Trans>site page</Trans></a>}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  <p className="px-4 py-2 border-t border-ink/5 dark:border-white/5 text-[12px] text-muted dark:text-[#a8a293]">
+                    <Trans>Created before the records: the members already labelled with a team are attached to it.</Trans>
+                  </p>
+                </div>
+              )}
+
+              {plan.teams.unknownLabels.length > 0 && (
+                <p className="text-[12.5px] text-[#9a6a12] dark:text-[#f0c266]">
+                  <Trans>Team labels of the site that match no team of {plan.lab} (kept as free labels): {plan.teams.unknownLabels.join(', ')}</Trans>
+                </p>
+              )}
+
               {plan.creations.length > 0 && (
                 <div className={panel}>
                   <div className={`${panelHead} text-[#1f7a4d] dark:text-[#5fd39a] bg-[rgba(46,160,102,.12)]`}>
@@ -157,7 +194,7 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
                         <input type="checkbox" className={box} checked={creations.has(c.index)} onChange={() => toggle(creations, c.index, setCreations)} />
                         <span className="flex-1">
                           <span className="font-semibold">{who(c.person)}</span>
-                          <span className="text-muted dark:text-[#a8a293]"> · {[c.person.team, c.employer, c.grade || c.employmentType || c.person.position].filter(Boolean).join(' · ')}</span>
+                          <span className="text-muted dark:text-[#a8a293]"> · {[c.person.team, c.employer, c.grade || c.employmentType || c.person.position, shown('membershipType', c.person.membershipType)].filter(Boolean).join(' · ')}</span>
                           {c.sameEmailLabs.length > 0 && (
                             <span className="block text-[12px] text-[#9a6a12] dark:text-[#f0c266]"><Trans>Same email already in {c.sameEmailLabs.join(', ')}: probably the same person (multi-affiliation).</Trans></span>
                           )}
@@ -183,7 +220,7 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
                         <span className="w-48 shrink-0 font-semibold">{m.name}</span>
                         <span className="flex-1 flex flex-wrap gap-x-4 gap-y-1">
                           {m.complements.map((c) => (
-                            <label key={c.field} className="inline-flex items-center gap-1.5 cursor-pointer" title={c.value}>
+                            <label key={c.field} className="inline-flex items-center gap-1.5 cursor-pointer" title={shown(c.field, c.value)}>
                               <input type="checkbox" className={box} checked={fields.has(fieldKey(m.index, c.field))} onChange={() => toggle(fields, fieldKey(m.index, c.field), setFields)} />
                               {t(FIELD_LABELS[c.field])}
                             </label>
@@ -215,7 +252,7 @@ export const SiteImportReview: React.FC<SiteImportReviewProps> = ({ onClose, onA
                           {m.differences.map((d) => (
                             <label key={d.field} className="flex items-start gap-1.5 cursor-pointer">
                               <input type="checkbox" className={box} checked={fields.has(fieldKey(m.index, d.field))} onChange={() => toggle(fields, fieldKey(m.index, d.field), setFields)} />
-                              <span><span className="text-muted dark:text-[#a8a293]">{t(FIELD_LABELS[d.field])} :</span> <s className="opacity-60">{d.current}</s> → <span className="font-semibold">{d.site}</span></span>
+                              <span><span className="text-muted dark:text-[#a8a293]">{t(FIELD_LABELS[d.field])} :</span> <s className="opacity-60">{shown(d.field, d.current)}</s> → <span className="font-semibold">{shown(d.field, d.site)}</span></span>
                             </label>
                           ))}
                         </span>

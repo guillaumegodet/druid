@@ -4,11 +4,11 @@ import { describe, it, expect } from 'vitest';
 import {
   planSiteImport, SiteImportDocumentSchema, typingOf, employerResolver, normName, applySiteImport, SiteImportSelectionSchema,
 } from '../directory/siteImport';
-import type { Researcher } from '../../types';
+import { StructureLevel, type Researcher, type Structure } from '../../types';
 import type { Institution } from '../directory/gristMapping';
 
 const researcher = (id: string, last: string, first: string, opts: Partial<{
-  uid: string; email: string; lab: string; team: string; role: string; validated: boolean; grade: string;
+  uid: string; email: string; lab: string; team: string; role: string; validated: boolean; grade: string; membershipType: string;
   employer: string; photoUrl: string; cv: string; rowId: number; extra: { structureName: string; team: string; role?: string; gristRowId?: number }[];
 }> = {}): Researcher => ({
   id, uid: opts.uid ?? id, lastName: last, firstName: first, displayName: `${last.toUpperCase()} ${first}`,
@@ -16,7 +16,7 @@ const researcher = (id: string, last: string, first: string, opts: Partial<{
   photoUrl: opts.photoUrl ?? '', profiles: { cvSiteLabo: opts.cv ?? '' },
   employment: { employer: opts.employer ?? '', grade: opts.grade ?? '' },
   affiliations: [
-    { structureName: opts.lab ?? 'LAB-A', team: opts.team ?? '', startDate: '', isPrimary: true, role: opts.role as any },
+    { structureName: opts.lab ?? 'LAB-A', team: opts.team ?? '', startDate: '', isPrimary: true, role: opts.role as any, membershipType: opts.membershipType as any },
     ...(opts.extra ?? []).map((e) => ({ ...e, startDate: '', isPrimary: false, role: e.role as any })),
   ],
   groups: [], identifiers: {},
@@ -29,8 +29,82 @@ const INSTITUTIONS: Institution[] = [
   { id: 3, name: 'ORGANISME', label: 'Organisme national', uai: '', ror: '', idref: '' },
 ];
 
-const doc = (people: Record<string, string>[]) => SiteImportDocumentSchema.parse({
-  format: 'druid-site-import', version: 1, lab: 'LAB-A', source: 'Site LAB-A', people,
+const doc = (people: Record<string, string>[], teams?: Record<string, string>[]) => SiteImportDocumentSchema.parse({
+  format: 'druid-site-import', version: 1, lab: 'LAB-A', source: 'Site LAB-A', people, ...(teams ? { teams } : {}),
+});
+
+const structure = (acronym: string, level: StructureLevel, parent = ''): Structure =>
+  ({ id: `S-${acronym}-${parent}`, acronym, level, parentStructure: parent } as unknown as Structure);
+const STRUCTURES = [
+  structure('LAB-A', StructureLevel.ENTITE), structure('LAB-B', StructureLevel.ENTITE),
+  structure('TH1', StructureLevel.EQUIPE, 'LAB-A'), structure('TH2', StructureLevel.EQUIPE, 'LAB-B'),
+];
+
+describe('site import — teams and membership type (plan-binomes-chercheurs D11)', () => {
+  const PEOPLE = [
+    researcher('durand-a', 'Durand', 'Alice', { rowId: 11, team: 'TH1' }),
+    researcher('martin-b', 'Martin', 'Bruno', { rowId: 12, membershipType: 'stat_mmb' }),
+  ];
+
+  it('proposes the teams of the file missing under the lab, and lists the labels matching no team', () => {
+    const plan = planSiteImport(doc([
+      { lastName: 'Durand', firstName: 'Alice', team: 'TH1|TH2' },
+      { lastName: 'Martin', firstName: 'Bruno', team: 'TH9' },
+    ], [{ acronym: 'TH1', name: 'Thème 1' }, { acronym: 'th2', name: 'Thème 2', url: 'https://lab/th2' }, { acronym: 'TH2', name: 'Doublon' }]),
+    PEOPLE, INSTITUTIONS, STRUCTURES);
+    // TH1 exists under LAB-A; TH2 exists only under LAB-B, so it is created under LAB-A (first spelling kept).
+    expect(plan.teams.toCreate).toEqual([{ acronym: 'th2', name: 'Thème 2', description: '', url: 'https://lab/th2' }]);
+    expect(plan.teams.unknownLabels).toEqual(['TH9']);
+  });
+
+  it('a file without teams plans none', () => {
+    const plan = planSiteImport(doc([{ lastName: 'Durand', firstName: 'Alice' }]), PEOPLE, INSTITUTIONS);
+    expect(plan.teams).toEqual({ toCreate: [], unknownLabels: [] });
+  });
+
+  it('offers the membership type as a complement or a difference, and ignores an unknown value', () => {
+    const plan = planSiteImport(doc([
+      { lastName: 'Durand', firstName: 'Alice', membershipType: 'assoc_mmb' },
+      { lastName: 'Martin', firstName: 'Bruno', membershipType: 'assoc_mmb' },
+      { lastName: 'Nouveau', firstName: 'Noé', membershipType: 'chercheur associé' },
+    ]), PEOPLE, INSTITUTIONS, STRUCTURES);
+    expect(plan.matches[0].complements).toEqual([{ field: 'membershipType', value: 'assoc_mmb' }]);
+    expect(plan.matches[1].differences).toEqual([{ field: 'membershipType', current: 'stat_mmb', site: 'assoc_mmb' }]);
+    expect(plan.creations[0].person.membershipType).toBe('');
+  });
+
+  it('creates the ticked teams first, under the lab, then writes the membership type', async () => {
+    const calls: { op: string; arg: any }[] = [];
+    const commands = {
+      createStructure: async (st: Structure) => { calls.push({ op: 'team', arg: st }); return { id: 'S-900' }; },
+      createPerson: async (r: Researcher) => { calls.push({ op: 'create', arg: r }); return { recordId: 501 }; },
+      updatePerson: async (_id: number, r: Researcher) => { calls.push({ op: 'update', arg: r }); },
+      applyValidations: async (entries: any[]) => entries.length,
+    };
+    const file = doc([
+      { lastName: 'Durand', firstName: 'Alice', membershipType: 'assoc_mmb' },
+      { lastName: 'Nouveau', firstName: 'Noé', team: 'TH3', membershipType: 'assoc_mmb' },
+    ], [{ acronym: 'TH3', name: 'Thème 3', description: 'Politiques éducatives', url: 'https://lab/th3' }, { acronym: 'TH4' }]);
+    const { teamsCreated, created, updated, stale } = await applySiteImport({
+      doc: file, selection: SiteImportSelectionSchema.parse({ teams: ['TH3', 'TH1'], creations: [1], fields: [{ index: 0, field: 'membershipType' }] }),
+      people: PEOPLE, institutions: INSTITUTIONS, structures: STRUCTURES, commands, ctx: {}, today: '2026-10-19', actor: 'admin-x',
+    });
+    expect({ teamsCreated, created, updated, stale }).toEqual({ teamsCreated: 1, created: 1, updated: 1, stale: 1 });
+    expect(calls.map((c) => c.op)).toEqual(['team', 'create', 'update']);
+    expect(calls[0].arg).toMatchObject({ acronym: 'TH3', officialName: 'Thème 3', level: StructureLevel.EQUIPE, parentStructure: 'LAB-A',
+      description: 'Politiques éducatives', website: 'https://lab/th3' });
+    expect(calls[1].arg.affiliations[0]).toMatchObject({ structureName: 'LAB-A', team: 'TH3', membershipType: 'assoc_mmb' });
+    expect(calls[2].arg.affiliations[0].membershipType).toBe('assoc_mmb');
+  });
+
+  it('creates no team when the lab has no structure', async () => {
+    const commands = { createStructure: async () => ({ id: 'S-1' }), createPerson: async () => ({ recordId: 1 }), updatePerson: async () => {}, applyValidations: async () => 0 };
+    const result = await applySiteImport({
+      doc: doc([], [{ acronym: 'TH3' }]), selection: SiteImportSelectionSchema.parse({ teams: ['TH3'] }),
+      people: PEOPLE, institutions: INSTITUTIONS, structures: [], commands, ctx: {}, today: '2026-10-19', actor: 'x',
+    });
+    expect(result).toMatchObject({ teamsCreated: 0, stale: 1 });
+  });
 });
 
 describe('site import — matching', () => {
@@ -138,6 +212,7 @@ describe('site import — application (lot 8 d3)', () => {
     let next = 500;
     return {
       calls,
+      createStructure: async () => ({ id: 'S-1' }),
       createPerson: async (researcher: Researcher) => { calls.push({ op: 'create', researcher }); return { recordId: next++ }; },
       updatePerson: async (recordId: number, researcher: Researcher) => {
         if (researcher.lastName === 'Casse') throw new Error('Grist HTTP 500');
@@ -168,7 +243,7 @@ describe('site import — application (lot 8 d3)', () => {
       fields: [{ index: 0, field: 'profileUrl' }, { index: 0, field: 'team' }, { index: 1, field: 'grade' }],
       validate: [0],
     });
-    expect(result).toEqual({ created: 1, updated: 2, validated: 1, stale: 0, errors: [] });
+    expect(result).toEqual({ teamsCreated: 0, created: 1, updated: 2, validated: 1, stale: 0, errors: [] });
     expect(calls.map((c) => c.op)).toEqual(['create', 'update', 'update', 'validate']);
     const created = calls[0].researcher!;
     expect(created).toMatchObject({
