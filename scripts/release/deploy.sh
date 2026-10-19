@@ -6,9 +6,9 @@
 #
 # Refuses anything that is not an annotated tag vX.Y.Z signed by an allowed signer, whose package.json carries
 # X.Y.Z and whose commit passed the CI. The image is built once per version from a clean checkout of the tag
-# (git worktree), never from a working copy. Before production: backup of the Grist doc and of the runtime
-# files; after: health check, automatic return to the previous image on failure. Every run is appended to
-# the deployment log.
+# (git worktree), never from a working copy. Before production: dump of the PostgreSQL database, backup of
+# the Grist doc and of the runtime files; after: health check, automatic return to the previous image on
+# failure. Every run is appended to the deployment log.
 #
 # Instance settings (paths, compose files, image names) come from a config file kept with the private data of
 # the instance: DRUID_DEPLOY_CONFIG=/path/to/deploy.env (see the variables read below).
@@ -35,6 +35,11 @@ if [ -z "$CONFIG" ] || [ ! -r "$CONFIG" ]; then die "DRUID_DEPLOY_CONFIG must na
 BACKUP_DIR=${BACKUP_DIR:-}
 BACKUP_PATHS=${BACKUP_PATHS:-}
 GRIST_ENV_FILE=${GRIST_ENV_FILE:-}
+# PostgreSQL container of the production database (pg_dump run inside it, over the local socket).
+DB_CONTAINER=${DB_CONTAINER:-}
+DB_NAME=${DB_NAME:-druid}
+DB_USER=${DB_USER:-postgres}
+[ -z "$DB_CONTAINER" ] || [ -n "$BACKUP_DIR" ] || die "DB_CONTAINER is set but BACKUP_DIR is not"
 GRIST_API_URL=${GRIST_API_URL:-https://grist.numerique.gouv.fr/api}
 MIN_MEM_MB=${MIN_MEM_MB:-2500}
 KEEP_VERSIONS=${KEEP_VERSIONS:-3}
@@ -124,6 +129,16 @@ fi
 STAMP=$(date +%Y%m%d-%H%M%S)
 if [ -n "$BACKUP_DIR" ]; then
   mkdir -p "$BACKUP_DIR"
+  if [ -n "$DB_CONTAINER" ]; then
+    OUT="$BACKUP_DIR/db-$STAMP-before-$TAG.dump"
+    # Custom format (pg_restore), written to a temporary file then checked by listing its contents.
+    (umask 077 && docker exec "$DB_CONTAINER" pg_dump -U "$DB_USER" -d "$DB_NAME" -Fc > "$OUT.tmp") \
+      || { rm -f "$OUT.tmp"; fail "dump of the database $DB_NAME ($DB_CONTAINER)"; }
+    docker exec -i "$DB_CONTAINER" pg_restore -l < "$OUT.tmp" >/dev/null 2>&1 \
+      || { rm -f "$OUT.tmp"; fail "dump of the database $DB_NAME is not readable by pg_restore"; }
+    mv "$OUT.tmp" "$OUT"
+    say "database saved: $OUT ($(du -h "$OUT" | cut -f1))"
+  fi
   if [ -n "$GRIST_ENV_FILE" ]; then
     DOC=$(sed -n 's/^VITE_GRIST_DOC_ID=//p' "$GRIST_ENV_FILE" | tail -1)
     KEY=$(sed -n 's/^GRIST_API_KEY=//p' "$GRIST_ENV_FILE" | tail -1)
@@ -138,7 +153,7 @@ if [ -n "$BACKUP_DIR" ]; then
     (umask 077 && tar -czf "$BACKUP_DIR/files-$STAMP-before-$TAG.tar.gz" $BACKUP_PATHS 2>/dev/null) || fail "backup of $BACKUP_PATHS"
   fi
   # Keep the KEEP_BACKUPS most recent backups of each kind.
-  for kind in grist files; do
+  for kind in db grist files; do
     find "$BACKUP_DIR" -maxdepth 1 -name "$kind-*" -type f -printf '%T@ %p\n' | sort -rn | tail -n +"$((KEEP_BACKUPS + 1))" | cut -d' ' -f2- | xargs -r rm -f
   done
 fi

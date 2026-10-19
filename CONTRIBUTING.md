@@ -81,9 +81,10 @@ Trois commandes, chacune à sa place :
 `scripts/release/deploy.sh` refuse un tag non annoté, non signé par une clé autorisée, dont `package.json` ne
 porte pas la version ou dont la CI n'est pas verte. Il construit l'image **une fois par version**, depuis une
 extraction propre du tag (jamais depuis une copie de travail), la déploie sur le test puis, après recette, la
-**même image** en production. Avant la production : sauvegarde du document Grist et des fichiers d'exécution ;
-après : contrôle de santé, et retour automatique à l'image précédente en cas d'échec. Chaque déploiement est
-consigné (date, opérateur, cible, version, commit, image, résultat). Revenir à une version antérieure :
+**même image** en production. Avant la production : dump de la base PostgreSQL (`DB_CONTAINER`, vérifié par
+`pg_restore -l`), sauvegarde du document Grist et des fichiers d'exécution ; après : contrôle de santé, et retour
+automatique à l'image précédente en cas d'échec. Chaque déploiement est consigné (date, opérateur, cible,
+version, commit, image, résultat). Revenir à une version antérieure :
 `deploy.sh prod <version> --skip-test-check`.
 
 Les réglages propres à une instance (chemins, fichiers compose, noms d'images) sont lus dans un fichier de
