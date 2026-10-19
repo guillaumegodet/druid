@@ -14,9 +14,12 @@
 //   - differences: a site value other than Druid's (never applied unless the user ticks it — « the site is right »);
 //     the photo is never overwritten;
 //   - members present on the site but not validated (to validate), and members absent from the site (to review:
-//     departures, other spellings) — SECONDAIRE / HISTORIQUE memberships excepted, their absence is expected.
+//     departures, other spellings) — SECONDAIRE / HISTORIQUE memberships excepted, their absence is expected;
+//   - teams the site declares and the lab has not (`teams` of the file, optional): created under the lab before the
+//     records are written, so that the team labels of the members link to them (druid-internal
+//     `docs/plan-binomes-chercheurs.md`, D11: the themes of a lab site).
 import { z } from 'zod';
-import type { Researcher } from '../../types';
+import { MEMBERSHIP_TYPES, StructureLevel, type MembershipType, type Researcher, type Structure } from '../../types';
 import type { Institution } from './gristMapping';
 
 export const SITE_IMPORT_FORMAT = 'druid-site-import';
@@ -42,8 +45,19 @@ export const SitePersonSchema = z.object({
   /** Presence given by the site (PRESENT; INTERNE / EXTERNE read as PRESENT), used when validating. */
   status: Text,
   uid: Text,
+  /** Membership type in the lab (cdb vocabulary: stat_mmb, assoc_mmb…) when the site tells it; any other value = ''. */
+  membershipType: Text.transform((v): MembershipType | '' => ((MEMBERSHIP_TYPES as string[]).includes(v) ? v as MembershipType : '')),
 });
 export type SitePerson = z.infer<typeof SitePersonSchema>;
+
+/** A team (or research theme) of the lab as the site presents it. */
+export const SiteTeamSchema = z.object({
+  acronym: z.string().trim().min(1).max(50),
+  name: Text,
+  description: z.string().trim().max(10000).optional().default(''),
+  url: Text,
+});
+export type SiteTeam = z.infer<typeof SiteTeamSchema>;
 
 export const SiteImportDocumentSchema = z.object({
   format: z.literal(SITE_IMPORT_FORMAT),
@@ -53,12 +67,14 @@ export const SiteImportDocumentSchema = z.object({
   url: z.string().trim().max(2000).optional().default(''),
   generatedAt: z.string().max(40).optional().default(''),
   people: z.array(SitePersonSchema).max(5000),
+  /** Teams of the lab on the site (optional): the ones missing under the lab are proposed for creation. */
+  teams: z.array(SiteTeamSchema).max(200).optional().default([]),
 });
 export type SiteImportDocument = z.infer<typeof SiteImportDocumentSchema>;
 
 /** Fields the import may fill in (complement) or replace (difference ticked by the user). */
-export type SiteField = 'email' | 'team' | 'profileUrl' | 'directoryUrl' | 'grade' | 'photoUrl';
-export const SITE_FIELDS: SiteField[] = ['email', 'team', 'profileUrl', 'directoryUrl', 'grade', 'photoUrl'];
+export type SiteField = 'email' | 'team' | 'profileUrl' | 'directoryUrl' | 'grade' | 'photoUrl' | 'membershipType';
+export const SITE_FIELDS: SiteField[] = ['email', 'team', 'profileUrl', 'directoryUrl', 'grade', 'photoUrl', 'membershipType'];
 /** Fields never overwritten: a photo is only added where there is none. */
 const COMPLEMENT_ONLY: SiteField[] = ['photoUrl'];
 
@@ -103,6 +119,9 @@ export interface SiteImportPlan {
   ambiguous: { index: number; person: SitePerson; candidates: { researcherId: string; name: string }[] }[];
   /** Lab members (PRINCIPAL or unqualified memberships) the site does not list. */
   absent: { researcherId: string; recordId: number | null; name: string; grade: string; team: string; validated: boolean }[];
+  /** Teams of the file missing under the lab (to create), and the team labels of the people that match no team of
+   * the lab nor of the file (left as free labels). */
+  teams: { toCreate: SiteTeam[]; unknownLabels: string[] };
 }
 
 /** Same normalization as sync_annuaire._norm: no accents, lower case, hyphens and apostrophes as spaces. */
@@ -137,10 +156,11 @@ export const typingOf = (p: SitePerson): { grade: string; employmentType: string
 };
 
 /** Value of a field on a researcher's membership of the lab. */
-const currentValue = (r: Researcher, membershipTeam: string, field: SiteField): string => {
+const currentValue = (r: Researcher, m: { team: string; membershipType: string }, field: SiteField): string => {
   switch (field) {
     case 'email': return r.email || '';
-    case 'team': return membershipTeam || '';
+    case 'team': return m.team || '';
+    case 'membershipType': return m.membershipType || '';
     case 'profileUrl': return r.profiles?.cvSiteLabo || '';
     case 'directoryUrl': return r.annuaireUrl || '';
     case 'grade': return r.employment?.grade || '';
@@ -176,13 +196,22 @@ export const employerResolver = (institutions: Institution[], labMembers: Resear
   };
 };
 
-interface LabMembership { researcher: Researcher; recordId: number | null; team: string; role: string }
+interface LabMembership { researcher: Researcher; recordId: number | null; team: string; role: string; membershipType: string }
+
+const normTeam = (s: unknown): string => String(s ?? '').trim().toUpperCase();
+
+/** The lab's structure and its teams, matched on the lab of the file. */
+const labStructures = (lab: string, structures: Structure[]) => ({
+  lab: structures.find((s) => String(s.level) === StructureLevel.ENTITE && normLab(s.acronym) === lab),
+  teams: structures.filter((s) => String(s.level) === StructureLevel.EQUIPE && normLab(s.parentStructure) === lab),
+});
 
 /**
  * Plan of an import. `people` = the whole directory (institution scope: the other labs are needed for the
- * multi-affiliation hint), `institutions` = the employers. Pure.
+ * multi-affiliation hint), `institutions` = the employers, `structures` = the directory's structures (teams of the
+ * lab). Pure.
  */
-export function planSiteImport(doc: SiteImportDocument, people: Researcher[], institutions: Institution[]): SiteImportPlan {
+export function planSiteImport(doc: SiteImportDocument, people: Researcher[], institutions: Institution[], structures: Structure[] = []): SiteImportPlan {
   const lab = normLab(doc.lab);
   const memberships: LabMembership[] = [];
   const emailLabs = new Map<string, Set<string>>();
@@ -190,7 +219,10 @@ export function planSiteImport(doc: SiteImportDocument, people: Researcher[], in
     for (const a of r.affiliations || []) {
       if (normLab(a.structureName) === lab) {
         // Row of the membership; a single-membership record carries it on the researcher only (PostgreSQL model).
-        memberships.push({ researcher: r, recordId: a.gristRowId ?? r.gristRowId ?? null, team: a.team || '', role: String(a.role || '').toUpperCase() });
+        memberships.push({
+          researcher: r, recordId: a.gristRowId ?? r.gristRowId ?? null, team: a.team || '', role: String(a.role || '').toUpperCase(),
+          membershipType: a.membershipType || '',
+        });
       }
       const email = (r.email || '').trim().toLowerCase();
       if (email) {
@@ -232,8 +264,14 @@ export function planSiteImport(doc: SiteImportDocument, people: Researcher[], in
   const resolveEmployer = employerResolver(institutions, memberships.map((m) => m.researcher));
   const plan: SiteImportPlan = {
     lab: doc.lab, source: doc.source, url: doc.url, siteCount: doc.people.length, labCount: memberships.length,
-    creations: [], matches: [], ambiguous: [], absent: [],
+    creations: [], matches: [], ambiguous: [], absent: [], teams: { toCreate: [], unknownLabels: [] },
   };
+  const existingTeams = new Set(labStructures(lab, structures).teams.map((t) => normTeam(t.acronym)));
+  const fileTeams = new Map<string, SiteTeam>();
+  for (const t of doc.teams) if (!fileTeams.has(normTeam(t.acronym))) fileTeams.set(normTeam(t.acronym), t);
+  plan.teams.toCreate = [...fileTeams.entries()].filter(([k]) => !existingTeams.has(k)).map(([, t]) => t);
+  const labels = new Set(doc.people.flatMap((p) => p.team.split('|').map((t) => t.trim()).filter(Boolean)));
+  plan.teams.unknownLabels = [...labels].filter((l) => !existingTeams.has(normTeam(l)) && !fileTeams.has(normTeam(l))).sort();
   const seen = new Set<LabMembership>();
   doc.people.forEach((p, index) => {
     const found = match(p);
@@ -255,7 +293,7 @@ export function planSiteImport(doc: SiteImportDocument, people: Researcher[], in
     for (const field of SITE_FIELDS) {
       const site = p[field];
       if (!site) continue;
-      const current = currentValue(m.researcher, m.team, field).trim();
+      const current = currentValue(m.researcher, m, field).trim();
       if (!current) complements.push({ field, value: site });
       else if (!sameValue(field, current, site) && !COMPLEMENT_ONLY.includes(field)) differences.push({ field, current, site });
     }
@@ -290,6 +328,8 @@ export function planSiteImport(doc: SiteImportDocument, people: Researcher[], in
 
 /** What the user kept in the review. Indexes are the people's positions in the file. */
 export const SiteImportSelectionSchema = z.object({
+  /** Acronyms of the teams to create under the lab (`plan.teams.toCreate`). */
+  teams: z.array(z.string().trim().min(1).max(50)).max(200).default([]),
   creations: z.array(z.number().int().min(0)).max(5000).default([]),
   /** Fields to write on matched members: complements and the differences ticked (« the site is right »). */
   fields: z.array(z.object({ index: z.number().int().min(0), field: z.enum(SITE_FIELDS as [SiteField, ...SiteField[]]) })).max(30000).default([]),
@@ -301,6 +341,7 @@ export const SiteImportSelectionSchema = z.object({
 export type SiteImportSelection = z.infer<typeof SiteImportSelectionSchema>;
 
 export interface SiteImportResult {
+  teamsCreated: number;
   created: number;
   updated: number;
   validated: number;
@@ -311,6 +352,7 @@ export interface SiteImportResult {
 
 /** Commands the application needs (lib/directory/commands.ts, Grist or PostgreSQL). */
 export interface SiteImportCommands {
+  createStructure(structure: Structure, ctx: any): Promise<{ id: string }>;
   createPerson(researcher: Researcher, ctx: any): Promise<{ recordId: number }>;
   updatePerson(recordId: number, researcher: Researcher, ctx: any): Promise<void>;
   applyValidations(entries: { recordId: number; validation: any }[], ctx: any): Promise<number>;
@@ -338,9 +380,10 @@ export const withSiteFields = (r: Researcher, lab: string, p: SitePerson, fields
     else if (field === 'directoryUrl') out.annuaireUrl = v;
     else if (field === 'grade') out.employment = { ...out.employment, grade: v };
     else if (field === 'photoUrl') out.photoUrl = v;
-    else if (field === 'team') {
+    else if (field === 'team' || field === 'membershipType') {
       const a = out.affiliations.find((x) => normLab(x.structureName) === normLab(lab));
-      if (a) a.team = v;
+      if (a && field === 'team') a.team = v;
+      else if (a) a.membershipType = v as MembershipType;
     }
   }
   return out;
@@ -353,7 +396,7 @@ export const newResearcherOf = (c: SiteImportCreation, lab: string, source: stri
     id: '', uid: p.uid, lastName: p.lastName, firstName: p.firstName, displayName: `${p.lastName.toUpperCase()} ${p.firstName}`.trim(),
     civility: '', email: p.email, status: '' as any,
     employment: { employer: c.employer, grade: c.grade, contractType: c.employmentType },
-    affiliations: [{ structureName: lab, team: p.team, startDate: '', isPrimary: true }],
+    affiliations: [{ structureName: lab, team: p.team, startDate: '', isPrimary: true, ...(p.membershipType ? { membershipType: p.membershipType } : {}) }],
     groups: [], identifiers: {}, photoUrl: p.photoUrl, annuaireUrl: p.directoryUrl,
     profiles: p.profileUrl ? { cvSiteLabo: p.profileUrl } : {},
     ...(validation ? { validation: validation as any } : {}),
@@ -361,23 +404,41 @@ export const newResearcherOf = (c: SiteImportCreation, lab: string, source: stri
   } as Researcher;
 };
 
+/** New team of the lab from the site (level team, under the lab's structure). */
+export const newTeamOf = (t: SiteTeam, labAcronym: string): Structure => ({
+  level: StructureLevel.EQUIPE, type: 'TEAM', acronym: t.acronym, officialName: t.name || t.acronym,
+  description: t.description, website: t.url, parentStructure: labAcronym,
+} as unknown as Structure);
+
 /**
  * Applies the rows the user kept. The plan is computed again here from the file and the current directory (the
- * browser's copy is never trusted): an item the plan no longer has is counted as stale and skipped. Order: creations,
- * then field updates, then validations (an update rewrites the record, its validation included).
+ * browser's copy is never trusted): an item the plan no longer has is counted as stale and skipped. Order: teams,
+ * creations, then field updates, then validations (an update rewrites the record, its validation included).
  */
 export async function applySiteImport(args: {
   doc: SiteImportDocument; selection: SiteImportSelection; people: Researcher[]; institutions: Institution[];
-  commands: SiteImportCommands; ctx: any; today: string; actor: string;
+  structures?: Structure[]; commands: SiteImportCommands; ctx: any; today: string; actor: string;
 }): Promise<SiteImportResult> {
-  const { doc, selection, people, institutions, commands, ctx, today, actor } = args;
-  const plan = planSiteImport(doc, people, institutions);
+  const { doc, selection, people, institutions, structures = [], commands, ctx, today, actor } = args;
+  const plan = planSiteImport(doc, people, institutions, structures);
   const source = doc.source || `Site ${doc.lab}`;
   // Lab label as the directory writes it (the file may differ in case or accents).
   const lab = people.flatMap((r) => r.affiliations || []).find((a) => normLab(a.structureName) === normLab(doc.lab))?.structureName || doc.lab;
-  const result: SiteImportResult = { created: 0, updated: 0, validated: 0, stale: 0, errors: [] };
+  const result: SiteImportResult = { teamsCreated: 0, created: 0, updated: 0, validated: 0, stale: 0, errors: [] };
   const fail = (index: number, name: string, e: unknown) =>
     result.errors.push({ index, name, error: e instanceof Error ? e.message : String(e) });
+
+  // Teams first: the records written next link their team labels to them.
+  const toCreate = new Map(plan.teams.toCreate.map((t) => [normTeam(t.acronym), t]));
+  const labStructure = labStructures(normLab(doc.lab), structures).lab;
+  for (const acronym of new Set(selection.teams.map(normTeam))) {
+    const t = toCreate.get(acronym);
+    if (!t || !labStructure) { result.stale++; continue; }
+    try {
+      await commands.createStructure(newTeamOf(t, labStructure.acronym), ctx);
+      result.teamsCreated++;
+    } catch (e) { fail(-1, t.acronym, e); }
+  }
 
   const creations = new Map(plan.creations.map((c) => [c.index, c]));
   for (const index of new Set(selection.creations)) {

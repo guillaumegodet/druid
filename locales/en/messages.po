@@ -619,7 +619,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
 #: components/researchers/MergeResearchersModal.tsx:291
-#: components/researchers/SiteImportReview.tsx:286
+#: components/researchers/SiteImportReview.tsx:323
 #: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
 #: components/researchers/TasksPage.tsx:342
@@ -1642,8 +1642,8 @@ msgstr "Add a call"
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
-#: components/researchers/SiteImportReview.tsx:110
-#: components/researchers/SiteImportReview.tsx:286
+#: components/researchers/SiteImportReview.tsx:117
+#: components/researchers/SiteImportReview.tsx:323
 #: components/researchers/UnifiedAlignPage.tsx:728
 msgid "Close"
 msgstr "Close"
@@ -1909,7 +1909,7 @@ msgstr "{valid, plural, one {Import # call} other {Import # calls}}"
 #: components/admin/ManualCallsAdmin.tsx:548
 #: components/dashboard/MediaMentionsPanel.tsx:555
 #: components/researchers/MergeResearchersModal.tsx:186
-#: components/researchers/SiteImportReview.tsx:275
+#: components/researchers/SiteImportReview.tsx:312
 msgid "validated"
 msgstr "validated"
 
@@ -4431,7 +4431,7 @@ msgstr "Citations"
 #: components/dashboard/PublicationsListTab.tsx:337
 #: components/researchers/AffiliationsTable.tsx:226
 #: components/researchers/AffiliationsTable.tsx:266
-#: components/researchers/SiteImportReview.tsx:11
+#: components/researchers/SiteImportReview.tsx:13
 #: lib/importConflicts.ts:74
 #: lib/structureLabels.ts:17
 msgid "Team"
@@ -11790,7 +11790,7 @@ msgid "Apply ({0})"
 msgstr "Apply ({0})"
 
 #: components/researchers/ListHeader.tsx:49
-#: components/researchers/SiteImportReview.tsx:11
+#: components/researchers/SiteImportReview.tsx:13
 #: lib/importConflicts.ts:69
 msgid "Email"
 msgstr "Email"
@@ -11817,7 +11817,7 @@ msgid "Import a validated list"
 msgstr "Import a validated list"
 
 #: components/researchers/ListHeader.tsx:120
-#: components/researchers/SiteImportReview.tsx:108
+#: components/researchers/SiteImportReview.tsx:115
 msgid "Import a lab website directory"
 msgstr "Import a lab website directory"
 
@@ -12202,120 +12202,149 @@ msgctxt "short"
 msgid "Next"
 msgstr "Next"
 
-#: components/researchers/SiteImportReview.tsx:11
+#: components/researchers/SiteImportReview.tsx:13
 #: lib/importConflicts.ts:89
 msgid "Directory page"
 msgstr "Directory page"
 
-#: components/researchers/SiteImportReview.tsx:11
+#: components/researchers/SiteImportReview.tsx:13
 msgid "Profile page"
 msgstr "Profile page"
 
-#: components/researchers/SiteImportReview.tsx:12
+#: components/researchers/SiteImportReview.tsx:14
+#: lib/importConflicts.ts:77
+msgid "Membership type"
+msgstr "Membership type"
+
+#: components/researchers/SiteImportReview.tsx:14
 #: lib/importConflicts.ts:90
 msgid "Photo"
 msgstr "Photo"
 
-#: components/researchers/SiteImportReview.tsx:12
+#: components/researchers/SiteImportReview.tsx:14
 msgid "Corps / grade"
 msgstr "Corps / grade"
 
-#: components/researchers/SiteImportReview.tsx:49
+#: components/researchers/SiteImportReview.tsx:52
 msgid "This file is not JSON."
 msgstr "This file is not JSON."
 
-#: components/researchers/SiteImportReview.tsx:59
+#: components/researchers/SiteImportReview.tsx:63
 msgid "The file could not be read."
 msgstr "The file could not be read."
 
-#: components/researchers/SiteImportReview.tsx:95
+#: components/researchers/SiteImportReview.tsx:102
 msgid "The import could not be applied."
 msgstr "The import could not be applied."
 
-#: components/researchers/SiteImportReview.tsx:118
+#: components/researchers/SiteImportReview.tsx:125
 msgid "File produced from the lab's website by the « sync-annuaire-grist » skill of druid-biblio (export mode). Nothing is written before you apply."
 msgstr "File produced from the lab's website by the « sync-annuaire-grist » skill of druid-biblio (export mode). Nothing is written before you apply."
 
-#: components/researchers/SiteImportReview.tsx:121
+#: components/researchers/SiteImportReview.tsx:128
 msgid "Choose the file (.json)"
 msgstr "Choose the file (.json)"
 
-#: components/researchers/SiteImportReview.tsx:125
+#: components/researchers/SiteImportReview.tsx:132
 msgid "Working…"
 msgstr "Working…"
 
-#: components/researchers/SiteImportReview.tsx:133
+#: components/researchers/SiteImportReview.tsx:140
 msgid "Import applied"
 msgstr "Import applied"
+
+#. placeholder {0}: result.teamsCreated
+#: components/researchers/SiteImportReview.tsx:141
+msgid "{0, plural, one {# team created.} other {# teams created.}}"
+msgstr "{0, plural, one {# team created.} other {# teams created.}}"
 
 #. placeholder {0}: result.created
 #. placeholder {1}: result.updated
 #. placeholder {2}: result.validated
-#: components/researchers/SiteImportReview.tsx:134
+#: components/researchers/SiteImportReview.tsx:142
 msgid "{0} created, {1} updated, {2} validated."
 msgstr "{0} created, {1} updated, {2} validated."
 
 #. placeholder {0}: result.stale
-#: components/researchers/SiteImportReview.tsx:135
+#: components/researchers/SiteImportReview.tsx:143
 msgid "{0, plural, one {# item skipped: the directory changed since the preview.} other {# items skipped: the directory changed since the preview.}}"
 msgstr "{0, plural, one {# item skipped: the directory changed since the preview.} other {# items skipped: the directory changed since the preview.}}"
 
 #. placeholder {0}: plan.lab
 #. placeholder {1}: plan.siteCount
 #. placeholder {2}: plan.labCount
-#: components/researchers/SiteImportReview.tsx:144
+#: components/researchers/SiteImportReview.tsx:152
 msgid "{0}: {1} on the site, {2} in Druid"
 msgstr "{0}: {1} on the site, {2} in Druid"
 
+#. placeholder {0}: plan.teams.toCreate.length
+#: components/researchers/SiteImportReview.tsx:160
+msgid "{0, plural, one {# team to create} other {# teams to create}}"
+msgstr "{0, plural, one {# team to create} other {# teams to create}}"
+
+#: components/researchers/SiteImportReview.tsx:169
+msgid "site page"
+msgstr "site page"
+
+#: components/researchers/SiteImportReview.tsx:175
+msgid "Created before the records: the members already labelled with a team are attached to it."
+msgstr "Created before the records: the members already labelled with a team are attached to it."
+
+#. placeholder {0}: plan.lab
+#. placeholder {1}: plan.teams.unknownLabels.join(', ')
+#: components/researchers/SiteImportReview.tsx:182
+msgid "Team labels of the site that match no team of {0} (kept as free labels): {1}"
+msgstr "Team labels of the site that match no team of {0} (kept as free labels): {1}"
+
 #. placeholder {0}: plan.creations.length
-#: components/researchers/SiteImportReview.tsx:152
+#: components/researchers/SiteImportReview.tsx:189
 msgid "{0, plural, one {# person to create (not validated)} other {# people to create (not validated)}}"
 msgstr "{0, plural, one {# person to create (not validated)} other {# people to create (not validated)}}"
 
 #. placeholder {0}: c.sameEmailLabs.join(', ')
-#: components/researchers/SiteImportReview.tsx:162
+#: components/researchers/SiteImportReview.tsx:199
 msgid "Same email already in {0}: probably the same person (multi-affiliation)."
 msgstr "Same email already in {0}: probably the same person (multi-affiliation)."
 
-#: components/researchers/SiteImportReview.tsx:170
+#: components/researchers/SiteImportReview.tsx:207
 msgid "Validate the created records too (the site is a reliable list)"
 msgstr "Validate the created records too (the site is a reliable list)"
 
 #. placeholder {0}: withComplements.length
-#: components/researchers/SiteImportReview.tsx:178
+#: components/researchers/SiteImportReview.tsx:215
 msgid "{0, plural, one {# record to complete (empty fields)} other {# records to complete (empty fields)}}"
 msgstr "{0, plural, one {# record to complete (empty fields)} other {# records to complete (empty fields)}}"
 
 #. placeholder {0}: withDifferences.length
-#: components/researchers/SiteImportReview.tsx:201
+#: components/researchers/SiteImportReview.tsx:238
 msgid "{0, plural, one {# record differs from the site — tick where the site is right} other {# records differ from the site — tick where the site is right}}"
 msgstr "{0, plural, one {# record differs from the site — tick where the site is right} other {# records differ from the site — tick where the site is right}}"
 
 #. placeholder {0}: t(FIELD_LABELS[f])
-#: components/researchers/SiteImportReview.tsx:206
+#: components/researchers/SiteImportReview.tsx:243
 msgid "all: {0}"
 msgstr "all: {0}"
 
 #. placeholder {0}: toValidate.length
-#: components/researchers/SiteImportReview.tsx:231
+#: components/researchers/SiteImportReview.tsx:268
 msgid "{0, plural, one {# member present on the site, not validated} other {# members present on the site, not validated}}"
 msgstr "{0, plural, one {# member present on the site, not validated} other {# members present on the site, not validated}}"
 
-#: components/researchers/SiteImportReview.tsx:236
+#: components/researchers/SiteImportReview.tsx:273
 msgid "validate all"
 msgstr "validate all"
 
 #. placeholder {0}: plan.ambiguous.length
-#: components/researchers/SiteImportReview.tsx:253
+#: components/researchers/SiteImportReview.tsx:290
 msgid "{0, plural, one {# homonym left out (to handle on the record)} other {# homonyms left out (to handle on the records)}}"
 msgstr "{0, plural, one {# homonym left out (to handle on the record)} other {# homonyms left out (to handle on the records)}}"
 
 #. placeholder {0}: plan.absent.length
-#: components/researchers/SiteImportReview.tsx:269
+#: components/researchers/SiteImportReview.tsx:306
 msgid "{0, plural, one {# member absent from the site (departure? other spelling?) — nothing is changed} other {# members absent from the site (departures? other spellings?) — nothing is changed}}"
 msgstr "{0, plural, one {# member absent from the site (departure? other spelling?) — nothing is changed} other {# members absent from the site (departures? other spellings?) — nothing is changed}}"
 
-#: components/researchers/SiteImportReview.tsx:290
+#: components/researchers/SiteImportReview.tsx:327
 msgid "{total, plural, one {Apply (# record)} other {Apply (# records)}}"
 msgstr "{total, plural, one {Apply (# record)} other {Apply (# records)}}"
 
@@ -14902,10 +14931,6 @@ msgstr "Invalid ID"
 #: lib/importConflicts.ts:67
 msgid "HDR"
 msgstr "HDR"
-
-#: lib/importConflicts.ts:77
-msgid "Membership type"
-msgstr "Membership type"
 
 #: lib/importConflicts.ts:78
 msgid "Affiliation start"

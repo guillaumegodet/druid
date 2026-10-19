@@ -353,3 +353,19 @@ export const resolveStructures = async (trx: Transaction<DB>, lab: string, teams
   }).filter((id): id is string => id !== null && id !== structureId);
   return { structureId, teamIds: [...new Set(teamIds)] };
 };
+
+/**
+ * Links a team just created to the memberships of its lab whose team labels name it (the labels of an import or of a
+ * lab roster arrive before the team exists). Returns the linked membership ids.
+ */
+export const linkTeamLabels = async (trx: Transaction<DB>, teamId: number): Promise<number[]> => {
+  const team = await trx.selectFrom('structure').select(['acronym', 'parent_id', 'level']).where('id', '=', String(teamId)).executeTakeFirst();
+  if (!team?.parent_id || !team.acronym || team.level !== '1') return [];
+  const key = normalizeAcronym(team.acronym);
+  const ids = (await trx.selectFrom('membership').select(['id', 'team_labels']).where('structure_id', '=', team.parent_id).execute())
+    .filter((m) => (m.team_labels || []).some((t) => normalizeAcronym(t) === key)).map((m) => m.id);
+  if (!ids.length) return [];
+  await trx.insertInto('membership_team').values(ids.map((id) => ({ membership_id: id, team_structure_id: String(teamId) })))
+    .onConflict((oc) => oc.doNothing()).execute();
+  return ids.map(Number);
+};
