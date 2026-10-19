@@ -123,6 +123,9 @@ const CAPABILITIES = {
   // « Calls for proposals » (docs/plan-funding-calls.md): PostgreSQL tables of the calls, their matches and the
   // collectors — absent on Grist storage and on Cloudflare Functions.
   HAS_CALLS: STORAGE_KIND === 'postgres',
+  // « My project » assistant of the calls (lot 7): the passages of the open calls compared with a project (embedding
+  // service, scripts/embed_calls.ts), the answer written by ILAAS.
+  HAS_CALLS_CHAT: STORAGE_KIND === 'postgres' && !!process.env.ILAAS_API_KEY && !!process.env.EMBEDDING_API_URL && !!process.env.EMBEDDING_API_MODEL,
   // Public read-only instance: Cloudflare only (functions/api/me.js, READ_ONLY=true) — the write
   // routes of this server are not guarded by it.
   READ_ONLY: false,
@@ -2330,6 +2333,91 @@ app.get('/api/calls/eligibility/:callId', requireEstablishmentScope, withEligibi
   }
   res.json({ rule, candidates });
 }));
+
+// « My project » assistant (docs/plan-funding-calls.md, lot 7): the project described by the user is compared with the
+// passages of the open calls (storage().projectChat: queries written by ILAAS, bge-m3 vectors, rank fusion), then ILAAS
+// presents the calls that fit from the calls found only. Same OpenAI-format SSE as /api/help-chat, so the ChatWidget
+// reads it the same way; the calls examined are appended to the stream, with a link to their page.
+app.post('/api/calls/project-chat', async (req, res) => {
+  const chat = CAPABILITIES.HAS_CALLS_CHAT ? storage().projectChat : null;
+  if (!chat) return res.status(503).json({ error: 'Project assistant not configured' });
+  if (!hasAnyRight(req.session.user?.access)) return res.status(403).json({ error: 'Forbidden' });
+  const messages = (Array.isArray(req.body?.messages) ? req.body.messages : [])
+    .filter((m) => m && (m.role === 'user' || m.role === 'assistant') && typeof m.content === 'string')
+    .slice(-8)
+    .map((m) => ({ role: m.role, content: m.content.slice(0, 4000) }));
+  if (!messages.some((m) => m.role === 'user')) return res.status(400).json({ error: 'messages[] required' });
+  const lang = req.body?.lang === 'en' ? 'en' : 'fr';
+
+  let found;
+  try {
+    found = await chat.search(messages, lang);
+  } catch (err) {
+    console.error('[ProjectChat] search:', err.message);
+    return res.status(502).json({ error: `Assistant unavailable: ${err.message}` });
+  }
+
+  const controller = new AbortController();
+  const killer = setTimeout(() => controller.abort(), 120000);
+  res.on('close', () => { if (!res.writableEnded) controller.abort(); });
+  try {
+    // ILAAS closes a connection now and then: one more attempt while nothing has been sent to the browser.
+    const ask = () => fetch(`${ILAAS_API_BASE}/chat/completions`, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${ILAAS_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: ILAAS_MODEL,
+        stream: true,
+        temperature: 0.2,
+        messages: [{ role: 'system', content: found.system }, ...messages],
+      }),
+      signal: controller.signal,
+    });
+    let upstream;
+    try {
+      upstream = await ask();
+    } catch (err) {
+      if (controller.signal.aborted) throw err;
+      console.error('[ProjectChat] ILAAS retried:', err.message);
+      upstream = await ask();
+    }
+    if (!upstream.ok || !upstream.body) {
+      console.error(`[ProjectChat] ILAAS HTTP ${upstream.status}`);
+      return res.status(502).json({ error: `Assistant unavailable: upstream ${upstream.status}` });
+    }
+    res.status(200).set({
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'X-Accel-Buffering': 'no',
+    });
+    res.flushHeaders();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    for await (const chunk of upstream.body) {
+      buffer += decoder.decode(chunk, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? '';
+      // Everything but the terminator is relayed; [DONE] is sent after the calls examined.
+      for (const line of lines) if (line.trim() !== 'data: [DONE]') res.write(`${line}\n`);
+    }
+    if (found.hits.length) {
+      const title = (h) => (lang === 'fr' && h.titleFr ? h.titleFr : h.title).replace(/[[\]]/g, '');
+      const list = found.hits.map((h) => (h.url ? `[${title(h)}](${h.url})` : title(h))).join(' · ');
+      const label = lang === 'en' ? 'Calls examined:' : 'Appels examinés :';
+      res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: `\n\n*${label} ${list}*` } }] })}\n\n`);
+    }
+    res.write('data: [DONE]\n\n');
+    res.end();
+  } catch (err) {
+    if (!res.headersSent) return res.status(502).json({ error: `Assistant unavailable: ${err.message}` });
+    res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: '\n\n⚠️ Réponse interrompue — réessayez.' } }] })}\n\n`);
+    res.write('data: [DONE]\n\n');
+    res.end();
+  } finally {
+    clearTimeout(killer);
+  }
+});
 
 // Administration › Calls for proposals (docs/plan-funding-calls.md, lot 2): programmes of the collectors (activate /
 // deactivate) and the log of the collections. Institution right, like the other administration tabs; the programmes

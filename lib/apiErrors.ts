@@ -141,6 +141,7 @@ export const API_ERRORS = [
   msg`messages[] required`,
   msg`Assistant unavailable`,
   msg`Help assistant not configured`,
+  msg`Project assistant not configured`,
   msg`The newsletter is only available for structures with an OpenAlex identifier (not groups)`,
   msg`Generation interrupted`,
   msg`Generation failed`,

@@ -171,6 +171,17 @@ export interface CallMatchRun {
   subset: Generated<string>;
 }
 
+export interface CallPassage {
+  call_id: string;
+  embedding: number[];
+  idx: number;
+  model: string;
+  section: string;
+  text: string;
+  text_hash: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface Establishment {
   created_at: Generated<Timestamp>;
   extra: Generated<Json>;
@@ -578,6 +589,7 @@ export interface DB {
   call_feedback: CallFeedback;
   call_match: CallMatch;
   call_match_run: CallMatchRun;
+  call_passage: CallPassage;
   establishment: Establishment;
   funder: Funder;
   funding_call: FundingCall;

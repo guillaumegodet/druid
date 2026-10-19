@@ -5,7 +5,7 @@
 // programme and subset (cluster, axis…). The server already limits the matches to the scope of the user; the structure
 // shown narrows them to its own directory records.
 import React, { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, ChevronDown, ChevronRight, ExternalLink, RefreshCw, Search } from 'lucide-react';
+import { AlertCircle, ChevronDown, ChevronRight, ExternalLink, Lightbulb, RefreshCw, Search } from 'lucide-react';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { i18n } from '@lingui/core';
 import type { Researcher } from '../../types';
@@ -19,10 +19,11 @@ import type { FunderCategory } from '../../lib/calls/programmes';
 import { MANUAL_SOURCE } from '../../lib/calls/manual';
 import { FUNDER_CATEGORY_LABELS } from './fundersAggregates';
 import { CallCandidates } from './CallCandidates';
-import { canUseEstablishmentTools } from '../../lib/auth';
+import { canUseEstablishmentTools, hasCapability } from '../../lib/auth';
+import { openChat } from '../ChatWidget';
 import { CallMeta, MatchCard, fmtDate, localized, publicationLinksOf, today, type PublicationLinks } from './CallMatchCard';
 
-type View = 'calls' | 'researchers' | 'candidates';
+type View = 'calls' | 'researchers' | 'candidates' | 'project';
 
 const SELECT_CLASS = 'px-3 py-1.5 rounded-full text-[13px] bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/15 text-ink dark:text-[#f5f2ea] max-w-[16rem]';
 
@@ -79,11 +80,13 @@ const CallRow: React.FC<{
   );
 };
 
-const ViewSwitch: React.FC<{ view: View; onChange: (v: View) => void; withCandidates: boolean }> = ({ view, onChange, withCandidates }) => {
+const ViewSwitch: React.FC<{ view: View; onChange: (v: View) => void; withCandidates: boolean; withProject: boolean }> = ({ view, onChange, withCandidates, withProject }) => {
   const { t } = useLingui();
   const views: [View, string][] = [['calls', t`Calls`], ['researchers', t`Researchers`]];
   // Candidates by career stage (lot 5): institution right only (D5).
   if (withCandidates) views.push(['candidates', t`Candidates`]);
+  // « My project » assistant (lot 7): an embedding service and a language model on the server.
+  if (withProject) views.push(['project', t`My project`]);
   return (
     <div className="flex items-center gap-1 p-1 rounded-full bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/15 shadow-soft w-fit">
       {views.map(([k, label]) => (
@@ -98,6 +101,44 @@ const ViewSwitch: React.FC<{ view: View; onChange: (v: View) => void; withCandid
           {label}
         </button>
       ))}
+    </div>
+  );
+};
+
+/**
+ * « My project » view (docs/plan-funding-calls.md, lot 7): the researcher describes a project, the assistant (mode
+ * « My project » of the ChatWidget, /api/calls/project-chat) finds the open calls that fit it and the conversation goes on
+ * there (follow-up questions on a call, another wording).
+ */
+const ProjectView: React.FC = () => {
+  const { t } = useLingui();
+  const [text, setText] = useState('');
+  const submit = () => { if (text.trim()) openChat('calls', text.trim()); };
+  return (
+    <div className="rounded-2xl bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/15 shadow-soft p-4 space-y-3 max-w-3xl">
+      <p className="text-[13px] text-muted dark:text-[#c3beb0] leading-relaxed">
+        <Trans>
+          Describe a project in a few sentences — objectives, methods, field of application — in French or in English. The assistant
+          compares it with the texts of the open calls of every programme followed (Europe, ANR, calls added by hand…) and presents those
+          that fit, with their deadline and a link to their page. It never decides on eligibility: check the conditions on the page of the call.
+        </Trans>
+      </p>
+      <textarea
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        onKeyDown={(e) => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); submit(); } }}
+        rows={6}
+        placeholder={t`E.g. We study how coastal towns can adapt to erosion and sea-level rise, combining shoreline monitoring by drones, hydrodynamic models and interviews with local stakeholders…`}
+        className="w-full rounded-xl bg-white dark:bg-white/10 border border-ink/10 dark:border-white/15 px-3 py-2 text-[13px] text-ink dark:text-[#f5f2ea] outline-none focus:border-accent-strong"
+      />
+      <button
+        type="button"
+        onClick={submit}
+        disabled={!text.trim()}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-semibold bg-ink text-white dark:bg-[#f5f2ea] dark:text-[#1c1a14] disabled:opacity-40"
+      >
+        <Lightbulb className="w-4 h-4" /> <Trans>Find calls for this project</Trans>
+      </button>
     </div>
   );
 };
@@ -257,8 +298,8 @@ export const CallsTab: React.FC<{
       )}
 
       <div className="flex flex-wrap items-center gap-3">
-        <ViewSwitch view={view} onChange={setView} withCandidates={canUseEstablishmentTools()} />
-        {view !== 'candidates' && (<>
+        <ViewSwitch view={view} onChange={setView} withCandidates={canUseEstablishmentTools()} withProject={hasCapability('HAS_CALLS_CHAT')} />
+        {(view === 'calls' || view === 'researchers') && (<>
         <label className="relative">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-lighter dark:text-[#8f897c]" />
           <input
@@ -312,7 +353,9 @@ export const CallsTab: React.FC<{
         </>)}
       </div>
 
-      {view === 'candidates' ? (
+      {view === 'project' ? (
+        <ProjectView />
+      ) : view === 'candidates' ? (
         <CallCandidates researchers={researchers} onOpenResearcher={onOpenResearcher} />
       ) : view === 'calls' ? (
         callRows.length === 0 ? (
