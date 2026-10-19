@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.10.0] — 2026-10-19
+
 ### Ajouté
 - **Appels à projets — « Mon projet »** : un chercheur décrit un projet (français ou anglais) et l'assistant présente
   les appels ouverts ou annoncés qui lui correspondent, tous programmes confondus (Europe, ANR, France 2030, appels
