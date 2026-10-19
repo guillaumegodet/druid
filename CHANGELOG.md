@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.11.0] — 2026-10-19
+
 ### Ajouté
 - **Import d'un annuaire de site — équipes et type d'appartenance** : le fichier `druid-site-import` peut déclarer les
   équipes (ou thèmes) du labo (`teams` : acronyme, nom, description, page) ; celles qui manquent sous le labo sont
