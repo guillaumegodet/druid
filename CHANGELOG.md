@@ -12,6 +12,13 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **Instances Cloudflare sur PostgreSQL — newsletter et veille** : la génération des brèves
+  (`/api/newsletter/generate`) écrit dans `newsletter_item` par le store des publications de l'instance au lieu de la
+  table Grist `Newsletter` ; la veille (`/api/news/:slug`) et les posts LinkedIn (`/api/newsletter/post`) lisent
+  l'Annuaire de la base. Une instance en `storage: "postgres"` peut donc garder `features.newsletter` (Centrale,
+  lot 10 d du plan de migration). Chaque route libère sa connexion à la base une fois la réponse construite.
+
 ## [2.10.0] — 2026-10-19
 
 ### Ajouté

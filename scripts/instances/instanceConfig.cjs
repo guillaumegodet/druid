@@ -88,10 +88,10 @@ const crossFieldErrors = (c) => {
   if (c.access === 'public' && !c.readOnly) errors.push('access "public" requires readOnly: true (no authentication, no writes)');
   if (c.storage === 'grist' && !c.grist) errors.push('storage "grist" needs the grist block (document of the instance)');
   if (c.storage === 'postgres') {
-    // No document left on a PostgreSQL instance: the axes of a structure follow it in lot 10 d, the key would be unused.
+    // No document left on a PostgreSQL instance (news items in newsletter_item, axis reviews in axis_review): the key
+    // would be unused.
     if (c.grist) errors.push('storage "postgres" excludes the grist block (no document is read any more)');
     if (c.secrets.includes('GRIST_API_KEY')) errors.push('storage "postgres" does not use the GRIST_API_KEY secret');
-    if (c.features.newsletter) errors.push('features.newsletter still reads the Newsletter table of a Grist document (lot 10 d)');
   }
   if (c.grist?.publicRead && !c.readOnly) errors.push('grist.publicRead requires readOnly: true (the browser reads the doc without the proxy)');
   if (c.readOnly && c.admins.length) errors.push('a readOnly instance has no administrator: admins must be empty');

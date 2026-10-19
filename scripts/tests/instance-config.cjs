@@ -65,8 +65,7 @@ const postgresDemo = () => ({ ...publicDemo(), grist: undefined, storage: 'postg
 check('storage grist needs the grist block', rejects({ ...publicDemo(), grist: undefined }, 'storage "grist" needs the grist block'), true);
 check('storage postgres excludes the grist block', rejects({ ...publicDemo(), storage: 'postgres' }, 'excludes the grist block'), true);
 check('storage postgres has no Grist key', rejects({ ...postgresDemo(), secrets: ['GRIST_API_KEY'] }, 'does not use the GRIST_API_KEY secret'), true);
-check('storage postgres: newsletter still needs a document', rejects({ ...privateCloudflare(), grist: undefined, storage: 'postgres', secrets: ['ILAAS_API_KEY'], features: { news: true, newsletter: true } }, 'features.newsletter still reads'), true);
-check('storage postgres: private writable instance is valid', parseInstanceConfig({ ...privateCloudflare(), grist: undefined, storage: 'postgres', secrets: ['ILAAS_API_KEY'], features: { news: true, newsletter: false } }).ok, true);
+check('storage postgres: private writable instance with news and newsletter is valid (lot 10 d)', parseInstanceConfig({ ...privateCloudflare(), grist: undefined, storage: 'postgres', secrets: ['ILAAS_API_KEY'], features: { news: true, newsletter: true } }).ok, true);
 check('unknown storage is rejected', rejects({ ...publicDemo(), storage: 'sqlite' }, 'storage'), true);
 check('public repository: a Grist instance still needs a public doc', publicRepoErrors({ ...publicDemo(), grist: { docId: 'AAAAAAAAAAAAAAAAAAAAAA' } }).length, 1);
 

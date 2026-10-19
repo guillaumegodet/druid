@@ -16,7 +16,7 @@
 //   OPENALEX_API_KEY(var, opt) — OpenAlex premium key
 
 import { instanceEnv, instanceOf } from '../../_lib/instance.js'
-import { storageOf } from '../../_lib/storage.js'
+import { withStorage } from '../../_lib/storage.js'
 
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
@@ -50,12 +50,12 @@ function linkedinMention(url) {
 }
 
 /** Resolves author names to their declared LinkedIn accounts (Annuaire, storage client of the instance). */
-async function resolveAuthorMentions(env, grist, authorNames) {
+async function resolveAuthorMentions(tables, authorNames) {
   const names = (Array.isArray(authorNames) ? authorNames : []).filter(Boolean)
-  if (names.length === 0 || !env.GRIST_API_KEY) return []
+  if (names.length === 0) return []
   try {
     const byName = new Map()
-    for (const r of await grist.records('Annuaire')) {
+    for (const r of await tables.records('Annuaire')) {
       const f = r.fields || {}
       const linkedin = String(f.LinkedIn || '').trim()
       if (!linkedin) continue
@@ -163,7 +163,7 @@ export async function onRequestPost(context) {
       if (r.ok) abstract = abstractOf(await r.json())
     }
     // Authors' LinkedIn accounts (Annuaire profile record) → @vanity mentions.
-    const mentions = await resolveAuthorMentions(env, storageOf(context).store.tables, body.authorNames)
+    const mentions = await withStorage(context, (storage) => (storage.missing ? [] : resolveAuthorMentions(storage.store.tables, body.authorNames)))
     const post = await generateSocialPost(env, {
       title: String(body.title || ''),
       abstract,

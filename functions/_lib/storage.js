@@ -99,6 +99,19 @@ export const storageOf = (context) => {
   return instance.storage === 'postgres' ? pgStorage(context, instance) : gristStorage(context, instance);
 };
 
+/**
+ * Runs `fn(storage)` with the storage of the request, then releases it: on PostgreSQL the client holds one of the few
+ * connections the database allows (5 for Centrale), whatever `fn` returns or throws. `fn` checks `storage.missing`.
+ */
+export const withStorage = async (context, fn) => {
+  const storage = storageOf(context);
+  try {
+    return await fn(storage);
+  } finally {
+    await storage.release();
+  }
+};
+
 // Keeps the driver referenced in the bundle of the Functions (node-postgres through Hyperdrive; the runtime needs the
 // Node.js compatibility of the project, `nodejs_compat`).
 export const PG_DRIVER = pg;

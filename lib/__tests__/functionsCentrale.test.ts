@@ -18,13 +18,15 @@ const { onRequestGet: news } = await import('../../functions/api/news/[slug].js'
 const { onRequestPost: newsletterGenerate } = await import('../../functions/api/newsletter/generate.js');
 const { onRequestPost: newsletterPost } = await import('../../functions/api/newsletter/post.js');
 const { onRequest: reports } = await import('../../functions/api/reports/[[path]].js');
+const { resolveInstance } = await import('../../functions/_lib/instance.js');
+const { parseInstanceConfig } = createRequire(import.meta.url)('../../scripts/instances/instanceConfig.cjs');
 
 const DOC = 'docCentrale';
 const ANNUAIRE = [
   { id: 1, fields: { Prenom: 'Ada', Nom: 'Lovelace', LABO: 'LS2N', Email: 'ada@example.org', LinkedIn: 'https://www.linkedin.com/in/ada-l' } },
   { id: 2, fields: { Prenom: 'Alan', Nom: 'Turing', LABO: 'GEM', Email: '', LinkedIn: '' } },
 ];
-const WORK = {
+const WORK: { id: string; [k: string]: unknown } = {
   id: 'https://openalex.org/W42', title: 'A work', doi: 'https://doi.org/10.1/x', publication_date: '2026-10-01',
   authorships: [{ author: { display_name: 'Ada Lovelace' }, institutions: [{ id: 'https://openalex.org/I4210117005' }] }],
   primary_location: { source: { display_name: 'Journal' } }, abstract_inverted_index: { An: [0], abstract: [1] },
@@ -102,5 +104,56 @@ describe('storage of the instance (Centrale)', () => {
     expect(r.status).toBe(200);
     expect(grist.length).toBeGreaterThan(0);
     expect(sameClient()).toBe(true);
+  });
+});
+
+// Needs DATABASE_URL_APP (druid_app on a migrated database), like the PostgreSQL cases of functionsApiV1.test.ts.
+const pgUrl = process.env.DATABASE_URL_APP;
+describe.skipIf(!pgUrl)('Centrale-only routes on PostgreSQL through Hyperdrive (lot 10 d)', () => {
+  const instance = resolveInstance({}, parseInstanceConfig({
+    slug: 'ecole', label: 'École fictive', target: 'cloudflare', domains: ['ecole.example.org'], access: 'cloudflare-access',
+    readOnly: false, storage: 'postgres', capabilities: { HAS_STATUS_VALIDATION: false }, features: { news: true, newsletter: true },
+    admins: [], openalexMailto: null, secrets: ['ILAAS_API_KEY'],
+  }).config);
+  const env = { HYPERDRIVE: { connectionString: pgUrl }, ILAAS_API_KEY: 'ki' };
+  const ACCESS = { 'Cf-Access-Authenticated-User-Email': 'redaction@example.org' };
+
+  it('newsletter/generate: the brief goes to newsletter_item, never generated twice, no Grist call', async () => {
+    // A work id of its own: the database is shared with the other integration tests.
+    WORK.id = `https://openalex.org/W${Date.now()}`;
+    const workId = WORK.id.split('/').pop() as string;
+    const generate = () => newsletterGenerate({
+      request: req('/api/newsletter/generate', { ...post({ slug: 'lheea', limit: 1 }), headers: { 'Content-Type': 'application/json', ...ACCESS } }),
+      env, data: { instance },
+    });
+    const { createDb } = await import('../db/client');
+    const db = createDb({ connectionString: pgUrl!, max: 1 });
+    try {
+      const r = await generate();
+      const body = await r.json();
+      expect([r.status, body.created.map((c: any) => c.fields.work_id)]).toEqual([200, [workId]]);
+      const rows = await db.selectFrom('newsletter_item').select(['id', 'slug', 'statut', 'accroche']).where('work_id', '=', workId).execute();
+      expect(rows.map((x) => [Number(x.id), x.slug, x.statut, x.accroche])).toEqual([[body.created[0].id, 'lheea', 'genere', 'Hook']]);
+      const again = await (await generate()).json();
+      expect(again.created).toEqual([]);
+      expect(grist).toEqual([]);
+    } finally {
+      await db.deleteFrom('newsletter_item').where('work_id', '=', workId).execute();
+      await db.destroy();
+      WORK.id = 'https://openalex.org/W42';
+    }
+  });
+
+  it('news and newsletter/post read the Annuaire from the database', async () => {
+    const n = await news({ request: req('/api/news/lheea'), params: { slug: 'lheea' }, env, data: { instance }, waitUntil: () => {} });
+    expect(n.status).toBe(200);
+    const p = await newsletterPost({ request: req('/api/newsletter/post', post({ title: 'T', authorNames: ['Nobody Here'] })), env, data: { instance } });
+    expect([p.status, (await p.json()).mentions]).toEqual([200, []]);
+    expect(grist).toEqual([]);
+  });
+
+  it('without its Hyperdrive binding: 500 for the generation, before any call', async () => {
+    const r = await newsletterGenerate({ request: req('/api/newsletter/generate', post({ slug: 'lheea' })), env: { ILAAS_API_KEY: 'ki' }, data: { instance } });
+    expect([r.status, (await r.json()).error, grist, other]).toEqual([500, 'HYPERDRIVE binding not configured on Cloudflare', [], []]);
   });
 });

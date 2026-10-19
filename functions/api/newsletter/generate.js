@@ -3,9 +3,10 @@
 //
 // Flow (see NewsletterPanel.tsx): OpenAlex articles from the last 30 days
 // (type « article » only) are popularized in French by the ILAAS LLM
-// (hook + 2-3 sentence brief) then stored in the Grist table
-// `Newsletter` (status « genere »). The associated researcher = first author of
-// the structure found in the Annuaire (normalized name → Email).
+// (hook + 2-3 sentence brief) then stored with the news items of the instance
+// (publications store: Grist table `Newsletter` or PostgreSQL `newsletter_item`,
+// status « genere »). The associated researcher = first author of the structure
+// found in the Annuaire (normalized name → Email).
 //
 // The call is BATCHED: at most `limit` briefs generated per invocation (each
 // LLM call takes several seconds); the response reports `remaining`
@@ -15,14 +16,13 @@
 // Response: { created: NewsletterItem[], skipped: number, remaining: number }
 //
 // Environment variables:
-//   GRIST_API_KEY   (secret)   — key of the directory storage (functions/_lib/storage.js)
-//   Grist doc and API base: grist of instance.json (functions/_lib/instance.js)
+//   storage of the instance (functions/_lib/storage.js): GRIST_API_KEY on Grist, HYPERDRIVE binding on PostgreSQL
 //   ILAAS_API_KEY   (secret)   — ILAAS API key (https://llm.ilaas.fr)
 //   ILAAS_API_BASE  (var, opt) — default https://llm.ilaas.fr/v1
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 
 import { instanceEnv, instanceOf } from '../../_lib/instance.js'
-import { storageOf } from '../../_lib/storage.js'
+import { withStorage } from '../../_lib/storage.js'
 
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
 const DEFAULT_MAILTO = 'bu-science-ouverte@univ-nantes.fr'
@@ -170,9 +170,6 @@ export async function onRequestPost(context) {
   if (!env.ILAAS_API_KEY) {
     return json({ error: 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)' }, 500)
   }
-  if (!env.GRIST_API_KEY) {
-    return json({ error: 'GRIST_API_KEY not configured on Cloudflare' }, 500)
-  }
 
   let body = {}
   try { body = await request.json() } catch { /* defaults */ }
@@ -183,12 +180,17 @@ export async function onRequestPost(context) {
   const limit = Math.min(6, Math.max(1, parseInt(body.limit, 10) || 4))
   const chars = Math.min(1000, Math.max(300, parseInt(body.chars, 10) || 300))
 
-  // Storage client of the instance (functions/_lib/storage.js).
-  const { tables: grist } = storageOf(context).store
+  // Storage of the instance (functions/_lib/storage.js), released once the response is built.
+  return withStorage(context, (storage) => (storage.missing
+    ? json({ error: storage.missing }, 500)
+    : generate(context, { instance, env, slug, struct, days, limit, chars }, storage.store)))
+}
 
+async function generate(context, { instance, env, slug, struct, days, limit, chars }, { tables, publications }) {
+  const actor = context.request.headers.get('Cf-Access-Authenticated-User-Email') || undefined
   try {
-    // 1. Briefs already in the table (any status) → a work_id is never regenerated.
-    const existing = new Set((await grist.records('Newsletter', { slug: [slug] })).map((r) => String(r.fields.work_id || '')))
+    // 1. Briefs already stored (any status) → a work_id is never regenerated.
+    const existing = await publications.newsletterWorkIds(slug)
 
     // 2. OpenAlex articles of the period (type article only).
     const from = new Date(Date.now() - days * 86400000).toISOString().slice(0, 10)
@@ -208,7 +210,7 @@ export async function onRequestPost(context) {
 
     // 3. Annuaire: normalized name → { nom, email } to associate the researcher.
     // An unreadable Annuaire leaves the briefs without researcher, as before.
-    const annuaireRows = await grist.records('Annuaire').catch(() => null)
+    const annuaireRows = await tables.records('Annuaire').catch(() => null)
     const labos = SLUG_LABOS[slug]
     const byName = new Map()
     if (annuaireRows) {
@@ -295,7 +297,7 @@ export async function onRequestPost(context) {
         valide_par: '',
         commentaire: '',
       }
-      const [id] = await grist.addRecords('Newsletter', [{ fields }])
+      const id = await publications.addNewsletterItem(fields, actor)
       created.push({ id: id ?? null, fields })
     }
 
