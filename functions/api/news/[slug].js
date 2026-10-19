@@ -9,7 +9,7 @@
 // Druid groups on this instance. Cache: Cloudflare Cache API, 1 h.
 
 import { instanceEnv, instanceOf } from '../../_lib/instance.js'
-import { storageOf } from '../../_lib/storage.js'
+import { withStorage } from '../../_lib/storage.js'
 
 const NEWS_MAX_WORKS = 600
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
@@ -41,7 +41,7 @@ const oaShortId = (u) => (u ? String(u).split('/').pop() : '')
 // The labs' OpenAlex entities (LS2N, GeM…) cover ALL their members, whatever
 // their supervising institution: without a filter, the monitoring highlights
 // researchers who are not at Centrale. We only keep works with at least one
-// author present in the Grist Annuaire (matching by normalized name, LABO
+// author present in the Annuaire of the instance (matching by normalized name, LABO
 // scope for the lab views — aligned with inject_effectifs_centrale.py).
 
 const SLUG_LABOS = {
@@ -63,11 +63,11 @@ const normName = (s) =>
     .filter(Boolean)
     .join(' ')
 
-/** Grist Annuaire (storage client of the instance) → Map normalized name → record (name, email, photo, url). */
-async function fetchEffectifs(slug, grist) {
+/** Annuaire of the instance (table client of its storage) → Map normalized name → record (name, email, photo, url). */
+async function fetchEffectifs(slug, tables) {
   const labos = SLUG_LABOS[slug]
   const byName = new Map()
-  for (const rec of await grist.records('Annuaire')) {
+  for (const rec of await tables.records('Annuaire')) {
     const f = rec.fields || {}
     if (labos && !labos.includes(String(f.LABO || '').toUpperCase())) continue
     const full = `${f.Prenom || ''} ${f.Nom || ''}`.trim()
@@ -208,12 +208,10 @@ export async function onRequestGet(context) {
     // Restrict to Centrale staff. If the directory is unavailable, degrade to
     // unfiltered monitoring (effectifsFilter=false, shown by the UI).
     let byName = null
-    if (env.GRIST_API_KEY) {
-      try {
-        byName = await fetchEffectifs(slug, storageOf(context).store.tables)
-      } catch (e) {
-        byName = null
-      }
+    try {
+      byName = await withStorage(context, (storage) => (storage.missing ? null : fetchEffectifs(slug, storage.store.tables)))
+    } catch (e) {
+      byName = null
     }
     const kept = works.slice(0, NEWS_MAX_WORKS)
     const items = []
