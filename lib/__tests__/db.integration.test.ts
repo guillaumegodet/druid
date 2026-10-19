@@ -76,6 +76,28 @@ describe.skipIf(!url)('PostgreSQL schema v1', () => {
     }, 'alice');
   });
 
+  it('audit log: no line for an update without change or touching bookkeeping columns only', async () => {
+    await inRollback(async (trx) => {
+      const p = await person(trx, { uid: 'audit-noop', email: 'ada@example.org' });
+      const idf = await trx.insertInto('person_identifier').values({ person_id: p.id, scheme: 'orcid', value: '0000-0002-1825-0097' })
+        .returning('id').executeTakeFirstOrThrow();
+      const task = await trx.insertInto('task').values({ type: 'test', title: 'Audit' }).returning('id').executeTakeFirstOrThrow();
+      const lines = async (table: string, id: string) => (await trx.selectFrom('audit_log').select('action')
+        .where('table_name', '=', table).where('row_id', '=', String(id)).orderBy('id').execute()).map((l) => l.action);
+      // Same values (a record saved without change), an identifier already primary, a nightly check of a task.
+      await trx.updateTable('person').set({ email: 'ada@example.org' }).where('id', '=', p.id).execute();
+      await trx.insertInto('person_identifier').values({ person_id: p.id, scheme: 'orcid', value: '0000-0002-1825-0097' })
+        .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: true })).execute();
+      await trx.updateTable('person_identifier').set({ checked_at: new Date() }).where('id', '=', idf.id).execute();
+      await trx.updateTable('task').set({ verified_at: new Date() }).where('id', '=', task.id).execute();
+      expect([await lines('person', p.id), await lines('person_identifier', idf.id), await lines('task', task.id)])
+        .toEqual([['insert'], ['insert'], ['insert']]);
+      // A real change is still logged, with the bookkeeping columns in its images.
+      await trx.updateTable('task').set({ status: 'fait', verified_at: new Date() }).where('id', '=', task.id).execute();
+      expect(await lines('task', task.id)).toEqual(['insert', 'update']);
+    });
+  });
+
   it('the application role reads and writes rows, never the schema', async () => {
     await inRollback(async (trx) => {
       await fails(trx, /permission denied|must be owner/, () => sql`CREATE TABLE intruder (id int)`.execute(trx));
