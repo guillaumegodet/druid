@@ -9,7 +9,7 @@ import { REPORT_TABLES } from '../../components/dashboard/report/reportTables';
 import { reportRemoteRequests, resolveReport } from '../../components/dashboard/report/resolveReport';
 import type { DashboardDataset } from '../../components/dashboard/types';
 
-// Report blocks fed by a remote source (druid-internal `docs/plan-binomes-chercheurs.md`, lot 2b): the
+// Report blocks fed by a remote source (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 2b): the
 // researcher pairs. Fictitious researchers and labs.
 
 const LAB = {

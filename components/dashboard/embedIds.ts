@@ -60,7 +60,7 @@ export const EMBEDDABLE_IDS = new Set<string>([
  * ⚠️ Keep in sync with the keys of REPORT_ONLY_CHARTS (report/reportCharts.tsx).
  */
 export const REPORT_ONLY_IDS = new Set<string>([
-  // Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 2b)
+  // Researcher pairs (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 2b)
   'collab-pairs-poles', 'collab-pairs-labs',
 ]);
 

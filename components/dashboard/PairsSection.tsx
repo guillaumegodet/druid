@@ -93,7 +93,7 @@ const TrendCell: React.FC<{ trend: PairTrend; first: number; last: number }> = (
 };
 
 /**
- * « Researcher pairs » sub-tab of Partnerships (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1): the
+ * « Researcher pairs » sub-tab of Partnerships (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 1): the
  * researchers who already co-sign across labs and poles, from the university-wide co-authorship network.
  */
 export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slug, range }) => {

@@ -1,4 +1,4 @@
-// Key figures and table of the researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lots 2
+// Key figures and table of the researcher pairs (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lots 2
 // and 2b), computed from a /pairs response: shared by the « Researcher pairs » sub-tab and the report
 // blocks (`kpis` set and `table` « pairs »), so that both show the same figures.
 

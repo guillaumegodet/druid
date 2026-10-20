@@ -195,7 +195,7 @@ function commonPublications(net, { a, b, from, to, maxAuthors = null, requireLab
     .map((p) => ({ year: p.y, title: p.title, doi: p.doi, authorCount: p.n }));
 }
 
-// ── Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1) ─────────────────────
+// ── Researcher pairs (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 1) ─────────────────────
 // The links of the graph, aggregated over the whole university without node cap: who co-signs with
 // whom across labs and poles. Uses the fields of network.json v3 when present (authors[].f profile
 // of OpenAlex fields, authors[].m lab memberships, authors[].uid) and degrades without them.
@@ -461,7 +461,7 @@ function rankPairs(net, opts = {}) {
   };
 }
 
-// ─── Suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 3) ───
+// ─── Suggested connections (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 3) ───
 // Pairs of researchers of different labs who never co-signed, scored by explainable signals computed on the
 // period: common co-authors (triadic closure, Adamic-Adar) and closeness of their OpenAlex themes — topics when
 // network.json has them (version 4), subfields otherwise.

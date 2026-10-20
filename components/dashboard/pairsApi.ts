@@ -1,4 +1,4 @@
-// Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1): client of /api/network/:slug/pairs
+// Researcher pairs (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 1): client of /api/network/:slug/pairs
 // (server.cjs + rankPairs of scripts/lib/co_network.cjs), computed on the university-wide network.json.
 
 import { YearRange } from './overviewAggregates';

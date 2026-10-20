@@ -5,7 +5,7 @@ import type { PairCell } from '../pairsApi';
 
 /**
  * Symmetric heatmap of the researcher pairs per couple of labs or of poles (druid-internal
- * `docs/plan-binomes-chercheurs.md`, lot 2): a cell counts the pairs, not their publications. The
+ * `docs/archive/plan-binomes-chercheurs.md`, lot 2): a cell counts the pairs, not their publications. The
  * `maxAxis` most involved entities are kept; a click on a cell gives the couple.
  */
 export const PairMatrixChart: React.FC<{

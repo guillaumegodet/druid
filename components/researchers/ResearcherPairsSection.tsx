@@ -16,7 +16,7 @@ import {
   type ResearcherPairsResponse,
 } from '../dashboard/pairsApi';
 
-// « Pairs » block of the researcher record (druid-internal `docs/plan-binomes-chercheurs.md`): the researcher's most
+// « Pairs » block of the researcher record (druid-internal `docs/archive/plan-binomes-chercheurs.md`): the researcher's most
 // frequent co-authors as photo cards, and the suggested connections of the last five years as a deck of cards to
 // judge one by one (the opinions of lot 4: « Relevant » on the right, « Not relevant » on the left, by button or by
 // dragging the card). Served by /api/researchers/:key/pairs from the university-wide network; hidden when the

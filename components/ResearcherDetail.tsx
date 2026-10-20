@@ -424,7 +424,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
                 the current edit (code review lot 6b). */}
             <MediaPresenceSection researcher={{ ...localResearcher, affiliations }} onUpdateField={updateField} />
           </div>
-          {/* « Research pairs » (druid-internal `docs/plan-binomes-chercheurs.md`): frequent co-authors and suggested
+          {/* « Research pairs » (druid-internal `docs/archive/plan-binomes-chercheurs.md`): frequent co-authors and suggested
               connections; hidden when the researcher is not in the university network. */}
           {!researcher.id.startsWith('NEW-') && (
             <div className="mt-4 lg:col-span-2 lg:col-start-1 empty:hidden">

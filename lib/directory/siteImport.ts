@@ -17,7 +17,7 @@
 //     departures, other spellings) — SECONDAIRE / HISTORIQUE memberships excepted, their absence is expected;
 //   - teams the site declares and the lab has not (`teams` of the file, optional): created under the lab before the
 //     records are written, so that the team labels of the members link to them (druid-internal
-//     `docs/plan-binomes-chercheurs.md`, D11: the themes of a lab site).
+//     `docs/archive/plan-binomes-chercheurs.md`, D11: the themes of a lab site).
 import { z } from 'zod';
 import { MEMBERSHIP_TYPES, StructureLevel, type MembershipType, type Researcher, type Structure } from '../../types';
 import type { Institution } from './gristMapping';
