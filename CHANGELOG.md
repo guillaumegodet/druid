@@ -13,6 +13,11 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Modifié
+- **Partenariats › Binômes › Rapprochements suggérés** : la proximité thématique compare les sujets (*topics*)
+  OpenAlex des chercheurs au lieu de leurs sous-disciplines quand le réseau les contient (`network.json` version 4 de
+  druid-biblio, seuil de similarité 0,1 ; sous-disciplines sinon). Les sujets communs sont nommés sur chaque ligne et
+  dans l'export CSV (`shared_topics`). Rétro-test 2020-2022 → 2023-2026 : 15 % des 100 premières suggestions sont
+  devenues des binômes, 10 % entre pôles (6 % avec les sous-disciplines).
 - **Partenariats › Binômes** : la vue « Rapprochements suggérés » est gardée dans l'adresse (`view=suggested`) ; un
   lien partagé ou un rechargement de la page y ramène directement.
 
