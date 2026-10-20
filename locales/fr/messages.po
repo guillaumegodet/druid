@@ -181,24 +181,24 @@ msgstr "Erreur lors de l'écriture (vue unifiée)"
 msgid "Error rejecting the candidate"
 msgstr "Erreur lors du rejet du candidat"
 
-#: App.tsx:972
+#: App.tsx:977
 msgid "Qualification error"
 msgstr "Erreur de qualification"
 
-#: App.tsx:976
+#: App.tsx:981
 msgid "Requalification error"
 msgstr "Erreur de requalification"
 
-#: App.tsx:982
+#: App.tsx:987
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Ligne Grist {gristRowId} introuvable dans le périmètre chargé"
 
-#: App.tsx:1002
+#: App.tsx:1007
 msgid "Loading dashboard…"
 msgstr "Chargement du tableau de bord…"
 
-#: App.tsx:1023
-#: App.tsx:1035
+#: App.tsx:1028
+#: App.tsx:1040
 #: components/dashboard/CallCandidates.tsx:127
 #: components/dashboard/CallCandidates.tsx:165
 #: components/dashboard/EmbedPage.tsx:90
@@ -215,20 +215,20 @@ msgstr "Chargement du tableau de bord…"
 msgid "Loading…"
 msgstr "Chargement…"
 
-#: App.tsx:1045
+#: App.tsx:1050
 msgid "View not found"
 msgstr "Vue introuvable"
 
-#: App.tsx:1069
+#: App.tsx:1074
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Votre compte a un droit « labo », mais aucune fiche de l'Annuaire ne porte votre identifiant avec un laboratoire en cours — contactez un administrateur pour faire mettre à jour votre fiche."
 
-#: App.tsx:1073
+#: App.tsx:1078
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "Aucun périmètre ne vous a été attribué dans Druid pour l'instant — contactez un administrateur pour qu'il vous rattache à une structure (groupe Keycloak <0>labo_viewer</0> ou <1>dashboard_viewer</1> sous votre labo)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1117
+#: App.tsx:1122
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Alignement unifié : {0} référentiel(s) en cours"
 
@@ -604,9 +604,9 @@ msgid "The group will be kept as soon as it has at least one member."
 msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 
 #: components/GroupList.tsx:168
-#: components/ResearcherDetail.tsx:311
-#: components/ResearcherDetail.tsx:483
-#: components/ResearcherDetail.tsx:586
+#: components/ResearcherDetail.tsx:316
+#: components/ResearcherDetail.tsx:495
+#: components/ResearcherDetail.tsx:598
 #: components/admin/InstitutionsAdmin.tsx:223
 #: components/admin/ManualCallsAdmin.tsx:328
 #: components/dashboard/AxisReviewTable.tsx:263
@@ -654,6 +654,7 @@ msgstr "Sélections transverses de chercheurs (conseil scientifique, projets, co
 #: components/dashboard/PairsSection.tsx:81
 #: components/dashboard/pairsKpis.ts:40
 #: components/researchers/ListHeader.tsx:135
+#: components/researchers/ResearcherPairsSection.tsx:68
 msgid "New"
 msgstr "Nouveau"
 
@@ -720,91 +721,91 @@ msgstr "Aucun membre dans ce groupe"
 msgid "Help for this page (opens the help centre in a new tab)"
 msgstr "Aide sur cette page (ouvre le centre d'aide dans un nouvel onglet)"
 
-#: components/ResearcherDetail.tsx:119
+#: components/ResearcherDetail.tsx:124
 msgid "Manual validation (Druid)"
 msgstr "Validation manuelle (Druid)"
 
 #. placeholder {0}: next.displayName
-#: components/ResearcherDetail.tsx:203
+#: components/ResearcherDetail.tsx:208
 msgid "Filled from LDAP: {0}."
 msgstr "Rempli depuis le LDAP : {0}."
 
-#: components/ResearcherDetail.tsx:206
+#: components/ResearcherDetail.tsx:211
 msgid "Employer not deducible from LDAP (hosted account, ambiguous corps): choose it under Employment & contract."
 msgstr "Employeur non déductible du LDAP (compte hébergé, corps ambigu) : choisissez-le dans « Emploi & contrat »."
 
-#: components/ResearcherDetail.tsx:215
+#: components/ResearcherDetail.tsx:220
 msgid "Lab: {lab}."
 msgstr "Labo : {lab}."
 
 #. placeholder {0}: otherLabs.join(', ')
-#: components/ResearcherDetail.tsx:217
+#: components/ResearcherDetail.tsx:222
 msgid "Other labs in LDAP: {0} — add them as memberships if relevant."
 msgstr "Autres labos dans le LDAP : {0} — à ajouter en appartenances si pertinent."
 
-#: components/ResearcherDetail.tsx:219
+#: components/ResearcherDetail.tsx:224
 #: components/researchers/AlignLaunchModal.tsx:153
 msgid "none"
 msgstr "aucune"
 
-#: components/ResearcherDetail.tsx:220
+#: components/ResearcherDetail.tsx:225
 msgid "No known lab among the LDAP affectations (principal: {affectation}): choose it in Memberships."
 msgstr "Aucun labo connu parmi les affectations LDAP (principale : {affectation}) : choisissez-le dans Appartenances."
 
-#: components/ResearcherDetail.tsx:226
+#: components/ResearcherDetail.tsx:231
 msgid "This uid already has a directory record ({labs}): check it before creating a duplicate."
 msgstr "Cet uid a déjà une fiche dans l'annuaire ({labs}) : vérifiez-la avant de créer un doublon."
 
-#: components/ResearcherDetail.tsx:251
+#: components/ResearcherDetail.tsx:256
 msgid "Back to the list"
 msgstr "Retour à la liste"
 
-#: components/ResearcherDetail.tsx:257
+#: components/ResearcherDetail.tsx:262
 #: components/Sidebar.tsx:158
 #: components/reports/ShareDialog.tsx:109
 msgid "People"
 msgstr "Personnel"
 
-#: components/ResearcherDetail.tsx:269
+#: components/ResearcherDetail.tsx:274
 #: components/dashboard/dashboardNav.ts:96
 #: components/researchers/DuplicatesPage.tsx:145
 msgid "Directory"
 msgstr "Annuaire"
 
-#: components/ResearcherDetail.tsx:279
+#: components/ResearcherDetail.tsx:284
 msgid "Open the Grist document (Annuaire table)"
 msgstr "Ouvrir le document Grist (table Annuaire)"
 
-#: components/ResearcherDetail.tsx:288
+#: components/ResearcherDetail.tsx:293
 msgid "Validated record — click to review / unvalidate"
 msgstr "Fiche fiabilisée — cliquer pour revoir / dévalider"
 
-#: components/ResearcherDetail.tsx:288
+#: components/ResearcherDetail.tsx:293
 msgid "Validate this record"
 msgstr "Fiabiliser cette fiche"
 
-#: components/ResearcherDetail.tsx:291
+#: components/ResearcherDetail.tsx:296
 msgid "Validated record"
 msgstr "Fiche validée"
 
-#: components/ResearcherDetail.tsx:291
-#: components/ResearcherDetail.tsx:502
+#: components/ResearcherDetail.tsx:296
+#: components/ResearcherDetail.tsx:514
 msgid "Validate the record"
 msgstr "Valider la fiche"
 
-#: components/ResearcherDetail.tsx:297
+#: components/ResearcherDetail.tsx:302
 msgid "Create a task to carry out outside Druid for this researcher (IdRef, ORCID, HAL…)"
 msgstr "Créer une tâche à réaliser hors Druid pour ce chercheur (IdRef, ORCID, HAL…)"
 
-#: components/ResearcherDetail.tsx:300
+#: components/ResearcherDetail.tsx:305
 msgid "Report a correction"
 msgstr "Signaler une correction"
 
-#: components/ResearcherDetail.tsx:308
+#: components/ResearcherDetail.tsx:313
 msgid "Export PDF"
 msgstr "Export PDF"
 
-#: components/ResearcherDetail.tsx:316
+#: components/ResearcherDetail.tsx:321
 #: components/StructureDetail.tsx:139
 #: components/admin/InstitutionsAdmin.tsx:219
 #: components/dashboard/AxisReviewTable.tsx:262
@@ -813,62 +814,62 @@ msgstr "Export PDF"
 msgid "Save"
 msgstr "Enregistrer"
 
-#: components/ResearcherDetail.tsx:316
+#: components/ResearcherDetail.tsx:321
 msgid "Create the record"
 msgstr "Créer la fiche"
 
-#: components/ResearcherDetail.tsx:348
-#: components/ResearcherDetail.tsx:349
+#: components/ResearcherDetail.tsx:353
+#: components/ResearcherDetail.tsx:354
 msgid "Edit photo (URL)"
 msgstr "Modifier la photo (URL)"
 
-#: components/ResearcherDetail.tsx:356
+#: components/ResearcherDetail.tsx:361
 msgid "Photo unavailable"
 msgstr "Photo inaccessible"
 
 #. placeholder {0}: researcher.uid || t`not provided`
 #. placeholder {1}: researcher.lastSync
-#: components/ResearcherDetail.tsx:374
+#: components/ResearcherDetail.tsx:379
 msgid "UID: {0} · Last sync: {1}"
 msgstr "UID : {0} · Dernière synchro : {1}"
 
-#: components/ResearcherDetail.tsx:374
+#: components/ResearcherDetail.tsx:379
 msgid "not provided"
 msgstr "non renseigné"
 
-#: components/ResearcherDetail.tsx:434
+#: components/ResearcherDetail.tsx:446
 msgid "Profile photo"
 msgstr "Photo de profil"
 
-#: components/ResearcherDetail.tsx:449
+#: components/ResearcherDetail.tsx:461
 msgid "Enter the address (http/https) of a public image: lab page, directory, HAL… Leave empty to fall back to the initials."
 msgstr "Indiquez l'adresse (http/https) d'une image publique : page du labo, annuaire, HAL… Laissez vide pour revenir aux initiales."
 
-#: components/ResearcherDetail.tsx:454
+#: components/ResearcherDetail.tsx:466
 msgid "Photo URL"
 msgstr "URL de la photo"
 
-#: components/ResearcherDetail.tsx:465
+#: components/ResearcherDetail.tsx:477
 msgid "The URL must start with http:// or https://."
 msgstr "L'URL doit commencer par http:// ou https://."
 
-#: components/ResearcherDetail.tsx:469
+#: components/ResearcherDetail.tsx:481
 msgid "The change will be written to Grist (photo_url column) when you click “Save”."
 msgstr "La modification sera écrite dans Grist (colonne photo_url) au clic sur « Enregistrer »."
 
-#: components/ResearcherDetail.tsx:479
+#: components/ResearcherDetail.tsx:491
 msgid "Remove photo"
 msgstr "Retirer la photo"
 
-#: components/ResearcherDetail.tsx:485
+#: components/ResearcherDetail.tsx:497
 msgid "Apply"
 msgstr "Appliquer"
 
-#: components/ResearcherDetail.tsx:514
+#: components/ResearcherDetail.tsx:526
 msgid "Validated presence"
 msgstr "Présence validée"
 
-#: components/ResearcherDetail.tsx:528
+#: components/ResearcherDetail.tsx:540
 #: components/dashboard/MediaSourcesAdmin.tsx:217
 #: components/dashboard/PairSuggestionsSection.tsx:217
 #: components/dashboard/PairsSection.tsx:218
@@ -876,7 +877,7 @@ msgstr "Présence validée"
 msgid "Scope"
 msgstr "Portée"
 
-#: components/ResearcherDetail.tsx:541
+#: components/ResearcherDetail.tsx:553
 #: components/admin/CallsProgrammesAdmin.tsx:107
 #: components/admin/CallsProgrammesAdmin.tsx:155
 #: components/researchers/AlignLaunchModal.tsx:128
@@ -884,38 +885,38 @@ msgstr "Portée"
 msgid "Source"
 msgstr "Source"
 
-#: components/ResearcherDetail.tsx:546
+#: components/ResearcherDetail.tsx:558
 msgid "E.g. 2026 lab survey, HR list…"
 msgstr "Ex. Enquête labo 2026, liste RH…"
 
-#: components/ResearcherDetail.tsx:554
+#: components/ResearcherDetail.tsx:566
 msgid "Date (auto)"
 msgstr "Date (auto)"
 
-#: components/ResearcherDetail.tsx:558
+#: components/ResearcherDetail.tsx:570
 msgid "Validated by (auto)"
 msgstr "Validé par (auto)"
 
 #. placeholder {0}: existingValidation.validationDate
 #. placeholder {1}: existingValidation.validatedBy
-#: components/ResearcherDetail.tsx:566
+#: components/ResearcherDetail.tsx:578
 msgid "Already validated on {0} by {1}."
 msgstr "Déjà validée le {0} par {1}."
 
 #. placeholder {0}: existingValidation.validationDate
-#: components/ResearcherDetail.tsx:567
+#: components/ResearcherDetail.tsx:579
 msgid "Already validated on {0}."
 msgstr "Déjà validée le {0}."
 
-#: components/ResearcherDetail.tsx:578
+#: components/ResearcherDetail.tsx:590
 msgid "Unvalidate"
 msgstr "Dévalider"
 
-#: components/ResearcherDetail.tsx:594
+#: components/ResearcherDetail.tsx:606
 msgid "Revalidate"
 msgstr "Revalider"
 
-#: components/ResearcherDetail.tsx:594
+#: components/ResearcherDetail.tsx:606
 #: components/admin/ManualCallsAdmin.tsx:636
 #: components/dashboard/MediaMentionsPanel.tsx:317
 #: components/dashboard/NewsletterPanel.tsx:388
@@ -1182,6 +1183,7 @@ msgstr "Page <0>{currentPage}</0> / <1>{totalPages}</1>"
 #: components/dashboard/NewsTab.tsx:781
 #: components/dashboard/PublicationsListTab.tsx:484
 #: components/dashboard/report/ReportWizard.tsx:490
+#: components/researchers/ResearcherPairsSection.tsx:415
 msgid "Previous"
 msgstr "Précédent"
 
@@ -1197,6 +1199,7 @@ msgstr "Précédent"
 #: components/dashboard/NewsTab.tsx:792
 #: components/dashboard/PublicationsListTab.tsx:495
 #: components/dashboard/report/ReportWizard.tsx:495
+#: components/researchers/ResearcherPairsSection.tsx:418
 msgid "Next"
 msgstr "Suivant"
 
@@ -1945,6 +1948,7 @@ msgstr "À valider"
 #: components/dashboard/NewsTab.tsx:207
 #: components/dashboard/NewsTab.tsx:639
 #: components/reports/ReportEditor.tsx:812
+#: components/researchers/ResearcherPairsSection.tsx:341
 msgid "All"
 msgstr "Tous"
 
@@ -3398,11 +3402,15 @@ msgstr "Score relatif {0} %"
 
 #: components/dashboard/CallMatchCard.tsx:64
 #: components/dashboard/PairSuggestionsSection.tsx:67
+#: components/researchers/ResearcherPairsSection.tsx:406
+#: components/researchers/ResearcherPairsSection.tsx:406
 msgid "Relevant"
 msgstr "Pertinent"
 
 #: components/dashboard/CallMatchCard.tsx:65
 #: components/dashboard/PairSuggestionsSection.tsx:69
+#: components/researchers/ResearcherPairsSection.tsx:400
+#: components/researchers/ResearcherPairsSection.tsx:400
 msgid "Not relevant"
 msgstr "Non pertinent"
 
@@ -5606,10 +5614,12 @@ msgstr "RICL = articles de revue indexés Scimago (proxy « revue internationale
 
 #. placeholder {0}: s.common
 #: components/dashboard/PairSuggestionsSection.tsx:36
+#: components/researchers/ResearcherPairsSection.tsx:193
 msgid "{0, plural, one {# common co-author:} other {# common co-authors:}}"
 msgstr "{0, plural, one {# coauteur commun :} other {# coauteurs communs :}}"
 
 #: components/dashboard/PairSuggestionsSection.tsx:40
+#: components/researchers/ResearcherPairsSection.tsx:196
 msgid "and {others} more"
 msgstr "et {others} autres"
 
@@ -5627,6 +5637,8 @@ msgid "closeness {0}"
 msgstr "proximité {0}"
 
 #: components/dashboard/PairSuggestionsSection.tsx:68
+#: components/researchers/ResearcherPairsSection.tsx:403
+#: components/researchers/ResearcherPairsSection.tsx:403
 msgid "Already in contact"
 msgstr "Déjà en contact"
 
@@ -5785,6 +5797,7 @@ msgstr "Seules les suggestions impliquant un chercheur de votre labo sont affich
 
 #: components/dashboard/PairSuggestionsSection.tsx:348
 #: components/dashboard/PairsSection.tsx:411
+#: components/researchers/ResearcherPairsSection.tsx:327
 msgid "How to read this view"
 msgstr "Comment lire cette vue"
 
@@ -5809,33 +5822,40 @@ msgid "PhD student"
 msgstr "doctorant"
 
 #: components/dashboard/PairsSection.tsx:81
+#: components/researchers/ResearcherPairsSection.tsx:68
 msgid "First joint publication in the last three years"
 msgstr "Première publication commune dans les trois dernières années"
 
 #: components/dashboard/PairsSection.tsx:82
 #: components/dashboard/pairsKpis.ts:41
+#: components/researchers/ResearcherPairsSection.tsx:69
 msgid "Rising"
 msgstr "En hausse"
 
 #: components/dashboard/PairsSection.tsx:82
+#: components/researchers/ResearcherPairsSection.tsx:69
 msgid "More joint publications in the last three years than in the three before"
 msgstr "Plus de publications communes dans les trois dernières années que dans les trois précédentes"
 
 #: components/dashboard/PairsSection.tsx:83
 #: components/dashboard/pairsKpis.ts:42
+#: components/researchers/ResearcherPairsSection.tsx:70
 msgid "Steady"
 msgstr "Stable"
 
 #: components/dashboard/PairsSection.tsx:83
+#: components/researchers/ResearcherPairsSection.tsx:70
 msgid "Joint publications in the last three years, no more than before"
 msgstr "Des publications communes dans les trois dernières années, pas plus qu’avant"
 
 #: components/dashboard/PairsSection.tsx:84
 #: components/dashboard/pairsKpis.ts:43
+#: components/researchers/ResearcherPairsSection.tsx:71
 msgid "Dormant"
 msgstr "En sommeil"
 
 #: components/dashboard/PairsSection.tsx:84
+#: components/researchers/ResearcherPairsSection.tsx:71
 msgid "No joint publication in the last three years"
 msgstr "Aucune publication commune dans les trois dernières années"
 
@@ -12719,6 +12739,106 @@ msgstr "⚠ Validation périmée — à revérifier"
 #: components/researchers/PresenceBadge.tsx:97
 msgid "Expired"
 msgstr "Périmé"
+
+#. placeholder {0}: pair.shared
+#: components/researchers/ResearcherPairsSection.tsx:104
+msgid "{0, plural, one {# joint pub.} other {# joint pubs}}"
+msgstr "{0, plural, one {# publi commune} other {# publis communes}}"
+
+#: components/researchers/ResearcherPairsSection.tsx:108
+msgid "other pole"
+msgstr "autre pôle"
+
+#: components/researchers/ResearcherPairsSection.tsx:168
+msgid "RELEVANT"
+msgstr "PERTINENT"
+
+#: components/researchers/ResearcherPairsSection.tsx:174
+msgid "NOT RELEVANT"
+msgstr "PAS PERTINENT"
+
+#: components/researchers/ResearcherPairsSection.tsx:178
+msgid "Interdisciplinary · other pole"
+msgstr "Interdisciplinaire · autre pôle"
+
+#: components/researchers/ResearcherPairsSection.tsx:199
+msgid "No common co-author yet: close by their research topics only."
+msgstr "Aucun coauteur commun pour l'instant : proches par leurs sujets de recherche seulement."
+
+#: components/researchers/ResearcherPairsSection.tsx:319
+msgid "Your research pairs"
+msgstr "Vos binômes de recherche"
+
+#: components/researchers/ResearcherPairsSection.tsx:319
+msgid "Research pairs"
+msgstr "Binômes de recherche"
+
+#: components/researchers/ResearcherPairsSection.tsx:322
+msgid "From the co-signed publications of the university network (CRISalid, OpenAlex, HAL), large collaborations of more than 50 authors left out."
+msgstr "D'après les publications cosignées du réseau de l'université (CRISalid, OpenAlex, HAL), hors grandes collaborations de plus de 50 auteurs."
+
+#: components/researchers/ResearcherPairsSection.tsx:338
+msgid "Most frequent co-authors"
+msgstr "Coauteurs les plus fréquents"
+
+#: components/researchers/ResearcherPairsSection.tsx:342
+msgid "Other labs"
+msgstr "Autres labos"
+
+#: components/researchers/ResearcherPairsSection.tsx:343
+msgid "Other poles"
+msgstr "Autres pôles"
+
+#: components/researchers/ResearcherPairsSection.tsx:351
+msgid "No pair with at least two joint publications for this filter."
+msgstr "Aucun binôme d'au moins deux publications communes pour ce filtre."
+
+#: components/researchers/ResearcherPairsSection.tsx:363
+msgid "You have seen every suggestion"
+msgstr "Vous avez vu toutes les suggestions"
+
+#: components/researchers/ResearcherPairsSection.tsx:365
+msgid "Start again"
+msgstr "Recommencer"
+
+#: components/researchers/ResearcherPairsSection.tsx:409
+#: components/researchers/ResearcherPairsSection.tsx:409
+msgid "Undo the last opinion"
+msgstr "Annuler le dernier avis"
+
+#: components/researchers/ResearcherPairsSection.tsx:430
+msgid "Researchers you could work with"
+msgstr "Des chercheurs avec qui travailler"
+
+#: components/researchers/ResearcherPairsSection.tsx:430
+msgid "Researchers to meet"
+msgstr "Chercheurs à rencontrer"
+
+#. placeholder {0}: data.suggestions.length
+#: components/researchers/ResearcherPairsSection.tsx:433
+msgid "{0, plural, one {# suggestion} other {# suggestions}}"
+msgstr "{0, plural, one {# suggestion} other {# suggestions}}"
+
+#. placeholder {0}: pending.length
+#: components/researchers/ResearcherPairsSection.tsx:435
+msgid "{0} left"
+msgstr "{0} restantes"
+
+#: components/researchers/ResearcherPairsSection.tsx:439
+msgid "Researchers of other labs who never co-signed with this researcher, ranked by their common co-authors and the closeness of their research topics over the last five years. These are leads: tested on past years, about one in seven of the first suggestions led to a joint publication."
+msgstr "Chercheurs d'autres labos qui n'ont jamais cosigné avec ce chercheur, classés selon leurs coauteurs communs et la proximité de leurs sujets de recherche sur les cinq dernières années. Ce sont des pistes : testées sur les années passées, environ une des premières suggestions sur sept a donné une publication commune."
+
+#: components/researchers/ResearcherPairsSection.tsx:447
+msgid "Drag the card to the right (relevant) or to the left (not relevant), or use the buttons. Your opinions, shared with the « Researcher pairs » tab of the dashboard, help judge the suggestions."
+msgstr "Faites glisser la carte vers la droite (pertinent) ou vers la gauche (non pertinent), ou utilisez les boutons. Vos avis, partagés avec le sous-onglet « Binômes » du tableau de bord, aident à juger les suggestions."
+
+#: components/researchers/ResearcherPairsSection.tsx:455
+msgid "Your opinions"
+msgstr "Vos avis"
+
+#: components/researchers/ResearcherPairsSection.tsx:465
+msgid "Withdraw the opinion and put the card back in the deck"
+msgstr "Retirer l'avis et remettre la carte dans la pile"
 
 #: components/researchers/ResearcherTable.tsx:86
 msgid "Identity"

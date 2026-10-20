@@ -230,6 +230,7 @@ function pairUniverse(net, opts, { includePhd }) {
   const visible = opts.visibleLabs ? new Set(opts.visibleLabs) : null;
   const [poleA, poleB] = opts.poles ?? [];
   const [labA, labB] = opts.labPair ?? [];
+  const authorId = opts.authorId ?? null;
   const poleOf = new Map(net.labs.map((l) => [l.acronym, l.pole ?? null]));
 
   const eligible = new Map();
@@ -248,6 +249,7 @@ function pairUniverse(net, opts, { includePhd }) {
   }
 
   const pairAllowed = (x, y) => {
+    if (authorId != null && x.a.id !== authorId && y.a.id !== authorId) return false;
     if (opts.scope === 'structure' ? !(x.inStructure && y.inStructure) : !(x.inStructure || y.inStructure)) return false;
     if (!x.visible && !y.visible) return false;
     if (crossLab && x.labs.some((l) => y.labs.includes(l))) return false;
@@ -277,6 +279,7 @@ function pairUniverse(net, opts, { includePhd }) {
  *   membership: 'all' | 'associates' | 'members' — labs kept for an author: every lab, the labs where the
  *                                 directory lists them (member or associate), or as a member only;
  *   visibleLabs: string[]|null  — restricted access: one author at least in these labs;
+ *   authorId: number|null       — only the pairs of this author (record of a researcher);
  *   limit: number               — pairs returned (most joint publications first, default 500).
  * }
  * @returns {pairs, total, counts, labMatrix, poleMatrix, refYear} — counts and matrices cover every pair
@@ -398,8 +401,10 @@ function rankPairs(net, opts = {}) {
     const years = list.map((idx) => net.pubs[idx].y).filter((yr) => yr <= refYear);
     const trend = trendOf(years.length ? years : [refYear]);
     const subfields = new Map();
+    const topics = new Map();
     for (const idx of inPeriod) {
       for (const s of new Set(net.pubs[idx].s ?? [])) subfields.set(s, (subfields.get(s) ?? 0) + 1);
+      for (const th of new Set(net.pubs[idx].t ?? [])) topics.set(th, (topics.get(th) ?? 0) + 1);
     }
     const crossPole = x.poles.length > 0 && y.poles.length > 0 && !x.poles.some((p) => y.poles.includes(p));
     counts[trend] += 1;
@@ -425,6 +430,12 @@ function rankPairs(net, opts = {}) {
         .sort((m, n) => n[1] - m[1] || m[0] - n[0])
         .slice(0, 3)
         .map(([s]) => net.subfields?.[s]?.name)
+        .filter(Boolean),
+      // Main OpenAlex topics of the joint publications (network.json v4; empty before).
+      topics: [...topics.entries()]
+        .sort((m, n) => n[1] - m[1] || m[0] - n[0])
+        .slice(0, 3)
+        .map(([th]) => net.topics?.[th]?.name)
         .filter(Boolean),
     });
   }

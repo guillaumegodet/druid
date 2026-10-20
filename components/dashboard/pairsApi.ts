@@ -35,6 +35,8 @@ export interface ResearcherPair {
   distance: number | null;
   crossPole: boolean;
   subfields: string[];
+  /** Main OpenAlex topics of the joint publications (network.json v4; absent from older servers). */
+  topics?: string[];
 }
 
 export interface PairsResponse {
@@ -227,3 +229,29 @@ export async function sendPairFeedback(slug: string, a: number, b: number, verdi
   });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }
+
+/** Pairs of one researcher (record page): most frequent co-authors and suggestions of the last five years. */
+export interface ResearcherPairsResponse {
+  /** false: the researcher is not in the university network (no joint publication with a resolved author). */
+  found: boolean;
+  authorId?: number;
+  observed: ResearcherPair[];
+  refYear?: number | null;
+  suggestions: PairSuggestion[];
+  level?: ThemeLevel;
+  from?: number;
+  to?: number;
+  feedback?: boolean;
+  /** Lab slug through which the viewer gives an opinion on a suggestion. */
+  feedbackSlug?: string | null;
+}
+
+export async function fetchResearcherPairs(key: string, signal?: AbortSignal): Promise<ResearcherPairsResponse | null> {
+  const res = await fetch(`/api/researchers/${encodeURIComponent(key)}/pairs`, { signal, cache: 'no-store' });
+  if (res.status === 404 || res.status === 403) return null;
+  if (!res.ok || !(res.headers.get('content-type') || '').includes('application/json')) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return (await res.json()) as ResearcherPairsResponse;
+}
+

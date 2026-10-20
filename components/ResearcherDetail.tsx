@@ -15,6 +15,7 @@ import { MediaPresenceSection } from './researchers/MediaPresenceSection';
 import { AffiliationHistorySection } from './researchers/AffiliationHistorySection';
 import { SuggestionsSection } from './researchers/SuggestionsSection';
 import { CallsSection } from './researchers/CallsSection';
+import { ResearcherPairsSection } from './researchers/ResearcherPairsSection';
 import { ValidationMark, LdapAccountMark } from './researchers/PresenceBadge';
 import { Presence } from '../lib/presence';
 import { HelpButton } from './HelpButton';
@@ -54,13 +55,17 @@ interface ResearcherDetailProps {
   onReportTask?: (researcher: Researcher) => void;
   /** Record opened by « Create » of the LDAP arrivals: « Fill from LDAP » runs once on opening. */
   autoLdapLookup?: boolean;
+  /** Records readable by the viewer (photos and links of the co-authors in « Research pairs »). */
+  researchers?: Researcher[];
+  /** Opens another record (a co-author of « Research pairs »). */
+  onOpenResearcher?: (id: string) => void;
 }
 
 /**
  * @component ResearcherDetail
  * @description Detail view allowing full editing of a researcher profile.
  */
-export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, onBack, onSave, isSaving, onNavigateToStructure, onValidate, structures = [], onCreateTeam, onReportTask, autoLdapLookup }) => {
+export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, onBack, onSave, isSaving, onNavigateToStructure, onValidate, structures = [], onCreateTeam, onReportTask, autoLdapLookup, researchers, onOpenResearcher }) => {
   const { t } = useLingui();
   // Local state for the form
   const [localResearcher, setLocalResearcher] = useState<Researcher>({...researcher});
@@ -419,6 +424,13 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
                 the current edit (code review lot 6b). */}
             <MediaPresenceSection researcher={{ ...localResearcher, affiliations }} onUpdateField={updateField} />
           </div>
+          {/* « Research pairs » (druid-internal `docs/plan-binomes-chercheurs.md`): frequent co-authors and suggested
+              connections; hidden when the researcher is not in the university network. */}
+          {!researcher.id.startsWith('NEW-') && (
+            <div className="mt-4 lg:col-span-2 lg:col-start-1 empty:hidden">
+              <ResearcherPairsSection researcher={localResearcher} researchers={researchers} onOpenResearcher={onOpenResearcher} />
+            </div>
+          )}
         </div>
       </div>
 
