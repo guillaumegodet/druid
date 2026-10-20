@@ -12,6 +12,10 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **Partenariats › Binômes** : la vue « Rapprochements suggérés » est gardée dans l'adresse (`view=suggested`) ; un
+  lien partagé ou un rechargement de la page y ramène directement.
+
 ## [2.13.0] — 2026-10-20
 
 ### Ajouté

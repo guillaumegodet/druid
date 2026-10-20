@@ -3357,8 +3357,8 @@ msgid "Researcher"
 msgstr "Researcher"
 
 #: components/dashboard/CallCandidates.tsx:176
-#: components/dashboard/CollaborationsTab.tsx:377
-#: components/dashboard/CollaborationsTab.tsx:390
+#: components/dashboard/CollaborationsTab.tsx:383
+#: components/dashboard/CollaborationsTab.tsx:396
 #: components/dashboard/report/reportTables.ts:59
 msgid "Labs"
 msgstr "Labs"
@@ -3805,7 +3805,7 @@ msgid "Compliance by team unavailable: no team with at least 3 analysable public
 msgstr "Compliance by team unavailable: no team with at least 3 analysable publications (staff not matched?)."
 
 #: components/dashboard/CollaborationsTab.tsx:51
-#: components/dashboard/CollaborationsTab.tsx:327
+#: components/dashboard/CollaborationsTab.tsx:333
 #: components/dashboard/charts/IntlVsNationalChart.tsx:35
 #: components/dashboard/kpiItems.ts:40
 msgctxt "feminine plural"
@@ -3865,7 +3865,7 @@ msgid "Most co-signing {labWord}"
 msgstr "Most co-signing {labWord}"
 
 #: components/dashboard/CollaborationsTab.tsx:219
-#: components/dashboard/CollaborationsTab.tsx:451
+#: components/dashboard/CollaborationsTab.tsx:457
 #: components/dashboard/PartnerBilanSection.tsx:423
 msgid "Yearly evolution"
 msgstr "Yearly evolution"
@@ -3874,89 +3874,89 @@ msgstr "Yearly evolution"
 msgid "See the researcher pairs behind these collaborations →"
 msgstr "See the researcher pairs behind these collaborations →"
 
-#: components/dashboard/CollaborationsTab.tsx:322
+#: components/dashboard/CollaborationsTab.tsx:328
 msgid "Typology"
 msgstr "Typology"
 
-#: components/dashboard/CollaborationsTab.tsx:323
+#: components/dashboard/CollaborationsTab.tsx:329
 msgid "Within the structure"
 msgstr "Within the structure"
 
-#: components/dashboard/CollaborationsTab.tsx:324
+#: components/dashboard/CollaborationsTab.tsx:330
 msgid "Nantes Université"
 msgstr "Nantes Université"
 
-#: components/dashboard/CollaborationsTab.tsx:325
-#: components/dashboard/CollaborationsTab.tsx:406
+#: components/dashboard/CollaborationsTab.tsx:331
+#: components/dashboard/CollaborationsTab.tsx:412
 #: components/dashboard/report/reportTables.ts:69
 msgid "Researcher pairs"
 msgstr "Researcher pairs"
 
-#: components/dashboard/CollaborationsTab.tsx:326
+#: components/dashboard/CollaborationsTab.tsx:332
 #: components/dashboard/charts/IntlVsNationalChart.tsx:28
 msgid "National"
 msgstr "National"
 
-#: components/dashboard/CollaborationsTab.tsx:328
+#: components/dashboard/CollaborationsTab.tsx:334
 msgid "By country"
 msgstr "By country"
 
-#: components/dashboard/CollaborationsTab.tsx:329
+#: components/dashboard/CollaborationsTab.tsx:335
 #: components/dashboard/PartnerInstitutionPicker.tsx:39
 #: components/dashboard/report/templates.ts:145
 #: components/dashboard/report/templates.ts:198
 msgid "Partner institutions"
 msgstr "Partner institutions"
 
-#: components/dashboard/CollaborationsTab.tsx:353
+#: components/dashboard/CollaborationsTab.tsx:359
 msgid "The collaboration typology is not filled in for this corpus (run <0>scripts/backfill_collaborations.py</0>)."
 msgstr "The collaboration typology is not filled in for this corpus (run <0>scripts/backfill_collaborations.py</0>)."
 
 #. placeholder {0}: typology.typed.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:360
+#: components/dashboard/CollaborationsTab.tsx:366
 msgid "Broadest category per publication · {0} typed publications"
 msgstr "Broadest category per publication · {0} typed publications"
 
 #. placeholder {0}: dataset.lab
-#: components/dashboard/CollaborationsTab.tsx:374
+#: components/dashboard/CollaborationsTab.tsx:380
 msgid "Co-publications between {0} labs (≥ 2 internal sub-structures signing)"
 msgstr "Co-publications between {0} labs (≥ 2 internal sub-structures signing)"
 
-#: components/dashboard/CollaborationsTab.tsx:375
+#: components/dashboard/CollaborationsTab.tsx:381
 msgid "internal co-publications"
 msgstr "internal co-publications"
 
-#: components/dashboard/CollaborationsTab.tsx:387
+#: components/dashboard/CollaborationsTab.tsx:393
 msgid "Co-publications with other Nantes Université labs (outside the current structure)"
 msgstr "Co-publications with other Nantes Université labs (outside the current structure)"
 
-#: components/dashboard/CollaborationsTab.tsx:388
+#: components/dashboard/CollaborationsTab.tsx:394
 msgid "publications with ≥ 1 other NU lab"
 msgstr "publications with ≥ 1 other NU lab"
 
 #. placeholder {0}: nantesProvenance.graphOnly.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:398
+#: components/dashboard/CollaborationsTab.tsx:404
 msgid "Including {0} publications found only through the co-authors' lab memberships in the CRISalid graph (for instance clinicians who sign « CHU Nantes » without their lab)."
 msgstr "Including {0} publications found only through the co-authors' lab memberships in the CRISalid graph (for instance clinicians who sign « CHU Nantes » without their lab)."
 
-#: components/dashboard/CollaborationsTab.tsx:407
+#: components/dashboard/CollaborationsTab.tsx:413
 msgid "Observed pairs"
 msgstr "Observed pairs"
 
-#: components/dashboard/CollaborationsTab.tsx:407
+#: components/dashboard/CollaborationsTab.tsx:413
 msgid "Suggested connections"
 msgstr "Suggested connections"
 
-#: components/dashboard/CollaborationsTab.tsx:430
+#: components/dashboard/CollaborationsTab.tsx:436
 msgid "No national partners identified (run <0>scripts/backfill_collaborations.py</0>)."
 msgstr "No national partners identified (run <0>scripts/backfill_collaborations.py</0>)."
 
 #. placeholder {0}: national.total.toLocaleString(numberLocale())
-#: components/dashboard/CollaborationsTab.tsx:435
+#: components/dashboard/CollaborationsTab.tsx:441
 msgid "Co-signing French institutions (outside Nantes Université) — <0>{0}</0> publications with ≥ 1 national partner."
 msgstr "Co-signing French institutions (outside Nantes Université) — <0>{0}</0> publications with ≥ 1 national partner."
 
-#: components/dashboard/CollaborationsTab.tsx:442
+#: components/dashboard/CollaborationsTab.tsx:448
 #: components/dashboard/embedRegistry.tsx:961
 msgid "Most co-signing institutions"
 msgstr "Most co-signing institutions"
