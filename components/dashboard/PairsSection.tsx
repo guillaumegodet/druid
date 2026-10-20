@@ -30,7 +30,7 @@ const PAGE = 100;
 const pct = (v: number | null) => (v == null ? '—' : `${Math.round(v * 100)} %`);
 
 /** Lab chips and reliability badges of one researcher of a pair. */
-const AuthorCell: React.FC<{ author: PairAuthor }> = ({ author }) => {
+export const AuthorCell: React.FC<{ author: PairAuthor }> = ({ author }) => {
   const { t } = useLingui();
   const kinds = new Set(Object.values(author.m ?? {}));
   const name = author.uid ? (

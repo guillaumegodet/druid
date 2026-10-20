@@ -142,3 +142,65 @@ export function pairsChartParams(p: PairsParams): ChartParams {
   if (!p.excludeLarge) out.large = 'include';
   return out;
 }
+
+/** Ranking of the suggested connections: combined score, common co-authors only, or subfields only. */
+export type SuggestionSignal = 'combined' | 'triadic' | 'topics';
+
+export interface PairSuggestion {
+  a: PairAuthor;
+  b: PairAuthor;
+  score: number;
+  /** Common co-authors over the period, and the most specific ones named. */
+  common: number;
+  via: { id: number; label: string; labs: string[] }[];
+  /** Closeness of the OpenAlex subfield profiles (0-1, damped for small profiles), and the shared subfields. */
+  similarity: number;
+  subfields: string[];
+  crossPole: boolean;
+}
+
+export interface SuggestionsResponse {
+  source: string;
+  generatedAt: string;
+  version: number;
+  structureLabs: string[] | null;
+  poles: { acronym: string; name: string }[];
+  restricted: boolean;
+  suggestions: PairSuggestion[];
+  total: number;
+}
+
+export interface SuggestionsParams {
+  range: YearRange;
+  relation: PairRelation;
+  scope: 'all' | 'structure';
+  membership: 'all' | 'associates' | 'members';
+  includePhd: boolean;
+  excludeLarge: boolean;
+  signal: SuggestionSignal;
+  /** Suggestions per researcher at most. */
+  quota: number;
+}
+
+/** Suggested connections (lot 3): /api/network/:slug/suggestions (suggestPairs of co_network.cjs). */
+export async function fetchSuggestions(slug: string, p: SuggestionsParams, signal?: AbortSignal): Promise<SuggestionsResponse | null> {
+  const qs = new URLSearchParams({
+    from: String(p.range.start),
+    to: String(p.range.end),
+    scope: p.scope,
+    membership: p.membership,
+    phd: p.includePhd ? '1' : '0',
+    signal: p.signal,
+    quota: String(p.quota),
+    limit: '500',
+  });
+  if (p.excludeLarge) qs.set('maxAuthors', String(LARGE_COLLAB_MAX_AUTHORS));
+  if (p.relation === 'pole') qs.set('crossPole', '1');
+  else if (p.relation !== 'lab') qs.set('poles', p.relation.split('|').join(','));
+  const res = await fetch(`/api/network/${encodeURIComponent(slug)}/suggestions?${qs}`, { signal });
+  if (res.status === 404) return null;
+  if (!res.ok || !(res.headers.get('content-type') || '').includes('application/json')) {
+    throw new Error(`HTTP ${res.status}`);
+  }
+  return (await res.json()) as SuggestionsResponse;
+}

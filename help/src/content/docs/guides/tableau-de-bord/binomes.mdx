@@ -90,6 +90,24 @@ par `|`, par exemple `Santé|S&T`.
 
 Ces blocs ne suivent pas les filtres de publications du rapport (partenaire, pays…) : seuls la structure et la période
 comptent. Ils n'ont pas de lien public : un rapport partagé les recalcule avec les droits de chaque lecteur.
+## Rapprochements suggérés
+
+Le bouton **Rapprochements suggérés**, en haut du sous-onglet, propose des chercheurs de **labos différents qui n'ont
+cosigné aucune publication**, classés selon deux signaux calculés sur la période :
+
+- **Coauteurs communs** : A et B publient chacun avec C. Un coauteur commun qui a peu de coauteurs compte plus qu'un
+  coauteur qui publie avec tout le monde (indice d'Adamic-Adar). Les trois coauteurs communs les plus spécifiques sont
+  nommés.
+- **Sous-disciplines communes** : la proximité des sous-disciplines OpenAlex de leurs publications, atténuée pour les
+  chercheurs qui ont peu publié. Les sous-disciplines partagées sont nommées.
+
+Le score vaut deux fois le signal des coauteurs communs plus celui des sous-disciplines. Chaque chercheur apparaît
+au plus 5 fois par défaut, pour qu'un chercheur très central ne remplisse pas la liste ; les doctorants ne sont pas
+suggérés par défaut. Les filtres de pôles, de périmètre et d'appartenance sont ceux des binômes observés.
+
+**Ce que valent ces suggestions** : calculées sur 2020-2022, environ une des 100 premières sur six a donné une
+publication commune en 2023-2026, et une sur quinze entre pôles différents. C'est beaucoup plus que le hasard
+(quelques paires sur 10 000), mais ce sont des **pistes** : une suggestion non suivie n'est pas une erreur.
 
 ## Qui voit quoi
 

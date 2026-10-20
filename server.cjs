@@ -1101,6 +1101,51 @@ app.get('/api/network/:slug/pairs', (req, res) => {
   });
 });
 
+// Suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 3): researchers of different labs who
+// never co-signed, scored by their common co-authors and their OpenAlex subfields over the period (suggestPairs).
+// Same file, scope and rights as /pairs; a reader limited to a lab sees the researchers suggested to its members (D2).
+const SUGGESTION_SIGNALS = new Set(['combined', 'triadic', 'topics']);
+const suggestionsCache = new Map();
+app.get('/api/network/:slug/suggestions', (req, res) => {
+  const r = resolveNetworkRequest(req, res);
+  if (!r) return;
+  const { visibleLabs, intOr } = r;
+  const { net, source, structureLabs } = universityNetwork(r);
+  const poles = String(req.query.poles || '').split(',').filter(Boolean);
+  const opts = {
+    structureLabs,
+    scope: req.query.scope === 'structure' ? 'structure' : 'all',
+    from: intOr(req.query.from, undefined),
+    to: intOr(req.query.to, undefined),
+    maxAuthors: intOr(req.query.maxAuthors, null),
+    crossPole: req.query.crossPole === '1',
+    poles: poles.length === 2 ? poles : null,
+    includePhd: req.query.phd === '1',
+    membership: PAIRS_MEMBERSHIP.has(req.query.membership) ? req.query.membership : 'all',
+    signal: SUGGESTION_SIGNALS.has(req.query.signal) ? req.query.signal : 'combined',
+    quota: Math.min(Math.max(intOr(req.query.quota, 5), 1), 50),
+    visibleLabs,
+    limit: Math.min(intOr(req.query.limit, 200), 1000),
+  };
+  const key = JSON.stringify([source, networkCache.get(source)?.mtimeMs, opts]);
+  let result = suggestionsCache.get(key);
+  if (!result) {
+    result = coNetwork.suggestPairs(net, opts);
+    if (suggestionsCache.size >= 30) suggestionsCache.delete(suggestionsCache.keys().next().value);
+    suggestionsCache.set(key, result);
+  }
+  res.set('Cache-Control', 'private, max-age=300');
+  res.json({
+    source,
+    generatedAt: net.generatedAt,
+    version: net.version ?? 1,
+    structureLabs,
+    poles: net.poles ?? [],
+    restricted: !!visibleLabs,
+    ...result,
+  });
+});
+
 // ── « Tableau de bord » section: monitoring of new publications ────────────
 // « Veille » tab of the React dashboard: queries OpenAlex LIVE
 // (most recent publications signed by the structure, sorted by descending

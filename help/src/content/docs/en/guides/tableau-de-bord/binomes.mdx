@@ -86,6 +86,23 @@ acronyms separated by `|`, for instance `Santé|S&T`.
 
 These blocks do not follow the publication filters of the report (partner, country…): only the structure and the
 period count. They have no public link: a shared report recomputes them with the rights of each reader.
+## Suggested connections
+
+The **Suggested connections** button, at the top of the sub-tab, lists researchers of **different labs who have not
+co-signed any publication**, ranked by two signals computed over the period:
+
+- **Common co-authors**: A and B both publish with C. A common co-author with few co-authors counts more than one who
+  publishes with everyone (Adamic-Adar index). The three most specific common co-authors are named.
+- **Shared subfields**: how close the OpenAlex subfields of their publications are, damped for researchers with few
+  publications. The shared subfields are named.
+
+The score is twice the common co-author signal plus the subfield one. Each researcher appears at most 5 times by
+default, so that a very central researcher does not fill the list; PhD students are not suggested by default. The
+pole, scope and membership filters are those of the observed pairs.
+
+**What these suggestions are worth**: computed on 2020-2022, about one in six of the first 100 led to a joint
+publication in 2023-2026, and one in fifteen between different poles. That is far above chance (a few pairs in
+10,000), but they are **leads**: a suggestion not followed is not an error.
 
 ## Who sees what
 

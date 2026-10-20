@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 
 // Inter-lab co-authorship graph (scripts/lib/co_network.cjs, docs/archive/plan-reseau-inter-labos.md lots 2 and 4).
-const { buildInterLabNetwork, commonPublications, rankPairs, OTHER_LABS_CATEGORY } = createRequire(import.meta.url)(
+const { buildInterLabNetwork, commonPublications, rankPairs, suggestPairs, OTHER_LABS_CATEGORY } = createRequire(import.meta.url)(
   '../../scripts/lib/co_network.cjs',
 );
 
@@ -220,5 +220,83 @@ describe('rankPairs', () => {
   it('counts the researchers of the structure engaged in pairs', () => {
     const r = rankPairs(PAIRS_NET, { structureLabs: ['LAB-A'] });
     expect(r.counts).toMatchObject({ perimeter: 2, perimeterEngaged: 2, perimeterCrossPole: 1 });
+  });
+});
+
+// Suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 3). Fictitious researchers.
+// L1, L3 in pole P1; L2, L4 in pole P2. Subfields: 0 = Artificial Intelligence, 1 = Oncology.
+const pubsOf = (n: number) => ({ '2021': Math.ceil(n / 2), '2022': Math.floor(n / 2) });
+const SUGGEST_NET = {
+  poles: [{ acronym: 'P1', name: 'Pole 1' }, { acronym: 'P2', name: 'Pole 2' }],
+  labs: [
+    { acronym: 'L1', pole: 'P1' }, { acronym: 'L2', pole: 'P2' }, { acronym: 'L3', pole: 'P1' }, { acronym: 'L4', pole: 'P2' },
+  ],
+  subfields: [{ name: 'Artificial Intelligence', field: 'Computer Science' }, { name: 'Oncology', field: 'Medicine' }],
+  authors: [
+    { id: 1, label: 'Ana Rivet', labs: ['L1'], pubs: pubsOf(5), uid: 'rivet-a' },
+    { id: 2, label: 'Ben Losier', labs: ['L2'], pubs: pubsOf(2) },
+    { id: 3, label: 'Cléo Vannier', labs: ['L3'], pubs: pubsOf(6) },
+    { id: 4, label: 'Dan Moreau', labs: ['L4'], pubs: pubsOf(3) },
+    { id: 5, label: 'Eva Thibaud', labs: ['L2'], phd: true, pubs: pubsOf(2) },
+    { id: 6, label: 'Fred Garnier', labs: ['L1'], pubs: pubsOf(3) },
+    { id: 7, label: 'Gil Pasquier', labs: ['L3'], pubs: pubsOf(3) },
+  ],
+  pubs: [
+    // 3 co-signs with 1, 2 and 5: researchers 1 and 2 (labs and poles apart) share one co-author.
+    { y: 2021, n: 3, a: [1, 3], s: [0] }, { y: 2022, n: 3, a: [1, 3], s: [0] },
+    { y: 2021, n: 3, a: [2, 3], s: [0] }, { y: 2022, n: 3, a: [2, 3], s: [0] },
+    { y: 2021, n: 3, a: [3, 5], s: [0] }, { y: 2022, n: 3, a: [3, 5], s: [0] },
+    // 6 co-signs oncology with 1 (same lab), 4 with 7: researchers 4 and 6 only share their subfield.
+    { y: 2021, n: 2, a: [1, 6], s: [1] }, { y: 2021, n: 2, a: [1, 6], s: [1] }, { y: 2022, n: 2, a: [1, 6], s: [1] },
+    { y: 2021, n: 2, a: [4, 7], s: [1] }, { y: 2021, n: 2, a: [4, 7], s: [1] }, { y: 2022, n: 2, a: [4, 7], s: [1] },
+    // 1 × 4 in a large collaboration only: not a link.
+    { y: 2022, n: 300, a: [1, 4], s: [1] },
+    // 1 × 2 after the period.
+    { y: 2024, n: 3, a: [1, 2], s: [0] },
+  ],
+};
+const PERIOD = { from: 2021, to: 2022, maxAuthors: 50 };
+const sugKeys = (r: { suggestions: { a: { id: number }; b: { id: number } }[] }) => r.suggestions.map((x) => `${x.a.id}-${x.b.id}`);
+
+describe('suggestPairs', () => {
+  it('suggests researchers of different labs who share co-authors, never linked or same-lab pairs', () => {
+    const r = suggestPairs(SUGGEST_NET, PERIOD);
+    const keys = sugKeys(r);
+    expect(keys.slice(0, 2)).toEqual(['3-6', '1-2']);
+    expect(keys).not.toContain('1-3'); // already co-signed
+    expect(keys).not.toContain('1-6'); // same lab
+    const anaBen = r.suggestions.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 1 && x.b.id === 2);
+    expect(anaBen).toMatchObject({ common: 1, crossPole: true, via: [{ id: 3, label: 'Cléo Vannier', labs: ['L3'] }] });
+    expect(anaBen.a.uid).toBe('rivet-a');
+  });
+
+  it('suggests researchers close by their subfields without any common co-author', () => {
+    const r = suggestPairs(SUGGEST_NET, PERIOD);
+    const fredDan = r.suggestions.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 4 && x.b.id === 6);
+    expect(fredDan).toMatchObject({ common: 0, subfields: ['Oncology'] });
+    // Identical profiles of 3 publications, damped by 3 / (3 + 5).
+    expect(fredDan.similarity).toBeCloseTo(0.38, 2);
+    expect(suggestPairs(SUGGEST_NET, { ...PERIOD, signal: 'triadic' }).suggestions.some((x: { common: number }) => x.common === 0)).toBe(false);
+  });
+
+  it('leaves the PhD students out by default and ignores large collaborations as links', () => {
+    expect(sugKeys(suggestPairs(SUGGEST_NET, PERIOD)).some((k) => k.split('-').includes('5'))).toBe(false);
+    expect(sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, includePhd: true }))).toContain('1-5');
+    // 1 and 4 only signed a 300-author paper together: still suggested (shared subfield).
+    expect(sugKeys(suggestPairs(SUGGEST_NET, PERIOD))).toContain('1-4');
+  });
+
+  it('only excludes the pairs linked up to the end of the period', () => {
+    expect(sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, to: 2024 }))).not.toContain('1-2');
+  });
+
+  it('caps the suggestions per researcher and applies the access and pole filters', () => {
+    expect(sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, quota: 1 }))).toEqual(['3-6', '1-2']);
+    const crossPole = sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, crossPole: true }));
+    expect(crossPole).toContain('1-2');
+    expect(crossPole).not.toContain('3-6');
+    const visible = sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, visibleLabs: ['L4'] }));
+    expect(visible.every((k) => k.split('-').includes('4'))).toBe(true);
+    expect(visible.length).toBeGreaterThan(0);
   });
 });

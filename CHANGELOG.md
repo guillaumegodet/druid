@@ -20,6 +20,12 @@ données à exécuter au déploiement).
   structures (une requête par jeu d'options), puis l'aperçu et le PDF s'en servent. Ils n'ont pas de lien public
   (ni bouton « Partager », ni lien « version interactive » dans le PDF), ignorent les filtres de publications du
   rapport et ne sont pas proposés sans `HAS_NETWORK_API`.
+- **Partenariats › Binômes › Rapprochements suggérés** : chercheurs de labos différents qui n'ont jamais cosigné,
+  classés par leurs coauteurs communs (Adamic-Adar, les plus spécifiques nommés) et la proximité de leurs
+  sous-disciplines OpenAlex (atténuée pour les petits profils), 5 suggestions par chercheur au plus, doctorants exclus
+  par défaut, mêmes filtres et mêmes droits que les binômes observés, export CSV. Route
+  `GET /api/network/:slug/suggestions` (`suggestPairs` de `co_network.cjs`). Rétro-test 2020-2022 → 2023-2026 :
+  environ une des 100 premières suggestions sur six a donné une publication commune (0,027 % au hasard).
 - **Partenariats › Binômes** : chiffres clés (binômes actifs, nouveaux, en sommeil, entre pôles, à profils éloignés,
   part des chercheurs de la structure engagés dans un binôme et dans un binôme entre pôles), cartes de chaleur des
   binômes par couple de pôles et par couple de labos (une case compte des binômes, pas des publications ; clic ⇒ le
