@@ -13,6 +13,13 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Partenariats › Binômes** : chiffres clés (binômes actifs, nouveaux, en sommeil, entre pôles, à profils éloignés,
+  part des chercheurs de la structure engagés dans un binôme et dans un binôme entre pôles), cartes de chaleur des
+  binômes par couple de pôles et par couple de labos (une case compte des binômes, pas des publications ; clic ⇒ le
+  tableau ne liste que ce couple de labos), export CSV du tableau et page d'aide « Repérer les binômes de
+  chercheurs ».
+
+### Ajouté
 - **Tableau de bord › Partenariats › Binômes** : les paires de chercheurs qui cosignent déjà, sur tout le réseau de
   l'université (un pôle voit ses binômes avec tous les labos). Filtres : labos différents, pôles différents ou
   couple de pôles, profils disciplinaires éloignés (distance entre les profils de disciplines OpenAlex, hors

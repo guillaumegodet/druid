@@ -229,6 +229,7 @@ const cosineDistance = (x, y) => {
  *   crossLab: boolean           — no common lab (default true);
  *   crossPole: boolean          — no common pole, both poles known;
  *   poles: [string, string]|null — one author in pole A, the other in pole B;
+ *   labPair: [string, string]|null — one author in lab A, the other in lab B (cell of the lab matrix);
  *   minDistance: number|null    — keep the pairs whose disciplinary distance is at least this;
  *   includePhd: boolean         — keep the PhD students (default true);
  *   membership: 'all' | 'associates' | 'members' — labs kept for an author: every lab, the labs where the
@@ -236,7 +237,9 @@ const cosineDistance = (x, y) => {
  *   visibleLabs: string[]|null  — restricted access: one author at least in these labs;
  *   limit: number               — pairs returned (most joint publications first, default 500).
  * }
- * @returns {pairs, total, counts, refYear}
+ * @returns {pairs, total, counts, labMatrix, poleMatrix, refYear} — counts and matrices cover every pair
+ *   kept (not only the `limit` returned); a matrix cell counts the pairs, not their publications, so that a
+ *   very productive pair does not hide ten emerging ones.
  */
 function rankPairs(net, opts = {}) {
   const from = opts.from ?? -Infinity;
@@ -249,6 +252,7 @@ function rankPairs(net, opts = {}) {
   const structure = opts.structureLabs ? new Set(opts.structureLabs) : null;
   const visible = opts.visibleLabs ? new Set(opts.visibleLabs) : null;
   const [poleA, poleB] = opts.poles ?? [];
+  const [labA, labB] = opts.labPair ?? [];
   const minDistance = opts.minDistance ?? null;
   const limit = opts.limit ?? 500;
 
@@ -278,11 +282,9 @@ function rankPairs(net, opts = {}) {
     if (!x.visible && !y.visible) return false;
     if (crossLab && x.labs.some((l) => y.labs.includes(l))) return false;
     if (opts.crossPole && (!x.poles.length || !y.poles.length || x.poles.some((p) => y.poles.includes(p)))) return false;
-    if (poleA && poleB) {
-      const ab = x.poles.includes(poleA) && y.poles.includes(poleB);
-      const ba = x.poles.includes(poleB) && y.poles.includes(poleA);
-      if (!ab && !ba) return false;
-    }
+    const either = (key, A, B) => (x[key].includes(A) && y[key].includes(B)) || (x[key].includes(B) && y[key].includes(A));
+    if (poleA && poleB && !either('poles', poleA, poleB)) return false;
+    if (labA && labB && !either('labs', labA, labB)) return false;
     return true;
   };
 
@@ -361,6 +363,21 @@ function rankPairs(net, opts = {}) {
   const rows = [];
   const counts = { new: 0, dormant: 0, rising: 0, steady: 0, distant: 0, crossPole: 0 };
   const engaged = new Set();
+  const crossPoleEngaged = new Set();
+  // Symmetric matrices: key "A|B" with A <= B, each couple counted once per pair.
+  const labCells = new Map();
+  const poleCells = new Map();
+  const addCells = (cells, xs, ys, trend) => {
+    const keys = new Set();
+    for (const u of xs) for (const v of ys) if (u !== v || cells === poleCells) keys.add(u < v ? `${u}|${v}` : `${v}|${u}`);
+    for (const key of keys) {
+      const cell = cells.get(key) ?? { pairs: 0, new: 0, dormant: 0 };
+      cell.pairs += 1;
+      if (trend === 'new') cell.new += 1;
+      if (trend === 'dormant') cell.dormant += 1;
+      cells.set(key, cell);
+    }
+  };
   for (const [key, list] of pairs) {
     if (!list) continue;
     const inPeriod = list.filter((idx) => net.pubs[idx].y >= from && net.pubs[idx].y <= to);
@@ -382,6 +399,9 @@ function rankPairs(net, opts = {}) {
     if (crossPole) counts.crossPole += 1;
     engaged.add(lo);
     engaged.add(hi);
+    if (crossPole) { crossPoleEngaged.add(lo); crossPoleEngaged.add(hi); }
+    addCells(labCells, x.labs, y.labs, trend);
+    addCells(poleCells, x.poles, y.poles, trend);
     const [px, py] = [production(x.a), production(y.a)];
     rows.push({
       a: authorOut(x),
@@ -401,10 +421,23 @@ function rankPairs(net, opts = {}) {
     });
   }
   rows.sort((m, n) => n.shared - m.shared || n.last - m.last || m.a.label.localeCompare(n.a.label));
+  // Researchers of the structure who published over the period: denominator of the engagement shares.
+  const perimeter = [...eligible.values()].filter((x) => x.inStructure && x.visible && production(x.a) > 0);
+  const matrix = (cells) => [...cells.entries()]
+    .map(([key, cell]) => { const [a, b] = key.split('|'); return { a, b, ...cell }; })
+    .sort((m, n) => n.pairs - m.pairs || m.a.localeCompare(n.a) || m.b.localeCompare(n.b));
   return {
     pairs: rows.slice(0, limit),
     total: rows.length,
-    counts: { ...counts, authors: engaged.size },
+    counts: {
+      ...counts,
+      authors: engaged.size,
+      perimeter: perimeter.length,
+      perimeterEngaged: perimeter.filter((x) => engaged.has(x.a.id)).length,
+      perimeterCrossPole: perimeter.filter((x) => crossPoleEngaged.has(x.a.id)).length,
+    },
+    labMatrix: matrix(labCells),
+    poleMatrix: matrix(poleCells),
     refYear: Number.isFinite(refYear) ? refYear : null,
   };
 }

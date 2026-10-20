@@ -205,4 +205,20 @@ describe('rankPairs', () => {
     expect(p.share).toEqual([2 / 7, 2 / 4]);
     expect(p.subfields).toEqual(['Oncology', 'Artificial Intelligence']);
   });
+
+  it('aggregates the kept pairs per couple of labs and of poles, and filters on a couple of labs', () => {
+    const r = rankPairs(PAIRS_NET, {});
+    expect(r.labMatrix).toEqual([
+      { a: 'LAB-A', b: 'LAB-B', pairs: 2, new: 1, dormant: 0 },
+      { a: 'LAB-A', b: 'LAB-C', pairs: 1, new: 1, dormant: 0 },
+    ]);
+    // Emma's lab has no pole: her pair is in no pole cell.
+    expect(r.poleMatrix).toEqual([{ a: 'P1', b: 'P2', pairs: 2, new: 1, dormant: 0 }]);
+    expect(pairKeys(rankPairs(PAIRS_NET, { labPair: ['LAB-C', 'LAB-A'] }))).toEqual(['2-5']);
+  });
+
+  it('counts the researchers of the structure engaged in pairs', () => {
+    const r = rankPairs(PAIRS_NET, { structureLabs: ['LAB-A'] });
+    expect(r.counts).toMatchObject({ perimeter: 2, perimeterEngaged: 2, perimeterCrossPole: 1 });
+  });
 });

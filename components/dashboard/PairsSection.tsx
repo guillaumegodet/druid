@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { ArrowDown, ArrowUp, Loader2, Minus, Sparkles } from 'lucide-react';
+import { ArrowDown, ArrowUp, Download, Loader2, Minus, Sparkles, X } from 'lucide-react';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { YearRange } from './overviewAggregates';
 import { LARGE_COLLAB_MAX_AUTHORS } from './interLabNetwork';
@@ -15,6 +15,12 @@ import {
   fetchPairs,
 } from './pairsApi';
 import { numberLocale } from '../../lib/i18n';
+import { toCsv } from '../../lib/chartExport';
+import { downloadBlob } from './chartFileExport';
+import { KpiGrid } from './KpiCards';
+import type { KpiItem } from './kpiItems';
+import { PairMatrixChart } from './charts/PairMatrixChart';
+import { helpUrl } from '../../lib/helpLinks';
 
 type SortKey = 'shared' | 'distance' | 'last';
 const PAGE = 100;
@@ -103,24 +109,44 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
 
   const [data, setData] = useState<PairsResponse | 'none' | 'error' | null>(null);
   const [loading, setLoading] = useState(false);
+  const params = useMemo<PairsParams>(
+    () => ({ range, relation, scope, distantOnly, membership, includePhd, excludeLarge, minShared }),
+    [range, relation, scope, distantOnly, membership, includePhd, excludeLarge, minShared],
+  );
   useEffect(() => {
     const ctrl = new AbortController();
     setLoading(true);
-    fetchPairs(slug, { range, relation, scope, distantOnly, membership, includePhd, excludeLarge, minShared }, ctrl.signal)
+    fetchPairs(slug, params, ctrl.signal)
       .then((r) => { setData(r ?? 'none'); setLoading(false); })
       .catch(() => { if (!ctrl.signal.aborted) { setData('error'); setLoading(false); } });
     return () => ctrl.abort();
-  }, [slug, range, relation, scope, distantOnly, membership, includePhd, excludeLarge, minShared]);
-  useEffect(() => { setShown(PAGE); setSelected(null); }, [data, sort]);
+  }, [slug, params]);
+
+  // Cell of the lab matrix: the table lists the pairs of that couple of labs (the matrices and the key
+  // figures stay those of every pair).
+  const [labPair, setLabPair] = useState<[string, string] | null>(null);
+  const [cellData, setCellData] = useState<PairsResponse | null>(null);
+  useEffect(() => { setLabPair(null); }, [params]);
+  useEffect(() => {
+    setCellData(null);
+    if (!labPair) return;
+    const ctrl = new AbortController();
+    fetchPairs(slug, { ...params, labPair }, ctrl.signal)
+      .then((r) => setCellData(r))
+      .catch(() => { /* the table keeps every pair */ });
+    return () => ctrl.abort();
+  }, [slug, params, labPair]);
+  useEffect(() => { setShown(PAGE); setSelected(null); }, [data, cellData, sort]);
 
   const loaded = data && typeof data === 'object' ? data : null;
+  const tableData = labPair ? cellData : loaded;
   const rows = useMemo(() => {
-    if (!loaded) return [];
-    const list = [...loaded.pairs];
+    if (!tableData) return [];
+    const list = [...tableData.pairs];
     if (sort === 'distance') list.sort((x, y) => (y.distance ?? -1) - (x.distance ?? -1) || y.shared - x.shared);
     else if (sort === 'last') list.sort((x, y) => y.last - x.last || y.shared - x.shared);
     return list;
-  }, [loaded, sort]);
+  }, [tableData, sort]);
 
   const poleCouples = useMemo(() => {
     const poles = loaded?.poles ?? [];
@@ -151,6 +177,49 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
       {label}
     </button>
   );
+  const kpis: KpiItem[] = loaded ? (() => {
+    const c = loaded.counts;
+    const share = (n: number) => (c.perimeter ? t`${Math.round((n / c.perimeter) * 100)}% of the ${fmt(c.perimeter)} publishing researchers` : undefined);
+    return [
+      { key: 'pairs-active', label: t`Active pairs`, value: fmt(loaded.total - c.dormant), hint: t`joint publication in the last three years` },
+      { key: 'pairs-new', label: t`New pairs`, value: fmt(c.new), hint: t`first joint publication in the last three years` },
+      { key: 'pairs-dormant', label: t`Dormant pairs`, value: fmt(c.dormant), hint: t`nothing joint for three years` },
+      { key: 'pairs-cross-pole', label: t`Between poles`, value: fmt(c.crossPole) },
+      { key: 'pairs-distant', label: t`Distant profiles`, value: fmt(c.distant), hint: t`distance ≥ ${DISTANT_PROFILES}` },
+      {
+        key: 'pairs-researchers',
+        label: loaded.structureLabs ? t`Researchers of the structure in a pair` : t`Researchers in a pair`,
+        value: fmt(c.perimeterEngaged),
+        hint: share(c.perimeterEngaged),
+      },
+      ...(loaded.poles.length > 0 ? [{
+        key: 'pairs-cross-pole-researchers',
+        label: t`Researchers in a cross-pole pair`,
+        value: fmt(c.perimeterCrossPole),
+        hint: share(c.perimeterCrossPole),
+      }] : []),
+    ];
+  })() : [];
+
+  const downloadCsv = () => {
+    const kind = (a: PairAuthor) => Object.values(a.m ?? {}).join('|');
+    const csv = toCsv({
+      name: 'binomes',
+      columns: [
+        'researcher_1', 'labs_1', 'poles_1', 'membership_1', 'researcher_2', 'labs_2', 'poles_2', 'membership_2',
+        'joint_publications', 'share_1', 'share_2', 'first_year', 'last_year', 'trend', 'distance', 'subfields',
+      ],
+      rows: rows.map((p) => [
+        p.a.label, p.a.labs.join('|'), p.a.poles.join('|'), kind(p.a),
+        p.b.label, p.b.labs.join('|'), p.b.poles.join('|'), kind(p.b),
+        p.shared, p.share[0], p.share[1], p.first, p.last, p.trend, p.distance, p.subfields.join('|'),
+      ]),
+    });
+    const suffix = labPair ? `-${labPair.join('-')}` : '';
+    downloadBlob(new Blob([`\ufeff${csv}\r\n`], { type: 'text/csv;charset=utf-8' }),
+      `binomes-${slug}-${range.start}-${range.end}${suffix}.csv`);
+  };
+
   const cov = loaded?.coverage;
   const coveragePct = cov && cov.signatures ? Math.round((cov.resolvedSignatures / cov.signatures) * 100) : 0;
 
@@ -223,6 +292,53 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
             </Trans>
           </p>
 
+          <KpiGrid items={kpis} className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3" />
+
+          <div className={`grid grid-cols-1 gap-4 ${loaded.poleMatrix.length > 0 ? 'xl:grid-cols-3' : ''}`}>
+            {loaded.poleMatrix.length > 0 && (
+              <PairMatrixChart
+                cells={loaded.poleMatrix}
+                title={t`Pairs by couple of poles`}
+                subtitle={t`Diagonal: pairs of different labs within a pole`}
+                exportName="collab-pairs-poles"
+              />
+            )}
+            <div className={loaded.poleMatrix.length > 0 ? 'xl:col-span-2' : ''}>
+              <PairMatrixChart
+                cells={loaded.labMatrix}
+                title={t`Pairs by couple of labs`}
+                subtitle={t`Number of pairs, not of publications · click a cell to list its pairs`}
+                exportName="collab-pairs-labs"
+                selected={labPair}
+                onCellClick={(a, b) => setLabPair(labPair && labPair[0] === a && labPair[1] === b ? null : [a, b])}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 px-1">
+            {labPair && (
+              <button
+                type="button"
+                onClick={() => setLabPair(null)}
+                title={t`Show every pair`}
+                className="pill inline-flex items-center gap-1 px-2.5 py-1 text-xs bg-accent/25 dark:bg-accent/20 text-ink dark:text-[#f5f2ea] hover:bg-accent/40 cursor-pointer"
+              >
+                {labPair[0]} × {labPair[1]}
+                {cellData && <span className="text-muted-light dark:text-[#8f897c]">· {fmt(cellData.total)}</span>}
+                <X className="w-3 h-3 opacity-60" />
+              </button>
+            )}
+            {rows.length > 0 && (
+              <button
+                type="button"
+                onClick={downloadCsv}
+                className="ml-auto inline-flex items-center gap-1 text-xs text-muted dark:text-[#c3beb0] hover:underline cursor-pointer"
+              >
+                <Download className="w-3.5 h-3.5" /> <Trans>Pairs (CSV)</Trans>
+              </button>
+            )}
+          </div>
+
           {selected && (
             <CommonPublicationsPanel
               slug={slug}
@@ -235,7 +351,11 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
             />
           )}
 
-          {rows.length === 0 ? (
+          {labPair && !cellData ? (
+            <div className="glass-card p-6 text-sm text-muted-light dark:text-[#8f897c]">
+              <Trans>Loading…</Trans>
+            </div>
+          ) : rows.length === 0 ? (
             <div className="glass-card p-6 text-sm text-muted-light dark:text-[#8f897c]">
               <Trans>No pair of researchers matches these filters over the period.</Trans>
             </div>
@@ -302,7 +422,10 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
             )}
             {loaded.restricted && (
               <> <Trans>Only the pairs involving a researcher of your lab are shown.</Trans></>
-            )}
+            )}{' '}
+            <a href={helpUrl('/guides/tableau-de-bord/binomes/', i18n.locale)} target="_blank" rel="noreferrer" className="underline hover:text-ink dark:hover:text-[#f5f2ea]">
+              <Trans>How to read this view</Trans>
+            </a>
           </p>
         </>
       )}

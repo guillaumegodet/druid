@@ -1062,6 +1062,7 @@ app.get('/api/network/:slug/pairs', (req, res) => {
   const { visibleLabs, intOr } = r;
   const { net, source, structureLabs } = universityNetwork(r);
   const poles = String(req.query.poles || '').split(',').filter(Boolean);
+  const labPair = String(req.query.labPair || '').split(',').filter(Boolean);
   const minDistance = Number(req.query.minDistance);
   const opts = {
     structureLabs,
@@ -1073,6 +1074,7 @@ app.get('/api/network/:slug/pairs', (req, res) => {
     crossLab: req.query.crossLab !== '0',
     crossPole: req.query.crossPole === '1',
     poles: poles.length === 2 ? poles : null,
+    labPair: labPair.length === 2 ? labPair : null,
     minDistance: Number.isFinite(minDistance) && req.query.minDistance !== '' ? minDistance : null,
     includePhd: req.query.phd !== '0',
     membership: PAIRS_MEMBERSHIP.has(req.query.membership) ? req.query.membership : 'all',

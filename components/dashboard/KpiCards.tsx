@@ -22,6 +22,9 @@ import {
   Landmark,
   Library,
   ArrowLeftRight,
+  Sparkles,
+  Moon,
+  Shuffle,
 } from 'lucide-react';
 import { OverviewKpis, YearRange } from './overviewAggregates';
 import { ImpactKpis } from './impactAggregates';
@@ -120,6 +123,14 @@ const KPI_STYLES: Record<string, { Icon: React.FC<{ className?: string }>; slot:
   q1: { Icon: Medal, slot: 4 },
   accessible: { Icon: Unlock, slot: 2 },
   'national-licence': { Icon: Library, slot: 3 },
+  // Researcher pairs (PairsSection.tsx)
+  'pairs-active': { Icon: Handshake, slot: 0 },
+  'pairs-new': { Icon: Sparkles, slot: 2 },
+  'pairs-dormant': { Icon: Moon, slot: 7 },
+  'pairs-cross-pole': { Icon: ArrowLeftRight, slot: 5 },
+  'pairs-distant': { Icon: Shuffle, slot: 4 },
+  'pairs-researchers': { Icon: Users, slot: 3 },
+  'pairs-cross-pole-researchers': { Icon: Users, slot: 6 },
   charter: { Icon: Award, slot: 1 },
 };
 
