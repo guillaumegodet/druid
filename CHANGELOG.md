@@ -12,6 +12,18 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Partenariats › Binômes › Rapprochements suggérés › avis** : boutons « Pertinent », « Déjà en contact », « Non
+  pertinent » sur chaque suggestion (un avis par personne et par paire, le dernier compte, second clic = retrait),
+  nombre d'avis de tous les utilisateurs, suggestions écartées par soi rangées à part (case pour les réafficher),
+  export CSV de tous les avis (droit établissement). La paire est identifiée par la fiche Druid des chercheurs (ou
+  leur nom), stable d'une régénération du réseau à l'autre. Routes `POST /api/network/:slug/suggestions/feedback`
+  et `GET /api/network/suggestions/feedback.csv` ; PostgreSQL seulement.
+
+### Migration
+- `20261020140000_collab_pair_feedback.sql` : table `collab_pair_feedback`, aucune reprise de données. À appliquer avec
+  les migrations (`druid-migrate`) ; sur druid-test aussi.
+
 ## [2.12.0] — 2026-10-20
 
 ### Ajouté

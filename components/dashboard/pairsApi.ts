@@ -157,7 +157,13 @@ export interface PairSuggestion {
   similarity: number;
   subfields: string[];
   crossPole: boolean;
+  /** Stable key of the pair and the opinions given on it (lot 4, PostgreSQL storage only). */
+  key?: string;
+  feedback?: { counts: Partial<Record<PairVerdict, number>>; mine: PairVerdict | null };
 }
+
+/** Opinion of a user on a suggested connection (lib/pairs/feedback.ts). */
+export type PairVerdict = 'relevant' | 'already_in_contact' | 'not_relevant';
 
 export interface SuggestionsResponse {
   source: string;
@@ -166,6 +172,8 @@ export interface SuggestionsResponse {
   structureLabs: string[] | null;
   poles: { acronym: string; name: string }[];
   restricted: boolean;
+  /** The instance stores opinions (PostgreSQL). */
+  feedback?: boolean;
   suggestions: PairSuggestion[];
   total: number;
 }
@@ -203,4 +211,14 @@ export async function fetchSuggestions(slug: string, p: SuggestionsParams, signa
     throw new Error(`HTTP ${res.status}`);
   }
   return (await res.json()) as SuggestionsResponse;
+}
+
+/** Records the viewer's opinion on a suggested connection (null withdraws it); the pair is given by its author ids. */
+export async function sendPairFeedback(slug: string, a: number, b: number, verdict: PairVerdict | null): Promise<void> {
+  const res = await fetch(`/api/network/${encodeURIComponent(slug)}/suggestions/feedback`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ a, b, verdict }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
 }

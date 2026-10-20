@@ -870,7 +870,7 @@ msgstr "Validated presence"
 
 #: components/ResearcherDetail.tsx:528
 #: components/dashboard/MediaSourcesAdmin.tsx:217
-#: components/dashboard/PairSuggestionsSection.tsx:132
+#: components/dashboard/PairSuggestionsSection.tsx:213
 #: components/dashboard/PairsSection.tsx:218
 #: components/reports/ReportEditor.tsx:789
 msgid "Scope"
@@ -3345,8 +3345,8 @@ msgid "{0, plural, one {# candidate} other {# candidates}}"
 msgstr "{0, plural, one {# candidate} other {# candidates}}"
 
 #: components/dashboard/CallCandidates.tsx:175
-#: components/dashboard/PairSuggestionsSection.tsx:203
-#: components/dashboard/PairSuggestionsSection.tsx:204
+#: components/dashboard/PairSuggestionsSection.tsx:301
+#: components/dashboard/PairSuggestionsSection.tsx:302
 #: components/dashboard/PairsSection.tsx:351
 #: components/dashboard/PairsSection.tsx:352
 #: components/dashboard/report/reportTables.ts:77
@@ -3397,10 +3397,12 @@ msgid "Relative score {0} %"
 msgstr "Relative score {0} %"
 
 #: components/dashboard/CallMatchCard.tsx:64
+#: components/dashboard/PairSuggestionsSection.tsx:64
 msgid "Relevant"
 msgstr "Relevant"
 
 #: components/dashboard/CallMatchCard.tsx:65
+#: components/dashboard/PairSuggestionsSection.tsx:66
 msgid "Not relevant"
 msgstr "Not relevant"
 
@@ -3725,7 +3727,7 @@ msgid "Download the list (CSV)"
 msgstr "Download the list (CSV)"
 
 #: components/dashboard/CharteTab.tsx:392
-#: components/dashboard/PairSuggestionsSection.tsx:206
+#: components/dashboard/PairSuggestionsSection.tsx:304
 msgid "Score"
 msgstr "Score"
 
@@ -5035,7 +5037,7 @@ msgid "Other labs (grouped)"
 msgstr "Other labs (grouped)"
 
 #: components/dashboard/NetworkTab.tsx:117
-#: components/dashboard/PairSuggestionsSection.tsx:152
+#: components/dashboard/PairSuggestionsSection.tsx:233
 #: components/dashboard/PairsSection.tsx:233
 msgid "Loading"
 msgstr "Loading"
@@ -5049,7 +5051,7 @@ msgid "The university network could not be loaded."
 msgstr "The university network could not be loaded."
 
 #: components/dashboard/NetworkTab.tsx:153
-#: components/dashboard/PairSuggestionsSection.tsx:173
+#: components/dashboard/PairSuggestionsSection.tsx:254
 #: components/dashboard/PairsSection.tsx:258
 msgid "Loading the university network…"
 msgstr "Loading the university network…"
@@ -5104,7 +5106,7 @@ msgid "Cross-lab links only"
 msgstr "Cross-lab links only"
 
 #: components/dashboard/NetworkTab.tsx:299
-#: components/dashboard/PairSuggestionsSection.tsx:161
+#: components/dashboard/PairSuggestionsSection.tsx:242
 #: components/dashboard/PairsSection.tsx:246
 msgid "Exclude large collaborations (more than {LARGE_COLLAB_MAX_AUTHORS} authors)"
 msgstr "Exclude large collaborations (more than {LARGE_COLLAB_MAX_AUTHORS} authors)"
@@ -5603,149 +5605,169 @@ msgid "RICL = journal articles indexed in Scimago (proxy for “international pe
 msgstr "RICL = journal articles indexed in Scimago (proxy for “international peer-reviewed journal”); conference papers do not distinguish national / international. Research FTE entered in the structure configuration."
 
 #. placeholder {0}: s.common
-#: components/dashboard/PairSuggestionsSection.tsx:31
+#: components/dashboard/PairSuggestionsSection.tsx:35
 msgid "{0, plural, one {# common co-author:} other {# common co-authors:}}"
 msgstr "{0, plural, one {# common co-author:} other {# common co-authors:}}"
 
-#: components/dashboard/PairSuggestionsSection.tsx:35
+#: components/dashboard/PairSuggestionsSection.tsx:39
 msgid "and {others} more"
 msgstr "and {others} more"
 
-#: components/dashboard/PairSuggestionsSection.tsx:40
+#: components/dashboard/PairSuggestionsSection.tsx:44
 msgid "Shared subfields:"
 msgstr "Shared subfields:"
 
 #. placeholder {0}: s.similarity.toLocaleString(i18n.locale, { minimumFractionDigits: 2 })
-#: components/dashboard/PairSuggestionsSection.tsx:44
+#: components/dashboard/PairSuggestionsSection.tsx:48
 msgid "closeness {0}"
 msgstr "closeness {0}"
 
-#: components/dashboard/PairSuggestionsSection.tsx:96
+#: components/dashboard/PairSuggestionsSection.tsx:65
+msgid "Already in contact"
+msgstr "Already in contact"
+
+#: components/dashboard/PairSuggestionsSection.tsx:79
+msgid "Your opinion on this suggestion (one per person, the last one wins; click again to withdraw it)"
+msgstr "Your opinion on this suggestion (one per person, the last one wins; click again to withdraw it)"
+
+#: components/dashboard/PairSuggestionsSection.tsx:173
 #: components/dashboard/PairsSection.tsx:167
 msgid "This structure is not part of the university co-authorship network."
 msgstr "This structure is not part of the university co-authorship network."
 
-#: components/dashboard/PairSuggestionsSection.tsx:126
+#: components/dashboard/PairSuggestionsSection.tsx:207
 #: components/dashboard/PairsSection.tsx:212
 #: components/reports/ReportEditor.tsx:787
 msgid "Which pairs"
 msgstr "Which pairs"
 
-#: components/dashboard/PairSuggestionsSection.tsx:127
+#: components/dashboard/PairSuggestionsSection.tsx:208
 #: components/dashboard/PairsSection.tsx:213
 #: components/reports/ReportEditor.tsx:805
 msgid "Researchers of different labs"
 msgstr "Researchers of different labs"
 
-#: components/dashboard/PairSuggestionsSection.tsx:128
+#: components/dashboard/PairSuggestionsSection.tsx:209
 #: components/dashboard/PairsSection.tsx:214
 #: components/reports/ReportEditor.tsx:806
 msgid "Researchers of different poles"
 msgstr "Researchers of different poles"
 
-#: components/dashboard/PairSuggestionsSection.tsx:133
+#: components/dashboard/PairSuggestionsSection.tsx:214
 #: components/dashboard/PairsSection.tsx:219
 #: components/reports/ReportEditor.tsx:807
 msgid "At least one researcher of the structure"
 msgstr "At least one researcher of the structure"
 
-#: components/dashboard/PairSuggestionsSection.tsx:134
+#: components/dashboard/PairSuggestionsSection.tsx:215
 #: components/dashboard/PairsSection.tsx:220
 #: components/reports/ReportEditor.tsx:808
 msgid "Both researchers in the structure"
 msgstr "Both researchers in the structure"
 
-#: components/dashboard/PairSuggestionsSection.tsx:137
+#: components/dashboard/PairSuggestionsSection.tsx:218
 #: components/dashboard/PairsSection.tsx:223
 msgid "Lab membership of the researchers"
 msgstr "Lab membership of the researchers"
 
-#: components/dashboard/PairSuggestionsSection.tsx:138
+#: components/dashboard/PairSuggestionsSection.tsx:219
 #: components/dashboard/PairsSection.tsx:224
 #: components/reports/ReportEditor.tsx:809
 msgid "Every lab attribution"
 msgstr "Every lab attribution"
 
-#: components/dashboard/PairSuggestionsSection.tsx:139
+#: components/dashboard/PairSuggestionsSection.tsx:220
 #: components/dashboard/PairsSection.tsx:225
 #: components/reports/ReportEditor.tsx:810
 msgid "Labs of the directory (members and associates)"
 msgstr "Labs of the directory (members and associates)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:140
+#: components/dashboard/PairSuggestionsSection.tsx:221
 #: components/dashboard/PairsSection.tsx:226
 #: components/reports/ReportEditor.tsx:811
 msgid "Labs of the directory (members only)"
 msgstr "Labs of the directory (members only)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:142
+#: components/dashboard/PairSuggestionsSection.tsx:223
 msgid "Ranking"
 msgstr "Ranking"
 
-#: components/dashboard/PairSuggestionsSection.tsx:143
+#: components/dashboard/PairSuggestionsSection.tsx:224
 msgid "Common co-authors and subfields"
 msgstr "Common co-authors and subfields"
 
-#: components/dashboard/PairSuggestionsSection.tsx:144
+#: components/dashboard/PairSuggestionsSection.tsx:225
 msgid "Common co-authors only"
 msgstr "Common co-authors only"
 
-#: components/dashboard/PairSuggestionsSection.tsx:145
+#: components/dashboard/PairSuggestionsSection.tsx:226
 msgid "Shared subfields only"
 msgstr "Shared subfields only"
 
-#: components/dashboard/PairSuggestionsSection.tsx:147
+#: components/dashboard/PairSuggestionsSection.tsx:228
 msgid "Suggestions per researcher at most"
 msgstr "Suggestions per researcher at most"
 
-#: components/dashboard/PairSuggestionsSection.tsx:149
+#: components/dashboard/PairSuggestionsSection.tsx:230
 msgid "≤ {n} per researcher"
 msgstr "≤ {n} per researcher"
 
-#: components/dashboard/PairSuggestionsSection.tsx:157
+#: components/dashboard/PairSuggestionsSection.tsx:238
 msgid "Suggest PhD students"
 msgstr "Suggest PhD students"
 
-#: components/dashboard/PairSuggestionsSection.tsx:168
+#: components/dashboard/PairSuggestionsSection.tsx:249
 msgid "The suggested connections could not be loaded."
 msgstr "The suggested connections could not be loaded."
 
 #. placeholder {0}: loaded.total
-#: components/dashboard/PairSuggestionsSection.tsx:181
+#: components/dashboard/PairSuggestionsSection.tsx:262
 msgid "{0, plural, one {# suggested connection} other {# suggested connections}}"
 msgstr "{0, plural, one {# suggested connection} other {# suggested connections}}"
 
-#: components/dashboard/PairSuggestionsSection.tsx:189
+#: components/dashboard/PairSuggestionsSection.tsx:267
+msgid "{asideCount, plural, one {Show the # suggestion you set aside} other {Show the # suggestions you set aside}}"
+msgstr "{asideCount, plural, one {Show the # suggestion you set aside} other {Show the # suggestions you set aside}}"
+
+#: components/dashboard/PairSuggestionsSection.tsx:275
+msgid "Every opinion (CSV)"
+msgstr "Every opinion (CSV)"
+
+#: components/dashboard/PairSuggestionsSection.tsx:284
 msgid "Suggestions (CSV)"
 msgstr "Suggestions (CSV)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:196
+#: components/dashboard/PairSuggestionsSection.tsx:294
 msgid "No suggested connection matches these filters over the period."
 msgstr "No suggested connection matches these filters over the period."
 
-#: components/dashboard/PairSuggestionsSection.tsx:205
+#: components/dashboard/PairSuggestionsSection.tsx:303
 msgid "Why"
 msgstr "Why"
 
-#: components/dashboard/PairSuggestionsSection.tsx:206
+#: components/dashboard/PairSuggestionsSection.tsx:304
 msgid "2 × common co-authors (Adamic-Adar) + closeness of the subfields"
 msgstr "2 × common co-authors (Adamic-Adar) + closeness of the subfields"
 
+#: components/dashboard/PairSuggestionsSection.tsx:305
+msgid "Your opinion"
+msgstr "Your opinion"
+
 #. placeholder {0}: fmt(rows.length - shown)
-#: components/dashboard/PairSuggestionsSection.tsx:223
+#: components/dashboard/PairSuggestionsSection.tsx:325
 #: components/dashboard/PairsSection.tsx:390
 msgid "Show more ({0} remaining)"
 msgstr "Show more ({0} remaining)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:231
+#: components/dashboard/PairSuggestionsSection.tsx:333
 msgid "Researchers of different labs who have not co-signed any publication, ranked by their common co-authors and the closeness of their OpenAlex subfields over the period. These are leads, not predictions: tested on 2020-2022, about one in six of the 100 first suggestions led to a joint publication in 2023-2026 (one in fifteen between poles). A researcher who left is still suggested until the network is regenerated."
 msgstr "Researchers of different labs who have not co-signed any publication, ranked by their common co-authors and the closeness of their OpenAlex subfields over the period. These are leads, not predictions: tested on 2020-2022, about one in six of the 100 first suggestions led to a joint publication in 2023-2026 (one in fifteen between poles). A researcher who left is still suggested until the network is regenerated."
 
-#: components/dashboard/PairSuggestionsSection.tsx:239
+#: components/dashboard/PairSuggestionsSection.tsx:341
 msgid "Only the suggestions involving a researcher of your lab are shown."
 msgstr "Only the suggestions involving a researcher of your lab are shown."
 
-#: components/dashboard/PairSuggestionsSection.tsx:242
+#: components/dashboard/PairSuggestionsSection.tsx:344
 #: components/dashboard/PairsSection.tsx:411
 msgid "How to read this view"
 msgstr "How to read this view"
@@ -14661,704 +14683,716 @@ msgstr "Invalid verdict"
 msgid "Unknown pair"
 msgstr "Unknown pair"
 
+#: lib/apiErrors.ts:51
+msgid "The opinions need the PostgreSQL storage"
+msgstr "The opinions need the PostgreSQL storage"
+
 #: lib/apiErrors.ts:52
+msgid "Invalid pair"
+msgstr "Invalid pair"
+
+#: lib/apiErrors.ts:53
+msgid "Unknown researcher"
+msgstr "Unknown researcher"
+
+#: lib/apiErrors.ts:56
 msgid "Give the URL of the call or its PDF"
 msgstr "Give the URL of the call or its PDF"
 
-#: lib/apiErrors.ts:53
+#: lib/apiErrors.ts:57
 msgid "A call with this URL is already known"
 msgstr "A call with this URL is already known"
 
-#: lib/apiErrors.ts:54
+#: lib/apiErrors.ts:58
 msgid "Invalid review status"
 msgstr "Invalid review status"
 
-#: lib/apiErrors.ts:55
+#: lib/apiErrors.ts:59
 msgid "Researchers were matched to this call: reject it instead"
 msgstr "Researchers were matched to this call: reject it instead"
 
-#: lib/apiErrors.ts:56
+#: lib/apiErrors.ts:60
 msgid "Invalid catalogue"
 msgstr "Invalid catalogue"
 
-#: lib/apiErrors.ts:57
+#: lib/apiErrors.ts:61
 msgid "This programme is collected automatically: add the call to a programme of its own"
 msgstr "This programme is collected automatically: add the call to a programme of its own"
 
-#: lib/apiErrors.ts:58
+#: lib/apiErrors.ts:62
 msgid "Unknown funder"
 msgstr "Unknown funder"
 
-#: lib/apiErrors.ts:59
+#: lib/apiErrors.ts:63
 msgid "A collected programme already has this identifier"
 msgstr "A collected programme already has this identifier"
 
-#: lib/apiErrors.ts:60
+#: lib/apiErrors.ts:64
 msgid "A collected call already has this identifier"
 msgstr "A collected call already has this identifier"
 
-#: lib/apiErrors.ts:61
+#: lib/apiErrors.ts:65
 msgid "No column of the file is a title (« Titre », « Title », « Intitulé »)"
 msgstr "No column of the file is a title (« Titre », « Title », « Intitulé »)"
 
-#: lib/apiErrors.ts:62
+#: lib/apiErrors.ts:66
 msgid "Invalid URL"
 msgstr "Invalid URL"
 
-#: lib/apiErrors.ts:63
+#: lib/apiErrors.ts:67
 msgid "Only http and https addresses are read"
 msgstr "Only http and https addresses are read"
 
-#: lib/apiErrors.ts:64
+#: lib/apiErrors.ts:68
 msgid "Unknown host"
 msgstr "Unknown host"
 
-#: lib/apiErrors.ts:65
+#: lib/apiErrors.ts:69
 msgid "This address is not a public website"
 msgstr "This address is not a public website"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:70
 msgid "The document is larger than 15 MB"
 msgstr "The document is larger than 15 MB"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:71
 msgid "The website did not answer in time"
 msgstr "The website did not answer in time"
 
-#: lib/apiErrors.ts:68
+#: lib/apiErrors.ts:72
 msgid "The website could not be read"
 msgstr "The website could not be read"
 
-#: lib/apiErrors.ts:69
+#: lib/apiErrors.ts:73
 msgid "The PDF could not be read"
 msgstr "The PDF could not be read"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:74
 msgid "The text is too short to describe a call"
 msgstr "The text is too short to describe a call"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:75
 msgid "The PDF has no text layer (scanned document?)"
 msgstr "The PDF has no text layer (scanned document?)"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:76
 msgid "Too many redirects"
 msgstr "Too many redirects"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:77
 msgid "The page does not exist (404)"
 msgstr "The page does not exist (404)"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:78
 msgid "The website answered with an error"
 msgstr "The website answered with an error"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:79
 msgid "Unsupported document"
 msgstr "Unsupported document"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:80
 msgid "The page has almost no text (built by JavaScript?): upload the PDF of the call instead"
 msgstr "The page has almost no text (built by JavaScript?): upload the PDF of the call instead"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:81
 msgid "The title is missing"
 msgstr "The title is missing"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:82
 msgid "The URL must start with http:// or https://"
 msgstr "The URL must start with http:// or https://"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:83
 msgid "The opening date is not a valid day (YYYY-MM-DD)"
 msgstr "The opening date is not a valid day (YYYY-MM-DD)"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:84
 msgid "A deadline is not a valid day (YYYY-MM-DD)"
 msgstr "A deadline is not a valid day (YYYY-MM-DD)"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:85
 msgid "At most 4 deadlines"
 msgstr "At most 4 deadlines"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:86
 msgid "The deadline is before the opening date"
 msgstr "The deadline is before the opening date"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:87
 msgid "The programme is missing"
 msgstr "The programme is missing"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:88
 msgid "The name of the programme is missing"
 msgstr "The name of the programme is missing"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:89
 msgid "The funder is missing"
 msgstr "The funder is missing"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:91
 msgid "ILAAS_API_KEY not configured (druid service env)"
 msgstr "ILAAS_API_KEY not configured (druid service env)"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:92
 msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:93
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID not configured"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:94
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY not configured"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:95
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY not configured on Cloudflare"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:96
 msgid "HYPERDRIVE binding not configured on Cloudflare"
 msgstr "HYPERDRIVE binding not configured on Cloudflare"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:98
 msgid "Unknown API route"
 msgstr "Unknown API route"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:99
 msgid "Directory storage unavailable"
 msgstr "Directory storage unavailable"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:100
 msgid "Another record already holds this value"
 msgstr "Another record already holds this value"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:101
 msgid "API v1 unavailable"
 msgstr "API v1 unavailable"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:102
 msgid "Grist proxy removed: use /api/v1"
 msgstr "Grist proxy removed: use /api/v1"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:103
 msgid "Not available on the PostgreSQL storage yet"
 msgstr "Not available on the PostgreSQL storage yet"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:104
 msgid "Invalid record"
 msgstr "Invalid record"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:105
 msgid "Invalid lab"
 msgstr "Invalid lab"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:106
 msgid "Invalid import file"
 msgstr "Invalid import file"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:107
 msgid "Replaced IdRef record not found"
 msgstr "Replaced IdRef record not found"
 
-#: lib/apiErrors.ts:104
+#: lib/apiErrors.ts:108
 msgid "Review table missing, run the alignment script first"
 msgstr "Review table missing, run the alignment script first"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:109
 msgid "Grist error (partial write)"
 msgstr "Grist error (partial write)"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:110
 msgid "Qualification: primary row required"
 msgstr "Qualification: primary row required"
 
-#: lib/apiErrors.ts:107
+#: lib/apiErrors.ts:111
 msgid "Invalid LDAP uid"
 msgstr "Invalid LDAP uid"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:112
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "This uid already has a directory record, merge the two records instead"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:113
 msgid "Record not found in Grist"
 msgstr "Record not found in Grist"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:114
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:115
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Merge: one of the rows no longer exists in Grist"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:116
 msgid "Grist error (writing the kept row)"
 msgstr "Grist error (writing the kept row)"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:117
 msgid "Grist error (deleting the absorbed row)"
 msgstr "Grist error (deleting the absorbed row)"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:118
 msgid "Merge not found"
 msgstr "Merge not found"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:119
 msgid "Merge already restored"
 msgstr "Merge already restored"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:120
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Row re-created but merge log not updated, do not restart the restoration"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:121
 msgid "Row re-created but kept row not restored"
 msgstr "Row re-created but kept row not restored"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:122
 msgid "The acronym / short name is required"
 msgstr "The acronym / short name is required"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:123
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "A team must be included in a lab (Memberships tab)"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:124
 msgid "A structure with this acronym already exists"
 msgstr "A structure with this acronym already exists"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:125
 msgid "local_id already used"
 msgstr "local_id already used"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:126
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:128
 msgid "The institution name is required"
 msgstr "The institution name is required"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:129
 msgid "The institution name is too long"
 msgstr "The institution name is too long"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:130
 msgid "Invalid UAI code"
 msgstr "Invalid UAI code"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:131
 msgid "Invalid ROR identifier"
 msgstr "Invalid ROR identifier"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:132
 msgid "Invalid IdRef PPN"
 msgstr "Invalid IdRef PPN"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:133
 msgid "An institution with this name already exists"
 msgstr "An institution with this name already exists"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:134
 msgid "An institution with this UAI already exists"
 msgstr "An institution with this UAI already exists"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:135
 msgid "Institutions require the institution right"
 msgstr "Institutions require the institution right"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:136
 msgid "Institution not found"
 msgstr "Institution not found"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:137
 #: lib/gristService.ts:139
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "Invalid Grist ID (gristRowId missing)"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:138
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:139
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:140
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:141
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:142
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "No OpenAlex identifier configured for this structure"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:143
 msgid "No dashboard data for this structure"
 msgstr "No dashboard data for this structure"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:145
 msgid "messages[] required"
 msgstr "messages[] required"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:146
 msgid "Assistant unavailable"
 msgstr "Assistant unavailable"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:147
 msgid "Help assistant not configured"
 msgstr "Help assistant not configured"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:148
 msgid "Project assistant not configured"
 msgstr "Project assistant not configured"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:149
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:150
 msgid "Generation interrupted"
 msgstr "Generation interrupted"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:151
 msgid "Generation failed"
 msgstr "Generation failed"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:152
 msgid "Analysis failed"
 msgstr "Analysis failed"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:153
 msgid "Missing theme"
 msgstr "Missing theme"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:154
 msgid "No publication to analyze"
 msgstr "No publication to analyze"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:155
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex unreachable"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:157
 msgid "Report not found"
 msgstr "Report not found"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:158
 msgid "Not allowed on this report"
 msgstr "Not allowed on this report"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:159
 msgid "Invalid report definition"
 msgstr "Invalid report definition"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:160
 msgid "Report changed since it was loaded"
 msgstr "Report changed since it was loaded"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:161
 msgid "Invalid report share"
 msgstr "Invalid report share"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:162
 msgid "Invalid report generation"
 msgstr "Invalid report generation"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:163
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Read-only instance: reports are kept in the browser"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:164
 msgid "Invalid AI task"
 msgstr "Invalid AI task"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:165
 msgid "PDF archiving is not configured on this instance"
 msgstr "PDF archiving is not configured on this instance"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:166
 msgid "Invalid PDF"
 msgstr "Invalid PDF"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:167
 msgid "Generation not found"
 msgstr "Generation not found"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:168
 msgid "PDF not archived"
 msgstr "PDF not archived"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:170
 msgid "Invalid record key"
 msgstr "Invalid record key"
 
-#: lib/apiErrors.ts:167
+#: lib/apiErrors.ts:171
 msgid "Career path not computed yet for this record"
 msgstr "Career path not computed yet for this record"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:172
 msgid "Grist unreachable"
 msgstr "Grist unreachable"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:173
 msgid "No Annuaire record for this key"
 msgstr "No Annuaire record for this key"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:174
 msgid "Refresh outside your scope"
 msgstr "Refresh outside your scope"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:175
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Too many refreshes in progress, retry in a minute"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:176
 msgid "Career-path computation failed"
 msgstr "Career-path computation failed"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:177
 msgid "No usable identifier for this record"
 msgstr "No usable identifier for this record"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:178
 msgid "Unknown suggestion"
 msgstr "Unknown suggestion"
 
-#: lib/apiErrors.ts:176
+#: lib/apiErrors.ts:180
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:181
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:178
+#: lib/apiErrors.ts:182
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:179
+#: lib/apiErrors.ts:183
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:180
+#: lib/apiErrors.ts:184
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:181
+#: lib/apiErrors.ts:185
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:182
+#: lib/apiErrors.ts:186
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:183
+#: lib/apiErrors.ts:187
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:185
+#: lib/apiErrors.ts:189
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:186
+#: lib/apiErrors.ts:190
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:187
+#: lib/apiErrors.ts:191
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:188
+#: lib/apiErrors.ts:192
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:189
+#: lib/apiErrors.ts:193
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:190
+#: lib/apiErrors.ts:194
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:191
+#: lib/apiErrors.ts:195
 msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
 msgstr "Identifier removals could not be sent to the CRISalid graph, try again later"
 
-#: lib/apiErrors.ts:192
+#: lib/apiErrors.ts:196
 msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 msgstr "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 
-#: lib/apiErrors.ts:193
+#: lib/apiErrors.ts:197
 msgid "Cannot send the identifier removals to the CRISalid graph"
 msgstr "Cannot send the identifier removals to the CRISalid graph"
 
-#: lib/apiErrors.ts:194
+#: lib/apiErrors.ts:198
 msgid "Cannot read the removals sent to the CRISalid graph"
 msgstr "Cannot read the removals sent to the CRISalid graph"
 
-#: lib/apiErrors.ts:195
+#: lib/apiErrors.ts:199
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:196
+#: lib/apiErrors.ts:200
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:198
+#: lib/apiErrors.ts:202
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:199
+#: lib/apiErrors.ts:203
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:200
+#: lib/apiErrors.ts:204
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:201
+#: lib/apiErrors.ts:205
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:202
+#: lib/apiErrors.ts:206
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:203
+#: lib/apiErrors.ts:207
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:204
+#: lib/apiErrors.ts:208
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:205
+#: lib/apiErrors.ts:209
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:206
+#: lib/apiErrors.ts:210
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:207
+#: lib/apiErrors.ts:211
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:208
+#: lib/apiErrors.ts:212
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:209
+#: lib/apiErrors.ts:213
 msgid "Grist writes require the institution right"
 msgstr "Grist writes require the institution right"
 
-#: lib/apiErrors.ts:210
+#: lib/apiErrors.ts:214
 msgid "Writes require an authenticated user (Cloudflare Access)"
 msgstr "Writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:211
+#: lib/apiErrors.ts:215
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:212
+#: lib/apiErrors.ts:216
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:213
+#: lib/apiErrors.ts:217
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:214
+#: lib/apiErrors.ts:218
 msgid "Invalid Grist identifiers"
 msgstr "Invalid Grist identifiers"
 
-#: lib/apiErrors.ts:215
+#: lib/apiErrors.ts:219
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:217
+#: lib/apiErrors.ts:221
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:218
+#: lib/apiErrors.ts:222
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:219
+#: lib/apiErrors.ts:223
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:220
+#: lib/apiErrors.ts:224
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:221
+#: lib/apiErrors.ts:225
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:222
+#: lib/apiErrors.ts:226
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:223
+#: lib/apiErrors.ts:227
 msgid "No alignment running"
 msgstr "No alignment running"
 
-#: lib/apiErrors.ts:224
+#: lib/apiErrors.ts:228
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:226
+#: lib/apiErrors.ts:230
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:227
+#: lib/apiErrors.ts:231
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:228
+#: lib/apiErrors.ts:232
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:229
+#: lib/apiErrors.ts:233
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:231
+#: lib/apiErrors.ts:235
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:233
+#: lib/apiErrors.ts:237
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:234
+#: lib/apiErrors.ts:238
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:235
+#: lib/apiErrors.ts:239
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:236
+#: lib/apiErrors.ts:240
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:238
+#: lib/apiErrors.ts:242
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:239
+#: lib/apiErrors.ts:243
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:240
+#: lib/apiErrors.ts:244
 msgid "Load failed"
 msgstr "Load failed"
 

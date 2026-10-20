@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Download, Loader2 } from 'lucide-react';
+import { Check, Download, Handshake, Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { YearRange } from './overviewAggregates';
 import { LARGE_COLLAB_MAX_AUTHORS } from './interLabNetwork';
@@ -7,11 +7,15 @@ import { AuthorCell } from './PairsSection';
 import {
   PairRelation,
   PairSuggestion,
+  PairVerdict,
   SuggestionSignal,
   SuggestionsParams,
   SuggestionsResponse,
   fetchSuggestions,
+  sendPairFeedback,
 } from './pairsApi';
+import { getUserInfo } from '../../lib/auth';
+import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
 import { toCsv } from '../../lib/chartExport';
 import { downloadBlob } from './chartFileExport';
@@ -48,6 +52,47 @@ const ReasonCell: React.FC<{ s: PairSuggestion }> = ({ s }) => {
   );
 };
 
+/** Opinions set aside by the viewer: hidden from the list unless asked for. */
+const ASIDE: ReadonlySet<PairVerdict> = new Set(['already_in_contact', 'not_relevant']);
+
+/** Opinion buttons of a suggestion (lot 4): one per person, the last one wins, a second click withdraws it. */
+const FeedbackButtons: React.FC<{ s: PairSuggestion; busy: boolean; onFeedback: (s: PairSuggestion, v: PairVerdict | null) => void }> = ({
+  s, busy, onFeedback,
+}) => {
+  const { t } = useLingui();
+  const options: { verdict: PairVerdict; label: string; icon: React.ReactNode }[] = [
+    { verdict: 'relevant', label: t`Relevant`, icon: <ThumbsUp className="w-3.5 h-3.5" /> },
+    { verdict: 'already_in_contact', label: t`Already in contact`, icon: <Handshake className="w-3.5 h-3.5" /> },
+    { verdict: 'not_relevant', label: t`Not relevant`, icon: <ThumbsDown className="w-3.5 h-3.5" /> },
+  ];
+  return (
+    <div className="flex flex-wrap items-center gap-1">
+      {options.map((o) => {
+        const mine = s.feedback?.mine === o.verdict;
+        const count = s.feedback?.counts[o.verdict] ?? 0;
+        return (
+          <button
+            key={o.verdict}
+            type="button"
+            disabled={busy}
+            onClick={() => onFeedback(s, mine ? null : o.verdict)}
+            title={t`Your opinion on this suggestion (one per person, the last one wins; click again to withdraw it)`}
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-semibold border whitespace-nowrap transition-colors disabled:opacity-50 ${
+              mine
+                ? 'bg-ink text-white border-ink dark:bg-[#f5f2ea] dark:text-[#1c1a14] dark:border-[#f5f2ea]'
+                : 'bg-white/70 dark:bg-white/10 border-white/80 dark:border-white/15 text-muted dark:text-[#c3beb0] hover:text-ink dark:hover:text-[#f5f2ea]'
+            }`}
+          >
+            {mine ? <Check className="w-3.5 h-3.5" /> : o.icon}
+            {o.label}
+            {count > 0 && <span className="tabular-nums opacity-70">{count}</span>}
+          </button>
+        );
+      })}
+    </div>
+  );
+};
+
 /**
  * « Suggested connections » of the Researcher pairs sub-tab (druid-internal `docs/plan-binomes-chercheurs.md`,
  * lot 3): researchers of different labs who never co-signed, ranked by their common co-authors and their OpenAlex
@@ -66,6 +111,9 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
 
   const [data, setData] = useState<SuggestionsResponse | 'none' | 'error' | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showAside, setShowAside] = useState(false);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
+  const [feedbackError, setFeedbackError] = useState<string | null>(null);
   const params = useMemo<SuggestionsParams>(
     () => ({ range, relation, scope, membership, includePhd, excludeLarge, signal, quota }),
     [range, relation, scope, membership, includePhd, excludeLarge, signal, quota],
@@ -78,9 +126,38 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
       .catch(() => { if (!ctrl.signal.aborted) { setData('error'); setLoading(false); } });
     return () => ctrl.abort();
   }, [slug, params]);
-  useEffect(() => { setShown(PAGE); }, [data]);
+  useEffect(() => { setShown(PAGE); }, [params]);
 
   const loaded = data && typeof data === 'object' ? data : null;
+
+  const onFeedback = async (sug: PairSuggestion, verdict: PairVerdict | null) => {
+    if (!sug.key) return;
+    setBusyKey(sug.key);
+    setFeedbackError(null);
+    try {
+      await sendPairFeedback(slug, sug.a.id, sug.b.id, verdict);
+      // Updated in place (no reload: the row stays where it is until the next load, or leaves the list when set aside).
+      setData((cur) => {
+        if (!cur || typeof cur !== 'object') return cur;
+        return {
+          ...cur,
+          suggestions: cur.suggestions.map((x) => {
+            if (x.key !== sug.key) return x;
+            const counts = { ...(x.feedback?.counts ?? {}) };
+            const before = x.feedback?.mine ?? null;
+            if (before) counts[before] = Math.max(0, (counts[before] ?? 1) - 1);
+            if (verdict) counts[verdict] = (counts[verdict] ?? 0) + 1;
+            return { ...x, feedback: { counts, mine: verdict } };
+          }),
+        };
+      });
+    } catch (e) {
+      setFeedbackError(apiErrorText(e));
+    } finally {
+      setBusyKey(null);
+    }
+  };
+
   const poleCouples = useMemo(() => {
     const poles = loaded?.poles ?? [];
     const out: { value: PairRelation; label: string }[] = [];
@@ -101,18 +178,22 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
   const fmt = (n: number) => n.toLocaleString(numberLocale());
   const select = 'input-soft !w-auto py-1 pr-7 text-xs cursor-pointer';
   const check = 'inline-flex items-center gap-1.5 cursor-pointer';
-  const rows = loaded?.suggestions ?? [];
+  const all = loaded?.suggestions ?? [];
+  const isAside = (x: PairSuggestion) => !!x.feedback?.mine && ASIDE.has(x.feedback.mine);
+  const asideCount = all.filter(isAside).length;
+  const rows = showAside ? all : all.filter((x) => !isAside(x));
+  const canExportFeedback = !!loaded?.feedback && getUserInfo().access.allowedSlugs === 'all';
 
   const downloadCsv = () => {
     const csv = toCsv({
       name: 'rapprochements',
       columns: [
         'researcher_1', 'labs_1', 'poles_1', 'researcher_2', 'labs_2', 'poles_2',
-        'score', 'common_coauthors', 'named_coauthors', 'closeness', 'shared_subfields',
+        'score', 'common_coauthors', 'named_coauthors', 'closeness', 'shared_subfields', 'my_opinion',
       ],
       rows: rows.map((s) => [
         s.a.label, s.a.labs.join('|'), s.a.poles.join('|'), s.b.label, s.b.labs.join('|'), s.b.poles.join('|'),
-        s.score, s.common, s.via.map((v) => v.label).join('|'), s.similarity, s.subfields.join('|'),
+        s.score, s.common, s.via.map((v) => v.label).join('|'), s.similarity, s.subfields.join('|'), s.feedback?.mine ?? '',
       ]),
     });
     downloadBlob(new Blob([`﻿${csv}\r\n`], { type: 'text/csv;charset=utf-8' }),
@@ -180,17 +261,34 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
             <p className="text-sm text-muted dark:text-[#c3beb0]">
               <Plural value={loaded.total} one="# suggested connection" other="# suggested connections" />
             </p>
+            {asideCount > 0 && (
+              <label className={`${check} text-xs text-muted dark:text-[#c3beb0]`}>
+                <input type="checkbox" checked={showAside} onChange={(e) => setShowAside(e.target.checked)} className="accent-[#7048e8]" />
+                <Plural value={asideCount} one="Show the # suggestion you set aside" other="Show the # suggestions you set aside" />
+              </label>
+            )}
+            {canExportFeedback && (
+              <a
+                href="/api/network/suggestions/feedback.csv"
+                className="ml-auto inline-flex items-center gap-1 text-xs text-muted dark:text-[#c3beb0] hover:underline"
+              >
+                <Download className="w-3.5 h-3.5" /> <Trans>Every opinion (CSV)</Trans>
+              </a>
+            )}
             {rows.length > 0 && (
               <button
                 type="button"
                 onClick={downloadCsv}
-                className="ml-auto inline-flex items-center gap-1 text-xs text-muted dark:text-[#c3beb0] hover:underline cursor-pointer"
+                className={`${canExportFeedback ? '' : 'ml-auto '}inline-flex items-center gap-1 text-xs text-muted dark:text-[#c3beb0] hover:underline cursor-pointer`}
               >
                 <Download className="w-3.5 h-3.5" /> <Trans>Suggestions (CSV)</Trans>
               </button>
             )}
           </div>
 
+          {feedbackError && (
+            <p className="text-xs text-[#b23b3b] dark:text-[#f08c8c] px-1">{feedbackError}</p>
+          )}
           {rows.length === 0 ? (
             <div className="glass-card p-6 text-sm text-muted-light dark:text-[#8f897c]">
               <Trans>No suggested connection matches these filters over the period.</Trans>
@@ -204,15 +302,19 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
                     <th className="px-3 py-2"><Trans>Researcher</Trans></th>
                     <th className="px-3 py-2"><Trans>Why</Trans></th>
                     <th className="px-3 py-2 text-right" title={t`2 × common co-authors (Adamic-Adar) + closeness of the subfields`}><Trans>Score</Trans></th>
+                    {loaded.feedback && <th className="px-3 py-2"><Trans>Your opinion</Trans></th>}
                   </tr>
                 </thead>
                 <tbody>
                   {rows.slice(0, shown).map((s) => (
-                    <tr key={`${s.a.id}-${s.b.id}`} className="border-t border-ink/5 dark:border-white/5 align-top">
+                    <tr key={`${s.a.id}-${s.b.id}`} className={`border-t border-ink/5 dark:border-white/5 align-top ${isAside(s) ? 'opacity-50' : ''}`}>
                       <td className="px-3 py-2"><AuthorCell author={s.a} /></td>
                       <td className="px-3 py-2"><AuthorCell author={s.b} /></td>
                       <td className="px-3 py-2"><ReasonCell s={s} /></td>
                       <td className="px-3 py-2 text-right text-muted dark:text-[#c3beb0]">{s.score.toFixed(2)}</td>
+                      {loaded.feedback && (
+                        <td className="px-3 py-2"><FeedbackButtons s={s} busy={busyKey === s.key} onFeedback={onFeedback} /></td>
+                      )}
                     </tr>
                   ))}
                 </tbody>
