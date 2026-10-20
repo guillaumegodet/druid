@@ -4,6 +4,7 @@ import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { YearRange } from './overviewAggregates';
 import { LARGE_COLLAB_MAX_AUTHORS } from './interLabNetwork';
 import { CommonPublicationsPanel } from './NetworkTab';
+import { ChartStateContext, type ChartState } from './EChartCard';
 import {
   DISTANT_PROFILES,
   PairAuthor,
@@ -13,12 +14,13 @@ import {
   PairTrend,
   ResearcherPair,
   fetchPairs,
+  pairsChartParams,
 } from './pairsApi';
+import { pairsKpiItems } from './pairsKpis';
 import { numberLocale } from '../../lib/i18n';
 import { toCsv } from '../../lib/chartExport';
 import { downloadBlob } from './chartFileExport';
 import { KpiGrid } from './KpiCards';
-import type { KpiItem } from './kpiItems';
 import { PairMatrixChart } from './charts/PairMatrixChart';
 import { helpUrl } from '../../lib/helpLinks';
 
@@ -113,6 +115,8 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
     () => ({ range, relation, scope, distantOnly, membership, includePhd, excludeLarge, minShared }),
     [range, relation, scope, distantOnly, membership, includePhd, excludeLarge, minShared],
   );
+  // « Add to a report » on a matrix keeps the options of the sub-tab (PAIRS_PARAMS of chartMeta.ts).
+  const chartState = useMemo<ChartState>(() => ({ params: pairsChartParams(params) }), [params]);
   useEffect(() => {
     const ctrl = new AbortController();
     setLoading(true);
@@ -177,29 +181,7 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
       {label}
     </button>
   );
-  const kpis: KpiItem[] = loaded ? (() => {
-    const c = loaded.counts;
-    const share = (n: number) => (c.perimeter ? t`${Math.round((n / c.perimeter) * 100)}% of the ${fmt(c.perimeter)} publishing researchers` : undefined);
-    return [
-      { key: 'pairs-active', label: t`Active pairs`, value: fmt(loaded.total - c.dormant), hint: t`joint publication in the last three years` },
-      { key: 'pairs-new', label: t`New pairs`, value: fmt(c.new), hint: t`first joint publication in the last three years` },
-      { key: 'pairs-dormant', label: t`Dormant pairs`, value: fmt(c.dormant), hint: t`nothing joint for three years` },
-      { key: 'pairs-cross-pole', label: t`Between poles`, value: fmt(c.crossPole) },
-      { key: 'pairs-distant', label: t`Distant profiles`, value: fmt(c.distant), hint: t`distance ≥ ${DISTANT_PROFILES}` },
-      {
-        key: 'pairs-researchers',
-        label: loaded.structureLabs ? t`Researchers of the structure in a pair` : t`Researchers in a pair`,
-        value: fmt(c.perimeterEngaged),
-        hint: share(c.perimeterEngaged),
-      },
-      ...(loaded.poles.length > 0 ? [{
-        key: 'pairs-cross-pole-researchers',
-        label: t`Researchers in a cross-pole pair`,
-        value: fmt(c.perimeterCrossPole),
-        hint: share(c.perimeterCrossPole),
-      }] : []),
-    ];
-  })() : [];
+  const kpis = loaded ? pairsKpiItems(loaded) : [];
 
   const downloadCsv = () => {
     const kind = (a: PairAuthor) => Object.values(a.m ?? {}).join('|');
@@ -294,6 +276,7 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
 
           <KpiGrid items={kpis} className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3" />
 
+          <ChartStateContext.Provider value={chartState}>
           <div className={`grid grid-cols-1 gap-4 ${loaded.poleMatrix.length > 0 ? 'xl:grid-cols-3' : ''}`}>
             {loaded.poleMatrix.length > 0 && (
               <PairMatrixChart
@@ -314,6 +297,7 @@ export const PairsSection: React.FC<{ slug: string; range: YearRange }> = ({ slu
               />
             </div>
           </div>
+          </ChartStateContext.Provider>
 
           <div className="flex flex-wrap items-center gap-2 px-1">
             {labPair && (

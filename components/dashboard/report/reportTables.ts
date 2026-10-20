@@ -1,11 +1,14 @@
 // Tables of report `table` blocks (docs/plan-mes-rapports.md § 2): plain rows computed from the
 // block dataset, shown in the preview and printed (paginated) in the PDF. First table: the list
 // of publications, annex of the « Collaboration avec une université » template (decision D6).
+// The researcher pairs table reads the block's remote payload (REMOTE_TABLES of chartMeta.ts).
 
 import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { YearRange } from '../overviewAggregates';
 import { unitsOfDataset } from '../collabAggregates';
+import type { PairsResponse } from '../pairsApi';
+import { pairAuthorLabel, pairTrendLabel } from '../pairsKpis';
 import type { DashboardDataset } from '../types';
 
 export interface TableColumn {
@@ -25,8 +28,14 @@ export interface TableRows {
 
 export interface ReportTable {
   label: MessageDescriptor;
-  build: (dataset: DashboardDataset, range: YearRange, limit: number) => TableRows;
+  /**
+   * `dataset` = restricted corpus of the block (null for a table fed by a remote source);
+   * `remote` = payload of its remote source.
+   */
+  build: (dataset: DashboardDataset | null, range: YearRange, limit: number, remote?: unknown) => TableRows;
 }
+
+const EMPTY_ROWS: TableRows = { columns: [], rows: [], omitted: 0 };
 
 export const DEFAULT_TABLE_LIMIT = 500;
 
@@ -35,6 +44,7 @@ export const REPORT_TABLES: Record<string, ReportTable> = {
   publications: {
     label: msg`List of publications`,
     build: (dataset, range, limit) => {
+      if (!dataset) return EMPTY_ROWS;
       const units = unitsOfDataset(dataset);
       const pubs = dataset.publications
         .filter((p) => typeof p.year === 'number' && p.year >= range.start && p.year <= range.end)
@@ -51,6 +61,36 @@ export const REPORT_TABLES: Record<string, ReportTable> = {
         rows: shown.map((p) => [String(p.year ?? ''), p.title ?? '—', p.journal ?? '', labsOf(p)]),
         links: shown.map((p) => (p.doi ? `https://doi.org/${p.doi.replace(/^https?:\/\/(dx\.)?doi\.org\//, '')}` : null)),
         omitted: pubs.length - shown.length,
+      };
+    },
+  },
+  // Most frequent pairs first (the order of the /pairs response).
+  pairs: {
+    label: msg`Researcher pairs`,
+    build: (_dataset, _range, limit, remote) => {
+      const r = remote as PairsResponse | undefined;
+      if (!r) return EMPTY_ROWS;
+      const shown = r.pairs.slice(0, limit);
+      const fmtDistance = (d: number | null) => (d == null ? '—' : d.toFixed(2));
+      return {
+        columns: [
+          { label: msg`Researcher`, width: 28 },
+          { label: msg`Researcher`, width: 28 },
+          { label: msg`Joint pubs`, width: 9 },
+          { label: msg`Years`, width: 11 },
+          { label: msg`Trend`, width: 12 },
+          { label: msg`Distance`, width: 10 },
+        ],
+        rows: shown.map((p) => [
+          pairAuthorLabel(p.a),
+          pairAuthorLabel(p.b),
+          String(p.shared),
+          p.first === p.last ? String(p.first) : `${p.first}–${p.last}`,
+          pairTrendLabel(p.trend),
+          fmtDistance(p.distance),
+        ]),
+        // Pairs beyond the 2 000 returned by the route count as omitted too.
+        omitted: Math.max(r.total, r.pairs.length) - shown.length,
       };
     },
   },

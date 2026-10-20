@@ -6,7 +6,7 @@
 // the /embed `f` parameter (embedState.ts) and the editor all go through them.
 
 import { z } from 'zod';
-import { EMBEDDABLE_IDS, KPI_SET_IDS, TABLE_IDS } from '../embedIds';
+import { KPI_SET_IDS, TABLE_IDS, isReportChartId } from '../embedIds';
 import type { PubFilters } from '../publicationFilters';
 
 /** Bounds of a definition (a Grist Text cell holds it, see plan § 3.1). */
@@ -103,7 +103,9 @@ const contextOverride = reportContextSchema.partial();
  * to them — a chart added from the dashboard keeps exactly what was shown there.
  */
 const ownFilters = z.boolean().optional();
-const chartId = z.string().refine((id) => EMBEDDABLE_IDS.has(id), { message: 'unknown chart' });
+const chartId = z.string().refine(isReportChartId, { message: 'unknown chart' });
+/** Block parameters (charts, and the key figures / tables fed by a remote source): sanitized when resolved. */
+const params = z.record(z.string().max(40), z.union([z.number(), z.string().max(40)])).optional();
 const blockId = z.string().regex(/^[A-Za-z0-9_-]{1,40}$/);
 const text = z.string().max(REPORT_LIMITS.maxText);
 const shortText = z.string().max(REPORT_LIMITS.maxString);
@@ -119,7 +121,7 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     note: text.optional(),
     override: contextOverride.optional(),
     ownFilters,
-    params: z.record(z.string().max(40), z.union([z.number(), z.string().max(40)])).optional(),
+    params,
   }),
   z.strictObject({
     id: blockId,
@@ -128,6 +130,7 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     setId: z.string().refine((id) => KPI_SET_IDS.has(id), { message: 'unknown key-figure set' }),
     override: contextOverride.optional(),
     ownFilters,
+    params,
   }),
   z.strictObject({
     id: blockId,
@@ -137,6 +140,7 @@ export const reportBlockSchema = z.discriminatedUnion('kind', [
     limit: z.number().int().min(1).max(5_000).optional(),
     override: contextOverride.optional(),
     ownFilters,
+    params,
   }),
   z.strictObject({ id: blockId, hidden: z.boolean().optional(), kind: z.literal('text'), markdown: text }),
   z.strictObject({

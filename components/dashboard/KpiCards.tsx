@@ -187,18 +187,21 @@ export const ImpactKpiCards: React.FC<{ kpis: ImpactKpis }> = ({ kpis }) => {
 /** Key-figure row of a report `kpis` block (KPI_SETS, kpiItems.ts). */
 export const KpiSetCards: React.FC<{
   setId: string;
-  dataset: DashboardDataset;
+  /** Null for a set read from a remote payload (`remote`). */
+  dataset: DashboardDataset | null;
   range: YearRange;
   /** Whole corpus of the structure (sets comparing with it: partner rank, impact reference). */
   source?: DashboardDataset | null;
   filters?: PubFilters;
-}> = ({ setId, dataset, range, source = null, filters }) => {
+  /** Payload of the set's remote source (REMOTE_KPI_SETS of chartMeta.ts). */
+  remote?: unknown;
+}> = ({ setId, dataset, range, source = null, filters, remote }) => {
   const { i18n } = useLingui();
   const set = KPI_SETS[setId];
   const items = React.useMemo(
-    () => (set ? set.items(dataset, range, { source, filters: filters ?? {} }) : []),
+    () => (set && (dataset || remote) ? set.items(dataset!, range, { source, filters: filters ?? {}, remote }) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [set, dataset, range, source, filters, i18n.locale],
+    [set, dataset, range, source, filters, remote, i18n.locale],
   );
   return <KpiGrid items={items} className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3" />;
 };

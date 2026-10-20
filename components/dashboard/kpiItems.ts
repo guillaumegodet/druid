@@ -11,6 +11,8 @@ import { aggregateOverview, CONFERENCE_LABEL, type OverviewKpis, type YearRange 
 import { partnerImpactItems, partnerKpiItems, type PartnerKpiContext } from './partnerKpis';
 import { fundingKpiItems, journalsKpiItems } from './themeKpis';
 import { countryImpactSetItems, countryKpiSetItems } from './countryKpis';
+import type { PairsResponse } from './pairsApi';
+import { pairsKpiItems } from './pairsKpis';
 import type { PubFilters } from './publicationFilters';
 import type { DashboardDataset } from './types';
 
@@ -114,13 +116,19 @@ export function impactKpiItems(kpis: ImpactKpis): KpiItem[] {
   ];
 }
 
+/** Context of a key-figure set: PartnerKpiContext, plus the remote payload of the sets that have one. */
+export interface KpiContext extends PartnerKpiContext {
+  /** Payload of the set's remote source (REMOTE_KPI_SETS of chartMeta.ts), e.g. a /pairs response. */
+  remote?: unknown;
+}
+
 export interface KpiSet {
   label: MessageDescriptor;
   /**
    * `dataset` = restricted corpus of the block; `ctx` = the whole corpus of its structure and the
    * block filters, for the sets comparing both (partner rank, impact reference).
    */
-  items: (dataset: DashboardDataset, range: YearRange, ctx?: PartnerKpiContext) => KpiItem[];
+  items: (dataset: DashboardDataset, range: YearRange, ctx?: KpiContext) => KpiItem[];
 }
 
 const noContext: PartnerKpiContext = { source: null, filters: {} };
@@ -159,5 +167,10 @@ export const KPI_SETS: Record<string, KpiSet> = {
   'country-impact': {
     label: msg`Key figures — impact of the collaboration with a country`,
     items: (dataset, range, ctx) => countryImpactSetItems(dataset, range, ctx ?? noContext),
+  },
+  // Researcher pairs: read from the /pairs response (remote source, REMOTE_KPI_SETS), not from the dataset.
+  pairs: {
+    label: msg`Key figures — researcher pairs`,
+    items: (_dataset, _range, ctx) => (ctx?.remote ? pairsKpiItems(ctx.remote as PairsResponse) : []),
   },
 };

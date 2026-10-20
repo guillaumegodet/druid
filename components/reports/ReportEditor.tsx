@@ -8,20 +8,26 @@ import {
   ArrowLeft, BarChart3, ChevronDown, ChevronUp, Copy, Eye, EyeOff, FileDown, Gauge, Heading, Plus,
   History, RefreshCw, Share2, Sparkles, Table2, Trash2, Type, X,
 } from 'lucide-react';
+import { i18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
 import { datasetFeatures, scopeFeatures } from '../dashboard/chartMeta';
 import { REPORT_TABLES, tableLabel } from '../dashboard/report/reportTables';
 import { AI_TASK_LABELS, generateAiText } from '../dashboard/report/reportAi';
-import { getUserInfo } from '../../lib/auth';
-import { EMBED_CHARTS } from '../dashboard/embedRegistry';
+import { getUserInfo, hasCapability } from '../../lib/auth';
+import { REMOTE_KPI_SETS, REMOTE_PARAMS, REMOTE_TABLES, type ChartParamDef, type ChartParams } from '../dashboard/chartMeta';
 import { KPI_SETS } from '../dashboard/kpiItems';
 import { buildFilterContext, describeFilters, type PubFilters } from '../dashboard/publicationFilters';
 import { newBlockId, type ReportBlock, type ReportDefinition } from '../dashboard/report/definition';
 import { composeReportPdf } from '../dashboard/report/composeReportPdf';
 import { ReportRenderer, type CapturedChart, type RenderItem } from '../dashboard/report/ReportRenderer';
 import { errorStatus, type ReportsBackend, type StoredReport } from '../dashboard/report/reportsApi';
-import { chartParamDefs, reportSlugs, resolveReport, type ResolvedReport } from '../dashboard/report/resolveReport';
+import { reportChartLabel } from '../dashboard/report/reportCharts';
+import { useReportRemote } from '../dashboard/report/remoteSources';
+import {
+  chartParamDefs, reportRemoteRequests, reportSlugs, resolveReport, type ResolvedReport,
+} from '../dashboard/report/resolveReport';
 import { useReportDatasets } from '../dashboard/report/useReportDatasets';
 import { ChartPicker } from './ChartPicker';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect } from './ReportControls';
@@ -147,7 +153,10 @@ export const ReportEditor: React.FC<{
   // ── Data and resolution ──
   const slugs = useMemo(() => (draft ? reportSlugs(draft) : []), [draft]);
   const datasets = useReportDatasets(slugs);
-  const resolved = useMemo(() => (draft ? resolveReport(draft, datasets) : null), [draft, datasets]);
+  // Remote data (researcher pairs…): requested from the definition, loaded like the datasets.
+  const remoteRequests = useMemo(() => (draft ? reportRemoteRequests(draft) : []), [draft]);
+  const remote = useReportRemote(remoteRequests);
+  const resolved = useMemo(() => (draft ? resolveReport(draft, datasets, new Date(), remote) : null), [draft, datasets, remote]);
   const mainDataset = draft ? datasets[draft.context.slug] : undefined;
   const features = useMemo(
     () => (mainDataset && draft ? scopeFeatures(datasetFeatures(mainDataset), draft.context.filters) : null),
@@ -189,15 +198,16 @@ export const ReportEditor: React.FC<{
   const startPdf = () => {
     if (!draft || !resolved) return;
     const items: RenderItem[] = resolved.blocks
-      .filter((rb) => !rb.block.hidden && rb.block.kind === 'chart' && rb.status === 'ok' && rb.dataset && rb.scope)
+      .filter((rb) => !rb.block.hidden && rb.block.kind === 'chart' && rb.status === 'ok' && rb.scope && (rb.dataset || rb.remote))
       .map((rb) => ({
         key: rb.block.id,
         chartId: (rb.block as Extract<ReportBlock, { kind: 'chart' }>).chartId,
-        dataset: rb.dataset!,
+        dataset: rb.dataset,
         range: rb.scope!.range,
         params: rb.params,
         filters: rb.scope!.filters,
         source: rb.source,
+        remote: rb.remote,
       }));
     const batches: RenderItem[][] = [];
     for (let i = 0; i < items.length; i += PDF_BATCH) batches.push(items.slice(i, i + PDF_BATCH));
@@ -561,12 +571,12 @@ const BlockIcon: React.FC<{ block: ReportBlock }> = ({ block }) => {
 type Translate = ReturnType<typeof useLingui>['t'];
 
 function blockLabel(b: ReportBlock, t: Translate): string {
-  if (b.kind === 'section') return b.title || t`Untitled section`;
-  if (b.kind === 'text') return b.markdown.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || t`Empty text`;
+  if (b.kind === 'section') return b.title || i18n._(msg`Untitled section`);
+  if (b.kind === 'text') return b.markdown.trim().split('\n')[0].replace(/^#+\s*/, '').slice(0, 80) || i18n._(msg`Empty text`);
   if (b.kind === 'kpis') return KPI_SETS[b.setId] ? t(KPI_SETS[b.setId].label) : b.setId;
   if (b.kind === 'chart') {
-    const entry = EMBED_CHARTS[b.chartId];
-    return b.title?.trim() || (entry ? t(entry.label) : b.chartId);
+    const label = reportChartLabel(b.chartId);
+    return b.title?.trim() || (label ? t(label) : b.chartId);
   }
   if (b.kind === 'table') return tableLabel(b.tableId);
   return t(AI_TASK_LABELS[b.task]);
@@ -657,11 +667,18 @@ const BlockSettings: React.FC<{
     );
   }
   if (block.kind === 'table') {
+    const source = REMOTE_TABLES[block.tableId];
     return (
       <div className={box}>
-        <select className={selectCls} value={block.tableId} disabled={!canEdit} onChange={(e) => onPatch({ tableId: e.target.value })}>
-          {Object.keys(REPORT_TABLES).map((id) => <option key={id} value={id}>{tableLabel(id)}</option>)}
+        <select className={selectCls} value={block.tableId} disabled={!canEdit}
+          onChange={(e) => onPatch({ tableId: e.target.value, params: undefined })}>
+          {Object.keys(REPORT_TABLES).filter((id) => id === block.tableId || remoteAvailable(REMOTE_TABLES[id])).map((id) => (
+            <option key={id} value={id}>{tableLabel(id)}</option>
+          ))}
         </select>
+        {source && (
+          <ParamInputs defs={REMOTE_PARAMS[source]} params={block.params} canEdit={canEdit} onChange={(params) => onPatch({ params })} />
+        )}
         <label className="flex items-center gap-2">
           <span className="text-xs font-semibold text-muted dark:text-[#c3beb0] w-28"><Trans>Max. rows in the PDF</Trans></span>
           <input type="number" className="input-soft !w-24" min={1} max={5000} disabled={!canEdit}
@@ -672,28 +689,29 @@ const BlockSettings: React.FC<{
     );
   }
   if (block.kind === 'kpis') {
+    const source = REMOTE_KPI_SETS[block.setId];
     return (
       <div className={box}>
-        <select className={selectCls} value={block.setId} disabled={!canEdit} onChange={(e) => onPatch({ setId: e.target.value })}>
-          {Object.entries(KPI_SETS).map(([id, set]) => <option key={id} value={id}>{t(set.label)}</option>)}
+        <select className={selectCls} value={block.setId} disabled={!canEdit}
+          onChange={(e) => onPatch({ setId: e.target.value, params: undefined })}>
+          {Object.entries(KPI_SETS).filter(([id]) => id === block.setId || remoteAvailable(REMOTE_KPI_SETS[id])).map(([id, set]) => (
+            <option key={id} value={id}>{t(set.label)}</option>
+          ))}
         </select>
+        {source && (
+          <ParamInputs defs={REMOTE_PARAMS[source]} params={block.params} canEdit={canEdit} onChange={(params) => onPatch({ params })} />
+        )}
       </div>
     );
   }
   if (block.kind !== 'chart') return null;
-  const params = block.params ?? {};
-  const setParam = (key: string, value: number | string | undefined) => {
-    const next = { ...params };
-    if (value === undefined || value === '') delete next[key];
-    else next[key] = value;
-    onPatch({ params: Object.keys(next).length ? next : undefined });
-  };
+  const label = reportChartLabel(block.chartId);
   return (
     <div className={box}>
       <label className="flex flex-col gap-1">
         <span className="text-xs font-semibold text-muted dark:text-[#c3beb0]"><Trans>Title (optional)</Trans></span>
         <input className="input-soft" value={block.title ?? ''} maxLength={300} disabled={!canEdit}
-          placeholder={EMBED_CHARTS[block.chartId] ? t(EMBED_CHARTS[block.chartId].label) : ''}
+          placeholder={label ? t(label) : ''}
           onChange={(e) => onPatch({ title: e.target.value || undefined })} />
       </label>
       <label className="flex flex-col gap-1">
@@ -701,21 +719,7 @@ const BlockSettings: React.FC<{
         <textarea className="input-soft" rows={3} value={block.note ?? ''} maxLength={20000} disabled={!canEdit}
           onChange={(e) => onPatch({ note: e.target.value || undefined })} />
       </label>
-      {chartParamDefs(block.chartId).map((def) => (
-        <label key={def.key} className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-muted dark:text-[#c3beb0] w-28">{paramLabel(def.key, t)}</span>
-          {def.values ? (
-            <select className={selectCls} value={String(params[def.key] ?? def.default ?? def.values[0])} disabled={!canEdit}
-              onChange={(e) => setParam(def.key, e.target.value)}>
-              {def.values.map((v) => <option key={v} value={v}>{paramValueLabel(v, t)}</option>)}
-            </select>
-          ) : (
-            <input type="number" className="input-soft !w-24" min={def.min} max={def.max} disabled={!canEdit}
-              value={params[def.key] ?? ''} placeholder={def.default != null ? String(def.default) : t`auto`}
-              onChange={(e) => setParam(def.key, e.target.value === '' ? undefined : Number(e.target.value))} />
-          )}
-        </label>
-      ))}
+      <ParamInputs defs={chartParamDefs(block.chartId)} params={block.params} canEdit={canEdit} onChange={(params) => onPatch({ params })} />
       {((block.override && Object.keys(block.override).length > 0) || block.ownFilters) && (
         <div className="flex items-center justify-between gap-2 text-xs text-muted dark:text-[#c3beb0]">
           <Trans>This chart has its own scope (structure, period or filters).</Trans>
@@ -730,17 +734,85 @@ const BlockSettings: React.FC<{
   );
 };
 
-function paramLabel(key: string, t: Translate): string {
+/** A remote source is offered only where its route exists (the pairs: HAS_NETWORK_API). */
+const remoteAvailable = (source: string | undefined): boolean => !source || hasCapability('HAS_NETWORK_API');
+
+/** Inputs of the block parameters (charts, and the key figures / tables fed by a remote source). */
+const ParamInputs: React.FC<{
+  defs: ChartParamDef[];
+  params: ChartParams | undefined;
+  canEdit: boolean;
+  onChange: (params: ChartParams | undefined) => void;
+}> = ({ defs, params = {}, canEdit, onChange }) => {
+  const { t } = useLingui();
+  const setParam = (key: string, value: number | string | undefined) => {
+    const next = { ...params };
+    if (value === undefined || value === '') delete next[key];
+    else next[key] = value;
+    onChange(Object.keys(next).length ? next : undefined);
+  };
+  return (
+    <>
+      {defs.map((def) => (
+        <label key={def.key} className="flex items-center gap-2">
+          <span className="text-xs font-semibold text-muted dark:text-[#c3beb0] w-28">{paramLabel(def.key)}</span>
+          {def.values ? (
+            <select className={selectCls} value={String(params[def.key] ?? def.default ?? def.values[0])} disabled={!canEdit}
+              onChange={(e) => setParam(def.key, e.target.value)}>
+              {def.values.map((v) => <option key={v} value={v}>{paramValueLabel(def.key, v)}</option>)}
+            </select>
+          ) : def.pattern ? (
+            <input className="input-soft !w-36" maxLength={40} disabled={!canEdit}
+              value={params[def.key] ?? ''} placeholder={paramPlaceholder(def.key)}
+              onChange={(e) => setParam(def.key, e.target.value.trim() || undefined)} />
+          ) : (
+            <input type="number" className="input-soft !w-24" min={def.min} max={def.max} disabled={!canEdit}
+              value={params[def.key] ?? ''} placeholder={def.default != null ? String(def.default) : t`auto`}
+              onChange={(e) => setParam(def.key, e.target.value === '' ? undefined : Number(e.target.value))} />
+          )}
+        </label>
+      ))}
+    </>
+  );
+};
+
+// Plain functions: `msg` descriptors (a `t` passed as an argument is not a macro, its strings would not be extracted).
+function paramLabel(key: string): string {
   switch (key) {
-    case 'thresholdPct': return t`Compliance threshold (%)`;
-    case 'n': return t`Number of items`;
-    case 'minPubs': return t`Min. publications`;
-    case 'level': return t`Level`;
+    case 'thresholdPct': return i18n._(msg`Compliance threshold (%)`);
+    case 'n': return i18n._(msg`Number of items`);
+    case 'minPubs': return i18n._(msg`Min. publications`);
+    case 'level': return i18n._(msg`Level`);
+    // Researcher pairs (PAIRS_PARAMS)
+    case 'relation': return i18n._(msg`Which pairs`);
+    case 'poles': return i18n._(msg`Couple of poles`);
+    case 'scope': return i18n._(msg`Scope`);
+    case 'membership': return i18n._(msg`Lab membership`);
+    case 'minShared': return i18n._(msg`Min. joint publications`);
+    case 'profiles': return i18n._(msg`Profiles`);
+    case 'phd': return i18n._(msg`PhD students`);
+    case 'large': return i18n._(msg`Large collaborations`);
     default: return key;
   }
 }
-function paramValueLabel(value: string, t: Translate): string {
-  if (value === 'subfield') return t`subfield`;
-  if (value === 'topic') return t`topic`;
-  return value;
+function paramPlaceholder(key: string): string {
+  return key === 'poles' ? i18n._(msg`acronyms A|B`) : '';
+}
+function paramValueLabel(key: string, value: string): string {
+  if (value === 'subfield') return i18n._(msg`subfield`);
+  if (value === 'topic') return i18n._(msg`topic`);
+  switch (`${key}:${value}`) {
+    case 'relation:lab': return i18n._(msg`Researchers of different labs`);
+    case 'relation:pole': return i18n._(msg`Researchers of different poles`);
+    case 'scope:all': return i18n._(msg`At least one researcher of the structure`);
+    case 'scope:structure': return i18n._(msg`Both researchers in the structure`);
+    case 'membership:all': return i18n._(msg`Every lab attribution`);
+    case 'membership:associates': return i18n._(msg`Labs of the directory (members and associates)`);
+    case 'membership:members': return i18n._(msg`Labs of the directory (members only)`);
+    case 'profiles:all': return i18n._(msg`All`);
+    case 'profiles:distant': return i18n._(msg`Distant only`);
+    case 'phd:include': case 'large:include': return i18n._(msg`Included`);
+    case 'phd:exclude': case 'large:exclude': return i18n._(msg`Excluded`);
+    default: return value;
+  }
 }

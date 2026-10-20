@@ -1,5 +1,6 @@
 // Off-screen rendering of a PDF report's dataviz: mounts the isolated
-// components of the embed registry (EMBED_CHARTS) in an invisible fixed-width
+// components of the embed registry (EMBED_CHARTS, plus the report-only charts
+// of reportCharts.tsx) in an invisible fixed-width
 // container, forced light theme, waits for the ECharts renders to settle
 // (« finished » event — maps load their GeoJSON asynchronously, force graphs
 // never « finish » → maximum delay per chart), then rasterizes each instance
@@ -15,8 +16,8 @@ import {
   ReportCaptureContext,
   ReportChartHandle,
 } from '../EChartCard';
-import { EMBED_CHARTS } from '../embedRegistry';
 import { DashboardDataset } from '../types';
+import { hasReportChart, ReportChart } from './reportCharts';
 import { YearRange } from '../overviewAggregates';
 import type { ChartParams } from '../chartMeta';
 import type { PubFilters } from '../publicationFilters';
@@ -26,13 +27,16 @@ export interface RenderItem {
   /** Capture key, unique in the batch (report block id, or the chart id in the wizard). */
   key: string;
   chartId: string;
-  dataset: DashboardDataset;
+  /** Null for a chart drawn from a remote payload (`remote`). */
+  dataset: DashboardDataset | null;
   range: YearRange;
   params?: ChartParams;
   /** Filters the dataset was restricted with (charts reading the partner group or the country). */
   filters?: PubFilters;
   /** Whole corpus of the block scope before the filters (pays-* charts, EmbedChartProps.source). */
   source?: DashboardDataset | null;
+  /** Payload of the chart's remote source, already loaded (report-only charts). */
+  remote?: unknown;
 }
 
 export interface CapturedChart {
@@ -92,7 +96,7 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({ items, onDone })
   const onDoneRef = useRef(onDone);
   onDoneRef.current = onDone;
 
-  const validItems = useMemo(() => items.filter((it) => EMBED_CHARTS[it.chartId]), [items]);
+  const validItems = useMemo(() => items.filter((it) => hasReportChart(it.chartId)), [items]);
 
   const capture = useMemo<ReportCapture>(
     () => ({
@@ -136,7 +140,7 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({ items, onDone })
       window.clearInterval(timer);
 
       const captures: CapturedChart[] = [];
-      const missing: string[] = items.filter((it) => !EMBED_CHARTS[it.chartId]).map((it) => it.key);
+      const missing: string[] = items.filter((it) => !hasReportChart(it.chartId)).map((it) => it.key);
       for (const { key: id, chartId } of validItems) {
         const e = entries.get(id);
         if (!e) {
@@ -181,16 +185,21 @@ export const ReportRenderer: React.FC<ReportRendererProps> = ({ items, onDone })
       <ForcedVizThemeContext.Provider value="light">
         <EmbedModeContext.Provider value={true}>
           <ReportCaptureContext.Provider value={capture}>
-            {validItems.map((it) => {
-              const { Chart } = EMBED_CHARTS[it.chartId];
-              return (
-                <div key={it.key} style={{ width: CHART_WIDTH, marginBottom: 16 }}>
-                  <ItemCapture itemKey={it.key} parent={capture}>
-                    <Chart dataset={it.dataset} range={it.range} params={it.params} filters={it.filters} source={it.source} />
-                  </ItemCapture>
-                </div>
-              );
-            })}
+            {validItems.map((it) => (
+              <div key={it.key} style={{ width: CHART_WIDTH, marginBottom: 16 }}>
+                <ItemCapture itemKey={it.key} parent={capture}>
+                  <ReportChart
+                    chartId={it.chartId}
+                    dataset={it.dataset}
+                    range={it.range}
+                    params={it.params}
+                    filters={it.filters}
+                    source={it.source}
+                    remote={it.remote}
+                  />
+                </ItemCapture>
+              </div>
+            ))}
           </ReportCaptureContext.Provider>
         </EmbedModeContext.Provider>
       </ForcedVizThemeContext.Provider>

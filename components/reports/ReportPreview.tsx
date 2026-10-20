@@ -1,16 +1,18 @@
 // In-page preview of a report (docs/plan-mes-rapports.md § 4.3): the resolved blocks rendered
-// with the registry components — the same data, periods and parameters as the PDF.
+// with the registry components — the same data, periods and parameters as the PDF (remote
+// payloads included, reportCharts.tsx).
 
 import React, { useMemo } from 'react';
 import { AlertTriangle, EyeOff, RefreshCw, Sparkles } from 'lucide-react';
 import { AI_TASK_LABELS, aiFrameLabel } from '../dashboard/report/reportAi';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { EMBED_CHARTS } from '../dashboard/embedRegistry';
 import { KpiSetCards } from '../dashboard/KpiCards';
 import { KPI_SETS } from '../dashboard/kpiItems';
 import { parseMarkdownLite, type MdInline } from '../dashboard/report/markdownLite';
 import type { ResolvedBlock, ResolvedReport } from '../dashboard/report/resolveReport';
 import { DEFAULT_TABLE_LIMIT, REPORT_TABLES, tableLabel } from '../dashboard/report/reportTables';
+import { ReportChart } from '../dashboard/report/reportCharts';
+import { hasActiveFilter } from '../dashboard/report/restrictDataset';
 import { FEATURE_LABELS } from './ChartPicker';
 
 const Inline: React.FC<{ runs: MdInline[] }> = ({ runs }) => (
@@ -54,8 +56,10 @@ const TableBlock: React.FC<{ tableId: string; rb: ResolvedBlock; limit?: number 
   const { t } = useLingui();
   const table = REPORT_TABLES[tableId];
   const data = useMemo(
-    () => (table && rb.dataset && rb.scope ? table.build(rb.dataset, rb.scope.range, limit ?? DEFAULT_TABLE_LIMIT) : null),
-    [table, rb.dataset, rb.scope, limit],
+    () => (table && rb.scope && (rb.dataset || rb.remote)
+      ? table.build(rb.dataset, rb.scope.range, limit ?? DEFAULT_TABLE_LIMIT, rb.remote)
+      : null),
+    [table, rb.dataset, rb.scope, rb.remote, limit],
   );
   if (!data) return null;
   const rest = data.rows.length - PREVIEW_ROWS;
@@ -129,18 +133,31 @@ const BlockBody: React.FC<{ rb: ResolvedBlock }> = ({ rb }) => {
     const reasons = rb.missing.map((f) => t(FEATURE_LABELS[f])).join(', ');
     return <Placeholder><Trans>Not available for {slug}: {reasons}.</Trans></Placeholder>;
   }
-  if (!rb.dataset || !rb.scope) return null;
-  if (b.kind === 'table') return <TableBlock tableId={b.tableId} rb={rb} limit={b.limit} />;
+  if (!rb.scope || !(rb.dataset || rb.remote)) return null;
+  // A block fed by a remote source ignores the publication filters of the report: say so.
+  const filtersIgnored = rb.remoteRequest && hasActiveFilter(rb.scope.filters) && (
+    <p className="text-xs text-muted-light dark:text-[#8f897c] px-1">
+      <Trans>The publication filters do not apply to this block.</Trans>
+    </p>
+  );
+  if (b.kind === 'table') return <>{filtersIgnored}<TableBlock tableId={b.tableId} rb={rb} limit={b.limit} /></>;
   if (b.kind === 'kpis') {
     const set = KPI_SETS[b.setId];
     return (
       <div className="flex flex-col gap-2">
         {set && <h4 className="section-label">{t(set.label)}</h4>}
-        <KpiSetCards setId={b.setId} dataset={rb.dataset} range={rb.scope.range} source={rb.source} filters={rb.scope.filters} />
+        {filtersIgnored}
+        <KpiSetCards
+          setId={b.setId}
+          dataset={rb.dataset}
+          range={rb.scope.range}
+          source={rb.source}
+          filters={rb.scope.filters}
+          remote={rb.remote}
+        />
       </div>
     );
   }
-  const entry = EMBED_CHARTS[b.chartId];
   return (
     <div className="flex flex-col gap-1.5">
       {b.title?.trim() && <h4 className="font-disp font-semibold text-[15px] text-ink dark:text-[#f5f2ea] px-1">{b.title}</h4>}
@@ -149,7 +166,16 @@ const BlockBody: React.FC<{ rb: ResolvedBlock }> = ({ rb }) => {
           <AlertTriangle className="w-3.5 h-3.5" /> <Trans>This chart says little under the current filters.</Trans>
         </p>
       )}
-      <entry.Chart dataset={rb.dataset} range={rb.scope.range} params={rb.params} filters={rb.scope.filters} source={rb.source} />
+      {filtersIgnored}
+      <ReportChart
+        chartId={b.chartId}
+        dataset={rb.dataset}
+        range={rb.scope.range}
+        params={rb.params}
+        filters={rb.scope.filters}
+        source={rb.source}
+        remote={rb.remote}
+      />
       {b.note?.trim() && <p className="text-sm text-ink dark:text-[#e8e4d8] px-1 whitespace-pre-line">{b.note}</p>}
     </div>
   );

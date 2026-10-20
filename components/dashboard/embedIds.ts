@@ -54,15 +54,29 @@ export const EMBEDDABLE_IDS = new Set<string>([
 ]);
 
 /**
+ * Charts a report block can show although they are not embeddable: their data come from an
+ * authenticated route (ChartMeta.remote), so a public /embed link could not draw them. They have
+ * no « Partager » button and the PDF prints no interactive link for them.
+ * ⚠️ Keep in sync with the keys of REPORT_ONLY_CHARTS (report/reportCharts.tsx).
+ */
+export const REPORT_ONLY_IDS = new Set<string>([
+  // Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 2b)
+  'collab-pairs-poles', 'collab-pairs-labs',
+]);
+
+/** Chart ids a report `chart` block may name. */
+export const isReportChartId = (id: string): boolean => EMBEDDABLE_IDS.has(id) || REPORT_ONLY_IDS.has(id);
+
+/**
  * Key-figure rows a report `kpis` block can show (kpiItems.ts, KPI_SETS).
  * ⚠️ Keep in sync with the keys of KPI_SETS.
  */
 export const KPI_SET_IDS = new Set<string>([
-  'overview', 'impact', 'partner', 'partner-impact', 'funding', 'journals', 'country', 'country-impact',
+  'overview', 'impact', 'partner', 'partner-impact', 'funding', 'journals', 'country', 'country-impact', 'pairs',
 ]);
 
 /**
  * Tables a report `table` block can show (reportTables.ts, REPORT_TABLES).
  * ⚠️ Keep in sync with the keys of REPORT_TABLES.
  */
-export const TABLE_IDS = new Set<string>(['publications']);
+export const TABLE_IDS = new Set<string>(['publications', 'pairs']);

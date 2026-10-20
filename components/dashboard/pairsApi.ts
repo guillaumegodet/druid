@@ -3,6 +3,7 @@
 
 import { YearRange } from './overviewAggregates';
 import { LARGE_COLLAB_MAX_AUTHORS } from './interLabNetwork';
+import { enumParam, intParam, type ChartParams } from './chartMeta';
 
 /** How a lab of the author is known (network.json v3): directory member, associate, or publications only. */
 export type PairMembership = 'stat' | 'assoc' | 'pubs';
@@ -108,4 +109,36 @@ export async function fetchPairs(slug: string, p: PairsParams, signal?: AbortSig
     throw new Error(`HTTP ${res.status}`);
   }
   return (await res.json()) as PairsResponse;
+}
+
+/**
+ * Options of a report block (PAIRS_PARAMS of chartMeta.ts, already sanitized) → request; a missing
+ * parameter takes the default of the « Researcher pairs » sub-tab.
+ */
+export function pairsParamsOf(range: YearRange, params: ChartParams | undefined): PairsParams {
+  const poles = enumParam<`${string}|${string}`>(params, 'poles');
+  return {
+    range,
+    relation: poles ?? (enumParam(params, 'relation') === 'pole' ? 'pole' : 'lab'),
+    scope: enumParam(params, 'scope') === 'structure' ? 'structure' : 'all',
+    membership: enumParam<PairsParams['membership']>(params, 'membership') ?? 'all',
+    includePhd: enumParam(params, 'phd') !== 'exclude',
+    excludeLarge: enumParam(params, 'large') !== 'include',
+    distantOnly: enumParam(params, 'profiles') === 'distant',
+    minShared: intParam(params, 'minShared') ?? 2,
+  };
+}
+
+/** Inverse of pairsParamsOf: the options of the sub-tab as block parameters (« Add to a report »). */
+export function pairsChartParams(p: PairsParams): ChartParams {
+  const out: ChartParams = {};
+  if (p.relation === 'pole') out.relation = 'pole';
+  else if (p.relation !== 'lab') out.poles = p.relation;
+  if (p.scope !== 'all') out.scope = p.scope;
+  if (p.membership !== 'all') out.membership = p.membership;
+  if (p.minShared !== 2) out.minShared = p.minShared;
+  if (p.distantOnly) out.profiles = 'distant';
+  if (!p.includePhd) out.phd = 'exclude';
+  if (!p.excludeLarge) out.large = 'include';
+  return out;
 }
