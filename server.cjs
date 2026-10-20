@@ -1020,10 +1020,20 @@ app.get('/api/network/:slug', (req, res) => {
   });
 });
 
+// The university-wide network for a composite that has its own file (pole-st): the researcher pairs and their
+// publications (`source=university`) use its author ids. The composite's labs become the structure's labs.
+const universityNetwork = (r) => {
+  if (r.source === NETWORK_SOURCE_SLUG) return { net: r.net, source: r.source, structureLabs: r.focus ? [r.focus] : null };
+  const university = loadNetwork(NETWORK_SOURCE_SLUG);
+  if (!university) return { net: r.net, source: r.source, structureLabs: null };
+  return { net: university, source: NETWORK_SOURCE_SLUG, structureLabs: r.net.labs.map((l) => l.acronym) };
+};
+
 app.get('/api/network/:slug/publications', (req, res) => {
   const r = resolveNetworkRequest(req, res);
   if (!r) return;
-  const { net, visibleLabs, intOr } = r;
+  const { visibleLabs, intOr } = r;
+  const { net } = req.query.source === 'university' ? universityNetwork(r) : r;
   const nodeRe = /^(a:\d+|lab:[\w&.' -]+)$/;
   const { a, b } = req.query;
   if (!nodeRe.test(String(a || '')) || !nodeRe.test(String(b || ''))) {
@@ -1039,6 +1049,54 @@ app.get('/api/network/:slug/publications', (req, res) => {
   });
   res.set('Cache-Control', 'private, max-age=300');
   res.json({ publications: publications.slice(0, 200), total: publications.length });
+});
+
+// Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1): the pairs always come from the
+// university-wide file (universityNetwork), so that a pole sees its pairs with every lab of the university (D2);
+// the structure's labs only scope them. Rights: those of the network (D1).
+const PAIRS_MEMBERSHIP = new Set(['all', 'associates', 'members']);
+const pairsCache = new Map(); // request key -> result (the network file's mtime is part of the key)
+app.get('/api/network/:slug/pairs', (req, res) => {
+  const r = resolveNetworkRequest(req, res);
+  if (!r) return;
+  const { visibleLabs, intOr } = r;
+  const { net, source, structureLabs } = universityNetwork(r);
+  const poles = String(req.query.poles || '').split(',').filter(Boolean);
+  const minDistance = Number(req.query.minDistance);
+  const opts = {
+    structureLabs,
+    scope: req.query.scope === 'structure' ? 'structure' : 'all',
+    from: intOr(req.query.from, undefined),
+    to: intOr(req.query.to, undefined),
+    minShared: intOr(req.query.minShared, 2),
+    maxAuthors: intOr(req.query.maxAuthors, null),
+    crossLab: req.query.crossLab !== '0',
+    crossPole: req.query.crossPole === '1',
+    poles: poles.length === 2 ? poles : null,
+    minDistance: Number.isFinite(minDistance) && req.query.minDistance !== '' ? minDistance : null,
+    includePhd: req.query.phd !== '0',
+    membership: PAIRS_MEMBERSHIP.has(req.query.membership) ? req.query.membership : 'all',
+    visibleLabs,
+    limit: Math.min(intOr(req.query.limit, 500), 2000),
+  };
+  const key = JSON.stringify([source, networkCache.get(source)?.mtimeMs, opts]);
+  let result = pairsCache.get(key);
+  if (!result) {
+    result = coNetwork.rankPairs(net, opts);
+    if (pairsCache.size >= 50) pairsCache.delete(pairsCache.keys().next().value);
+    pairsCache.set(key, result);
+  }
+  res.set('Cache-Control', 'private, max-age=300');
+  res.json({
+    source,
+    generatedAt: net.generatedAt,
+    version: net.version ?? 1,
+    structureLabs,
+    poles: net.poles ?? [],
+    coverage: net.coverage,
+    restricted: !!visibleLabs,
+    ...result,
+  });
 });
 
 // ── « Tableau de bord » section: monitoring of new publications ────────────

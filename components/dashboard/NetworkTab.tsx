@@ -317,23 +317,24 @@ const InterLabToolbar: React.FC<{
   );
 };
 
-/** List of the co-publications behind a clicked link of the graph. */
-const CommonPublicationsPanel: React.FC<{
+/** List of the co-publications behind a clicked link of the graph (or a researcher pair, `university`). */
+export const CommonPublicationsPanel: React.FC<{
   slug: string;
   link: { a: string; b: string };
   names: Map<string, string>;
   range: YearRange;
   excludeLarge: boolean;
   onClose: () => void;
-}> = ({ slug, link, names, range, excludeLarge, onClose }) => {
+  university?: boolean;
+}> = ({ slug, link, names, range, excludeLarge, onClose, university = false }) => {
   const { t } = useLingui();
   const [state, setState] = useState<{ pubs: CommonPublication[]; total: number } | 'error' | null>(null);
   const load = useCallback((signal: AbortSignal) => {
     setState(null);
-    fetchCommonPublications(slug, link.a, link.b, range, excludeLarge, signal)
+    fetchCommonPublications(slug, link.a, link.b, range, excludeLarge, signal, university)
       .then((r) => setState({ pubs: r.publications, total: r.total }))
       .catch(() => { if (!signal.aborted) setState('error'); });
-  }, [slug, link, range, excludeLarge]);
+  }, [slug, link, range, excludeLarge, university]);
   useEffect(() => {
     const ctrl = new AbortController();
     load(ctrl.signal);

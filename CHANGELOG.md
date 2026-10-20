@@ -12,6 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Tableau de bord › Partenariats › Binômes** : les paires de chercheurs qui cosignent déjà, sur tout le réseau de
+  l'université (un pôle voit ses binômes avec tous les labos). Filtres : labos différents, pôles différents ou
+  couple de pôles, profils disciplinaires éloignés (distance entre les profils de disciplines OpenAlex, hors
+  publications communes), appartenance d'après l'annuaire (membres, associés, labo déduit des seules publications),
+  doctorants, grandes collaborations, minimum de publications communes. Pour chaque binôme : publications communes
+  sur la période, part dans la production de chacun, tendance (nouveau, en hausse, stable, en sommeil), distance,
+  sous-disciplines dominantes ; clic ⇒ publications communes. Lien depuis les sous-onglets « Au sein de la
+  structure » et « Nantes Université ». Route `GET /api/network/:slug/pairs` ; absent sans `HAS_NETWORK_API`
+  (Cloudflare). La distance et les appartenances demandent un `network.json` v3 (druid-biblio).
+
 ## [2.11.1] — 2026-10-20
 
 ### Modifié

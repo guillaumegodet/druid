@@ -79,7 +79,10 @@ export interface CommonPublication {
   authorCount: number | null;
 }
 
-/** Publications behind a link (`a` / `b` = node ids of the graph). */
+/**
+ * Publications behind a link (`a` / `b` = node ids of the graph). `university`: the ids come from the
+ * university-wide file (researcher pairs), even on a composite that has its own (pole-st).
+ */
 export async function fetchCommonPublications(
   slug: string,
   a: string,
@@ -87,6 +90,7 @@ export async function fetchCommonPublications(
   range: YearRange,
   excludeLarge: boolean,
   signal?: AbortSignal,
+  university = false,
 ): Promise<{ publications: CommonPublication[]; total: number }> {
   const qs = query({
     a,
@@ -94,6 +98,7 @@ export async function fetchCommonPublications(
     from: range.start,
     to: range.end,
     maxAuthors: excludeLarge ? LARGE_COLLAB_MAX_AUTHORS : undefined,
+    source: university ? 'university' : undefined,
   });
   const res = await fetch(`/api/network/${encodeURIComponent(slug)}/publications?${qs}`, { signal });
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
