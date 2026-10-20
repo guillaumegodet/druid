@@ -12,6 +12,14 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Fiche chercheur › Binômes de recherche** : en bas de la fiche d'un chercheur du réseau de l'université, ses
+  coauteurs les plus fréquents en cartes (photo de la fiche, labo, publications communes, tendance, sujets principaux
+  des publications communes ; filtres autres labos / autres pôles) et ses rapprochements suggérés des cinq dernières
+  années en pile de cartes à juger une à une (glisser à droite = pertinent, à gauche = non pertinent, ou boutons
+  pertinent / déjà en contact / non pertinent / annuler), avec les mêmes avis que le sous-onglet Binômes. Route
+  `GET /api/researchers/:key/pairs` (droit sur un labo du chercheur, ou le chercheur lui-même).
+
 ### Modifié
 - **Partenariats › Binômes › Rapprochements suggérés** : la proximité thématique compare les sujets (*topics*)
   OpenAlex des chercheurs au lieu de leurs sous-disciplines quand le réseau les contient (`network.json` version 4 de
