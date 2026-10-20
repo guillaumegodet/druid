@@ -4,7 +4,7 @@
 // people, and its own parameters. Kept apart from embedRegistry.tsx (which
 // pulls ECharts and every chart component) so that plain modules — URL
 // decoding, report validation, tests — can read it.
-// ⚠️ Keep the keys in sync with EMBEDDABLE_IDS (embedIds.ts) — checked by
+// ⚠️ Keep the keys in sync with EMBEDDABLE_IDS + REPORT_ONLY_IDS (embedIds.ts) — checked by
 // lib/__tests__/reportScope.test.ts.
 
 import { hasSubStructures, unitsOfDataset } from './collabAggregates';
@@ -45,9 +45,17 @@ export type DatasetFeature =
   | 'regions';
 
 /**
- * Parameter of a chart: an integer between `min` and `max`, or one of `values`.
- * A missing value means the chart's usual default. (Flat shape rather than a
- * tagged union: the non-strict tsconfig narrows it poorly.)
+ * Source of the data of a report block that are not computed from the dataset but fetched from an
+ * authenticated route of the instance (report/remoteSources.ts): the report loads them before
+ * resolving the block, like the datasets.
+ * - `pairs`: researcher pairs of the university network (/api/network/:slug/pairs, HAS_NETWORK_API).
+ */
+export type RemoteSource = 'pairs';
+
+/**
+ * Parameter of a chart: an integer between `min` and `max`, one of `values`, or a
+ * string matching `pattern`. A missing value means the chart's usual default. (Flat
+ * shape rather than a tagged union: the non-strict tsconfig narrows it poorly.)
  */
 export interface ChartParamDef {
   key: string;
@@ -55,6 +63,8 @@ export interface ChartParamDef {
   max?: number;
   /** Allowed values of an enumerated parameter (min/max ignored). */
   values?: string[];
+  /** Free string parameter: regular expression the value must match (min/max ignored). */
+  pattern?: string;
   /** Omitted when the chart computes its default from the data (e.g. network threshold). */
   default?: number | string;
 }
@@ -76,6 +86,8 @@ export interface ChartMeta {
   /** Coverage diagnosis: only offered by the « structure report » template. */
   technical?: boolean;
   params?: ChartParamDef[];
+  /** Data fetched from an authenticated route rather than computed from the dataset (report only). */
+  remote?: RemoteSource;
 }
 
 const FOREIGN_SUBSET: (keyof PubFilters)[] = [
@@ -90,6 +102,33 @@ const country = (extra: Partial<ChartMeta> = {}): ChartMeta => ({
 });
 const charte = (extra: Partial<ChartMeta> = {}): ChartMeta => ({
   tab: 'charte', requires: ['charte'], params: CHARTE_PARAMS, ...extra,
+});
+
+/**
+ * Options of the researcher pairs (pairsApi.ts, pairsParamsOf), shared by their charts, key figures
+ * and table: which pairs (different labs or poles, or one couple of poles `A|B`), scope, lab
+ * membership, minimum joint publications, distant profiles only, PhD students, large collaborations.
+ */
+export const PAIRS_PARAMS: ChartParamDef[] = [
+  { key: 'relation', values: ['lab', 'pole'], default: 'lab' },
+  { key: 'poles', pattern: '^[^|,]{1,18}\\|[^|,]{1,18}$' },
+  { key: 'scope', values: ['all', 'structure'], default: 'all' },
+  { key: 'membership', values: ['all', 'associates', 'members'], default: 'all' },
+  { key: 'minShared', min: 1, max: 10, default: 2 },
+  { key: 'profiles', values: ['all', 'distant'], default: 'all' },
+  { key: 'phd', values: ['include', 'exclude'], default: 'include' },
+  { key: 'large', values: ['exclude', 'include'], default: 'exclude' },
+];
+
+/** Parameters of the key figures and tables fed by a remote source. */
+export const REMOTE_PARAMS: Record<RemoteSource, ChartParamDef[]> = { pairs: PAIRS_PARAMS };
+
+/** Remote source of the report key-figure sets and tables that have one (other ids: none). */
+export const REMOTE_KPI_SETS: Record<string, RemoteSource> = { pairs: 'pairs' };
+export const REMOTE_TABLES: Record<string, RemoteSource> = { pairs: 'pairs' };
+
+const pairs = (extra: Partial<ChartMeta> = {}): ChartMeta => ({
+  tab: 'collaborations', remote: 'pairs', params: PAIRS_PARAMS, ...extra,
 });
 
 export const CHART_META: Record<string, ChartMeta> = {
@@ -153,6 +192,9 @@ export const CHART_META: Record<string, ChartMeta> = {
   'pays-bilateral': country(),
   'pays-pays-tiers': country(),
   'pays-langues': country({ trivialUnder: ['language'] }),
+  // Researcher pairs (report only, REPORT_ONLY_IDS): counts of pairs per couple of poles / of labs.
+  'collab-pairs-poles': pairs(),
+  'collab-pairs-labs': pairs(),
   'collab-national-top': { tab: 'collaborations' },
   'collab-national-evolution': { tab: 'collaborations' },
   'carte-france': { tab: 'collaborations' },
@@ -267,12 +309,19 @@ export function sanitizeChartParams(
   chartId: string,
   raw: Record<string, unknown> | null | undefined,
 ): ChartParams {
+  return sanitizeParams(CHART_META[chartId]?.params ?? [], raw);
+}
+
+/** Same as sanitizeChartParams, for an explicit list of definitions. */
+export function sanitizeParams(defs: ChartParamDef[], raw: Record<string, unknown> | null | undefined): ChartParams {
   const out: ChartParams = {};
   if (!raw) return out;
-  for (const def of CHART_META[chartId]?.params ?? []) {
+  for (const def of defs) {
     const v = raw[def.key];
     if (def.values) {
       if (typeof v === 'string' && def.values.includes(v)) out[def.key] = v;
+    } else if (def.pattern) {
+      if (typeof v === 'string' && v.length <= 40 && new RegExp(def.pattern, 'u').test(v)) out[def.key] = v;
     } else if (typeof v === 'number' && Number.isFinite(v)) {
       out[def.key] = Math.min(def.max ?? Infinity, Math.max(def.min ?? -Infinity, Math.round(v)));
     }

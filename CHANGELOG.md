@@ -13,11 +13,22 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Mes rapports › binômes de chercheurs** : les cartes de chaleur des binômes (par couple de pôles, par couple de
+  labos) s'ajoutent à un rapport depuis le sous-onglet (bouton « Ajouter à un rapport », avec ses filtres) ou depuis
+  l'éditeur ; nouveaux blocs « Chiffres clés — binômes de chercheurs » et tableau « Binômes de chercheurs ». Ces blocs
+  lisent la route authentifiée `/api/network/:slug/pairs` : le rapport charge leurs données comme celles des
+  structures (une requête par jeu d'options), puis l'aperçu et le PDF s'en servent. Ils n'ont pas de lien public
+  (ni bouton « Partager », ni lien « version interactive » dans le PDF), ignorent les filtres de publications du
+  rapport et ne sont pas proposés sans `HAS_NETWORK_API`.
 - **Partenariats › Binômes** : chiffres clés (binômes actifs, nouveaux, en sommeil, entre pôles, à profils éloignés,
   part des chercheurs de la structure engagés dans un binôme et dans un binôme entre pôles), cartes de chaleur des
   binômes par couple de pôles et par couple de labos (une case compte des binômes, pas des publications ; clic ⇒ le
   tableau ne liste que ce couple de labos), export CSV du tableau et page d'aide « Repérer les binômes de
   chercheurs ».
+
+### Corrigé
+- **Mes rapports** : les libellés des réglages des blocs (seuil de conformité, nombre d'éléments, publications min.)
+  et « Section sans titre » / « Texte vide » restaient en anglais dans l'interface française.
 
 ### Ajouté
 - **Tableau de bord › Partenariats › Binômes** : les paires de chercheurs qui cosignent déjà, sur tout le réseau de

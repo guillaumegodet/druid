@@ -33,7 +33,7 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { Download, Maximize2, ChevronDown, Minimize2, Share2, Copy, Check, ExternalLink, X, Info, FilePlus2 } from 'lucide-react';
 import { chartDoc } from './report/chartDocs';
 import { VIZ_DARK, VIZ_LIGHT, VizTheme } from './palette';
-import { EMBEDDABLE_IDS } from './embedIds';
+import { EMBEDDABLE_IDS, REPORT_ONLY_IDS } from './embedIds';
 import { downloadBlob, renderChartSvg, svgToPdf, toStaticOption } from './chartFileExport';
 import { chartTables, toCsv, type DataTable } from '../../lib/chartExport';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -402,6 +402,8 @@ export const EChartCard: React.FC<EChartCardProps> = ({
   // Button visible only for dataviz that can really be embedded: an
   // exportName missing from the registry would produce a « not found » /embed link.
   const canShare = shareable && !embedMode && shareScope != null && EMBEDDABLE_IDS.has(exportName);
+  // Report-only charts (data from an authenticated route) can join a report but not be shared.
+  const canAddToReport = canShare || (!embedMode && shareScope != null && REPORT_ONLY_IDS.has(exportName));
   const addToReport = useContext(AddToReportContext);
   const chartState = useContext(ChartStateContext);
 
@@ -552,7 +554,7 @@ export const EChartCard: React.FC<EChartCardProps> = ({
               <Info className="w-4 h-4" />
             </button>
           )}
-          {canShare && addToReport && (
+          {canAddToReport && addToReport && (
             <button
               type="button"
               onClick={() => addToReport(exportName, title, chartState)}

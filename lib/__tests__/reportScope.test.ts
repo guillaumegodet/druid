@@ -11,7 +11,7 @@ import {
   sanitizeChartParams,
   trivialFiltersOf,
 } from '../../components/dashboard/chartMeta';
-import { EMBEDDABLE_IDS, KPI_SET_IDS } from '../../components/dashboard/embedIds';
+import { EMBEDDABLE_IDS, KPI_SET_IDS, REPORT_ONLY_IDS } from '../../components/dashboard/embedIds';
 import { KPI_SETS } from '../../components/dashboard/kpiItems';
 import { aggregateDomains } from '../../components/dashboard/phase4Aggregates';
 import {
@@ -62,8 +62,13 @@ const DS = dataset([
 const titles = (d: DashboardDataset) => d.publications.map((p) => p.title);
 
 describe('chart metadata (CHART_META)', () => {
-  it('covers exactly the embeddable charts', () => {
-    expect(new Set(Object.keys(CHART_META))).toEqual(EMBEDDABLE_IDS);
+  it('covers exactly the embeddable and report-only charts', () => {
+    expect(new Set(Object.keys(CHART_META))).toEqual(new Set([...EMBEDDABLE_IDS, ...REPORT_ONLY_IDS]));
+    for (const id of REPORT_ONLY_IDS) {
+      expect(EMBEDDABLE_IDS.has(id), id).toBe(false);
+      // Their data come from an authenticated route: never computed from the dataset.
+      expect(CHART_META[id].remote, id).toBeDefined();
+    }
   });
 
   it('places every chart of the PDF catalog in its section tab', () => {
@@ -78,6 +83,10 @@ describe('chart metadata (CHART_META)', () => {
         if (p.values) {
           expect(p.values.length, id).toBeGreaterThan(0);
           if (p.default != null) expect(p.values, id).toContain(p.default);
+          continue;
+        }
+        if (p.pattern) {
+          expect(() => new RegExp(p.pattern!, 'u'), id).not.toThrow();
           continue;
         }
         expect(typeof p.min === 'number' && typeof p.max === 'number', id).toBe(true);

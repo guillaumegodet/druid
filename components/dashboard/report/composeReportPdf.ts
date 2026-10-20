@@ -87,15 +87,19 @@ export async function composeReportPdf(
     else if (b.kind === 'text') pdf.markdown(b.markdown);
     // AI blocks never generated are left out of the PDF.
     else if (b.kind === 'ai') { if (b.text?.trim()) pdf.aiBlock(aiFrameLabel(b), b.text); }
-    else if (b.kind === 'kpis' && rb.dataset && rb.scope) {
+    // Key figures and tables: from the restricted dataset, or from the remote payload (rb.remote).
+    else if (b.kind === 'kpis' && rb.status === 'ok' && rb.scope && (rb.dataset || rb.remote)) {
       const set = KPI_SETS[b.setId];
       if (set) {
-        pdf.kpiGrid(i18n._(set.label), set.items(rb.dataset, rb.scope.range, { source: rb.source, filters: rb.scope.filters }));
+        pdf.kpiGrid(
+          i18n._(set.label),
+          set.items(rb.dataset!, rb.scope.range, { source: rb.source, filters: rb.scope.filters, remote: rb.remote }),
+        );
       }
-    } else if (b.kind === 'table' && rb.dataset && rb.scope) {
+    } else if (b.kind === 'table' && rb.status === 'ok' && rb.scope && (rb.dataset || rb.remote)) {
       const table = REPORT_TABLES[b.tableId];
       if (!table) continue;
-      const tr = table.build(rb.dataset, rb.scope.range, b.limit ?? DEFAULT_TABLE_LIMIT);
+      const tr = table.build(rb.dataset, rb.scope.range, b.limit ?? DEFAULT_TABLE_LIMIT, rb.remote);
       pdf.simpleTable(
         tableLabel(b.tableId),
         tr.columns.map((c) => i18n._(c.label)),

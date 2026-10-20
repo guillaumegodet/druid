@@ -449,6 +449,22 @@ export const CHART_DOCS: Record<string, ChartDocSource> = {
   },
 
   // ── Network ────────────────────────────────────────────────────────────────
+  'collab-pairs-poles': {
+    description:
+      msg`Researcher pairs per couple of poles of the university: each cell counts the pairs of researchers who co-signed at least the chosen number of publications over the period, one in each pole (diagonal: researchers of different labs within one pole).`,
+    methode:
+      msg`University-wide co-authorship network (druid-biblio network.json): two internal authors form a pair when they co-sign enough publications; labs come from the directory or, failing that, from the publications; poles from the university configuration. A cell counts pairs, not publications; new and dormant pairs compare the last three years with the three before.`,
+    limites:
+      msg`Lower bounds: only the signatures linked to a lab of the university count. A pair says nothing about the importance of the collaboration nor about the performance of the researchers; the publication filters of the report do not apply.`,
+  },
+  'collab-pairs-labs': {
+    description:
+      msg`Researcher pairs per couple of labs: each cell counts the pairs of researchers of two labs who co-signed at least the chosen number of publications over the period. The 20 most involved labs are shown.`,
+    methode:
+      msg`University-wide co-authorship network (druid-biblio network.json): two internal authors of different labs form a pair when they co-sign enough publications; labs come from the directory or, failing that, from the publications. A cell counts pairs, not publications.`,
+    limites:
+      msg`Lower bounds: only the signatures linked to a lab of the university count. A researcher with several labs counts in each; the publication filters of the report do not apply.`,
+  },
   'reseau-cosignatures': {
     description:
       msg`Internal co-signature network: each node is an author of the structure, each link a volume of co-signed publications.`,

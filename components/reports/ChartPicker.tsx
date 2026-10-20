@@ -1,15 +1,16 @@
-// Chart catalog of the report editor: every chart of the registry, grouped by dashboard tab
-// (REPORT_SECTIONS order), searchable; charts the structure cannot show (no teams, not
-// composite…) are listed greyed out with the reason.
+// Chart catalog of the report editor: every chart of the registry (and the report-only charts
+// whose route the instance has), grouped by dashboard tab (REPORT_SECTIONS order), searchable;
+// charts the structure cannot show (no teams, not composite…) are listed greyed out with the reason.
 
 import React, { useEffect, useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
+import { hasCapability } from '../../lib/auth';
 import { CHART_META, missingFeatures, type DatasetFeature } from '../dashboard/chartMeta';
-import { EMBED_CHARTS } from '../dashboard/embedRegistry';
 import { REPORT_SECTIONS } from '../dashboard/report/reportCatalog';
+import { hasReportChart, reportChartLabel } from '../dashboard/report/reportCharts';
 
 export const FEATURE_LABELS: Record<DatasetFeature, MessageDescriptor> = {
   composite: msg`needs a structure with member labs`,
@@ -40,11 +41,13 @@ export const ChartPicker: React.FC<{
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();
+    // The researcher pairs come from the university network route (HAS_NETWORK_API).
+    const remoteOk = hasCapability('HAS_NETWORK_API');
     return REPORT_SECTIONS.map((s) => ({
       title: t(s.title),
       charts: Object.keys(CHART_META)
-        .filter((id) => CHART_META[id].tab === s.tab && EMBED_CHARTS[id])
-        .map((id) => ({ id, label: t(EMBED_CHARTS[id].label), missing: features ? missingFeatures(id, features) : [] }))
+        .filter((id) => CHART_META[id].tab === s.tab && hasReportChart(id) && (remoteOk || !CHART_META[id].remote))
+        .map((id) => ({ id, label: t(reportChartLabel(id)!), missing: features ? missingFeatures(id, features) : [] }))
         .filter((c) => !q || c.label.toLowerCase().includes(q) || c.id.includes(q)),
     })).filter((g) => g.charts.length > 0);
   }, [query, features, t]);
