@@ -14,6 +14,7 @@ import { InternationalTab } from './InternationalTab';
 import { PartnerBilanSection } from './PartnerBilanSection';
 import { CountrySection } from './CountrySection';
 import { PairsSection } from './PairsSection';
+import { PairSuggestionsSection } from './PairSuggestionsSection';
 import { hasCapability } from '../../lib/auth';
 import { PubFilters } from './publicationFilters';
 import { TeamDonutChart, RankBarChart } from './charts/TeamCharts';
@@ -286,6 +287,8 @@ export const CollaborationsTab: React.FC<{
     if ((sub === 'structure' && !composite) || (sub === 'pairs' && !canPairs)) setSub('typology');
   }, [sub, composite, canPairs]);
   const openPairs = canPairs ? () => setSub('pairs') : undefined;
+  // « Researcher pairs »: the pairs that co-sign, or the suggested connections (lot 3).
+  const [pairsView, setPairsView] = useState<'observed' | 'suggested'>('observed');
   useEffect(() => () => writeSubTab(null), []);
 
   const typology = useMemo(
@@ -398,7 +401,27 @@ export const CollaborationsTab: React.FC<{
         </p>
       )}
 
-      {sub === 'pairs' && canPairs && slug && <PairsSection slug={slug} range={range} />}
+      {sub === 'pairs' && canPairs && slug && (
+        <>
+          <div className="flex flex-wrap gap-1.5" role="tablist" aria-label={tr`Researcher pairs`}>
+            {([['observed', tr`Observed pairs`], ['suggested', tr`Suggested connections`]] as const).map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                role="tab"
+                aria-selected={pairsView === key}
+                onClick={() => setPairsView(key)}
+                className={`pill px-3 py-1 text-xs cursor-pointer ${pairsView === key ? 'bg-accent/30 text-ink dark:text-[#f5f2ea] font-semibold' : 'text-muted dark:text-[#c3beb0] hover:bg-accent/15'}`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          {pairsView === 'observed'
+            ? <PairsSection slug={slug} range={range} />
+            : <PairSuggestionsSection slug={slug} range={range} />}
+        </>
+      )}
 
       {sub === 'national' && national && (
         <>

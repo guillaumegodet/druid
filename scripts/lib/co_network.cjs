@@ -219,6 +219,48 @@ const cosineDistance = (x, y) => {
 };
 
 /**
+ * Authors that can belong to a pair (with the labs kept by the membership filter, their poles, whether they
+ * are in the structure and visible to the viewer) and the rule deciding whether two of them form an allowed
+ * pair. Shared by rankPairs and suggestPairs (options documented with rankPairs).
+ */
+function pairUniverse(net, opts, { includePhd }) {
+  const crossLab = opts.crossLab !== false;
+  const kinds = MEMBERSHIP_KINDS[opts.membership] ?? null;
+  const structure = opts.structureLabs ? new Set(opts.structureLabs) : null;
+  const visible = opts.visibleLabs ? new Set(opts.visibleLabs) : null;
+  const [poleA, poleB] = opts.poles ?? [];
+  const [labA, labB] = opts.labPair ?? [];
+  const poleOf = new Map(net.labs.map((l) => [l.acronym, l.pole ?? null]));
+
+  const eligible = new Map();
+  for (const a of net.authors) {
+    if (!includePhd && a.phd) continue;
+    const labs = kinds && a.m ? a.labs.filter((l) => kinds.has(a.m[l])) : a.labs;
+    if (labs.length === 0) continue;
+    const poles = [...new Set(labs.map((l) => poleOf.get(l)).filter(Boolean))];
+    eligible.set(a.id, {
+      a,
+      labs,
+      poles,
+      inStructure: !structure || labs.some((l) => structure.has(l)),
+      visible: !visible || a.labs.some((l) => visible.has(l)),
+    });
+  }
+
+  const pairAllowed = (x, y) => {
+    if (opts.scope === 'structure' ? !(x.inStructure && y.inStructure) : !(x.inStructure || y.inStructure)) return false;
+    if (!x.visible && !y.visible) return false;
+    if (crossLab && x.labs.some((l) => y.labs.includes(l))) return false;
+    if (opts.crossPole && (!x.poles.length || !y.poles.length || x.poles.some((p) => y.poles.includes(p)))) return false;
+    const either = (key, A, B) => (x[key].includes(A) && y[key].includes(B)) || (x[key].includes(B) && y[key].includes(A));
+    if (poleA && poleB && !either('poles', poleA, poleB)) return false;
+    if (labA && labB && !either('labs', labA, labB)) return false;
+    return true;
+  };
+  return { eligible, pairAllowed };
+}
+
+/**
  * @param net network.json content
  * @param opts {
  *   structureLabs: string[]|null — labs of the current structure (null = the whole university);
@@ -246,47 +288,13 @@ function rankPairs(net, opts = {}) {
   const to = opts.to ?? Infinity;
   const minShared = Math.max(1, opts.minShared ?? 2);
   const maxAuthors = opts.maxAuthors ?? null;
-  const crossLab = opts.crossLab !== false;
-  const includePhd = opts.includePhd !== false;
-  const kinds = MEMBERSHIP_KINDS[opts.membership] ?? null;
-  const structure = opts.structureLabs ? new Set(opts.structureLabs) : null;
-  const visible = opts.visibleLabs ? new Set(opts.visibleLabs) : null;
-  const [poleA, poleB] = opts.poles ?? [];
-  const [labA, labB] = opts.labPair ?? [];
   const minDistance = opts.minDistance ?? null;
   const limit = opts.limit ?? 500;
 
-  const poleOf = new Map(net.labs.map((l) => [l.acronym, l.pole ?? null]));
+  const { eligible, pairAllowed } = pairUniverse(net, opts, { includePhd: opts.includePhd !== false });
   // Reference year of the trends: end of the period, or the last year of the corpus.
   const lastYear = net.pubs.reduce((m, p) => Math.max(m, p.y), -Infinity);
   const refYear = Number.isFinite(to) ? Math.min(to, lastYear) : lastYear;
-
-  // Authors that can belong to a pair, with the labs kept by the membership filter.
-  const eligible = new Map();
-  for (const a of net.authors) {
-    if (!includePhd && a.phd) continue;
-    const labs = kinds && a.m ? a.labs.filter((l) => kinds.has(a.m[l])) : a.labs;
-    if (labs.length === 0) continue;
-    const poles = [...new Set(labs.map((l) => poleOf.get(l)).filter(Boolean))];
-    eligible.set(a.id, {
-      a,
-      labs,
-      poles,
-      inStructure: !structure || labs.some((l) => structure.has(l)),
-      visible: !visible || a.labs.some((l) => visible.has(l)),
-    });
-  }
-
-  const pairAllowed = (x, y) => {
-    if (opts.scope === 'structure' ? !(x.inStructure && y.inStructure) : !(x.inStructure || y.inStructure)) return false;
-    if (!x.visible && !y.visible) return false;
-    if (crossLab && x.labs.some((l) => y.labs.includes(l))) return false;
-    if (opts.crossPole && (!x.poles.length || !y.poles.length || x.poles.some((p) => y.poles.includes(p)))) return false;
-    const either = (key, A, B) => (x[key].includes(A) && y[key].includes(B)) || (x[key].includes(B) && y[key].includes(A));
-    if (poleA && poleB && !either('poles', poleA, poleB)) return false;
-    if (labA && labB && !either('labs', labA, labB)) return false;
-    return true;
-  };
 
   // Joint publications of every allowed pair, all years (first / last year, trend), large ones excluded.
   const pairs = new Map(); // "lo|hi" -> publication indexes, or null when the pair is not allowed
@@ -442,4 +450,228 @@ function rankPairs(net, opts = {}) {
   };
 }
 
-module.exports = { buildInterLabNetwork, commonPublications, rankPairs, OTHER_LABS_CATEGORY, DISTANT_PROFILES };
+// ─── Suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 3) ───
+// Pairs of researchers of different labs who never co-signed, scored by explainable signals computed on the
+// period: common co-authors (triadic closure, Adamic-Adar) and closeness of their OpenAlex subfields.
+
+/** Co-authors with more neighbours than this generate no candidate (Adamic-Adar weighs them little anyway). */
+const HUB_DEGREE = 300;
+/** Thematic candidates kept per researcher (most similar first). */
+const TOPIC_CANDIDATES = 30;
+/**
+ * Publications with subfields under which a thematic profile is not trusted: the similarity is multiplied by
+ * m / (m + TOPIC_PRIOR), m = the smaller profile (two researchers with one identical publication are not « 100 % close »).
+ */
+const TOPIC_PRIOR = 5;
+/** Default weights of the combined score (set from the retrospective test). */
+const SUGGESTION_WEIGHTS = { triadic: 2, topics: 1 };
+
+/**
+ * @param net network.json content
+ * @param opts {
+ *   structureLabs, scope, crossPole, poles, membership, visibleLabs — as rankPairs (crossLab is always true);
+ *   from, to: number          — period of the signals (co-authorships, subfields); pairs with a joint publication
+ *                               up to `to` are never suggested;
+ *   maxAuthors: number|null   — ignore publications with more authors (large collaborations);
+ *   includePhd: boolean       — suggest PhD students (default false; they still count as common co-authors);
+ *   minPubs: number           — publications of each researcher over the period (default 2);
+ *   recentYears: number       — each researcher published in the last N years of the period (default 3);
+ *   signal: 'combined' | 'triadic' | 'topics' — ranking (default combined);
+ *   weights: {triadic, topics} — weights of the combined score;
+ *   minSimilarity: number     — thematic similarity below which the signal counts as 0 (default 0.2);
+ *   quota: number|null        — suggestions per researcher at most (default 5, null = none);
+ *   limit: number             — suggestions returned (default 200).
+ * }
+ * @returns {suggestions, total} — each suggestion: the two researchers, score, common co-authors (count, the
+ *   most specific ones named) and thematic similarity (with the shared subfields named).
+ */
+function suggestPairs(net, opts = {}) {
+  const from = opts.from ?? -Infinity;
+  const to = opts.to ?? Infinity;
+  const maxAuthors = opts.maxAuthors ?? null;
+  const minPubs = opts.minPubs ?? 2;
+  const recentYears = opts.recentYears ?? 3;
+  const signal = opts.signal ?? 'combined';
+  const weights = { ...SUGGESTION_WEIGHTS, ...(opts.weights ?? {}) };
+  const minSimilarity = opts.minSimilarity ?? 0.2;
+  const topicPrior = opts.topicPrior ?? TOPIC_PRIOR;
+  const quota = opts.quota === undefined ? 5 : opts.quota;
+  const limit = opts.limit ?? 200;
+
+  const { eligible: all, pairAllowed } = pairUniverse(net, { ...opts, crossLab: true }, { includePhd: !!opts.includePhd });
+  const lastYear = net.pubs.reduce((m, p) => Math.max(m, p.y), -Infinity);
+  const end = Number.isFinite(to) ? Math.min(to, lastYear) : lastYear;
+  // Active researchers: enough publications over the period, one at least in its last years.
+  const eligible = new Map();
+  for (const [id, x] of all) {
+    let n = 0;
+    let recent = false;
+    for (const [y, c] of Object.entries(x.a.pubs || {})) {
+      const yr = Number(y);
+      if (yr < from || yr > end) continue;
+      n += c;
+      if (yr > end - recentYears) recent = true;
+    }
+    if (n >= minPubs && recent) eligible.set(id, x);
+  }
+  // Never intra-lab, whatever the membership filter keeps.
+  const allowed = (x, y) => !x.a.labs.some((l) => y.a.labs.includes(l)) && pairAllowed(x, y);
+  const pairKey = (i, j) => (i < j ? i * 1e5 + j : j * 1e5 + i);
+
+  // Co-authorship graph of the period and the pairs already linked (any joint publication up to `to`).
+  const neighbours = new Map();
+  const linked = new Set();
+  const subfieldCounts = new Map(); // author -> Map(subfield -> publications)
+  const subfieldPubs = new Map(); // author -> publications with subfields
+  for (const p of net.pubs) {
+    if (p.y > end || (maxAuthors != null && p.n != null && p.n > maxAuthors)) continue;
+    for (let i = 0; i < p.a.length; i++) for (let j = i + 1; j < p.a.length; j++) linked.add(pairKey(p.a[i], p.a[j]));
+    if (p.y < from) continue;
+    for (const id of p.a) {
+      if (!neighbours.has(id)) neighbours.set(id, new Set());
+      for (const other of p.a) if (other !== id) neighbours.get(id).add(other);
+      if (!eligible.has(id) || !p.s?.length) continue;
+      if (!subfieldCounts.has(id)) subfieldCounts.set(id, new Map());
+      subfieldPubs.set(id, (subfieldPubs.get(id) ?? 0) + 1);
+      const counts = subfieldCounts.get(id);
+      for (const sf of new Set(p.s)) counts.set(sf, (counts.get(sf) ?? 0) + 1);
+    }
+  }
+
+  const candidates = new Map(); // key -> {i, j, aa, via: [ids]}
+  const candidate = (i, j) => {
+    const key = pairKey(i, j);
+    let c = candidates.get(key);
+    if (c === undefined) {
+      const x = eligible.get(i);
+      const y = eligible.get(j);
+      c = !linked.has(key) && x && y && allowed(x, y) ? { i: Math.min(i, j), j: Math.max(i, j), aa: 0, via: [], similarity: null } : null;
+      candidates.set(key, c);
+    }
+    return c;
+  };
+
+  // 1. Triadic closure: every pair of eligible neighbours of a co-author, weighted 1 / log(degree).
+  for (const [z, ns] of neighbours) {
+    if (ns.size < 2 || ns.size > HUB_DEGREE) continue;
+    const w = 1 / Math.log(ns.size);
+    const ids = [...ns].filter((id) => eligible.has(id));
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const c = candidate(ids[i], ids[j]);
+        if (!c) continue;
+        c.aa += w;
+        c.via.push(z);
+      }
+    }
+  }
+
+  // 2. Thematic closeness: cosine of the subfield profiles, candidates through the main subfields.
+  const vectors = new Map();
+  for (const [id, counts] of subfieldCounts) {
+    const norm = Math.sqrt([...counts.values()].reduce((t, v) => t + v * v, 0));
+    vectors.set(id, { counts, norm, pubs: subfieldPubs.get(id) });
+  }
+  const cosine = (i, j) => {
+    const u = vectors.get(i);
+    const v = vectors.get(j);
+    if (!u || !v) return 0;
+    const [small, large] = u.counts.size < v.counts.size ? [u, v] : [v, u];
+    let dot = 0;
+    for (const [k, n] of small.counts) dot += n * (large.counts.get(k) ?? 0);
+    const m = Math.min(u.pubs, v.pubs);
+    return (dot / (u.norm * v.norm)) * (m / (m + topicPrior));
+  };
+  const topSubfields = (id) => [...vectors.get(id).counts.entries()].sort((m, n) => n[1] - m[1] || m[0] - n[0]).slice(0, 3).map(([k]) => k);
+  const bySubfield = new Map();
+  for (const id of vectors.keys()) {
+    for (const sf of topSubfields(id)) {
+      if (!bySubfield.has(sf)) bySubfield.set(sf, []);
+      bySubfield.get(sf).push(id);
+    }
+  }
+  for (const i of vectors.keys()) {
+    const seen = new Set();
+    const best = [];
+    for (const sf of topSubfields(i)) {
+      for (const j of bySubfield.get(sf)) {
+        if (j === i || seen.has(j)) continue;
+        seen.add(j);
+        const sim = cosine(i, j);
+        if (sim >= minSimilarity) best.push([j, sim]);
+      }
+    }
+    best.sort((m, n) => n[1] - m[1]);
+    for (const [j] of best.slice(0, TOPIC_CANDIDATES)) candidate(i, j);
+  }
+
+  // Scores: triadic signal bounded to [0, 1[ (1 − e^−AA), similarity in [0, 1].
+  const scored = [];
+  for (const c of candidates.values()) {
+    if (!c) continue;
+    c.similarity = cosine(c.i, c.j);
+    const triadic = 1 - Math.exp(-c.aa);
+    const topics = c.similarity >= minSimilarity ? c.similarity : 0;
+    c.score = signal === 'triadic' ? c.aa : signal === 'topics' ? topics : weights.triadic * triadic + weights.topics * topics;
+    if (c.score > 0) scored.push(c);
+  }
+  scored.sort((m, n) => n.score - m.score || n.aa - m.aa || m.i - n.i || m.j - n.j);
+
+  // Quota per researcher: a very central researcher does not take the whole list.
+  const perAuthor = new Map();
+  const kept = [];
+  for (const c of scored) {
+    if (quota != null && ((perAuthor.get(c.i) ?? 0) >= quota || (perAuthor.get(c.j) ?? 0) >= quota)) continue;
+    perAuthor.set(c.i, (perAuthor.get(c.i) ?? 0) + 1);
+    perAuthor.set(c.j, (perAuthor.get(c.j) ?? 0) + 1);
+    kept.push(c);
+  }
+
+  const byId = new Map(net.authors.map((a) => [a.id, a]));
+  const authorOut = (x) => ({
+    id: x.a.id,
+    label: x.a.label,
+    labs: x.labs,
+    poles: x.poles,
+    phd: !!x.a.phd,
+    ...(x.a.m ? { m: Object.fromEntries(x.labs.map((l) => [l, x.a.m[l] ?? 'pubs'])) } : {}),
+    ...(x.a.uid ? { uid: x.a.uid } : {}),
+  });
+  const sharedSubfields = (i, j) => {
+    const u = vectors.get(i)?.counts;
+    const v = vectors.get(j)?.counts;
+    if (!u || !v) return [];
+    return [...u.entries()]
+      .filter(([k]) => v.has(k))
+      .map(([k, n]) => [k, Math.min(n, v.get(k))])
+      .sort((m, n) => n[1] - m[1] || m[0] - n[0])
+      .slice(0, 3)
+      .map(([k]) => net.subfields?.[k]?.name)
+      .filter(Boolean);
+  };
+  return {
+    suggestions: kept.slice(0, limit).map((c) => {
+      const x = eligible.get(c.i);
+      const y = eligible.get(c.j);
+      return {
+        a: authorOut(x),
+        b: authorOut(y),
+        score: Math.round(c.score * 1000) / 1000,
+        common: c.via.length,
+        // The most specific common co-authors first (fewest co-authors of their own).
+        via: [...c.via]
+          .sort((m, n) => neighbours.get(m).size - neighbours.get(n).size || m - n)
+          .slice(0, 3)
+          .map((z) => ({ id: z, label: byId.get(z)?.label ?? '', labs: byId.get(z)?.labs ?? [] })),
+        similarity: Math.round(c.similarity * 100) / 100,
+        subfields: sharedSubfields(c.i, c.j),
+        crossPole: x.poles.length > 0 && y.poles.length > 0 && !x.poles.some((p) => y.poles.includes(p)),
+      };
+    }),
+    total: kept.length,
+  };
+}
+
+module.exports = {
+  buildInterLabNetwork, commonPublications, rankPairs, suggestPairs, OTHER_LABS_CATEGORY, DISTANT_PROFILES, SUGGESTION_WEIGHTS,
+};
