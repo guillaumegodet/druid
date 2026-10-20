@@ -12,29 +12,7 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
-### Ajouté
-- **Mes rapports › binômes de chercheurs** : les cartes de chaleur des binômes (par couple de pôles, par couple de
-  labos) s'ajoutent à un rapport depuis le sous-onglet (bouton « Ajouter à un rapport », avec ses filtres) ou depuis
-  l'éditeur ; nouveaux blocs « Chiffres clés — binômes de chercheurs » et tableau « Binômes de chercheurs ». Ces blocs
-  lisent la route authentifiée `/api/network/:slug/pairs` : le rapport charge leurs données comme celles des
-  structures (une requête par jeu d'options), puis l'aperçu et le PDF s'en servent. Ils n'ont pas de lien public
-  (ni bouton « Partager », ni lien « version interactive » dans le PDF), ignorent les filtres de publications du
-  rapport et ne sont pas proposés sans `HAS_NETWORK_API`.
-- **Partenariats › Binômes › Rapprochements suggérés** : chercheurs de labos différents qui n'ont jamais cosigné,
-  classés par leurs coauteurs communs (Adamic-Adar, les plus spécifiques nommés) et la proximité de leurs
-  sous-disciplines OpenAlex (atténuée pour les petits profils), 5 suggestions par chercheur au plus, doctorants exclus
-  par défaut, mêmes filtres et mêmes droits que les binômes observés, export CSV. Route
-  `GET /api/network/:slug/suggestions` (`suggestPairs` de `co_network.cjs`). Rétro-test 2020-2022 → 2023-2026 :
-  environ une des 100 premières suggestions sur six a donné une publication commune (0,027 % au hasard).
-- **Partenariats › Binômes** : chiffres clés (binômes actifs, nouveaux, en sommeil, entre pôles, à profils éloignés,
-  part des chercheurs de la structure engagés dans un binôme et dans un binôme entre pôles), cartes de chaleur des
-  binômes par couple de pôles et par couple de labos (une case compte des binômes, pas des publications ; clic ⇒ le
-  tableau ne liste que ce couple de labos), export CSV du tableau et page d'aide « Repérer les binômes de
-  chercheurs ».
-
-### Corrigé
-- **Mes rapports** : les libellés des réglages des blocs (seuil de conformité, nombre d'éléments, publications min.)
-  et « Section sans titre » / « Texte vide » restaient en anglais dans l'interface française.
+## [2.12.0] — 2026-10-20
 
 ### Ajouté
 - **Tableau de bord › Partenariats › Binômes** : les paires de chercheurs qui cosignent déjà, sur tout le réseau de
@@ -46,6 +24,28 @@ données à exécuter au déploiement).
   sous-disciplines dominantes ; clic ⇒ publications communes. Lien depuis les sous-onglets « Au sein de la
   structure » et « Nantes Université ». Route `GET /api/network/:slug/pairs` ; absent sans `HAS_NETWORK_API`
   (Cloudflare). La distance et les appartenances demandent un `network.json` v3 (druid-biblio).
+- **Partenariats › Binômes** : chiffres clés (binômes actifs, nouveaux, en sommeil, entre pôles, à profils éloignés,
+  part des chercheurs de la structure engagés dans un binôme et dans un binôme entre pôles), cartes de chaleur des
+  binômes par couple de pôles et par couple de labos (une case compte des binômes, pas des publications ; clic ⇒ le
+  tableau ne liste que ce couple de labos), export CSV du tableau et page d'aide « Repérer les binômes de
+  chercheurs ».
+- **Partenariats › Binômes › Rapprochements suggérés** : chercheurs de labos différents qui n'ont jamais cosigné,
+  classés par leurs coauteurs communs (Adamic-Adar, les plus spécifiques nommés) et la proximité de leurs
+  sous-disciplines OpenAlex (atténuée pour les petits profils), 5 suggestions par chercheur au plus, doctorants exclus
+  par défaut, mêmes filtres et mêmes droits que les binômes observés, export CSV. Route
+  `GET /api/network/:slug/suggestions` (`suggestPairs` de `co_network.cjs`). Rétro-test 2020-2022 → 2023-2026 :
+  environ une des 100 premières suggestions sur six a donné une publication commune (0,027 % au hasard).
+- **Mes rapports › binômes de chercheurs** : les cartes de chaleur des binômes (par couple de pôles, par couple de
+  labos) s'ajoutent à un rapport depuis le sous-onglet (bouton « Ajouter à un rapport », avec ses filtres) ou depuis
+  l'éditeur ; nouveaux blocs « Chiffres clés — binômes de chercheurs » et tableau « Binômes de chercheurs ». Ces blocs
+  lisent la route authentifiée `/api/network/:slug/pairs` : le rapport charge leurs données comme celles des
+  structures (une requête par jeu d'options), puis l'aperçu et le PDF s'en servent. Ils n'ont pas de lien public
+  (ni bouton « Partager », ni lien « version interactive » dans le PDF), ignorent les filtres de publications du
+  rapport et ne sont pas proposés sans `HAS_NETWORK_API`.
+
+### Corrigé
+- **Mes rapports** : les libellés des réglages des blocs (seuil de conformité, nombre d'éléments, publications min.)
+  et « Section sans titre » / « Texte vide » restaient en anglais dans l'interface française.
 
 ## [2.11.1] — 2026-10-20
 
