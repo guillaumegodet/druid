@@ -204,6 +204,7 @@ msgstr "Chargement du tableau de bord…"
 #: components/dashboard/EmbedPage.tsx:90
 #: components/dashboard/NetworkTab.tsx:361
 #: components/dashboard/NewsletterPanel.tsx:277
+#: components/dashboard/PairsSection.tsx:356
 #: components/etl/EtlConsolePage.tsx:441
 #: components/reports/HistoryDialog.tsx:78
 #: components/reports/ReportEditor.tsx:265
@@ -650,7 +651,7 @@ msgstr "Sélections transverses de chercheurs (conseil scientifique, projets, co
 
 #: components/GroupList.tsx:199
 #: components/admin/CallsProgrammesAdmin.tsx:158
-#: components/dashboard/PairsSection.tsx:73
+#: components/dashboard/PairsSection.tsx:79
 #: components/researchers/ListHeader.tsx:135
 msgid "New"
 msgstr "Nouveau"
@@ -868,7 +869,7 @@ msgstr "Présence validée"
 
 #: components/ResearcherDetail.tsx:528
 #: components/dashboard/MediaSourcesAdmin.tsx:217
-#: components/dashboard/PairsSection.tsx:167
+#: components/dashboard/PairsSection.tsx:236
 msgid "Scope"
 msgstr "Portée"
 
@@ -3339,8 +3340,8 @@ msgid "{0, plural, one {# candidate} other {# candidates}}"
 msgstr "{0, plural, one {# candidat} other {# candidats}}"
 
 #: components/dashboard/CallCandidates.tsx:175
-#: components/dashboard/PairsSection.tsx:247
-#: components/dashboard/PairsSection.tsx:248
+#: components/dashboard/PairsSection.tsx:367
+#: components/dashboard/PairsSection.tsx:368
 #: components/researchers/TaskForm.tsx:101
 #: components/researchers/TasksPage.tsx:173
 msgid "Researcher"
@@ -4012,7 +4013,7 @@ msgid "Domains of the co-publications"
 msgstr "Domaines des co-publications"
 
 #: components/dashboard/CountryCharts.tsx:173
-#: components/dashboard/PairsSection.tsx:253
+#: components/dashboard/PairsSection.tsx:373
 #: components/dashboard/embedRegistry.tsx:588
 #: components/dashboard/embedRegistry.tsx:593
 msgid "Main subfields"
@@ -5014,7 +5015,7 @@ msgid "Other labs (grouped)"
 msgstr "Autres labos (regroupés)"
 
 #: components/dashboard/NetworkTab.tsx:117
-#: components/dashboard/PairsSection.tsx:182
+#: components/dashboard/PairsSection.tsx:251
 msgid "Loading"
 msgstr "Chargement"
 
@@ -5027,7 +5028,7 @@ msgid "The university network could not be loaded."
 msgstr "Le réseau de l'université n'a pas pu être chargé."
 
 #: components/dashboard/NetworkTab.tsx:153
-#: components/dashboard/PairsSection.tsx:207
+#: components/dashboard/PairsSection.tsx:276
 msgid "Loading the university network…"
 msgstr "Chargement du réseau de l'université…"
 
@@ -5081,7 +5082,7 @@ msgid "Cross-lab links only"
 msgstr "Liens inter-labos seulement"
 
 #: components/dashboard/NetworkTab.tsx:299
-#: components/dashboard/PairsSection.tsx:195
+#: components/dashboard/PairsSection.tsx:264
 msgid "Exclude large collaborations (more than {LARGE_COLLAB_MAX_AUTHORS} authors)"
 msgstr "Exclure les grandes collaborations (plus de {LARGE_COLLAB_MAX_AUTHORS} auteurs)"
 
@@ -5578,120 +5579,174 @@ msgstr "conf."
 msgid "RICL = journal articles indexed in Scimago (proxy for “international peer-reviewed journal”); conference papers do not distinguish national / international. Research FTE entered in the structure configuration."
 msgstr "RICL = articles de revue indexés Scimago (proxy « revue internationale à comité de lecture ») ; les communications de conférence ne distinguent pas national / international. ETPR saisi en configuration de la structure."
 
-#: components/dashboard/PairsSection.tsx:51
+#: components/dashboard/PairsSection.tsx:57
 msgid "Associate or visiting member of the lab in the directory"
 msgstr "Membre associé ou invité du labo dans l'annuaire"
 
-#: components/dashboard/PairsSection.tsx:52
+#: components/dashboard/PairsSection.tsx:58
 msgid "associate"
 msgstr "associé"
 
-#: components/dashboard/PairsSection.tsx:56
+#: components/dashboard/PairsSection.tsx:62
 msgid "Lab deduced from the publications only: the directory does not list this person in the lab"
 msgstr "Labo déduit des seules publications : l'annuaire ne compte pas cette personne dans le labo"
 
-#: components/dashboard/PairsSection.tsx:57
+#: components/dashboard/PairsSection.tsx:63
 msgid "lab from publications"
 msgstr "labo déduit des publications"
 
-#: components/dashboard/PairsSection.tsx:62
+#: components/dashboard/PairsSection.tsx:68
 msgid "PhD student"
 msgstr "doctorant"
 
-#: components/dashboard/PairsSection.tsx:73
+#: components/dashboard/PairsSection.tsx:79
 msgid "First joint publication in the last three years"
 msgstr "Première publication commune dans les trois dernières années"
 
-#: components/dashboard/PairsSection.tsx:74
+#: components/dashboard/PairsSection.tsx:80
 msgid "Rising"
 msgstr "En hausse"
 
-#: components/dashboard/PairsSection.tsx:74
+#: components/dashboard/PairsSection.tsx:80
 msgid "More joint publications in the last three years than in the three before"
 msgstr "Plus de publications communes dans les trois dernières années que dans les trois précédentes"
 
-#: components/dashboard/PairsSection.tsx:75
+#: components/dashboard/PairsSection.tsx:81
 msgid "Steady"
 msgstr "Stable"
 
-#: components/dashboard/PairsSection.tsx:75
+#: components/dashboard/PairsSection.tsx:81
 msgid "Joint publications in the last three years, no more than before"
 msgstr "Des publications communes dans les trois dernières années, pas plus qu’avant"
 
-#: components/dashboard/PairsSection.tsx:76
+#: components/dashboard/PairsSection.tsx:82
 msgid "Dormant"
 msgstr "En sommeil"
 
-#: components/dashboard/PairsSection.tsx:76
+#: components/dashboard/PairsSection.tsx:82
 msgid "No joint publication in the last three years"
 msgstr "Aucune publication commune dans les trois dernières années"
 
-#: components/dashboard/PairsSection.tsx:137
+#: components/dashboard/PairsSection.tsx:163
 msgid "This structure is not part of the university co-authorship network."
 msgstr "Cette structure ne fait pas partie du réseau de cosignatures de l'université."
 
-#: components/dashboard/PairsSection.tsx:161
+#. placeholder {0}: Math.round((n / c.perimeter) * 100)
+#. placeholder {1}: fmt(c.perimeter)
+#: components/dashboard/PairsSection.tsx:182
+msgid "{0}% of the {1} publishing researchers"
+msgstr "{0} % des {1} chercheurs publiants"
+
+#: components/dashboard/PairsSection.tsx:184
+msgid "Active pairs"
+msgstr "Binômes actifs"
+
+#: components/dashboard/PairsSection.tsx:184
+msgid "joint publication in the last three years"
+msgstr "publication commune dans les trois dernières années"
+
+#: components/dashboard/PairsSection.tsx:185
+msgid "New pairs"
+msgstr "Nouveaux binômes"
+
+#: components/dashboard/PairsSection.tsx:185
+msgid "first joint publication in the last three years"
+msgstr "première publication commune dans les trois dernières années"
+
+#: components/dashboard/PairsSection.tsx:186
+msgid "Dormant pairs"
+msgstr "Binômes en sommeil"
+
+#: components/dashboard/PairsSection.tsx:186
+msgid "nothing joint for three years"
+msgstr "rien en commun depuis trois ans"
+
+#: components/dashboard/PairsSection.tsx:187
+msgid "Between poles"
+msgstr "Entre pôles"
+
+#: components/dashboard/PairsSection.tsx:188
+msgid "Distant profiles"
+msgstr "Profils éloignés"
+
+#: components/dashboard/PairsSection.tsx:188
+msgid "distance ≥ {DISTANT_PROFILES}"
+msgstr "distance ≥ {DISTANT_PROFILES}"
+
+#: components/dashboard/PairsSection.tsx:191
+msgid "Researchers of the structure in a pair"
+msgstr "Chercheurs de la structure dans un binôme"
+
+#: components/dashboard/PairsSection.tsx:191
+msgid "Researchers in a pair"
+msgstr "Chercheurs dans un binôme"
+
+#: components/dashboard/PairsSection.tsx:197
+msgid "Researchers in a cross-pole pair"
+msgstr "Chercheurs dans un binôme entre pôles"
+
+#: components/dashboard/PairsSection.tsx:230
 msgid "Which pairs"
 msgstr "Quels binômes"
 
-#: components/dashboard/PairsSection.tsx:162
+#: components/dashboard/PairsSection.tsx:231
 msgid "Researchers of different labs"
 msgstr "Chercheurs de labos différents"
 
-#: components/dashboard/PairsSection.tsx:163
+#: components/dashboard/PairsSection.tsx:232
 msgid "Researchers of different poles"
 msgstr "Chercheurs de pôles différents"
 
-#: components/dashboard/PairsSection.tsx:168
+#: components/dashboard/PairsSection.tsx:237
 msgid "At least one researcher of the structure"
 msgstr "Au moins un chercheur de la structure"
 
-#: components/dashboard/PairsSection.tsx:169
+#: components/dashboard/PairsSection.tsx:238
 msgid "Both researchers in the structure"
 msgstr "Les deux chercheurs dans la structure"
 
-#: components/dashboard/PairsSection.tsx:172
+#: components/dashboard/PairsSection.tsx:241
 msgid "Lab membership of the researchers"
 msgstr "Appartenance des chercheurs aux labos"
 
-#: components/dashboard/PairsSection.tsx:173
+#: components/dashboard/PairsSection.tsx:242
 msgid "Every lab attribution"
 msgstr "Tous les rattachements"
 
-#: components/dashboard/PairsSection.tsx:174
+#: components/dashboard/PairsSection.tsx:243
 msgid "Labs of the directory (members and associates)"
 msgstr "Labos de l'annuaire (membres et associés)"
 
-#: components/dashboard/PairsSection.tsx:175
+#: components/dashboard/PairsSection.tsx:244
 msgid "Labs of the directory (members only)"
 msgstr "Labos de l'annuaire (membres seulement)"
 
-#: components/dashboard/PairsSection.tsx:177
+#: components/dashboard/PairsSection.tsx:246
 msgid "Minimum joint publications"
 msgstr "Minimum de publications communes"
 
-#: components/dashboard/PairsSection.tsx:179
+#: components/dashboard/PairsSection.tsx:248
 msgid "≥ {n} joint publications"
 msgstr "≥ {n} publications communes"
 
-#: components/dashboard/PairsSection.tsx:185
+#: components/dashboard/PairsSection.tsx:254
 msgid "Distance between the OpenAlex field profiles of the two researchers, outside their joint publications"
 msgstr "Distance entre les profils de disciplines OpenAlex des deux chercheurs, hors publications communes"
 
-#: components/dashboard/PairsSection.tsx:187
+#: components/dashboard/PairsSection.tsx:256
 msgid "Distant disciplinary profiles only (distance ≥ {DISTANT_PROFILES})"
 msgstr "Profils disciplinaires éloignés seulement (distance ≥ {DISTANT_PROFILES})"
 
-#: components/dashboard/PairsSection.tsx:191
+#: components/dashboard/PairsSection.tsx:260
 msgid "Include PhD students"
 msgstr "Inclure les doctorants"
 
-#: components/dashboard/PairsSection.tsx:202
+#: components/dashboard/PairsSection.tsx:271
 msgid "The researcher pairs could not be loaded."
 msgstr "Les binômes n'ont pas pu être chargés."
 
 #. placeholder {0}: loaded.total
-#: components/dashboard/PairsSection.tsx:214
+#: components/dashboard/PairsSection.tsx:283
 msgid "{0, plural, one {# pair of researchers} other {# pairs of researchers}}"
 msgstr "{0, plural, one {# binôme de chercheurs} other {# binômes de chercheurs}}"
 
@@ -5700,60 +5755,89 @@ msgstr "{0, plural, one {# binôme de chercheurs} other {# binômes de chercheur
 #. placeholder {2}: fmt(loaded.counts.distant)
 #. placeholder {3}: fmt(loaded.counts.new)
 #. placeholder {4}: fmt(loaded.counts.dormant)
-#: components/dashboard/PairsSection.tsx:219
+#: components/dashboard/PairsSection.tsx:288
 msgid "involving {0} researchers — {1} between poles, {2} with distant profiles, {3} new, {4} dormant."
 msgstr "impliquant {0} chercheurs — {1} entre pôles, {2} de profils éloignés, {3} nouveaux, {4} en sommeil."
 
-#: components/dashboard/PairsSection.tsx:240
+#: components/dashboard/PairsSection.tsx:301
+msgid "Pairs by couple of poles"
+msgstr "Binômes par couple de pôles"
+
+#: components/dashboard/PairsSection.tsx:302
+msgid "Diagonal: pairs of different labs within a pole"
+msgstr "Diagonale : binômes de labos différents au sein d'un pôle"
+
+#: components/dashboard/PairsSection.tsx:309
+msgid "Pairs by couple of labs"
+msgstr "Binômes par couple de labos"
+
+#: components/dashboard/PairsSection.tsx:310
+msgid "Number of pairs, not of publications · click a cell to list its pairs"
+msgstr "Nombre de binômes, pas de publications · cliquez sur une case pour lister ses binômes"
+
+#: components/dashboard/PairsSection.tsx:323
+msgid "Show every pair"
+msgstr "Afficher tous les binômes"
+
+#: components/dashboard/PairsSection.tsx:337
+msgid "Pairs (CSV)"
+msgstr "Binômes (CSV)"
+
+#: components/dashboard/PairsSection.tsx:360
+#: components/dashboard/charts/PairMatrixChart.tsx:106
 msgid "No pair of researchers matches these filters over the period."
 msgstr "Aucun binôme ne correspond à ces filtres sur la période."
 
-#: components/dashboard/PairsSection.tsx:249
+#: components/dashboard/PairsSection.tsx:369
 msgid "Joint pubs"
 msgstr "Publis communes"
 
-#: components/dashboard/PairsSection.tsx:250
+#: components/dashboard/PairsSection.tsx:370
 #: components/reports/ReportEditor.tsx:317
 msgid "Share"
 msgstr "Partager"
 
-#: components/dashboard/PairsSection.tsx:250
+#: components/dashboard/PairsSection.tsx:370
 msgid "Part of each researcher's publications of the period"
 msgstr "Part des publications de chaque chercheur sur la période"
 
-#: components/dashboard/PairsSection.tsx:251
+#: components/dashboard/PairsSection.tsx:371
 #: components/dashboard/countryKpis.ts:45
 #: components/dashboard/partnerKpis.ts:145
 msgid "Trend"
 msgstr "Évolution"
 
-#: components/dashboard/PairsSection.tsx:252
+#: components/dashboard/PairsSection.tsx:372
 msgid "Distance"
 msgstr "Distance"
 
-#: components/dashboard/PairsSection.tsx:261
+#: components/dashboard/PairsSection.tsx:381
 msgid "Show the joint publications"
 msgstr "Voir les publications communes"
 
 #. placeholder {0}: fmt(rows.length - shown)
-#: components/dashboard/PairsSection.tsx:286
+#: components/dashboard/PairsSection.tsx:406
 msgid "Show more ({0} remaining)"
 msgstr "Afficher plus ({0} restants)"
 
 #. placeholder {0}: loaded.source
 #. placeholder {1}: new Date(loaded.generatedAt).toLocaleDateString(i18n.locale)
 #. placeholder {2}: loaded.refYear ?? '—'
-#: components/dashboard/PairsSection.tsx:294
+#: components/dashboard/PairsSection.tsx:414
 msgid "Source: university-wide corpus ({0}) of {1}. The numbers are lower bounds: {coveragePct}% of the internal signatures are linked to a lab. They describe joint publications, not the performance of the researchers. The trend compares the last three years up to {2} with the three before."
 msgstr "Source : corpus de l'université ({0}) du {1}. Les volumes sont des minorants : {coveragePct} % des signatures internes sont rattachées à un labo. Ils décrivent des publications communes, pas la performance des chercheurs. La tendance compare les trois dernières années jusqu'à {2} aux trois précédentes."
 
-#: components/dashboard/PairsSection.tsx:301
+#: components/dashboard/PairsSection.tsx:421
 msgid "Disciplinary distance and directory memberships are unavailable until the network is regenerated."
 msgstr "La distance disciplinaire et les appartenances de l'annuaire seront disponibles une fois le réseau régénéré."
 
-#: components/dashboard/PairsSection.tsx:304
+#: components/dashboard/PairsSection.tsx:424
 msgid "Only the pairs involving a researcher of your lab are shown."
 msgstr "Seuls les binômes impliquant un chercheur de votre labo sont affichés."
+
+#: components/dashboard/PairsSection.tsx:427
+msgid "How to read this view"
+msgstr "Comment lire cette vue"
 
 #: components/dashboard/PartnerBilanSection.tsx:153
 msgid "Thematic analysis (AI)"
@@ -7147,6 +7231,21 @@ msgstr "Auteurs de l'université ; taille = nombre de publications, couleur = la
 #: components/dashboard/charts/NetworkChart.tsx:140
 msgid "Internal authors; size = number of publications, colour = team"
 msgstr "Auteurs internes ; taille = nombre de publications, couleur = équipe"
+
+#. placeholder {0}: c.pairs
+#: components/dashboard/charts/PairMatrixChart.tsx:66
+msgid "{0} pairs"
+msgstr "{0} binômes"
+
+#. placeholder {0}: c.new
+#: components/dashboard/charts/PairMatrixChart.tsx:66
+msgid "{0} new"
+msgstr "{0} nouveaux"
+
+#. placeholder {0}: c.dormant
+#: components/dashboard/charts/PairMatrixChart.tsx:66
+msgid "{0} dormant"
+msgstr "{0} en sommeil"
 
 #: components/dashboard/charts/PublicationTypesChart.tsx:36
 #: components/dashboard/labels.ts:39

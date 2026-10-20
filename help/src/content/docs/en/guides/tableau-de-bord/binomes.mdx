@@ -1,0 +1,95 @@
+---
+title: "Find researcher pairs"
+description: "See which researchers co-sign across labs and poles, and spot interdisciplinary, new or dormant pairs."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure"
+	menu="Dashboard › Collaborations › Partnerships › Researcher pairs"
+/>
+
+The **Researcher pairs** sub-tab of the **Partnerships** view lists the **pairs of researchers who publish together**
+without belonging to the same lab. It helps spot the bridges between labs and between poles — especially
+**interdisciplinary** pairs — for the scientific coordination of a pole, a lab or the research office. It is read over
+the period chosen at the top of the dashboard.
+
+The pairs are computed on the **whole university corpus**, even from a lab or a pole: the Science and Technology pole
+thus sees its pairs with the health, humanities and social science labs. The link **See the researcher pairs…** under
+the diagram of the « Within the structure » and « Nantes Université » sub-tabs leads there too.
+
+## Key figures
+
+| Card | What it counts |
+|---|---|
+| **Active pairs** | Pairs with at least one joint publication in the last three years of the period. |
+| **New pairs** | Pairs whose first joint publication is from the last three years. |
+| **Dormant pairs** | Pairs with nothing published together for three years. |
+| **Between poles** | Pairs whose two researchers are in different poles. |
+| **Distant profiles** | Pairs whose disciplinary profiles are distant (see below). |
+| **Researchers of the structure in a pair** | How many researchers of the structure who published over the period have at least one pair, and their share. |
+| **Researchers in a cross-pole pair** | The same for cross-pole pairs. |
+
+## The two heatmaps
+
+- **Pairs by couple of poles**: each cell counts the pairs between two poles; the diagonal counts the pairs of
+  different labs within one pole.
+- **Pairs by couple of labs**: the 20 most involved labs. **Click a cell** to list only the pairs of that couple of
+  labs; click the label above the table (or the cell again) to come back to every pair.
+
+A cell counts **pairs**, not publications: a very productive pair does not hide ten emerging ones.
+
+## The table
+
+For each pair: the two researchers (lab, pole), the number of **joint publications** over the period, the **share**
+they represent in each researcher's output, the **trend** (new, rising, steady, dormant) with the years of the first
+and last joint publication, the disciplinary **distance** and the main subfields of the joint publications. The
+« Joint pubs », « Trend » and « Distance » columns sort with a click. **Click a row** to list the joint publications;
+a researcher's name opens their record when they are identified in the directory. The **Pairs (CSV)** button downloads
+the table shown.
+
+## Filters
+
+- **Which pairs**: researchers of different labs (default), of different poles, or a given couple of poles.
+- **At least one researcher / both in the structure** (from a lab or a pole).
+- **Membership**: every lab attribution, or only the labs where the directory lists the researcher (members and
+  associates, or members only).
+- **Minimum joint publications** (2 by default).
+- **Distant disciplinary profiles only**, **Include PhD students**, **Exclude large collaborations**.
+
+## Disciplinary distance
+
+Each researcher has a profile: how all their publications spread over the OpenAlex fields (26 fields). The distance
+is 0 for two identical profiles and 1 for two profiles without any common field. It is computed **outside the joint
+publications**, otherwise a very productive pair would always look close. From 0.5 on, the pair has « distant
+profiles ». Pole and distance complement each other: two dentistry researchers in labs of different poles have close
+profiles, while two researchers of the same pole can be far apart.
+
+## Researcher badges
+
+- **associate**: the researcher is an associate or visiting member of the lab in the directory.
+- **lab from publications**: the directory does not list them in this lab; the attribution comes from their
+  publications. Former members, colleagues from other institutions, or affiliation errors (clinicians wrongly
+  attributed to a lab): check before drawing conclusions.
+- **PhD student**.
+
+## Who sees what
+
+- With rights on the **whole institution** or on a pole, every pair of the scope is visible.
+- With rights limited to **your lab**, only the pairs with a researcher of your lab are listed.
+
+## Known limits
+
+- **The numbers are lower bounds**: about a quarter of the signatures are linked to no lab (abbreviated names in
+  OpenAlex); the rate is shown under the table.
+- **A researcher is identified by name**: two namesakes can be confused.
+- **These figures describe joint publications**, not the performance of the researchers.
+- The sub-tab does not exist on instances hosted on Cloudflare.
+
+## See also
+
+- [Explore the co-authorship network](/en/guides/tableau-de-bord/reseau/)
+- [Analyse collaborations](/en/guides/tableau-de-bord/collaborations/)

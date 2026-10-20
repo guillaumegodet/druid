@@ -47,8 +47,25 @@ export interface PairsResponse {
   restricted: boolean;
   pairs: ResearcherPair[];
   total: number;
-  counts: { new: number; dormant: number; rising: number; steady: number; distant: number; crossPole: number; authors: number };
+  counts: {
+    new: number; dormant: number; rising: number; steady: number; distant: number; crossPole: number;
+    /** Researchers in at least one pair. */
+    authors: number;
+    /** Researchers of the structure who published over the period, and those among them in a pair / a cross-pole pair. */
+    perimeter: number; perimeterEngaged: number; perimeterCrossPole: number;
+  };
+  /** Pairs per couple of labs / of poles (a = b: within one pole), most pairs first. */
+  labMatrix: PairCell[];
+  poleMatrix: PairCell[];
   refYear: number | null;
+}
+
+export interface PairCell {
+  a: string;
+  b: string;
+  pairs: number;
+  new: number;
+  dormant: number;
 }
 
 /** « Distant profiles » threshold (DISTANT_PROFILES of co_network.cjs, decision D10). */
@@ -66,6 +83,8 @@ export interface PairsParams {
   includePhd: boolean;
   excludeLarge: boolean;
   minShared: number;
+  /** Cell of the lab matrix: one researcher in lab A, the other in lab B. */
+  labPair?: [string, string] | null;
 }
 
 export async function fetchPairs(slug: string, p: PairsParams, signal?: AbortSignal): Promise<PairsResponse | null> {
@@ -82,6 +101,7 @@ export async function fetchPairs(slug: string, p: PairsParams, signal?: AbortSig
   if (p.relation === 'pole') qs.set('crossPole', '1');
   else if (p.relation !== 'lab') qs.set('poles', p.relation.split('|').join(','));
   if (p.distantOnly) qs.set('minDistance', String(DISTANT_PROFILES));
+  if (p.labPair) qs.set('labPair', p.labPair.join(','));
   const res = await fetch(`/api/network/${encodeURIComponent(slug)}/pairs?${qs}`, { signal });
   if (res.status === 404) return null;
   if (!res.ok || !(res.headers.get('content-type') || '').includes('application/json')) {

@@ -1,0 +1,98 @@
+---
+title: "Repérer les binômes de chercheurs"
+description: "Voir quels chercheurs cosignent entre labos et entre pôles, repérer les binômes interdisciplinaires, nouveaux ou en sommeil."
+sidebar:
+  order: 5
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure"
+	menu="Tableau de bord › Collaborations › Partenariats › Binômes"
+/>
+
+Le sous-onglet **Binômes** de la vue **Partenariats** liste les **paires de chercheurs qui publient ensemble** sans
+appartenir au même labo. Il sert à repérer les passerelles entre labos et entre pôles — en particulier les binômes
+**interdisciplinaires** — pour l'animation scientifique d'un pôle, d'un labo ou de la direction de la recherche. Il se
+lit sur la période choisie en haut du tableau de bord.
+
+Les binômes sont calculés sur le **corpus de toute l'université**, même depuis un labo ou un pôle : le Pôle Sciences et
+technologies voit ainsi ses binômes avec les labos de santé, d'humanités et de sociétés. On y arrive aussi par le lien
+**Voir les binômes de chercheurs…** sous le diagramme des sous-onglets « Dans la structure » et « Nantes Université ».
+
+## Les chiffres clés
+
+| Carte | Ce qu'elle compte |
+|---|---|
+| **Binômes actifs** | Les binômes avec au moins une publication commune dans les trois dernières années de la période. |
+| **Nouveaux binômes** | Ceux dont la première publication commune date des trois dernières années. |
+| **Binômes en sommeil** | Ceux qui n'ont rien publié ensemble depuis trois ans. |
+| **Entre pôles** | Les binômes dont les deux chercheurs sont dans des pôles différents. |
+| **Profils éloignés** | Les binômes dont les profils disciplinaires sont éloignés (voir plus bas). |
+| **Chercheurs de la structure dans un binôme** | Combien de chercheurs de la structure ayant publié sur la période ont au moins un binôme, et leur part. |
+| **Chercheurs dans un binôme entre pôles** | Même chose pour les binômes entre pôles. |
+
+## Les deux cartes de chaleur
+
+- **Binômes par couple de pôles** : chaque case compte les binômes entre deux pôles ; la diagonale compte les binômes
+  de labos différents au sein d'un même pôle.
+- **Binômes par couple de labos** : les 20 labos les plus impliqués. **Cliquez sur une case** pour ne lister que les
+  binômes de ce couple de labos ; cliquez sur l'étiquette au-dessus du tableau (ou de nouveau sur la case) pour revenir
+  à tous les binômes.
+
+Une case compte des **binômes**, pas des publications : un binôme très productif ne masque pas dix binômes naissants.
+
+## Le tableau
+
+Pour chaque binôme : les deux chercheurs (labo, pôle), le nombre de **publications communes** sur la période, la
+**part** qu'elles représentent dans la production de chacun, la **tendance** (nouveau, en hausse, stable, en sommeil)
+avec les années de la première et de la dernière publication commune, la **distance** disciplinaire et les
+sous-disciplines dominantes des publications communes. Les colonnes « Publis communes », « Tendance » et
+« Distance » se trient d'un clic. **Cliquez sur une ligne** pour lister les publications communes ; le nom d'un
+chercheur ouvre sa fiche quand il est identifié dans l'annuaire. Le bouton **Binômes (CSV)** télécharge le tableau
+affiché.
+
+## Les filtres
+
+- **Quels binômes** : chercheurs de labos différents (par défaut), de pôles différents, ou un couple de pôles précis
+  (par exemple « Pôle Santé × Pôle S&T »).
+- **Au moins un chercheur / les deux dans la structure** (depuis un labo ou un pôle).
+- **Appartenance** : tous les rattachements, ou seulement les labos où l'annuaire compte le chercheur (membres et
+  associés, ou membres seulement).
+- **Minimum de publications communes** (2 par défaut).
+- **Profils disciplinaires éloignés seulement**, **Inclure les doctorants**, **Exclure les grandes collaborations**.
+
+## Distance disciplinaire
+
+Chaque chercheur a un profil : la répartition de toutes ses publications entre les disciplines OpenAlex
+(26 disciplines). La distance vaut 0 pour deux profils identiques et 1 pour deux profils sans discipline commune. Elle
+se calcule **hors publications communes**, sinon un binôme très productif paraîtrait toujours proche. À partir de 0,5,
+le binôme est dit « à profils éloignés ». Le pôle et la distance se complètent : deux odontologistes de labos de pôles
+différents ont des profils proches, alors que deux chercheurs d'un même pôle peuvent être éloignés.
+
+## Badges des chercheurs
+
+- **associé** : le chercheur est membre associé ou invité du labo dans l'annuaire.
+- **labo déduit des publications** : l'annuaire ne le compte pas dans ce labo ; le rattachement vient de ses
+  publications. C'est le cas d'anciens membres, de collègues d'autres établissements, ou d'erreurs d'affiliation
+  (cliniciens rattachés à tort à un labo) : à vérifier avant d'en tirer une conclusion.
+- **doctorant**.
+
+## Qui voit quoi
+
+- Avec un droit sur **tout l'établissement** ou sur un pôle, tous les binômes du périmètre sont visibles.
+- Avec un droit limité à **votre labo**, seuls les binômes dont un chercheur est de votre labo sont listés.
+
+## Limites connues
+
+- **Les volumes sont des minorants** : environ un quart des signatures n'est rattaché à aucun labo (noms abrégés dans
+  OpenAlex) ; le taux est indiqué sous le tableau.
+- **Un chercheur est identifié par son nom** : deux homonymes peuvent être confondus.
+- **Ces chiffres décrivent des publications communes**, pas la performance des chercheurs.
+- Le sous-onglet n'existe pas sur les instances hébergées sur Cloudflare.
+
+## Voir aussi
+
+- [Explorer le réseau de co-signatures](/guides/tableau-de-bord/reseau/)
+- [Analyser les collaborations](/guides/tableau-de-bord/collaborations/)
