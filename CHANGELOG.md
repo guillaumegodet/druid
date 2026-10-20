@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.14.0] — 2026-10-20
+
 ### Ajouté
 - **Fiche chercheur › Binômes de recherche** : en bas de la fiche d'un chercheur du réseau de l'université, ses
   coauteurs les plus fréquents en cartes (photo de la fiche, labo, publications communes, tendance, sujets principaux
