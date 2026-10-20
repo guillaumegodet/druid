@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.13.0] — 2026-10-20
+
 ### Ajouté
 - **Partenariats › Binômes › Rapprochements suggérés › avis** : boutons « Pertinent », « Déjà en contact », « Non
   pertinent » sur chaque suggestion (un avis par personne et par paire, le dernier compte, second clic = retrait),
