@@ -98,15 +98,17 @@ cosigné aucune publication**, classés selon deux signaux calculés sur la pér
 - **Coauteurs communs** : A et B publient chacun avec C. Un coauteur commun qui a peu de coauteurs compte plus qu'un
   coauteur qui publie avec tout le monde (indice d'Adamic-Adar). Les trois coauteurs communs les plus spécifiques sont
   nommés.
-- **Sous-disciplines communes** : la proximité des sous-disciplines OpenAlex de leurs publications, atténuée pour les
-  chercheurs qui ont peu publié. Les sous-disciplines partagées sont nommées.
+- **Sujets de recherche communs** : la proximité des sujets (*topics*) OpenAlex de leurs publications, atténuée pour
+  les chercheurs qui ont peu publié. Les sujets partagés sont nommés, par exemple « Bone Tissue Engineering
+  Materials ». OpenAlex compte environ 4 500 sujets, bien plus précis que ses 250 sous-disciplines ; sur un réseau
+  généré sans les sujets, Druid compare les sous-disciplines.
 
-Le score vaut deux fois le signal des coauteurs communs plus celui des sous-disciplines. Chaque chercheur apparaît
+Le score vaut deux fois le signal des coauteurs communs plus celui des sujets. Chaque chercheur apparaît
 au plus 5 fois par défaut, pour qu'un chercheur très central ne remplisse pas la liste ; les doctorants ne sont pas
 suggérés par défaut. Les filtres de pôles, de périmètre et d'appartenance sont ceux des binômes observés.
 
-**Ce que valent ces suggestions** : calculées sur 2020-2022, environ une des 100 premières sur six a donné une
-publication commune en 2023-2026, et une sur quinze entre pôles différents. C'est beaucoup plus que le hasard
+**Ce que valent ces suggestions** : calculées sur 2020-2022, environ une des 100 premières sur sept a donné une
+publication commune en 2023-2026, et une sur dix entre pôles différents. C'est beaucoup plus que le hasard
 (quelques paires sur 10 000), mais ce sont des **pistes** : une suggestion non suivie n'est pas une erreur.
 
 ### Donner son avis

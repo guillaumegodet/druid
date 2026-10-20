@@ -143,7 +143,7 @@ export function pairsChartParams(p: PairsParams): ChartParams {
   return out;
 }
 
-/** Ranking of the suggested connections: combined score, common co-authors only, or subfields only. */
+/** Ranking of the suggested connections: combined score, common co-authors only, or themes only. */
 export type SuggestionSignal = 'combined' | 'triadic' | 'topics';
 
 export interface PairSuggestion {
@@ -153,14 +153,17 @@ export interface PairSuggestion {
   /** Common co-authors over the period, and the most specific ones named. */
   common: number;
   via: { id: number; label: string; labs: string[] }[];
-  /** Closeness of the OpenAlex subfield profiles (0-1, damped for small profiles), and the shared subfields. */
+  /** Closeness of the OpenAlex theme profiles (0-1, damped for small profiles), and the shared themes. */
   similarity: number;
-  subfields: string[];
+  themes: string[];
   crossPole: boolean;
   /** Stable key of the pair and the opinions given on it (lot 4, PostgreSQL storage only). */
   key?: string;
   feedback?: { counts: Partial<Record<PairVerdict, number>>; mine: PairVerdict | null };
 }
+
+/** Themes of the profiles: OpenAlex topics (network.json v4) or subfields. */
+export type ThemeLevel = 'topic' | 'subfield';
 
 /** Opinion of a user on a suggested connection (lib/pairs/feedback.ts). */
 export type PairVerdict = 'relevant' | 'already_in_contact' | 'not_relevant';
@@ -176,6 +179,8 @@ export interface SuggestionsResponse {
   feedback?: boolean;
   suggestions: PairSuggestion[];
   total: number;
+  /** Absent from servers older than the topics (subfields). */
+  level?: ThemeLevel;
 }
 
 export interface SuggestionsParams {

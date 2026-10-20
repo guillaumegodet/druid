@@ -11,6 +11,7 @@ import {
   SuggestionSignal,
   SuggestionsParams,
   SuggestionsResponse,
+  ThemeLevel,
   fetchSuggestions,
   sendPairFeedback,
 } from './pairsApi';
@@ -23,8 +24,8 @@ import { helpUrl } from '../../lib/helpLinks';
 
 const PAGE = 50;
 
-/** Why a pair is suggested: its common co-authors, then its shared subfields. */
-const ReasonCell: React.FC<{ s: PairSuggestion }> = ({ s }) => {
+/** Why a pair is suggested: its common co-authors, then its shared themes (topics or subfields). */
+const ReasonCell: React.FC<{ s: PairSuggestion; level: ThemeLevel }> = ({ s, level }) => {
   const { i18n } = useLingui();
   const others = s.common - s.via.length;
   return (
@@ -39,11 +40,13 @@ const ReasonCell: React.FC<{ s: PairSuggestion }> = ({ s }) => {
           {others > 0 && <> <Trans>and {others} more</Trans></>}
         </span>
       )}
-      {s.subfields.length > 0 && (
+      {s.themes.length > 0 && (
         <span>
-          <span className="font-semibold text-ink dark:text-[#f5f2ea]"><Trans>Shared subfields:</Trans></span>
+          <span className="font-semibold text-ink dark:text-[#f5f2ea]">
+            {level === 'topic' ? <Trans>Shared research topics:</Trans> : <Trans>Shared subfields:</Trans>}
+          </span>
           {' '}
-          {s.subfields.join(', ')}
+          {s.themes.join(', ')}
           {' · '}
           <Trans>closeness {s.similarity.toLocaleString(i18n.locale, { minimumFractionDigits: 2 })}</Trans>
         </span>
@@ -96,7 +99,7 @@ const FeedbackButtons: React.FC<{ s: PairSuggestion; busy: boolean; onFeedback: 
 /**
  * « Suggested connections » of the Researcher pairs sub-tab (druid-internal `docs/plan-binomes-chercheurs.md`,
  * lot 3): researchers of different labs who never co-signed, ranked by their common co-authors and their OpenAlex
- * subfields over the period, each row saying why.
+ * topics (subfields for a network without topics) over the period, each row saying why.
  */
 export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }> = ({ slug, range }) => {
   const { t, i18n } = useLingui();
@@ -183,17 +186,18 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
   const asideCount = all.filter(isAside).length;
   const rows = showAside ? all : all.filter((x) => !isAside(x));
   const canExportFeedback = !!loaded?.feedback && getUserInfo().access.allowedSlugs === 'all';
+  const level: ThemeLevel = loaded?.level ?? 'subfield';
 
   const downloadCsv = () => {
     const csv = toCsv({
       name: 'rapprochements',
       columns: [
         'researcher_1', 'labs_1', 'poles_1', 'researcher_2', 'labs_2', 'poles_2',
-        'score', 'common_coauthors', 'named_coauthors', 'closeness', 'shared_subfields', 'my_opinion',
+        'score', 'common_coauthors', 'named_coauthors', 'closeness', level === 'topic' ? 'shared_topics' : 'shared_subfields', 'my_opinion',
       ],
       rows: rows.map((s) => [
         s.a.label, s.a.labs.join('|'), s.a.poles.join('|'), s.b.label, s.b.labs.join('|'), s.b.poles.join('|'),
-        s.score, s.common, s.via.map((v) => v.label).join('|'), s.similarity, s.subfields.join('|'), s.feedback?.mine ?? '',
+        s.score, s.common, s.via.map((v) => v.label).join('|'), s.similarity, s.themes.join('|'), s.feedback?.mine ?? '',
       ]),
     });
     downloadBlob(new Blob([`﻿${csv}\r\n`], { type: 'text/csv;charset=utf-8' }),
@@ -221,9 +225,9 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
             <option value="members">{t`Labs of the directory (members only)`}</option>
           </select>
           <select className={select} value={signal} onChange={(e) => setSignal(e.target.value as SuggestionSignal)} title={t`Ranking`}>
-            <option value="combined">{t`Common co-authors and subfields`}</option>
+            <option value="combined">{level === 'topic' ? t`Common co-authors and research topics` : t`Common co-authors and subfields`}</option>
             <option value="triadic">{t`Common co-authors only`}</option>
-            <option value="topics">{t`Shared subfields only`}</option>
+            <option value="topics">{level === 'topic' ? t`Shared research topics only` : t`Shared subfields only`}</option>
           </select>
           <select className={select} value={quota} onChange={(e) => setQuota(Number(e.target.value))} title={t`Suggestions per researcher at most`}>
             {[1, 3, 5, 10].map((n) => (
@@ -301,7 +305,7 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
                     <th className="px-3 py-2"><Trans>Researcher</Trans></th>
                     <th className="px-3 py-2"><Trans>Researcher</Trans></th>
                     <th className="px-3 py-2"><Trans>Why</Trans></th>
-                    <th className="px-3 py-2 text-right" title={t`2 × common co-authors (Adamic-Adar) + closeness of the subfields`}><Trans>Score</Trans></th>
+                    <th className="px-3 py-2 text-right" title={level === 'topic' ? t`2 × common co-authors (Adamic-Adar) + closeness of the research topics` : t`2 × common co-authors (Adamic-Adar) + closeness of the subfields`}><Trans>Score</Trans></th>
                     {loaded.feedback && <th className="px-3 py-2"><Trans>Your opinion</Trans></th>}
                   </tr>
                 </thead>
@@ -310,7 +314,7 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
                     <tr key={`${s.a.id}-${s.b.id}`} className={`border-t border-ink/5 dark:border-white/5 align-top ${isAside(s) ? 'opacity-50' : ''}`}>
                       <td className="px-3 py-2"><AuthorCell author={s.a} /></td>
                       <td className="px-3 py-2"><AuthorCell author={s.b} /></td>
-                      <td className="px-3 py-2"><ReasonCell s={s} /></td>
+                      <td className="px-3 py-2"><ReasonCell s={s} level={level} /></td>
                       <td className="px-3 py-2 text-right text-muted dark:text-[#c3beb0]">{s.score.toFixed(2)}</td>
                       {loaded.feedback && (
                         <td className="px-3 py-2"><FeedbackButtons s={s} busy={busyKey === s.key} onFeedback={onFeedback} /></td>
@@ -332,10 +336,10 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
           <p className="text-xs text-muted-light dark:text-[#8f897c] leading-relaxed px-1">
             <Trans>
               Researchers of different labs who have not co-signed any publication, ranked by their common co-authors
-              and the closeness of their OpenAlex subfields over the period. These are leads, not predictions: tested
-              on 2020-2022, about one in six of the 100 first suggestions led to a joint publication in 2023-2026
-              (one in fifteen between poles). A researcher who left is still suggested until the network is
-              regenerated.
+              and the closeness of their OpenAlex research topics over the period (subfields when the network has no
+              topics). These are leads, not predictions: tested on 2020-2022, about one in seven of the 100 first
+              suggestions led to a joint publication in 2023-2026 (one in ten between poles). A researcher who left is
+              still suggested until the network is regenerated.
             </Trans>
             {loaded.restricted && (
               <> <Trans>Only the suggestions involving a researcher of your lab are shown.</Trans></>

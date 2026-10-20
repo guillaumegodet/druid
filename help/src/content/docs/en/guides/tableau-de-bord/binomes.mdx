@@ -93,15 +93,17 @@ co-signed any publication**, ranked by two signals computed over the period:
 
 - **Common co-authors**: A and B both publish with C. A common co-author with few co-authors counts more than one who
   publishes with everyone (Adamic-Adar index). The three most specific common co-authors are named.
-- **Shared subfields**: how close the OpenAlex subfields of their publications are, damped for researchers with few
-  publications. The shared subfields are named.
+- **Shared research topics**: how close the OpenAlex topics of their publications are, damped for researchers with
+  few publications. The shared topics are named, for instance « Bone Tissue Engineering Materials ». OpenAlex has
+  about 4,500 topics, far finer than its 250 subfields; on a network generated without the topics, Druid compares the
+  subfields.
 
-The score is twice the common co-author signal plus the subfield one. Each researcher appears at most 5 times by
+The score is twice the common co-author signal plus the topic one. Each researcher appears at most 5 times by
 default, so that a very central researcher does not fill the list; PhD students are not suggested by default. The
 pole, scope and membership filters are those of the observed pairs.
 
-**What these suggestions are worth**: computed on 2020-2022, about one in six of the first 100 led to a joint
-publication in 2023-2026, and one in fifteen between different poles. That is far above chance (a few pairs in
+**What these suggestions are worth**: computed on 2020-2022, about one in seven of the first 100 led to a joint
+publication in 2023-2026, and one in ten between different poles. That is far above chance (a few pairs in
 10,000), but they are **leads**: a suggestion not followed is not an error.
 
 ### Giving your opinion
