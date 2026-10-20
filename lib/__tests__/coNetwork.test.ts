@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { createRequire } from 'node:module';
 
 // Inter-lab co-authorship graph (scripts/lib/co_network.cjs, docs/archive/plan-reseau-inter-labos.md lots 2 and 4).
-const { buildInterLabNetwork, commonPublications, OTHER_LABS_CATEGORY } = createRequire(import.meta.url)(
+const { buildInterLabNetwork, commonPublications, rankPairs, OTHER_LABS_CATEGORY } = createRequire(import.meta.url)(
   '../../scripts/lib/co_network.cjs',
 );
 
@@ -94,5 +94,115 @@ describe('commonPublications', () => {
     expect(commonPublications(NET, { a: 'a:1', b: 'lab:LAB-B', maxAuthors: 50 }).map((p: { title: string }) => p.title))
       .toEqual(['A with B']);
     expect(commonPublications(NET, { a: 'a:3', b: 'a:4', requireLabs: ['LAB-C'] })).toEqual([]);
+  });
+});
+
+// Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1): network.json v3, two poles.
+// Fields: 0 = Computer Science, 1 = Medicine. LAB-A (pole P1) × LAB-B (pole P2), LAB-C without pole.
+const PAIRS_NET = {
+  poles: [{ acronym: 'P1', name: 'Pole 1' }, { acronym: 'P2', name: 'Pole 2' }],
+  labs: [
+    { acronym: 'LAB-A', slug: 'lab-a', pole: 'P1', authors: 2 },
+    { acronym: 'LAB-B', slug: 'lab-b', pole: 'P2', authors: 2 },
+    { acronym: 'LAB-C', slug: 'lab-c', pole: null, authors: 1 },
+  ],
+  subfields: [
+    { name: 'Artificial Intelligence', field: 'Computer Science' },
+    { name: 'Oncology', field: 'Medicine' },
+  ],
+  fields: [{ name: 'Computer Science' }, { name: 'Medicine' }],
+  authors: [
+    { id: 1, label: 'Alice A', labs: ['LAB-A'], m: { 'LAB-A': 'stat' }, uid: 'alice', pubs: { '2020': 1, '2024': 6 }, f: { '0': 6, '1': 2 } },
+    { id: 2, label: 'Bruno A', labs: ['LAB-A'], phd: true, m: { 'LAB-A': 'stat' }, pubs: { '2024': 4 }, f: { '0': 2, '1': 2 } },
+    { id: 3, label: 'Chloé B', labs: ['LAB-B'], m: { 'LAB-B': 'assoc' }, pubs: { '2020': 1, '2024': 4 }, f: { '0': 3, '1': 2 } },
+    { id: 4, label: 'Denis B', labs: ['LAB-B'], m: { 'LAB-B': 'pubs' }, pubs: { '2024': 4 }, f: { '1': 4 } },
+    { id: 5, label: 'Emma C', labs: ['LAB-C'], pubs: { '2024': 4 }, f: { '1': 4 } },
+  ],
+  pubs: [
+    // Alice × Chloé: computer science together, once in 2020, twice in 2024.
+    { y: 2020, n: 3, a: [1, 3], s: [0] },
+    { y: 2024, n: 3, a: [1, 3], s: [0] },
+    { y: 2024, n: 3, a: [1, 3], s: [0] },
+    // Alice × Denis: new in 2024, medicine for Denis.
+    { y: 2024, n: 4, a: [1, 4], s: [0, 1] },
+    { y: 2024, n: 4, a: [1, 4], s: [1] },
+    // Bruno × Alice: same lab.
+    { y: 2024, n: 2, a: [1, 2], s: [0] },
+    { y: 2024, n: 2, a: [1, 2], s: [0] },
+    // Bruno × Emma (lab without pole), one of them a large collaboration.
+    { y: 2024, n: 3, a: [2, 5], s: [1] },
+    { y: 2024, n: 300, a: [2, 5], s: [1] },
+  ],
+};
+const pairKeys = (r: { pairs: { a: { id: number }; b: { id: number } }[] }) =>
+  r.pairs.map((p) => `${p.a.id}-${p.b.id}`).sort();
+
+describe('rankPairs', () => {
+  it('keeps the cross-lab pairs with at least two joint publications', () => {
+    const r = rankPairs(PAIRS_NET, {});
+    expect(pairKeys(r)).toEqual(['1-3', '1-4', '2-5']);
+    expect(r.total).toBe(3);
+    expect(r.pairs[0]).toMatchObject({ shared: 3, first: 2020, last: 2024, crossPole: true });
+    expect(r.pairs[0].a).toMatchObject({ label: 'Alice A', uid: 'alice', poles: ['P1'], m: { 'LAB-A': 'stat' } });
+  });
+
+  it('applies the period, maxAuthors and minShared', () => {
+    expect(pairKeys(rankPairs(PAIRS_NET, { from: 2020, to: 2020, minShared: 1 }))).toEqual(['1-3']);
+    expect(pairKeys(rankPairs(PAIRS_NET, { from: 2020, to: 2020 }))).toEqual([]);
+    expect(pairKeys(rankPairs(PAIRS_NET, { maxAuthors: 50 }))).toEqual(['1-3', '1-4']);
+    expect(pairKeys(rankPairs(PAIRS_NET, { crossLab: false }))).toEqual(['1-2', '1-3', '1-4', '2-5']);
+  });
+
+  it('filters on poles: different poles, or a pole couple in either order', () => {
+    expect(pairKeys(rankPairs(PAIRS_NET, { crossPole: true }))).toEqual(['1-3', '1-4']);
+    expect(pairKeys(rankPairs(PAIRS_NET, { poles: ['P2', 'P1'] }))).toEqual(['1-3', '1-4']);
+    expect(pairKeys(rankPairs(PAIRS_NET, { poles: ['P1', 'P1'] }))).toEqual([]);
+  });
+
+  it('computes the disciplinary distance outside the joint publications', () => {
+    const r = rankPairs(PAIRS_NET, {});
+    const byKey = new Map(r.pairs.map((p: { a: { id: number }; b: { id: number }; distance: number | null }) => [`${p.a.id}-${p.b.id}`, p.distance]));
+    // Without their 3 joint publications: Alice {CS 3, Medicine 2}, Chloé {Medicine 2} => 1 - 2/√13.
+    expect(byKey.get('1-3')).toBe(0.45);
+    // Alice {CS 5} × Denis {Medicine 2}, Bruno {CS 2} × Emma {Medicine 2}: orthogonal.
+    expect(byKey.get('1-4')).toBe(1);
+    expect(pairKeys(rankPairs(PAIRS_NET, { minDistance: 0.5 }))).toEqual(['1-4', '2-5']);
+  });
+
+  it('reduces the labs of each author with the membership filter', () => {
+    expect(pairKeys(rankPairs(PAIRS_NET, { membership: 'associates' }))).toEqual(['1-3', '2-5']);
+    // Emma has no memberships (version 2 file): her labs are kept whatever the filter.
+    expect(pairKeys(rankPairs(PAIRS_NET, { membership: 'members' }))).toEqual(['2-5']);
+  });
+
+  it('excludes the PhD students on demand', () => {
+    expect(pairKeys(rankPairs(PAIRS_NET, { includePhd: false }))).toEqual(['1-3', '1-4']);
+  });
+
+  it('scopes the pairs to the structure and to the visible labs', () => {
+    expect(pairKeys(rankPairs(PAIRS_NET, { structureLabs: ['LAB-C'] }))).toEqual(['2-5']);
+    expect(pairKeys(rankPairs(PAIRS_NET, { structureLabs: ['LAB-A', 'LAB-B'], scope: 'structure' }))).toEqual(['1-3', '1-4']);
+    expect(pairKeys(rankPairs(PAIRS_NET, { visibleLabs: ['LAB-B'] }))).toEqual(['1-3', '1-4']);
+  });
+
+  it('gives a trend relative to the end of the period and counts the pairs', () => {
+    const r = rankPairs(PAIRS_NET, { to: 2026 });
+    const trend = new Map(r.pairs.map((p: { a: { id: number }; b: { id: number }; trend: string }) => [`${p.a.id}-${p.b.id}`, p.trend]));
+    expect(trend.get('1-4')).toBe('new');
+    expect(trend.get('1-3')).toBe('rising');
+    expect(r.counts).toMatchObject({ new: 2, rising: 1, crossPole: 2, authors: 5 });
+    // The reference year never goes past the last year of the corpus.
+    expect(r.refYear).toBe(2024);
+    const dormant = {
+      ...PAIRS_NET,
+      pubs: [{ y: 2019, n: 2, a: [1, 3], s: [] }, { y: 2020, n: 2, a: [1, 3], s: [] }, { y: 2024, n: 1, a: [4], s: [] }],
+    };
+    expect(rankPairs(dormant, {}).pairs[0]).toMatchObject({ trend: 'dormant', first: 2019, last: 2020 });
+  });
+
+  it('shares of production and top subfields of the joint publications', () => {
+    const p = rankPairs(PAIRS_NET, {}).pairs.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 1 && x.b.id === 4);
+    expect(p.share).toEqual([2 / 7, 2 / 4]);
+    expect(p.subfields).toEqual(['Oncology', 'Artificial Intelligence']);
   });
 });

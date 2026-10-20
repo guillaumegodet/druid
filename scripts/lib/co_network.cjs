@@ -195,4 +195,218 @@ function commonPublications(net, { a, b, from, to, maxAuthors = null, requireLab
     .map((p) => ({ year: p.y, title: p.title, doi: p.doi, authorCount: p.n }));
 }
 
-module.exports = { buildInterLabNetwork, commonPublications, OTHER_LABS_CATEGORY };
+// ── Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1) ─────────────────────
+// The links of the graph, aggregated over the whole university without node cap: who co-signs with
+// whom across labs and poles. Uses the fields of network.json v3 when present (authors[].f profile
+// of OpenAlex fields, authors[].m lab memberships, authors[].uid) and degrades without them.
+
+/** Default disciplinary distance from which a pair counts as « distant profiles » (D10: cosine < 0.5). */
+const DISTANT_PROFILES = 0.5;
+/** Kinds of lab membership kept by each value of the `membership` option (authors[].m). */
+const MEMBERSHIP_KINDS = {
+  members: new Set(['stat']),
+  associates: new Set(['stat', 'assoc']),
+};
+
+const cosineDistance = (x, y) => {
+  let dot = 0;
+  let nx = 0;
+  let ny = 0;
+  for (const [k, v] of x) { nx += v * v; dot += v * (y.get(k) ?? 0); }
+  for (const v of y.values()) ny += v * v;
+  if (nx === 0 || ny === 0) return null;
+  return Math.max(0, 1 - dot / Math.sqrt(nx * ny));
+};
+
+/**
+ * @param net network.json content
+ * @param opts {
+ *   structureLabs: string[]|null — labs of the current structure (null = the whole university);
+ *   scope: 'all' | 'structure'  — at least one author in the structure, or both;
+ *   from, to: number            — year range (inclusive) of the counted joint publications;
+ *   minShared: number           — minimum joint publications over the period (default 2);
+ *   maxAuthors: number|null     — ignore publications with more authors (large collaborations);
+ *   crossLab: boolean           — no common lab (default true);
+ *   crossPole: boolean          — no common pole, both poles known;
+ *   poles: [string, string]|null — one author in pole A, the other in pole B;
+ *   minDistance: number|null    — keep the pairs whose disciplinary distance is at least this;
+ *   includePhd: boolean         — keep the PhD students (default true);
+ *   membership: 'all' | 'associates' | 'members' — labs kept for an author: every lab, the labs where the
+ *                                 directory lists them (member or associate), or as a member only;
+ *   visibleLabs: string[]|null  — restricted access: one author at least in these labs;
+ *   limit: number               — pairs returned (most joint publications first, default 500).
+ * }
+ * @returns {pairs, total, counts, refYear}
+ */
+function rankPairs(net, opts = {}) {
+  const from = opts.from ?? -Infinity;
+  const to = opts.to ?? Infinity;
+  const minShared = Math.max(1, opts.minShared ?? 2);
+  const maxAuthors = opts.maxAuthors ?? null;
+  const crossLab = opts.crossLab !== false;
+  const includePhd = opts.includePhd !== false;
+  const kinds = MEMBERSHIP_KINDS[opts.membership] ?? null;
+  const structure = opts.structureLabs ? new Set(opts.structureLabs) : null;
+  const visible = opts.visibleLabs ? new Set(opts.visibleLabs) : null;
+  const [poleA, poleB] = opts.poles ?? [];
+  const minDistance = opts.minDistance ?? null;
+  const limit = opts.limit ?? 500;
+
+  const poleOf = new Map(net.labs.map((l) => [l.acronym, l.pole ?? null]));
+  // Reference year of the trends: end of the period, or the last year of the corpus.
+  const lastYear = net.pubs.reduce((m, p) => Math.max(m, p.y), -Infinity);
+  const refYear = Number.isFinite(to) ? Math.min(to, lastYear) : lastYear;
+
+  // Authors that can belong to a pair, with the labs kept by the membership filter.
+  const eligible = new Map();
+  for (const a of net.authors) {
+    if (!includePhd && a.phd) continue;
+    const labs = kinds && a.m ? a.labs.filter((l) => kinds.has(a.m[l])) : a.labs;
+    if (labs.length === 0) continue;
+    const poles = [...new Set(labs.map((l) => poleOf.get(l)).filter(Boolean))];
+    eligible.set(a.id, {
+      a,
+      labs,
+      poles,
+      inStructure: !structure || labs.some((l) => structure.has(l)),
+      visible: !visible || a.labs.some((l) => visible.has(l)),
+    });
+  }
+
+  const pairAllowed = (x, y) => {
+    if (opts.scope === 'structure' ? !(x.inStructure && y.inStructure) : !(x.inStructure || y.inStructure)) return false;
+    if (!x.visible && !y.visible) return false;
+    if (crossLab && x.labs.some((l) => y.labs.includes(l))) return false;
+    if (opts.crossPole && (!x.poles.length || !y.poles.length || x.poles.some((p) => y.poles.includes(p)))) return false;
+    if (poleA && poleB) {
+      const ab = x.poles.includes(poleA) && y.poles.includes(poleB);
+      const ba = x.poles.includes(poleB) && y.poles.includes(poleA);
+      if (!ab && !ba) return false;
+    }
+    return true;
+  };
+
+  // Joint publications of every allowed pair, all years (first / last year, trend), large ones excluded.
+  const pairs = new Map(); // "lo|hi" -> publication indexes, or null when the pair is not allowed
+  net.pubs.forEach((p, idx) => {
+    if (maxAuthors != null && p.n != null && p.n > maxAuthors) return;
+    const ids = p.a.filter((id) => eligible.has(id));
+    for (let i = 0; i < ids.length; i++) {
+      for (let j = i + 1; j < ids.length; j++) {
+        const [lo, hi] = ids[i] < ids[j] ? [ids[i], ids[j]] : [ids[j], ids[i]];
+        const key = `${lo}|${hi}`;
+        let list = pairs.get(key);
+        if (list === undefined) {
+          list = pairAllowed(eligible.get(lo), eligible.get(hi)) ? [] : null;
+          pairs.set(key, list);
+        }
+        if (list) list.push(idx);
+      }
+    }
+  });
+
+  // Profiles of OpenAlex fields (v3) and field of each subfield of the vocabulary.
+  const fieldIndex = new Map((net.fields ?? []).map((f, i) => [f.name, String(i)]));
+  const subfieldField = (net.subfields ?? []).map((sf) => fieldIndex.get(sf.field) ?? null);
+  const pubFields = (p) => new Set((p.s ?? []).map((s) => subfieldField[s]).filter((f) => f != null));
+  const profile = (a, shared) => {
+    const v = new Map(Object.entries(a.f ?? {}));
+    for (const [k, n] of shared) v.set(k, Math.max(0, (v.get(k) ?? 0) - n));
+    return v;
+  };
+  // Joint publications of the pair, whatever their size: the profiles counted them all.
+  const pubsOf = new Map();
+  const authorPubs = (id) => {
+    if (!pubsOf.has(id)) pubsOf.set(id, new Set());
+    return pubsOf.get(id);
+  };
+  if (fieldIndex.size) net.pubs.forEach((p, idx) => { for (const id of p.a) authorPubs(id).add(idx); });
+  const distanceOf = (x, y) => {
+    if (!fieldIndex.size || !x.a.f || !y.a.f) return null;
+    const shared = new Map();
+    const [small, large] = authorPubs(x.a.id).size < authorPubs(y.a.id).size
+      ? [authorPubs(x.a.id), authorPubs(y.a.id)]
+      : [authorPubs(y.a.id), authorPubs(x.a.id)];
+    for (const idx of small) {
+      if (!large.has(idx)) continue;
+      for (const f of pubFields(net.pubs[idx])) shared.set(f, (shared.get(f) ?? 0) + 1);
+    }
+    return cosineDistance(profile(x.a, shared), profile(y.a, shared));
+  };
+
+  const production = (a) => {
+    let n = 0;
+    for (const [y, c] of Object.entries(a.pubs || {})) if (Number(y) >= from && Number(y) <= to) n += c;
+    return n;
+  };
+  const authorOut = (x) => ({
+    id: x.a.id,
+    label: x.a.label,
+    labs: x.labs,
+    poles: x.poles,
+    phd: !!x.a.phd,
+    ...(x.a.m ? { m: Object.fromEntries(x.labs.map((l) => [l, x.a.m[l] ?? 'pubs'])) } : {}),
+    ...(x.a.uid ? { uid: x.a.uid } : {}),
+  });
+  const trendOf = (years) => {
+    const first = Math.min(...years);
+    const last = Math.max(...years);
+    if (first > refYear - 3) return 'new';
+    if (last <= refYear - 3) return 'dormant';
+    const recent = years.filter((y) => y > refYear - 3 && y <= refYear).length;
+    const before = years.filter((y) => y > refYear - 6 && y <= refYear - 3).length;
+    return recent > before ? 'rising' : 'steady';
+  };
+
+  const rows = [];
+  const counts = { new: 0, dormant: 0, rising: 0, steady: 0, distant: 0, crossPole: 0 };
+  const engaged = new Set();
+  for (const [key, list] of pairs) {
+    if (!list) continue;
+    const inPeriod = list.filter((idx) => net.pubs[idx].y >= from && net.pubs[idx].y <= to);
+    if (inPeriod.length < minShared) continue;
+    const [lo, hi] = key.split('|').map(Number);
+    const x = eligible.get(lo);
+    const y = eligible.get(hi);
+    const distance = distanceOf(x, y);
+    if (minDistance != null && (distance == null || distance < minDistance)) continue;
+    const years = list.map((idx) => net.pubs[idx].y).filter((yr) => yr <= refYear);
+    const trend = trendOf(years.length ? years : [refYear]);
+    const subfields = new Map();
+    for (const idx of inPeriod) {
+      for (const s of new Set(net.pubs[idx].s ?? [])) subfields.set(s, (subfields.get(s) ?? 0) + 1);
+    }
+    const crossPole = x.poles.length > 0 && y.poles.length > 0 && !x.poles.some((p) => y.poles.includes(p));
+    counts[trend] += 1;
+    if (distance != null && distance >= DISTANT_PROFILES) counts.distant += 1;
+    if (crossPole) counts.crossPole += 1;
+    engaged.add(lo);
+    engaged.add(hi);
+    const [px, py] = [production(x.a), production(y.a)];
+    rows.push({
+      a: authorOut(x),
+      b: authorOut(y),
+      shared: inPeriod.length,
+      share: [px ? inPeriod.length / px : null, py ? inPeriod.length / py : null],
+      first: Math.min(...list.map((idx) => net.pubs[idx].y)),
+      last: Math.max(...list.map((idx) => net.pubs[idx].y)),
+      trend,
+      distance: distance == null ? null : Math.round(distance * 100) / 100,
+      crossPole,
+      subfields: [...subfields.entries()]
+        .sort((m, n) => n[1] - m[1] || m[0] - n[0])
+        .slice(0, 3)
+        .map(([s]) => net.subfields?.[s]?.name)
+        .filter(Boolean),
+    });
+  }
+  rows.sort((m, n) => n.shared - m.shared || n.last - m.last || m.a.label.localeCompare(n.a.label));
+  return {
+    pairs: rows.slice(0, limit),
+    total: rows.length,
+    counts: { ...counts, authors: engaged.size },
+    refYear: Number.isFinite(refYear) ? refYear : null,
+  };
+}
+
+module.exports = { buildInterLabNetwork, commonPublications, rankPairs, OTHER_LABS_CATEGORY, DISTANT_PROFILES };

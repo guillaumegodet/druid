@@ -13,6 +13,8 @@ import {
 import { InternationalTab } from './InternationalTab';
 import { PartnerBilanSection } from './PartnerBilanSection';
 import { CountrySection } from './CountrySection';
+import { PairsSection } from './PairsSection';
+import { hasCapability } from '../../lib/auth';
 import { PubFilters } from './publicationFilters';
 import { TeamDonutChart, RankBarChart } from './charts/TeamCharts';
 import { YearlyEvolutionChart } from './charts/YearlyEvolutionChart';
@@ -183,7 +185,9 @@ const InternalCollabSection: React.FC<{
   /** Filter to apply for a co-signing lab (sub-structure or NU lab). */
   labFilter?: (lab: string) => PubFilters;
   onOpenList?: (filters: PubFilters) => void;
-}> = ({ agg, caption, metricLabel, idPrefix, labWord, labFilter, onOpenList }) => {
+  /** Link to the « Researcher pairs » sub-tab, under the Sankey. */
+  onOpenPairs?: () => void;
+}> = ({ agg, caption, metricLabel, idPrefix, labWord, labFilter, onOpenList, onOpenPairs }) => {
   const { t } = useLingui();
   if (agg.total === 0) {
     return (
@@ -233,12 +237,17 @@ const InternalCollabSection: React.FC<{
         </div>
       </div>
       {agg.sankey.links.length > 0 && <InternalCollabSankeyChart agg={agg} idPrefix={idPrefix} />}
+      {onOpenPairs && (
+        <button type="button" onClick={onOpenPairs} className="self-start px-1 text-sm text-muted dark:text-[#c3beb0] hover:underline cursor-pointer">
+          <Trans>See the researcher pairs behind these collaborations →</Trans>
+        </button>
+      )}
     </div>
   );
 };
 
-type SubTab = 'typology' | 'structure' | 'nantes' | 'national' | 'international' | 'country' | 'partners';
-const SUB_TABS: SubTab[] = ['typology', 'structure', 'nantes', 'national', 'international', 'country', 'partners'];
+type SubTab = 'typology' | 'structure' | 'nantes' | 'pairs' | 'national' | 'international' | 'country' | 'partners';
+const SUB_TABS: SubTab[] = ['typology', 'structure', 'nantes', 'pairs', 'national', 'international', 'country', 'partners'];
 
 /** Sub-tab of the shareable link (`?sub=`, docs/archive/plan-collaboration-pays.md § 2). */
 const readSubTab = (): SubTab => {
@@ -262,14 +271,21 @@ export const CollaborationsTab: React.FC<{
   dataset: DashboardDataset;
   range: YearRange;
   onOpenList?: (filters: PubFilters) => void;
-}> = ({ dataset, range, onOpenList }) => {
+  /** Structure slug: the « Researcher pairs » sub-tab reads its university-wide network (HAS_NETWORK_API). */
+  slug?: string | null;
+}> = ({ dataset, range, onOpenList, slug }) => {
   const { t: tr } = useLingui();
   const { publications } = dataset;
   const composite = useMemo(() => hasSubStructures(publications), [publications]);
+  const canPairs = hasCapability('HAS_NETWORK_API') && !!slug;
   const [sub, setSub] = useState<SubTab>(readSubTab);
   useEffect(() => writeSubTab(sub), [sub]);
-  // A shared link may point to « Within the structure » on a structure without sub-structures.
-  useEffect(() => { if (sub === 'structure' && !composite) setSub('typology'); }, [sub, composite]);
+  // A shared link may point to « Within the structure » on a structure without sub-structures, or to the pairs
+  // on an instance without the network API.
+  useEffect(() => {
+    if ((sub === 'structure' && !composite) || (sub === 'pairs' && !canPairs)) setSub('typology');
+  }, [sub, composite, canPairs]);
+  const openPairs = canPairs ? () => setSub('pairs') : undefined;
   useEffect(() => () => writeSubTab(null), []);
 
   const typology = useMemo(
@@ -303,6 +319,7 @@ export const CollaborationsTab: React.FC<{
     { key: 'typology', label: tr`Typology` },
     ...(composite ? [{ key: 'structure' as SubTab, label: tr`Within the structure` }] : []),
     { key: 'nantes', label: tr`Nantes Université` },
+    ...(canPairs ? [{ key: 'pairs' as SubTab, label: tr`Researcher pairs` }] : []),
     { key: 'national', label: tr`National` },
     { key: 'international', label: tr({ message: `International`, context: "feminine plural" }) },
     { key: 'country', label: tr`By country` },
@@ -357,6 +374,7 @@ export const CollaborationsTab: React.FC<{
           labWord={tr`Labs`}
           onOpenList={onOpenList}
           labFilter={(lab) => ({ sousStructure: lab })}
+          onOpenPairs={openPairs}
         />
       )}
 
@@ -369,6 +387,7 @@ export const CollaborationsTab: React.FC<{
           labWord={tr`Labs`}
           onOpenList={onOpenList}
           labFilter={(lab) => ({ nantesPartner: lab })}
+          onOpenPairs={openPairs}
         />
       )}
       {sub === 'nantes' && nantes && nantes.total > 0 && nantesProvenance && nantesProvenance.graphOnly > 0 && (
@@ -378,6 +397,8 @@ export const CollaborationsTab: React.FC<{
           </Trans>
         </p>
       )}
+
+      {sub === 'pairs' && canPairs && slug && <PairsSection slug={slug} range={range} />}
 
       {sub === 'national' && national && (
         <>
