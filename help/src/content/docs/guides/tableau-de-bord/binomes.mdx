@@ -121,6 +121,22 @@ suit les deux chercheurs d'une régénération du réseau à l'autre. Avec un dr
 **Tous les avis (CSV)** télécharge l'ensemble des avis, pour juger la qualité des suggestions. Les avis ne sont pas
 disponibles sur les instances sans base PostgreSQL.
 
+## Sur la fiche d'un chercheur
+
+En bas de la fiche, le bloc **Binômes de recherche** reprend ces deux vues pour une seule personne :
+
+- **Coauteurs les plus fréquents** : une carte par coauteur avec au moins deux publications communes, toutes années
+  confondues, avec sa photo, son labo, le nombre de publications communes, la tendance et les sujets principaux des
+  publications communes. Les boutons **Autres labos** et **Autres pôles** ne gardent que les binômes hors du labo ou
+  du pôle du chercheur.
+- **Chercheurs à rencontrer** : les rapprochements suggérés sur les cinq dernières années, présentés en pile de
+  cartes. Faites glisser la carte vers la droite (pertinent) ou vers la gauche (non pertinent), ou utilisez les
+  boutons ; la poignée de main signale un contact déjà établi. Ces avis sont les mêmes que ceux du sous-onglet, et
+  un clic sur un avis de la liste **Vos avis** le retire et remet la carte dans la pile.
+
+Le bloc n'apparaît pas pour un chercheur absent du réseau de l'université (aucune publication cosignée avec un
+autre chercheur rattaché). Un clic sur le nom d'un coauteur ouvre sa fiche quand elle vous est accessible.
+
 ## Qui voit quoi
 
 - Avec un droit sur **tout l'établissement** ou sur un pôle, tous les binômes du périmètre sont visibles.

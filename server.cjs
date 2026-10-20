@@ -1207,6 +1207,64 @@ app.get('/api/network/suggestions/feedback.csv', requireEstablishmentScope, asyn
   }
 });
 
+// Pairs of one researcher (record page, druid-internal `docs/plan-binomes-chercheurs.md`): their most frequent
+// co-authors (every lab, all years) and the researchers suggested to them over the last five years, from the
+// university-wide network. Rights: a lab of the researcher readable by the viewer, or the researcher themself.
+// `feedbackSlug`: lab slug through which the viewer gives an opinion (POST /api/network/:slug/suggestions/feedback).
+const researcherPairsCache = new Map();
+// Same bound as LARGE_COLLAB_MAX_AUTHORS (components/dashboard/interLabNetwork.ts): large collaborations are no pair.
+const RECORD_PAIRS_MAX_AUTHORS = 50;
+app.get('/api/researchers/:key/pairs', async (req, res) => {
+  const access = req.session.user?.access;
+  const key = String(req.params.key || '');
+  const self = req.session.user?.preferred_username === key;
+  if (!hasAnyRight(access) && !self) return res.status(403).json({ error: 'Forbidden' });
+  let net;
+  try {
+    net = loadNetwork(NETWORK_SOURCE_SLUG);
+  } catch (e) {
+    console.error('[Network] unreadable network.json:', e.message);
+    return res.status(500).json({ error: 'Unreadable network data' });
+  }
+  if (!net) return res.status(404).json({ error: 'No network data' });
+  const author = net.authors.find((a) => a.uid === key);
+  if (!author) return res.json({ found: false, observed: [], suggestions: [] });
+  const labSlugs = net.labs.filter((l) => l.slug && author.labs.includes(l.acronym)).map((l) => l.slug);
+  const readable = labSlugs.filter((slug) => canAccessSlug(access, slug));
+  if (!self && !access?.allSlugs && !readable.length) return res.status(403).json({ error: 'Forbidden' });
+  const lastYear = net.pubs.reduce((m, p) => Math.max(m, p.y), -Infinity);
+  const cacheKey = JSON.stringify([networkCache.get(NETWORK_SOURCE_SLUG)?.mtimeMs, author.id]);
+  let result = researcherPairsCache.get(cacheKey);
+  if (!result) {
+    const common = { authorId: author.id, maxAuthors: RECORD_PAIRS_MAX_AUTHORS };
+    const observed = coNetwork.rankPairs(net, { ...common, crossLab: false, minShared: 2, limit: 24 });
+    const suggested = coNetwork.suggestPairs(net, { ...common, from: lastYear - 4, to: lastYear, quota: null, limit: 12 });
+    result = { observed: observed.pairs, refYear: observed.refYear, suggestions: suggested.suggestions, level: suggested.level, from: lastYear - 4, to: lastYear };
+    if (researcherPairsCache.size >= 200) researcherPairsCache.delete(researcherPairsCache.keys().next().value);
+    researcherPairsCache.set(cacheKey, result);
+  }
+  const feedback = storage().pairFeedback;
+  const feedbackSlug = (access?.allSlugs ? labSlugs : readable)[0] ?? null;
+  let suggestions = result.suggestions;
+  if (feedback && feedbackSlug) {
+    try {
+      suggestions = await feedback.annotate(suggestions, req.session.user.preferred_username);
+    } catch (e) {
+      console.error('[pairs] feedback unavailable:', e.message);
+    }
+  }
+  res.set('Cache-Control', 'private, no-cache');
+  res.json({
+    found: true,
+    authorId: author.id,
+    generatedAt: net.generatedAt,
+    ...result,
+    suggestions,
+    feedback: !!feedback && !!feedbackSlug,
+    feedbackSlug,
+  });
+});
+
 // ── « Tableau de bord » section: monitoring of new publications ────────────
 // « Veille » tab of the React dashboard: queries OpenAlex LIVE
 // (most recent publications signed by the structure, sorted by descending

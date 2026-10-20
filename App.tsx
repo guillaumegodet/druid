@@ -881,6 +881,11 @@ function App() {
             }}
             onCreateTeam={writable ? (lab) => handleCreateStructure({ level: StructureLevel.EQUIPE, type: 'TEAM', parentStructure: lab }) : undefined}
             onReportTask={tasksEnabled ? (r) => setTaskForm({ researcher: r }) : undefined}
+            researchers={researchers}
+            onOpenResearcher={(id) => {
+              const r = researchers.find((x) => x.id === id);
+              if (r) { handleResearcherSelect(r, detailReturnView); window.scrollTo({ top: 0 }); }
+            }}
           />
         );
       case ViewState.STRUCTURES_LIST:

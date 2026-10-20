@@ -302,6 +302,24 @@ describe('suggestPairs', () => {
     expect(sugKeys(suggestPairs(withTopics(1), PERIOD))).not.toContain('4-6');
   });
 
+  it('keeps the pairs of one researcher only (record page)', () => {
+    const sug = sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, quota: null, authorId: 4 }));
+    expect(sug.length).toBeGreaterThan(0);
+    expect(sug.every((k) => k.split('-').includes('4'))).toBe(true);
+    const observed = rankPairs(SUGGEST_NET, { authorId: 1, crossLab: false, minShared: 2, maxAuthors: 50 });
+    expect(observed.pairs.map((p: { a: { id: number }; b: { id: number } }) => `${p.a.id}-${p.b.id}`).sort()).toEqual(['1-3', '1-6']);
+  });
+
+  it('names the main topics of the joint publications of a pair (version 4)', () => {
+    const net = {
+      ...SUGGEST_NET,
+      topics: [{ name: 'Immunotherapy Research' }],
+      pubs: SUGGEST_NET.pubs.map((p) => ({ ...p, t: p.s[0] === 1 ? [0] : [] })),
+    };
+    const fred = rankPairs(net, { authorId: 6, crossLab: false, maxAuthors: 50 }).pairs[0];
+    expect(fred).toMatchObject({ shared: 3, topics: ['Immunotherapy Research'] });
+  });
+
   it('only excludes the pairs linked up to the end of the period', () => {
     expect(sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, to: 2024 }))).not.toContain('1-2');
   });
