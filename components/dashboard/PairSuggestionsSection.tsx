@@ -97,7 +97,7 @@ const FeedbackButtons: React.FC<{ s: PairSuggestion; busy: boolean; onFeedback: 
 };
 
 /**
- * « Suggested connections » of the Researcher pairs sub-tab (druid-internal `docs/plan-binomes-chercheurs.md`,
+ * « Suggested connections » of the Researcher pairs sub-tab (druid-internal `docs/archive/plan-binomes-chercheurs.md`,
  * lot 3): researchers of different labs who never co-signed, ranked by their common co-authors and their OpenAlex
  * topics (subfields for a network without topics) over the period, each row saying why.
  */

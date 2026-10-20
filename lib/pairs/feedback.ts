@@ -1,5 +1,5 @@
 // Opinions of the users on the suggested connections between researchers (druid-internal
-// `docs/plan-binomes-chercheurs.md`, lot 4): stable pair keys, ordering of the suggestions, PostgreSQL store.
+// `docs/archive/plan-binomes-chercheurs.md`, lot 4): stable pair keys, ordering of the suggestions, PostgreSQL store.
 // The author ids of network.json change at each regeneration, so a pair is keyed by its researchers' Druid record ids
 // (`u:<id>`), or their names when the directory join found nobody (`n:<name>`).
 import { sql, type Kysely } from 'kysely';

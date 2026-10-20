@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { pairAuthorKey, pairKeyOf, withFeedback, type PairFeedback } from '../pairs/feedback';
 
-// Opinions on the suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 4). Fictitious names.
+// Opinions on the suggested connections (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 4). Fictitious names.
 
 describe('pair keys', () => {
   it('uses the Druid record id, else the normalized name', () => {

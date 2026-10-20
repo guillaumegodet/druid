@@ -1,4 +1,4 @@
-// Remote data of report blocks (druid-internal `docs/plan-binomes-chercheurs.md`, lot 2b): some charts,
+// Remote data of report blocks (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 2b): some charts,
 // key figures and tables are not computed from the dataset but fetched from an authenticated route
 // of the instance (ChartMeta.remote). The report loads them once per distinct request, like the
 // datasets (useReportDatasets), then resolves and renders the blocks synchronously — the preview,

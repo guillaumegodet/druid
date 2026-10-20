@@ -1051,7 +1051,7 @@ app.get('/api/network/:slug/publications', (req, res) => {
   res.json({ publications: publications.slice(0, 200), total: publications.length });
 });
 
-// Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1): the pairs always come from the
+// Researcher pairs (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 1): the pairs always come from the
 // university-wide file (universityNetwork), so that a pole sees its pairs with every lab of the university (D2);
 // the structure's labs only scope them. Rights: those of the network (D1).
 const PAIRS_MEMBERSHIP = new Set(['all', 'associates', 'members']);
@@ -1101,7 +1101,7 @@ app.get('/api/network/:slug/pairs', (req, res) => {
   });
 });
 
-// Suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 3): researchers of different labs who
+// Suggested connections (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 3): researchers of different labs who
 // never co-signed, scored by their common co-authors and their OpenAlex subfields over the period (suggestPairs).
 // Same file, scope and rights as /pairs; a reader limited to a lab sees the researchers suggested to its members (D2).
 const SUGGESTION_SIGNALS = new Set(['combined', 'triadic', 'topics']);
@@ -1207,7 +1207,7 @@ app.get('/api/network/suggestions/feedback.csv', requireEstablishmentScope, asyn
   }
 });
 
-// Pairs of one researcher (record page, druid-internal `docs/plan-binomes-chercheurs.md`): their most frequent
+// Pairs of one researcher (record page, druid-internal `docs/archive/plan-binomes-chercheurs.md`): their most frequent
 // co-authors (every lab, all years) and the researchers suggested to them over the last five years, from the
 // university-wide network. Rights: a lab of the researcher readable by the viewer, or the researcher themself.
 // `feedbackSlug`: lab slug through which the viewer gives an opinion (POST /api/network/:slug/suggestions/feedback).

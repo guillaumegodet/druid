@@ -97,7 +97,7 @@ describe('commonPublications', () => {
   });
 });
 
-// Researcher pairs (druid-internal `docs/plan-binomes-chercheurs.md`, lot 1): network.json v3, two poles.
+// Researcher pairs (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 1): network.json v3, two poles.
 // Fields: 0 = Computer Science, 1 = Medicine. LAB-A (pole P1) × LAB-B (pole P2), LAB-C without pole.
 const PAIRS_NET = {
   poles: [{ acronym: 'P1', name: 'Pole 1' }, { acronym: 'P2', name: 'Pole 2' }],
@@ -223,7 +223,7 @@ describe('rankPairs', () => {
   });
 });
 
-// Suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 3). Fictitious researchers.
+// Suggested connections (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 3). Fictitious researchers.
 // L1, L3 in pole P1; L2, L4 in pole P2. Subfields: 0 = Artificial Intelligence, 1 = Oncology.
 const pubsOf = (n: number) => ({ '2021': Math.ceil(n / 2), '2022': Math.floor(n / 2) });
 const SUGGEST_NET = {

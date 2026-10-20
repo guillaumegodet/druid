@@ -1,5 +1,5 @@
 // Opinions on the suggested connections in PostgreSQL (lib/pairs/feedback.ts, druid-internal
-// `docs/plan-binomes-chercheurs.md` lot 4), against a migrated database as the application role: one opinion per user
+// `docs/archive/plan-binomes-chercheurs.md` lot 4), against a migrated database as the application role: one opinion per user
 // and pair (the last one wins), withdrawal, counts and the viewer's own, ordering of the suggestions, CSV rows. Needs
 // DATABASE_URL_APP: run by the « database » CI job and `npm run test:db`. Rolled back. Fictitious names.
 import { afterAll, describe, expect, it, vi } from 'vitest';

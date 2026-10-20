@@ -47,7 +47,7 @@ export const API_ERRORS = [
   msg`Invalid pair id`,
   msg`Invalid verdict`,
   msg`Unknown pair`,
-  // Opinions on the suggested connections between researchers (`docs/plan-binomes-chercheurs.md`, lot 4)
+  // Opinions on the suggested connections between researchers (`docs/archive/plan-binomes-chercheurs.md`, lot 4)
   msg`The opinions need the PostgreSQL storage`,
   msg`Invalid pair`,
   msg`Unknown researcher`,
