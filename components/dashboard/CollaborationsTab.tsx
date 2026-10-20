@@ -255,10 +255,16 @@ const readSubTab = (): SubTab => {
   const v = new URLSearchParams(window.location.search).get('sub');
   return SUB_TABS.includes(v as SubTab) ? (v as SubTab) : 'typology';
 };
-const writeSubTab = (sub: SubTab | null) => {
+type PairsView = 'observed' | 'suggested';
+/** View of the « Researcher pairs » sub-tab (`view=suggested`), so that a link can open the suggested connections. */
+const readPairsView = (): PairsView =>
+  new URLSearchParams(window.location.search).get('view') === 'suggested' ? 'suggested' : 'observed';
+const writeSubTab = (sub: SubTab | null, pairsView: PairsView = 'observed') => {
   const p = new URLSearchParams(window.location.search);
   if (sub && sub !== 'typology') p.set('sub', sub);
   else p.delete('sub');
+  if (sub === 'pairs' && pairsView === 'suggested') p.set('view', 'suggested');
+  else p.delete('view');
   window.history.replaceState(window.history.state, '', `${window.location.pathname}?${p.toString()}`);
 };
 
@@ -280,15 +286,15 @@ export const CollaborationsTab: React.FC<{
   const composite = useMemo(() => hasSubStructures(publications), [publications]);
   const canPairs = hasCapability('HAS_NETWORK_API') && !!slug;
   const [sub, setSub] = useState<SubTab>(readSubTab);
-  useEffect(() => writeSubTab(sub), [sub]);
+  // « Researcher pairs »: the pairs that co-sign, or the suggested connections (lot 3).
+  const [pairsView, setPairsView] = useState<PairsView>(readPairsView);
+  useEffect(() => writeSubTab(sub, pairsView), [sub, pairsView]);
   // A shared link may point to « Within the structure » on a structure without sub-structures, or to the pairs
   // on an instance without the network API.
   useEffect(() => {
     if ((sub === 'structure' && !composite) || (sub === 'pairs' && !canPairs)) setSub('typology');
   }, [sub, composite, canPairs]);
   const openPairs = canPairs ? () => setSub('pairs') : undefined;
-  // « Researcher pairs »: the pairs that co-sign, or the suggested connections (lot 3).
-  const [pairsView, setPairsView] = useState<'observed' | 'suggested'>('observed');
   useEffect(() => () => writeSubTab(null), []);
 
   const typology = useMemo(
