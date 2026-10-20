@@ -1106,7 +1106,7 @@ app.get('/api/network/:slug/pairs', (req, res) => {
 // Same file, scope and rights as /pairs; a reader limited to a lab sees the researchers suggested to its members (D2).
 const SUGGESTION_SIGNALS = new Set(['combined', 'triadic', 'topics']);
 const suggestionsCache = new Map();
-app.get('/api/network/:slug/suggestions', (req, res) => {
+app.get('/api/network/:slug/suggestions', async (req, res) => {
   const r = resolveNetworkRequest(req, res);
   if (!r) return;
   const { visibleLabs, intOr } = r;
@@ -1134,7 +1134,17 @@ app.get('/api/network/:slug/suggestions', (req, res) => {
     if (suggestionsCache.size >= 30) suggestionsCache.delete(suggestionsCache.keys().next().value);
     suggestionsCache.set(key, result);
   }
-  res.set('Cache-Control', 'private, max-age=300');
+  // Opinions of the users (lot 4, PostgreSQL only): per viewer, so neither cached here nor by the browser.
+  const feedback = storage().pairFeedback;
+  let suggestions = result.suggestions;
+  if (feedback) {
+    try {
+      suggestions = await feedback.annotate(suggestions, req.session.user.preferred_username);
+    } catch (e) {
+      console.error('[pairs] feedback unavailable:', e.message);
+    }
+  }
+  res.set('Cache-Control', feedback ? 'private, no-cache' : 'private, max-age=300');
   res.json({
     source,
     generatedAt: net.generatedAt,
@@ -1142,8 +1152,59 @@ app.get('/api/network/:slug/suggestions', (req, res) => {
     structureLabs,
     poles: net.poles ?? [],
     restricted: !!visibleLabs,
+    feedback: !!feedback,
     ...result,
+    suggestions,
   });
+});
+
+// Opinion of the viewer on a suggested connection (lot 4): the pair is given by the author ids of the current network
+// and must be visible to the viewer (one researcher in their labs when restricted); the stable key, names and labs
+// are read from the network. verdict null withdraws the opinion.
+const PAIR_VERDICTS = new Set(['relevant', 'already_in_contact', 'not_relevant']);
+app.post('/api/network/:slug/suggestions/feedback', async (req, res) => {
+  const r = resolveNetworkRequest(req, res);
+  if (!r) return;
+  const store = storage().pairFeedback;
+  if (!store) return res.status(501).json({ error: 'The opinions need the PostgreSQL storage' });
+  const { a, b, verdict } = req.body || {};
+  const comment = typeof req.body?.comment === 'string' ? req.body.comment.slice(0, 2000) : '';
+  if (!Number.isInteger(a) || !Number.isInteger(b) || a === b) return res.status(400).json({ error: 'Invalid pair' });
+  if (verdict !== null && !PAIR_VERDICTS.has(verdict)) return res.status(400).json({ error: 'Invalid verdict' });
+  const { net } = universityNetwork(r);
+  const byId = new Map(net.authors.map((x) => [x.id, x]));
+  const x = byId.get(a);
+  const y = byId.get(b);
+  if (!x || !y) return res.status(404).json({ error: 'Unknown researcher' });
+  if (r.visibleLabs && ![...x.labs, ...y.labs].some((l) => r.visibleLabs.includes(l))) return res.status(403).json({ error: 'Forbidden' });
+  const author = req.session.user.preferred_username;
+  try {
+    const pairKey = store.pairKeyOf(x, y);
+    if (verdict === null) await store.remove(pairKey, author);
+    else await store.save({ pairKey, slug: req.params.slug, a: x, b: y, verdict, comment, author });
+    res.json({ ok: true, pairKey });
+  } catch (e) {
+    console.error('[pairs] feedback not saved:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// Every opinion on the suggested connections, for their evaluation (institution right).
+app.get('/api/network/suggestions/feedback.csv', requireEstablishmentScope, async (req, res) => {
+  const store = storage().pairFeedback;
+  if (!store) return res.status(501).json({ error: 'The opinions need the PostgreSQL storage' });
+  try {
+    const rows = await store.rows();
+    const cell = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
+    const head = ['pair_key', 'slug', 'a_label', 'a_labs', 'b_label', 'b_labs', 'verdict', 'comment', 'author', 'created_at'];
+    const lines = [head.join(';'), ...rows.map((row) => head.map((k) => cell(row[k])).join(';'))];
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="pair-suggestions-feedback.csv"');
+    res.send(`\ufeff${lines.join('\r\n')}\r\n`);
+  } catch (e) {
+    console.error('[pairs] feedback export failed:', e.message);
+    res.status(500).json({ error: e.message });
+  }
 });
 
 // ── « Tableau de bord » section: monitoring of new publications ────────────

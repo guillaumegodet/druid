@@ -182,6 +182,20 @@ export interface CallPassage {
   updated_at: Generated<Timestamp>;
 }
 
+export interface CollabPairFeedback {
+  a_label: string;
+  a_labs: Generated<string>;
+  author: string;
+  b_label: string;
+  b_labs: Generated<string>;
+  comment: Generated<string>;
+  created_at: Generated<Timestamp>;
+  id: Generated<Int8>;
+  pair_key: string;
+  slug: string;
+  verdict: string;
+}
+
 export interface Establishment {
   created_at: Generated<Timestamp>;
   extra: Generated<Json>;
@@ -590,6 +604,7 @@ export interface DB {
   call_match: CallMatch;
   call_match_run: CallMatchRun;
   call_passage: CallPassage;
+  collab_pair_feedback: CollabPairFeedback;
   establishment: Establishment;
   funder: Funder;
   funding_call: FundingCall;
