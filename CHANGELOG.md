@@ -12,7 +12,22 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.14.0] — 2026-10-20
+
+### Ajouté
+- **Fiche chercheur › Binômes de recherche** : en bas de la fiche d'un chercheur du réseau de l'université, ses
+  coauteurs les plus fréquents en cartes (photo de la fiche, labo, publications communes, tendance, sujets principaux
+  des publications communes ; filtres autres labos / autres pôles) et ses rapprochements suggérés des cinq dernières
+  années en pile de cartes à juger une à une (glisser à droite = pertinent, à gauche = non pertinent, ou boutons
+  pertinent / déjà en contact / non pertinent / annuler), avec les mêmes avis que le sous-onglet Binômes. Route
+  `GET /api/researchers/:key/pairs` (droit sur un labo du chercheur, ou le chercheur lui-même).
+
 ### Modifié
+- **Partenariats › Binômes › Rapprochements suggérés** : la proximité thématique compare les sujets (*topics*)
+  OpenAlex des chercheurs au lieu de leurs sous-disciplines quand le réseau les contient (`network.json` version 4 de
+  druid-biblio, seuil de similarité 0,1 ; sous-disciplines sinon). Les sujets communs sont nommés sur chaque ligne et
+  dans l'export CSV (`shared_topics`). Rétro-test 2020-2022 → 2023-2026 : 15 % des 100 premières suggestions sont
+  devenues des binômes, 10 % entre pôles (6 % avec les sous-disciplines).
 - **Partenariats › Binômes** : la vue « Rapprochements suggérés » est gardée dans l'adresse (`view=suggested`) ; un
   lien partagé ou un rechargement de la page y ramène directement.
 
