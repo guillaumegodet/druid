@@ -452,25 +452,37 @@ function rankPairs(net, opts = {}) {
 
 // ─── Suggested connections (druid-internal `docs/plan-binomes-chercheurs.md`, lot 3) ───
 // Pairs of researchers of different labs who never co-signed, scored by explainable signals computed on the
-// period: common co-authors (triadic closure, Adamic-Adar) and closeness of their OpenAlex subfields.
+// period: common co-authors (triadic closure, Adamic-Adar) and closeness of their OpenAlex themes — topics when
+// network.json has them (version 4), subfields otherwise.
 
 /** Co-authors with more neighbours than this generate no candidate (Adamic-Adar weighs them little anyway). */
 const HUB_DEGREE = 300;
 /** Thematic candidates kept per researcher (most similar first). */
 const TOPIC_CANDIDATES = 30;
 /**
- * Publications with subfields under which a thematic profile is not trusted: the similarity is multiplied by
+ * Thematic similarity below which the signal counts as 0, per level of the profile. Topics (≈ 3 000) are much finer
+ * than subfields (≈ 230): their cosines are lower for researchers just as close (retrospective test of druid-internal
+ * `docs/binomes-chercheurs/lot3-retrotest.md`).
+ */
+const MIN_SIMILARITY = { topic: 0.1, subfield: 0.2 };
+/**
+ * Publications with themes under which a thematic profile is not trusted: the similarity is multiplied by
  * m / (m + TOPIC_PRIOR), m = the smaller profile (two researchers with one identical publication are not « 100 % close »).
  */
 const TOPIC_PRIOR = 5;
 /** Default weights of the combined score (set from the retrospective test). */
 const SUGGESTION_WEIGHTS = { triadic: 2, topics: 1 };
 
+/** Level of the thematic profiles of a network: OpenAlex topics (version 4) or subfields. */
+function themeLevel(net) {
+  return Array.isArray(net.topics) && net.topics.length > 0 ? 'topic' : 'subfield';
+}
+
 /**
  * @param net network.json content
  * @param opts {
  *   structureLabs, scope, crossPole, poles, membership, visibleLabs — as rankPairs (crossLab is always true);
- *   from, to: number          — period of the signals (co-authorships, subfields); pairs with a joint publication
+ *   from, to: number          — period of the signals (co-authorships, themes); pairs with a joint publication
  *                               up to `to` are never suggested;
  *   maxAuthors: number|null   — ignore publications with more authors (large collaborations);
  *   includePhd: boolean       — suggest PhD students (default false; they still count as common co-authors);
@@ -478,12 +490,13 @@ const SUGGESTION_WEIGHTS = { triadic: 2, topics: 1 };
  *   recentYears: number       — each researcher published in the last N years of the period (default 3);
  *   signal: 'combined' | 'triadic' | 'topics' — ranking (default combined);
  *   weights: {triadic, topics} — weights of the combined score;
- *   minSimilarity: number     — thematic similarity below which the signal counts as 0 (default 0.2);
+ *   minSimilarity: number     — thematic similarity below which the signal counts as 0 (default MIN_SIMILARITY);
  *   quota: number|null        — suggestions per researcher at most (default 5, null = none);
  *   limit: number             — suggestions returned (default 200).
  * }
- * @returns {suggestions, total} — each suggestion: the two researchers, score, common co-authors (count, the
- *   most specific ones named) and thematic similarity (with the shared subfields named).
+ * @returns {suggestions, total, level} — level of the themes ('topic' | 'subfield'); each suggestion: the two
+ *   researchers, score, common co-authors (count, the most specific ones named) and thematic similarity (with the
+ *   shared themes named).
  */
 function suggestPairs(net, opts = {}) {
   const from = opts.from ?? -Infinity;
@@ -493,7 +506,11 @@ function suggestPairs(net, opts = {}) {
   const recentYears = opts.recentYears ?? 3;
   const signal = opts.signal ?? 'combined';
   const weights = { ...SUGGESTION_WEIGHTS, ...(opts.weights ?? {}) };
-  const minSimilarity = opts.minSimilarity ?? 0.2;
+  // Thematic profiles: OpenAlex topics when the file has them, subfields otherwise.
+  const level = themeLevel(net);
+  const themesOf = level === 'topic' ? (p) => p.t : (p) => p.s;
+  const vocabulary = (level === 'topic' ? net.topics : net.subfields) ?? [];
+  const minSimilarity = opts.minSimilarity ?? MIN_SIMILARITY[level];
   const topicPrior = opts.topicPrior ?? TOPIC_PRIOR;
   const quota = opts.quota === undefined ? 5 : opts.quota;
   const limit = opts.limit ?? 200;
@@ -521,8 +538,8 @@ function suggestPairs(net, opts = {}) {
   // Co-authorship graph of the period and the pairs already linked (any joint publication up to `to`).
   const neighbours = new Map();
   const linked = new Set();
-  const subfieldCounts = new Map(); // author -> Map(subfield -> publications)
-  const subfieldPubs = new Map(); // author -> publications with subfields
+  const themeCounts = new Map(); // author -> Map(theme -> publications)
+  const themePubs = new Map(); // author -> publications with themes
   for (const p of net.pubs) {
     if (p.y > end || (maxAuthors != null && p.n != null && p.n > maxAuthors)) continue;
     for (let i = 0; i < p.a.length; i++) for (let j = i + 1; j < p.a.length; j++) linked.add(pairKey(p.a[i], p.a[j]));
@@ -530,11 +547,12 @@ function suggestPairs(net, opts = {}) {
     for (const id of p.a) {
       if (!neighbours.has(id)) neighbours.set(id, new Set());
       for (const other of p.a) if (other !== id) neighbours.get(id).add(other);
-      if (!eligible.has(id) || !p.s?.length) continue;
-      if (!subfieldCounts.has(id)) subfieldCounts.set(id, new Map());
-      subfieldPubs.set(id, (subfieldPubs.get(id) ?? 0) + 1);
-      const counts = subfieldCounts.get(id);
-      for (const sf of new Set(p.s)) counts.set(sf, (counts.get(sf) ?? 0) + 1);
+      const themes = themesOf(p);
+      if (!eligible.has(id) || !themes?.length) continue;
+      if (!themeCounts.has(id)) themeCounts.set(id, new Map());
+      themePubs.set(id, (themePubs.get(id) ?? 0) + 1);
+      const counts = themeCounts.get(id);
+      for (const th of new Set(themes)) counts.set(th, (counts.get(th) ?? 0) + 1);
     }
   }
 
@@ -566,11 +584,11 @@ function suggestPairs(net, opts = {}) {
     }
   }
 
-  // 2. Thematic closeness: cosine of the subfield profiles, candidates through the main subfields.
+  // 2. Thematic closeness: cosine of the theme profiles, candidates through the main themes.
   const vectors = new Map();
-  for (const [id, counts] of subfieldCounts) {
+  for (const [id, counts] of themeCounts) {
     const norm = Math.sqrt([...counts.values()].reduce((t, v) => t + v * v, 0));
-    vectors.set(id, { counts, norm, pubs: subfieldPubs.get(id) });
+    vectors.set(id, { counts, norm, pubs: themePubs.get(id) });
   }
   const cosine = (i, j) => {
     const u = vectors.get(i);
@@ -582,19 +600,19 @@ function suggestPairs(net, opts = {}) {
     const m = Math.min(u.pubs, v.pubs);
     return (dot / (u.norm * v.norm)) * (m / (m + topicPrior));
   };
-  const topSubfields = (id) => [...vectors.get(id).counts.entries()].sort((m, n) => n[1] - m[1] || m[0] - n[0]).slice(0, 3).map(([k]) => k);
-  const bySubfield = new Map();
+  const topThemes = (id) => [...vectors.get(id).counts.entries()].sort((m, n) => n[1] - m[1] || m[0] - n[0]).slice(0, 3).map(([k]) => k);
+  const byTheme = new Map();
   for (const id of vectors.keys()) {
-    for (const sf of topSubfields(id)) {
-      if (!bySubfield.has(sf)) bySubfield.set(sf, []);
-      bySubfield.get(sf).push(id);
+    for (const th of topThemes(id)) {
+      if (!byTheme.has(th)) byTheme.set(th, []);
+      byTheme.get(th).push(id);
     }
   }
   for (const i of vectors.keys()) {
     const seen = new Set();
     const best = [];
-    for (const sf of topSubfields(i)) {
-      for (const j of bySubfield.get(sf)) {
+    for (const th of topThemes(i)) {
+      for (const j of byTheme.get(th)) {
         if (j === i || seen.has(j)) continue;
         seen.add(j);
         const sim = cosine(i, j);
@@ -637,7 +655,7 @@ function suggestPairs(net, opts = {}) {
     ...(x.a.m ? { m: Object.fromEntries(x.labs.map((l) => [l, x.a.m[l] ?? 'pubs'])) } : {}),
     ...(x.a.uid ? { uid: x.a.uid } : {}),
   });
-  const sharedSubfields = (i, j) => {
+  const sharedThemes = (i, j) => {
     const u = vectors.get(i)?.counts;
     const v = vectors.get(j)?.counts;
     if (!u || !v) return [];
@@ -646,7 +664,7 @@ function suggestPairs(net, opts = {}) {
       .map(([k, n]) => [k, Math.min(n, v.get(k))])
       .sort((m, n) => n[1] - m[1] || m[0] - n[0])
       .slice(0, 3)
-      .map(([k]) => net.subfields?.[k]?.name)
+      .map(([k]) => vocabulary[k]?.name)
       .filter(Boolean);
   };
   return {
@@ -664,11 +682,12 @@ function suggestPairs(net, opts = {}) {
           .slice(0, 3)
           .map((z) => ({ id: z, label: byId.get(z)?.label ?? '', labs: byId.get(z)?.labs ?? [] })),
         similarity: Math.round(c.similarity * 100) / 100,
-        subfields: sharedSubfields(c.i, c.j),
+        themes: sharedThemes(c.i, c.j),
         crossPole: x.poles.length > 0 && y.poles.length > 0 && !x.poles.some((p) => y.poles.includes(p)),
       };
     }),
     total: kept.length,
+    level,
   };
 }
 

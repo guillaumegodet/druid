@@ -870,7 +870,7 @@ msgstr "Présence validée"
 
 #: components/ResearcherDetail.tsx:528
 #: components/dashboard/MediaSourcesAdmin.tsx:217
-#: components/dashboard/PairSuggestionsSection.tsx:213
+#: components/dashboard/PairSuggestionsSection.tsx:217
 #: components/dashboard/PairsSection.tsx:218
 #: components/reports/ReportEditor.tsx:789
 msgid "Scope"
@@ -3345,8 +3345,8 @@ msgid "{0, plural, one {# candidate} other {# candidates}}"
 msgstr "{0, plural, one {# candidat} other {# candidats}}"
 
 #: components/dashboard/CallCandidates.tsx:175
-#: components/dashboard/PairSuggestionsSection.tsx:301
-#: components/dashboard/PairSuggestionsSection.tsx:302
+#: components/dashboard/PairSuggestionsSection.tsx:305
+#: components/dashboard/PairSuggestionsSection.tsx:306
 #: components/dashboard/PairsSection.tsx:351
 #: components/dashboard/PairsSection.tsx:352
 #: components/dashboard/report/reportTables.ts:77
@@ -3397,12 +3397,12 @@ msgid "Relative score {0} %"
 msgstr "Score relatif {0} %"
 
 #: components/dashboard/CallMatchCard.tsx:64
-#: components/dashboard/PairSuggestionsSection.tsx:64
+#: components/dashboard/PairSuggestionsSection.tsx:67
 msgid "Relevant"
 msgstr "Pertinent"
 
 #: components/dashboard/CallMatchCard.tsx:65
-#: components/dashboard/PairSuggestionsSection.tsx:66
+#: components/dashboard/PairSuggestionsSection.tsx:69
 msgid "Not relevant"
 msgstr "Non pertinent"
 
@@ -3727,7 +3727,7 @@ msgid "Download the list (CSV)"
 msgstr "Télécharger la liste (CSV)"
 
 #: components/dashboard/CharteTab.tsx:392
-#: components/dashboard/PairSuggestionsSection.tsx:304
+#: components/dashboard/PairSuggestionsSection.tsx:308
 msgid "Score"
 msgstr "Score"
 
@@ -5037,7 +5037,7 @@ msgid "Other labs (grouped)"
 msgstr "Autres labos (regroupés)"
 
 #: components/dashboard/NetworkTab.tsx:117
-#: components/dashboard/PairSuggestionsSection.tsx:233
+#: components/dashboard/PairSuggestionsSection.tsx:237
 #: components/dashboard/PairsSection.tsx:233
 msgid "Loading"
 msgstr "Chargement"
@@ -5051,7 +5051,7 @@ msgid "The university network could not be loaded."
 msgstr "Le réseau de l'université n'a pas pu être chargé."
 
 #: components/dashboard/NetworkTab.tsx:153
-#: components/dashboard/PairSuggestionsSection.tsx:254
+#: components/dashboard/PairSuggestionsSection.tsx:258
 #: components/dashboard/PairsSection.tsx:258
 msgid "Loading the university network…"
 msgstr "Chargement du réseau de l'université…"
@@ -5106,7 +5106,7 @@ msgid "Cross-lab links only"
 msgstr "Liens inter-labos seulement"
 
 #: components/dashboard/NetworkTab.tsx:299
-#: components/dashboard/PairSuggestionsSection.tsx:242
+#: components/dashboard/PairSuggestionsSection.tsx:246
 #: components/dashboard/PairsSection.tsx:246
 msgid "Exclude large collaborations (more than {LARGE_COLLAB_MAX_AUTHORS} authors)"
 msgstr "Exclure les grandes collaborations (plus de {LARGE_COLLAB_MAX_AUTHORS} auteurs)"
@@ -5605,169 +5605,185 @@ msgid "RICL = journal articles indexed in Scimago (proxy for “international pe
 msgstr "RICL = articles de revue indexés Scimago (proxy « revue internationale à comité de lecture ») ; les communications de conférence ne distinguent pas national / international. ETPR saisi en configuration de la structure."
 
 #. placeholder {0}: s.common
-#: components/dashboard/PairSuggestionsSection.tsx:35
+#: components/dashboard/PairSuggestionsSection.tsx:36
 msgid "{0, plural, one {# common co-author:} other {# common co-authors:}}"
 msgstr "{0, plural, one {# coauteur commun :} other {# coauteurs communs :}}"
 
-#: components/dashboard/PairSuggestionsSection.tsx:39
+#: components/dashboard/PairSuggestionsSection.tsx:40
 msgid "and {others} more"
 msgstr "et {others} autres"
 
-#: components/dashboard/PairSuggestionsSection.tsx:44
+#: components/dashboard/PairSuggestionsSection.tsx:46
+msgid "Shared research topics:"
+msgstr "Sujets de recherche communs :"
+
+#: components/dashboard/PairSuggestionsSection.tsx:46
 msgid "Shared subfields:"
 msgstr "Sous-disciplines communes :"
 
 #. placeholder {0}: s.similarity.toLocaleString(i18n.locale, { minimumFractionDigits: 2 })
-#: components/dashboard/PairSuggestionsSection.tsx:48
+#: components/dashboard/PairSuggestionsSection.tsx:51
 msgid "closeness {0}"
 msgstr "proximité {0}"
 
-#: components/dashboard/PairSuggestionsSection.tsx:65
+#: components/dashboard/PairSuggestionsSection.tsx:68
 msgid "Already in contact"
 msgstr "Déjà en contact"
 
-#: components/dashboard/PairSuggestionsSection.tsx:79
+#: components/dashboard/PairSuggestionsSection.tsx:82
 msgid "Your opinion on this suggestion (one per person, the last one wins; click again to withdraw it)"
 msgstr "Votre avis sur cette suggestion (un par personne, le dernier compte ; cliquez de nouveau pour le retirer)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:173
+#: components/dashboard/PairSuggestionsSection.tsx:176
 #: components/dashboard/PairsSection.tsx:167
 msgid "This structure is not part of the university co-authorship network."
 msgstr "Cette structure ne fait pas partie du réseau de cosignatures de l'université."
 
-#: components/dashboard/PairSuggestionsSection.tsx:207
+#: components/dashboard/PairSuggestionsSection.tsx:211
 #: components/dashboard/PairsSection.tsx:212
 #: components/reports/ReportEditor.tsx:787
 msgid "Which pairs"
 msgstr "Quels binômes"
 
-#: components/dashboard/PairSuggestionsSection.tsx:208
+#: components/dashboard/PairSuggestionsSection.tsx:212
 #: components/dashboard/PairsSection.tsx:213
 #: components/reports/ReportEditor.tsx:805
 msgid "Researchers of different labs"
 msgstr "Chercheurs de labos différents"
 
-#: components/dashboard/PairSuggestionsSection.tsx:209
+#: components/dashboard/PairSuggestionsSection.tsx:213
 #: components/dashboard/PairsSection.tsx:214
 #: components/reports/ReportEditor.tsx:806
 msgid "Researchers of different poles"
 msgstr "Chercheurs de pôles différents"
 
-#: components/dashboard/PairSuggestionsSection.tsx:214
+#: components/dashboard/PairSuggestionsSection.tsx:218
 #: components/dashboard/PairsSection.tsx:219
 #: components/reports/ReportEditor.tsx:807
 msgid "At least one researcher of the structure"
 msgstr "Au moins un chercheur de la structure"
 
-#: components/dashboard/PairSuggestionsSection.tsx:215
+#: components/dashboard/PairSuggestionsSection.tsx:219
 #: components/dashboard/PairsSection.tsx:220
 #: components/reports/ReportEditor.tsx:808
 msgid "Both researchers in the structure"
 msgstr "Les deux chercheurs dans la structure"
 
-#: components/dashboard/PairSuggestionsSection.tsx:218
+#: components/dashboard/PairSuggestionsSection.tsx:222
 #: components/dashboard/PairsSection.tsx:223
 msgid "Lab membership of the researchers"
 msgstr "Appartenance des chercheurs aux labos"
 
-#: components/dashboard/PairSuggestionsSection.tsx:219
+#: components/dashboard/PairSuggestionsSection.tsx:223
 #: components/dashboard/PairsSection.tsx:224
 #: components/reports/ReportEditor.tsx:809
 msgid "Every lab attribution"
 msgstr "Tous les rattachements"
 
-#: components/dashboard/PairSuggestionsSection.tsx:220
+#: components/dashboard/PairSuggestionsSection.tsx:224
 #: components/dashboard/PairsSection.tsx:225
 #: components/reports/ReportEditor.tsx:810
 msgid "Labs of the directory (members and associates)"
 msgstr "Labos de l'annuaire (membres et associés)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:221
+#: components/dashboard/PairSuggestionsSection.tsx:225
 #: components/dashboard/PairsSection.tsx:226
 #: components/reports/ReportEditor.tsx:811
 msgid "Labs of the directory (members only)"
 msgstr "Labos de l'annuaire (membres seulement)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:223
+#: components/dashboard/PairSuggestionsSection.tsx:227
 msgid "Ranking"
 msgstr "Classement"
 
-#: components/dashboard/PairSuggestionsSection.tsx:224
+#: components/dashboard/PairSuggestionsSection.tsx:228
+msgid "Common co-authors and research topics"
+msgstr "Coauteurs communs et sujets de recherche"
+
+#: components/dashboard/PairSuggestionsSection.tsx:228
 msgid "Common co-authors and subfields"
 msgstr "Coauteurs communs et sous-disciplines"
 
-#: components/dashboard/PairSuggestionsSection.tsx:225
+#: components/dashboard/PairSuggestionsSection.tsx:229
 msgid "Common co-authors only"
 msgstr "Coauteurs communs seulement"
 
-#: components/dashboard/PairSuggestionsSection.tsx:226
+#: components/dashboard/PairSuggestionsSection.tsx:230
+msgid "Shared research topics only"
+msgstr "Sujets de recherche communs seulement"
+
+#: components/dashboard/PairSuggestionsSection.tsx:230
 msgid "Shared subfields only"
 msgstr "Sous-disciplines communes seulement"
 
-#: components/dashboard/PairSuggestionsSection.tsx:228
+#: components/dashboard/PairSuggestionsSection.tsx:232
 msgid "Suggestions per researcher at most"
 msgstr "Suggestions par chercheur au plus"
 
-#: components/dashboard/PairSuggestionsSection.tsx:230
+#: components/dashboard/PairSuggestionsSection.tsx:234
 msgid "≤ {n} per researcher"
 msgstr "≤ {n} par chercheur"
 
-#: components/dashboard/PairSuggestionsSection.tsx:238
+#: components/dashboard/PairSuggestionsSection.tsx:242
 msgid "Suggest PhD students"
 msgstr "Suggérer des doctorants"
 
-#: components/dashboard/PairSuggestionsSection.tsx:249
+#: components/dashboard/PairSuggestionsSection.tsx:253
 msgid "The suggested connections could not be loaded."
 msgstr "Les rapprochements suggérés n'ont pas pu être chargés."
 
 #. placeholder {0}: loaded.total
-#: components/dashboard/PairSuggestionsSection.tsx:262
+#: components/dashboard/PairSuggestionsSection.tsx:266
 msgid "{0, plural, one {# suggested connection} other {# suggested connections}}"
 msgstr "{0, plural, one {# rapprochement suggéré} other {# rapprochements suggérés}}"
 
-#: components/dashboard/PairSuggestionsSection.tsx:267
+#: components/dashboard/PairSuggestionsSection.tsx:271
 msgid "{asideCount, plural, one {Show the # suggestion you set aside} other {Show the # suggestions you set aside}}"
 msgstr "{asideCount, plural, one {Afficher la suggestion que vous avez écartée} other {Afficher les # suggestions que vous avez écartées}}"
 
-#: components/dashboard/PairSuggestionsSection.tsx:275
+#: components/dashboard/PairSuggestionsSection.tsx:279
 msgid "Every opinion (CSV)"
 msgstr "Tous les avis (CSV)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:284
+#: components/dashboard/PairSuggestionsSection.tsx:288
 msgid "Suggestions (CSV)"
 msgstr "Suggestions (CSV)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:294
+#: components/dashboard/PairSuggestionsSection.tsx:298
 msgid "No suggested connection matches these filters over the period."
 msgstr "Aucun rapprochement suggéré pour ces filtres sur la période."
 
-#: components/dashboard/PairSuggestionsSection.tsx:303
+#: components/dashboard/PairSuggestionsSection.tsx:307
 msgid "Why"
 msgstr "Pourquoi"
 
-#: components/dashboard/PairSuggestionsSection.tsx:304
+#: components/dashboard/PairSuggestionsSection.tsx:308
+msgid "2 × common co-authors (Adamic-Adar) + closeness of the research topics"
+msgstr "2 × coauteurs communs (Adamic-Adar) + proximité des sujets de recherche"
+
+#: components/dashboard/PairSuggestionsSection.tsx:308
 msgid "2 × common co-authors (Adamic-Adar) + closeness of the subfields"
 msgstr "2 × coauteurs communs (Adamic-Adar) + proximité des sous-disciplines"
 
-#: components/dashboard/PairSuggestionsSection.tsx:305
+#: components/dashboard/PairSuggestionsSection.tsx:309
 msgid "Your opinion"
 msgstr "Votre avis"
 
 #. placeholder {0}: fmt(rows.length - shown)
-#: components/dashboard/PairSuggestionsSection.tsx:325
+#: components/dashboard/PairSuggestionsSection.tsx:329
 #: components/dashboard/PairsSection.tsx:390
 msgid "Show more ({0} remaining)"
 msgstr "Afficher plus ({0} restants)"
 
-#: components/dashboard/PairSuggestionsSection.tsx:333
-msgid "Researchers of different labs who have not co-signed any publication, ranked by their common co-authors and the closeness of their OpenAlex subfields over the period. These are leads, not predictions: tested on 2020-2022, about one in six of the 100 first suggestions led to a joint publication in 2023-2026 (one in fifteen between poles). A researcher who left is still suggested until the network is regenerated."
-msgstr "Chercheurs de labos différents qui n'ont cosigné aucune publication, classés selon leurs coauteurs communs et la proximité de leurs sous-disciplines OpenAlex sur la période. Ce sont des pistes, pas des prédictions : testées sur 2020-2022, environ une des 100 premières suggestions sur six a donné une publication commune en 2023-2026 (une sur quinze entre pôles). Un chercheur parti reste suggéré jusqu'à la régénération du réseau."
+#: components/dashboard/PairSuggestionsSection.tsx:337
+msgid "Researchers of different labs who have not co-signed any publication, ranked by their common co-authors and the closeness of their OpenAlex research topics over the period (subfields when the network has no topics). These are leads, not predictions: tested on 2020-2022, about one in seven of the 100 first suggestions led to a joint publication in 2023-2026 (one in ten between poles). A researcher who left is still suggested until the network is regenerated."
+msgstr "Chercheurs de labos différents qui n'ont cosigné aucune publication, classés selon leurs coauteurs communs et la proximité de leurs sujets de recherche OpenAlex sur la période (sous-disciplines quand le réseau n'a pas les sujets). Ce sont des pistes, pas des prédictions : testées sur 2020-2022, environ une des 100 premières suggestions sur sept a donné une publication commune en 2023-2026 (une sur dix entre pôles). Un chercheur parti reste suggéré tant que le réseau n'est pas régénéré."
 
-#: components/dashboard/PairSuggestionsSection.tsx:341
+#: components/dashboard/PairSuggestionsSection.tsx:345
 msgid "Only the suggestions involving a researcher of your lab are shown."
 msgstr "Seules les suggestions impliquant un chercheur de votre labo sont affichées."
 
-#: components/dashboard/PairSuggestionsSection.tsx:344
+#: components/dashboard/PairSuggestionsSection.tsx:348
 #: components/dashboard/PairsSection.tsx:411
 msgid "How to read this view"
 msgstr "Comment lire cette vue"

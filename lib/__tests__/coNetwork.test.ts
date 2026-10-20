@@ -272,8 +272,9 @@ describe('suggestPairs', () => {
 
   it('suggests researchers close by their subfields without any common co-author', () => {
     const r = suggestPairs(SUGGEST_NET, PERIOD);
+    expect(r.level).toBe('subfield');
     const fredDan = r.suggestions.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 4 && x.b.id === 6);
-    expect(fredDan).toMatchObject({ common: 0, subfields: ['Oncology'] });
+    expect(fredDan).toMatchObject({ common: 0, themes: ['Oncology'] });
     // Identical profiles of 3 publications, damped by 3 / (3 + 5).
     expect(fredDan.similarity).toBeCloseTo(0.38, 2);
     expect(suggestPairs(SUGGEST_NET, { ...PERIOD, signal: 'triadic' }).suggestions.some((x: { common: number }) => x.common === 0)).toBe(false);
@@ -284,6 +285,21 @@ describe('suggestPairs', () => {
     expect(sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, includePhd: true }))).toContain('1-5');
     // 1 and 4 only signed a 300-author paper together: still suggested (shared subfield).
     expect(sugKeys(suggestPairs(SUGGEST_NET, PERIOD))).toContain('1-4');
+  });
+
+  it('compares the topics instead of the subfields when the network has them (version 4)', () => {
+    // Oncology publications: 1 × 6 on topic 0; 4 × 7 on topic 0 (same research) or topic 1 (another one).
+    const withTopics = (dan: number) => ({
+      ...SUGGEST_NET,
+      topics: [{ name: 'Immunotherapy Research' }, { name: 'Leukemia Treatment' }],
+      pubs: SUGGEST_NET.pubs.map((p) => ({ ...p, t: p.s[0] !== 1 ? [] : p.a.includes(4) ? [dan] : [0] })),
+    });
+    const same = suggestPairs(withTopics(0), PERIOD);
+    expect(same.level).toBe('topic');
+    const fredDan = same.suggestions.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 4 && x.b.id === 6);
+    expect(fredDan).toMatchObject({ common: 0, themes: ['Immunotherapy Research'] });
+    // Same subfield, different topics: no longer close.
+    expect(sugKeys(suggestPairs(withTopics(1), PERIOD))).not.toContain('4-6');
   });
 
   it('only excludes the pairs linked up to the end of the period', () => {
