@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.12.0] — 2026-10-20
+
 ### Ajouté
 - **Mes rapports › binômes de chercheurs** : les cartes de chaleur des binômes (par couple de pôles, par couple de
   labos) s'ajoutent à un rapport depuis le sous-onglet (bouton « Ajouter à un rapport », avec ses filtres) ou depuis
