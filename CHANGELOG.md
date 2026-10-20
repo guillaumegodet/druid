@@ -12,6 +12,14 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.11.1] — 2026-10-20
+
+### Modifié
+- **Mise en production (`deploy.sh prod`)** : la base PostgreSQL de l'instance est sauvegardée avant la bascule
+  (`pg_dump -Fc` dans le conteneur `DB_CONTAINER`, fichier `db-<horodatage>-before-<tag>.dump` dans `BACKUP_DIR`) et
+  le dump est vérifié par `pg_restore -l` ; le déploiement s'arrête si l'un ou l'autre échoue. Les dumps sont purgés
+  avec les autres sauvegardes (`KEEP_BACKUPS`). Jusqu'ici, seul le document Grist était sauvegardé.
+
 ### Corrigé
 - **Journal d'audit (PostgreSQL)** : une mise à jour qui ne change que des colonnes de suivi (`updated_at`,
   `verified_at` des tâches revérifiées chaque nuit, `checked_at` d'un identifiant) n'écrit plus de ligne, pas plus
@@ -23,6 +31,8 @@ données à exécuter au déploiement).
 - `20261019150000_audit_skip_bookkeeping.sql` : nouvelle version de la fonction `audit_row()`, sans reprise de
   données (les lignes déjà écrites restent). À appliquer avec les migrations (`druid-migrate` à Nantes, job `migrate`
   du workflow `centrale-db` pour Centrale, hors des heures d'usage).
+- Réglage d'instance `DB_CONTAINER` (et au besoin `DB_NAME`, `DB_USER`) à ajouter à la configuration de déploiement
+  avant la mise en production ; sans lui, la base n'est pas sauvegardée par `deploy.sh`.
 
 ## [2.11.0] — 2026-10-19
 
