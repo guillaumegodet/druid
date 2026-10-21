@@ -13,6 +13,16 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Runner de jobs du SaaS** (druid-internal `docs/plan-druid-saas.md`, lot 3) : sur un déploiement multi-tenant,
+  les alignements des personnes (`people.align` : scripts `sync_*.cjs` lancés par le runner sur le schéma du tenant,
+  `DRUID_DATABASE_SCHEMA`, caches dans la table `align_cache` du tenant servis à `/<source>_align_cache.json`), la
+  construction des tableaux de bord (`etl.build` : configuration druid-biblio par labo d'après les identifiants
+  confirmés, ETL par labo, exports sur R2 servis à `/dashboard-data/*`) et l'alignement des structures sont des jobs
+  de `saas.job` (`POST /api/jobs`, `GET /api/jobs/:id`, `POST /api/jobs/:id/cancel`) ; les routes
+  `/api/align/*`, `/api/sync-idref-*` et `/api/structures-align/*` existent en Functions avec le même contrat que
+  `server.cjs` (409 quand un run est en cours, « Stop » = fin du processus fils), `HAS_SERVER_JOBS` vaut vrai sur un
+  tenant. Un job en cours par tenant, rafraîchissement planifié selon l'offre (fenêtre nocturne), alerte
+  e-mail après deux échecs consécutifs, clés du client (Scopus…) chiffrées dans `saas.tenant_secret`.
 - **Références communes à l'écran** (druid-internal `docs/plan-binomes-citations.md`, lot 3) : dans les rapprochements
   suggérés et le bloc « Binômes de recherche » de la fiche, chaque ligne dit « N références communes », affiche à la
   demande les trois plus rares avec leur titre lu sur OpenAlex, et « A cite déjà n publications de B » ; classements

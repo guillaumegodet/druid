@@ -116,7 +116,7 @@ describe.skipIf(!url)('Functions of a tenant', () => {
     const user = await who.json() as any;
     expect(user).toMatchObject({ email: owners[SLUGS[0]], auth: 'session', roles: ['user', 'admin', 'dashboard_viewer'] });
     expect(user.access.isSuperAdmin).toBe(true);
-    expect(user.capabilities).toMatchObject({ READ_ONLY: false, HAS_SERVER_JOBS: false, HAS_BENCHMARK: false });
+    expect(user.capabilities).toMatchObject({ READ_ONLY: false, HAS_SERVER_JOBS: true, HAS_BENCHMARK: false });
     expect(user.tenant).toMatchObject({ slug: SLUGS[0], status: 'active', plan: { code: 'trial', seats: 1 }, members: 3 });
     expect(user.instance).toMatchObject({ slug: SLUGS[0], label: 'Tenant zz-fn-alpha', storage: 'postgres' });
     // The cookie of alpha opens nothing on beta.

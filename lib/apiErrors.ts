@@ -240,6 +240,13 @@ export const API_ERRORS = [
   msg`No alignment running`,
   // Structure identifiers alignment (druid-internal docs/plan-druid-saas.md, lot 4)
   msg`Structure alignment already running`,
+  // Jobs of a tenant (druid-internal docs/plan-druid-saas.md, lot 3 a: functions/_lib/jobs.js, functions/api/jobs)
+  msg`Institution right required`,
+  msg`Job already finished`,
+  msg`Job already running`,
+  msg`Dashboard build already running`,
+  msg`Unknown job type`,
+  msg`Method not allowed`,
   msg`Structure alignment needs the PostgreSQL storage`,
   msg`Unknown identifier type`,
   msg`Invalid identifier`,

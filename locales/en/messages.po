@@ -15970,79 +15970,103 @@ msgstr "No alignment running"
 msgid "Structure alignment already running"
 msgstr "Structure alignment already running"
 
-#: lib/apiErrors.ts:243
+#: lib/apiErrors.ts:244
+msgid "Institution right required"
+msgstr "Institution right required"
+
+#: lib/apiErrors.ts:245
+msgid "Job already finished"
+msgstr "Job already finished"
+
+#: lib/apiErrors.ts:246
+msgid "Job already running"
+msgstr "Job already running"
+
+#: lib/apiErrors.ts:247
+msgid "Dashboard build already running"
+msgstr "Dashboard build already running"
+
+#: lib/apiErrors.ts:248
+msgid "Unknown job type"
+msgstr "Unknown job type"
+
+#: lib/apiErrors.ts:249
+msgid "Method not allowed"
+msgstr "Method not allowed"
+
+#: lib/apiErrors.ts:250
 msgid "Structure alignment needs the PostgreSQL storage"
 msgstr "Structure alignment needs the PostgreSQL storage"
 
-#: lib/apiErrors.ts:244
+#: lib/apiErrors.ts:251
 msgid "Unknown identifier type"
 msgstr "Unknown identifier type"
 
-#: lib/apiErrors.ts:245
+#: lib/apiErrors.ts:252
 msgid "Invalid identifier"
 msgstr "Invalid identifier"
 
-#: lib/apiErrors.ts:246
+#: lib/apiErrors.ts:253
 msgid "Candidate not found"
 msgstr "Candidate not found"
 
-#: lib/apiErrors.ts:247
+#: lib/apiErrors.ts:254
 msgid "Identifier not found"
 msgstr "Identifier not found"
 
-#: lib/apiErrors.ts:248
+#: lib/apiErrors.ts:255
 msgid "Structure not found"
 msgstr "Structure not found"
 
-#: lib/apiErrors.ts:249
+#: lib/apiErrors.ts:256
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:251
+#: lib/apiErrors.ts:258
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:252
+#: lib/apiErrors.ts:259
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:253
+#: lib/apiErrors.ts:260
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:254
+#: lib/apiErrors.ts:261
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:256
+#: lib/apiErrors.ts:263
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:258
+#: lib/apiErrors.ts:265
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:259
+#: lib/apiErrors.ts:266
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:260
+#: lib/apiErrors.ts:267
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:261
+#: lib/apiErrors.ts:268
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:263
+#: lib/apiErrors.ts:270
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:264
+#: lib/apiErrors.ts:271
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:265
+#: lib/apiErrors.ts:272
 msgid "Load failed"
 msgstr "Load failed"
 

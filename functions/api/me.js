@@ -98,7 +98,8 @@ const tenantUser = async (context, instance) => {
   const member = memberOf(context);
   if (!member) return json(403, { error: 'This account is not a member of this Druid' });
   const { roles, access } = accessForMember(member, instance.readOnly);
-  const capabilities = capabilitiesForTenant({ ...CAPABILITIES, HAS_STATUS_VALIDATION: instance.statusValidation, HAS_STRUCTURE_IDS: true }, instance.tenant.plan, { settings: instance.tenant.settings, status: instance.tenant.status });
+  // Runs are jobs of the runner (lot 3 a): the alignment pages and the dashboards of druid-biblio work on a tenant.
+  const capabilities = capabilitiesForTenant({ ...CAPABILITIES, HAS_STATUS_VALIDATION: instance.statusValidation, HAS_STRUCTURE_IDS: true, HAS_SERVER_JOBS: true, HAS_QUALINKA: true }, instance.tenant.plan, { settings: instance.tenant.settings, status: instance.tenant.status });
   capabilities.READ_ONLY = instance.readOnly;
   const members = await withSaasDb(context.env, (db) => countMembers(db, instance.tenant.id)).catch(() => 0);
   const tenantRow = { slug: instance.tenant.slug, status: instance.tenant.status, mail_domains: instance.tenant.mailDomains };

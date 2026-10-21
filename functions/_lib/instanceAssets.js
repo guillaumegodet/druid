@@ -12,7 +12,9 @@
 //
 // No route: this module exports no onRequest handler; the route files are written by
 // scripts/prepare-cloudflare-assets.cjs (ASSET_ROUTE_FILES) on a shared build only.
-import { instanceOf } from './instance.js';
+import { isAlignCacheName, readAlignCache } from '../../lib/saas/alignCache.ts';
+import { identityOf, memberOf } from './identity.js';
+import { SAAS_ASSETS_BINDING, instanceForRequestAnywhere, saasIdentity, withTenantDb } from './saas.js';
 
 export const ASSET_ROOT = '/instance-assets';
 // Alignment caches read by the front at the site root (lib/gristService.ts, AbesExportModal).
@@ -40,15 +42,50 @@ export const instanceAssetPath = (slug, pathname) => {
 
 const notFound = () => new Response('Not found', { status: 404, headers: { 'Cache-Control': 'no-store' } });
 
+/**
+ * Files of a tenant of the control plane (druid-internal docs/plan-druid-saas.md, lot 3): its alignment caches are rows
+ * of its schema (lib/saas/alignCache.ts, written by the runner), its dashboards objects of the R2 bucket `SAAS_ASSETS`
+ * under `<slug>/dashboard-data/…` (lib/saas/r2.ts). Members only: the caches hold names, the dashboards the corpus.
+ */
+const serveTenantAsset = async (context, instance, pathname) => {
+  const { env, request } = context;
+  if (!identityOf(context) || !memberOf(context)) return new Response(JSON.stringify({ error: 'Authentication required' }), { status: 401, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+  const segments = pathname.split('/').filter(Boolean);
+  if (segments.length === 1 && segments[0].endsWith('.json') && isAlignCacheName(segments[0].slice(0, -5))) {
+    const data = await withTenantDb(env, instance, (db) => readAlignCache(db, segments[0].slice(0, -5)));
+    const body = request.method === 'HEAD' ? null : JSON.stringify(data || {});
+    return new Response(body, { status: 200, headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' } });
+  }
+  if (segments[0] === 'dashboard-data' && segments.length > 1) {
+    const bucket = env[SAAS_ASSETS_BINDING];
+    if (!bucket) return notFound();
+    const key = `${instance.slug}/${segments.join('/')}`;
+    const object = await bucket.get(key);
+    if (!object) return notFound();
+    const headers = new Headers({ 'Cache-Control': 'private, max-age=300' });
+    if (typeof object.writeHttpMetadata === 'function') object.writeHttpMetadata(headers);
+    if (object.httpEtag) headers.set('ETag', object.httpEtag);
+    if (!headers.get('Content-Type')) headers.set('Content-Type', key.endsWith('.gz') ? 'application/gzip' : 'application/json');
+    return new Response(request.method === 'HEAD' ? null : object.body, { status: 200, headers });
+  }
+  return notFound();
+};
+
 /** Route handler: the file of the request host's instance (404 for an unknown host or file). */
 export async function serveInstanceAsset(context) {
   const { request, env } = context;
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response(null, { status: 405, headers: { Allow: 'GET, HEAD' } });
   }
-  const instance = instanceOf(context);
+  const instance = await instanceForRequestAnywhere(request, env);
   if (!instance) return notFound();
   const url = new URL(request.url);
+  if (instance.tenant) {
+    // The asset routes have no /api middleware: the session is resolved here.
+    const { email, member } = await saasIdentity(env, request, instance);
+    context.data = { ...(context.data || {}), identity: email, member, instance };
+    return serveTenantAsset(context, instance, url.pathname);
+  }
   const target = instanceAssetPath(instance.slug, url.pathname);
   if (!target) return notFound();
   const res = await env.ASSETS.fetch(new Request(new URL(target, url), { method: request.method, headers: request.headers }));

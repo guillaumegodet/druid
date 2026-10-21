@@ -15970,79 +15970,103 @@ msgstr "Aucun alignement en cours"
 msgid "Structure alignment already running"
 msgstr "Un alignement des structures est déjà en cours"
 
-#: lib/apiErrors.ts:243
+#: lib/apiErrors.ts:244
+msgid "Institution right required"
+msgstr "Droit établissement requis"
+
+#: lib/apiErrors.ts:245
+msgid "Job already finished"
+msgstr "Tâche déjà terminée"
+
+#: lib/apiErrors.ts:246
+msgid "Job already running"
+msgstr "Tâche déjà en cours"
+
+#: lib/apiErrors.ts:247
+msgid "Dashboard build already running"
+msgstr "Construction des tableaux de bord déjà en cours"
+
+#: lib/apiErrors.ts:248
+msgid "Unknown job type"
+msgstr "Type de tâche inconnu"
+
+#: lib/apiErrors.ts:249
+msgid "Method not allowed"
+msgstr "Méthode non autorisée"
+
+#: lib/apiErrors.ts:250
 msgid "Structure alignment needs the PostgreSQL storage"
 msgstr "L’alignement des structures nécessite le stockage PostgreSQL"
 
-#: lib/apiErrors.ts:244
+#: lib/apiErrors.ts:251
 msgid "Unknown identifier type"
 msgstr "Type d’identifiant inconnu"
 
-#: lib/apiErrors.ts:245
+#: lib/apiErrors.ts:252
 msgid "Invalid identifier"
 msgstr "Identifiant invalide"
 
-#: lib/apiErrors.ts:246
+#: lib/apiErrors.ts:253
 msgid "Candidate not found"
 msgstr "Candidat introuvable"
 
-#: lib/apiErrors.ts:247
+#: lib/apiErrors.ts:254
 msgid "Identifier not found"
 msgstr "Identifiant introuvable"
 
-#: lib/apiErrors.ts:248
+#: lib/apiErrors.ts:255
 msgid "Structure not found"
 msgstr "Structure introuvable"
 
-#: lib/apiErrors.ts:249
+#: lib/apiErrors.ts:256
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:251
+#: lib/apiErrors.ts:258
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:252
+#: lib/apiErrors.ts:259
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:253
+#: lib/apiErrors.ts:260
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:254
+#: lib/apiErrors.ts:261
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:256
+#: lib/apiErrors.ts:263
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: lib/apiErrors.ts:258
+#: lib/apiErrors.ts:265
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:259
+#: lib/apiErrors.ts:266
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:260
+#: lib/apiErrors.ts:267
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:261
+#: lib/apiErrors.ts:268
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:263
+#: lib/apiErrors.ts:270
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:264
+#: lib/apiErrors.ts:271
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:265
+#: lib/apiErrors.ts:272
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 
