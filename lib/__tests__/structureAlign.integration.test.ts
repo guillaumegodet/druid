@@ -186,6 +186,14 @@ describe.skipIf(!url)('structure identifiers on PostgreSQL', () => {
     const after = await trx.selectFrom('structure_alignment_candidate').selectAll().where('structure_id', '=', String(lab1)).execute();
     expect(after.find((c) => c.type === 'hal_collection')?.decision).toBe('rejected');
     expect(after.find((c) => c.type === 'hal_struct')?.decision).toBe('pending');
+    // A registry down on a forced rerun: the pending candidates of its type survive, the error is recorded and the
+    // pair is due again on the next incremental run.
+    const halDown: Registry = { ...registry, hal: { ...registry.hal, byLink: async () => { throw new Error('HAL down'); }, collections: async () => { throw new Error('HAL down'); } } };
+    await runStructureAlignment(trx as any, halDown, { mode: 'search', concurrency: 1, only: ['LAB1'] });
+    const kept = await trx.selectFrom('structure_alignment_candidate').selectAll().where('structure_id', '=', String(lab1)).execute();
+    expect(kept.find((c) => c.type === 'hal_struct')?.decision).toBe('pending');
+    expect((await trx.selectFrom('structure_alignment_search').select('error').where('structure_id', '=', String(lab1)).where('type', '=', 'hal_struct').executeTakeFirstOrThrow()).error).toMatch(/HAL down/);
+    expect((await runStructureAlignment(trx as any, registry, { mode: 'search', concurrency: 1 })).total).toBe(1);
     // verify stamps the confirmed identifiers.
     await runStructureAlignment(trx as any, registry, { mode: 'verify', concurrency: 1, only: ['LAB1'] });
     const ids = (await readStructureIdentifiers(trx, [lab1])).get(lab1) ?? [];

@@ -121,14 +121,16 @@ export const runStructureAlignment = async (db: Db, registry: Registry, options:
 
 /** Writes the result of one structure: candidates upserted (pending ones refreshed, decided ones kept), verifications
  * stamped on the identifiers, search bookkeeping. Candidates of the run's types that the run no longer proposes are
- * dropped when still pending (a record corrected, a value confirmed meanwhile). */
+ * dropped when still pending (a record corrected, a value confirmed meanwhile), unless the type's registry failed. */
 export const persist = async (db: Db, result: StructureAlignResult, mode: AlignMode): Promise<void> => {
   const sid = String(result.structureId);
   // Given a transaction (the tests), the writes join it instead of opening one.
   const inTransaction = async (fn: (trx: Db) => Promise<void>) => (db.isTransaction ? fn(db) : db.transaction().execute(fn));
   await inTransaction(async (trx) => {
     await sql`SELECT set_config('druid.actor', 'job:align_structures', true)`.execute(trx);
-    const types = [...new Set(result.searched.map((s) => s.type))];
+    // Pending candidates of the types the run looked at again are replaced — except when a registry failed on the
+    // type: what the previous run found is worth more than nothing.
+    const types = [...new Set(result.searched.filter((s) => !s.error).map((s) => s.type))];
     if (types.length) {
       const keep = result.candidates.map((c) => `${c.type}:${c.candidateId}`);
       const stale = await trx.selectFrom('structure_alignment_candidate').select(['id', 'type', 'candidate_id']).where('structure_id', '=', sid).where('type', 'in', types).where('decision', '=', 'pending').execute();

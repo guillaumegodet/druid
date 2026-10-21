@@ -50,8 +50,9 @@ export interface RegistryClientOptions {
   fetch?: FetchLike;
   openalexApiKey?: string | null;
   openalexMailto?: string | null;
-  /** Pause between two calls to the same host (ms). */
+  /** Pause between two calls to the same host (ms); `pauseByHost` overrides it for a host. */
   pauseMs?: number;
+  pauseByHost?: Record<string, number>;
   timeoutMs?: number;
   userAgent?: string;
   log?: (line: string) => void;
@@ -64,6 +65,9 @@ const notNull = <T>(x: T | null | undefined): x is T => x !== null && x !== unde
 export const createRegistryClient = (options: RegistryClientOptions = {}): Registry => {
   const doFetch: FetchLike = options.fetch ?? ((url, init) => fetch(url, init as any) as any);
   const pauseMs = options.pauseMs ?? 150;
+  // OpenAlex counts its quota per caller IP: behind an institutional proxy every colleague shares it, and the
+  // polite pool answers 429 well under its nominal rate — one call a second there.
+  const pauseByHost: Record<string, number> = { 'api.openalex.org': 1000, ...(options.pauseByHost || {}) };
   const timeoutMs = options.timeoutMs ?? 20_000;
   const userAgent = options.userAgent ?? 'Druid (structure identifiers alignment; https://github.com/guillaumegodet/druid)';
   const log = options.log ?? (() => {});
@@ -80,7 +84,7 @@ export const createRegistryClient = (options: RegistryClientOptions = {}): Regis
       hostQueue.set(host, new Promise<void>((r) => { release = r; }));
       await prev;
       try {
-        const wait = (lastCall.get(host) ?? 0) + pauseMs - Date.now();
+        const wait = (lastCall.get(host) ?? 0) + (pauseByHost[host] ?? pauseMs) - Date.now();
         if (wait > 0) await sleep(wait);
         // A 429 (OpenAlex shares its quota between every caller behind the same proxy) or a 5xx: up to three more
         // tries, 2 s / 5 s / 12 s apart or what Retry-After says; a network failure: one more try.
