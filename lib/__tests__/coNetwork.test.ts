@@ -324,6 +324,48 @@ describe('suggestPairs', () => {
     expect(sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, to: 2024 }))).not.toContain('1-2');
   });
 
+  // Cited works (version 5, druid-internal `docs/plan-binomes-citations.md`, lot 2): 2 and 4 (labs and poles apart,
+  // no common co-author, themes apart) cite the same two references; 2 also cites a publication of 4 (W40).
+  const WITH_REFS = {
+    ...SUGGEST_NET,
+    refs: ['W100', 'W101', 'W40', 'W900'],
+    pubs: SUGGEST_NET.pubs.map((p) => {
+      if (p.a.includes(2) && p.a.includes(3)) return { ...p, s: [], r: [0, 1, 2, 3] };
+      if (p.a.includes(4) && p.a.includes(7)) return { ...p, w: p.y === 2021 ? 'W40' : undefined, s: [1], r: [0, 1, 3] };
+      return { ...p, r: [3] }; // W900: cited by everybody
+    }),
+  };
+
+  it('suggests researchers who cite the same references and names the rarest ones (version 5)', () => {
+    const r = suggestPairs(WITH_REFS, { ...PERIOD, refHub: 5 });
+    expect(r.references).toBe(true);
+    const benDan = r.suggestions.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 2 && x.b.id === 4);
+    expect(benDan).toMatchObject({ common: 0, references: 3, sharedRefs: ['W100', 'W101', 'W900'] });
+    // W900 (cited by 14 publications > 5) weighs 0; W100 and W101 (5 publications) 1 / ln 6, W40 (2) 1 / ln 3. Ben's
+    // profile also holds W40: cosine 0.655, damped by 2 / (2 + 5) (two publications with references) = 0.187.
+    expect(benDan.coupling).toBe(0.19);
+    // Ranking by references: Ben and researcher 3 (co-signers of the citing publications) share the most with Dan
+    // and Gil (3 and Gil: same lab).
+    expect(sugKeys(suggestPairs(WITH_REFS, { ...PERIOD, signal: 'coupling', refHub: 5 })).slice(0, 3).sort()).toEqual(['2-4', '2-7', '3-4']);
+    // Without the cited works (version 4) the signal is absent and the ranking of the other signals unchanged.
+    const v4 = suggestPairs(SUGGEST_NET, PERIOD);
+    expect(v4.references).toBe(false);
+    expect(v4.suggestions.every((x: { coupling: number; cites: null }) => x.coupling === 0 && x.cites === null)).toBe(true);
+    expect(sugKeys(v4)).toEqual(sugKeys(suggestPairs({ ...WITH_REFS, refs: [] }, PERIOD)));
+  });
+
+  it('counts the publications of one researcher that the other cites', () => {
+    const r = suggestPairs(WITH_REFS, { ...PERIOD, signal: 'cites' });
+    const benDan = r.suggestions.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 2 && x.b.id === 4);
+    // Ben's two publications of the period cite Dan's W40 (2021): ab = 2, nothing the other way.
+    expect(benDan.cites).toEqual({ ab: 2, ba: 0 });
+    // Researcher 3 co-signs Ben's citing publications: a citation of Dan too.
+    expect(sugKeys(r).slice(0, 2).sort()).toEqual(['2-4', '3-4']);
+    // Gil co-signed W40 with Dan: no self-citation, and 2 × 7 is a direct citation too.
+    const benGil = r.suggestions.find((x: { a: { id: number }; b: { id: number } }) => x.a.id === 2 && x.b.id === 7);
+    expect(benGil.cites).toEqual({ ab: 2, ba: 0 });
+  });
+
   it('caps the suggestions per researcher and applies the access and pole filters', () => {
     expect(sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, quota: 1 }))).toEqual(['3-6', '1-2']);
     const crossPole = sugKeys(suggestPairs(SUGGEST_NET, { ...PERIOD, crossPole: true }));

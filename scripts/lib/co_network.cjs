@@ -463,8 +463,10 @@ function rankPairs(net, opts = {}) {
 
 // ─── Suggested connections (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 3) ───
 // Pairs of researchers of different labs who never co-signed, scored by explainable signals computed on the
-// period: common co-authors (triadic closure, Adamic-Adar) and closeness of their OpenAlex themes — topics when
-// network.json has them (version 4), subfields otherwise.
+// period: common co-authors (triadic closure, Adamic-Adar), closeness of their OpenAlex themes — topics when
+// network.json has them (version 4), subfields otherwise — and, when network.json carries the cited works
+// (version 5, druid-internal `docs/plan-binomes-citations.md`, lot 2), the references they share (bibliographic
+// coupling) and the publications of one that the other already cites (direct citation).
 
 /** Co-authors with more neighbours than this generate no candidate (Adamic-Adar weighs them little anyway). */
 const HUB_DEGREE = 300;
@@ -481,8 +483,25 @@ const MIN_SIMILARITY = { topic: 0.1, subfield: 0.2 };
  * m / (m + TOPIC_PRIOR), m = the smaller profile (two researchers with one identical publication are not « 100 % close »).
  */
 const TOPIC_PRIOR = 5;
-/** Default weights of the combined score (set from the retrospective test). */
-const SUGGESTION_WEIGHTS = { triadic: 2, topics: 1 };
+/**
+ * References cited by more publications of the period than this neither weigh nor bring candidates (methods
+ * papers, databases, reviews: everybody cites them). Below, a reference weighs 1 / log(1 + publications citing it).
+ */
+const REF_HUB = 100;
+/** Coupling candidates kept per researcher (most similar first). */
+const REF_CANDIDATES = 30;
+/** Coupling similarity below which the signal counts as 0 (cosines of reference profiles are small: most references
+ * of a researcher are cited by nobody else of the university). */
+const MIN_COUPLING = 0.01;
+/** Publications with references under which a coupling profile is not trusted (as TOPIC_PRIOR). */
+const REF_PRIOR = 5;
+/**
+ * Default weights of the combined score, set from the retrospective tests (druid-internal
+ * `docs/binomes-chercheurs/lot3-retrotest.md`, `lot2-citations-retrotest.md`): the shared references predict
+ * future co-signatures poorly (P@100 5 % alone, 16 % for the co-authors) and lower the top of the list when they
+ * weigh 1 — kept low, as a tie-breaker and an explanation, visible on their own through `signal: 'coupling'`.
+ */
+const SUGGESTION_WEIGHTS = { triadic: 2, topics: 1, coupling: 0.5, cites: 1 };
 
 /** Level of the thematic profiles of a network: OpenAlex topics (version 4) or subfields. */
 function themeLevel(net) {
@@ -499,15 +518,19 @@ function themeLevel(net) {
  *   includePhd: boolean       — suggest PhD students (default false; they still count as common co-authors);
  *   minPubs: number           — publications of each researcher over the period (default 2);
  *   recentYears: number       — each researcher published in the last N years of the period (default 3);
- *   signal: 'combined' | 'triadic' | 'topics' — ranking (default combined);
- *   weights: {triadic, topics} — weights of the combined score;
+ *   signal: 'combined' | 'triadic' | 'topics' | 'coupling' | 'cites' — ranking (default combined);
+ *   weights: {triadic, topics, coupling, cites} — weights of the combined score;
  *   minSimilarity: number     — thematic similarity below which the signal counts as 0 (default MIN_SIMILARITY);
+ *   minCoupling, refPrior, refHub: number — same knobs for the coupling signal (defaults MIN_COUPLING, REF_PRIOR,
+ *                               REF_HUB);
  *   quota: number|null        — suggestions per researcher at most (default 5, null = none);
  *   limit: number             — suggestions returned (default 200).
  * }
- * @returns {suggestions, total, level} — level of the themes ('topic' | 'subfield'); each suggestion: the two
- *   researchers, score, common co-authors (count, the most specific ones named) and thematic similarity (with the
- *   shared themes named).
+ * @returns {suggestions, total, level, references} — level of the themes ('topic' | 'subfield'), `references` true
+ *   when the network carries the cited works; each suggestion: the two researchers, score, common co-authors
+ *   (count, the most specific ones named), thematic similarity (with the shared themes named) and, with the cited
+ *   works, the shared references (count, coupling similarity, the rarest ones named by W-id) and the direct
+ *   citations (`cites.ab` = publications of a citing b, `cites.ba`).
  */
 function suggestPairs(net, opts = {}) {
   const from = opts.from ?? -Infinity;
@@ -523,6 +546,10 @@ function suggestPairs(net, opts = {}) {
   const vocabulary = (level === 'topic' ? net.topics : net.subfields) ?? [];
   const minSimilarity = opts.minSimilarity ?? MIN_SIMILARITY[level];
   const topicPrior = opts.topicPrior ?? TOPIC_PRIOR;
+  const hasRefs = Array.isArray(net.refs) && net.refs.length > 0;
+  const minCoupling = opts.minCoupling ?? MIN_COUPLING;
+  const refPrior = opts.refPrior ?? REF_PRIOR;
+  const refHub = opts.refHub ?? REF_HUB;
   const quota = opts.quota === undefined ? 5 : opts.quota;
   const limit = opts.limit ?? 200;
 
@@ -551,20 +578,39 @@ function suggestPairs(net, opts = {}) {
   const linked = new Set();
   const themeCounts = new Map(); // author -> Map(theme -> publications)
   const themePubs = new Map(); // author -> publications with themes
+  const refCounts = new Map(); // author -> Map(reference index -> publications citing it)
+  const refPubs = new Map(); // author -> publications with references
+  const citedBy = new Map(); // reference index -> publications of the period citing it
+  const owners = new Map(); // W-id of a publication (up to `to`) -> its eligible authors
+  const citing = []; // [eligible authors, reference indexes] of the publications of the period
   for (const p of net.pubs) {
     if (p.y > end || (maxAuthors != null && p.n != null && p.n > maxAuthors)) continue;
     for (let i = 0; i < p.a.length; i++) for (let j = i + 1; j < p.a.length; j++) linked.add(pairKey(p.a[i], p.a[j]));
+    if (hasRefs && p.w) owners.set(p.w, p.a.filter((id) => eligible.has(id)));
     if (p.y < from) continue;
+    const authors = [];
     for (const id of p.a) {
       if (!neighbours.has(id)) neighbours.set(id, new Set());
       for (const other of p.a) if (other !== id) neighbours.get(id).add(other);
+      if (!eligible.has(id)) continue;
+      authors.push(id);
       const themes = themesOf(p);
-      if (!eligible.has(id) || !themes?.length) continue;
+      if (!themes?.length) continue;
       if (!themeCounts.has(id)) themeCounts.set(id, new Map());
       themePubs.set(id, (themePubs.get(id) ?? 0) + 1);
       const counts = themeCounts.get(id);
       for (const th of new Set(themes)) counts.set(th, (counts.get(th) ?? 0) + 1);
     }
+    if (!hasRefs || !p.r?.length || !authors.length) continue;
+    const refs = [...new Set(p.r)];
+    for (const r of refs) citedBy.set(r, (citedBy.get(r) ?? 0) + 1);
+    for (const id of authors) {
+      if (!refCounts.has(id)) refCounts.set(id, new Map());
+      refPubs.set(id, (refPubs.get(id) ?? 0) + 1);
+      const counts = refCounts.get(id);
+      for (const r of refs) counts.set(r, (counts.get(r) ?? 0) + 1);
+    }
+    citing.push([authors, refs]);
   }
 
   const candidates = new Map(); // key -> {i, j, aa, via: [ids]}
@@ -574,7 +620,9 @@ function suggestPairs(net, opts = {}) {
     if (c === undefined) {
       const x = eligible.get(i);
       const y = eligible.get(j);
-      c = !linked.has(key) && x && y && allowed(x, y) ? { i: Math.min(i, j), j: Math.max(i, j), aa: 0, via: [], similarity: null } : null;
+      c = !linked.has(key) && x && y && allowed(x, y)
+        ? { i: Math.min(i, j), j: Math.max(i, j), aa: 0, via: [], similarity: null, coupling: 0, cites: null }
+        : null;
       candidates.set(key, c);
     }
     return c;
@@ -634,14 +682,97 @@ function suggestPairs(net, opts = {}) {
     for (const [j] of best.slice(0, TOPIC_CANDIDATES)) candidate(i, j);
   }
 
-  // Scores: triadic signal bounded to [0, 1[ (1 − e^−AA), similarity in [0, 1].
+  // 3. Bibliographic coupling (version 5): cosine of the reference profiles, each reference weighted by
+  // 1 / log(1 + publications of the period citing it), damped like the themes; the dot products come from the
+  // inverted index (reference → authors citing it), hubs left out. Candidates through the closest profiles.
+  const refWeight = new Map(); // reference index -> idf-like weight (0 for a hub)
+  for (const [r, n] of citedBy) refWeight.set(r, n > refHub ? 0 : 1 / Math.log(1 + n));
+  const refVectors = new Map(); // author -> {counts, norm, pubs}
+  const refAuthors = new Map(); // reference index -> [[author, publications citing it]] (hubs left out)
+  for (const [id, counts] of refCounts) {
+    let norm2 = 0;
+    for (const [r, n] of counts) {
+      const w = refWeight.get(r);
+      if (!w) continue;
+      norm2 += (n * w) ** 2;
+      if (!refAuthors.has(r)) refAuthors.set(r, []);
+      refAuthors.get(r).push([id, n]);
+    }
+    refVectors.set(id, { counts, norm: Math.sqrt(norm2), pubs: refPubs.get(id) });
+  }
+  const dots = new Map(); // pair key -> weighted dot product (cosine of the profiles)
+  const sums = new Map(); // pair key -> sum of the weights of the shared references (ranking by references)
+  for (const [r, authors] of refAuthors) {
+    if (authors.length < 2) continue;
+    const w = refWeight.get(r);
+    for (let x = 0; x < authors.length; x++) {
+      for (let y = x + 1; y < authors.length; y++) {
+        const key = pairKey(authors[x][0], authors[y][0]);
+        dots.set(key, (dots.get(key) ?? 0) + authors[x][1] * authors[y][1] * w * w);
+        sums.set(key, (sums.get(key) ?? 0) + w);
+      }
+    }
+  }
+  const couplingOf = (i, j) => {
+    const u = refVectors.get(i);
+    const v = refVectors.get(j);
+    const dot = dots.get(pairKey(i, j));
+    if (!u || !v || !dot || !u.norm || !v.norm) return 0;
+    const m = Math.min(u.pubs, v.pubs);
+    return (dot / (u.norm * v.norm)) * (m / (m + refPrior));
+  };
+  if (hasRefs) {
+    const partners = new Map(); // author -> [[partner, coupling]]
+    for (const key of dots.keys()) {
+      const i = Math.floor(key / 1e5);
+      const j = key % 1e5;
+      const sim = couplingOf(i, j);
+      if (sim < minCoupling) continue;
+      for (const [a, b] of [[i, j], [j, i]]) {
+        if (!partners.has(a)) partners.set(a, []);
+        partners.get(a).push([b, sim]);
+      }
+    }
+    for (const [i, best] of partners) {
+      best.sort((m, n) => n[1] - m[1] || m[0] - n[0]);
+      for (const [j] of best.slice(0, REF_CANDIDATES)) candidate(i, j);
+    }
+    // 4. Direct citations: a publication of the period citing a publication of the network (up to `to`).
+    for (const [authors, refs] of citing) {
+      const seen = new Set();
+      for (const r of refs) {
+        const cited = owners.get(net.refs[r]);
+        if (!cited?.length) continue;
+        for (const a of authors) {
+          for (const b of cited) {
+            if (a === b || seen.has(a * 1e5 + b)) continue;
+            seen.add(a * 1e5 + b);
+            const c = candidate(a, b);
+            if (!c) continue;
+            c.cites ??= { ab: 0, ba: 0 };
+            c.cites[a === c.i ? 'ab' : 'ba'] += 1;
+          }
+        }
+      }
+    }
+  }
+
+  // Scores: triadic signal bounded to [0, 1[ (1 − e^−AA), similarities in [0, 1], citations bounded alike.
   const scored = [];
   for (const c of candidates.values()) {
     if (!c) continue;
     c.similarity = cosine(c.i, c.j);
+    c.coupling = couplingOf(c.i, c.j);
     const triadic = 1 - Math.exp(-c.aa);
     const topics = c.similarity >= minSimilarity ? c.similarity : 0;
-    c.score = signal === 'triadic' ? c.aa : signal === 'topics' ? topics : weights.triadic * triadic + weights.topics * topics;
+    const coupling = c.coupling >= minCoupling ? c.coupling : 0;
+    const citations = c.cites ? c.cites.ab + c.cites.ba : 0;
+    const cites = 1 - Math.exp(-citations);
+    c.score = signal === 'triadic' ? c.aa
+      : signal === 'topics' ? topics
+        : signal === 'coupling' ? (sums.get(pairKey(c.i, c.j)) ?? 0)
+          : signal === 'cites' ? citations + coupling / 10
+            : weights.triadic * triadic + weights.topics * topics + (weights.coupling ?? 0) * coupling + (weights.cites ?? 0) * cites;
     if (c.score > 0) scored.push(c);
   }
   scored.sort((m, n) => n.score - m.score || n.aa - m.aa || m.i - n.i || m.j - n.j);
@@ -678,10 +809,21 @@ function suggestPairs(net, opts = {}) {
       .map(([k]) => vocabulary[k]?.name)
       .filter(Boolean);
   };
+  // Shared references of a pair: count, and the rarest ones (fewest citing publications) named by W-id.
+  const sharedRefs = (i, j) => {
+    const u = refVectors.get(i)?.counts;
+    const v = refVectors.get(j)?.counts;
+    if (!u || !v) return { count: 0, top: [] };
+    const [small, large] = u.size < v.size ? [u, v] : [v, u];
+    const shared = [...small.keys()].filter((r) => large.has(r));
+    const top = shared.sort((m, n) => citedBy.get(m) - citedBy.get(n) || m - n).slice(0, 3).map((r) => net.refs[r]);
+    return { count: shared.length, top };
+  };
   return {
     suggestions: kept.slice(0, limit).map((c) => {
       const x = eligible.get(c.i);
       const y = eligible.get(c.j);
+      const refs = hasRefs ? sharedRefs(c.i, c.j) : { count: 0, top: [] };
       return {
         a: authorOut(x),
         b: authorOut(y),
@@ -694,11 +836,16 @@ function suggestPairs(net, opts = {}) {
           .map((z) => ({ id: z, label: byId.get(z)?.label ?? '', labs: byId.get(z)?.labs ?? [] })),
         similarity: Math.round(c.similarity * 100) / 100,
         themes: sharedThemes(c.i, c.j),
+        references: refs.count,
+        coupling: Math.round(c.coupling * 100) / 100,
+        sharedRefs: refs.top,
+        cites: c.cites,
         crossPole: x.poles.length > 0 && y.poles.length > 0 && !x.poles.some((p) => y.poles.includes(p)),
       };
     }),
     total: kept.length,
     level,
+    references: hasRefs,
   };
 }
 
