@@ -13,6 +13,10 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Références communes à l'écran** (druid-internal `docs/plan-binomes-citations.md`, lot 3) : dans les rapprochements
+  suggérés et le bloc « Binômes de recherche » de la fiche, chaque ligne dit « N références communes », affiche à la
+  demande les trois plus rares avec leur titre lu sur OpenAlex, et « A cite déjà n publications de B » ; classements
+  « Références communes seules » et « Citations directes seules », colonnes CSV, aide fr/en.
 - **Binômes suggérés par les citations** (druid-internal `docs/plan-binomes-citations.md`, lot 2) : quand le
   `network.json` de druid-biblio porte les références citées (version 5), les rapprochements suggérés ajoutent deux
   signaux explicables — les références communes (couplage bibliographique, pondéré par la rareté de chaque référence,

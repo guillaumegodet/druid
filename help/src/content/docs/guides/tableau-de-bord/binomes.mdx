@@ -93,7 +93,7 @@ comptent. Ils n'ont pas de lien public : un rapport partagé les recalcule avec 
 ## Rapprochements suggérés
 
 Le bouton **Rapprochements suggérés**, en haut du sous-onglet, propose des chercheurs de **labos différents qui n'ont
-cosigné aucune publication**, classés selon deux signaux calculés sur la période :
+cosigné aucune publication**, classés selon des signaux calculés sur la période :
 
 - **Coauteurs communs** : A et B publient chacun avec C. Un coauteur commun qui a peu de coauteurs compte plus qu'un
   coauteur qui publie avec tout le monde (indice d'Adamic-Adar). Les trois coauteurs communs les plus spécifiques sont
@@ -102,8 +102,18 @@ cosigné aucune publication**, classés selon deux signaux calculés sur la pér
   les chercheurs qui ont peu publié. Les sujets partagés sont nommés, par exemple « Bone Tissue Engineering
   Materials ». OpenAlex compte environ 4 500 sujets, bien plus précis que ses 250 sous-disciplines ; sur un réseau
   généré sans les sujets, Druid compare les sous-disciplines.
+- **Références communes** (quand le réseau porte les références citées) : A et B citent les mêmes travaux. Une
+  référence que peu de publications de l'établissement citent compte plus qu'un article de méthode cité par tout le
+  monde. La ligne indique le nombre de références communes, leur proximité, et affiche à la demande les trois plus
+  rares avec leur titre, lu sur OpenAlex, et un lien vers la notice.
+- **Citation directe** : « A cite déjà 3 publications de B ». La personne connaît les travaux de l'autre.
 
-Le score vaut deux fois le signal des coauteurs communs plus celui des sujets. Chaque chercheur apparaît
+Le score vaut deux fois le signal des coauteurs communs, plus celui des sujets, plus la moitié de la proximité des
+références, plus les citations directes. Les références pèsent peu à dessein : testées sur le passé, elles
+prédisent mal les cosignatures à venir ; elles décrivent une lecture commune plus qu'une collaboration probable,
+et OpenAlex ne connaît les références que de la moitié environ des publications (surtout les articles de revue,
+très peu en lettres, droit ou philosophie). Le menu **Classement** permet de trier sur les références communes seules
+ou sur les citations directes seules. Chaque chercheur apparaît
 au plus 5 fois par défaut, pour qu'un chercheur très central ne remplisse pas la liste ; les doctorants ne sont pas
 suggérés par défaut. Les filtres de pôles, de périmètre et d'appartenance sont ceux des binômes observés.
 

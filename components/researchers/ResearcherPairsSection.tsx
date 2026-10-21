@@ -5,6 +5,7 @@ import type { Researcher } from '../../types';
 import { hasCapability, getUserInfo } from '../../lib/auth';
 import { apiErrorText } from '../../lib/apiErrors';
 import { helpUrl } from '../../lib/helpLinks';
+import { DirectCitations, SharedReferences } from '../dashboard/PairSuggestionsSection';
 import {
   fetchResearcherPairs,
   sendPairFeedback,
@@ -196,8 +197,14 @@ const SuggestionCard: React.FC<{
             {others > 0 && <> <Trans>and {others} more</Trans></>}
           </span>
         ) : (
-          <span><Trans>No common co-author yet: close by their research topics only.</Trans></span>
+          <span>
+            {s.references
+              ? <Trans>No common co-author yet: close by their research topics and their references.</Trans>
+              : <Trans>No common co-author yet: close by their research topics only.</Trans>}
+          </span>
         )}
+        <DirectCitations s={s} />
+        <SharedReferences s={s} />
       </div>
     </div>
   );
