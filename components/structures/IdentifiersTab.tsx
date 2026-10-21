@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { AlertTriangle, Check, Fingerprint, Link2, Plus, RefreshCw, X } from 'lucide-react';
-import { Structure } from '../../types';
+import { Structure, StructureLevel } from '../../types';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DirectoryApi } from '../../lib/directoryApi';
 import { apiErrorText } from '../../lib/apiErrors';
@@ -18,15 +18,21 @@ interface IdentifiersTabProps {
 const inputClass = "input-soft font-mono";
 const labelClass = "block text-[11px] font-semibold text-muted-light dark:text-[#8f897c] mb-1";
 
-/** Types shown on the record, in this order. */
-const RECORD_TYPES: StructureIdType[] = ['rnsr', 'ror', 'hal_struct', 'hal_collection', 'openalex', 'idref', 'wikidata', 'isni', 'uai', 'siret', 'grid', 'scopus_affil'];
+/** Types shown on the record by level (decision of 2026-10-21): a lab carries the harvesting identifiers, an
+ * institution or a grouping its legal and registry ones; a team carries none (the harvesting uses its lab's). */
+const RECORD_TYPES: Record<string, StructureIdType[]> = {
+  [StructureLevel.ENTITE]: ['rnsr', 'ror', 'hal_struct', 'hal_collection', 'openalex', 'idref', 'wikidata', 'scopus_affil'],
+  [StructureLevel.ETABLISSEMENT]: ['uai', 'siret', 'ror', 'idref', 'wikidata', 'isni', 'grid', 'openalex', 'hal_struct', 'scopus_affil'],
+  [StructureLevel.INTERMEDIAIRE]: ['uai', 'ror', 'idref', 'wikidata', 'isni', 'hal_struct', 'openalex'],
+  [StructureLevel.EQUIPE]: [],
+};
 
 /**
  * Identifiers of an existing structure on PostgreSQL (druid-internal docs/plan-druid-saas.md, lot 4 d): the
  * multi-valued list of structure_identifier — primary, source, date of the last check, link to the record — with
  * « add », « remove », « make primary ». The decisions on the alignment candidates stay on the alignment page.
  */
-const IdentifierList: React.FC<{ recordId: number; writable: boolean }> = ({ recordId, writable }) => {
+const IdentifierList: React.FC<{ recordId: number; writable: boolean; types: StructureIdType[] }> = ({ recordId, writable, types }) => {
   const { t } = useLingui();
   const [items, setItems] = useState<StructureIdentifier[] | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +54,7 @@ const IdentifierList: React.FC<{ recordId: number; writable: boolean }> = ({ rec
   return (
     <div className="space-y-3">
       {error && <p className="text-[12.5px] font-semibold text-[#b3441f] dark:text-[#e08a6a]">{error}</p>}
-      {RECORD_TYPES.map((type) => {
+      {types.map((type) => {
         const meta = STRUCTURE_ID_META[type];
         const values = confirmed.filter((i) => i.type === type);
         if (!values.length && !writable) return null;
@@ -116,7 +122,9 @@ export const IdentifiersTab: React.FC<IdentifiersTabProps> = ({
                 <Fingerprint className="w-5 h-5 text-muted-lighter dark:text-[#8f897c]" />
                 <h3 className="section-label"><Trans>Third-party identifiers</Trans></h3>
              </div>
-             {useList ? <IdentifierList recordId={recordId} writable={canWrite()} /> : (
+             {useList && String(structure.level) === StructureLevel.EQUIPE ? (
+               <p className="text-[13px] text-muted dark:text-[#8f897c]"><Trans>A team carries no identifier of its own: the publications are harvested through the identifiers of its lab.</Trans></p>
+             ) : useList ? <IdentifierList recordId={recordId} writable={canWrite()} types={RECORD_TYPES[String(structure.level)] || RECORD_TYPES[StructureLevel.ENTITE]} /> : (
              <div className="space-y-4">
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>

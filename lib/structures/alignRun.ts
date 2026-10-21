@@ -19,7 +19,8 @@ import type { Registry } from './registryClient';
 export interface AlignRunOptions {
   mode: AlignMode;
   types?: StructureIdType[];
-  /** Only these structures (row ids or acronyms); default: every lab and team, institutions excluded. */
+  /** Only these labs (row ids or acronyms); default: every lab. Teams, groupings and institutions are never aligned:
+   * the harvesting uses the identifiers of the labs (decision of 2026-10-21). */
   only?: string[];
   /** Search again the structures already searched for a type (default: only the never-searched pairs). */
   force?: boolean;
@@ -67,9 +68,9 @@ export const runStructureAlignment = async (db: Db, registry: Registry, options:
 
   const only = options.only?.map((v) => v.trim().toUpperCase()).filter(Boolean);
   let targets = structures.filter((s) => {
+    if (String(s.level) !== StructureLevel.ENTITE) return false;
     const rowId = Number(String(s.id).replace(/^S-/, ''));
-    if (only?.length) return only.includes(String(rowId)) || only.includes(s.acronym.toUpperCase()) || only.includes(String(s.localId || '').toUpperCase());
-    return String(s.level) !== StructureLevel.ETABLISSEMENT;
+    return !only?.length || only.includes(String(rowId)) || only.includes(s.acronym.toUpperCase()) || only.includes(String(s.localId || '').toUpperCase());
   });
   if (!options.force && !only?.length) {
     // Incremental: a structure with every type already looked at (or filled) has nothing new to search.

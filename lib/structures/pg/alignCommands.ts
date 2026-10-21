@@ -103,8 +103,9 @@ export const createPgStructureAlignCommands = ({ db, repository }: { db: Db; rep
       let generatedAt = '';
       for (const s of searchRows) { const at = new Date(s.searched_at as any).toISOString(); if (at > generatedAt) generatedAt = at; }
       const stats = { structures: 0, actionable: 0, strong: 0, ambiguous: 0, arbitrate: 0, conflicts: 0 };
-      const rank = (s: Structure) => (levelOf(s) === 'institution' ? 0 : levelOf(s) === 'lab' ? 1 : levelOf(s) === 'team' ? 2 : 3);
-      const rows: StructureAlignRow[] = [...structures].sort((a, b) => rank(a) - rank(b) || a.acronym.localeCompare(b.acronym)).map((s) => {
+      // Labs only (decision of 2026-10-21): the harvesting uses their identifiers; teams, groupings and institutions
+      // keep theirs on their record but are not aligned.
+      const rows: StructureAlignRow[] = structures.filter((s) => levelOf(s) === 'lab').sort((a, b) => a.acronym.localeCompare(b.acronym)).map((s) => {
         const structureId = structureRowId(s);
         const ids = identifiers.get(structureId) ?? [];
         const cells: StructureAlignRow['cells'] = {};
