@@ -115,6 +115,8 @@ jobs:
           psql "$SUPERUSER_URL" -v ON_ERROR_STOP=1 -qc "ALTER ROLE druid_owner PASSWORD 'owner'; ALTER ROLE druid_app PASSWORD 'app'"
       - name: Migrations (up, down, up)
         run: npm run -s db:migrate && npm run -s db:rollback && npm run -s db:migrate
+      - name: Control-plane migrations of a multi-tenant deployment (up, down, up)
+        run: npm run -s db:saas:migrate && npm run -s db:saas:rollback && npm run -s db:saas:migrate
       - name: Kysely types up to date (npm run db:types)
         run: npx kysely-codegen --verify
       - name: Integration tests

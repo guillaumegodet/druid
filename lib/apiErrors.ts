@@ -35,6 +35,13 @@ export const API_ERRORS = [
   msg`Not found`,
   msg`Unknown structure`,
   msg`Unknown Druid instance for this host`,
+  // Tenants of a control plane (druid-internal docs/plan-druid-saas.md, lot 1 e)
+  msg`Authentication required`,
+  msg`This account is not a member of this Druid`,
+  msg`Not a tenant of the control plane`,
+  msg`Invalid request`,
+  msg`Invalid e-mail address`,
+  msg`Read-only account: writes are disabled`,
   // Calls for proposals (docs/plan-funding-calls.md)
   msg`The calls for proposals need the PostgreSQL storage`,
   msg`The theses need the PostgreSQL storage`,

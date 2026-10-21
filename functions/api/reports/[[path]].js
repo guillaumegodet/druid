@@ -3,7 +3,7 @@
 // storage, from the shared module scripts/lib/reports_store.cjs (bundled by esbuild), over the storage client of the
 // instance (functions/_lib/storage.js).
 //
-// Identity = Cloudflare Access (header Cf-Access-Authenticated-User-Email); without it the API
+// Identity = Cloudflare Access header, or the session of a tenant (functions/_lib/identity.js); without it the API
 // refuses (401), except locally with ALLOW_ANONYMOUS_WRITES=true (never on a shared deployment).
 // Read-only instance (public demo): 403 on every route — the client keeps reports in the browser
 // (lib/reportsApi.ts). Super admins = the `admins` of the instance.
@@ -12,6 +12,7 @@
 // the instance slug (one bucket may serve a shared deployment). Without the binding, archiving is
 // off: the history keeps the metadata only.
 import reportsStore from '../../../scripts/lib/reports_store.cjs';
+import { identityOf } from '../../_lib/identity.js';
 import { storageOf } from '../../_lib/storage.js';
 
 const json = (status, body) =>
@@ -35,7 +36,7 @@ export async function onRequest(context) {
   const { instance, store: storage, missing, release } = storageOf(context);
   if (instance.readOnly) return json(403, { error: 'Read-only instance: reports are kept in the browser' });
 
-  const email = request.headers.get('Cf-Access-Authenticated-User-Email');
+  const email = identityOf(context);
   const anonymousAllowed = !instance.shared && env.ALLOW_ANONYMOUS_WRITES === 'true';
   if (!email && !anonymousAllowed) return json(401, { error: 'Unauthorized' });
 

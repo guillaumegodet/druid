@@ -4,6 +4,7 @@
 // key is the instance's (ILAAS_API_KEY, per instance on a shared deployment). Refused on a
 // read-only instance (public demo): anonymous visitors must not spend the ILAAS quota.
 import reportsAi from '../../scripts/lib/reports_ai.cjs';
+import { identityOf } from '../_lib/identity.js';
 import { instanceEnv, instanceOf } from '../_lib/instance.js';
 
 const json = (status, body) =>
@@ -14,7 +15,7 @@ export async function onRequestPost(context) {
   const instance = instanceOf(context);
   const env = instanceEnv(context.env, instance);
   if (instance.readOnly) return json(403, { error: 'Read-only instance: writes are disabled' });
-  const email = request.headers.get('Cf-Access-Authenticated-User-Email');
+  const email = identityOf(context);
   const anonymousAllowed = !instance.shared && env.ALLOW_ANONYMOUS_WRITES === 'true';
   if (!email && !anonymousAllowed) return json(401, { error: 'Unauthorized' });
   if (!env.ILAAS_API_KEY) return json(500, { error: 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)' });
