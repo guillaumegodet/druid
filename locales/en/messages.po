@@ -212,7 +212,7 @@ msgstr "Loading dashboard…"
 #: components/researchers/AffiliationHistorySection.tsx:211
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:388
-#: components/structures/IdentifiersTab.tsx:46
+#: components/structures/IdentifiersTab.tsx:52
 msgid "Loading…"
 msgstr "Loading…"
 
@@ -487,7 +487,7 @@ msgstr "Structure or group"
 #: components/Sidebar.tsx:159
 #: components/reports/ReportControls.tsx:47
 #: components/researchers/UnifiedAlignPage.tsx:605
-#: components/structures/StructureAlignPanel.tsx:354
+#: components/structures/StructureAlignPanel.tsx:350
 msgid "Structures"
 msgstr "Structures"
 
@@ -998,7 +998,7 @@ msgstr "Open this structure's bibliometric dashboard"
 
 #: components/StructureDetail.tsx:129
 #: components/researchers/MediaPresenceSection.tsx:48
-#: components/structures/IdentifiersTab.tsx:162
+#: components/structures/IdentifiersTab.tsx:170
 msgid "Website"
 msgstr "Website"
 
@@ -1142,7 +1142,6 @@ msgstr "Structure deletion: not available"
 #: components/dashboard/report/ReportWizard.tsx:271
 #: components/dashboard/report/composeReportPdf.ts:63
 #: components/reports/NewReportDialog.tsx:233
-#: components/structures/StructureAlignPanel.tsx:398
 msgid "Structure"
 msgstr "Structure"
 
@@ -1412,7 +1411,7 @@ msgstr "failed"
 
 #: components/admin/CallsProgrammesAdmin.tsx:177
 #: components/researchers/UnifiedAlignPage.tsx:651
-#: components/structures/StructureAlignPanel.tsx:354
+#: components/structures/StructureAlignPanel.tsx:350
 msgid "done"
 msgstr "done"
 
@@ -1557,7 +1556,7 @@ msgid "e.g. Université Paris Nanterre"
 msgstr "e.g. Université Paris Nanterre"
 
 #: components/admin/InstitutionsAdmin.tsx:127
-#: components/structures/IdentifiersTab.tsx:133
+#: components/structures/IdentifiersTab.tsx:141
 msgid "UAI code"
 msgstr "UAI code"
 
@@ -1581,9 +1580,9 @@ msgstr "The name is what the record form shows in its « Employing institution �
 #: components/reports/AddToReportDialog.tsx:198
 #: components/reports/ShareDialog.tsx:157
 #: components/researchers/AffiliationsTable.tsx:102
-#: components/structures/IdentifiersTab.tsx:80
-#: components/structures/IdentifiersTab.tsx:88
-#: components/structures/StructureAlignPanel.tsx:190
+#: components/structures/IdentifiersTab.tsx:86
+#: components/structures/IdentifiersTab.tsx:94
+#: components/structures/StructureAlignPanel.tsx:195
 msgid "Add"
 msgstr "Add"
 
@@ -1663,7 +1662,7 @@ msgstr "Add a call"
 #: components/researchers/SiteImportReview.tsx:117
 #: components/researchers/SiteImportReview.tsx:323
 #: components/researchers/UnifiedAlignPage.tsx:748
-#: components/structures/StructureAlignPanel.tsx:412
+#: components/structures/StructureAlignPanel.tsx:408
 msgid "Close"
 msgstr "Close"
 
@@ -1958,7 +1957,6 @@ msgstr "To validate"
 #: components/dashboard/NewsTab.tsx:639
 #: components/reports/ReportEditor.tsx:812
 #: components/researchers/ResearcherPairsSection.tsx:341
-#: components/structures/StructureAlignPanel.tsx:334
 msgid "All"
 msgstr "All"
 
@@ -2522,7 +2520,7 @@ msgid "Confidence of the automatic classification"
 msgstr "Confidence of the automatic classification"
 
 #: components/dashboard/AxisReviewTable.tsx:130
-#: components/structures/StructureAlignPanel.tsx:159
+#: components/structures/StructureAlignPanel.tsx:164
 msgid "Confirmed"
 msgstr "Confirmed"
 
@@ -2565,8 +2563,8 @@ msgstr "Review status"
 
 #: components/dashboard/AxisReviewTable.tsx:170
 #: components/dashboard/MediaMentionsPanel.tsx:359
-#: components/structures/StructureAlignPanel.tsx:182
-#: components/structures/StructureAlignPanel.tsx:371
+#: components/structures/StructureAlignPanel.tsx:187
+#: components/structures/StructureAlignPanel.tsx:367
 msgid "To review"
 msgstr "To review"
 
@@ -3377,7 +3375,6 @@ msgstr "Researcher"
 #: components/dashboard/CollaborationsTab.tsx:383
 #: components/dashboard/CollaborationsTab.tsx:396
 #: components/dashboard/report/reportTables.ts:59
-#: components/structures/StructureAlignPanel.tsx:334
 msgid "Labs"
 msgstr "Labs"
 
@@ -5336,6 +5333,7 @@ msgstr "Citations (already received)"
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
 #: components/researchers/ListHeader.tsx:51
+#: components/structures/StructureAlignPanel.tsx:394
 #: lib/importConflicts.ts:75
 msgid "Lab"
 msgstr "Lab"
@@ -6251,7 +6249,7 @@ msgstr "Filters"
 #: components/dashboard/PublicationsListTab.tsx:263
 #: components/reports/ReportEditor.tsx:389
 #: components/researchers/UnifiedAlignPage.tsx:694
-#: components/structures/StructureAlignPanel.tsx:374
+#: components/structures/StructureAlignPanel.tsx:370
 msgid "Remove this filter"
 msgstr "Remove this filter"
 
@@ -7700,7 +7698,6 @@ msgstr "Publication rate per research FTE, age pyramid and most prolific authors
 #: components/dashboard/dashboardNav.ts:98
 #: components/dashboard/report/reportCatalog.ts:92
 #: components/dashboard/report/reportTables.ts:59
-#: components/structures/StructureAlignPanel.tsx:334
 msgid "Teams"
 msgstr "Teams"
 
@@ -9854,7 +9851,7 @@ msgid "BSO affiliation markers (one per line: acronym, name, RNSR/UAI number…)
 msgstr "BSO affiliation markers (one per line: acronym, name, RNSR/UAI number…)"
 
 #: components/etl/EtlConsolePage.tsx:405
-#: components/structures/IdentifiersTab.tsx:147
+#: components/structures/IdentifiersTab.tsx:155
 msgid "HAL collection"
 msgstr "HAL collection"
 
@@ -11703,8 +11700,8 @@ msgid "Make it the primary IdHAL_i (the one harvested by CRISalid)"
 msgstr "Make it the primary IdHAL_i (the one harvested by CRISalid)"
 
 #: components/researchers/GeneralTab.tsx:185
-#: components/structures/IdentifiersTab.tsx:70
-#: components/structures/StructureAlignPanel.tsx:172
+#: components/structures/IdentifiersTab.tsx:76
+#: components/structures/StructureAlignPanel.tsx:177
 msgid "make primary"
 msgstr "make primary"
 
@@ -11979,7 +11976,7 @@ msgstr "All the headcount analyses"
 
 #: components/researchers/LdapAlignPage.tsx:31
 #: components/researchers/UnifiedAlignPage.tsx:52
-#: components/structures/StructureAlignPanel.tsx:346
+#: components/structures/StructureAlignPanel.tsx:342
 msgid "Check existing ones"
 msgstr "Check existing ones"
 
@@ -12370,7 +12367,7 @@ msgstr "No orphan."
 
 #: components/researchers/LdapVerifyPanel.tsx:178
 #: components/researchers/UnifiedAlignPage.tsx:806
-#: components/structures/StructureAlignPanel.tsx:455
+#: components/structures/StructureAlignPanel.tsx:450
 #: components/structures/StructuresLdapReview.tsx:134
 msgid "Writing…"
 msgstr "Writing…"
@@ -12697,7 +12694,7 @@ msgid "union"
 msgstr "union"
 
 #: components/researchers/MergeResearchersModal.tsx:251
-#: components/structures/StructureAlignPanel.tsx:101
+#: components/structures/StructureAlignPanel.tsx:106
 msgid "conflict"
 msgstr "conflict"
 
@@ -13622,8 +13619,8 @@ msgid "Directory conflicts"
 msgstr "Directory conflicts"
 
 #: components/researchers/UnifiedAlignPage.tsx:76
-#: components/structures/IdentifiersTab.tsx:65
-#: components/structures/StructureAlignPanel.tsx:163
+#: components/structures/IdentifiersTab.tsx:71
+#: components/structures/StructureAlignPanel.tsx:168
 msgid "primary"
 msgstr "primary"
 
@@ -13640,7 +13637,7 @@ msgid "{label}: one candidate to check — tick to fill in, click to see it"
 msgstr "{label}: one candidate to check — tick to fill in, click to see it"
 
 #: components/researchers/UnifiedAlignPage.tsx:134
-#: components/structures/StructureAlignPanel.tsx:86
+#: components/structures/StructureAlignPanel.tsx:90
 msgid "strong candidate"
 msgstr "strong candidate"
 
@@ -13698,7 +13695,7 @@ msgid "No candidate found during the last {label} run."
 msgstr "No candidate found during the last {label} run."
 
 #: components/researchers/UnifiedAlignPage.tsx:170
-#: components/structures/StructureAlignPanel.tsx:109
+#: components/structures/StructureAlignPanel.tsx:114
 msgid "not found"
 msgstr "not found"
 
@@ -13813,8 +13810,8 @@ msgid "Researcher identifier alignment"
 msgstr "Researcher identifier alignment"
 
 #: components/researchers/UnifiedAlignPage.tsx:599
-msgid "RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab or team, one column per identifier"
-msgstr "RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab or team, one column per identifier"
+msgid "RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab, one column per identifier"
+msgstr "RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab, one column per identifier"
 
 #: components/researchers/UnifiedAlignPage.tsx:599
 msgid "IdRef · ORCID · HAL · OpenAlex · Scopus — one row per person, one column per identifier"
@@ -13852,7 +13849,7 @@ msgid "Choose the sources, see the number of records and the cost, then start th
 msgstr "Choose the sources, see the number of records and the cost, then start the search on the filtered lab and group"
 
 #: components/researchers/UnifiedAlignPage.tsx:637
-#: components/structures/StructureAlignPanel.tsx:343
+#: components/structures/StructureAlignPanel.tsx:339
 msgid "Search running…"
 msgstr "Search running…"
 
@@ -13865,7 +13862,7 @@ msgstr "Search everywhere…"
 #. placeholder {1}: p.total ?? '?'
 #. placeholder {1}: progress.total ?? '?'
 #: components/researchers/UnifiedAlignPage.tsx:651
-#: components/structures/StructureAlignPanel.tsx:354
+#: components/structures/StructureAlignPanel.tsx:350
 msgid "stopped at {0}/{1}"
 msgstr "stopped at {0}/{1}"
 
@@ -13890,7 +13887,7 @@ msgid "Stops this source: the records in progress finish, what was found is kept
 msgstr "Stops this source: the records in progress finish, what was found is kept; the next run resumes with the records not searched yet"
 
 #: components/researchers/UnifiedAlignPage.tsx:661
-#: components/structures/StructureAlignPanel.tsx:357
+#: components/structures/StructureAlignPanel.tsx:353
 msgid "Stop"
 msgstr "Stop"
 
@@ -13911,7 +13908,7 @@ msgid "Candidates to check"
 msgstr "Candidates to check"
 
 #: components/researchers/UnifiedAlignPage.tsx:689
-#: components/structures/StructureAlignPanel.tsx:370
+#: components/structures/StructureAlignPanel.tsx:366
 msgid "Ambiguous"
 msgstr "Ambiguous"
 
@@ -13920,13 +13917,13 @@ msgid "Name mismatches / replaced entries"
 msgstr "Name mismatches / replaced entries"
 
 #: components/researchers/UnifiedAlignPage.tsx:691
-#: components/structures/StructureAlignPanel.tsx:180
-#: components/structures/StructureAlignPanel.tsx:372
+#: components/structures/StructureAlignPanel.tsx:185
+#: components/structures/StructureAlignPanel.tsx:368
 msgid "Conflicts"
 msgstr "Conflicts"
 
 #: components/researchers/UnifiedAlignPage.tsx:694
-#: components/structures/StructureAlignPanel.tsx:374
+#: components/structures/StructureAlignPanel.tsx:370
 msgid "Show only this kind of work"
 msgstr "Show only this kind of work"
 
@@ -13955,12 +13952,12 @@ msgid "Only empty cells are filled in; no existing value is overwritten (OpenAle
 msgstr "Only empty cells are filled in; no existing value is overwritten (OpenAlex: checked profiles are added to the list, nothing is removed). Conflicts are listed for manual review."
 
 #: components/researchers/UnifiedAlignPage.tsx:716
-#: components/structures/StructureAlignPanel.tsx:388
+#: components/structures/StructureAlignPanel.tsx:384
 msgid "Uncheck all strong candidates"
 msgstr "Uncheck all strong candidates"
 
 #: components/researchers/UnifiedAlignPage.tsx:716
-#: components/structures/StructureAlignPanel.tsx:388
+#: components/structures/StructureAlignPanel.tsx:384
 msgid "Check all strong candidates"
 msgstr "Check all strong candidates"
 
@@ -13978,7 +13975,7 @@ msgid "Only records with something to do on {0}"
 msgstr "Only records with something to do on {0}"
 
 #: components/researchers/UnifiedAlignPage.tsx:748
-#: components/structures/StructureAlignPanel.tsx:412
+#: components/structures/StructureAlignPanel.tsx:408
 msgid "Open the detail"
 msgstr "Open the detail"
 
@@ -14491,94 +14488,98 @@ msgstr "e.g. 201822446V"
 msgid "Cluster (derived — read only)"
 msgstr "Cluster (derived — read only)"
 
-#: components/structures/IdentifiersTab.tsx:66
-#: components/structures/StructureAlignPanel.tsx:164
-msgid "checked on"
-msgstr "checked on"
-
-#: components/structures/IdentifiersTab.tsx:66
+#: components/structures/IdentifiersTab.tsx:72
 msgid "Source of the value"
 msgstr "Source of the value"
 
-#: components/structures/IdentifiersTab.tsx:67
-#: components/structures/StructureAlignPanel.tsx:37
-#: components/structures/StructureAlignPanel.tsx:167
-msgid "closed record"
-msgstr "closed record"
+#: components/structures/IdentifiersTab.tsx:72
+#: components/structures/StructureAlignPanel.tsx:169
+msgid "checked on"
+msgstr "checked on"
 
-#: components/structures/IdentifiersTab.tsx:67
-#: components/structures/StructureAlignPanel.tsx:167
+#: components/structures/IdentifiersTab.tsx:73
+#: components/structures/StructureAlignPanel.tsx:172
 msgid "record not found"
 msgstr "record not found"
 
-#: components/structures/IdentifiersTab.tsx:67
+#: components/structures/IdentifiersTab.tsx:73
+#: components/structures/StructureAlignPanel.tsx:36
+#: components/structures/StructureAlignPanel.tsx:172
+msgid "closed record"
+msgstr "closed record"
+
+#: components/structures/IdentifiersTab.tsx:73
 msgid "record names something else"
 msgstr "record names something else"
 
-#: components/structures/IdentifiersTab.tsx:71
-#: components/structures/StructureAlignPanel.tsx:173
-msgid "remove"
-msgstr "remove"
-
 #. placeholder {0}: i.value
-#: components/structures/IdentifiersTab.tsx:71
+#: components/structures/IdentifiersTab.tsx:77
 msgid "Remove {0}? It will not be suggested again by the alignment."
 msgstr "Remove {0}? It will not be suggested again by the alignment."
 
-#: components/structures/IdentifiersTab.tsx:79
+#: components/structures/IdentifiersTab.tsx:77
+#: components/structures/StructureAlignPanel.tsx:178
+msgid "remove"
+msgstr "remove"
+
+#: components/structures/IdentifiersTab.tsx:85
 msgid "Identifier or URL"
 msgstr "Identifier or URL"
 
 #. placeholder {0}: meta.label
-#: components/structures/IdentifiersTab.tsx:86
+#: components/structures/IdentifiersTab.tsx:92
 msgid "Add a {0} identifier"
 msgstr "Add a {0} identifier"
 
-#: components/structures/IdentifiersTab.tsx:94
+#: components/structures/IdentifiersTab.tsx:100
 msgid "Candidates found by the alignment are reviewed on the Alignment page, Structures tab."
 msgstr "Candidates found by the alignment are reviewed on the Alignment page, Structures tab."
 
-#: components/structures/IdentifiersTab.tsx:117
+#: components/structures/IdentifiersTab.tsx:123
 msgid "Third-party identifiers"
 msgstr "Third-party identifiers"
 
-#: components/structures/IdentifiersTab.tsx:123
+#: components/structures/IdentifiersTab.tsx:126
+msgid "A team carries no identifier of its own: the publications are harvested through the identifiers of its lab."
+msgstr "A team carries no identifier of its own: the publications are harvested through the identifiers of its lab."
+
+#: components/structures/IdentifiersTab.tsx:131
 msgid "ROR ID (global)"
 msgstr "ROR ID (global)"
 
-#: components/structures/IdentifiersTab.tsx:124
+#: components/structures/IdentifiersTab.tsx:132
 msgid "e.g. 04z8jg214"
 msgstr "e.g. 04z8jg214"
 
-#: components/structures/IdentifiersTab.tsx:127
+#: components/structures/IdentifiersTab.tsx:135
 msgid "Scopus ID"
 msgstr "Scopus ID"
 
-#: components/structures/IdentifiersTab.tsx:128
+#: components/structures/IdentifiersTab.tsx:136
 msgid "e.g. 60028048"
 msgstr "e.g. 60028048"
 
-#: components/structures/IdentifiersTab.tsx:134
+#: components/structures/IdentifiersTab.tsx:142
 msgid "e.g. 0442953W"
 msgstr "e.g. 0442953W"
 
-#: components/structures/IdentifiersTab.tsx:138
+#: components/structures/IdentifiersTab.tsx:146
 msgid "e.g. 0000 0001 …"
 msgstr "e.g. 0000 0001 …"
 
-#: components/structures/IdentifiersTab.tsx:143
+#: components/structures/IdentifiersTab.tsx:151
 msgid "e.g. Q123456"
 msgstr "e.g. Q123456"
 
-#: components/structures/IdentifiersTab.tsx:158
+#: components/structures/IdentifiersTab.tsx:166
 msgid "Links & signature"
 msgstr "Links & signature"
 
-#: components/structures/IdentifiersTab.tsx:166
+#: components/structures/IdentifiersTab.tsx:174
 msgid "Bibliographic signature"
 msgstr "Bibliographic signature"
 
-#: components/structures/IdentifiersTab.tsx:167
+#: components/structures/IdentifiersTab.tsx:175
 msgid "Nantes Université, …"
 msgstr "Nantes Université, …"
 
@@ -14646,294 +14647,304 @@ msgstr "Split"
 msgid "+ Add a link"
 msgstr "+ Add a link"
 
-#: components/structures/StructureAlignPanel.tsx:36
+#: components/structures/StructureAlignPanel.tsx:35
 msgid "reached through another identifier"
 msgstr "reached through another identifier"
 
-#: components/structures/StructureAlignPanel.tsx:36
+#: components/structures/StructureAlignPanel.tsx:35
 msgid "same acronym"
 msgstr "same acronym"
 
-#: components/structures/StructureAlignPanel.tsx:36
+#: components/structures/StructureAlignPanel.tsx:35
 msgid "same name"
 msgstr "same name"
 
-#: components/structures/StructureAlignPanel.tsx:36
+#: components/structures/StructureAlignPanel.tsx:35
 msgid "same unit number"
 msgstr "same unit number"
 
-#: components/structures/StructureAlignPanel.tsx:36
+#: components/structures/StructureAlignPanel.tsx:35
 msgid "other unit number"
 msgstr "other unit number"
 
-#: components/structures/StructureAlignPanel.tsx:37
+#: components/structures/StructureAlignPanel.tsx:36
 msgid "same city"
 msgstr "same city"
 
-#: components/structures/StructureAlignPanel.tsx:37
+#: components/structures/StructureAlignPanel.tsx:36
 msgid "same supervising institution"
 msgstr "same supervising institution"
 
-#: components/structures/StructureAlignPanel.tsx:37
+#: components/structures/StructureAlignPanel.tsx:36
 msgid "other kind of organization"
 msgstr "other kind of organization"
 
-#: components/structures/StructureAlignPanel.tsx:37
+#: components/structures/StructureAlignPanel.tsx:36
 msgid "no works"
 msgstr "no works"
 
-#: components/structures/StructureAlignPanel.tsx:38
+#: components/structures/StructureAlignPanel.tsx:37
 msgid "other country"
 msgstr "other country"
 
-#: components/structures/StructureAlignPanel.tsx:38
+#: components/structures/StructureAlignPanel.tsx:37
 msgid "share of the lab's documents"
 msgstr "share of the lab's documents"
 
-#: components/structures/StructureAlignPanel.tsx:38
+#: components/structures/StructureAlignPanel.tsx:37
 msgid "collection of a team"
 msgstr "collection of a team"
 
-#: components/structures/StructureAlignPanel.tsx:38
+#: components/structures/StructureAlignPanel.tsx:37
 msgid "links back to a known identifier"
 msgstr "links back to a known identifier"
 
 #. placeholder {0}: e.worksCount.toLocaleString(numberLocale())
-#: components/structures/StructureAlignPanel.tsx:52
+#: components/structures/StructureAlignPanel.tsx:51
 msgid "{0} works"
 msgstr "{0} works"
 
-#: components/structures/StructureAlignPanel.tsx:60
+#: components/structures/StructureAlignPanel.tsx:59
 msgid "closed"
 msgstr "closed"
 
-#: components/structures/StructureAlignPanel.tsx:61
+#: components/structures/StructureAlignPanel.tsx:60
 msgid "Score of the candidate"
 msgstr "Score of the candidate"
 
 #. placeholder {0}: e.conflictWith
 #. placeholder {1}: STRUCTURE_ID_META[type].label
-#: components/structures/StructureAlignPanel.tsx:66
+#: components/structures/StructureAlignPanel.tsx:65
 msgid "Contradicts the confirmed value {0} ({1}) — accepting it replaces the primary value."
 msgstr "Contradicts the confirmed value {0} ({1}) — accepting it replaces the primary value."
 
-#: components/structures/StructureAlignPanel.tsx:82
+#: components/structures/StructureAlignPanel.tsx:85
 msgid "{label}: one strong candidate — tick to accept, click to see it"
 msgstr "{label}: one strong candidate — tick to accept, click to see it"
 
-#: components/structures/StructureAlignPanel.tsx:86
+#. placeholder {0}: strong.length
+#: components/structures/StructureAlignPanel.tsx:85
+msgid "{label}: {0} strong candidates, all to accept — tick to accept them, click to see them"
+msgstr "{label}: {0} strong candidates, all to accept — tick to accept them, click to see them"
+
+#. placeholder {0}: strong.length
+#: components/structures/StructureAlignPanel.tsx:90
+msgid "{0} strong"
+msgstr "{0} strong"
+
+#: components/structures/StructureAlignPanel.tsx:90
 msgid "+1 strong"
 msgstr "+1 strong"
 
-#: components/structures/StructureAlignPanel.tsx:91
+#: components/structures/StructureAlignPanel.tsx:96
 msgid "{label}: several strong candidates — pick"
 msgstr "{label}: several strong candidates — pick"
 
 #. placeholder {0}: strong.length
-#: components/structures/StructureAlignPanel.tsx:92
+#: components/structures/StructureAlignPanel.tsx:97
 msgid "{0, plural, one {# candidate ?} other {# candidates ?}}"
 msgstr "{0, plural, one {# candidate ?} other {# candidates ?}}"
 
-#: components/structures/StructureAlignPanel.tsx:96
+#: components/structures/StructureAlignPanel.tsx:101
 msgid "{label}: candidates to review"
 msgstr "{label}: candidates to review"
 
-#: components/structures/StructureAlignPanel.tsx:97
+#: components/structures/StructureAlignPanel.tsx:102
 msgid "{n, plural, one {# to review} other {# to review}}"
 msgstr "{n, plural, one {# to review} other {# to review}}"
 
-#: components/structures/StructureAlignPanel.tsx:100
+#: components/structures/StructureAlignPanel.tsx:105
 msgid "{label}: the confirmed value is contradicted or its record is unreadable"
 msgstr "{label}: the confirmed value is contradicted or its record is unreadable"
 
 #. placeholder {0}: cell.existing.map((i) => i.value).join(', ')
-#: components/structures/StructureAlignPanel.tsx:104
+#: components/structures/StructureAlignPanel.tsx:109
 msgid "Confirmed: {0}"
 msgstr "Confirmed: {0}"
 
 #. placeholder {0}: cell.existing.length
-#: components/structures/StructureAlignPanel.tsx:105
+#: components/structures/StructureAlignPanel.tsx:110
 msgid "{0} values"
 msgstr "{0} values"
 
-#: components/structures/StructureAlignPanel.tsx:105
+#: components/structures/StructureAlignPanel.tsx:110
 msgid "confirmed"
 msgstr "confirmed"
 
 #. placeholder {0}: cell.error
-#: components/structures/StructureAlignPanel.tsx:108
+#: components/structures/StructureAlignPanel.tsx:113
 msgid "Search failed: {0}"
 msgstr "Search failed: {0}"
 
-#: components/structures/StructureAlignPanel.tsx:108
+#: components/structures/StructureAlignPanel.tsx:113
 msgid "Searched, nothing found"
 msgstr "Searched, nothing found"
 
-#: components/structures/StructureAlignPanel.tsx:111
+#: components/structures/StructureAlignPanel.tsx:116
 msgid "Never searched"
 msgstr "Never searched"
 
 #. placeholder {0}: c.candidateId
-#: components/structures/StructureAlignPanel.tsx:142
+#: components/structures/StructureAlignPanel.tsx:147
 msgid "Accept {0}"
 msgstr "Accept {0}"
 
-#: components/structures/StructureAlignPanel.tsx:145
+#: components/structures/StructureAlignPanel.tsx:150
 msgid "Wrong candidate: never suggested again"
 msgstr "Wrong candidate: never suggested again"
 
-#: components/structures/StructureAlignPanel.tsx:147
+#: components/structures/StructureAlignPanel.tsx:152
 msgid "Refuse"
 msgstr "Refuse"
 
 #. placeholder {0}: String((i.checkResult as any).label || '')
-#: components/structures/StructureAlignPanel.tsx:167
+#: components/structures/StructureAlignPanel.tsx:172
 msgid "record names something else: {0}"
 msgstr "record names something else: {0}"
 
-#: components/structures/StructureAlignPanel.tsx:181
-#: components/structures/StructureAlignPanel.tsx:369
+#: components/structures/StructureAlignPanel.tsx:186
+#: components/structures/StructureAlignPanel.tsx:365
 msgid "Strong candidates"
 msgstr "Strong candidates"
 
-#: components/structures/StructureAlignPanel.tsx:183
+#: components/structures/StructureAlignPanel.tsx:188
 msgid "Weak"
 msgstr "Weak"
 
 #. placeholder {0}: cell.error
-#: components/structures/StructureAlignPanel.tsx:184
+#: components/structures/StructureAlignPanel.tsx:189
 msgid "The last search failed: {0}"
 msgstr "The last search failed: {0}"
 
-#: components/structures/StructureAlignPanel.tsx:184
+#: components/structures/StructureAlignPanel.tsx:189
 msgid "Nothing found during the last search."
 msgstr "Nothing found during the last search."
 
-#: components/structures/StructureAlignPanel.tsx:185
+#: components/structures/StructureAlignPanel.tsx:190
 msgid "Never searched for this structure."
 msgstr "Never searched for this structure."
 
 #. placeholder {0}: meta.label
-#: components/structures/StructureAlignPanel.tsx:189
+#: components/structures/StructureAlignPanel.tsx:194
 msgid "Type a {0} identifier or URL"
 msgstr "Type a {0} identifier or URL"
 
-#: components/structures/StructureAlignPanel.tsx:195
+#: components/structures/StructureAlignPanel.tsx:200
 msgid "Searches every registry again for this structure, even the types already searched"
 msgstr "Searches every registry again for this structure, even the types already searched"
 
-#: components/structures/StructureAlignPanel.tsx:196
+#: components/structures/StructureAlignPanel.tsx:201
 msgid "Search this structure again"
 msgstr "Search this structure again"
 
-#: components/structures/StructureAlignPanel.tsx:225
+#: components/structures/StructureAlignPanel.tsx:229
 msgid "Error loading the structures"
 msgstr "Error loading the structures"
 
-#: components/structures/StructureAlignPanel.tsx:298
+#: components/structures/StructureAlignPanel.tsx:300
 msgid "{accepted} identifier(s) confirmed."
 msgstr "{accepted} identifier(s) confirmed."
 
 #. placeholder {0}: c.candidateId
-#: components/structures/StructureAlignPanel.tsx:304
+#: components/structures/StructureAlignPanel.tsx:306
 msgid "Why is {0} wrong? (optional note)"
 msgstr "Why is {0} wrong? (optional note)"
 
 #. placeholder {0}: c.candidateId
 #. placeholder {1}: row.acronym
-#: components/structures/StructureAlignPanel.tsx:307
+#: components/structures/StructureAlignPanel.tsx:309
 msgid "Candidate {0} refused for {1}."
 msgstr "Candidate {0} refused for {1}."
 
 #. placeholder {0}: STRUCTURE_ID_META[type].label
 #. placeholder {1}: row.acronym
-#: components/structures/StructureAlignPanel.tsx:311
+#: components/structures/StructureAlignPanel.tsx:313
 msgid "{0} identifier added to {1}."
 msgstr "{0} identifier added to {1}."
 
 #. placeholder {0}: row.acronym
-#: components/structures/StructureAlignPanel.tsx:314
+#: components/structures/StructureAlignPanel.tsx:316
 msgid "Remove {value} from {0}? It will not be suggested again."
 msgstr "Remove {value} from {0}? It will not be suggested again."
 
-#: components/structures/StructureAlignPanel.tsx:336
-msgid "Find a structure…"
-msgstr "Find a structure…"
+#: components/structures/StructureAlignPanel.tsx:332
+msgid "Find a lab…"
+msgstr "Find a lab…"
 
-#: components/structures/StructureAlignPanel.tsx:341
+#: components/structures/StructureAlignPanel.tsx:337
 msgid "Reads RNSR, ROR, HAL, OpenAlex, IdRef and Wikidata for the structures not searched yet (bridges from the known identifiers first, then a search by name)"
 msgstr "Reads RNSR, ROR, HAL, OpenAlex, IdRef and Wikidata for the structures not searched yet (bridges from the known identifiers first, then a search by name)"
 
-#: components/structures/StructureAlignPanel.tsx:343
+#: components/structures/StructureAlignPanel.tsx:339
 msgid "Find missing identifiers"
 msgstr "Find missing identifiers"
 
-#: components/structures/StructureAlignPanel.tsx:345
+#: components/structures/StructureAlignPanel.tsx:341
 msgid "Reads the records of every confirmed identifier: missing, closed or contradicted records become conflicts"
 msgstr "Reads the records of every confirmed identifier: missing, closed or contradicted records become conflicts"
 
 #. placeholder {0}: progress.error
-#: components/structures/StructureAlignPanel.tsx:354
+#: components/structures/StructureAlignPanel.tsx:350
 msgid "error: {0}"
 msgstr "error: {0}"
 
 #. placeholder {0}: progress.candidates
 #. placeholder {1}: progress.conflicts ?? 0
-#: components/structures/StructureAlignPanel.tsx:355
+#: components/structures/StructureAlignPanel.tsx:351
 msgid "{0} candidate(s), {1} conflict(s)"
 msgstr "{0} candidate(s), {1} conflict(s)"
 
-#: components/structures/StructureAlignPanel.tsx:363
+#: components/structures/StructureAlignPanel.tsx:359
 msgid "Loading the structures…"
 msgstr "Loading the structures…"
 
-#: components/structures/StructureAlignPanel.tsx:367
-msgid "Structures to process"
-msgstr "Structures to process"
+#: components/structures/StructureAlignPanel.tsx:363
+msgid "Labs to process"
+msgstr "Labs to process"
 
-#: components/structures/StructureAlignPanel.tsx:383
+#: components/structures/StructureAlignPanel.tsx:379
 msgid "A candidate is strong when two registries point to it independently or when the record carries the acronym or the unit number. Accepting a candidate confirms the identifier; the exports and the bibliometric ETL read the confirmed values."
 msgstr "A candidate is strong when two registries point to it independently or when the record carries the acronym or the unit number. Accepting a candidate confirms the identifier; the exports and the bibliometric ETL read the confirmed values."
 
-#: components/structures/StructureAlignPanel.tsx:392
+#: components/structures/StructureAlignPanel.tsx:388
 msgid "No structure in the directory yet."
 msgstr "No structure in the directory yet."
 
-#: components/structures/StructureAlignPanel.tsx:392
-msgid "No structure to show for this filter."
-msgstr "No structure to show for this filter."
+#: components/structures/StructureAlignPanel.tsx:388
+msgid "No lab to show for this filter."
+msgstr "No lab to show for this filter."
 
-#: components/structures/StructureAlignPanel.tsx:392
+#: components/structures/StructureAlignPanel.tsx:388
 msgid "Nothing to do: run a search to find the missing identifiers."
 msgstr "Nothing to do: run a search to find the missing identifiers."
 
-#: components/structures/StructureAlignPanel.tsx:392
+#: components/structures/StructureAlignPanel.tsx:388
 msgid "Nothing to do."
 msgstr "Nothing to do."
 
-#: components/structures/StructureAlignPanel.tsx:400
+#: components/structures/StructureAlignPanel.tsx:396
 msgid "Remove the type filter"
 msgstr "Remove the type filter"
 
 #. placeholder {0}: STRUCTURE_ID_META[ty].label
-#: components/structures/StructureAlignPanel.tsx:400
+#: components/structures/StructureAlignPanel.tsx:396
 msgid "Only structures with something to do on {0}"
 msgstr "Only structures with something to do on {0}"
 
-#: components/structures/StructureAlignPanel.tsx:417
+#: components/structures/StructureAlignPanel.tsx:413
 msgid "Open the structure record in a new tab"
 msgstr "Open the structure record in a new tab"
 
-#: components/structures/StructureAlignPanel.tsx:451
+#: components/structures/StructureAlignPanel.tsx:446
 msgid "Last search on {generatedAt}"
 msgstr "Last search on {generatedAt}"
 
-#: components/structures/StructureAlignPanel.tsx:451
+#: components/structures/StructureAlignPanel.tsx:446
 msgid "No search run yet"
 msgstr "No search run yet"
 
 #. placeholder {0}: selected.size
-#: components/structures/StructureAlignPanel.tsx:455
+#: components/structures/StructureAlignPanel.tsx:450
 msgid "Confirm ({0})"
 msgstr "Confirm ({0})"
 
