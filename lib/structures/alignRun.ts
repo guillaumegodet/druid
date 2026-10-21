@@ -62,7 +62,8 @@ export const runStructureAlignment = async (db: Db, registry: Registry, options:
   const rows = await db.selectFrom('structure').select(['id', 'local_id', 'extra']).orderBy('id').execute();
   const structures = mapStructureRecords(rows.map((s) => ({ id: Number(s.id), fields: { ...(s.extra as object), local_id: s.local_id } })));
   const identifiers = await readStructureIdentifiers(db);
-  const searched = new Set((await db.selectFrom('structure_alignment_search').select(['structure_id', 'type']).execute()).map((r) => `${r.structure_id}:${r.type}`));
+  // A pair searched with an error (registry down, quota) is searched again.
+  const searched = new Set((await db.selectFrom('structure_alignment_search').select(['structure_id', 'type']).where('error', 'is', null).execute()).map((r) => `${r.structure_id}:${r.type}`));
 
   const only = options.only?.map((v) => v.trim().toUpperCase()).filter(Boolean);
   let targets = structures.filter((s) => {

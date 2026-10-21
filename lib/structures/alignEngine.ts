@@ -8,7 +8,7 @@
  * (registryClient.ts, or a fake in the tests); the database side is lib/structures/pg.
  */
 import {
-  ALIGNED_STRUCTURE_ID_TYPES, nameSimilarity, normalizeAcronymKey, parseUnitLabel, significantTokens, structureIdUrl, type StructureIdType,
+  ALIGNED_STRUCTURE_ID_TYPES, nameSimilarity, nameTokens, normalizeAcronymKey, parseUnitLabel, significantTokens, structureIdUrl, type StructureIdType,
 } from './identifiers';
 import type { Registry } from './registryClient';
 import type { RegistryRecord } from './registries';
@@ -103,14 +103,19 @@ const read = async (registry: Registry, type: StructureIdType, id: string): Prom
 const nameEvidence = (facts: StructureFacts, rec: RegistryRecord) => {
   const acr = normalizeAcronymKey(facts.acronym);
   const recAcronyms = [rec.acronym, ...rec.altNames].map(normalizeAcronymKey).filter(Boolean);
-  const acronymMatch = !!acr && acr.length >= 2 && (recAcronyms.includes(acr) || normalizeAcronymKey(rec.label) === acr);
+  // The record's own acronym, or a label reduced to the acronym (`LS2N`): a sure match in a registry of research
+  // organizations, a coincidence in a general one (a team called « Sourire » is not the film) — see GENERAL_REGISTRIES.
+  const acronymField = !!acr && acr.length >= 2 && recAcronyms.includes(acr);
+  const acronymMatch = acronymField || (!!acr && acr.length >= 2 && normalizeAcronymKey(rec.label) === acr);
+  // `PSYCHOLOGIE` within « Faculté de Psychologie (Nantes) »: enough to recognize a record, not to pick one.
+  const acronymInLabel = !!acr && acr.length >= 4 && [rec.label, ...rec.altNames].some((n) => nameTokens(n).includes(acr));
   const names = [rec.label, ...rec.altNames];
   const nameScore = Math.max(...names.map((n) => nameSimilarity(facts.name, n)), facts.acronym ? Math.max(...names.map((n) => nameSimilarity(facts.acronym, n))) * 0.8 : 0);
   const unit = facts.unitLabel ? parseUnitLabel(facts.unitLabel) : null;
   const recUnit = rec.unitLabel ? parseUnitLabel(rec.unitLabel) : null;
   const unitMatch = !!unit && !!recUnit && unit.code === recUnit.code;
   const unitClash = !!unit && !!recUnit && unit.code !== recUnit.code;
-  return { acronymMatch, nameScore, unitMatch, unitClash };
+  return { acronymMatch, acronymField, acronymInLabel, nameScore, unitMatch, unitClash };
 };
 
 const cityMatch = (facts: StructureFacts, rec: RegistryRecord): boolean => {
@@ -146,11 +151,16 @@ const evidenceOf = (facts: StructureFacts, rec: RegistryRecord, paths: string[],
 });
 
 /** Score of a searched record (0..1) and why. */
+/** Registries of everything (not only research organizations): a name alone never makes a strong candidate there. */
+const GENERAL_REGISTRIES: StructureIdType[] = ['wikidata', 'idref'];
+
 const scoreRecord = (facts: StructureFacts, rec: RegistryRecord): { score: number; reasons: string[]; nameScore: number } => {
-  const { acronymMatch, nameScore, unitMatch, unitClash } = nameEvidence(facts, rec);
+  const { acronymMatch, acronymField, nameScore, unitMatch, unitClash } = nameEvidence(facts, rec);
+  const general = GENERAL_REGISTRIES.includes(rec.type);
   const reasons: string[] = [];
   let score = nameScore * 0.45;
-  if (acronymMatch) { score += 0.4; reasons.push('acronym'); }
+  if (acronymField || (acronymMatch && !general)) { score += 0.4; reasons.push('acronym'); }
+  else if (acronymMatch) { score += 0.1; reasons.push('acronym'); }
   if (nameScore >= 0.6) reasons.push('name');
   if (unitMatch) { score += 0.25; reasons.push('unit_label'); }
   if (unitClash) { score -= 0.25; reasons.push('other_unit_label'); }
@@ -161,6 +171,11 @@ const scoreRecord = (facts: StructureFacts, rec: RegistryRecord): { score: numbe
   if (rec.closed) { score -= 0.2; reasons.push('closed'); }
   if (rec.type === 'openalex' && rec.worksCount === 0) { score -= 0.1; reasons.push('no_works'); }
   if (facts.countryCode && rec.countryCode && rec.countryCode.toUpperCase() !== facts.countryCode.toUpperCase()) { score -= 0.4; reasons.push('other_country'); }
+  // A general registry: strong only when the record links back to an identifier the structure already has, or
+  // carries the unit number; otherwise at most medium, for a human to read.
+  const linksBack = (Object.entries(rec.links) as [StructureIdType, string[]][]).some(([t, vs]) => vs.some((v) => (facts.ids[t] || []).includes(v)));
+  if (general && !linksBack && !unitMatch) score = Math.min(score, STRONG - 0.01);
+  if (linksBack) { score = Math.max(score, STRONG); reasons.push('links_back'); }
   return { score: Math.max(0, Math.min(1, score)), reasons, nameScore };
 };
 
@@ -243,8 +258,8 @@ export async function alignStructure(facts: StructureFacts, registry: Registry, 
         const failed = searched.get(type)?.error?.includes(value);
         verifications.push({ type, value, ok: false, result: failed ? { exists: false, error: 'unreadable' } : { exists: false } });
       } else {
-        const { acronymMatch, nameScore } = nameEvidence(facts, rec);
-        verifications.push({ type, value, ok: !rec.closed && (acronymMatch || nameScore >= 0.3), result: { exists: true, label: rec.label, closed: rec.closed, nameScore: round(nameScore), acronymMatch } });
+        const { acronymMatch, acronymInLabel, nameScore } = nameEvidence(facts, rec);
+        verifications.push({ type, value, ok: !rec.closed && (acronymMatch || acronymInLabel || nameScore >= 0.3), result: { exists: true, label: rec.label, closed: rec.closed, nameScore: round(nameScore), acronymMatch: acronymMatch || acronymInLabel } });
       }
     }
     if (depth >= MAX_DEPTH) continue;
@@ -286,6 +301,8 @@ export async function alignStructure(facts: StructureFacts, registry: Registry, 
     const query = { name: facts.name, acronym: facts.acronym, city: facts.city, countryCode: facts.countryCode };
     for (const type of types) {
       if (!REGISTRY_TYPES.includes(type) || confirmed(type).length || hasStrong(type)) continue;
+      // A team has a HAL record at most; the other registries know the lab, not its teams: bridges only.
+      if (facts.level === 'team' && type !== 'hal_struct') continue;
       const lookup = type === 'hal_struct' ? registry.hal : (registry as any)[type];
       let recs: RegistryRecord[] = [];
       try { recs = await lookup.search(query); touch(type); } catch (e) { touch(type, `search: ${e instanceof Error ? e.message : e}`); continue; }

@@ -82,6 +82,9 @@ export const createRegistryClient = (options: RegistryClientOptions = {}): Regis
       try {
         const wait = (lastCall.get(host) ?? 0) + pauseMs - Date.now();
         if (wait > 0) await sleep(wait);
+        // A 429 (OpenAlex shares its quota between every caller behind the same proxy) or a 5xx: up to three more
+        // tries, 2 s / 5 s / 12 s apart or what Retry-After says; a network failure: one more try.
+        const BACKOFF = [2000, 5000, 12000];
         for (let attempt = 0; ; attempt++) {
           lastCall.set(host, Date.now());
           const controller = typeof AbortController === 'function' ? new AbortController() : null;
@@ -90,7 +93,11 @@ export const createRegistryClient = (options: RegistryClientOptions = {}): Regis
             const res = await doFetch(url, { headers: { Accept: 'application/json', 'User-Agent': userAgent }, signal: controller?.signal });
             if (res.ok) return await res.json();
             if (res.status === 404) return null;
-            if (attempt === 0 && (res.status === 429 || res.status >= 500)) { await sleep(1500); continue; }
+            if (attempt < BACKOFF.length && (res.status === 429 || res.status >= 500)) {
+              const retryAfter = Number((res as any).headers?.get?.('retry-after')) * 1000;
+              await sleep(retryAfter > 0 && retryAfter < 60_000 ? retryAfter : BACKOFF[attempt]);
+              continue;
+            }
             throw new Error(`HTTP ${res.status} ${host}`);
           } catch (err) {
             if (attempt === 0 && !(err instanceof Error && /^HTTP /.test(err.message))) { await sleep(1500); continue; }
