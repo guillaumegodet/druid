@@ -145,8 +145,9 @@ export function pairsChartParams(p: PairsParams): ChartParams {
   return out;
 }
 
-/** Ranking of the suggested connections: combined score, common co-authors only, or themes only. */
-export type SuggestionSignal = 'combined' | 'triadic' | 'topics';
+/** Ranking of the suggested connections: combined score, common co-authors only, themes only, shared references
+ * only or direct citations only (the last two with the cited works of network.json v5). */
+export type SuggestionSignal = 'combined' | 'triadic' | 'topics' | 'coupling' | 'cites';
 
 export interface PairSuggestion {
   a: PairAuthor;
@@ -158,6 +159,12 @@ export interface PairSuggestion {
   /** Closeness of the OpenAlex theme profiles (0-1, damped for small profiles), and the shared themes. */
   similarity: number;
   themes: string[];
+  /** Shared references (cited works, network.json v5): count, coupling similarity (0-1), the rarest ones by W-id,
+   * and the direct citations (`ab` = publications of a citing b). Absent from servers older than lot 2. */
+  references?: number;
+  coupling?: number;
+  sharedRefs?: string[];
+  cites?: { ab: number; ba: number } | null;
   crossPole: boolean;
   /** Stable key of the pair and the opinions given on it (lot 4, PostgreSQL storage only). */
   key?: string;
@@ -183,6 +190,8 @@ export interface SuggestionsResponse {
   total: number;
   /** Absent from servers older than the topics (subfields). */
   level?: ThemeLevel;
+  /** The network carries the cited works (v5): the reference signals are available. */
+  references?: boolean;
 }
 
 export interface SuggestionsParams {

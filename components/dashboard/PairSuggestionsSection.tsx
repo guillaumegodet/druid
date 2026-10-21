@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Check, Download, Handshake, Loader2, ThumbsDown, ThumbsUp } from 'lucide-react';
+import { Check, Download, ExternalLink, Handshake, Loader2, Quote, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { YearRange } from './overviewAggregates';
 import { LARGE_COLLAB_MAX_AUTHORS } from './interLabNetwork';
@@ -21,15 +21,93 @@ import { numberLocale } from '../../lib/i18n';
 import { toCsv } from '../../lib/chartExport';
 import { downloadBlob } from './chartFileExport';
 import { helpUrl } from '../../lib/helpLinks';
+import { WorkTitle, fetchWorkTitle, openAlexWorkUrl } from '../../lib/pairs/openalexTitles';
 
 const PAGE = 50;
 
-/** Why a pair is suggested: its common co-authors, then its shared themes (topics or subfields). */
+/**
+ * Shared references of a pair (cited works, lot 3 of druid-internal `docs/plan-binomes-citations.md`): the count,
+ * and on demand the rarest ones with their title fetched from OpenAlex, each linked to openalex.org.
+ */
+export const SharedReferences: React.FC<{ s: PairSuggestion; className?: string }> = ({ s, className = '' }) => {
+  const { i18n } = useLingui();
+  const [open, setOpen] = useState(false);
+  const [titles, setTitles] = useState<Record<string, WorkTitle | null>>({});
+  const ids = s.sharedRefs ?? [];
+  const idsKey = ids.join('|');
+  useEffect(() => {
+    if (!open) return;
+    let alive = true;
+    idsKey.split('|').filter(Boolean).forEach((id) => {
+      fetchWorkTitle(id).then((w) => { if (alive) setTitles((cur) => ({ ...cur, [id]: w })); });
+    });
+    return () => { alive = false; };
+  }, [open, idsKey]);
+  if (!s.references) return null;
+  return (
+    <span className={className}>
+      <span className="font-semibold text-ink dark:text-[#f5f2ea]">
+        <Plural value={s.references} one="# shared reference" other="# shared references" />
+      </span>
+      {s.coupling != null && s.coupling > 0 && (
+        <> · <Trans>closeness {s.coupling.toLocaleString(i18n.locale, { minimumFractionDigits: 2 })}</Trans></>
+      )}
+      {ids.length > 0 && !open && (
+        <>
+          {' '}
+          <button type="button" onClick={() => setOpen(true)} className="underline hover:text-ink dark:hover:text-[#f5f2ea] cursor-pointer">
+            <Plural value={ids.length} one="show the rarest one" other="show the # rarest" />
+          </button>
+        </>
+      )}
+      {open && (
+        <ul className="mt-0.5 flex flex-col gap-0.5">
+          {ids.map((id) => {
+            const w = titles[id];
+            return (
+              <li key={id} className="flex items-start gap-1">
+                <Quote className="w-3 h-3 mt-0.5 shrink-0 opacity-60" />
+                <a href={openAlexWorkUrl(id)} target="_blank" rel="noreferrer" className="hover:underline inline-flex items-start gap-1">
+                  <span>
+                    {w === undefined ? <Loader2 className="w-3 h-3 animate-spin inline" /> : w?.title ? w.title : id}
+                    {w?.year ? ` (${w.year})` : ''}
+                  </span>
+                  <ExternalLink className="w-3 h-3 mt-0.5 shrink-0 opacity-60" />
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </span>
+  );
+};
+
+/** Direct citations of a pair: « A already cites n publications of B », in each direction. */
+export const DirectCitations: React.FC<{ s: PairSuggestion; className?: string }> = ({ s, className = '' }) => {
+  if (!s.cites || (!s.cites.ab && !s.cites.ba)) return null;
+  const Line: React.FC<{ from: string; n: number; to: string }> = ({ from, n, to }) => (
+    <span className="font-semibold text-ink dark:text-[#f5f2ea]">
+      {n === 1
+        ? <Trans>{from} already cites one publication of {to}</Trans>
+        : <Trans>{from} already cites {n} publications of {to}</Trans>}
+    </span>
+  );
+  return (
+    <span className={`flex flex-col gap-0.5 ${className}`}>
+      {s.cites.ab > 0 && <Line from={s.a.label} n={s.cites.ab} to={s.b.label} />}
+      {s.cites.ba > 0 && <Line from={s.b.label} n={s.cites.ba} to={s.a.label} />}
+    </span>
+  );
+};
+
+/** Why a pair is suggested: its common co-authors, its shared themes (topics or subfields), then its references. */
 const ReasonCell: React.FC<{ s: PairSuggestion; level: ThemeLevel }> = ({ s, level }) => {
   const { i18n } = useLingui();
   const others = s.common - s.via.length;
   return (
     <div className="flex flex-col gap-1 text-xs text-muted dark:text-[#c3beb0]">
+      <DirectCitations s={s} />
       {s.common > 0 && (
         <span>
           <span className="font-semibold text-ink dark:text-[#f5f2ea]">
@@ -51,6 +129,7 @@ const ReasonCell: React.FC<{ s: PairSuggestion; level: ThemeLevel }> = ({ s, lev
           <Trans>closeness {s.similarity.toLocaleString(i18n.locale, { minimumFractionDigits: 2 })}</Trans>
         </span>
       )}
+      <SharedReferences s={s} />
     </div>
   );
 };
@@ -193,11 +272,13 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
       name: 'rapprochements',
       columns: [
         'researcher_1', 'labs_1', 'poles_1', 'researcher_2', 'labs_2', 'poles_2',
-        'score', 'common_coauthors', 'named_coauthors', 'closeness', level === 'topic' ? 'shared_topics' : 'shared_subfields', 'my_opinion',
+        'score', 'common_coauthors', 'named_coauthors', 'closeness', level === 'topic' ? 'shared_topics' : 'shared_subfields',
+        'shared_references', 'references_closeness', 'rarest_references', 'cites_1_to_2', 'cites_2_to_1', 'my_opinion',
       ],
       rows: rows.map((s) => [
         s.a.label, s.a.labs.join('|'), s.a.poles.join('|'), s.b.label, s.b.labs.join('|'), s.b.poles.join('|'),
-        s.score, s.common, s.via.map((v) => v.label).join('|'), s.similarity, s.themes.join('|'), s.feedback?.mine ?? '',
+        s.score, s.common, s.via.map((v) => v.label).join('|'), s.similarity, s.themes.join('|'),
+        s.references ?? 0, s.coupling ?? 0, (s.sharedRefs ?? []).join('|'), s.cites?.ab ?? 0, s.cites?.ba ?? 0, s.feedback?.mine ?? '',
       ]),
     });
     downloadBlob(new Blob([`﻿${csv}\r\n`], { type: 'text/csv;charset=utf-8' }),
@@ -228,6 +309,8 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
             <option value="combined">{level === 'topic' ? t`Common co-authors and research topics` : t`Common co-authors and subfields`}</option>
             <option value="triadic">{t`Common co-authors only`}</option>
             <option value="topics">{level === 'topic' ? t`Shared research topics only` : t`Shared subfields only`}</option>
+            {loaded?.references && <option value="coupling">{t`Shared references only`}</option>}
+            {loaded?.references && <option value="cites">{t`Direct citations only`}</option>}
           </select>
           <select className={select} value={quota} onChange={(e) => setQuota(Number(e.target.value))} title={t`Suggestions per researcher at most`}>
             {[1, 3, 5, 10].map((n) => (
@@ -305,7 +388,12 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
                     <th className="px-3 py-2"><Trans>Researcher</Trans></th>
                     <th className="px-3 py-2"><Trans>Researcher</Trans></th>
                     <th className="px-3 py-2"><Trans>Why</Trans></th>
-                    <th className="px-3 py-2 text-right" title={level === 'topic' ? t`2 × common co-authors (Adamic-Adar) + closeness of the research topics` : t`2 × common co-authors (Adamic-Adar) + closeness of the subfields`}><Trans>Score</Trans></th>
+                    <th
+                      className="px-3 py-2 text-right"
+                      title={loaded.references
+                        ? (level === 'topic' ? t`2 × common co-authors (Adamic-Adar) + closeness of the research topics + ½ closeness of the references + direct citations` : t`2 × common co-authors (Adamic-Adar) + closeness of the subfields + ½ closeness of the references + direct citations`)
+                        : (level === 'topic' ? t`2 × common co-authors (Adamic-Adar) + closeness of the research topics` : t`2 × common co-authors (Adamic-Adar) + closeness of the subfields`)}
+                    ><Trans>Score</Trans></th>
                     {loaded.feedback && <th className="px-3 py-2"><Trans>Your opinion</Trans></th>}
                   </tr>
                 </thead>
@@ -341,6 +429,13 @@ export const PairSuggestionsSection: React.FC<{ slug: string; range: YearRange }
               suggestions led to a joint publication in 2023-2026 (one in ten between poles). A researcher who left is
               still suggested until the network is regenerated.
             </Trans>
+            {loaded.references && (
+              <> <Trans>
+                The references they share (same works cited, OpenAlex) and the publications of one already cited by the
+                other also count, with a low weight: they describe a common reading more than a future co-signature,
+                and OpenAlex knows the references of about half of the publications (journal articles mostly).
+              </Trans></>
+            )}
             {loaded.restricted && (
               <> <Trans>Only the suggestions involving a researcher of your lab are shown.</Trans></>
             )}{' '}

@@ -89,7 +89,7 @@ period count. They have no public link: a shared report recomputes them with the
 ## Suggested connections
 
 The **Suggested connections** button, at the top of the sub-tab, lists researchers of **different labs who have not
-co-signed any publication**, ranked by two signals computed over the period:
+co-signed any publication**, ranked by signals computed over the period:
 
 - **Common co-authors**: A and B both publish with C. A common co-author with few co-authors counts more than one who
   publishes with everyone (Adamic-Adar index). The three most specific common co-authors are named.
@@ -97,8 +97,18 @@ co-signed any publication**, ranked by two signals computed over the period:
   few publications. The shared topics are named, for instance « Bone Tissue Engineering Materials ». OpenAlex has
   about 4,500 topics, far finer than its 250 subfields; on a network generated without the topics, Druid compares the
   subfields.
+- **Shared references** (when the network carries the cited works): A and B cite the same works. A reference that
+  few publications of the institution cite counts more than a methods paper cited by everyone. The row gives the
+  number of shared references, their closeness, and shows on demand the three rarest ones with their title, read
+  from OpenAlex, and a link to the record.
+- **Direct citation**: « A already cites 3 publications of B ». The person knows the other's work.
 
-The score is twice the common co-author signal plus the topic one. Each researcher appears at most 5 times by
+The score is twice the common co-author signal, plus the topic one, plus half the closeness of the references, plus
+the direct citations. The references weigh little on purpose: tested on past years, they predict future
+co-signatures poorly; they describe a common reading more than a likely collaboration, and OpenAlex knows the
+references of about half of the publications only (journal articles mostly, very few in humanities, law or
+philosophy). The **Ranking** menu sorts on the shared references alone or on the direct citations alone. Each
+researcher appears at most 5 times by
 default, so that a very central researcher does not fill the list; PhD students are not suggested by default. The
 pole, scope and membership filters are those of the observed pairs.
 
