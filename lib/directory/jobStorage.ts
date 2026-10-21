@@ -24,8 +24,12 @@ export const storageKindFromEnv = (env: Record<string, string | undefined>): Sto
 const pools = new Map<string, Db>();
 export const databaseFromEnv = (env: Record<string, string | undefined>, max = 4, allowExitOnIdle = true): Db => {
   const url = env.DRUID_DATABASE_URL!;
-  if (!pools.has(url)) pools.set(url, createDb({ connectionString: url, max, allowExitOnIdle }));
-  return pools.get(url)!;
+  // DRUID_DATABASE_SCHEMA: the schema of a tenant of a multi-tenant deployment (druid-internal docs/plan-druid-saas.md,
+  // lot 3 b — the runner sets it for the alignment scripts); unset = the public schema (Nantes).
+  const schema = String(env.DRUID_DATABASE_SCHEMA || '').trim() || undefined;
+  const key = `${url}#${schema || ''}`;
+  if (!pools.has(key)) pools.set(key, createDb({ connectionString: url, max, allowExitOnIdle, schema }));
+  return pools.get(key)!;
 };
 /** Closes the pools (end of a job, so that the process can exit). */
 export const closeDatabases = async () => {

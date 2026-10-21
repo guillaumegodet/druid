@@ -35,6 +35,12 @@ export type Numeric = ColumnType<string, number | string, number | string>;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface AlignCache {
+  data: Json;
+  name: string;
+  updated_at: Generated<Timestamp>;
+}
+
 export interface AlignmentCandidate {
   applied: Generated<boolean>;
   applied_on: string | null;
@@ -636,6 +642,7 @@ export interface TaskEvent {
 }
 
 export interface DB {
+  align_cache: AlignCache;
   alignment_candidate: AlignmentCandidate;
   audit_log: AuditLog;
   axis_review: AxisReview;

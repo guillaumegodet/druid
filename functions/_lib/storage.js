@@ -14,6 +14,7 @@
 //    `node:*`, which the Pages Functions build accepts without a flag), never from the `pg` package directly.
 import pg from '../_generated/pg.js';
 import { createDbWith } from '../../lib/db/core.ts';
+import { alignCacheSourceOf } from '../../lib/saas/alignCache.ts';
 import { createGristAlignCommands } from '../../lib/directory/alignCommands.ts';
 import { tokenAlignTexts } from '../../lib/directory/alignTexts.ts';
 import { createGristDirectoryCommands } from '../../lib/directory/commands.ts';
@@ -84,8 +85,11 @@ const pgStorage = (context, instance) => {
     return { instance, apiKey: undefined, store: null, missing: `${instance.tenant ? 'SAAS_HYPERDRIVE' : 'HYPERDRIVE'} binding not configured on Cloudflare`, release: async () => {} };
   }
   const db = createDbWith(pg, { connectionString, max: 1, schema: instance.tenant ? instance.tenant.schema : undefined });
+  // A tenant's caches are rows of its schema, written by the runner after each run (lib/saas/alignCache.ts); its IdRef
+  // search is the Qualinka engine of the runner (lot 3 b). The other instances read their static files.
+  const caches = instance.tenant ? alignCacheSourceOf(db) : alignCachesOf(context, instance);
   const store = createPgStorage({
-    db, tablesActor: 'cloudflare', align: { caches: alignCachesOf(context, instance), texts: tokenAlignTexts, hasQualinka: false },
+    db, tablesActor: 'cloudflare', align: { caches, texts: tokenAlignTexts, hasQualinka: !!instance.tenant },
   });
   // The repository caches (lists, structures) are dropped with the client: one request, one client.
   return { instance, apiKey: undefined, store, missing: null, release: () => db.destroy().catch(() => {}) };

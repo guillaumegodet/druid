@@ -83,6 +83,8 @@ export interface JobTable {
   id: Generated<string>;
   tenant_id: string;
   type: string;
+  /** What a live job excludes for its tenant (lib/saas/jobs.ts jobKeyOf): the type, or `people.align:<source>`. */
+  key: string;
   params: Generated<Record<string, unknown>>;
   status: Generated<JobStatus>;
   progress: Generated<Record<string, unknown>>;
@@ -92,6 +94,9 @@ export interface JobTable {
   created_at: Generated<string>;
   started_at: string | null;
   finished_at: string | null;
+  /** « Stop » asked by the UI (lot 3 a): the runner ends the child process, the job ends `cancelled`. */
+  cancel_requested_at: string | null;
+  runner: string | null;
 }
 export interface TenantSecretTable {
   tenant_id: string;
@@ -278,8 +283,8 @@ export const touchLogin = async (db: SaasDb, tenantId: string, email: string): P
 export const JOB_TYPES = ['tenant.provision', 'structures.align', 'etl.build', 'people.align'] as const;
 export type JobType = typeof JOB_TYPES[number];
 
-export const enqueueJob = async (db: SaasDb, { tenantId, type, params = {}, createdBy = null }: { tenantId: string; type: JobType; params?: Record<string, unknown>; createdBy?: string | null }): Promise<string> => {
-  const row = await db.insertInto('job').values({ tenant_id: tenantId, type, params, created_by: createdBy }).returning('id').executeTakeFirstOrThrow();
+export const enqueueJob = async (db: SaasDb, { tenantId, type, params = {}, createdBy = null, key }: { tenantId: string; type: JobType; params?: Record<string, unknown>; createdBy?: string | null; key?: string }): Promise<string> => {
+  const row = await db.insertInto('job').values({ tenant_id: tenantId, type, key: key || type, params, created_by: createdBy }).returning('id').executeTakeFirstOrThrow();
   return row.id;
 };
 
@@ -293,10 +298,11 @@ export const latestJobs = async (db: SaasDb, tenantId: string): Promise<Job[]> =
   return rows.filter((j) => (seen.has(j.type) ? false : (seen.add(j.type), true)));
 };
 
-/** Public view of a job (the portal and the tenant UI): no params, no internal log beyond its last line. */
+/** Public view of a job (the portal and the tenant UI): no internal log beyond its last line, the params as given. */
 export const publicJobInfo = (job: Job) => ({
-  id: job.id, type: job.type, status: job.status, progress: job.progress, attempts: job.attempts,
-  createdAt: job.created_at, startedAt: job.started_at, finishedAt: job.finished_at,
+  id: job.id, type: job.type, key: job.key, status: job.status, params: job.params, progress: job.progress, attempts: job.attempts,
+  createdAt: job.created_at, startedAt: job.started_at, finishedAt: job.finished_at, createdBy: job.created_by,
+  cancelRequested: !!job.cancel_requested_at,
   error: job.status === 'failed' ? (job.log || '').split('\n').filter(Boolean).slice(-1)[0] || 'failed' : null,
 });
 

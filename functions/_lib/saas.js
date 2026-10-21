@@ -124,6 +124,19 @@ export const safeNextPath = (next) => {
 /** Connection of the schema of a tenant: the shared database, every query qualified by the schema (lib/db/core.ts). */
 export const tenantConnectionString = (env) => connectionStringOf(env);
 
+/** Runs `fn(db)` on the schema of a tenant instance (one connection, released after). */
+export const withTenantDb = async (env, instance, fn) => {
+  const db = createDbWith(pg, { connectionString: connectionStringOf(env), max: 1, schema: instance.tenant.schema });
+  try {
+    return await fn(db);
+  } finally {
+    await db.destroy().catch(() => {});
+  }
+};
+
+/** R2 bucket of the private files of the tenants (dashboards, lot 3 c): binding `SAAS_ASSETS`, optional. */
+export const SAAS_ASSETS_BINDING = 'SAAS_ASSETS';
+
 // ── Sessions ─────────────────────────────────────────────────────────────────────────────────────────────────────────
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

@@ -117,12 +117,14 @@ describe.skipIf(!url)('portal: create a tenant, provision it, open it', () => {
     // The provisioning queues the structure alignment (lot 4), run here against registries that answer nothing.
     const emptyRegistries = (async () => ({ ok: true, status: 200, json: async () => ({}), text: async () => '' })) as unknown as typeof fetch;
     const out = await runJobsOnce(saas!, { ownerUrl: url!, appUrl, baseDomain: BASE, cloudflare: null, email: null, log: () => {}, fetchImpl: emptyRegistries });
-    expect(out).toEqual({ done: 2, failed: 0 });
+    // The alignment then queues the first dashboard build (lot 3 c): no ETL on this runner, it fails and says why.
+    expect(out).toEqual({ done: 2, failed: 1, cancelled: 0 });
     const st = await (await callPortal(`/start/api/tenants/${SLUG}`, { headers: { Cookie: cookie } })).json() as any;
     expect(st.status).toBe('active');
     expect(st.jobs).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: 'tenant.provision', status: 'done', progress: expect.objectContaining({ step: 'ready', pct: 100 }) }),
       expect.objectContaining({ type: 'structures.align', status: 'done' }),
+      expect.objectContaining({ type: 'etl.build', status: 'failed', error: expect.stringContaining('ETL not configured') }),
     ]));
     const db = createDb({ connectionString: appUrl!, max: 1, schema: tenantSchemaName(SLUG), allowExitOnIdle: true });
     try {
