@@ -311,23 +311,23 @@ export async function alignStructure(facts: StructureFacts, registry: Registry, 
       let facet: { total: number; codes: { code: string; count: number }[] };
       try { facet = await registry.hal.collections(docid); touch('hal_collection'); } catch (e) { touch('hal_collection', `collections of ${docid}: ${e instanceof Error ? e.message : e}`); continue; }
       if (!facet.total) continue;
-      for (const { code, count } of facet.codes) {
-        if (isKnown('hal_collection', code)) continue;
+      // The lab's own collection carries the acronym and most of its documents; `<ACRONYM>-<TEAM>` collections are the
+      // teams' (a few per cent each); the supervising institutions' collections carry every document of the lab.
+      const shared = facet.codes.filter(({ code, count }) => !isKnown('hal_collection', code) && count / facet.total >= 0.2)
+        .sort((a, b) => b.count - a.count).slice(0, 6);
+      for (const { code, count } of shared) {
         const codeKey = normalizeAcronymKey(code);
-        const exact = !!acr && (codeKey === acr || codeKey.startsWith(`${acr}`) && codeKey.length <= acr.length + 3);
         const share = count / facet.total;
-        // Collections of the supervising institutions carry every document of the lab: not the lab's collection.
-        const parentLike = share >= 0.95 && !exact;
-        if (parentLike || (tutelleKeys.has(codeKey) && !exact)) continue;
-        let score = exact ? 0.85 : share >= 0.5 ? 0.5 : share >= 0.2 ? 0.35 : 0;
-        if (!score) continue;
-        if (exact && share >= 0.5) score = 0.95;
+        const exact = !!acr && codeKey === acr;
+        if (!exact && (share >= 0.95 || tutelleKeys.has(codeKey))) continue;
+        const teamLike = !exact && !!acr && codeKey.startsWith(acr);
+        const score = exact ? (share >= 0.5 ? 0.95 : 0.85) : teamLike ? 0.3 : share >= 0.5 ? 0.5 : 0.35;
         const k = keyOf('hal_collection', code);
         const prev = candidates.get(k);
         if (prev && prev.score >= score) continue;
         candidates.set(k, {
           type: 'hal_collection', candidateId: code, score: round(score), strength: strengthOf(score),
-          evidence: { label: code, acronym: null, city: null, kind: 'collection', unitLabel: null, tutelles: [], worksCount: count, closed: false, url: structureIdUrl('hal_collection', code), paths: [`hal_struct:${docid} → hal_collection`], nameScore: exact ? 1 : 0, reasons: [exact ? 'acronym' : 'share', `${Math.round(share * 100)}%`] },
+          evidence: { label: code, acronym: null, city: null, kind: 'collection', unitLabel: null, tutelles: [], worksCount: count, closed: false, url: structureIdUrl('hal_collection', code), paths: [`hal_struct:${docid} → hal_collection`], nameScore: exact ? 1 : 0, reasons: [exact ? 'acronym' : teamLike ? 'team_collection' : 'share', `${Math.round(share * 100)}%`] },
         });
       }
     }

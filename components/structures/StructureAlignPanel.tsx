@@ -35,7 +35,7 @@ const ReasonPills: React.FC<{ c: StructureCandidateView }> = ({ c }) => {
   const label: Record<string, string> = {
     bridge: t`reached through another identifier`, acronym: t`same acronym`, name: t`same name`, unit_label: t`same unit number`, other_unit_label: t`other unit number`,
     city: t`same city`, supervisor: t`same supervising institution`, other_kind: t`other kind of organization`, closed: t`closed record`, no_works: t`no works`,
-    other_country: t`other country`, share: t`share of the lab's documents`,
+    other_country: t`other country`, share: t`share of the lab's documents`, team_collection: t`collection of a team`,
   };
   const pills = c.evidence.reasons.filter((r) => label[r]).map((r) => label[r]);
   return (
