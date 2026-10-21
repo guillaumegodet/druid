@@ -13,6 +13,12 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Binômes suggérés par les citations** (druid-internal `docs/plan-binomes-citations.md`, lot 2) : quand le
+  `network.json` de druid-biblio porte les références citées (version 5), les rapprochements suggérés ajoutent deux
+  signaux explicables — les références communes (couplage bibliographique, pondéré par la rareté de chaque référence,
+  classement `signal=coupling`) et la citation directe (`cites`, publications de l'un citées par l'autre). Poids par
+  défaut 2 : 1 : 0,5 : 1 d'après le rétro-test ; la réponse de l'API porte `references`, `coupling`, `sharedRefs` et
+  `cites` par suggestion (affichage au lot 3).
 - **Identifiants des structures et leur alignement** (stockage PostgreSQL) : chaque laboratoire ou équipe porte ses
   identifiants dans une table dédiée (`structure_identifier`, multivaluée : RNSR, ROR, structures HAL, collection HAL,
   OpenAlex, IdRef, Wikidata, ISNI, UAI, SIRET, GRID, affiliation Scopus) avec statut, source et date de vérification ;

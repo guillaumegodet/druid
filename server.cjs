@@ -1106,7 +1106,7 @@ app.get('/api/network/:slug/pairs', (req, res) => {
 // Suggested connections (druid-internal `docs/archive/plan-binomes-chercheurs.md`, lot 3): researchers of different labs who
 // never co-signed, scored by their common co-authors and their OpenAlex subfields over the period (suggestPairs).
 // Same file, scope and rights as /pairs; a reader limited to a lab sees the researchers suggested to its members (D2).
-const SUGGESTION_SIGNALS = new Set(['combined', 'triadic', 'topics']);
+const SUGGESTION_SIGNALS = new Set(['combined', 'triadic', 'topics', 'coupling', 'cites']);
 const suggestionsCache = new Map();
 app.get('/api/network/:slug/suggestions', async (req, res) => {
   const r = resolveNetworkRequest(req, res);
