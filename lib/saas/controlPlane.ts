@@ -38,6 +38,8 @@ export interface TenantTable {
   country: string | null;
   mail_domains: Generated<string[]>;
   settings: Generated<Record<string, unknown>>;
+  /** Establishment and labs entered on the portal (lib/saas/onboarding.ts OnboardingPayload), seeded by the job. */
+  onboarding: Record<string, unknown> | null;
   created_by: string | null;
   created_at: Generated<string>;
   updated_at: Generated<string>;
@@ -98,7 +100,16 @@ export interface TenantSecretTable {
   iv: string;
   updated_at: Generated<string>;
 }
+export interface AccessRequestTable {
+  id: Generated<string>;
+  tenant_id: string;
+  email: string;
+  note: string | null;
+  created_at: Generated<string>;
+  handled_at: string | null;
+}
 export interface SaasDB {
+  access_request: AccessRequestTable;
   plan: PlanTable;
   tenant: TenantTable;
   tenant_host: TenantHostTable;
@@ -112,6 +123,7 @@ export type SaasDb = Kysely<SaasDB>;
 export type Tenant = Selectable<TenantTable>;
 export type Plan = Selectable<PlanTable>;
 export type Member = Selectable<MemberTable>;
+export type Job = Selectable<JobTable>;
 
 /** Schema of the control plane; the client is opened with `schema: SAAS_SCHEMA` (lib/db/core.ts). */
 export const SAAS_SCHEMA = 'saas';
@@ -260,4 +272,52 @@ export const deleteSession = async (db: SaasDb, sessionId: string | null): Promi
 
 export const touchLogin = async (db: SaasDb, tenantId: string, email: string): Promise<void> => {
   await db.updateTable('member').set({ last_login_at: sql<string>`now()` }).where('tenant_id', '=', tenantId).where('email', '=', normalizeEmail(email)).execute();
+};
+
+// ── Jobs (lot 2 d, lot 3) ────────────────────────────────────────────────────────────────────────────────────────────
+export const JOB_TYPES = ['tenant.provision', 'structures.align', 'etl.build', 'people.align'] as const;
+export type JobType = typeof JOB_TYPES[number];
+
+export const enqueueJob = async (db: SaasDb, { tenantId, type, params = {}, createdBy = null }: { tenantId: string; type: JobType; params?: Record<string, unknown>; createdBy?: string | null }): Promise<string> => {
+  const row = await db.insertInto('job').values({ tenant_id: tenantId, type, params, created_by: createdBy }).returning('id').executeTakeFirstOrThrow();
+  return row.id;
+};
+
+export const findJob = async (db: SaasDb, id: string): Promise<Job | null> =>
+  (UUID_RE.test(id) ? (await db.selectFrom('job').selectAll().where('id', '=', id).executeTakeFirst()) || null : null);
+
+/** Latest job of each type of a tenant (the construction page and « My establishment »). */
+export const latestJobs = async (db: SaasDb, tenantId: string): Promise<Job[]> => {
+  const rows = await db.selectFrom('job').selectAll().where('tenant_id', '=', tenantId).orderBy('created_at', 'desc').limit(50).execute();
+  const seen = new Set<string>();
+  return rows.filter((j) => (seen.has(j.type) ? false : (seen.add(j.type), true)));
+};
+
+/** Public view of a job (the portal and the tenant UI): no params, no internal log beyond its last line. */
+export const publicJobInfo = (job: Job) => ({
+  id: job.id, type: job.type, status: job.status, progress: job.progress, attempts: job.attempts,
+  createdAt: job.created_at, startedAt: job.started_at, finishedAt: job.finished_at,
+  error: job.status === 'failed' ? (job.log || '').split('\n').filter(Boolean).slice(-1)[0] || 'failed' : null,
+});
+
+// ── Portal (lot 2) ───────────────────────────────────────────────────────────────────────────────────────────────────
+export const findTenantByRor = async (db: SaasDb, ror: string): Promise<Tenant | null> =>
+  (await db.selectFrom('tenant').selectAll().where('ror', '=', ror).where('status', '<>', 'deleted').executeTakeFirst()) || null;
+
+/** Tenants where `email` is a member (the « my Druids » list of the portal). */
+export const tenantsOfEmail = async (db: SaasDb, email: string): Promise<(Tenant & { role: MemberRole; host: string | null })[]> =>
+  db.selectFrom('member').innerJoin('tenant', 'tenant.id', 'member.tenant_id')
+    .leftJoin('tenant_host', (j) => j.onRef('tenant_host.tenant_id', '=', 'tenant.id').on('tenant_host.is_primary', '=', true))
+    .selectAll('tenant').select(['member.role', 'tenant_host.host'])
+    .where('member.email', '=', normalizeEmail(email)).where('tenant.status', '<>', 'deleted').orderBy('tenant.label').execute();
+
+export const primaryHost = async (db: SaasDb, tenantId: string): Promise<string | null> => {
+  const row = await db.selectFrom('tenant_host').select('host').where('tenant_id', '=', tenantId).orderBy('is_primary', 'desc').executeTakeFirst();
+  return row?.host || null;
+};
+
+/** Someone finds their establishment already created: the owner is told (lot 6), the request is kept once. */
+export const createAccessRequest = async (db: SaasDb, tenantId: string, email: string, note: string | null = null): Promise<void> => {
+  await db.insertInto('access_request').values({ tenant_id: tenantId, email: normalizeEmail(email), note })
+    .onConflict((oc) => oc.columns(['tenant_id', 'email']).doNothing()).execute();
 };
