@@ -42,6 +42,12 @@ export const API_ERRORS = [
   msg`Invalid request`,
   msg`Invalid e-mail address`,
   msg`Read-only account: writes are disabled`,
+  // Portal « create my Druid » (lot 2)
+  msg`Portal not enabled on this host`,
+  msg`This establishment already has a Druid`,
+  msg`This slug is already taken`,
+  msg`Unknown tenant`,
+  msg`Upstream registry unavailable`,
   // Calls for proposals (docs/plan-funding-calls.md)
   msg`The calls for proposals need the PostgreSQL storage`,
   msg`The theses need the PostgreSQL storage`,

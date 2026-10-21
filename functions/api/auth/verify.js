@@ -6,10 +6,7 @@
 // A link of another tenant (or of the portal) never opens this one: the row must carry this tenant's id.
 import { consumeMagicLink, createSession, touchLogin } from '../../../lib/saas/controlPlane.ts';
 import { instanceOf } from '../../_lib/instance.js';
-import { json, safeNextPath, sessionCookie, withSaasDb } from '../../_lib/saas.js';
-
-const escape = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const sha256Hex = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+import { html, json, safeNextPath, sessionCookie, sha256Hex, verifyInterstitial, withSaasDb } from '../../_lib/saas.js';
 
 const loginUrl = (origin, params) => {
   const u = new URL('/auth/login', origin);
@@ -22,18 +19,7 @@ export function onRequestGet(context) {
   const url = new URL(request.url);
   const token = url.searchParams.get('token') || '';
   if (!token) return Response.redirect(loginUrl(url.origin, { reason: 'invalid' }), 302);
-  const html = `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Druid — connexion</title></head>
-<body style="font-family:system-ui,-apple-system,sans-serif;text-align:center;padding:3rem 1.5rem;color:#1c1b19;background:#f4f0e6">
-<p style="font-weight:800;font-size:1.4rem">Druid</p>
-<p style="color:#6f6a5e">Connexion en cours… · Signing you in…</p>
-<form id="f" method="POST" action="/api/auth/verify">
-<input type="hidden" name="token" value="${escape(token)}">
-<noscript><button type="submit" style="margin-top:1rem;padding:.7rem 1.5rem;border:0;border-radius:999px;background:#1c1b19;color:#fff;font-weight:600;cursor:pointer">Me connecter · Sign in</button></noscript>
-</form>
-<script>document.getElementById('f').submit()</script>
-</body></html>`;
-  return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
+  return html(verifyInterstitial(token, '/api/auth/verify'));
 }
 
 export async function onRequestPost(context) {
