@@ -5,6 +5,7 @@ import { sql, Transaction } from 'kysely';
 import type { DB } from '../../db/schema.gen';
 import type { GristRecord } from '../gristMapping';
 import { mapStructureRecords } from '../gristMapping';
+import { confirmIdentifiersFromFields } from '../../structures/pg/identifiers';
 
 const orNull = (v: unknown): string | null => (v === null || v === undefined || String(v).trim() === '' ? null : String(v));
 
@@ -26,9 +27,15 @@ const structureColumns = async (trx: Transaction<DB>, id: number, fields: Record
   };
 };
 
-/** Writes the whole V2 field set of a structure (normalized columns recomputed). */
-export const writeStructure = async (trx: Transaction<DB>, id: number, fields: Record<string, any>): Promise<void> => {
+/**
+ * Writes the whole V2 field set of a structure (normalized columns recomputed). The identifier fields it carries
+ * (ror, nns, idref, hal_collection, uai, isni, wikidata, scopus, hal_struct_ids, openalex_ids) confirm their values in
+ * structure_identifier (druid-internal docs/plan-druid-saas.md, lot 4 a), as `identifierSource` — `manual` for the
+ * record form, `import` for the syncs and seeds.
+ */
+export const writeStructure = async (trx: Transaction<DB>, id: number, fields: Record<string, any>, identifierSource = 'import'): Promise<void> => {
   await trx.updateTable('structure').set(await structureColumns(trx, id, fields)).where('id', '=', String(id)).execute();
+  await confirmIdentifiersFromFields(trx, id, fields, identifierSource);
 };
 
 /** Merges some V2 fields into a structure (LDAP sync, record form). */

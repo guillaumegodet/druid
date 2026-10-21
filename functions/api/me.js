@@ -53,6 +53,8 @@ export const CAPABILITIES = {
   HAS_STATUS_VALIDATION: false,
   // « À traiter › Tâches »: needs the /api/tasks routes of server.cjs (no Functions port).
   HAS_TASKS: false,
+  // Identifiers of the structures and their alignment: PostgreSQL storage (set per instance below).
+  HAS_STRUCTURE_IDS: false,
   // Public read-only instance (demo): readOnly in instance.json. Not a HAS_* flag — it removes features
   // rather than adding an integration; the Grist proxy enforces it server-side.
   READ_ONLY: false,
@@ -63,6 +65,7 @@ export const CAPABILITIES = {
 export const capabilitiesFor = (instance) => ({
   ...CAPABILITIES,
   HAS_STATUS_VALIDATION: instance.statusValidation,
+  HAS_STRUCTURE_IDS: instance.storage === 'postgres',
   READ_ONLY: instance.readOnly,
 });
 
@@ -95,7 +98,7 @@ const tenantUser = async (context, instance) => {
   const member = memberOf(context);
   if (!member) return json(403, { error: 'This account is not a member of this Druid' });
   const { roles, access } = accessForMember(member, instance.readOnly);
-  const capabilities = capabilitiesForTenant({ ...CAPABILITIES, HAS_STATUS_VALIDATION: instance.statusValidation }, instance.tenant.plan, { settings: instance.tenant.settings, status: instance.tenant.status });
+  const capabilities = capabilitiesForTenant({ ...CAPABILITIES, HAS_STATUS_VALIDATION: instance.statusValidation, HAS_STRUCTURE_IDS: true }, instance.tenant.plan, { settings: instance.tenant.settings, status: instance.tenant.status });
   capabilities.READ_ONLY = instance.readOnly;
   const members = await withSaasDb(context.env, (db) => countMembers(db, instance.tenant.id)).catch(() => 0);
   const tenantRow = { slug: instance.tenant.slug, status: instance.tenant.status, mail_domains: instance.tenant.mailDomains };

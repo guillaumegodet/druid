@@ -13,7 +13,7 @@ const NAME = /^[a-z0-9][a-z0-9_-]{0,39}$/;
 const FINGERPRINT = /^[0-9a-f]{64}$/;
 
 /** Read routes open to a service token: the lists a client needs to rebuild a lab's staff, nothing else. */
-const SERVICE_READ_ROUTES = ['/api/v1/people', '/api/v1/structures', '/api/v1/institutions'];
+const SERVICE_READ_ROUTES = ['/api/v1/people', '/api/v1/structures', '/api/v1/structures/identifiers', '/api/v1/institutions'];
 
 const fingerprintOf = (token) => crypto.createHash('sha256').update(String(token), 'utf8').digest('hex');
 

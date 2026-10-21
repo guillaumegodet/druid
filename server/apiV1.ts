@@ -202,7 +202,7 @@ export const createServerStorage = (options: ApiV1Options) => {
   if (kind === 'postgres') {
     const db = createDb({ connectionString: options.databaseUrl!, max: 8 });
     // Same assembly as the Cloudflare Functions (lib/directory/pg/storage.ts, lot 10 a).
-    const { repository, commands, publications, tables, align } = createPgStorage({
+    const { repository, commands, publications, tables, align, structureAlign } = createPgStorage({
       db, loadLdapCache: ldapStatus, gristPublications, tablesActor: 'server',
       align: { caches, texts: tokenAlignTexts, hasQualinka },
     });
@@ -210,6 +210,7 @@ export const createServerStorage = (options: ApiV1Options) => {
       kind, grist: main, publications, repository, commands, tables,
       ldap: options.hasLdap ? createPgLdapCommands({ db, repository, ldap: ldapSource }) : undefined,
       align: align!,
+      structureAlign,
       /** Ports of the work routes (tasks, arbitrations, peer lists, reports), writes audited under `actor`. */
       workPorts: (actor: string) => createPgWorkPorts({ db, actor }),
       /** Removals sent before the people.csv export and state update after it, while the graph publisher is on (lot 11 d). */

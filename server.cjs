@@ -126,6 +126,8 @@ const CAPABILITIES = {
   // « My project » assistant of the calls (lot 7): the passages of the open calls compared with a project (embedding
   // service, scripts/embed_calls.ts), the answer written by ILAAS.
   HAS_CALLS_CHAT: STORAGE_KIND === 'postgres' && !!process.env.ILAAS_API_KEY && !!process.env.EMBEDDING_API_URL && !!process.env.EMBEDDING_API_MODEL,
+  // Identifiers of the structures and their alignment (druid-internal docs/plan-druid-saas.md, lot 4): PostgreSQL tables.
+  HAS_STRUCTURE_IDS: STORAGE_KIND === 'postgres',
   // Public read-only instance: Cloudflare only (functions/api/me.js, READ_ONLY=true) — the write
   // routes of this server are not guarded by it.
   READ_ONLY: false,
@@ -3695,6 +3697,47 @@ app.get('/api/align/:source/progress', requireEstablishmentScope, (req, res) => 
   }
 });
 
+// ── Structure identifiers alignment (scripts/align_structures.ts → scripts/.build/align_structures.cjs) ────────────
+// Same contract as the people alignments: background run, progress in structures_align_progress.json, « Stop » = SIGTERM.
+// The results go to PostgreSQL (structure_alignment_candidate), read by /api/v1/structures/alignment — druid-internal
+// docs/plan-druid-saas.md, lot 4 e.
+const STRUCTURES_ALIGN_PROGRESS_PATH = 'structures_align_progress.json';
+app.get('/api/structures-align/trigger', requireEstablishmentScope, (req, res) => {
+  if (process.env.DRUID_STORAGE !== 'postgres') return res.status(400).json({ error: 'Structure alignment needs the PostgreSQL storage' });
+  const mode = req.query.mode === 'verify' ? 'verify' : 'search';
+  const types = String(req.query.types || '').split(',').map((t) => t.trim()).filter((t) => /^[a-z_]+$/.test(t)).join(',');
+  const only = String(req.query.only || '').split(',').map((t) => t.trim()).filter((t) => /^[A-Za-z0-9_.-]{1,64}$/.test(t)).join(',');
+  const force = req.query.force === '1' || req.query.force === 'true';
+  const limit = Math.max(0, parseInt(req.query.limit, 10) || 0);
+  const running = runningProgress(STRUCTURES_ALIGN_PROGRESS_PATH);
+  if (running) return res.status(409).json({ error: 'Structure alignment already running', progress: running });
+  try {
+    console.log(`[Sync] Triggering structure alignment (mode=${mode}${types ? `, types=${types}` : ''}${only ? `, only=${only}` : ''})...`);
+    const args = ['scripts/.build/align_structures.cjs', `--mode=${mode}`, `--progress=${STRUCTURES_ALIGN_PROGRESS_PATH}`];
+    if (types) args.push(`--types=${types}`);
+    if (only) args.push(`--only=${only}`);
+    if (force) args.push('--force');
+    if (limit > 0) args.push(`--limit=${limit}`);
+    startBackgroundRun('Structures', STRUCTURES_ALIGN_PROGRESS_PATH, { mode, types: types || undefined, only: only || undefined }, args);
+    res.json({ started: true, mode, types: types || undefined, only: only || undefined });
+  } catch (err) {
+    console.error('[Sync Structures Error]', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+app.post('/api/structures-align/stop', requireEstablishmentScope, (req, res) => {
+  if (!stopBackgroundRun('Structures', STRUCTURES_ALIGN_PROGRESS_PATH)) return res.status(404).json({ error: 'No alignment running' });
+  res.json({ stopping: true });
+});
+app.get('/api/structures-align/progress', requireEstablishmentScope, (req, res) => {
+  try {
+    if (!fs.existsSync(STRUCTURES_ALIGN_PROGRESS_PATH)) return res.json({ running: false, total: 0, done: 0 });
+    res.json(JSON.parse(fs.readFileSync(STRUCTURES_ALIGN_PROGRESS_PATH, 'utf8')));
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // ── LDAP candidate search (affiliation of records without uid) ──────────────
 // Matches Annuaire records without uid_dyna to LDAP staff by email, and
 // writes a cache of proposals (Grist read-only). Tracked via
@@ -3783,7 +3826,7 @@ app.use((err, req, res, _next) => {
 if (require.main === module) {
   // Runs interrupted by a restart (the child dies with the container): their
   // progress file, left at running:true, would block any new run (409).
-  for (const f of [IDREF_PROGRESS_PATH, LDAP_CAND_PROGRESS_PATH, LDAP_PROGRESS_PATH, STRUCT_LDAP_PROGRESS_PATH, ...Object.values(ALIGN_SOURCES).map((s) => s.progress)]) {
+  for (const f of [IDREF_PROGRESS_PATH, LDAP_CAND_PROGRESS_PATH, LDAP_PROGRESS_PATH, STRUCT_LDAP_PROGRESS_PATH, STRUCTURES_ALIGN_PROGRESS_PATH, ...Object.values(ALIGN_SOURCES).map((s) => s.progress)]) {
     if (settleProgress(f, 'Interrompu par un redémarrage du serveur')) console.warn(`[Sync] ${f}: run interrupted, file closed`);
   }
   const server = app.listen(PORT, '0.0.0.0', () => {

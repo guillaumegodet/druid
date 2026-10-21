@@ -15,6 +15,8 @@ import type { NewsletterEditableField } from './publications/store';
 import type { AxisCorrectionRow } from './publications/axes';
 import type { AxisReview, AxisReviewInput } from './publications/axisReviews';
 import type { SiteImportPlan, SiteImportResult, SiteImportSelection } from './directory/siteImport';
+import type { StructureIdType, StructureIdentifier } from './structures/identifiers';
+import type { StructureAlignOverview } from './structures/alignView';
 
 export const DIRECTORY_API_BASE = '/api/v1';
 
@@ -107,6 +109,19 @@ export const DirectoryApi = {
       'POST', 'ldap/candidates', { entries }),
   applyStructuresLdap: (updateIds: string[], createKeys: string[]) =>
     send<{ updated: number; created: number }>('POST', 'ldap/structures', { updateIds, createKeys }),
+  // Structure identifiers and their alignment (druid-internal docs/plan-druid-saas.md, lot 4).
+  structureAlignment: (): Promise<StructureAlignOverview> => fetchJson('structures/alignment'),
+  structureIdentifiers: (recordId: number): Promise<StructureIdentifier[]> => fetchItems<StructureIdentifier>(`structures/${recordId}/identifiers`),
+  acceptStructureCandidates: (items: { structureId: number; type: StructureIdType; candidateId: string }[]) =>
+    send<{ accepted: number }>('POST', 'structures/alignment/accept', { items }),
+  rejectStructureCandidate: (item: { structureId: number; type: StructureIdType; candidateId: string; note?: string | null }) =>
+    send<{ rejected: number }>('POST', 'structures/alignment/reject', item),
+  addStructureIdentifier: async (recordId: number, type: StructureIdType, value: string, primary?: boolean): Promise<StructureIdentifier[]> =>
+    (await send<{ items: StructureIdentifier[] }>('POST', `structures/${recordId}/identifiers`, { type, value, primary })).items,
+  removeStructureIdentifier: async (recordId: number, type: StructureIdType, value: string, note?: string | null): Promise<StructureIdentifier[]> =>
+    (await send<{ items: StructureIdentifier[] }>('POST', `structures/${recordId}/identifiers/remove`, { type, value, note })).items,
+  setPrimaryStructureIdentifier: async (recordId: number, type: StructureIdType, value: string): Promise<StructureIdentifier[]> =>
+    (await send<{ items: StructureIdentifier[] }>('POST', `structures/${recordId}/identifiers/primary`, { type, value })).items,
   alignmentsUnified: (sources: UnifiedAlignSource[], mode: AlignMode): Promise<UnifiedAlignDiff> =>
     fetchJson(`alignments/unified?mode=${mode}&sources=${sources.join(',')}`),
   applyAlignSelection: (selection: { mode: AlignMode; selected: string[]; chosen: Record<string, string>; decisions: Record<string, UnifiedArbitrateDecision> }) =>

@@ -542,6 +542,49 @@ export interface Structure {
   url: string | null;
 }
 
+export interface StructureAlignmentCandidate {
+  candidate_id: string;
+  created_at: Generated<Timestamp>;
+  decided_at: Timestamp | null;
+  decided_by: string | null;
+  decision: Generated<string>;
+  evidence: Generated<Json>;
+  id: Generated<Int8>;
+  mode: string;
+  note: string | null;
+  score: Numeric | null;
+  seen_at: Generated<Timestamp>;
+  strength: string;
+  structure_id: Int8;
+  type: string;
+  updated_at: Generated<Timestamp>;
+}
+
+export interface StructureAlignmentSearch {
+  candidates: Generated<number>;
+  error: string | null;
+  mode: string;
+  searched_at: Generated<Timestamp>;
+  structure_id: Int8;
+  type: string;
+}
+
+export interface StructureIdentifier {
+  check_result: Json | null;
+  checked_at: Timestamp | null;
+  created_at: Generated<Timestamp>;
+  decided_by: string | null;
+  id: Generated<Int8>;
+  is_primary: Generated<boolean>;
+  note: string | null;
+  source: Generated<string>;
+  status: Generated<string>;
+  structure_id: Int8;
+  type: string;
+  updated_at: Generated<Timestamp>;
+  value: string;
+}
+
 export interface SyncState {
   changed_fields: Generated<string[]>;
   last_run: string | null;
@@ -629,6 +672,9 @@ export interface DB {
   report_generation: ReportGeneration;
   report_share: ReportShare;
   structure: Structure;
+  structure_alignment_candidate: StructureAlignmentCandidate;
+  structure_alignment_search: StructureAlignmentSearch;
+  structure_identifier: StructureIdentifier;
   sync_state: SyncState;
   task: Task;
   task_event: TaskEvent;

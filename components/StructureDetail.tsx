@@ -76,7 +76,7 @@ export const StructureDetail: React.FC<StructureDetailProps> = ({ structure, all
       case Tab.GENERAL:
         return <IdentificationTab structure={localStructure} onUpdateField={updateField} isNew={isNew} onOpenMemberships={() => setActiveTab(Tab.GOVERNANCE)} />;
       case Tab.IDENTIFIERS:
-        return <IdentifiersTab structure={localStructure} onUpdateField={updateField} />;
+        return <IdentifiersTab structure={localStructure} onUpdateField={updateField} isNew={isNew} />;
       case Tab.CLASSIFICATION:
         return <ClassificationTab structure={localStructure} onUpdateField={updateField} />;
       case Tab.GOVERNANCE:

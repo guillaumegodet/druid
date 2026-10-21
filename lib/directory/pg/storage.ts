@@ -12,6 +12,7 @@ import { createPgAlignCommands } from './alignCommands';
 import { createPgDirectoryCommands } from './commands';
 import { createPgDirectoryRepository } from './repository';
 import { createPgTableClient } from './tableClient';
+import { createPgStructureAlignCommands } from '../../structures/pg/alignCommands';
 
 export interface PgStorageOptions {
   db: Db;
@@ -40,6 +41,8 @@ export const createPgStorage = ({ db, loadLdapCache, gristPublications, tablesAc
     /** Migrated tables seen as the Grist document (reads of server.cjs, jobs, reports): lib/directory/pg/tableClient.ts. */
     tables: createPgTableClient({ db, actor: tablesActor }),
     align: alignCommands,
+    /** Identifiers of the structures and their alignment (druid-internal docs/plan-druid-saas.md, lot 4). */
+    structureAlign: createPgStructureAlignCommands({ db, repository }),
   };
 };
 export type PgStorage = ReturnType<typeof createPgStorage>;
