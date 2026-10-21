@@ -144,3 +144,24 @@ Every tenant has its own PostgreSQL schema (`t_<slug>`) on the same database, mi
   `auth: 'session'`.
 - Secrets of a tenant (LLM, Elsevier…) will live encrypted in `tenant_secret` (lot 6); the per-instance secrets
   `<NAME>__<SLUG>` of the registry do not apply to tenants.
+
+### Portal « create my Druid » and the runner (lot 2)
+
+On the host **`SAAS_PORTAL_HOST`** of a control-plane deployment, `/start` (functions/start/[[path]].js,
+functions/_lib/portalPages.js) lets anybody with an e-mail address create the Druid of their establishment: magic link of
+the portal (session with no tenant), then an assistant in three steps — the establishment (search in **ROR**, and for a
+French one the UAI, SIRET, IdRef and Wikidata from the ministry dataset `fr-esr-principaux-etablissements-enseignement-superieur`
+plus the OpenAlex id), its research structures (prelisted from the **RNSR**, `fr-esr-structures-recherche-publiques-actives`,
+by the UAI of the establishment; others typed in), the address `<slug>.<SAAS_BASE_DOMAIN>` and the mail domain. The
+creation writes the tenant (status `provisioning`, payload in `tenant.onboarding`), its host, the creator as `owner` and
+queues the job **`tenant.provision`**; one trial per establishment (unique ROR: a second person gets « ask for access »,
+`access_request`). The construction page polls `/start/api/tenants/<slug>` and, once active, opens the tenant on its
+own host with a magic link of that host.
+
+The **runner** (`scripts/saas/runner.ts` → `scripts/.build/saas_runner.cjs`, lib/saas/runner.ts) is a Node process next
+to the database (never a Worker: it spawns dbmate): it claims the queued jobs (`FOR UPDATE SKIP LOCKED`) and, for
+`tenant.provision`, migrates the schema, seeds the establishment and the structures through the directory commands,
+creates the route `<host>/*` of the Worker through the Cloudflare API (`SAAS_CF_API_TOKEN`, `SAAS_CF_ZONE_ID`,
+`SAAS_WORKER_NAME`; skipped when unset), sets the tenant active and sends the « ready » e-mail (`RESEND_API_KEY`).
+`--once` processes the queue and exits (CI, cron); without it, polls every 10 s. The other job types (alignments, ETL)
+come with lot 3.

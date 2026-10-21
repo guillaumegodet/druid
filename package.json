@@ -22,7 +22,7 @@
     "db:types": "kysely-codegen",
     "db:saas:migrate": "node scripts/saas/control_plane_migrate.cjs up",
     "db:saas:rollback": "node scripts/saas/control_plane_migrate.cjs rollback",
-    "build:saas": "mkdir -p scripts/.build && esbuild scripts/saas/tenant_db.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/tenant_db.cjs --log-level=warning",
+    "build:saas": "mkdir -p scripts/.build && esbuild scripts/saas/tenant_db.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/tenant_db.cjs --log-level=warning && esbuild scripts/saas/runner.ts --bundle --platform=node --format=cjs --external:pg-native --log-override:empty-import-meta=silent --outfile=scripts/.build/saas_runner.cjs --log-level=warning",
     "test:db": "vitest run --no-file-parallelism lib/__tests__/*.integration.test.ts",
     "migrate:grist-to-pg": "npm run -s build:migrate && node scripts/.build/migrate_grist_to_pg.cjs",
     "seed:demo": "npm run -s build:seed && node scripts/.build/seed_demo_pg.cjs",

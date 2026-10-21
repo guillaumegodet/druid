@@ -23,6 +23,13 @@ données à exécuter au déploiement).
   (`owner`, `admin`, `viewer`, `lab`), capacités d'après le plan (`trial`, `team`, `complete`) et les réglages du tenant ;
   `/api/me` renvoie un bloc `tenant`. Isolation vérifiée par les tests d'intégration (`saasTenants`, `saasFunctions`).
   Druid-internal `docs/plan-druid-saas.md`, lot 1 a-c et e.
+- **Portail « Créer mon Druid »** (`/start` sur l'hôte `SAAS_PORTAL_HOST`) : connexion par lien magique, assistant en
+  trois étapes — établissement cherché dans ROR (UAI, SIRET, IdRef, Wikidata et identifiant OpenAlex retrouvés pour un
+  établissement français), structures de recherche prélistées depuis le RNSR par l'UAI de l'établissement (cases à
+  cocher, ajout à la main), adresse `<slug>.<domaine>` et domaine des e-mails — puis page de construction et ouverture
+  du nouveau Druid sur son hôte. Un seul essai par établissement (ROR), avec demande d'accès pour les suivants.
+  **Runner de jobs** (`scripts/saas/runner.ts`) : traite `tenant.provision` (schéma migré, établissement et structures
+  écrits par les commandes de l'annuaire, route Cloudflare de l'hôte, e-mail « votre Druid est prêt »). Lot 2.
 
 ### Corrigé
 - **Création d'une structure ou d'un établissement employeur sur une instance Cloudflare PostgreSQL** : la commande

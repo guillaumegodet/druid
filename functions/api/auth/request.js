@@ -2,19 +2,19 @@
 // Always 200 for a well-formed address (no account enumeration): the link is only sent to a MEMBER of the tenant.
 // At most 5 links per address and quarter of an hour. Without RESEND_API_KEY, `SAAS_DEV_LINKS=true` returns the link in
 // the response (local runs and tests only).
-import { createMagicLink, findMember, isValidEmail, normalizeEmail } from '../../../lib/saas/controlPlane.ts';
-import { sendMagicLink } from '../../_lib/email.js';
+import { findMember, isValidEmail, normalizeEmail } from '../../../lib/saas/controlPlane.ts';
 import { instanceOf } from '../../_lib/instance.js';
-import { json, safeNextPath, withSaasDb } from '../../_lib/saas.js';
+import { issueMagicLink, json, safeNextPath, withSaasDb } from '../../_lib/saas.js';
 
-const LINKS_PER_QUARTER = 5;
+export const LINKS_PER_QUARTER = 5;
 
-const generateToken = () => {
-  const bytes = new Uint8Array(32);
-  crypto.getRandomValues(bytes);
-  return btoa(String.fromCharCode(...bytes)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+/** Links already sent to `email` for `tenantId` (null = the portal) in the last quarter of an hour. */
+export const recentLinks = async (db, email, tenantId) => {
+  let q = db.selectFrom('magic_link').select(({ fn }) => fn.countAll().as('n'))
+    .where('email', '=', email).where('created_at', '>', new Date(Date.now() - 15 * 60_000).toISOString());
+  q = tenantId === null ? q.where('tenant_id', 'is', null) : q.where('tenant_id', '=', tenantId);
+  return Number((await q.executeTakeFirst())?.n || 0);
 };
-const sha256Hex = async (s) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)))].map((b) => b.toString(16).padStart(2, '0')).join('');
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -36,15 +36,8 @@ export async function onRequestPost(context) {
     await withSaasDb(env, async (db) => {
       const member = await findMember(db, tenant.id, email);
       if (!member) return;
-      const recent = await db.selectFrom('magic_link').select(({ fn }) => fn.countAll().as('n'))
-        .where('email', '=', email).where('tenant_id', '=', tenant.id).where('created_at', '>', new Date(Date.now() - 15 * 60_000).toISOString()).executeTakeFirst();
-      if (Number(recent?.n || 0) >= LINKS_PER_QUARTER) return;
-      const token = generateToken();
-      await createMagicLink(db, { email, tenantId: tenant.id, tokenHash: await sha256Hex(token), nextPath });
-      const link = `${new URL(request.url).origin}/api/auth/verify?token=${token}`;
-      if (env.RESEND_API_KEY) await sendMagicLink(env, { to: email, link, tenantLabel: instance.label });
-      else if (env.SAAS_DEV_LINKS === 'true') devLink = link;
-      else throw new Error('RESEND_API_KEY not configured');
+      if (await recentLinks(db, email, tenant.id) >= LINKS_PER_QUARTER) return;
+      devLink = await issueMagicLink(db, env, { email, tenantId: tenant.id, verifyUrl: `${new URL(request.url).origin}/api/auth/verify`, nextPath, label: instance.label });
     });
   } catch (err) {
     console.error(JSON.stringify({ event: 'auth.request.failed', instance: instance.slug, error: String(err?.message || err) }));
