@@ -168,7 +168,7 @@ describe.skipIf(!url)('structure identifiers on PostgreSQL', () => {
     };
     const progress: number[] = [];
     const report = await runStructureAlignment(trx as any, registry, { mode: 'search', concurrency: 1, onProgress: (p) => progress.push(p.done) });
-    // Every lab and team of the fixture, institutions excluded; the duplicated-local-id and no-id rows are structures too.
+    // Every lab of the fixture (level 2 — the duplicated-local-id and no-id rows derive it too); teams and institutions are not aligned.
     expect(report.total).toBeGreaterThanOrEqual(2);
     expect(report.done).toBe(report.total);
     expect(progress.at(-1)).toBe(report.total);

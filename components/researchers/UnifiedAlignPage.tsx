@@ -596,7 +596,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
             <Sparkles className="page-header-icon w-7 h-7 text-[#7048e8] dark:text-[#9a7bff]" />
             <div>
               <h1 className="font-disp text-3xl md:text-[38px] font-bold tracking-tight text-ink dark:text-[#f5f2ea] leading-none">{structuresTab ? <Trans>Structure identifier alignment</Trans> : <Trans>Researcher identifier alignment</Trans>}</h1>
-              <p className="page-header-sub text-[15px] text-muted dark:text-[#8f897c] mt-1.5">{structuresTab ? <Trans>RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab or team, one column per identifier</Trans> : <Trans>IdRef · ORCID · HAL · OpenAlex · Scopus — one row per person, one column per identifier</Trans>}</p>
+              <p className="page-header-sub text-[15px] text-muted dark:text-[#8f897c] mt-1.5">{structuresTab ? <Trans>RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab, one column per identifier</Trans> : <Trans>IdRef · ORCID · HAL · OpenAlex · Scopus — one row per person, one column per identifier</Trans>}</p>
             </div>
             <HelpButton path={structuresTab ? '/guides/identifiants/aligner-les-structures/' : VIEW_HELP[ViewState.UNIFIED_ALIGN]} />
           </div>

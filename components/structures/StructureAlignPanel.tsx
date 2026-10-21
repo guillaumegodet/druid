@@ -13,8 +13,8 @@ import { isActionable, type StructureAlignCell, type StructureAlignOverview, typ
 import { PixelBtn, StatCard } from '../researchers/alignAtoms';
 
 /**
- * « Structures » tab of the alignment page (druid-internal docs/plan-druid-saas.md, § 4.5): one row per structure
- * (labs, then teams), one column per identifier type, a badge per cell saying its state, a drawer to decide — accept a
+ * « Structures » tab of the alignment page (druid-internal docs/plan-druid-saas.md, § 4.5): one row per lab (the only
+ * level aligned: the harvesting uses the labs' identifiers), one column per identifier type, a badge per cell saying its state, a drawer to decide — accept a
  * candidate with its evidence (record label, acronym, city, supervising institutions, works count, the bridges that
  * reached it), refuse it with a note, type a value by hand. « Check all strong candidates » then Apply validates in
  * bulk. Runs are server jobs (HAS_SERVER_JOBS): /api/structures-align/*, same contract as the people alignments.
@@ -23,7 +23,6 @@ import { PixelBtn, StatCard } from '../researchers/alignAtoms';
 /** Short column headers of the narrow table (index.css .unified-table). */
 const TYPE_SHORT: Record<StructureIdType, string> = { rnsr: 'RNSR', ror: 'ROR', hal_struct: 'HAL', hal_collection: 'Coll.', openalex: 'OA', idref: 'IdRef', wikidata: 'WD', isni: 'ISNI', uai: 'UAI', siret: 'SIRET', grid: 'GRID', scopus_affil: 'Sco.' };
 type KindFilter = 'strong' | 'ambiguous' | 'arbitrate' | 'conflict' | '';
-type LevelFilter = 'lab' | 'team' | '';
 const cellKey = (row: StructureAlignRow, type: StructureIdType) => `${row.structureId}::${type}`;
 const candKey = (row: StructureAlignRow, type: StructureIdType, candidateId: string) => `${row.structureId}::${type}::${candidateId}`;
 
@@ -77,13 +76,19 @@ const Pastille: React.FC<{ type: StructureIdType; cell?: StructureAlignCell; row
     const both = (text: React.ReactNode, icon: React.ReactNode) => <><span className="ua-text">{text}</span><span className="ua-icon items-center gap-0.5">{icon}</span></>;
     if (!cell) return <span className="block w-full text-center text-muted-faint text-[12px]">—</span>;
     const strong = cell.candidates.filter((c) => c.strength === 'strong');
-    if (cell.status === 'strong' && strong.length === 1) {
-      const key = candKey(row, type, strong[0].candidateId);
-      const title = t`${label}: one strong candidate — tick to accept, click to see it`;
+    if (cell.status === 'strong') {
+      // One checkbox ticks every strong candidate of the cell: on a multi-valued type (HAL records before and after a
+      // merger, OpenAlex institutions) they are all to accept.
+      const keys = strong.map((c) => candKey(row, type, c.candidateId));
+      const all = keys.every((k) => selected.has(k));
+      const toggle = () => { for (const k of keys) if (all === selected.has(k)) onToggleSelect(k); };
+      const title = strong.length === 1 ? t`${label}: one strong candidate — tick to accept, click to see it` : t`${label}: ${strong.length} strong candidates, all to accept — tick to accept them, click to see them`;
       return (
-        <span className={`${base} bg-[rgba(46,160,102,.14)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.18)] dark:text-[#5fd39a] border border-transparent cursor-pointer hover:border-accent-strong ${selected.has(key) ? '!bg-accent/25 !border-accent-strong' : ''}`}>
-          <input type="checkbox" checked={selected.has(key)} onChange={() => onToggleSelect(key)} className="accent-[#1c1b19] dark:accent-[#f4d24a]" onClick={(e) => e.stopPropagation()} aria-label={title} />
-          <span onClick={onToggleOpen} className="flex-1 inline-flex items-center justify-center gap-1" title={title}>{both(cell.existing.length ? t`+1 strong` : t`strong candidate`, <Sparkles className="w-3.5 h-3.5" />)}</span>
+        <span className={`${base} bg-[rgba(46,160,102,.14)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.18)] dark:text-[#5fd39a] border border-transparent cursor-pointer hover:border-accent-strong ${all ? '!bg-accent/25 !border-accent-strong' : ''}`}>
+          <input type="checkbox" checked={all} onChange={toggle} className="accent-[#1c1b19] dark:accent-[#f4d24a]" onClick={(e) => e.stopPropagation()} aria-label={title} />
+          <span onClick={onToggleOpen} className="flex-1 inline-flex items-center justify-center gap-1" title={title}>
+            {both(strong.length > 1 ? t`${strong.length} strong` : cell.existing.length ? t`+1 strong` : t`strong candidate`, <><Sparkles className="w-3.5 h-3.5" />{strong.length > 1 && <span className="font-mono text-[11.5px]">{strong.length}</span>}</>)}
+          </span>
         </span>
       );
     }
@@ -214,7 +219,6 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
   const [openKey, setOpenKey] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [kind, setKind] = useState<KindFilter>('');
-  const [level, setLevel] = useState<LevelFilter>('');
   const [typeFilter, setTypeFilter] = useState<StructureIdType | ''>('');
   const [query, setQuery] = useState('');
   const [progress, setProgress] = useState<RunProgress | null>(null);
@@ -263,12 +267,11 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
     const types = typeFilter ? [typeFilter] : overview.types;
     const matchKind = (c?: StructureAlignCell) => !!c && (kind ? c.status === kind : isActionable(c));
     return overview.rows.filter((r) => {
-      if (level && r.level !== level) return false;
       if (q && !(`${r.acronym} ${r.name} ${r.parentAcronym || ''}`.toLowerCase().includes(q))) return false;
       // Without a text search, only the structures with something to do are listed (as for the people).
       return q ? true : types.some((ty) => matchKind(r.cells[ty]));
     });
-  }, [overview, kind, level, typeFilter, query]);
+  }, [overview, kind, typeFilter, query]);
 
   const counts = useMemo(() => {
     const c = { strong: 0, ambiguous: 0, arbitrate: 0, conflict: 0 };
@@ -277,14 +280,13 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
   }, [rows, overview]);
   const typeCounts = useMemo(() => {
     const c = {} as Record<StructureIdType, number>;
-    for (const ty of overview?.types || []) c[ty] = (overview?.rows || []).filter((r) => (level ? r.level === level : true) && isActionable(r.cells[ty])).length;
+    for (const ty of overview?.types || []) c[ty] = (overview?.rows || []).filter((r) => isActionable(r.cells[ty])).length;
     return c;
-  }, [overview, level]);
+  }, [overview]);
 
   const strongKeys = useMemo(() => rows.flatMap((r) => (overview?.types || []).flatMap((ty) => {
     const cell = r.cells[ty];
-    const strong = cell?.candidates.filter((c) => c.strength === 'strong') || [];
-    return cell?.status === 'strong' && strong.length === 1 ? [candKey(r, ty, strong[0].candidateId)] : [];
+    return cell?.status === 'strong' ? cell.candidates.filter((c) => c.strength === 'strong').map((c) => candKey(r, ty, c.candidateId)) : [];
   })), [rows, overview]);
   const allStrong = strongKeys.length > 0 && strongKeys.every((k) => selected.has(k));
   const toggleSelect = (key: string) => setSelected((p) => { const n = new Set(p); n.has(key) ? n.delete(key) : n.add(key); return n; });
@@ -323,17 +325,11 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
   const types = overview?.types || [];
   const running = !!progress?.running;
   const generatedAt = overview && overview.generatedAt > '1971' ? new Date(overview.generatedAt).toLocaleString(numberLocale()) : '';
-  const levelBtn = (l: LevelFilter, label: React.ReactNode) => (
-    <button onClick={() => setLevel(l)} className={`px-3.5 py-1.5 rounded-full font-disp text-[13px] font-semibold transition-colors ${level === l ? 'bg-ink text-white dark:bg-accent dark:text-ink shadow-nav-active' : 'text-muted dark:text-[#8f897c] hover:text-ink dark:hover:text-[#f5f2ea]'}`}>{label}</button>
-  );
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 px-4 md:px-7 pb-4">
-        <div className="flex flex-wrap items-center gap-1 rounded-3xl bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white/70 dark:border-white/15 p-1 shadow-soft">
-          {levelBtn('', <Trans>All</Trans>)}{levelBtn('lab', <Trans>Labs</Trans>)}{levelBtn('team', <Trans>Teams</Trans>)}
-        </div>
-        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t`Find a structure…`} className="input-soft !w-56 h-10 py-1.5 text-[13px]" />
+        <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t`Find a lab…`} className="input-soft !w-56 h-10 py-1.5 text-[13px]" />
         <div className="flex-1" />
         {canRun && (
           <>
@@ -364,7 +360,7 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
         ) : overview && (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-              <StatCard label={t`Structures to process`} value={rows.length} />
+              <StatCard label={t`Labs to process`} value={rows.length} />
               {([
                 ['strong', t`Strong candidates`, counts.strong, 'bg-[rgba(46,160,102,.16)] dark:bg-[rgba(46,160,102,.14)]'],
                 ['ambiguous', t`Ambiguous`, counts.ambiguous, 'bg-[rgba(231,111,154,.15)] dark:bg-[rgba(231,111,154,.12)]'],
@@ -389,13 +385,13 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
                 </button>
               )}
               {rows.length === 0 ? (
-                <p className="text-[13px] text-muted-faint py-8">{overview.stats.structures === 0 ? t`No structure in the directory yet.` : query || kind || level ? t`No structure to show for this filter.` : canRun ? t`Nothing to do: run a search to find the missing identifiers.` : t`Nothing to do.`}</p>
+                <p className="text-[13px] text-muted-faint py-8">{overview.stats.structures === 0 ? t`No structure in the directory yet.` : query || kind ? t`No lab to show for this filter.` : canRun ? t`Nothing to do: run a search to find the missing identifiers.` : t`Nothing to do.`}</p>
               ) : (
                 <div className="unified-table rounded-card border border-ink/8 dark:border-white/8 bg-white/40 dark:bg-white/[.03]">
                   <div>
                     <div className="grid unified-grid sticky -top-4 max-md:top-0 z-10 rounded-t-card items-center px-3 py-2 bg-[#f3efe4] dark:bg-[#24231f] border-b border-ink/8 dark:border-white/10 text-[10.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c]" style={{ '--src-count': types.length } as React.CSSProperties}>
                       <span />
-                      <span><Trans>Structure</Trans></span>
+                      <span><Trans>Lab</Trans></span>
                       {types.map((ty) => (
                         <button key={ty} type="button" onClick={() => setTypeFilter((f) => (f === ty ? '' : ty))} title={typeFilter === ty ? t`Remove the type filter` : t`Only structures with something to do on ${STRUCTURE_ID_META[ty].label}`}
                           className={`text-center rounded-full py-0.5 transition-colors ${typeFilter === ty ? 'bg-ink text-white dark:bg-accent dark:text-ink' : typeFilter ? 'opacity-40 hover:opacity-100' : 'hover:text-ink dark:hover:text-[#f5f2ea]'}`}>
@@ -419,7 +415,6 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
                                   <span className="truncate">{row.acronym || row.name}</span>
                                   <ExternalLink className="w-3.5 h-3.5 shrink-0 text-muted-faint opacity-0 group-hover/name:opacity-100 transition-opacity" />
                                 </a>
-                                {row.level === 'team' && row.parentAcronym && <span className="inline-flex shrink-0 items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cream-50 dark:bg-white/10 border border-ink/5 dark:border-white/10 text-[11px] font-semibold text-ink dark:text-[#e7e2d6]"><span className="w-1.5 h-1.5 rounded-full bg-[#7048e8] dark:bg-[#9a7bff]" />{row.parentAcronym}</span>}
                               </div>
                               <div className="text-[11px] text-muted-faint mt-0.5 truncate">{row.name}</div>
                             </div>

@@ -56,14 +56,14 @@ export const cellStatus = (existing: StructureIdentifier[], candidates: Structur
   const strong = candidates.filter((c) => c.strength === 'strong');
   const medium = candidates.filter((c) => c.strength === 'medium');
   const conflict = candidates.some((c) => c.strength === 'conflict') || existing.some((i) => i.checkResult && (i.checkResult as any).ok === false);
+  // Several HAL records (before and after a merger of universities) or OpenAlex institutions are normal for one lab:
+  // on a multi-valued type, several strong candidates are all to accept, never an ambiguity.
   if (existing.length) {
     if (conflict) return 'conflict';
-    // Several HAL records or OpenAlex institutions are normal: more strong candidates are offered on top.
-    if (multi && strong.length === 1) return 'strong';
-    if (multi && strong.length > 1) return 'ambiguous';
+    if (multi && strong.length) return 'strong';
     return 'present';
   }
-  if (strong.length === 1) return 'strong';
+  if (strong.length === 1 || (multi && strong.length > 1)) return 'strong';
   if (strong.length > 1) return 'ambiguous';
   if (medium.length) return 'arbitrate';
   return searched ? 'absent' : 'none';
