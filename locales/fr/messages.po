@@ -935,9 +935,8 @@ msgstr "Outils d'alignement"
 
 #: components/Sidebar.tsx:110
 #: components/Sidebar.tsx:168
-#: components/researchers/UnifiedAlignPage.tsx:598
-msgid "Researcher identifier alignment"
-msgstr "Alignement des identifiants chercheurs"
+msgid "Identifier alignment"
+msgstr "Alignement des identifiants"
 
 #: components/Sidebar.tsx:115
 #: components/Sidebar.tsx:170
@@ -13809,6 +13808,10 @@ msgstr "Profil {0} marqué « Identité mêlée » — ticket ouvert dans la tab
 msgid "Structure identifier alignment"
 msgstr "Alignement des identifiants des structures"
 
+#: components/researchers/UnifiedAlignPage.tsx:598
+msgid "Researcher identifier alignment"
+msgstr "Alignement des identifiants chercheurs"
+
 #: components/researchers/UnifiedAlignPage.tsx:599
 msgid "RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab or team, one column per identifier"
 msgstr "RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — une ligne par laboratoire ou équipe, une colonne par identifiant"
@@ -14489,18 +14492,13 @@ msgid "Cluster (derived — read only)"
 msgstr "Pôle (dérivé — lecture seule)"
 
 #: components/structures/IdentifiersTab.tsx:66
-msgid "Source of the value"
-msgstr "Source de la valeur"
-
-#: components/structures/IdentifiersTab.tsx:66
 #: components/structures/StructureAlignPanel.tsx:164
 msgid "checked on"
 msgstr "vérifié le"
 
-#: components/structures/IdentifiersTab.tsx:67
-#: components/structures/StructureAlignPanel.tsx:167
-msgid "record not found"
-msgstr "notice introuvable"
+#: components/structures/IdentifiersTab.tsx:66
+msgid "Source of the value"
+msgstr "Source de la valeur"
 
 #: components/structures/IdentifiersTab.tsx:67
 #: components/structures/StructureAlignPanel.tsx:37
@@ -14509,18 +14507,23 @@ msgid "closed record"
 msgstr "notice fermée"
 
 #: components/structures/IdentifiersTab.tsx:67
+#: components/structures/StructureAlignPanel.tsx:167
+msgid "record not found"
+msgstr "notice introuvable"
+
+#: components/structures/IdentifiersTab.tsx:67
 msgid "record names something else"
 msgstr "la notice désigne autre chose"
-
-#. placeholder {0}: i.value
-#: components/structures/IdentifiersTab.tsx:71
-msgid "Remove {0}? It will not be suggested again by the alignment."
-msgstr "Retirer {0} ? L’alignement ne le proposera plus."
 
 #: components/structures/IdentifiersTab.tsx:71
 #: components/structures/StructureAlignPanel.tsx:173
 msgid "remove"
 msgstr "retirer"
+
+#. placeholder {0}: i.value
+#: components/structures/IdentifiersTab.tsx:71
+msgid "Remove {0}? It will not be suggested again by the alignment."
+msgstr "Retirer {0} ? L’alignement ne le proposera plus."
 
 #: components/structures/IdentifiersTab.tsx:79
 msgid "Identifier or URL"
