@@ -27,7 +27,7 @@ coverage** chart gives the share of records holding each identifier. Note it dow
 
 Before looking for missing ones, make sure the existing ones are right.
 
-1. Open **Alignment tools › Researcher identifier alignment** and choose the laboratory.
+1. Open **Alignment tools › Identifier alignment** and choose the laboratory.
 2. Select **Check existing ones**, then **Search everywhere**.
 3. Handle the **Name mismatches / replaced entries**: **Update** the IdRef records merged by
    ABES, confirm or detach the name mismatches.

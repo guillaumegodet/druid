@@ -27,7 +27,7 @@ Dans **Personnel**, filtrez le laboratoire puis **Toutes les analyses d'effectif
 
 Avant de chercher les manquants, assurez-vous que ceux qui existent sont justes.
 
-1. Ouvrez **Outils d'alignement › Alignement des identifiants chercheurs** et choisissez le
+1. Ouvrez **Outils d'alignement › Alignement des identifiants** et choisissez le
    laboratoire.
 2. Sélectionnez **Vérifier les existants**, puis **Rechercher partout**.
 3. Traitez les **Écarts de nom / notices remplacées** : **Mettre à jour** les notices IdRef

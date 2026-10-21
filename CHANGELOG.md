@@ -58,6 +58,10 @@ données à exécuter au déploiement).
   **Runner de jobs** (`scripts/saas/runner.ts`) : traite `tenant.provision` (schéma migré, établissement et structures
   écrits par les commandes de l'annuaire, route Cloudflare de l'hôte, e-mail « votre Druid est prêt »). Lot 2.
 
+### Modifié
+- Entrée de menu « Alignement des identifiants » (ex-« Alignement des identifiants chercheurs ») : la page porte
+  désormais les personnes et les structures.
+
 ### Corrigé
 - **Création d'une structure ou d'un établissement employeur sur une instance Cloudflare PostgreSQL** : la commande
   lisait le dépôt (pool de connexions) à l'intérieur de sa transaction ; avec une seule connexion par requête

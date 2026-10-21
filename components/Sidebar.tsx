@@ -107,7 +107,7 @@ const AlignToolsDropdown: React.FC<AlignToolsDropdownProps> = ({ isUnified, isLd
       {open && (
         <div className="absolute left-0 top-full mt-2 w-56 glass-card-strong rounded-card shadow-soft-lg overflow-hidden z-50">
           <button onClick={() => navigate(ViewState.UNIFIED_ALIGN)} className={`${itemCls(isUnified)} border-b border-ink/5 dark:border-white/5`}>
-            <Sparkles className="w-4 h-4" /> <Trans>Researcher identifier alignment</Trans>
+            <Sparkles className="w-4 h-4" /> <Trans>Identifier alignment</Trans>
           </button>
           {/* Instances without a directory (Centrale, Cloudflare): no LDAP alignment. */}
           {hasCapability('HAS_LDAP') && (
@@ -165,7 +165,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isO
   // reserved to institution-level rights (admins, central services), see lib/auth.canUseEstablishmentTools.
   const alignTools = canUseEstablishmentTools()
     ? [
-      { view: ViewState.UNIFIED_ALIGN, active: isUnified, label: t`Researcher identifier alignment`, icon: <Sparkles className="w-5 h-5" /> },
+      { view: ViewState.UNIFIED_ALIGN, active: isUnified, label: t`Identifier alignment`, icon: <Sparkles className="w-5 h-5" /> },
       // Instances without a directory (Centrale, Cloudflare): no LDAP alignment.
       ...(hasCapability('HAS_LDAP') ? [{ view: ViewState.LDAP_ALIGN, active: isLdapCandidates, label: t`LDAP alignment`, icon: <UserSearch className="w-5 h-5" /> }] : []),
     ]
