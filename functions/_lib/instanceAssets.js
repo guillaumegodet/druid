@@ -77,12 +77,12 @@ export async function serveInstanceAsset(context) {
   if (request.method !== 'GET' && request.method !== 'HEAD') {
     return new Response(null, { status: 405, headers: { Allow: 'GET, HEAD' } });
   }
-  const instance = await instanceForRequestAnywhere(request, env);
+  // The asset routes have no /api middleware: the instance (registry, then control plane) is resolved here.
+  const instance = context.data?.instance || await instanceForRequestAnywhere(request, env);
   if (!instance) return notFound();
   const url = new URL(request.url);
   if (instance.tenant) {
-    // The asset routes have no /api middleware: the session is resolved here.
-    const { email, member } = await saasIdentity(env, request, instance);
+    const { email, member } = context.data?.member !== undefined ? { email: context.data.identity, member: context.data.member } : await saasIdentity(env, request, instance);
     context.data = { ...(context.data || {}), identity: email, member, instance };
     return serveTenantAsset(context, instance, url.pathname);
   }
