@@ -14691,6 +14691,10 @@ msgstr "share of the lab's documents"
 msgid "collection of a team"
 msgstr "collection of a team"
 
+#: components/structures/StructureAlignPanel.tsx:38
+msgid "links back to a known identifier"
+msgstr "links back to a known identifier"
+
 #. placeholder {0}: e.worksCount.toLocaleString(numberLocale())
 #: components/structures/StructureAlignPanel.tsx:52
 msgid "{0} works"

@@ -245,6 +245,30 @@ describe('structure alignment engine', () => {
     expect(registry.calls.filter((c) => c.endsWith('.search'))).toEqual([]);
   });
 
+  it('a general registry (Wikidata, IdRef) never makes a strong candidate from a name alone; a team is only searched on HAL', async () => {
+    const registry = fakeRegistry();
+    // Wikidata item literally called like the team, nothing else in common.
+    registry.wikidata.search = async () => { registry.calls.push('wikidata.search'); return [rec({ type: 'wikidata', id: 'Q1', label: 'Sourire', altNames: ['Le Sourire'] })]; };
+    const team = await alignStructure({ ...facts({}), acronym: 'SOURIRE', name: 'Équipe Sourire', level: 'team', unitLabel: null }, registry, { mode: 'search' });
+    expect(registry.calls.filter((c) => c.endsWith('.search'))).toEqual(['hal.search']);
+    expect(by(team, 'wikidata')).toEqual([]);
+    const lab = await alignStructure({ ...facts({}), acronym: 'SOURIRE', name: 'Sourire', unitLabel: null }, registry, { mode: 'search' });
+    const wd = by(lab, 'wikidata');
+    expect(wd[0]?.strength ?? 'none').not.toBe('strong');
+    // The same item linking back to the lab's ROR is strong.
+    registry.wikidata.search = async () => [rec({ type: 'wikidata', id: 'Q1', label: 'Sourire', links: { ror: ['01abcde23'] } })];
+    const linked = await alignStructure({ ...facts({ ror: ['01abcde23'] }), acronym: 'SOURIRE', name: 'Sourire', unitLabel: null }, { ...registry, hal: { ...registry.hal, byLink: async () => [] }, openalex: { ...registry.openalex, byRor: async () => [] }, wikidata: { ...registry.wikidata, byLink: async () => [] } }, { mode: 'search' });
+    expect(by(linked, 'wikidata')[0]).toMatchObject({ candidateId: 'Q1', strength: 'strong' });
+    expect(by(linked, 'wikidata')[0].evidence.reasons).toContain('links_back');
+  });
+
+  it('verify: a record naming the structure within a longer label is consistent', async () => {
+    const registry = fakeRegistry();
+    registry.idref.get = async () => rec({ type: 'idref', id: '000000009', label: 'Nantes Université. Pôle Humanités. Faculté de Psychologie (Nantes)' });
+    const r = await alignStructure({ ...facts({ idref: ['000000009'] }), acronym: 'PSYCHOLOGIE', name: 'Psychologie', unitLabel: null }, registry, { mode: 'verify' });
+    expect(r.verifications[0]).toMatchObject({ type: 'idref', ok: true });
+  });
+
   it('a registry failure is reported on its type and does not stop the others', async () => {
     const registry = fakeRegistry();
     registry.hal.byLink = async () => { throw new Error('HAL down'); };
