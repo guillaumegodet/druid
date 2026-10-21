@@ -76,13 +76,19 @@ const Pastille: React.FC<{ type: StructureIdType; cell?: StructureAlignCell; row
     const both = (text: React.ReactNode, icon: React.ReactNode) => <><span className="ua-text">{text}</span><span className="ua-icon items-center gap-0.5">{icon}</span></>;
     if (!cell) return <span className="block w-full text-center text-muted-faint text-[12px]">—</span>;
     const strong = cell.candidates.filter((c) => c.strength === 'strong');
-    if (cell.status === 'strong' && strong.length === 1) {
-      const key = candKey(row, type, strong[0].candidateId);
-      const title = t`${label}: one strong candidate — tick to accept, click to see it`;
+    if (cell.status === 'strong') {
+      // One checkbox ticks every strong candidate of the cell: on a multi-valued type (HAL records before and after a
+      // merger, OpenAlex institutions) they are all to accept.
+      const keys = strong.map((c) => candKey(row, type, c.candidateId));
+      const all = keys.every((k) => selected.has(k));
+      const toggle = () => { for (const k of keys) if (all === selected.has(k)) onToggleSelect(k); };
+      const title = strong.length === 1 ? t`${label}: one strong candidate — tick to accept, click to see it` : t`${label}: ${strong.length} strong candidates, all to accept — tick to accept them, click to see them`;
       return (
-        <span className={`${base} bg-[rgba(46,160,102,.14)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.18)] dark:text-[#5fd39a] border border-transparent cursor-pointer hover:border-accent-strong ${selected.has(key) ? '!bg-accent/25 !border-accent-strong' : ''}`}>
-          <input type="checkbox" checked={selected.has(key)} onChange={() => onToggleSelect(key)} className="accent-[#1c1b19] dark:accent-[#f4d24a]" onClick={(e) => e.stopPropagation()} aria-label={title} />
-          <span onClick={onToggleOpen} className="flex-1 inline-flex items-center justify-center gap-1" title={title}>{both(cell.existing.length ? t`+1 strong` : t`strong candidate`, <Sparkles className="w-3.5 h-3.5" />)}</span>
+        <span className={`${base} bg-[rgba(46,160,102,.14)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.18)] dark:text-[#5fd39a] border border-transparent cursor-pointer hover:border-accent-strong ${all ? '!bg-accent/25 !border-accent-strong' : ''}`}>
+          <input type="checkbox" checked={all} onChange={toggle} className="accent-[#1c1b19] dark:accent-[#f4d24a]" onClick={(e) => e.stopPropagation()} aria-label={title} />
+          <span onClick={onToggleOpen} className="flex-1 inline-flex items-center justify-center gap-1" title={title}>
+            {both(strong.length > 1 ? t`${strong.length} strong` : cell.existing.length ? t`+1 strong` : t`strong candidate`, <><Sparkles className="w-3.5 h-3.5" />{strong.length > 1 && <span className="font-mono text-[11.5px]">{strong.length}</span>}</>)}
+          </span>
         </span>
       );
     }
@@ -280,8 +286,7 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
 
   const strongKeys = useMemo(() => rows.flatMap((r) => (overview?.types || []).flatMap((ty) => {
     const cell = r.cells[ty];
-    const strong = cell?.candidates.filter((c) => c.strength === 'strong') || [];
-    return cell?.status === 'strong' && strong.length === 1 ? [candKey(r, ty, strong[0].candidateId)] : [];
+    return cell?.status === 'strong' ? cell.candidates.filter((c) => c.strength === 'strong').map((c) => candKey(r, ty, c.candidateId)) : [];
   })), [rows, overview]);
   const allStrong = strongKeys.length > 0 && strongKeys.every((k) => selected.has(k));
   const toggleSelect = (key: string) => setSelected((p) => { const n = new Set(p); n.has(key) ? n.delete(key) : n.add(key); return n; });

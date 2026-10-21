@@ -127,6 +127,9 @@ describe('structure identifiers: cells and projection', () => {
     expect(cellStatus([id('ror', '01abcde23')], [cand('conflict')], true, false)).toBe('conflict');
     expect(cellStatus([{ ...id('ror', '01abcde23'), checkResult: { ok: false, exists: false } }], [], true, false)).toBe('conflict');
     expect(cellStatus([id('hal_struct', '1')], [cand('strong')], true, true)).toBe('strong');
+    // Two HAL records (before and after a merger) are both to accept: strong, not ambiguous.
+    expect(cellStatus([], [cand('strong', 'a'), cand('strong', 'b')], true, true)).toBe('strong');
+    expect(cellStatus([id('hal_struct', '1')], [cand('strong', 'a'), cand('strong', 'b')], true, true)).toBe('strong');
   });
   it('projection to the V2 fields', () => {
     const fields = projectedFields([
