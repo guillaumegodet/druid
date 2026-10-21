@@ -66,6 +66,9 @@ export interface DruidCapabilities {
   /** « My project » assistant of the calls (docs/plan-funding-calls.md, lot 7): PostgreSQL storage, a language model
    * (ILAAS_*) and an embedding service (EMBEDDING_API_*) on server.cjs — false elsewhere. */
   HAS_CALLS_CHAT: boolean;
+  /** Identifiers of the structures and their alignment (« Structures » tab of the alignment page, « Identifiers »
+   * tab of the structure record; druid-internal docs/plan-druid-saas.md, lot 4): PostgreSQL storage, every runtime. */
+  HAS_STRUCTURE_IDS: boolean;
   /** Public read-only instance (demo on Cloudflare, docs/archive/plan-instance-demo-cloudflare.md):
    * the Grist proxy refuses every write and the UI hides editing. Unlike the HAS_* flags it
    * removes features; false everywhere except where READ_ONLY=true is configured. */
@@ -114,6 +117,7 @@ const EMPTY_CAPABILITIES: DruidCapabilities = {
   HAS_TASKS: false,
   HAS_CALLS: false,
   HAS_CALLS_CHAT: false,
+  HAS_STRUCTURE_IDS: false,
   READ_ONLY: false,
 };
 

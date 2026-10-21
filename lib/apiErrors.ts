@@ -238,6 +238,14 @@ export const API_ERRORS = [
   msg`Alignment already running`,
   msg`Unknown alignment source`,
   msg`No alignment running`,
+  // Structure identifiers alignment (druid-internal docs/plan-druid-saas.md, lot 4)
+  msg`Structure alignment already running`,
+  msg`Structure alignment needs the PostgreSQL storage`,
+  msg`Unknown identifier type`,
+  msg`Invalid identifier`,
+  msg`Candidate not found`,
+  msg`Identifier not found`,
+  msg`Structure not found`,
   msg`No run yet`,
   // single-person LDAP lookup (researcher creation form)
   msg`LDAP not configured on this instance`,

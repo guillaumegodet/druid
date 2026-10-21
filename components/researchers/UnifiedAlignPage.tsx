@@ -19,6 +19,9 @@ import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { HelpButton } from '../HelpButton';
+import { StructureAlignPanel } from '../structures/StructureAlignPanel';
+import { usePersistedState } from '../../lib/usePersistedState';
+import { Building2 } from 'lucide-react';
 import { VIEW_HELP } from '../../lib/helpLinks';
 import { ViewState } from '../../types';
 import { hasCapability } from '../../lib/auth';
@@ -375,6 +378,9 @@ interface UnifiedAlignPageProps {
   onRejectCandidate?: (src: UnifiedAlignSource, row: RowRef, candidate: Candidate, candidateCount?: number) => Promise<boolean>;
   /** « Identité mêlée »: ticket in the source's review table (neither validated nor rejected). */
   onMixedCandidate?: (src: UnifiedAlignSource, row: RowRef, candidate: Candidate, candidateCount?: number) => Promise<boolean>;
+  /** The « Structures » tab (identifiers of the labs and teams, druid-internal docs/plan-druid-saas.md, lot 4) may
+   * write: PostgreSQL storage and a user allowed to write. Absent = tab hidden (Grist storage). */
+  structuresWritable?: boolean | null;
 }
 
 /** What the page sends when applying: its selection, rebuilt into updates by the server. */
@@ -384,9 +390,12 @@ export interface UnifiedSelection {
   decisions: Record<string, UnifiedArbitrateDecision>;
 }
 
-export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, onModeChange, progress, applying = false, onRerunAll, onStop, onApply, onApplyRedirection, onRejectCandidate, onMixedCandidate }) => {
+export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, onModeChange, progress, applying = false, onRerunAll, onStop, onApply, onApplyRedirection, onRejectCandidate, onMixedCandidate, structuresWritable = null }) => {
   const { t } = useLingui();
   const [toast, setToast] = useState<string | null>(null);
+  // « People » (the five authority sources, one row per person) or « Structures » (identifiers of the labs and teams).
+  const [tab, setTab] = usePersistedState<'people' | 'structures'>('druid.unifiedAlign.tab', 'people');
+  const structuresTab = structuresWritable !== null && tab === 'structures';
   const [labo, setLabo] = useState('');
   const [group, setGroup] = useState<AlignGroup>('personnel');
   const [openKey, setOpenKey] = useState<string | null>(null);
@@ -586,12 +595,20 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
           <div className="flex items-center gap-3">
             <Sparkles className="page-header-icon w-7 h-7 text-[#7048e8] dark:text-[#9a7bff]" />
             <div>
-              <h1 className="font-disp text-3xl md:text-[38px] font-bold tracking-tight text-ink dark:text-[#f5f2ea] leading-none"><Trans>Researcher identifier alignment</Trans></h1>
-              <p className="page-header-sub text-[15px] text-muted dark:text-[#8f897c] mt-1.5"><Trans>IdRef · ORCID · HAL · OpenAlex · Scopus — one row per person, one column per identifier</Trans></p>
+              <h1 className="font-disp text-3xl md:text-[38px] font-bold tracking-tight text-ink dark:text-[#f5f2ea] leading-none">{structuresTab ? <Trans>Structure identifier alignment</Trans> : <Trans>Researcher identifier alignment</Trans>}</h1>
+              <p className="page-header-sub text-[15px] text-muted dark:text-[#8f897c] mt-1.5">{structuresTab ? <Trans>RNSR · ROR · HAL · OpenAlex · IdRef · Wikidata — one row per lab or team, one column per identifier</Trans> : <Trans>IdRef · ORCID · HAL · OpenAlex · Scopus — one row per person, one column per identifier</Trans>}</p>
             </div>
-            <HelpButton path={VIEW_HELP[ViewState.UNIFIED_ALIGN]} />
+            <HelpButton path={structuresTab ? '/guides/identifiants/aligner-les-structures/' : VIEW_HELP[ViewState.UNIFIED_ALIGN]} />
           </div>
+          {structuresWritable !== null && (
+            <div className="flex items-center gap-1 rounded-3xl bg-white/70 dark:bg-white/10 backdrop-blur-xl border border-white/70 dark:border-white/15 p-1 shadow-soft">
+              {([['people', <Users key="p" className="w-3.5 h-3.5" />, t`People`], ['structures', <Building2 key="s" className="w-3.5 h-3.5" />, t`Structures`]] as ['people' | 'structures', React.ReactNode, string][]).map(([k, icon, label]) => (
+                <button key={k} onClick={() => setTab(k)} className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-disp text-[13px] font-semibold transition-colors ${tab === k ? 'bg-ink text-white dark:bg-accent dark:text-ink shadow-nav-active' : 'text-muted dark:text-[#8f897c] hover:text-ink dark:hover:text-[#f5f2ea]'}`}>{icon} {label}</button>
+              ))}
+            </div>
+          )}
         </div>
+        {!structuresTab && (
         <div className="flex flex-wrap items-center gap-2">
           {(['search', 'verify'] as AlignMode[]).map((m) => (
             <button key={m} onClick={() => onModeChange(m)} disabled={anyRunning}
@@ -620,7 +637,8 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
             {anyRunning ? t`Search running…` : t`Search everywhere…`}
           </PixelBtn>}
         </div>
-        {progress && (
+        )}
+        {!structuresTab && progress && (
           <div className="flex flex-wrap gap-3 mt-2 text-[11px] font-semibold text-muted dark:text-[#8f897c]">
             {sources.map((s) => {
               const p = progress[s];
@@ -654,6 +672,8 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
           onClose={() => setLaunchOpen(false)} onLaunch={launch} />
       )}
 
+      {structuresTab ? <StructureAlignPanel writable={!!structuresWritable} onToast={setToast} /> : (
+      <>
       <div className="flex-1 md:overflow-auto px-4 md:px-7 py-4" data-page-scroll>
         {!diff ? (
           <div className="flex flex-col items-center justify-center py-24 text-muted-faint gap-3">
@@ -787,6 +807,8 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
           </PixelBtn>
         )}
       </footer>
+      </>
+      )}
 
       {toast && (
         <div className="fixed bottom-4 right-4 z-50 flex items-center gap-2 px-5 py-3 rounded-full bg-white/80 dark:bg-white/10 backdrop-blur-xl border border-white/80 dark:border-white/15 shadow-soft text-[13px] font-semibold text-ink dark:text-[#f5f2ea]">

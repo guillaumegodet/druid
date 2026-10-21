@@ -114,11 +114,16 @@ describe.skipIf(!url)('portal: create a tenant, provision it, open it', () => {
   });
 
   it('the runner provisions the tenant: schema, directory, status active', async () => {
-    const out = await runJobsOnce(saas!, { ownerUrl: url!, appUrl, baseDomain: BASE, cloudflare: null, email: null, log: () => {} });
-    expect(out).toEqual({ done: 1, failed: 0 });
+    // The provisioning queues the structure alignment (lot 4), run here against registries that answer nothing.
+    const emptyRegistries = (async () => ({ ok: true, status: 200, json: async () => ({}), text: async () => '' })) as unknown as typeof fetch;
+    const out = await runJobsOnce(saas!, { ownerUrl: url!, appUrl, baseDomain: BASE, cloudflare: null, email: null, log: () => {}, fetchImpl: emptyRegistries });
+    expect(out).toEqual({ done: 2, failed: 0 });
     const st = await (await callPortal(`/start/api/tenants/${SLUG}`, { headers: { Cookie: cookie } })).json() as any;
     expect(st.status).toBe('active');
-    expect(st.jobs[0]).toMatchObject({ type: 'tenant.provision', status: 'done', progress: { step: 'ready', pct: 100 } });
+    expect(st.jobs).toEqual(expect.arrayContaining([
+      expect.objectContaining({ type: 'tenant.provision', status: 'done', progress: expect.objectContaining({ step: 'ready', pct: 100 }) }),
+      expect.objectContaining({ type: 'structures.align', status: 'done' }),
+    ]));
     const db = createDb({ connectionString: appUrl!, max: 1, schema: tenantSchemaName(SLUG), allowExitOnIdle: true });
     try {
       const structures = await db.selectFrom('structure').select(['acronym', 'rnsr', 'type']).orderBy('acronym').execute();
@@ -128,7 +133,7 @@ describe.skipIf(!url)('portal: create a tenant, provision it, open it', () => {
     } finally {
       await db.destroy();
     }
-    const job = await saas!.selectFrom('job').select('log').where('tenant_id', '=', (await saas!.selectFrom('tenant').select('id').where('slug', '=', SLUG).executeTakeFirstOrThrow()).id).executeTakeFirstOrThrow();
+    const job = await saas!.selectFrom('job').select('log').where('type', '=', 'tenant.provision').where('tenant_id', '=', (await saas!.selectFrom('tenant').select('id').where('slug', '=', SLUG).executeTakeFirstOrThrow()).id).executeTakeFirstOrThrow();
     expect(job.log).toContain('1 skipped');
   }, 120_000);
 

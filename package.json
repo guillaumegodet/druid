@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node scripts/build-info.cjs && node scripts/prepare-cloudflare-assets.cjs && node scripts/functions_pg_bundle.cjs && npm run build:server && npm run build:migrate && npm run build:copy && npm run build:graph && npm run build:publications && npm run build:seed && npm run build:calls && npm run build:export-calls && npm run build:collect && npm run build:theses && npm run build:eligibility && npm run build:embed-calls && npm run build:saas && vite build && node scripts/seed_demo_on_pages.cjs",
+    "build": "node scripts/build-info.cjs && node scripts/prepare-cloudflare-assets.cjs && node scripts/functions_pg_bundle.cjs && npm run build:server && npm run build:migrate && npm run build:copy && npm run build:graph && npm run build:publications && npm run build:seed && npm run build:calls && npm run build:export-calls && npm run build:collect && npm run build:theses && npm run build:eligibility && npm run build:embed-calls && npm run build:saas && npm run build:structures-align && vite build && node scripts/seed_demo_on_pages.cjs",
     "build:server": "esbuild server/apiV1.ts --bundle --platform=node --format=cjs --target=node20 --external:unpdf --outfile=server-api.cjs --log-level=warning",
     "preview": "vite preview",
     "i18n:extract": "lingui extract --clean",
@@ -22,6 +22,7 @@
     "db:types": "kysely-codegen",
     "db:saas:migrate": "node scripts/saas/control_plane_migrate.cjs up",
     "db:saas:rollback": "node scripts/saas/control_plane_migrate.cjs rollback",
+    "build:structures-align": "mkdir -p scripts/.build && esbuild scripts/align_structures.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/align_structures.cjs --log-level=warning",
     "build:saas": "mkdir -p scripts/.build && esbuild scripts/saas/tenant_db.ts --bundle --platform=node --format=cjs --external:pg-native --outfile=scripts/.build/tenant_db.cjs --log-level=warning && esbuild scripts/saas/runner.ts --bundle --platform=node --format=cjs --external:pg-native --log-override:empty-import-meta=silent --outfile=scripts/.build/saas_runner.cjs --log-level=warning",
     "test:db": "vitest run --no-file-parallelism lib/__tests__/*.integration.test.ts",
     "migrate:grist-to-pg": "npm run -s build:migrate && node scripts/.build/migrate_grist_to_pg.cjs",

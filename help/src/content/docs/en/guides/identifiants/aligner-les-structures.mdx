@@ -1,0 +1,73 @@
+---
+title: "Align the identifiers of the structures"
+description: "Find and check the RNSR, ROR, HAL, OpenAlex, IdRef and Wikidata identifiers of the labs and teams."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Central services, Druid administrators"
+	menu="Alignment tools › Researcher identifier alignment › Structures tab"
+	disponibilite="instances on PostgreSQL; rerunning searches from Druid depends on the instance"
+/>
+
+A lab has a dozen identifiers and no registry links them all: the **RNSR** for the French open
+science monitor and scanR, the **ROR** for collaborations, the **HAL structure** and **HAL
+collection** for deposits, the **OpenAlex institution** for the corpus, the **IdRef** for ABES and
+SoVisu+, **Wikidata** for the rest. The **Structures** tab of the alignment page brings them
+together: **one row per lab or team, one column per identifier**.
+
+## What the search does
+
+1. **Bridges first.** From every identifier already confirmed, Druid reads the record and derives the
+   others: the HAL record of a lab often carries its RNSR, ROR and IdRef; the ROR record carries the
+   Wikidata item; OpenAlex knows the ROR. A value reached by two independent paths, or whose record
+   carries the acronym or the unit number, is a **strong candidate**.
+2. **Then a search**, for the types still empty: by name, acronym, unit number (“UMR 6004”), city and
+   supervising institutions. Every candidate gets a score; a university proposed for a lab, or a
+   closed record, is penalized.
+3. **Checking** (“Check existing ones”) reads the records of the confirmed identifiers again: a record
+   that disappeared, closed or contradicts another identifier becomes a **conflict**.
+
+## Steps
+
+### 1. Run a search
+
+1. Open **Alignment tools › Researcher identifier alignment** and click **Structures** at the top
+   right.
+2. Click **Find missing identifiers**. The search only takes the structures never searched; **Search
+   this structure again** in the detail of a row forces one structure.
+3. On an instance without server jobs (Cloudflare), the candidates are computed by an external job:
+   the tab is then used to review them.
+
+### 2. Read the badges
+
+- **strong candidate**: one sure value. Tick the box to accept it.
+- **N candidates ?**: several strong values, for instance two HAL records (old and current). Open the
+  row and choose; several HAL or OpenAlex records may be confirmed together.
+- **N to review**: medium candidates, to read before deciding.
+- **conflict**: the confirmed identifier is contradicted by a bridge, or its record disappeared.
+- **confirmed**: nothing to do. **not found**: searched, nothing convincing. **·**: never searched.
+
+### 3. Decide
+
+1. **Check all strong candidates** then **Confirm** validates in bulk; that is the bulk of the volume.
+2. In the detail of a cell, every candidate shows its record (link), acronym, unit number, city,
+   supervising institutions, works count (OpenAlex) and the bridges that reached it. **Refuse**
+   discards a candidate with a note: it will never be suggested again.
+3. **Type** a value by hand (identifier or URL) when you know it.
+4. The confirmed values are the ones the exports (SoVisu+) and the bibliometric dashboard read; for
+   the multi-valued types, the **primary** value is the one harvested.
+
+## On the structure record
+
+The **Identifiers & links** tab of the record lists the confirmed identifiers, their source (typed,
+imported, alignment), the date of the last check and a link to each record. You can add, remove or
+change the primary value there; the candidates are decided on the alignment page.
+
+## See also
+
+- [Align a lab's identifiers](/en/guides/identifiants/aligner-les-identifiants/) for people.
+- [Accept or reject a candidate](/en/guides/identifiants/accepter-rejeter-candidat/).

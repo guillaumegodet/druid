@@ -926,6 +926,7 @@ function App() {
             onApplyRedirection={writable ? handleApplyIdrefRedirection : undefined}
             onRejectCandidate={writable ? handleRejectUnifiedCandidate : undefined}
             onMixedCandidate={writable ? handleMixedUnifiedCandidate : undefined}
+            structuresWritable={hasCapability('HAS_STRUCTURE_IDS') ? writable : null}
           />
         );
       case ViewState.LDAP_ALIGN:

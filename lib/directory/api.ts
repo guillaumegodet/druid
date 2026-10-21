@@ -41,6 +41,12 @@
 // Alignments (lot 2 e, institution right): GET /api/v1/alignments/unified?mode=&sources= (texts as tokens, see
 // lib/directory/alignTexts.ts), POST /alignments/apply { mode, selected, chosen, decisions },
 // POST /alignments/redirection { rowId, ppn }, POST /alignments/reject { source, row, candidate, … }.
+// Structure identifiers (druid-internal docs/plan-druid-saas.md, lot 4; PostgreSQL storage only, institution right unless
+// said otherwise): GET /api/v1/structures/alignment (overview of the « Structures » tab), GET /structures/identifiers (feed
+// of the ETL: confirmed identifiers of every structure), GET /structures/<recordId>/identifiers (any authenticated user),
+// POST /structures/alignment/accept { items: [{ structureId, type, candidateId }] }, POST /structures/alignment/reject
+// { structureId, type, candidateId, note? }, POST /structures/<recordId>/identifiers { type, value, primary? } (rights of
+// the structure), POST …/identifiers/remove { type, value, note? }, POST …/identifiers/primary { type, value }.
 // Publications (lot 2 f, D10 — tables kept in Grist): PATCH /api/v1/newsletter/<id> { fields } (news item of one of
 // the user's structures), PATCH /api/v1/axis-corrections/<slug>/<rowId> { axe } (structure of the user).
 // Reads of lot 2 c: GET /api/v1/duplicates (DuplicatesDiff, rows of the scope), GET /api/v1/people/rows?ids=1,2
@@ -57,6 +63,8 @@ import { AXES_GRIST } from '../publications/axes';
 import type { CommandContext, DirectoryCommands, WriteAudit } from './commands';
 import type { LdapCommands } from './ldapCommands';
 import type { AlignCommands } from './alignCommands';
+import type { StructureAlignCommands } from '../structures/pg/alignCommands';
+import { STRUCTURE_ID_TYPES } from '../structures/identifiers';
 import { UNIFIED_ALIGN_SOURCES, UnifiedAlignSource } from './alignments';
 import { ApiError } from './errors';
 import { applySiteImport, planSiteImport, SiteImportDocumentSchema, SiteImportSelectionSchema } from './siteImport';
@@ -71,6 +79,8 @@ export interface DirectoryApiBindings {
   align?: AlignCommands;
   /** LDAP review commands; absent on an instance without LDAP (Cloudflare). */
   ldap?: LdapCommands;
+  /** Identifiers of the structures and their alignment (PostgreSQL storage only, druid-internal plan SaaS lot 4). */
+  structureAlign?: StructureAlignCommands;
   /** null = no authenticated user. */
   scope: DirectoryScope | null;
   /** Authenticated user, recorded as the author of the writes (PostgreSQL audit log). */
@@ -116,6 +126,11 @@ const AlignApplyBody = z.object({
   chosen: z.record(z.string(), z.string()), decisions: z.record(z.string(), z.enum(['confirm', 'detach', 'ignore'])),
 });
 const AlignRedirectionBody = z.object({ rowId: z.string().regex(/^G-\d+$/), ppn: z.string().min(1) });
+const StructureIdTypeEnum = z.enum(STRUCTURE_ID_TYPES);
+const StructureCandidateRef = z.object({ structureId: RecordId, type: StructureIdTypeEnum, candidateId: z.string().min(1).max(200) });
+const StructureAcceptBody = z.object({ items: z.array(StructureCandidateRef).min(1).max(2000) });
+const StructureRejectBody = StructureCandidateRef.extend({ note: z.string().max(2000).optional().nullable() });
+const StructureIdentifierBody = z.object({ type: StructureIdTypeEnum, value: z.string().min(1).max(200), primary: z.boolean().optional(), note: z.string().max(2000).optional().nullable() });
 const AlignRejectBody = z.object({
   source: AlignSourceEnum,
   row: z.object({ id: z.string().regex(/^G-\d+$/), uid: z.string(), displayName: z.string(), labo: z.string().optional() }),
@@ -173,6 +188,20 @@ export const createDirectoryApi = (): Hono<Env> => {
     return c.json(await c.env.repository.people({ all: false, labAnchors: [anchor] }), 200, NO_STORE);
   });
   app.get('/structures', async (c) => c.json(await c.env.repository.structures(), 200, NO_STORE));
+  app.get('/structures/alignment', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    return c.json(await c.env.structureAlign.overview(ctxOf(c as any)), 200, NO_STORE);
+  });
+  app.get('/structures/identifiers', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    return c.json({ items: await c.env.structureAlign.feed(ctxOf(c as any)) }, 200, NO_STORE);
+  });
+  app.get('/structures/:recordId/identifiers', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const recordId = recordIdOf(c.req.param('recordId'));
+    if (!recordId) return c.json({ error: 'Invalid id' }, 400, NO_STORE);
+    return c.json({ items: await c.env.structureAlign.identifiers(recordId, ctxOf(c as any)) }, 200, NO_STORE);
+  });
   app.get('/institutions', async (c) => c.json(await c.env.repository.institutions(), 200, NO_STORE));
   app.get('/abes-exports', async (c) => c.json(await c.env.repository.abesExports(c.env.scope!), 200, NO_STORE));
 
@@ -304,6 +333,39 @@ export const createDirectoryApi = (): Hono<Env> => {
     const body = await bodyOf(c, StructureBody);
     if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     return c.json(await c.env.commands!.createStructure(body as any, ctxOf(c)), 201, NO_STORE);
+  });
+  writes.post('/structures/alignment/accept', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const body = await bodyOf(c, StructureAcceptBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.structureAlign.accept(body.items, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/structures/alignment/reject', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const body = await bodyOf(c, StructureRejectBody);
+    if (!body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json(await c.env.structureAlign.reject(body, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.post('/structures/:recordId/identifiers', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const recordId = recordIdOf(c.req.param('recordId'));
+    const body = await bodyOf(c, StructureIdentifierBody);
+    if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json({ items: await c.env.structureAlign.add(recordId, body.type, body.value, body.primary, ctxOf(c)) }, 201, NO_STORE);
+  });
+  writes.post('/structures/:recordId/identifiers/remove', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const recordId = recordIdOf(c.req.param('recordId'));
+    const body = await bodyOf(c, StructureIdentifierBody);
+    if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json({ items: await c.env.structureAlign.remove(recordId, body.type, body.value, body.note ?? null, ctxOf(c)) }, 200, NO_STORE);
+  });
+  writes.post('/structures/:recordId/identifiers/primary', async (c) => {
+    if (!c.env.structureAlign) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const recordId = recordIdOf(c.req.param('recordId'));
+    const body = await bodyOf(c, StructureIdentifierBody);
+    if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    return c.json({ items: await c.env.structureAlign.setPrimary(recordId, body.type, body.value, ctxOf(c)) }, 200, NO_STORE);
   });
   writes.put('/structures/:recordId', async (c) => {
     const recordId = recordIdOf(c.req.param('recordId'));

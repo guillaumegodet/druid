@@ -425,7 +425,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
         throw new ApiError(403, 'Rows outside scope or unknown: Structures');
       }
       if (!current) throw new ApiError(404, `Structure not found: S-${recordId}`);
-      await writeStructure(trx, recordId, { ...(current.extra as object), local_id: current.local_id, ...fields });
+      await writeStructure(trx, recordId, { ...(current.extra as object), local_id: current.local_id, ...fields }, 'manual');
       ctx.audit({ table: 'Structures', kind: 'update', rows: [recordId], fields: Object.keys(fields), count: 1 });
     }),
 

@@ -13,6 +13,27 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Identifiants des structures et leur alignement** (stockage PostgreSQL) : chaque laboratoire ou équipe porte ses
+  identifiants dans une table dédiée (`structure_identifier`, multivaluée : RNSR, ROR, structures HAL, collection HAL,
+  OpenAlex, IdRef, Wikidata, ISNI, UAI, SIRET, GRID, affiliation Scopus) avec statut, source et date de vérification ;
+  les colonnes et champs V2 (`ror`, `nns`, `idref`, `hal_collection`, `uai`, `isni`, `wikidata`, `scopus`,
+  `hal_struct_ids`, `openalex_ids`) en sont la projection, toujours lue par les exports. Nouvel onglet **Structures** de
+  la page Alignement : une ligne par structure, une colonne par identifiant, candidats avec preuves (notice, sigle,
+  numéro d'unité, ville, tutelles, nombre de travaux, passerelles), validation en masse des candidats forts, refus avec
+  motif (plus jamais proposé), saisie manuelle, conflits quand une notice confirmée a disparu, est fermée ou est
+  contredite. Le job `scripts/align_structures.ts` lit RNSR, ROR, AuréHAL (structures et collections), OpenAlex, IdRef et
+  Wikidata, **passerelles d'abord** (une valeur atteinte par deux chemins est forte) puis recherche par nom ; lancé
+  depuis la page (`/api/structures-align/*`) ou en cron. Onglet **Identifiants** de la fiche structure refait sur ce
+  modèle. Routes `/api/v1/structures/alignment`, `/api/v1/structures/<id>/identifiers`, et
+  `/api/v1/structures/identifiers` (identifiants confirmés de toutes les structures, lisible par jeton de service pour
+  le back-end bibliométrique). Sur un déploiement multi-établissements, le provisionnement d'un tenant met en file un
+  job `structures.align` : les identifiants de ses laboratoires découlent du RNSR saisi au portail. Druid-internal
+  `docs/plan-druid-saas.md`, lot 4.
+
+### Migration
+- `20261021140000_structure_identifiers.sql` : tables `structure_identifier`, `structure_alignment_candidate`,
+  `structure_alignment_search`, reprise des identifiants déjà saisis (source `migration`). Puis
+  `node scripts/.build/align_structures.cjs --mode=search` pour une première passe.
 - **Déploiement multi-établissements (plan de contrôle)** : un déploiement Cloudflare qui lie la base de contrôle
   (`SAAS_HYPERDRIVE`) sert, en plus des instances déclarées au build, les **tenants** inscrits dans le schéma `saas`
   (tables `tenant`, `tenant_host`, `member`, `plan`, `magic_link`, `session`, `job`, `tenant_secret`,

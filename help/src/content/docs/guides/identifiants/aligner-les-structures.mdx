@@ -1,0 +1,76 @@
+---
+title: "Aligner les identifiants des structures"
+description: "Retrouver et vérifier les identifiants RNSR, ROR, HAL, OpenAlex, IdRef et Wikidata des laboratoires et des équipes."
+sidebar:
+  order: 2
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Services centraux, administrateurs Druid"
+	menu="Outils d'alignement › Alignement des identifiants chercheurs › onglet Structures"
+	disponibilite="instances sur PostgreSQL ; la relance des recherches depuis Druid dépend de l'instance"
+/>
+
+Un laboratoire a une dizaine d'identifiants et aucun registre ne les relie tous : le **RNSR** pour le
+BSO et scanR, le **ROR** pour les collaborations, la **structure HAL** et la **collection HAL** pour
+les dépôts, l'**institution OpenAlex** pour le corpus, l'**IdRef** pour l'ABES et SoVisu+, **Wikidata**
+pour le reste. L'onglet **Structures** de la page d'alignement les réunit : **une ligne par
+laboratoire ou équipe, une colonne par identifiant**.
+
+## Ce que fait la recherche
+
+1. **Les passerelles d'abord.** À partir de chaque identifiant déjà confirmé, Druid lit la notice et en
+   déduit les autres : la notice HAL d'un labo porte souvent son RNSR, son ROR et son IdRef ; la notice
+   ROR porte le Wikidata ; OpenAlex connaît le ROR. Une valeur atteinte par deux chemins indépendants,
+   ou dont la notice porte le sigle ou le numéro d'unité, est un **candidat fort**.
+2. **La recherche ensuite**, pour les types encore vides : par nom, sigle, numéro d'unité (« UMR
+   6004 »), ville et tutelles. Chaque candidat reçoit un score ; une université proposée pour un
+   labo, ou une notice fermée, est pénalisée.
+3. **La vérification** (« Vérifier les existants ») relit les notices des identifiants confirmés :
+   une notice disparue, fermée ou qui contredit un autre identifiant devient un **conflit**.
+
+## Étapes
+
+### 1. Lancer une recherche
+
+1. Ouvrez **Outils d'alignement › Alignement des identifiants chercheurs** et cliquez sur
+   **Structures** en haut à droite.
+2. Cliquez sur **Trouver les identifiants manquants**. La recherche ne reprend que les structures
+   jamais cherchées ; **Rechercher cette structure à nouveau** dans le détail d'une ligne force une
+   structure.
+3. Sur une instance sans travaux serveur (Cloudflare), les candidats sont calculés par un job
+   externe : l'onglet sert alors à les revoir.
+
+### 2. Lire les pastilles
+
+- **candidat fort** : une seule valeur sûre. Cochez la case pour l'accepter.
+- **N candidats ?** : plusieurs valeurs fortes, par exemple deux notices HAL (ancienne et actuelle).
+  Ouvrez la ligne et choisissez ; plusieurs notices HAL ou OpenAlex peuvent être confirmées ensemble.
+- **N à revoir** : des candidats moyens, à lire avant de décider.
+- **conflit** : l'identifiant confirmé est contredit par une passerelle, ou sa notice a disparu.
+- **confirmé** : rien à faire. **non trouvé** : cherché, rien de probant. **·** : jamais cherché.
+
+### 3. Décider
+
+1. **Cocher tous les candidats forts** puis **Confirmer** valide en masse ; c'est le gros du volume.
+2. Dans le détail d'une cellule, chaque candidat montre sa notice (lien), son sigle, son numéro
+   d'unité, sa ville, ses tutelles, son nombre de travaux (OpenAlex) et les passerelles qui l'ont
+   atteint. **Refuser** écarte un candidat avec un motif : il ne sera plus jamais proposé.
+3. **Saisir** une valeur à la main (identifiant ou URL) quand vous la connaissez.
+4. Les valeurs confirmées sont celles que lisent les exports (SoVisu+) et le tableau de bord
+   bibliométrique ; pour les types multivalués, la valeur **principale** est celle moissonnée.
+
+## Dans la fiche structure
+
+L'onglet **Identifiants & liens** de la fiche liste les identifiants confirmés, leur source
+(saisie, import, alignement), la date de la dernière vérification et un lien vers chaque notice.
+On peut y ajouter, retirer ou changer la valeur principale ; les candidats, eux, se décident sur la
+page d'alignement.
+
+## Pour aller plus loin
+
+- [Aligner les identifiants d'un labo](/guides/identifiants/aligner-les-identifiants/) pour les
+  personnes.
+- [Accepter ou rejeter un candidat](/guides/identifiants/accepter-rejeter-candidat/).

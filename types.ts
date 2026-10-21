@@ -326,7 +326,8 @@ export interface Structure {
   rorId?: string;             // Research Organization Registry
   halCollectionUrl?: string;  // Link to the HAL portal (V2: hal_collection)
   identifiers: {
-    halStructIds?: string[];  // HAL structure IDs
+    halStructIds?: string[];  // HAL structure IDs (V2: hal_struct_ids, projected from structure_identifier)
+    openalexIds?: string[];   // OpenAlex institution ids (V2: openalex_ids, projected from structure_identifier)
     idrefId?: string;
     scopusId?: string;
     uai?: string;             // UAI code (V2: uai)

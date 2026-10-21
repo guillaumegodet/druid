@@ -317,7 +317,9 @@ export function mapStructureRecords(records: GristRecord[]): Structure[] {
       rorId: String(fields['ror'] || ''),
       halCollectionUrl: fields['hal_collection'] || '',
       identifiers: {
-        halStructIds: [],
+        // Projections of structure_identifier (druid-internal docs/plan-druid-saas.md, lot 4 a), pipe-separated.
+        halStructIds: String(fields['hal_struct_ids'] || '').split('|').map((v: string) => v.trim()).filter(Boolean),
+        openalexIds: String(fields['openalex_ids'] || '').split('|').map((v: string) => v.trim()).filter(Boolean),
         // `idref` column (PPN of the corporate body record, created on 2026-09-11 for
         // l'export ABES — docs/plan-export-abes-idref.md, lot 0).
         idrefId: String(fields['idref'] || ''),

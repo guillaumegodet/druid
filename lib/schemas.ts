@@ -144,6 +144,7 @@ export const LineageLinkSchema = z.object({
 
 export const StructureIdentifiersSchema = z.object({
   halStructIds: z.array(z.string()).default([]),
+  openalexIds: z.array(z.string()).default([]),
   idrefId: z.string().optional().nullable(),
   scopusId: z.string().optional().nullable(),
   uai: z.string().optional().nullable(),
