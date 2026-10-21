@@ -163,5 +163,8 @@ to the database (never a Worker: it spawns dbmate): it claims the queued jobs (`
 `tenant.provision`, migrates the schema, seeds the establishment and the structures through the directory commands,
 creates the route `<host>/*` of the Worker through the Cloudflare API (`SAAS_CF_API_TOKEN`, `SAAS_CF_ZONE_ID`,
 `SAAS_WORKER_NAME`; skipped when unset), sets the tenant active and sends the « ready » e-mail (`RESEND_API_KEY`).
-`--once` processes the queue and exits (CI, cron); without it, polls every 10 s. The other job types (alignments, ETL)
-come with lot 3.
+`--once` processes the queue and exits (CI, cron); without it, polls every 10 s. Provisioning then queues a
+`structures.align` job (lot 4): the identifiers of the seeded labs (HAL, ROR, OpenAlex, IdRef, Wikidata, HAL collection)
+are derived from their RNSR through the open registries (`OPENALEX_API_KEY` or `OPENALEX_MAILTO` for OpenAlex), and
+reviewed on the Structures tab of the alignment page of the tenant. The other job types (people alignments, ETL) come
+with lot 3.

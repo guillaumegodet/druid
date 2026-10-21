@@ -6,6 +6,7 @@
 //   SAAS_BASE_DOMAIN=dirladata.fr          host of a new tenant = <slug>.<base>
 //   SAAS_CF_API_TOKEN, SAAS_CF_ZONE_ID, SAAS_WORKER_NAME   route <host>/* → the Worker (skipped when unset)
 //   RESEND_API_KEY, EMAIL_FROM             « your Druid is ready » e-mail (skipped when unset)
+//   OPENALEX_API_KEY | OPENALEX_MAILTO      OpenAlex calls of the structure alignment (structures.align)
 //   node scripts/.build/saas_runner.cjs [--once] [--interval 10]
 import { openSaasDb } from '../../lib/saas/tenantDb';
 import { runForever, runJobsOnce, type RunnerEnv } from '../../lib/saas/runner';
@@ -26,6 +27,7 @@ const main = async (): Promise<void> => {
   const env: RunnerEnv = {
     ownerUrl, appUrl: process.env.DATABASE_URL_APP || ownerUrl, baseDomain, cloudflare: cf,
     email: process.env.RESEND_API_KEY ? { RESEND_API_KEY: process.env.RESEND_API_KEY, EMAIL_FROM: process.env.EMAIL_FROM } : null,
+    openalexApiKey: process.env.OPENALEX_API_KEY || null, openalexMailto: process.env.OPENALEX_MAILTO || null,
     log: (l) => console.log(`[saas-runner] ${new Date().toISOString()} ${l}`),
   };
   const saas = openSaasDb(ownerUrl);

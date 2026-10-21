@@ -26,7 +26,9 @@ données à exécuter au déploiement).
   depuis la page (`/api/structures-align/*`) ou en cron. Onglet **Identifiants** de la fiche structure refait sur ce
   modèle. Routes `/api/v1/structures/alignment`, `/api/v1/structures/<id>/identifiers`, et
   `/api/v1/structures/identifiers` (identifiants confirmés de toutes les structures, lisible par jeton de service pour
-  le back-end bibliométrique). Druid-internal `docs/plan-druid-saas.md`, lot 4.
+  le back-end bibliométrique). Sur un déploiement multi-établissements, le provisionnement d'un tenant met en file un
+  job `structures.align` : les identifiants de ses laboratoires découlent du RNSR saisi au portail. Druid-internal
+  `docs/plan-druid-saas.md`, lot 4.
 
 ### Migration
 - `20261021140000_structure_identifiers.sql` : tables `structure_identifier`, `structure_alignment_candidate`,
