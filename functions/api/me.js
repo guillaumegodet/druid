@@ -23,7 +23,10 @@
 // auth.ts (frontend) redirects to /auth/login when /api/me is not OK:
 // so we always answer 200 here; access control happens at the edge (Access).
 
+import { accessForMember, capabilitiesForTenant, countMembers, publicTenantInfo } from '../../lib/saas/controlPlane.ts';
+import { identityOf, memberOf } from '../_lib/identity.js';
 import { instanceOf, parseAdminEmails, publicInstanceInfo, resolveInstance } from '../_lib/instance.js';
+import { json, withSaasDb } from '../_lib/saas.js';
 
 export { parseAdminEmails };
 
@@ -80,10 +83,33 @@ export const buildUser = (email, adminEmails, capabilities = CAPABILITIES, insta
     : { name: instance.label, email: '', preferred_username: instance.slug, roles, access, capabilities, instance: info, anonymous: true };
 };
 
+/**
+ * Tenant of the control plane (druid-internal docs/plan-druid-saas.md, lot 1 e): the session decides. Without one, 401
+ * — the front then goes to /auth/login (functions/auth/login.js); a session of a non-member is 403. Rights come from
+ * the member row (lib/saas/controlPlane.ts accessForMember), capabilities from the plan and the tenant's overrides;
+ * `auth: 'session'` makes the front send every later 401 back to the login.
+ */
+const tenantUser = async (context, instance) => {
+  const email = identityOf(context);
+  if (!email) return json(401, { error: 'Authentication required', login: '/auth/login' });
+  const member = memberOf(context);
+  if (!member) return json(403, { error: 'This account is not a member of this Druid' });
+  const { roles, access } = accessForMember(member, instance.readOnly);
+  const capabilities = capabilitiesForTenant({ ...CAPABILITIES, HAS_STATUS_VALIDATION: instance.statusValidation }, instance.tenant.plan, { settings: instance.tenant.settings, status: instance.tenant.status });
+  capabilities.READ_ONLY = instance.readOnly;
+  const members = await withSaasDb(context.env, (db) => countMembers(db, instance.tenant.id)).catch(() => 0);
+  const tenantRow = { slug: instance.tenant.slug, status: instance.tenant.status, mail_domains: instance.tenant.mailDomains };
+  return json(200, {
+    name: email, email, preferred_username: email, roles, access, capabilities,
+    instance: publicInstanceInfo(instance), tenant: publicTenantInfo(tenantRow, instance.tenant.plan, members), auth: 'session',
+  });
+};
+
 export async function onRequest(context) {
   const { request } = context;
-  const email = request.headers.get('Cf-Access-Authenticated-User-Email');
   const instance = instanceOf(context);
+  if (instance.tenant) return tenantUser(context, instance);
+  const email = request.headers.get('Cf-Access-Authenticated-User-Email');
   // Read-only instance: nobody is admin (the Administration section only holds write tools).
   const adminEmails = instance.readOnly ? [] : instance.admins;
   const user = buildUser(email, adminEmails, capabilitiesFor(instance), instance);

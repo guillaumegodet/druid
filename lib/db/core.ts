@@ -21,13 +21,20 @@ export interface DbOptions {
   max?: number;
   /** A job: its process may end while idle connections remain (they no longer keep it alive). */
   allowExitOnIdle?: boolean;
+  /**
+   * PostgreSQL schema holding the tables (multi-tenant deployment, druid-internal docs/plan-druid-saas.md, lot 1 b: one
+   * schema per tenant). Every query names its tables `<schema>.<table>` (Kysely withSchema): no `search_path` to set,
+   * which a pooled connection (Hyperdrive) would not keep anyway. Absent = the default search path (`public`).
+   */
+  schema?: string;
 }
 
-export const createDbWith = (driver: PgDriver, { connectionString, max = 5, allowExitOnIdle = false }: DbOptions): Db => {
+export const createDbWith = <T = DB>(driver: PgDriver, { connectionString, max = 5, allowExitOnIdle = false, schema }: DbOptions): Kysely<T> => {
   const getTypeParser = (oid: number, format?: any) => (oid === DATE_OID ? (v: string) => v : driver.types.getTypeParser(oid, format));
-  return new Kysely<DB>({
+  const db = new Kysely<T>({
     dialect: new PostgresDialect({ pool: new driver.Pool({ connectionString, max, allowExitOnIdle, types: { getTypeParser } }) }),
   });
+  return schema ? db.withSchema(schema) : db;
 };
 
 /**

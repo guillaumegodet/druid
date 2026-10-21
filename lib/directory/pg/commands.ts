@@ -398,9 +398,14 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       return valid.length;
     }),
 
-    createStructure: (structure, ctx) => writing(ctx, async (trx) => {
+    // The repository reads of these three commands happen BEFORE the transaction: the repository queries the pool,
+    // and a runtime with one connection per request (Cloudflare Functions, pool of 1) would wait for it forever while
+    // the transaction holds that connection.
+    createStructure: async (structure, ctx) => {
       // Uniqueness checked against every structure (the browser only knew the ones it could see).
-      const fields = structureCreateFields(structure, (await repository.structures()).items, todayIso());
+      const all = (await repository.structures()).items;
+      return writing(ctx, async (trx) => {
+      const fields = structureCreateFields(structure, all, todayIso());
       assertStructureLabels(ctx.scope, [fields['short_labels']]);
       const id = await insertStructure(trx, fields);
       ctx.audit({ table: 'Structures', kind: 'create', rows: [id], count: 1 });
@@ -408,7 +413,8 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       const linked = await linkTeamLabels(trx, id);
       if (linked.length) ctx.audit({ table: 'Annuaire', kind: 'update', rows: linked, fields: ['team'], count: linked.length });
       return { id: `S-${id}` };
-    }),
+      });
+    },
 
     updateStructure: (recordId, structure, ctx) => writing(ctx, async (trx) => {
       if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist identifiers');
@@ -424,27 +430,32 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     }),
 
     // ── Employing institutions (`establishment`): institution right only; the audit trigger logs the row ──
-    createInstitution: (input, ctx) => writing(ctx, async (trx) => {
+    createInstitution: async (input, ctx) => {
       if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
-      const f = prepareInstitutionWrite(input, (await repository.institutions()).items);
+      const existing = (await repository.institutions()).items;
+      return writing(ctx, async (trx) => {
+      const f = prepareInstitutionWrite(input, existing);
       const { id } = await trx.insertInto('establishment')
         .values({ name: f.name, label: orNull(f.label), uai: orNull(f.uai), ror: orNull(f.ror), idref: orNull(f.idref) })
         .returning('id').executeTakeFirstOrThrow();
       ctx.audit({ table: 'Etablissements', kind: 'create', rows: [Number(id)], fields: ['Employeur', 'Libelle', 'UAI', 'ROR', 'idref'], count: 1 });
       return { id: Number(id) };
-    }),
+      });
+    },
 
-    updateInstitution: (recordId, input, ctx) => writing(ctx, async (trx) => {
+    updateInstitution: async (recordId, input, ctx) => {
       if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
       if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist identifiers');
       const existing = (await repository.institutions()).items;
       if (!existing.some((e) => e.id === recordId)) throw new ApiError(404, `Institution not found: ${recordId}`);
+      return writing(ctx, async (trx) => {
       const f = prepareInstitutionWrite(input, existing, recordId);
       await trx.updateTable('establishment')
         .set({ name: f.name, label: orNull(f.label), uai: orNull(f.uai), ror: orNull(f.ror), idref: orNull(f.idref), updated_at: sql`now()` })
         .where('id', '=', String(recordId)).execute();
       ctx.audit({ table: 'Etablissements', kind: 'update', rows: [recordId], fields: ['Employeur', 'Libelle', 'UAI', 'ROR', 'idref'], count: 1 });
-    }),
+      });
+    },
 
     /**
      * Qualifies a group of rows sharing a uid: `concomitant` → the chosen row PRINCIPAL, the others SECONDAIRE;

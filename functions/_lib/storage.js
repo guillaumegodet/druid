@@ -22,6 +22,7 @@ import { createGristDirectoryRepository, createGristReader } from '../../lib/dir
 import { createGristPublicationsStore } from '../../lib/publications/store.ts';
 import { instanceAssetPath } from './instanceAssets.js';
 import { HYPERDRIVE_BINDING, instanceOf, secretOf } from './instance.js';
+import { tenantConnectionString } from './saas.js';
 
 const gristStores = new Map();
 
@@ -75,12 +76,14 @@ const gristStorage = (context, instance) => {
 };
 
 const pgStorage = (context, instance) => {
-  const binding = secretOf(context.env, instance, HYPERDRIVE_BINDING);
+  // A tenant of the control plane (druid-internal docs/plan-druid-saas.md, lot 1 b): its schema of the shared database,
+  // every query qualified by the schema (lib/db/core.ts) — the binding of the control plane, no per-instance binding.
+  const binding = instance.tenant ? tenantConnectionString(context.env) : secretOf(context.env, instance, HYPERDRIVE_BINDING);
   const connectionString = binding && typeof binding === 'object' ? binding.connectionString : (typeof binding === 'string' ? binding : '');
   if (!connectionString) {
-    return { instance, apiKey: undefined, store: null, missing: 'HYPERDRIVE binding not configured on Cloudflare', release: async () => {} };
+    return { instance, apiKey: undefined, store: null, missing: `${instance.tenant ? 'SAAS_HYPERDRIVE' : 'HYPERDRIVE'} binding not configured on Cloudflare`, release: async () => {} };
   }
-  const db = createDbWith(pg, { connectionString, max: 1 });
+  const db = createDbWith(pg, { connectionString, max: 1, schema: instance.tenant ? instance.tenant.schema : undefined });
   const store = createPgStorage({
     db, tablesActor: 'cloudflare', align: { caches: alignCachesOf(context, instance), texts: tokenAlignTexts, hasQualinka: false },
   });

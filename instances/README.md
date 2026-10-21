@@ -119,3 +119,28 @@ they answer 404 unless `features.news` / `features.newsletter` is true in `insta
 
 A `DRUID_INSTANCE` without a matching `instances/<slug>/` folder fails the build on purpose, so
 a typo cannot silently deploy a site without data.
+
+## Control plane: tenants resolved at run time (multi-tenant deployment)
+
+A shared deployment that binds the control-plane database as **`SAAS_HYPERDRIVE`** (Hyperdrive, druid-internal
+docs/plan-druid-saas.md, lot 1) serves, besides the instances of the registry above, the **tenants** of the `saas` schema
+of that database (`db/saas/migrations`, `npm run db:saas:migrate`): `tenant` (slug, label, plan, status, settings),
+`tenant_host` (host → tenant), `member` (accounts and roles), `plan`, `magic_link`, `session`, `job`, `tenant_secret`.
+Every tenant has its own PostgreSQL schema (`t_<slug>`) on the same database, migrated from `db/migrations` by
+`scripts/saas/tenant_db.ts` (`npm run build:saas` → `scripts/.build/tenant_db.cjs`: `create`, `migrate-all`, `list`,
+`drop`), and every query of the Functions is qualified by that schema (`lib/db/core.ts`, option `schema`) — no
+`search_path`, which a pooled connection would not keep.
+
+- Host resolution (`functions/api/_middleware.js`, `functions/_lib/saas.js`): the hosts the registry **declares** first
+  (demos), then `tenant_host`; cached per isolate (60 s) and in the optional KV namespace **`SAAS_REGISTRY`** (5 min). On
+  such a deployment a missing or single-instance registry serves no host by itself.
+- Identity: a session cookie (`druid_session`) opened by a **magic link** — `/auth/login` (page), `POST /api/auth/request`
+  (members only, 5 links per address and quarter of an hour, e-mail through Resend: secrets `RESEND_API_KEY`,
+  `EMAIL_FROM`; `SAAS_DEV_LINKS=true` returns the link instead, local runs only), `GET`/`POST /api/auth/verify`,
+  `/auth/logout`. The cookie of one tenant opens nothing on another; the Cloudflare Access header is ignored on a tenant.
+- Rights: the member row (`owner` = super administrator, `admin`, `viewer` = read only, `lab` = labs of `lab_scope`);
+  capabilities: the structural ones of this runtime, then `plan.capabilities`, then `tenant.settings.capabilities`;
+  a tenant that is not `active` is read-only. `/api/me` adds a `tenant` block (plan, seats, members, mail domains) and
+  `auth: 'session'`.
+- Secrets of a tenant (LLM, Elsevier…) will live encrypted in `tenant_secret` (lot 6); the per-instance secrets
+  `<NAME>__<SLUG>` of the registry do not apply to tenants.

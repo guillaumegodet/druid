@@ -12,6 +12,28 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Déploiement multi-établissements (plan de contrôle)** : un déploiement Cloudflare qui lie la base de contrôle
+  (`SAAS_HYPERDRIVE`) sert, en plus des instances déclarées au build, les **tenants** inscrits dans le schéma `saas`
+  (tables `tenant`, `tenant_host`, `member`, `plan`, `magic_link`, `session`, `job`, `tenant_secret`,
+  `db/saas/migrations`) : chaque établissement a son propre schéma PostgreSQL (`t_<slug>`, migré depuis
+  `db/migrations` par `scripts/saas/tenant_db.ts` — `create`, `migrate-all`, `list`, `drop`), résolu à l'exécution par
+  le nom d'hôte, sans build. Connexion par **lien magique** (`/auth/login`, `/api/auth/request`, `/api/auth/verify`,
+  `/auth/logout`, e-mail Resend), session par cookie propre au tenant ; droits d'après le rôle du membre
+  (`owner`, `admin`, `viewer`, `lab`), capacités d'après le plan (`trial`, `team`, `complete`) et les réglages du tenant ;
+  `/api/me` renvoie un bloc `tenant`. Isolation vérifiée par les tests d'intégration (`saasTenants`, `saasFunctions`).
+  Druid-internal `docs/plan-druid-saas.md`, lot 1 a-c et e.
+
+### Corrigé
+- **Création d'une structure ou d'un établissement employeur sur une instance Cloudflare PostgreSQL** : la commande
+  lisait le dépôt (pool de connexions) à l'intérieur de sa transaction ; avec une seule connexion par requête
+  (Hyperdrive), la requête attendait indéfiniment. Les lectures précèdent maintenant la transaction.
+
+### Migration
+- `20261021090000_audit_row_search_path_current.sql` : `audit_row()` fige son `search_path` sur celui de sa création
+  (`FROM CURRENT`, `public` sur une base mono-établissement) au lieu de `public` en dur, pour que chaque schéma de
+  tenant journalise dans son propre `audit_log`. Sans reprise de données.
+
 ## [2.14.0] — 2026-10-20
 
 ### Ajouté

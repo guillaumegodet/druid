@@ -1,7 +1,7 @@
 {
   "dialect": "postgres",
   "outFile": "lib/db/schema.gen.ts",
-  "excludePattern": "public.schema_migrations",
+  "excludePattern": "{public.schema_migrations,saas.*,t_*.*}",
   "dateParser": "string",
   "overrides": {
     "columns": {

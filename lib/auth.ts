@@ -83,8 +83,19 @@ interface UserInfo {
   instance?: InstanceInfo;
   /** Deployment environment (server DRUID_ENV): `production`, `test`… Absent on Cloudflare = production. */
   environment?: string;
-  /** `session` when the server authenticates by session cookie (server.cjs); absent on Cloudflare. */
+  /** `session` when the server authenticates by session cookie (server.cjs, tenant of a control plane). */
   auth?: 'session';
+  /** Tenant of a multi-tenant deployment (functions/api/me.js, druid-internal docs/plan-druid-saas.md): plan and
+   * seats shown by the « My establishment » page; absent elsewhere. */
+  tenant?: TenantInfo;
+}
+
+export interface TenantInfo {
+  slug: string;
+  status: 'provisioning' | 'active' | 'suspended' | 'deleted';
+  plan: { code: string; label: string; seats: number | null; historyYears: number | null; refresh: string; features: Record<string, unknown> } | null;
+  members: number;
+  mailDomains: string[];
 }
 
 const EMPTY_ACCESS: DruidAccess = { isSuperAdmin: false, isMediaAdmin: false, isLabViewer: false, annuaireLabs: [], allowedSlugs: [] };
@@ -161,6 +172,16 @@ export const getEnvironment = (): string => _userInfo?.environment || 'productio
 export const isProductionEnvironment = (): boolean => getEnvironment() === 'production';
 
 export const getRoles = (): string[] => _userInfo?.roles ?? [];
+
+/** Tenant of the current deployment (null outside a control plane). */
+export const getTenantInfo = (): TenantInfo | null => _userInfo?.tenant ?? null;
+
+/** Feature locked by the plan of the tenant (`plan.features.locked`, e.g. `reports`, `media`): the front shows the
+ * entry with its upgrade note instead of hiding it. Never locked outside a tenant. */
+export const isLockedByPlan = (feature: string): boolean => {
+  const locked = getTenantInfo()?.plan?.features?.locked;
+  return Array.isArray(locked) && locked.includes(feature);
+};
 
 export const hasRole = (role: string): boolean => getRoles().includes(role);
 

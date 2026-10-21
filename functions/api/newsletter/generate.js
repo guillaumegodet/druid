@@ -22,6 +22,7 @@
 //   ILAAS_MODEL     (var, opt) — default mistral-small-4-119b
 
 import { instanceEnv, instanceOf } from '../../_lib/instance.js'
+import { identityOf } from '../../_lib/identity.js'
 import { withStorage } from '../../_lib/storage.js'
 
 // OpenAlex polite-pool contact: openalexMailto of instance.json (or OPENALEX_MAILTO) overrides this service address.
@@ -187,7 +188,7 @@ export async function onRequestPost(context) {
 }
 
 async function generate(context, { instance, env, slug, struct, days, limit, chars }, { tables, publications }) {
-  const actor = context.request.headers.get('Cf-Access-Authenticated-User-Email') || undefined
+  const actor = identityOf(context) || undefined
   try {
     // 1. Briefs already stored (any status) → a work_id is never regenerated.
     const existing = await publications.newsletterWorkIds(slug)

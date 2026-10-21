@@ -20,6 +20,10 @@ if (!fs.existsSync(GENERATED)) {
   process.exit(1);
 }
 
+// The driver bundle of the Functions (functions/_generated/pg.js, written by a Cloudflare build), imported by the
+// middleware since the control plane (functions/_lib/saas.js): built when absent.
+const PG_BUNDLE = new URL('../../functions/_generated/pg.js', import.meta.url);
+if (!fs.existsSync(PG_BUNDLE)) await createRequire(import.meta.url)('../functions_pg_bundle.cjs').buildFunctionsPg();
 const { buildUser, parseAdminEmails, capabilitiesFor, onRequest: me } = await import('../../functions/api/me.js');
 const { resolveInstance, resolveForHost, publicInstanceInfo, secretOf, secretSuffix, instanceEnv } = await import('../../functions/_lib/instance.js');
 const { onRequest: middleware } = await import('../../functions/api/_middleware.js');
