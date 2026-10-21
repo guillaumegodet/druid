@@ -10,7 +10,7 @@ import { spawn } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import pg from 'pg';
-import { createDbWith } from '../db/core';
+import { createDbWith, pgConnectionOptions } from '../db/core';
 import { SAAS_SCHEMA, tenantSchemaName, type SaasDb, type TenantStatus } from './controlPlane';
 
 export interface TenantDbOptions {
@@ -58,7 +58,7 @@ export const migrateTenantSchema = async (schema: string, opts: TenantDbOptions)
   const log = opts.log || (() => {});
   const appRole = opts.appRole ?? 'druid_app';
   const migrationsDir = opts.migrationsDir || path.join(process.cwd(), 'db', 'migrations');
-  const client = new pg.Client({ connectionString: opts.ownerUrl });
+  const client = new pg.Client(pgConnectionOptions(opts.ownerUrl));
   await client.connect();
   try {
     await client.query(`CREATE SCHEMA IF NOT EXISTS ${ident(schema)}`);
@@ -79,7 +79,7 @@ export const migrateTenantSchema = async (schema: string, opts: TenantDbOptions)
     ['-u', urlWithSearchPath(opts.ownerUrl, schema), '--migrations-dir', migrationsDir, '--no-dump-schema', 'up'], log);
   // Functions created before 20261021090000 pinned `search_path = public`: make sure every trigger function of the
   // schema resolves its tables in the schema (idempotent; the migration above already does it for audit_row).
-  const client2 = new pg.Client({ connectionString: opts.ownerUrl });
+  const client2 = new pg.Client(pgConnectionOptions(opts.ownerUrl));
   await client2.connect();
   try {
     const fns = await client2.query<{ name: string }>(
@@ -103,7 +103,7 @@ export const migrateControlPlane = async (opts: TenantDbOptions): Promise<void> 
 /** Drops the schema of a tenant and everything in it. The caller has checked the tenant row (status deleted). */
 export const dropTenantSchema = async (schema: string, opts: Pick<TenantDbOptions, 'ownerUrl'>): Promise<void> => {
   if (!schema.startsWith('t_')) throw new Error(`refusing to drop "${schema}": not a tenant schema`);
-  const client = new pg.Client({ connectionString: opts.ownerUrl });
+  const client = new pg.Client(pgConnectionOptions(opts.ownerUrl));
   await client.connect();
   try {
     await client.query(`DROP SCHEMA IF EXISTS ${ident(schema)} CASCADE`);

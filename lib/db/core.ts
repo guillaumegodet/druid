@@ -29,10 +29,26 @@ export interface DbOptions {
   schema?: string;
 }
 
+/**
+ * node-postgres options of a connection string, with the meaning libpq gives to `sslmode`: `require` (and `prefer`) =
+ * TLS without verification of the server certificate (a managed database with a self-signed certificate, Clever Cloud),
+ * `disable` = no TLS; the verifying modes, a `sslrootcert` or an explicit `uselibpqcompat` are left to the driver. pg 8
+ * reads `require` as `verify-full` (and pg 9 will change it again), so the parameter is taken out of the string and
+ * `ssl` set explicitly. The same string goes untouched to dbmate (lib/pq), which already follows libpq.
+ */
+export const pgConnectionOptions = (connectionString: string): { connectionString: string; ssl?: false | { rejectUnauthorized: false } } => {
+  const m = /[?&]sslmode=([^&#]*)/.exec(connectionString);
+  if (!m || /[?&](sslrootcert|uselibpqcompat)=/.test(connectionString)) return { connectionString };
+  const mode = decodeURIComponent(m[1]);
+  if (mode !== 'require' && mode !== 'prefer' && mode !== 'disable') return { connectionString };
+  const stripped = connectionString.replace(m[0], m[0].startsWith('?') ? '?' : '').replace('?&', '?').replace(/[?&]$/, '');
+  return { connectionString: stripped, ssl: mode === 'disable' ? false : { rejectUnauthorized: false } };
+};
+
 export const createDbWith = <T = DB>(driver: PgDriver, { connectionString, max = 5, allowExitOnIdle = false, schema }: DbOptions): Kysely<T> => {
   const getTypeParser = (oid: number, format?: any) => (oid === DATE_OID ? (v: string) => v : driver.types.getTypeParser(oid, format));
   const db = new Kysely<T>({
-    dialect: new PostgresDialect({ pool: new driver.Pool({ connectionString, max, allowExitOnIdle, types: { getTypeParser } }) }),
+    dialect: new PostgresDialect({ pool: new driver.Pool({ ...pgConnectionOptions(connectionString), max, allowExitOnIdle, types: { getTypeParser } }) }),
   });
   return schema ? db.withSchema(schema) : db;
 };

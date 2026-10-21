@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **`sslmode=require` sur une base managée** : node-postgres (serveur, runner, CLI des tenants) le lisait comme
+  `verify-full` et refusait le certificat auto-signé de Clever Cloud (« self-signed certificate ») ; `sslmode` suit
+  désormais la sémantique libpq (`require`/`prefer` = TLS sans vérification du certificat, `disable` = sans TLS,
+  modes vérifiants inchangés), comme dbmate.
+
 ### Ajouté
 - **Runner de jobs du SaaS** (druid-internal `docs/plan-druid-saas.md`, lot 3) : sur un déploiement multi-tenant,
   les alignements des personnes (`people.align` : scripts `sync_*.cjs` lancés par le runner sur le schéma du tenant,
