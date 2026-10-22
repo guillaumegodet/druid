@@ -73,7 +73,7 @@ check('public repository: a Grist instance still needs a public doc', publicRepo
   const r = parseInstanceConfig(publicDemo(), { folder: 'demo' });
   check('public demo is valid', r.ok, true);
   check('defaults: Grist API base', r.config.grist.apiBase, DEFAULT_GRIST_API_BASE);
-  check('defaults: features off', r.config.features, { news: false, newsletter: false });
+  check('defaults: features off', r.config.features, { news: false, newsletter: false, network: false });
   check('defaults: no admins, no secrets, no mailto, no deployment', [r.config.admins, r.config.secrets, r.config.openalexMailto, r.config.deployment], [[], [], null, null]);
   check('public demo passes the public rules', publicRepoErrors(publicDemo()), []);
 }
@@ -111,6 +111,8 @@ check('deployment accepted on Cloudflare', parseInstanceConfig({ ...publicDemo()
 check('deployment must be a Pages project name', rejects({ ...publicDemo(), deployment: 'Druid SaaS' }, 'deployment'), true);
 check('deployment only on Cloudflare', rejects({ ...docker(), deployment: 'druid-saas' }, 'deployment only exists'), true);
 check('news only on Cloudflare', rejects({ ...docker(), features: { news: true, newsletter: false } }, 'news/newsletter'), true);
+check('network feature only on Cloudflare', rejects({ ...docker(), features: { network: true } }, 'news/newsletter/network'), true);
+check('network feature accepted on a public demo', parseInstanceConfig({ ...publicDemo(), features: { network: true } }).config.features, { news: false, newsletter: false, network: true });
 
 // ── public repository rules ──────────────────────────────────────────────────
 check('public repo: writable instance refused', publicRepoErrors(privateCloudflare()).length > 0, true);

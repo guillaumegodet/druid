@@ -68,7 +68,10 @@ const instanceSchema = z.strictObject({
     // /api/news/* and /api/newsletter/* hold the structures and staff filters of the instance.
     news: z.boolean().default(false),
     newsletter: z.boolean().default(false),
-  }).default({ news: false, newsletter: false }),
+    // dashboard-data/network.json of the instance (university-wide co-authorship network): « Réseau » tab in inter-lab
+    // mode, researcher pairs, suggested connections (functions/api/network/[[path]].js, capability HAS_NETWORK_API).
+    network: z.boolean().default(false),
+  }).default({ news: false, newsletter: false, network: false }),
   // Administrators by e-mail (Cloudflare Access identity). Keycloak instances manage them in Keycloak.
   admins: z.array(z.email()).default([]),
   // OpenAlex polite-pool contact; null = the default address of the code.
@@ -103,7 +106,7 @@ const crossFieldErrors = (c) => {
     if (c.grist?.extraDocIds.length) errors.push('grist.extraDocIds is not supported on target "cloudflare" (the proxy serves one doc)');
   }
   if (c.grist && !c.grist.publicRead && !c.secrets.includes('GRIST_API_KEY')) errors.push('a doc without publicRead needs the GRIST_API_KEY secret');
-  if ((c.features.news || c.features.newsletter) && c.target !== 'cloudflare') errors.push('features news/newsletter only exist on target "cloudflare"');
+  if ((c.features.news || c.features.newsletter || c.features.network) && c.target !== 'cloudflare') errors.push('features news/newsletter/network only exist on target "cloudflare"');
   if (c.deployment && c.target !== 'cloudflare') errors.push('deployment only exists on target "cloudflare"');
   return errors;
 };

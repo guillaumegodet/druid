@@ -14,7 +14,8 @@
   },
   "features": {
     "news": false,
-    "newsletter": false
+    "newsletter": false,
+    "network": true
   },
   "admins": [],
   "openalexMailto": null,

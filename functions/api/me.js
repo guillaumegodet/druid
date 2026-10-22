@@ -45,7 +45,8 @@ export const CAPABILITIES = {
   HAS_SOVISU_EXPORT: false,
   HAS_SERVER_JOBS: false,
   HAS_BENCHMARK: false,
-  // Inter-lab « Réseau » (/api/network of server.cjs, reads druid-biblio's network.json): no Functions port.
+  // Inter-lab « Réseau », researcher pairs and suggested connections (functions/api/network/[[path]].js on the
+  // network.json shipped with the dashboards of the instance): `features.network` of instance.json (set below).
   HAS_NETWORK_API: false,
   HAS_QUALINKA: false,
   // Internal/external status + manual validation: irrelevant for an instance that only records
@@ -55,6 +56,10 @@ export const CAPABILITIES = {
   HAS_TASKS: false,
   // Identifiers of the structures and their alignment: PostgreSQL storage (set per instance below).
   HAS_STRUCTURE_IDS: false,
+  // Calls for proposals, theses of the records (functions/api/calls, functions/api/researchers/*): PostgreSQL storage
+  // (set per instance below). The « My project » assistant needs the LLM and embedding services of the Node server.
+  HAS_CALLS: false,
+  HAS_CALLS_CHAT: false,
   // Public read-only instance (demo): readOnly in instance.json. Not a HAS_* flag — it removes features
   // rather than adding an integration; the Grist proxy enforces it server-side.
   READ_ONLY: false,
@@ -66,6 +71,8 @@ export const capabilitiesFor = (instance) => ({
   ...CAPABILITIES,
   HAS_STATUS_VALIDATION: instance.statusValidation,
   HAS_STRUCTURE_IDS: instance.storage === 'postgres',
+  HAS_CALLS: instance.storage === 'postgres',
+  HAS_NETWORK_API: !!instance.features?.network,
   READ_ONLY: instance.readOnly,
 });
 
