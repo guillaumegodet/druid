@@ -14,6 +14,8 @@ export interface TabVisibilityInput {
   hasStaff?: boolean;
   /** Calls for proposals were imported with their matches (« Calls for proposals », docs/plan-funding-calls.md). */
   hasCalls?: boolean;
+  /** At least one publication tagged with a UN Sustainable Development Goal (sdg.ts). */
+  hasSdg?: boolean;
 }
 
 /**
@@ -28,5 +30,6 @@ export function visibleTabKeys<T extends string>(tabs: readonly T[], input: TabV
       && (key !== 'themes' || input.hasAxes)
       && (key !== 'benchmark' || input.hasBenchmark)
       && (key !== 'staff' || input.hasStaff === true)
-      && (key !== 'calls' || input.hasCalls === true)));
+      && (key !== 'calls' || input.hasCalls === true)
+      && (key !== 'sdg' || input.hasSdg === true)));
 }

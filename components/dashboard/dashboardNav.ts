@@ -19,6 +19,7 @@ export type DashboardTab =
   | 'apc'
   | 'funders'
   | 'themes'
+  | 'sdg'
   | 'benchmark'
   | 'charte'
   | 'list'
@@ -105,6 +106,7 @@ export const DASHBOARD_FAMILIES: DashboardFamilyDef[] = [
     description: msg`Strategy and compliance: strategic axes, funding, publication charges, signature charter.`,
     tabs: [
       { key: 'themes', label: msg`Strategic axes`, hint: msg`Publications matched to the strategic axes of the structure.` },
+      { key: 'sdg', label: msg`Sustainable Development Goals`, hint: msg`Publications linked to the 17 UN goals, as tagged by OpenAlex.` },
       { key: 'funders', label: msg`Funding`, hint: msg`Funders and projects cited in the publications.` },
       { key: 'calls', label: msg`Calls for proposals`, hint: msg`Calls of the funding programmes (Horizon Europe, ANR…) and the researchers whose publications relate to them.` },
       { key: 'apc', label: msg`APC monitoring`, hint: msg`Article processing charges paid and publisher agreements.` },

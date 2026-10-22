@@ -13,6 +13,15 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Vue « Objectifs de développement durable »** (famille Pilotage, après les axes stratégiques ; druid-internal
+  `docs/plan-odd-sdg.md`, lot 1) : les 17 ODD de l'ONU qu'OpenAlex attribue à chaque publication (champ
+  `sustainable_development_goals`, exporté par druid-biblio depuis le 2026-10-22 sous `sdgs[]`). Chiffres clés
+  (publications avec un ODD, ODD couverts, ODD principal, ODD par publication), répartition par ODD aux couleurs
+  officielles, évolution annuelle et part étiquetée par année, ODD par labo ou équipe (effectifs ou parts), tableau
+  accès ouvert / FWCI / top 10 % / international par ODD, case « hors ODD 3 ». Rebonds vers la liste des publications
+  (nouveau filtre « Objectif de développement durable » : un ODD, avec / sans ODD ; colonne `sdgs` du CSV), quatre
+  graphiques dans les intégrations et dans « Mes rapports » (`sdg-repartition`, `sdg-evolution`, `sdg-couverture`,
+  `sdg-equipes`). La vue reste masquée tant que l'export de la structure ne porte aucun ODD.
 - **Portail SaaS : bouton « Réessayer »** sur la page de construction quand le provisionnement d'un tenant a échoué
   (`POST /start/api/tenants/:slug/retry`, propriétaire seulement, refusé si une construction est déjà en file ou en
   cours) ; le seed de l'annuaire tolère une reprise (établissement déjà créé conservé).

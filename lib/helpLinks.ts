@@ -47,6 +47,7 @@ export const DASHBOARD_TAB_HELP: Record<DashboardTab, string> = {
   funders: '/donnees/indicateurs/',
   calls: '/guides/tableau-de-bord/appels-a-projets/',
   themes: '/donnees/indicateurs/',
+  sdg: '/donnees/indicateurs/',
   benchmark: '/donnees/indicateurs/',
   charte: '/donnees/publications-attribution/#charte-de-signature',
   teams: '/donnees/publications-attribution/#comment-les-auteurs-sont-reconnus',

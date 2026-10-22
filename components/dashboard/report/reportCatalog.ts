@@ -83,6 +83,11 @@ export const REPORT_SECTIONS: ReportSection[] = [
     ids: ['axes-repartition', 'axes-barres', 'axes-evolution', 'axes-types', 'axes-equipes'],
   },
   {
+    tab: 'sdg',
+    title: msg`Sustainable Development Goals`,
+    ids: ['sdg-repartition', 'sdg-evolution', 'sdg-couverture', 'sdg-equipes'],
+  },
+  {
     tab: 'charte',
     title: msg`Signature charter`,
     ids: ['charte-conformite', 'charte-scores', 'charte-evolution', 'charte-criteres', 'charte-equipes'],

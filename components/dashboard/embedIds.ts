@@ -40,6 +40,8 @@ export const EMBEDDABLE_IDS = new Set<string>([
   // Keywords / Axes
   'top-mots-cles', 'top-sous-domaines',
   'axes-repartition', 'axes-barres', 'axes-evolution', 'axes-types', 'axes-equipes',
+  // Sustainable Development Goals
+  'sdg-repartition', 'sdg-evolution', 'sdg-couverture', 'sdg-equipes',
   // Signature charter
   'charte-conformite', 'charte-scores', 'charte-evolution', 'charte-criteres',
   'charte-equipes',

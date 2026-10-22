@@ -19,6 +19,7 @@ import { comboLabelOf } from './sourcesAggregates';
 import { buildPartnerCatalog, partnerKey } from './collabAggregates';
 import { hasCountry } from './countryAggregates';
 import { FUNDER_CATEGORY_LABELS, funderCategory, fundersOf, hasFunding } from './fundersAggregates';
+import { sdgLabel, sdgsOf } from './sdg';
 
 /** Effective strategic axis of a publication (1st axis if multiple, « Autre » otherwise). */
 export function axeOfPub(p: DashboardPublication): string {
@@ -133,6 +134,8 @@ export interface PubFilters {
   funderCategory?: string;
   /** Acknowledges this funder (canonical name, canonFunderName()). */
   funder?: string;
+  /** UN Sustainable Development Goal (number 1-17), `any` (at least one) or `none` (sdg.ts). */
+  sdg?: number | 'any' | 'none';
 }
 
 /** Resolution context built once per dataset (headcount matches). */
@@ -249,6 +252,12 @@ export function matchesFilters(
   if (f.funded && !hasFunding(p)) return false;
   if (f.funderCategory && !fundersOf(p).some((name) => funderCategory(name) === f.funderCategory)) return false;
   if (f.funder && !fundersOf(p).includes(f.funder)) return false;
+  if (f.sdg != null) {
+    const goals = sdgsOf(p);
+    if (f.sdg === 'none') { if (goals.length > 0) return false; }
+    else if (f.sdg === 'any') { if (goals.length === 0) return false; }
+    else if (!goals.includes(f.sdg)) return false;
+  }
   return true;
 }
 
@@ -327,6 +336,9 @@ export function describeFilters(f: PubFilters, ctx: FilterContext): FilterChip[]
     push('funderCategory', _(msg`Funders: ${category}`));
   }
   if (f.funder) push('funder', _(msg`Funder: ${f.funder}`));
+  if (f.sdg === 'none') push('sdg', _(msg`Without Sustainable Development Goal`));
+  else if (f.sdg === 'any') push('sdg', _(msg`With a Sustainable Development Goal`));
+  else if (f.sdg != null) push('sdg', _(msg`SDG: ${sdgLabel(f.sdg)}`));
   for (const [key, label] of Object.entries(FLAG_LABELS) as [keyof PubFilters, MessageDescriptor][]) {
     if (f[key]) push(key, _(label));
   }
@@ -361,6 +373,8 @@ export interface FilterOptions {
   /** Source combinations, sorted by decreasing volume (as in the Sources tab). */
   sourceCombos: string[];
   hasCharter: boolean;
+  /** Goals present in the corpus (official order); empty when the export has none. */
+  sdgs: number[];
 }
 
 const collator = new Intl.Collator('fr');
@@ -413,5 +427,6 @@ export function buildFilterOptions(
       .sort((a, b) => b[1] - a[1] || collator.compare(a[0], b[0]))
       .map(([c]) => c),
     hasCharter: pubs.some((p) => p.charte != null),
+    sdgs: Array.from(new Set(pubs.flatMap(sdgsOf))).sort((a, b) => a - b),
   };
 }

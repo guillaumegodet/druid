@@ -71,6 +71,7 @@ export const pubFiltersSchema = z.strictObject({
   funded: z.boolean().optional(),
   funderCategory: str.optional(),
   funder: str.optional(),
+  sdg: z.union([z.number().int().min(1).max(17), z.literal('any'), z.literal('none')]).optional(),
 });
 
 // Compile-time guard: the schema covers every PubFilters field, and only those.
