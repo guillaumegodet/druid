@@ -997,7 +997,7 @@ msgid "Open this structure's bibliometric dashboard"
 msgstr "Ouvrir le tableau de bord bibliométrique de cette structure"
 
 #: components/StructureDetail.tsx:129
-#: components/researchers/MediaPresenceSection.tsx:48
+#: components/researchers/DigitalIdentitySection.tsx:37
 #: components/structures/IdentifiersTab.tsx:170
 msgid "Website"
 msgstr "Site web"
@@ -4865,7 +4865,6 @@ msgid "The media watch could not be loaded: {error}"
 msgstr "La veille médias n'a pas pu être chargée : {error}"
 
 #: components/dashboard/MediaMentionsPanel.tsx:460
-#: components/researchers/MediaPresenceSection.tsx:129
 msgid "Media presence"
 msgstr "Présence médiatique"
 
@@ -8195,7 +8194,7 @@ msgid "TV"
 msgstr "TV"
 
 #: components/dashboard/mediaTypes.ts:16
-#: components/researchers/MediaPresenceSection.tsx:36
+#: components/researchers/DigitalIdentitySection.tsx:25
 msgid "Blog"
 msgstr "Blog / carnet"
 
@@ -11417,6 +11416,142 @@ msgstr "Thèse soutenue entre le {from} et le {to}."
 msgid "PhD of the record: {phd}."
 msgstr "Thèse de la fiche : {phd}."
 
+#: components/researchers/DigitalIdentitySection.tsx:21
+msgid "Bluesky"
+msgstr "Bluesky"
+
+#: components/researchers/DigitalIdentitySection.tsx:21
+msgid "https://bsky.app/profile/…"
+msgstr "https://bsky.app/profile/…"
+
+#: components/researchers/DigitalIdentitySection.tsx:22
+msgid "Mastodon"
+msgstr "Mastodon"
+
+#: components/researchers/DigitalIdentitySection.tsx:22
+msgid "https://instance/@account"
+msgstr "https://instance/@compte"
+
+#: components/researchers/DigitalIdentitySection.tsx:23
+msgid "YouTube"
+msgstr "YouTube"
+
+#: components/researchers/DigitalIdentitySection.tsx:23
+msgid "https://youtube.com/@channel"
+msgstr "https://youtube.com/@chaine"
+
+#: components/researchers/DigitalIdentitySection.tsx:24
+msgid "Podcast (RSS feed)"
+msgstr "Podcast (flux RSS)"
+
+#: components/researchers/DigitalIdentitySection.tsx:24
+msgid "https://…/feed.xml"
+msgstr "https://…/feed.xml"
+
+#: components/researchers/DigitalIdentitySection.tsx:25
+#: components/researchers/DigitalIdentitySection.tsx:37
+msgid "https://…"
+msgstr "https://…"
+
+#: components/researchers/DigitalIdentitySection.tsx:26
+#: lib/importConflicts.ts:92
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+#: components/researchers/DigitalIdentitySection.tsx:26
+msgid "https://linkedin.com/in/…"
+msgstr "https://linkedin.com/in/…"
+
+#: components/researchers/DigitalIdentitySection.tsx:30
+msgid "Institutional CV"
+msgstr "CV institutionnel"
+
+#: components/researchers/DigitalIdentitySection.tsx:30
+msgid "URL of the institutional page"
+msgstr "URL de la fiche institutionnelle"
+
+#: components/researchers/DigitalIdentitySection.tsx:31
+msgid "Lab website CV"
+msgstr "CV site labo"
+
+#: components/researchers/DigitalIdentitySection.tsx:31
+msgid "URL of the page on the lab website"
+msgstr "URL de la page sur le site du labo"
+
+#: components/researchers/DigitalIdentitySection.tsx:32
+msgid "CV (pdf, docx…)"
+msgstr "CV (pdf, docx…)"
+
+#: components/researchers/DigitalIdentitySection.tsx:32
+msgid "URL of the CV document"
+msgstr "URL du document CV"
+
+#: components/researchers/DigitalIdentitySection.tsx:33
+msgid "HAL CV"
+msgstr "CV HAL"
+
+#: components/researchers/DigitalIdentitySection.tsx:33
+msgid "https://cv.hal.science/…"
+msgstr "https://cv.hal.science/…"
+
+#: components/researchers/DigitalIdentitySection.tsx:34
+msgid "Academia"
+msgstr "Academia"
+
+#: components/researchers/DigitalIdentitySection.tsx:34
+msgid "https://…academia.edu/…"
+msgstr "https://…academia.edu/…"
+
+#: components/researchers/DigitalIdentitySection.tsx:35
+#: lib/importConflicts.ts:93
+msgid "ResearchGate"
+msgstr "ResearchGate"
+
+#: components/researchers/DigitalIdentitySection.tsx:35
+msgid "https://researchgate.net/profile/…"
+msgstr "https://researchgate.net/profile/…"
+
+#: components/researchers/DigitalIdentitySection.tsx:36
+#: lib/importConflicts.ts:91
+msgid "Google Scholar"
+msgstr "Google Scholar"
+
+#: components/researchers/DigitalIdentitySection.tsx:36
+msgid "https://scholar.google.com/citations?user=…"
+msgstr "https://scholar.google.com/citations?user=…"
+
+#: components/researchers/DigitalIdentitySection.tsx:69
+msgid "Open: {label}"
+msgstr "Ouvrir : {label}"
+
+#: components/researchers/DigitalIdentitySection.tsx:102
+msgid "Digital identity"
+msgstr "Identité numérique"
+
+#: components/researchers/DigitalIdentitySection.tsx:111
+msgid "Social media accounts"
+msgstr "Comptes réseaux sociaux"
+
+#: components/researchers/DigitalIdentitySection.tsx:114
+msgid "Declared public accounts (Bluesky, Mastodon, YouTube channel, podcast, blog, LinkedIn): once entered here, they become sources tracked by the media watch."
+msgstr "Comptes publics déclarés (Bluesky, Mastodon, chaîne YouTube, podcast, blog, LinkedIn) : renseignés ici, ils deviennent des sources suivies par la veille."
+
+#: components/researchers/DigitalIdentitySection.tsx:135
+msgid "Profiles & CV"
+msgstr "Profils & CV"
+
+#: components/researchers/DigitalIdentitySection.tsx:149
+msgid "These links are saved with the record (“Save” button at the top)."
+msgstr "Ces liens sont enregistrés avec la fiche (bouton « Enregistrer » en haut)."
+
+#: components/researchers/DigitalIdentitySection.tsx:155
+msgid "Declared accounts & profiles"
+msgstr "Comptes & profils déclarés"
+
+#: components/researchers/DigitalIdentitySection.tsx:157
+msgid "No link declared."
+msgstr "Aucun lien déclaré."
+
 #: components/researchers/DuplicateQualifyPanel.tsx:31
 msgid "Main row:"
 msgstr "Ligne principale :"
@@ -12454,150 +12589,6 @@ msgstr "Importer un annuaire de site"
 #: components/researchers/ListHeader.tsx:127
 msgid "Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)"
 msgstr "Doublons à fusionner ou qualifier, et tâches à réaliser hors Druid (IdRef, ORCID, HAL…)"
-
-#: components/researchers/MediaPresenceSection.tsx:32
-msgid "Bluesky"
-msgstr "Bluesky"
-
-#: components/researchers/MediaPresenceSection.tsx:32
-msgid "https://bsky.app/profile/…"
-msgstr "https://bsky.app/profile/…"
-
-#: components/researchers/MediaPresenceSection.tsx:33
-msgid "Mastodon"
-msgstr "Mastodon"
-
-#: components/researchers/MediaPresenceSection.tsx:33
-msgid "https://instance/@account"
-msgstr "https://instance/@compte"
-
-#: components/researchers/MediaPresenceSection.tsx:34
-msgid "YouTube"
-msgstr "YouTube"
-
-#: components/researchers/MediaPresenceSection.tsx:34
-msgid "https://youtube.com/@channel"
-msgstr "https://youtube.com/@chaine"
-
-#: components/researchers/MediaPresenceSection.tsx:35
-msgid "Podcast (RSS feed)"
-msgstr "Podcast (flux RSS)"
-
-#: components/researchers/MediaPresenceSection.tsx:35
-msgid "https://…/feed.xml"
-msgstr "https://…/feed.xml"
-
-#: components/researchers/MediaPresenceSection.tsx:36
-#: components/researchers/MediaPresenceSection.tsx:48
-msgid "https://…"
-msgstr "https://…"
-
-#: components/researchers/MediaPresenceSection.tsx:37
-#: lib/importConflicts.ts:92
-msgid "LinkedIn"
-msgstr "LinkedIn"
-
-#: components/researchers/MediaPresenceSection.tsx:37
-msgid "https://linkedin.com/in/…"
-msgstr "https://linkedin.com/in/…"
-
-#: components/researchers/MediaPresenceSection.tsx:41
-msgid "Institutional CV"
-msgstr "CV institutionnel"
-
-#: components/researchers/MediaPresenceSection.tsx:41
-msgid "URL of the institutional page"
-msgstr "URL de la fiche institutionnelle"
-
-#: components/researchers/MediaPresenceSection.tsx:42
-msgid "Lab website CV"
-msgstr "CV site labo"
-
-#: components/researchers/MediaPresenceSection.tsx:42
-msgid "URL of the page on the lab website"
-msgstr "URL de la page sur le site du labo"
-
-#: components/researchers/MediaPresenceSection.tsx:43
-msgid "CV (pdf, docx…)"
-msgstr "CV (pdf, docx…)"
-
-#: components/researchers/MediaPresenceSection.tsx:43
-msgid "URL of the CV document"
-msgstr "URL du document CV"
-
-#: components/researchers/MediaPresenceSection.tsx:44
-msgid "HAL CV"
-msgstr "CV HAL"
-
-#: components/researchers/MediaPresenceSection.tsx:44
-msgid "https://cv.hal.science/…"
-msgstr "https://cv.hal.science/…"
-
-#: components/researchers/MediaPresenceSection.tsx:45
-msgid "Academia"
-msgstr "Academia"
-
-#: components/researchers/MediaPresenceSection.tsx:45
-msgid "https://…academia.edu/…"
-msgstr "https://…academia.edu/…"
-
-#: components/researchers/MediaPresenceSection.tsx:46
-#: lib/importConflicts.ts:93
-msgid "ResearchGate"
-msgstr "ResearchGate"
-
-#: components/researchers/MediaPresenceSection.tsx:46
-msgid "https://researchgate.net/profile/…"
-msgstr "https://researchgate.net/profile/…"
-
-#: components/researchers/MediaPresenceSection.tsx:47
-#: lib/importConflicts.ts:91
-msgid "Google Scholar"
-msgstr "Google Scholar"
-
-#: components/researchers/MediaPresenceSection.tsx:47
-msgid "https://scholar.google.com/citations?user=…"
-msgstr "https://scholar.google.com/citations?user=…"
-
-#: components/researchers/MediaPresenceSection.tsx:80
-msgid "Open: {label}"
-msgstr "Ouvrir : {label}"
-
-#: components/researchers/MediaPresenceSection.tsx:138
-msgid "Social media accounts"
-msgstr "Comptes réseaux sociaux"
-
-#: components/researchers/MediaPresenceSection.tsx:141
-msgid "Declared public accounts (Bluesky, Mastodon, YouTube channel, podcast, blog, LinkedIn): once entered here, they become sources tracked by the media watch."
-msgstr "Comptes publics déclarés (Bluesky, Mastodon, chaîne YouTube, podcast, blog, LinkedIn) : renseignés ici, ils deviennent des sources suivies par la veille."
-
-#: components/researchers/MediaPresenceSection.tsx:162
-msgid "Profiles & CV"
-msgstr "Profils & CV"
-
-#: components/researchers/MediaPresenceSection.tsx:176
-msgid "These links are saved with the record (“Save” button at the top)."
-msgstr "Ces liens sont enregistrés avec la fiche (bouton « Enregistrer » en haut)."
-
-#: components/researchers/MediaPresenceSection.tsx:182
-msgid "Declared accounts & profiles"
-msgstr "Comptes & profils déclarés"
-
-#: components/researchers/MediaPresenceSection.tsx:184
-msgid "No link declared."
-msgstr "Aucun lien déclaré."
-
-#: components/researchers/MediaPresenceSection.tsx:207
-msgid "Latest mentions of the lab ({labo})"
-msgstr "Dernières mentions du laboratoire ({labo})"
-
-#: components/researchers/MediaPresenceSection.tsx:211
-msgid "No recent mention collected for this lab."
-msgstr "Aucune mention récente collectée pour ce laboratoire."
-
-#: components/researchers/MediaPresenceSection.tsx:237
-msgid "The researcher's individual mentions will appear here once the personal part of the media watch is enabled (DPO review in progress)."
-msgstr "Les mentions individuelles du chercheur apparaîtront ici après l'activation du volet nominatif de la veille (cadrage DPO en cours)."
 
 #. placeholder {0}: entry.dropped_rowid
 #. placeholder {1}: entry.Nom

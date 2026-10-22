@@ -11,7 +11,7 @@ import { PRESENCE_LABELS, VALIDATION_SCOPE_LABELS } from '../lib/researcherLabel
 
 // Sub-components
 import { GeneralTab } from './researchers/GeneralTab';
-import { MediaPresenceSection } from './researchers/MediaPresenceSection';
+import { DigitalIdentitySection } from './researchers/DigitalIdentitySection';
 import { AffiliationHistorySection } from './researchers/AffiliationHistorySection';
 import { SuggestionsSection } from './researchers/SuggestionsSection';
 import { CallsSection } from './researchers/CallsSection';
@@ -422,7 +422,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
                 merged into localResearcher (only on save, see handleSave line
                 186) — without this merge, the lab used for /api/mentions stays the one from before
                 the current edit (code review lot 6b). */}
-            <MediaPresenceSection researcher={{ ...localResearcher, affiliations }} onUpdateField={updateField} />
+            <DigitalIdentitySection researcher={{ ...localResearcher, affiliations }} onUpdateField={updateField} />
           </div>
           {/* « Research pairs » (druid-internal `docs/archive/plan-binomes-chercheurs.md`): frequent co-authors and suggested
               connections; hidden when the researcher is not in the university network. */}
