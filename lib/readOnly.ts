@@ -19,6 +19,7 @@ const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
 const READ_POST_PREFIXES = [
   '/api/collab-theme/',
   '/api/benchmark/topic-distribution',
+  '/api/benchmark/sdg-distribution',
   '/api/help-chat',
   '/api/chat',
 ];

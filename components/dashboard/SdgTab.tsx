@@ -22,6 +22,15 @@ import { SdgAggregates, aggregateSdgs } from './sdgAggregates';
 import { DashboardDataset } from './types';
 import { YearRange } from './overviewAggregates';
 import { numberLocale } from '../../lib/i18n';
+import { hasCapability } from '../../lib/auth';
+import { apiErrorText } from '../../lib/apiErrors';
+import { usePersistedState } from '../../lib/usePersistedState';
+import {
+  MIN_SIGNATURE_COUNT,
+  computePeerRelativeSdgSignature,
+  type PeerSdgDistributionResponse,
+  type SdgPeerSignature,
+} from './benchmarkAggregates';
 
 /** Colours of the yearly series (top goals, then gray for « Other SDGs »). */
 export const sdgSeriesColors = (agg: SdgAggregates): string[] =>
@@ -119,6 +128,136 @@ export const SdgCoverageChart: React.FC<{ agg: SdgAggregates; exportName?: strin
       exportName={exportName}
       height={260}
     />
+  );
+};
+
+/** Cap of the on-demand peer computation (group_api.py MAX_PEER_TOPIC_RORS, same as the Benchmark tab). */
+const MAX_PEER_RORS = 15;
+
+/** Share of each goal locally vs in the peer group (ratio), goals in official order and colours. */
+const SdgPeerSignatureChart: React.FC<{ data: SdgPeerSignature[]; peerCount: number }> = ({ data, peerCount }) => {
+  const t = useVizTheme();
+  const { t: tr } = useLingui();
+  const nf = (n: number) => n.toLocaleString(numberLocale());
+  const rows = useMemo(() => [...data].reverse(), [data]);
+  const option = useMemo(
+    () => ({
+      textStyle: baseTextStyle(t),
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: (p: { dataIndex: number }[]) => {
+          const d = rows[p[0].dataIndex];
+          return `${sdgLabel(d.id)}<br/>${tr`${nf(d.count)} publication(s) — ${(d.share * 100).toFixed(1)} % of the local goals vs ${(d.peerShare * 100).toFixed(1)} % in the peer group (× ${d.ratio.toFixed(2)})`}`;
+        },
+        ...baseTooltip(t),
+      },
+      grid: { left: 8, right: 48, top: 8, bottom: 8, containLabel: true },
+      xAxis: { ...baseValueAxis(t), name: tr`× peer group share`, nameTextStyle: { color: t.inkMuted, fontSize: 11 } },
+      yAxis: {
+        ...baseCategoryAxis(t),
+        data: rows.map((d) => sdgLabel(d.id)),
+        axisLabel: { color: t.inkSecondary, fontSize: 11, width: 230, overflow: 'truncate' as const },
+      },
+      series: [
+        {
+          type: 'bar',
+          data: rows.map((d) => ({ value: Math.round(d.ratio * 100) / 100, itemStyle: { color: sdgColor(d.id), borderRadius: [0, 4, 4, 0] } })),
+          label: { show: true, position: 'right', fontSize: 10, color: t.inkSecondary, formatter: '×{c}' },
+          markLine: { silent: true, symbol: 'none', lineStyle: { color: t.inkMuted, type: 'dashed' }, data: [{ xAxis: 1 }] },
+        },
+      ],
+    }),
+    [rows, t, tr],
+  );
+  return (
+    <EChartCard
+      title={tr`Goals vs the peer group`}
+      subtitle={tr`Local share of each goal / share in the group of ${nf(peerCount)} selected peers (OpenAlex, all years) · goals with ≥ ${MIN_SIGNATURE_COUNT} local publications`}
+      option={option}
+      exportName="sdg-pairs"
+      height={Math.max(260, rows.length * 30 + 90)}
+      shareable={false}
+    />
+  );
+};
+
+/**
+ * « Vs the peer group » block (lot 3, decision D6): the peers selected in the Benchmark tab
+ * (same persisted key), one OpenAlex group_by per institution relayed by the server and cached
+ * on the druid-biblio side. Only on an institution dashboard with the ETL API (not on Cloudflare).
+ */
+const SdgPeerSection: React.FC<{ dataset: DashboardDataset; range: YearRange }> = ({ dataset, range }) => {
+  const { t: tr } = useLingui();
+  const nf = (n: number) => n.toLocaleString(numberLocale());
+  const ownRor = dataset.benchmark?.openalex.ror ?? null;
+  const [selectedPeerRors] = usePersistedState<string[]>(`druid-benchmark-peers:${dataset.slug}`, []);
+  const [peerData, setPeerData] = useState<PeerSdgDistributionResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const signature = useMemo(
+    () => (peerData ? computePeerRelativeSdgSignature(dataset.publications, range, peerData, ownRor) : []),
+    [peerData, dataset.publications, range, ownRor],
+  );
+  if (!ownRor || !hasCapability('HAS_ETL_API')) return null;
+
+  const fetchPeers = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/benchmark/sdg-distribution', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rors: [...new Set([ownRor, ...selectedPeerRors])] }),
+      });
+      const body = await res.json();
+      if (!res.ok) throw new Error(body?.error || tr`HTTP error ${res.status}`);
+      setPeerData(body.data as PeerSdgDistributionResponse);
+    } catch (e) {
+      setError(e instanceof Error ? apiErrorText(e) : tr`Unknown error`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-3">
+      <div className="px-1">
+        <h3 className="font-disp font-semibold text-[15px] text-ink dark:text-[#f5f2ea]"><Trans>Vs the peer group</Trans></h3>
+        <p className="text-xs text-muted-light dark:text-[#8f897c] mt-0.5">
+          <Trans>
+            Share of each goal in the local corpus compared with its share among the universities selected in the Benchmark view (« Compare with chosen universities »). The peers are read from OpenAlex, all years and all fields, one request per institution, then cached server-side.
+          </Trans>
+        </p>
+      </div>
+      {selectedPeerRors.length === 0 ? (
+        <div className="glass-card p-4 text-sm text-muted-light dark:text-[#8f897c]">
+          <Trans>First select a peer group in the Benchmark view (Impact family).</Trans>
+        </div>
+      ) : selectedPeerRors.length > MAX_PEER_RORS ? (
+        <div className="glass-card p-4 text-sm text-muted-light dark:text-[#8f897c]">
+          <Trans>Group of {nf(selectedPeerRors.length)} institutions too large for this on-demand computation (max {MAX_PEER_RORS}) — reduce the selection in the Benchmark view.</Trans>
+        </div>
+      ) : (
+        <>
+          <button
+            type="button"
+            onClick={fetchPeers}
+            disabled={loading}
+            className="pill w-fit px-4 py-1.5 text-sm bg-accent/25 dark:bg-accent/15 text-ink dark:text-[#f5f2ea] hover:bg-accent/40 dark:hover:bg-accent/25 disabled:opacity-50 disabled:cursor-wait cursor-pointer"
+          >
+            {loading ? tr`Computing…` : peerData ? tr`Recompute for the current selection` : tr`Compare with these ${nf(selectedPeerRors.length)} peers`}
+          </button>
+          {error && <div className="text-sm text-red-600 dark:text-red-400">{error}</div>}
+          {signature.length > 0 && <SdgPeerSignatureChart data={signature} peerCount={selectedPeerRors.length} />}
+          {peerData && signature.length === 0 && !loading && !error && (
+            <div className="glass-card p-4 text-sm text-muted-light dark:text-[#8f897c]">
+              <Trans>No goal with enough local publications over the selected period, or no goal known for the peer group.</Trans>
+            </div>
+          )}
+        </>
+      )}
+    </div>
   );
 };
 
@@ -301,6 +440,7 @@ export const SdgTab: React.FC<{
       )}
 
       <ImpactTable agg={agg} onOpenList={onOpenList} />
+      <SdgPeerSection dataset={dataset} range={range} />
       <p className="text-xs text-muted-light dark:text-[#8f897c] px-1">
         <Trans>Official titles and colours of the United Nations. The figures are not comparable with rankings built on other classifiers (THE Impact Rankings, SciVal).</Trans>
       </p>

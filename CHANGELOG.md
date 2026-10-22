@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Vue « Objectifs de développement durable » › bloc « Face au groupe de pairs »** (druid-internal
+  `docs/plan-odd-sdg.md`, lot 3) : part de chaque ODD dans le corpus local rapportée à sa part chez les universités
+  choisies dans la vue Benchmark (même sélection), ODD des pairs lus sur OpenAlex par `POST /api/benchmark/sdg-distribution`
+  (relais vers druid-biblio, cache de 180 jours, 15 établissements au plus). Instances reliées à druid-biblio seulement.
+
 ## [2.15.0] — 2026-10-22
 
 ### Ajouté

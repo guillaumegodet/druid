@@ -2177,6 +2177,10 @@ app.post('/api/groups/authors-search', (req, res) =>
 // capped on the druid-etl-api side (group_api.py, MAX_PEER_TOPIC_RORS).
 app.post('/api/benchmark/topic-distribution', (req, res) =>
   relayGroupApi(res, 'POST', '/api/benchmark/topic-distribution', req.body));
+// Same for the UN Sustainable Development Goals of the peers (« Sustainable Development Goals » view,
+// druid-internal docs/plan-odd-sdg.md, lot 3): one OpenAlex group_by per institution, cached 180 days.
+app.post('/api/benchmark/sdg-distribution', (req, res) =>
+  relayGroupApi(res, 'POST', '/api/benchmark/sdg-distribution', req.body));
 
 // ── Native ETL console (structures): relay to druid-etl-api ────────────────
 // Replaces the Streamlit admin page (biblio_etl/admin.py): structure

@@ -2458,8 +2458,8 @@ msgstr "Publication types by strategic axis"
 #: components/dashboard/AxesTab.tsx:396
 #: components/dashboard/NewsTab.tsx:42
 #: components/dashboard/NewsTab.tsx:585
-#: components/dashboard/SdgTab.tsx:142
-#: components/dashboard/SdgTab.tsx:268
+#: components/dashboard/SdgTab.tsx:281
+#: components/dashboard/SdgTab.tsx:407
 #: components/dashboard/StaffSection.tsx:254
 #: components/dashboard/StaffSection.tsx:379
 #: components/dashboard/charts/WorldChoroplethChart.tsx:58
@@ -2474,7 +2474,7 @@ msgid "Publications"
 msgstr "Publications"
 
 #: components/dashboard/AxesTab.tsx:396
-#: components/dashboard/SdgTab.tsx:268
+#: components/dashboard/SdgTab.tsx:407
 msgid "Share (%)"
 msgstr "Share (%)"
 
@@ -2810,6 +2810,7 @@ msgid "{0} publication(s) — × {1} vs the peer group ({2}% of the group's publ
 msgstr "{0} publication(s) — × {1} vs the peer group ({2}% of the group's publications on this topic)"
 
 #: components/dashboard/BenchmarkTab.tsx:355
+#: components/dashboard/SdgTab.tsx:156
 msgid "× peer group share"
 msgstr "× peer group share"
 
@@ -2984,6 +2985,7 @@ msgstr "Add to the comparison group"
 #: components/dashboard/BenchmarkTab.tsx:1070
 #: components/dashboard/BenchmarkTab.tsx:1082
 #: components/dashboard/BenchmarkTab.tsx:1147
+#: components/dashboard/SdgTab.tsx:214
 msgid "HTTP error {0}"
 msgstr "HTTP error {0}"
 
@@ -2991,6 +2993,7 @@ msgstr "HTTP error {0}"
 #: components/dashboard/BenchmarkTab.tsx:1073
 #: components/dashboard/BenchmarkTab.tsx:1086
 #: components/dashboard/BenchmarkTab.tsx:1150
+#: components/dashboard/SdgTab.tsx:217
 #: components/rights/RightsPage.tsx:144
 msgid "Unknown error"
 msgstr "Unknown error"
@@ -3202,11 +3205,13 @@ msgid "Group of {0} institutions too large for this on-demand computation (max {
 msgstr "Group of {0} institutions too large for this on-demand computation (max {MAX_PEER_TOPIC_RORS}) — reduce the selection above."
 
 #: components/dashboard/BenchmarkTab.tsx:1439
+#: components/dashboard/SdgTab.tsx:249
 #: components/researchers/AffiliationHistorySection.tsx:204
 msgid "Computing…"
 msgstr "Computing…"
 
 #: components/dashboard/BenchmarkTab.tsx:1441
+#: components/dashboard/SdgTab.tsx:249
 msgid "Recompute for the current selection"
 msgstr "Recompute for the current selection"
 
@@ -5309,7 +5314,7 @@ msgstr "1 active filter"
 
 #: components/dashboard/NewsTab.tsx:592
 #: components/dashboard/PublicationsListTab.tsx:298
-#: components/dashboard/SdgTab.tsx:143
+#: components/dashboard/SdgTab.tsx:282
 #: components/dashboard/benchmarkAggregates.ts:280
 #: components/dashboard/charts/OpenAccessDonutChart.tsx:55
 #: components/dashboard/countryKpis.ts:68
@@ -6453,130 +6458,173 @@ msgstr "Top 20 internal authors (number of publications over the period)"
 #. placeholder {0}: nf(r.count)
 #. placeholder {1}: r.pctTagged
 #. placeholder {2}: r.pctTotal
-#: components/dashboard/SdgTab.tsx:49
+#: components/dashboard/SdgTab.tsx:58
 msgid "{0} publication(s) — {1} % of the tagged publications, {2} % of the corpus"
 msgstr "{0} publication(s) — {1} % of the tagged publications, {2} % of the corpus"
 
-#: components/dashboard/SdgTab.tsx:72
+#: components/dashboard/SdgTab.tsx:81
 #: components/dashboard/embedRegistry.tsx:697
 msgid "Publications by Sustainable Development Goal"
 msgstr "Publications by Sustainable Development Goal"
 
 #. placeholder {0}: nf(agg.tagged)
-#: components/dashboard/SdgTab.tsx:73
+#: components/dashboard/SdgTab.tsx:82
 msgid "{0} tagged publication(s) · a publication counts in each of its goals"
 msgstr "{0} tagged publication(s) · a publication counts in each of its goals"
 
-#: components/dashboard/SdgTab.tsx:77
+#: components/dashboard/SdgTab.tsx:86
 msgid "No publication tagged with a goal over the period."
 msgstr "No publication tagged with a goal over the period."
 
 #. placeholder {0}: r.tagged
 #. placeholder {1}: r.total
 #. placeholder {2}: r.pct
-#: components/dashboard/SdgTab.tsx:94
+#: components/dashboard/SdgTab.tsx:103
 msgid "{0} / {1} publications tagged ({2} %)"
 msgstr "{0} / {1} publications tagged ({2} %)"
 
-#: components/dashboard/SdgTab.tsx:116
+#: components/dashboard/SdgTab.tsx:125
 #: components/dashboard/embedRegistry.tsx:715
 msgid "Share of publications tagged with a goal, by year"
 msgstr "Share of publications tagged with a goal, by year"
 
-#: components/dashboard/SdgTab.tsx:117
+#: components/dashboard/SdgTab.tsx:126
 msgid "Stability of the OpenAlex tagging over time; the untagged part is not a lack of data"
 msgstr "Stability of the OpenAlex tagging over time; the untagged part is not a lack of data"
 
-#: components/dashboard/SdgTab.tsx:132
+#. placeholder {0}: nf(d.count)
+#. placeholder {1}: (d.share * 100).toFixed(1)
+#. placeholder {2}: (d.peerShare * 100).toFixed(1)
+#. placeholder {3}: d.ratio.toFixed(2)
+#: components/dashboard/SdgTab.tsx:151
+msgid "{0} publication(s) — {1} % of the local goals vs {2} % in the peer group (× {3})"
+msgstr "{0} publication(s) — {1} % of the local goals vs {2} % in the peer group (× {3})"
+
+#: components/dashboard/SdgTab.tsx:175
+msgid "Goals vs the peer group"
+msgstr "Goals vs the peer group"
+
+#. placeholder {0}: nf(peerCount)
+#: components/dashboard/SdgTab.tsx:176
+msgid "Local share of each goal / share in the group of {0} selected peers (OpenAlex, all years) · goals with ≥ {MIN_SIGNATURE_COUNT} local publications"
+msgstr "Local share of each goal / share in the group of {0} selected peers (OpenAlex, all years) · goals with ≥ {MIN_SIGNATURE_COUNT} local publications"
+
+#: components/dashboard/SdgTab.tsx:226
+msgid "Vs the peer group"
+msgstr "Vs the peer group"
+
+#: components/dashboard/SdgTab.tsx:228
+msgid "Share of each goal in the local corpus compared with its share among the universities selected in the Benchmark view (« Compare with chosen universities »). The peers are read from OpenAlex, all years and all fields, one request per institution, then cached server-side."
+msgstr "Share of each goal in the local corpus compared with its share among the universities selected in the Benchmark view (« Compare with chosen universities »). The peers are read from OpenAlex, all years and all fields, one request per institution, then cached server-side."
+
+#: components/dashboard/SdgTab.tsx:235
+msgid "First select a peer group in the Benchmark view (Impact family)."
+msgstr "First select a peer group in the Benchmark view (Impact family)."
+
+#. placeholder {0}: nf(selectedPeerRors.length)
+#: components/dashboard/SdgTab.tsx:239
+msgid "Group of {0} institutions too large for this on-demand computation (max {MAX_PEER_RORS}) — reduce the selection in the Benchmark view."
+msgstr "Group of {0} institutions too large for this on-demand computation (max {MAX_PEER_RORS}) — reduce the selection in the Benchmark view."
+
+#. placeholder {0}: nf(selectedPeerRors.length)
+#: components/dashboard/SdgTab.tsx:249
+msgid "Compare with these {0} peers"
+msgstr "Compare with these {0} peers"
+
+#: components/dashboard/SdgTab.tsx:255
+msgid "No goal with enough local publications over the selected period, or no goal known for the peer group."
+msgstr "No goal with enough local publications over the selected period, or no goal known for the peer group."
+
+#: components/dashboard/SdgTab.tsx:271
 msgid "Open access and impact by goal"
 msgstr "Open access and impact by goal"
 
-#: components/dashboard/SdgTab.tsx:134
+#: components/dashboard/SdgTab.tsx:273
 msgid "Same rules as the Impact tab: FWCI mean on the publications with a value, top 10 % among them."
 msgstr "Same rules as the Impact tab: FWCI mean on the publications with a value, top 10 % among them."
 
-#: components/dashboard/SdgTab.tsx:141
+#: components/dashboard/SdgTab.tsx:280
 msgid "Goal"
 msgstr "Goal"
 
-#: components/dashboard/SdgTab.tsx:144
+#: components/dashboard/SdgTab.tsx:283
 #: components/dashboard/charts/ImpactGroupCharts.tsx:37
 #: components/dashboard/charts/ImpactGroupCharts.tsx:62
 #: components/dashboard/kpiItems.ts:112
 msgid "Mean FWCI"
 msgstr "Mean FWCI"
 
-#: components/dashboard/SdgTab.tsx:145
+#: components/dashboard/SdgTab.tsx:284
 msgid "Top 10 %"
 msgstr "Top 10 %"
 
-#: components/dashboard/SdgTab.tsx:146
+#: components/dashboard/SdgTab.tsx:285
 #: components/dashboard/fundersAggregates.ts:40
 msgid "International"
 msgstr "International"
 
-#: components/dashboard/SdgTab.tsx:155
+#: components/dashboard/SdgTab.tsx:294
 msgid "UN page of the goal"
 msgstr "UN page of the goal"
 
-#: components/dashboard/SdgTab.tsx:198
+#: components/dashboard/SdgTab.tsx:337
 msgid "No Sustainable Development Goal in this export: regenerate the dashboard of the structure (druid-biblio harvests the OpenAlex field since 2026-10-22)."
 msgstr "No Sustainable Development Goal in this export: regenerate the dashboard of the structure (druid-biblio harvests the OpenAlex field since 2026-10-22)."
 
-#: components/dashboard/SdgTab.tsx:207
+#: components/dashboard/SdgTab.tsx:346
 msgid "Goals assigned by OpenAlex to each publication (Aurora classifier, only the goals above its threshold). About half of a corpus carries a goal: the untagged publications are not missing data. A publication counts in each of its goals."
 msgstr "Goals assigned by OpenAlex to each publication (Aurora classifier, only the goals above its threshold). About half of a corpus carries a goal: the untagged publications are not missing data. A publication counts in each of its goals."
 
-#: components/dashboard/SdgTab.tsx:213
+#: components/dashboard/SdgTab.tsx:352
 msgid "Excluding SDG 3 (health)"
 msgstr "Excluding SDG 3 (health)"
 
-#: components/dashboard/SdgTab.tsx:219
+#: components/dashboard/SdgTab.tsx:358
 msgid "Publications with a goal"
 msgstr "Publications with a goal"
 
 #. placeholder {0}: agg.pctTagged
 #. placeholder {1}: nf(agg.total)
-#: components/dashboard/SdgTab.tsx:221
+#: components/dashboard/SdgTab.tsx:360
 msgid "{0} % of {1} publications"
 msgstr "{0} % of {1} publications"
 
-#: components/dashboard/SdgTab.tsx:227
+#: components/dashboard/SdgTab.tsx:366
 msgid "Goals covered"
 msgstr "Goals covered"
 
-#: components/dashboard/SdgTab.tsx:233
+#: components/dashboard/SdgTab.tsx:372
 msgid "Main goal"
 msgstr "Main goal"
 
-#: components/dashboard/SdgTab.tsx:241
+#: components/dashboard/SdgTab.tsx:380
 msgid "Goals per tagged publication"
 msgstr "Goals per tagged publication"
 
-#: components/dashboard/SdgTab.tsx:253
+#: components/dashboard/SdgTab.tsx:392
 #: components/dashboard/embedRegistry.tsx:706
 msgid "Yearly evolution by goal"
 msgstr "Yearly evolution by goal"
 
-#: components/dashboard/SdgTab.tsx:286
+#: components/dashboard/SdgTab.tsx:425
 #: components/dashboard/embedRegistry.tsx:724
 msgid "Goals by lab"
 msgstr "Goals by lab"
 
-#: components/dashboard/SdgTab.tsx:286
+#: components/dashboard/SdgTab.tsx:425
 msgid "Goals by lab (share of each lab's tagged publications)"
 msgstr "Goals by lab (share of each lab's tagged publications)"
 
-#: components/dashboard/SdgTab.tsx:287
+#: components/dashboard/SdgTab.tsx:426
 #: components/dashboard/embedRegistry.tsx:724
 msgid "Goals by team"
 msgstr "Goals by team"
 
-#: components/dashboard/SdgTab.tsx:287
+#: components/dashboard/SdgTab.tsx:426
 msgid "Goals by team (share of each team's tagged publications)"
 msgstr "Goals by team (share of each team's tagged publications)"
 
-#: components/dashboard/SdgTab.tsx:305
+#: components/dashboard/SdgTab.tsx:445
 msgid "Official titles and colours of the United Nations. The figures are not comparable with rankings built on other classifiers (THE Impact Rankings, SciVal)."
 msgstr "Official titles and colours of the United Nations. The figures are not comparable with rankings built on other classifiers (THE Impact Rankings, SciVal)."
 
@@ -14814,18 +14862,13 @@ msgid "Cluster (derived — read only)"
 msgstr "Cluster (derived — read only)"
 
 #: components/structures/IdentifiersTab.tsx:72
-msgid "Source of the value"
-msgstr "Source of the value"
-
-#: components/structures/IdentifiersTab.tsx:72
 #: components/structures/StructureAlignPanel.tsx:169
 msgid "checked on"
 msgstr "checked on"
 
-#: components/structures/IdentifiersTab.tsx:73
-#: components/structures/StructureAlignPanel.tsx:172
-msgid "record not found"
-msgstr "record not found"
+#: components/structures/IdentifiersTab.tsx:72
+msgid "Source of the value"
+msgstr "Source of the value"
 
 #: components/structures/IdentifiersTab.tsx:73
 #: components/structures/StructureAlignPanel.tsx:36
@@ -14834,18 +14877,23 @@ msgid "closed record"
 msgstr "closed record"
 
 #: components/structures/IdentifiersTab.tsx:73
+#: components/structures/StructureAlignPanel.tsx:172
+msgid "record not found"
+msgstr "record not found"
+
+#: components/structures/IdentifiersTab.tsx:73
 msgid "record names something else"
 msgstr "record names something else"
-
-#. placeholder {0}: i.value
-#: components/structures/IdentifiersTab.tsx:77
-msgid "Remove {0}? It will not be suggested again by the alignment."
-msgstr "Remove {0}? It will not be suggested again by the alignment."
 
 #: components/structures/IdentifiersTab.tsx:77
 #: components/structures/StructureAlignPanel.tsx:178
 msgid "remove"
 msgstr "remove"
+
+#. placeholder {0}: i.value
+#: components/structures/IdentifiersTab.tsx:77
+msgid "Remove {0}? It will not be suggested again by the alignment."
+msgstr "Remove {0}? It will not be suggested again by the alignment."
 
 #: components/structures/IdentifiersTab.tsx:85
 msgid "Identifier or URL"
