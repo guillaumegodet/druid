@@ -42,7 +42,9 @@ export type DatasetFeature =
   /** Not a dataset property: the block filters name a partner country (pays-* charts, scopeFeatures). */
   | 'country'
   /** Regions (province, state) of the partner institutions — exports since 2026-10-07. */
-  | 'regions';
+  | 'regions'
+  /** UN Sustainable Development Goals on the publications (sdgs, exports since 2026-10-22). */
+  | 'sdgs';
 
 /**
  * Source of the data of a report block that are not computed from the dataset but fetched from an
@@ -235,6 +237,11 @@ export const CHART_META: Record<string, ChartMeta> = {
   'axes-evolution': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
   'axes-types': { tab: 'themes', requires: ['axes'], trivialUnder: ['axe'] },
   'axes-equipes': { tab: 'themes', requires: ['axes', 'teams'], trivialUnder: ['axe', 'team'] },
+  // ── Sustainable Development Goals
+  'sdg-repartition': { tab: 'sdg', requires: ['sdgs'], trivialUnder: ['sdg'] },
+  'sdg-evolution': { tab: 'sdg', requires: ['sdgs'], trivialUnder: ['sdg'] },
+  'sdg-couverture': { tab: 'sdg', requires: ['sdgs'], trivialUnder: ['sdg'] },
+  'sdg-equipes': { tab: 'sdg', requires: ['sdgs'], trivialUnder: ['sdg', 'team', 'sousStructure'] },
   // ── Signature charter
   'charte-conformite': charte({ trivialUnder: ['charterCompliant'] }),
   'charte-scores': charte(),
@@ -277,6 +284,7 @@ export function datasetFeatures(dataset: DashboardDataset): Set<DatasetFeature> 
   if (pubs.some((p) => p.charte?.score != null)) out.add('charte');
   if (unitsOfDataset(dataset).kind === 'labs') out.add('labs');
   if (pubs.some((p) => p.partnerInstitutions.some((o) => o.region))) out.add('regions');
+  if (pubs.some((p) => (p.sdgs?.length ?? 0) > 0)) out.add('sdgs');
   return out;
 }
 

@@ -102,6 +102,12 @@ export interface DashboardPublication {
     ror?: string | null;
   }[];
   domains: string[];
+  /**
+   * United Nations Sustainable Development Goals OpenAlex assigns to the work (number 1-17 and classifier score),
+   * best score first; key absent when none, and from exports predating 2026-10-22
+   * (druid-internal docs/plan-odd-sdg.md).
+   */
+  sdgs?: { id: number; score: number }[];
   // phase 4: Journals / Keywords / Axes / List / Charter
   title: string | null;
   doi: string | null;

@@ -20,3 +20,18 @@ describe('authorYears filter (Researchers tab drill-down)', () => {
     expect(countActiveFilters({ authorYears: [] })).toBe(0);
   });
 });
+
+describe('sdg filter (Sustainable Development Goals tab)', () => {
+  const tagged = { year: 2024, authorIds: [], sdgs: [{ id: 14, score: 0.6 }] } as unknown as DashboardPublication;
+  const untagged = { year: 2024, authorIds: [] } as unknown as DashboardPublication;
+
+  it('matches one goal, any goal or none', () => {
+    expect(matchesFilters(tagged, { sdg: 14 }, ctx)).toBe(true);
+    expect(matchesFilters(tagged, { sdg: 3 }, ctx)).toBe(false);
+    expect(matchesFilters(tagged, { sdg: 'any' }, ctx)).toBe(true);
+    expect(matchesFilters(untagged, { sdg: 'any' }, ctx)).toBe(false);
+    expect(matchesFilters(untagged, { sdg: 'none' }, ctx)).toBe(true);
+    expect(matchesFilters(tagged, { sdg: 'none' }, ctx)).toBe(false);
+    expect(countActiveFilters({ sdg: 'none' })).toBe(1);
+  });
+});

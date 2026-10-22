@@ -50,6 +50,9 @@ import {
   FundersYearChart,
 } from './FundersTab';
 import { aggregateFunders, aggregateCategoryByLabo } from './fundersAggregates';
+import { aggregateSdgs } from './sdgAggregates';
+import { SdgBarChart, SdgCoverageChart, sdgSeriesColors } from './SdgTab';
+import { sdgColor } from './sdg';
 import {
   aggregateCollabTypology,
   aggregateInternalCollab,
@@ -187,6 +190,9 @@ const useAxes = ({ dataset, range }: EmbedChartProps) => {
   const colorOf = useMemo(() => axisColorOf(t, axes), [t, axes]);
   return { d, colorOf, seriesColors: d.axeNames.map(colorOf) };
 };
+/** Sustainable Development Goals aggregates (no « excluding SDG 3 » toggle in embeds: the whole tagging). */
+const useSdgs = ({ dataset, range }: EmbedChartProps) =>
+  useMemo(() => aggregateSdgs(dataset.publications, range), [dataset, range]);
 const useInternalCollab = ({ dataset, range }: EmbedChartProps, scope: 'structure' | 'nu') =>
   useMemo(
     () => aggregateInternalCollab(
@@ -682,6 +688,44 @@ export const EMBED_CHARTS: Record<string, Entry> = {
           data={d.byTeam}
           colors={seriesColors}
           height={Math.max(260, d.byTeam.categories.length * 34 + 90)}
+        />
+      );
+    },
+  },
+  // Sustainable Development Goals (druid-internal docs/plan-odd-sdg.md, lot 1)
+  'sdg-repartition': {
+    label: msg`Publications by Sustainable Development Goal`,
+    Chart: (p) => <SdgBarChart agg={useSdgs(p)} />,
+  },
+  'sdg-evolution': {
+    label: msg`Yearly evolution by Sustainable Development Goal`,
+    Chart: (p) => {
+      const d = useSdgs(p);
+      return (
+        <StackedAreaChart
+          title={i18n._(msg`Yearly evolution by goal`)}
+          exportName="sdg-evolution"
+          data={d.byYear}
+          colors={sdgSeriesColors(d)}
+        />
+      );
+    },
+  },
+  'sdg-couverture': {
+    label: msg`Share of publications tagged with a goal, by year`,
+    Chart: (p) => <SdgCoverageChart agg={useSdgs(p)} />,
+  },
+  'sdg-equipes': {
+    label: msg`Sustainable Development Goals by lab or team`,
+    Chart: (p) => {
+      const d = useSdgs(p);
+      return (
+        <StackedBarHChart
+          title={i18n._(d.groupKind === 'sousStructure' ? msg`Goals by lab` : msg`Goals by team`)}
+          exportName="sdg-equipes"
+          data={d.byGroup}
+          colors={d.goals.map(sdgColor)}
+          height={Math.max(260, d.byGroup.categories.length * 34 + 90)}
         />
       );
     },

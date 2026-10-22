@@ -14,6 +14,7 @@ import {
 } from './publicationFilters';
 import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
+import { sdgLabel } from './sdg';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 
 const PAGE_SIZE = 50;
@@ -171,6 +172,7 @@ export const PublicationsListTab: React.FC<{
       ['subfields', (p) => list(p.subfields)],
       ['topics', (p) => list(p.topics)],
       ['strategic_axe', (p) => p.chosenAxe],
+      ['sdgs', (p) => list((p.sdgs ?? []).map((s) => `${s.id} (${s.score})`))],
       ['axe_motivation', (p) => p.axeMotivation],
       ['has_apc', (p) => bool(p.hasApc)],
       ['apc_paid_usd', (p) => p.apcDetail?.paidUsd],
@@ -380,6 +382,16 @@ export const PublicationsListTab: React.FC<{
               value={filters.theme ?? ''}
               options={options.themes.map((v) => ({ value: v, label: v }))}
               onChange={(v) => patch({ theme: v || undefined })}
+            />
+            <FilterSelect
+              label={t`Sustainable Development Goal`}
+              value={filters.sdg == null ? '' : String(filters.sdg)}
+              options={options.sdgs.length === 0 ? [] : [
+                { value: 'any', label: t`With a goal` },
+                { value: 'none', label: t`Without goal` },
+                ...options.sdgs.map((g) => ({ value: String(g), label: sdgLabel(g) })),
+              ]}
+              onChange={(v) => patch({ sdg: v === '' ? undefined : v === 'any' || v === 'none' ? v : Number(v) })}
             />
             <FilterSelect
               label={t`Sources (provenance)`}

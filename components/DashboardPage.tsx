@@ -18,6 +18,7 @@ import { ApcTab } from './dashboard/ApcTab';
 import { FundersTab } from './dashboard/FundersTab';
 import { CallsTab } from './dashboard/CallsTab';
 import { AxesTab } from './dashboard/AxesTab';
+import { SdgTab } from './dashboard/SdgTab';
 import { BenchmarkTab } from './dashboard/BenchmarkTab';
 import { CharteTab } from './dashboard/CharteTab';
 import { PublicationsListTab } from './dashboard/PublicationsListTab';
@@ -270,15 +271,17 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   // « Vue d'ensemble » always stays visible.
   const hasAxes = (data?.strategicAxes?.length ?? 0) > 0;
   const hasBenchmark = data?.benchmark != null;
+  // United Nations Sustainable Development Goals: tab hidden until the export carries the OpenAlex tags (sdg.ts).
+  const hasSdg = useMemo(() => (data?.publications ?? []).some((p) => (p.sdgs?.length ?? 0) > 0), [data]);
   // While the directory loads, keep the view in the catalog (hidden later if nothing matches).
   const hasStaff = (staffResearchers?.length ?? 0) > 0 || (researchersLoading && !(slug && groupSlugs.includes(slug)));
   const families = useMemo(() => {
     const keys = visibleTabKeys(
       DASHBOARD_TABS.map(({ key }) => key),
-      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff, hasCalls },
+      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff, hasCalls, hasSdg },
     );
     return visibleFamilies(keys);
-  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff, hasCalls]);
+  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff, hasCalls, hasSdg]);
   const visibleKeys = useMemo(() => new Set(families.flatMap((f) => f.tabs.map((x) => x.key))), [families]);
   useEffect(() => {
     if (data && !visibleKeys.has(tab)) goTo('overview');
@@ -622,6 +625,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 />
               )}
               {tab === 'themes' && <AxesTab dataset={scopedData} range={range} onOpenList={openList} />}
+              {tab === 'sdg' && <SdgTab dataset={scopedData} range={range} onOpenList={openList} />}
               {tab === 'benchmark' && <BenchmarkTab dataset={scopedData} range={range} />}
               {tab === 'charte' && <CharteTab dataset={scopedData} range={range} onOpenList={openList} />}
               {tab === 'news' && <NewsTab dataset={scopedData} slug={slug} />}

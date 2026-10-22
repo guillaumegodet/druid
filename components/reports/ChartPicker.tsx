@@ -23,6 +23,7 @@ export const FEATURE_LABELS: Record<DatasetFeature, MessageDescriptor> = {
   country: msg`needs a partner country in the report filters`,
   regions: msg`needs the regions of the partner institutions (recent export)`,
   labs: msg`needs the labs of the publications`,
+  sdgs: msg`needs the Sustainable Development Goals of the publications (export since 2026-10-22)`,
 };
 
 export const ChartPicker: React.FC<{

@@ -350,6 +350,37 @@ export const CHART_DOCS: Record<string, ChartDocSource> = {
     methode: msg`Same classification, crossed with the teams of the authors in the directory; a publication signed by several teams counts once in each.`,
     limites: msg`Same caveats as the breakdown by axis; « Non identifié » gathers the publications whose authors have no team in the directory.`,
   },
+  // ── Sustainable Development Goals ─────────────────────────────────────────
+  'sdg-repartition': {
+    description:
+      msg`Number of publications linked to each of the 17 UN Sustainable Development Goals.`,
+    methode:
+      msg`Goals assigned by OpenAlex to each work (Aurora classifier, only the goals above its threshold); a publication counts in each of its goals, so the bars add up to more than the number of tagged publications.`,
+    limites:
+      msg`About half of a corpus carries a goal; HAL-only records without a DOI are never tagged; goal 3 (health) dominates in a university with a hospital. Not comparable with rankings built on other classifiers (THE Impact Rankings).`,
+  },
+  'sdg-evolution': {
+    description:
+      msg`Yearly evolution of the publications linked to the main goals (the other goals are folded into one series).`,
+    methode:
+      msg`Same tagging as the breakdown; the six goals with the most publications over the period keep their own series.`,
+    limites:
+      msg`OpenAlex re-tags the works when its classifier changes: a yearly trend also reflects the tagging, not only the activity.`,
+  },
+  'sdg-couverture': {
+    description:
+      msg`Share of the publications of each year tagged with at least one goal.`,
+    methode:
+      msg`Publications with at least one goal divided by the publications of the year.`,
+    limites:
+      msg`A low share reflects the disciplines (fundamental, theoretical and humanities work is rarely tagged) and the sources (HAL-only records), not missing data.`,
+  },
+  'sdg-equipes': {
+    description:
+      msg`How each member lab (composite structure) or team spreads over the goals.`,
+    methode:
+      msg`Tagged publications of each lab or team, split by goal (a publication counts in each of its goals and in each of its teams).`,
+  },
 
   // ── Signature charter ──────────────────────────────────────────────────────
   'charte-conformite': {
