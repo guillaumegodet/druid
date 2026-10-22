@@ -102,6 +102,10 @@ données à exécuter au déploiement).
   écrits par les commandes de l'annuaire, route Cloudflare de l'hôte, e-mail « votre Druid est prêt »). Lot 2.
 
 ### Modifié
+- **Fiche chercheur › « Identité numérique »** (ex-« Présence médiatique ») : la carte garde les comptes et profils
+  publics déclarés (réseaux sociaux, CV, profils académiques) ; le bloc « Dernières mentions du laboratoire » et la
+  note sur les mentions individuelles sont retirés — les mentions dans les médias se consultent dans le tableau de
+  bord (Veille › Médias). Toutes les instances.
 - `README.md` : description du stockage PostgreSQL (le document Grist n'est plus la source de vérité), des
   fonctionnalités livrées depuis la version 2.0 (appels à projets, binômes, thèses, identifiants des structures,
   déploiement multi-établissements) et des variables d'environnement actuelles.

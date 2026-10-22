@@ -1,28 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { ExternalLink, Megaphone, Share2, GraduationCap } from 'lucide-react';
+import React from 'react';
+import { ExternalLink, IdCard, Share2, GraduationCap } from 'lucide-react';
 import { Researcher } from '../../types';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 
-// « Présence médiatique » block of the Personnel record (media monitoring).
-// In-place editing of the social media accounts (Grist columns Bluesky/Mastodon/
+// « Digital identity » block of the Personnel record (formerly « Media presence »): the public accounts and
+// profiles the researcher declares. In-place editing of the social media accounts (fields Bluesky/Mastodon/
 // YouTube/Podcast_flux/Blog/LinkedIn) and of the academic profiles / CVs
 // (CV_institutionnel/CV_site_labo/CV_pdf_docx_/CV_HAL/Academia/Researchgate/
 // Profil_GS/Site_web). Changes are propagated via `onUpdateField`
-// and persisted by the record's « Enregistrer » button.
-// The displayed mentions remain those of the lab as long as the named-person
-// part of media monitoring is not enabled (DPO framing — see the monitoring plan).
-
-interface LabMention {
-  id: string;
-  url: string;
-  title: string;
-  media_name: string;
-  media_type: string;
-  published_at: string;
-  status: string;
-}
+// and persisted by the record's « Enregistrer » button. The media mentions live in the dashboard
+// (components/dashboard/MediaMentionsPanel.tsx): the record no longer lists those of the lab.
 
 type SocialKey = keyof NonNullable<Researcher['socials']>;
 type ProfileKey = keyof NonNullable<Researcher['profiles']>;
@@ -88,30 +77,14 @@ const LinkField: React.FC<{
   );
 };
 
-export const MediaPresenceSection: React.FC<{
+export const DigitalIdentitySection: React.FC<{
   researcher: Researcher;
   /** Propagates a change to the record form (see ResearcherDetail.updateField).
    * Absent ⇒ read-only display (pills). */
   onUpdateField?: (field: string, value: any, subObject?: string) => void;
 }> = ({ researcher, onUpdateField }) => {
   const { t } = useLingui();
-  const labo = researcher.affiliations?.[0]?.structureName || '';
-  const [mentions, setMentions] = useState<LabMention[] | null>(null);
   const editable = !!onUpdateField;
-
-  useEffect(() => {
-    if (!labo) return;
-    let cancelled = false;
-    fetch(`/api/mentions?structure=${encodeURIComponent(labo.toLowerCase())}&days=120&limit=5`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!cancelled && d) setMentions(d.items ?? []);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [labo]);
 
   const socials = researcher.socials || {};
   const profiles = researcher.profiles || {};
@@ -125,8 +98,8 @@ export const MediaPresenceSection: React.FC<{
   return (
     <div className="glass-card p-5 flex flex-col gap-5">
       <h4 className="font-disp font-semibold text-[14px] text-ink dark:text-[#f5f2ea] flex items-center gap-2">
-        <Megaphone className="w-4 h-4" />
-        <Trans>Media presence</Trans>
+        <IdCard className="w-4 h-4" />
+        <Trans>Digital identity</Trans>
       </h4>
 
       {editable ? (
@@ -200,44 +173,6 @@ export const MediaPresenceSection: React.FC<{
           )}
         </div>
       )}
-
-      {labo && (
-        <div>
-          <div className={`${labelCls} mb-1.5`}>
-            <Trans>Latest mentions of the lab ({labo})</Trans>
-          </div>
-          {!mentions || mentions.length === 0 ? (
-            <p className="text-xs text-muted dark:text-[#c3beb0]">
-              <Trans>No recent mention collected for this lab.</Trans>
-            </p>
-          ) : (
-            <ul className="flex flex-col gap-1">
-              {mentions.map((m) => (
-                <li key={m.id} className="text-xs truncate">
-                  <a
-                    href={m.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-ink dark:text-[#f5f2ea] hover:underline"
-                    title={m.title}
-                  >
-                    <span className="text-muted dark:text-[#c3beb0]">
-                      {m.published_at?.slice(0, 10)} · {m.media_name} —{' '}
-                    </span>
-                    {m.title}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
-
-      <p className="text-[11px] text-muted-lighter dark:text-[#8f897c]">
-        <Trans>
-          The researcher's individual mentions will appear here once the personal part of the media watch is enabled (DPO review in progress).
-        </Trans>
-      </p>
     </div>
   );
 };
