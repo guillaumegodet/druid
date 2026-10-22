@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.15.0] — 2026-10-22
+
 ### Ajouté
 - **Vue « Objectifs de développement durable »** (famille Pilotage, après les axes stratégiques ; druid-internal
   `docs/plan-odd-sdg.md`, lot 1) : les 17 ODD de l'ONU qu'OpenAlex attribue à chaque publication (champ
