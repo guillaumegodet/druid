@@ -102,6 +102,16 @@ en accès ouvert. La vue **Pilotage › Suivi des APC** les présente sous trois
 
 Les montants en devises étrangères sont convertis en euros à un taux approximatif.
 
+## Objectifs de développement durable
+
+Les **17 ODD** d'une publication sont ceux qu'**OpenAlex** lui attribue (classifieur du réseau
+Aurora : seuls les objectifs au-dessus de son seuil sont conservés, avec leur score). Une
+publication peut en porter plusieurs ; elle compte alors dans chacun. Environ la moitié d'un
+corpus en porte au moins un : la part « sans ODD » tient aux disciplines et aux sources (notices
+HAL sans DOI), pas à un défaut de données. Les chiffres ne sont pas comparables aux classements
+fondés sur d'autres classifieurs (*THE Impact Rankings*, SciVal). Voir
+[Lire les objectifs de développement durable](/guides/tableau-de-bord/odd/).
+
 ## Limites connues
 
 - **Dépendance à OpenAlex** : FWCI, top 1 %/10 %, citations et APC estimées viennent

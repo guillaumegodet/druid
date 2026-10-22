@@ -13,6 +13,12 @@ n'existent que sur les instances qui en disposent (voir
 
 ### Tableau de bord
 
+- **Vue Pilotage › Objectifs de développement durable** : les 17 ODD de l'ONU qu'OpenAlex
+  attribue aux publications — chiffres clés, répartition par objectif aux couleurs officielles,
+  évolution annuelle, ODD par labo ou équipe, accès ouvert et impact par objectif, case « hors
+  ODD 3 ». Nouveau filtre ODD dans la liste des publications ; graphiques disponibles dans Mes
+  rapports et en intégration. Voir
+  [Lire les objectifs de développement durable](/guides/tableau-de-bord/odd/).
 - **Sept familles d'analyses** au lieu d'une rangée de dix-sept onglets : **Vue d'ensemble**,
   **Publications**, **Impact**, **Collaborations**, **Effectifs**, **Pilotage** et **Veille**.
   Cliquez une famille, puis l'une de ses vues sur la seconde rangée. La Vue d'ensemble se

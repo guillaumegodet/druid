@@ -1,0 +1,80 @@
+---
+title: "Read the Sustainable Development Goals"
+description: "Read the Sustainable Development Goals view: where the SDGs of a publication come from, the charts, the list filter, the limits of the OpenAlex tagging."
+sidebar:
+  order: 10
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="All profiles with access to the structure"
+	menu="Dashboard › Steering › Sustainable Development Goals"
+	disponibilite="every instance, as soon as the export of the structure carries goals (dashboards regenerated since 22 October 2026)"
+/>
+
+The **Sustainable Development Goals** view (**Steering** family) shows how the publications of
+the structure spread over the **17 SDGs** adopted by the United Nations in 2015 (health, clean
+energy, climate, life below water…). It serves sustainability and social responsibility reports,
+institutional files and labs that want to place their themes against these goals.
+
+## Where the goals of a publication come from
+
+Druid classifies nothing itself: it reads the goals **OpenAlex** assigns to each publication.
+OpenAlex uses the classifier of the **Aurora** university network, a language model trained to
+recognise, in the title and abstract, the work related to each goal. For each publication it keeps
+the goals whose **score** exceeds its threshold; a publication may carry several goals, or none.
+
+What to keep in mind:
+
+- **About half of a corpus carries a goal.** Fundamental, theoretical or methodological work, and
+  a large part of the humanities, get none: the « without SDG » share is not missing data.
+- **Only the publications known to OpenAlex are tagged.** A record that comes from HAL alone,
+  without a DOI, has no goal.
+- **SDG 3 (health) dominates** in a university with a teaching hospital: the **Excluding SDG 3**
+  box lets the sixteen other goals be read.
+- **Tags change**: OpenAlex re-tags the publications when its classifier changes. The figures of
+  two exports far apart in time may differ.
+
+## The charts
+
+| Chart | What it shows |
+|---|---|
+| **Key figures** | Publications with at least one goal (and their share of the corpus), goals covered out of 17, main goal, mean number of goals per tagged publication. |
+| **Publications by Sustainable Development Goal** | One bar per goal present, in the official order and colours. The tooltip gives the share of the tagged publications and the share of the corpus. A publication counts in **each** of its goals: the bars add up to more than the number of tagged publications. |
+| **Yearly evolution by goal** | Stacked areas of the six goals with the most publications over the period, the others folded into « Other SDGs ». |
+| **Share of publications tagged with a goal, by year** | The proportion of each year's publications carrying at least one goal. A flat curve supports year-to-year comparisons; a step signals a change of classifier or of sources. |
+| **Goals by lab or by team** | On a composite structure, the goals of each member lab; otherwise those of each team. **Share (%)** compares profiles, **Publications** compares volumes. |
+| **Open access and impact by goal** | For each goal: publications, open access share, mean FWCI, top 10 % share and international share, with the rules of the [Impact view](/en/donnees/indicateurs/#impact). |
+
+A click on a bar, an area or a count opens the **publication list** filtered on that goal (and
+on the year, lab or team clicked). The four charts are available in
+[My reports](/en/guides/rapports/ajouter-un-graphique/) and can be
+[embedded](/en/guides/tableau-de-bord/integrer-une-dataviz/) in a web page.
+
+## In the publication list
+
+The **Sustainable Development Goal** filter of the [list](/en/guides/tableau-de-bord/liste-des-publications/)
+offers each goal present in the corpus, **With a goal** and **Without goal**. The CSV export adds
+a `sdgs` column with, for each publication, the goal numbers and the classifier score.
+
+## Known limits
+
+- **A guidance indicator, not an audit**: the classifier recognises topics close to the goals, it
+  does not judge the contribution of a work to sustainable development. SDG 16 (peace, justice,
+  institutions) and SDG 4 (education) come out on many humanities publications whose link with
+  the goal is remote.
+- **Not comparable with rankings**: the *THE Impact Rankings* and SciVal rely on Elsevier's
+  keyword queries, not on OpenAlex; the volumes do not match.
+- **Compare labs of the same field**: a humanities lab and a health lab do not have the same share
+  of tagged publications; always read the « without SDG » share next to the figures.
+- The view stays **hidden** while the export of the structure carries no goal: regenerating the
+  dashboard from the [ETL console](/en/guides/administration/console-etl/) is enough.
+
+## See also
+
+- [Indicators](/en/donnees/indicateurs/#sustainable-development-goals)
+- [Choose a structure, a period, a scope](/en/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Publication list](/en/guides/tableau-de-bord/liste-des-publications/)
+- [Data sources](/en/donnees/sources-des-donnees/)
+- The 17 goals on the United Nations site: [sdgs.un.org/goals](https://sdgs.un.org/goals)
