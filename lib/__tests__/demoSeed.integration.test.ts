@@ -1,5 +1,6 @@
 // Seed of the demo loaded into PostgreSQL (lot 10 b) and read back by the PostgreSQL repository, then its fictitious
-// calls for proposals, theses and eligibility (lib/migration/demoExtras.ts) read back by the stores of the routes;
+// calls for proposals, theses, eligibility and lab identifiers (lib/migration/demoExtras.ts) read back by the stores of
+// the routes and the overview of the « Structures » alignment tab;
 // rolled back at the end. Needs DATABASE_URL (druid_owner: the load empties the tables); run by the « database » CI job
 // and `npm run test:db`.
 import fs from 'node:fs';
@@ -15,6 +16,7 @@ import { transformDirectory } from '../migration/gristToPg';
 import { transformWork } from '../migration/gristToPgWork';
 import { loadDemoExtras } from '../migration/loadDemoExtras';
 import { loadDirectory, loadWork } from '../migration/loadPg';
+import { createPgStructureAlignCommands } from '../structures/pg/alignCommands';
 import { createThesisStore } from '../thesisStore';
 
 const url = process.env.DATABASE_URL;
@@ -50,7 +52,7 @@ describe.skipIf(!url)('demo seed on PostgreSQL', () => {
     });
   });
 
-  it('loads the calls, theses and eligibility of the demo and serves them through the stores of the routes', async () => {
+  it('loads the calls, theses, eligibility and lab identifiers of the demo and serves them through the stores of the routes', async () => {
     const data = (await import('../../instances/demo/demo-data.mjs')) as DemoData;
     const directory = transformDirectory(demoDirectoryInput(data));
     const work = transformWork(emptyWorkInput(), directory.rows);
@@ -72,6 +74,10 @@ describe.skipIf(!url)('demo seed on PostgreSQL', () => {
       const rules = await eligibility.rules();
       const candidates = await eligibility.candidates(rules.find((r) => r.scheme === 'ERC-StG')!.callId);
       const phd = extras.theses.find((t) => t.status === 'defended')!;
+      const repository = createPgDirectoryRepository({ db: trx as any });
+      const structures = await createPgStructureAlignCommands({ db: trx as any, repository }).overview({ scope: { all: true, labAnchors: [] }, actor: 'test', audit: () => {} });
+      const lira = structures.rows.find((r) => r.acronym === 'LIRA')!;
+      const liraRow = await trx.selectFrom('structure').select(['rnsr', 'extra']).where('local_id', '=', 'LIRA').executeTakeFirstOrThrow();
       seen = {
         loaded,
         runs: overview.runs.length, calls: overview.calls, matches: overview.matches,
@@ -86,6 +92,10 @@ describe.skipIf(!url)('demo seed on PostgreSQL', () => {
         thesis: (await theses.thesesOfUid(phd.uid))?.theses.map((t) => [t.nnt, t.status, t.defendedOn]),
         check: (await theses.thesesOfUid(phd.uid))?.check?.found,
         coverage: await theses.coverage(),
+        structures: structures.stats,
+        liraCells: Object.fromEntries(Object.entries(lira.cells).map(([t, c]) => [t, c!.status])),
+        liraRow: [liraRow.rnsr, (liraRow.extra as any).nns, (liraRow.extra as any).hal_struct_ids, (liraRow.extra as any).hal_collection],
+        biosConflict: structures.rows.find((r) => r.acronym === 'BIOS')!.cells.rnsr!.candidates.map((c) => [c.strength, c.evidence.conflictWith]),
       };
       throw new Rollback();
     })).rejects.toBeInstanceOf(Rollback);
@@ -97,6 +107,8 @@ describe.skipIf(!url)('demo seed on PostgreSQL', () => {
         funding_call: extras.calls.length, call_match_run: extras.runs.length, call_match: extras.matches.length, call_feedback: extras.feedback.length,
         call_eligibility_rule: 2, call_eligibility: extras.eligibility.reduce((n, e) => n + e.candidates.length, 0),
         person_thesis: extras.theses.length, person_thesis_check: data.buildResearchers().filter((r) => r.IdRef).length,
+        structure_identifier: extras.structures.reduce((n, s) => n + s.identifiers.length, 0),
+        structure_alignment_candidate: extras.structures.reduce((n, s) => n + s.candidates.length, 0),
       },
       runs: extras.runs.length, calls: extras.calls.length, matches: extras.matches.length,
       programmes: ['anr-aapg', 'erc', 'horizon-europe', 'manual-region-udemo-emergence', 'msca'],
@@ -114,6 +126,10 @@ describe.skipIf(!url)('demo seed on PostgreSQL', () => {
         checked: data.buildResearchers().filter((r) => r.IdRef).length,
         withPhd: extras.theses.filter((t) => t.status === 'defended').length,
       },
+      structures: { structures: 3, actionable: 3, strong: 6, ambiguous: 1, arbitrate: 3, conflicts: 1 },
+      liraCells: { rnsr: 'present', ror: 'strong', hal_struct: 'strong', hal_collection: 'present', openalex: 'strong', idref: 'strong', wikidata: 'arbitrate' },
+      liraRow: ['000000001A', '000000001A', '900000101', 'https://hal.science/UDEMO-LIRA'],
+      biosConflict: [['conflict', '000000002B']],
     });
   });
 });
