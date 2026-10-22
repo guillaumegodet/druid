@@ -13,6 +13,10 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Corrigé
+- **Provisionnement d'un tenant SaaS sur une base dont le schéma `public` est vide** (Clever Cloud) : la version de
+  l'annuaire était lue par deux requêtes SQL brutes sur `audit_log`, non qualifiées par le schéma du tenant ; le
+  premier enregistrement de l'annuaire échouait (« relation "audit_log" does not exist ») et le tenant restait en
+  `provisioning`. Lecture par le query builder (qualifiée) ; la CI rejoue les tests multi-tenants sur une base vierge.
 - **`sslmode=require` sur une base managée** : node-postgres (serveur, runner, CLI des tenants) le lisait comme
   `verify-full` et refusait le certificat auto-signé de Clever Cloud (« self-signed certificate ») ; `sslmode` suit
   désormais la sémantique libpq (`require`/`prefer` = TLS sans vérification du certificat, `disable` = sans TLS,

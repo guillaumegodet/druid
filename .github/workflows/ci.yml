@@ -121,6 +121,16 @@ jobs:
         run: npx kysely-codegen --verify
       - name: Integration tests
         run: npm run -s test:db
+      # A managed multi-tenant database (Clever Cloud) has an EMPTY public schema: a query that falls back to
+      # `public` passes on the migrated database above and fails there (« relation "audit_log" does not exist »).
+      - name: Multi-tenant tests on a database whose public schema is empty
+        env:
+          SUPERUSER_URL: postgres://postgres:postgres@localhost:5432/druid
+          DATABASE_URL: postgres://druid_owner:owner@localhost:5432/blank?sslmode=disable
+          DATABASE_URL_APP: postgres://druid_app:app@localhost:5432/blank?sslmode=disable
+        run: |
+          psql "$SUPERUSER_URL" -v ON_ERROR_STOP=1 -qc "CREATE DATABASE blank OWNER druid_owner"
+          npm run -s test:db:saas
 
   # Conventional Commits on the commits a pull request brings (CONTRIBUTING.md): they feed the CHANGELOG.
   commit-messages:
