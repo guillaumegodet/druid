@@ -94,6 +94,7 @@ DEMO_LABS = {
             ("Cybersécurité", ["sécurité", "cryptographie", "vie privée"]),
         ],
         "domains": ["Physical Sciences"],
+        "sdgs": [(9, 5), (4, 3), (16, 2), (11, 2), (7, 1)],
         "subfields": ["Artificial Intelligence", "Computer Networks and Communications",
                       "Computer Security and Cryptography", "Software"],
         "topics": ["Machine learning for networks", "Peer-to-peer systems",
@@ -111,6 +112,7 @@ DEMO_LABS = {
             ("Biologie des systèmes", ["modélisation", "systèmes", "métabolisme"]),
         ],
         "domains": ["Life Sciences"],
+        "sdgs": [(3, 4), (14, 4), (15, 3), (2, 2), (13, 2), (6, 1)],
         "subfields": ["Genetics", "Ecology", "Molecular Biology", "Systems Biology"],
         "topics": ["Functional genomics", "Population ecology modelling",
                    "Metabolic networks", "Conservation biology",
@@ -127,6 +129,7 @@ DEMO_LABS = {
             ("Géométrie", ["géométrie", "topologie", "variété"]),
         ],
         "domains": ["Physical Sciences"],
+        "sdgs": [(9, 3), (4, 2), (13, 1), (7, 1)],
         "subfields": ["Analysis", "Probability and Statistics", "Geometry and Topology",
                       "Applied Mathematics"],
         "topics": ["Partial differential equations", "Stochastic processes",
@@ -147,6 +150,7 @@ DEMO2_LABS = {
             ("Procédés de fabrication", ["fabrication additive", "usinage", "procédé"]),
         ],
         "domains": ["Physical Sciences"],
+        "sdgs": [(9, 5), (7, 3), (12, 2), (13, 2), (11, 1)],
         "subfields": ["Mechanics of Materials", "Fluid Flow and Transfer Processes",
                       "Industrial and Manufacturing Engineering", "Materials Chemistry"],
         "topics": ["Fatigue of composite structures", "Turbulent flow simulation",
@@ -163,6 +167,7 @@ DEMO2_LABS = {
             ("Robotique", ["robot", "commande", "vision"]),
         ],
         "domains": ["Physical Sciences"],
+        "sdgs": [(9, 5), (7, 2), (11, 2), (12, 1)],
         "subfields": ["Control and Systems Engineering", "Hardware and Architecture",
                       "Artificial Intelligence", "Industrial and Manufacturing Engineering"],
         "topics": ["Real-time embedded systems", "Digital twins for manufacturing",
@@ -354,6 +359,25 @@ def make_funders():
     return funders, awards
 
 
+def make_sdgs(doi, cfg):
+    """UN Sustainable Development Goals of a publication (DashboardPublication.sdgs, « ODD » dashboard
+    view): about half of the publications carry one or two goals of the lab's pool with a
+    classifier score, as OpenAlex tags them. Drawn from a generator seeded by the DOI so that the
+    main stream (and every other value of the demo) stays unchanged; key omitted when none."""
+    rng = random.Random(f"sdgs:{doi}")
+    if rng.random() >= 0.52:
+        return {}
+    pool = cfg["sdgs"]
+    goals = []
+    for _ in range(rng.choices([1, 2], weights=[70, 30])[0]):
+        goal = rng.choices([g for g, _ in pool], weights=[w for _, w in pool])[0]
+        if goal not in goals:
+            goals.append(goal)
+    sdgs = sorted(({"id": g, "score": round(rng.uniform(0.42, 0.99), 2)} for g in goals),
+                  key=lambda x: -x["score"])
+    return {"sdgs": sdgs}
+
+
 def make_pub(lab_slug, cfg, lab_teams, member_ids, extra_ids, sibling_labs):
     year = random.randint(YEAR_FROM, YEAR_TO)
     ptype = pick(PUB_TYPES)
@@ -407,7 +431,7 @@ def make_pub(lab_slug, cfg, lab_teams, member_ids, extra_ids, sibling_labs):
     funders, awards = make_funders()
     is_article = ptype == "Article de revue"
 
-    return {
+    rec = {
         "sources": sources, "sourceDb": source_db,
         "crisalidHarvesters": cr_harvesters, "openalexLookup": oa_lookup,
         "funders": funders, "awards": awards,
@@ -440,6 +464,8 @@ def make_pub(lab_slug, cfg, lab_teams, member_ids, extra_ids, sibling_labs):
         "journalPublisher": publisher if is_article else None,
         "charte": make_charte(cfg["acronym"], nu_seul),
     }
+    rec.update(make_sdgs(rec["doi"], cfg))   # after the dict: the random stream stays as before
+    return rec
 
 
 def build_lab(slug, cfg, members, lab_teams, sibling_names):
