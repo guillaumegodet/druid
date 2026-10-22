@@ -12,6 +12,14 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Démo publique : onglet « Structures » de l'alignement des identifiants garni.** Le seed de la démo écrit désormais
+  des identifiants fictifs pour les trois labos (RNSR, ROR, HAL, collection HAL, OpenAlex, IdRef) et les candidats qu'un
+  passage du job d'alignement aurait laissés : candidats forts atteints par les passerelles, ambiguïté entre deux
+  notices IdRef, notices à arbitrer, RNSR confirmé contredit par le registre, recherches sans résultat, type jamais
+  cherché (`lib/migration/demoStructureIds.ts`). Les valeurs ne peuvent désigner aucune notice réelle (RNSR en « 0000… »,
+  ROR hors alphabet, HAL à neuf chiffres, PPN à clé fausse) et sont projetées sur les fiches des structures.
+
 ## [2.15.0] — 2026-10-22
 
 ### Ajouté
