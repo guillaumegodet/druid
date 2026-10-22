@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { StructureLevel, StructureMission, StructureNature, StructureStatus, type Structure } from '../../types';
 import type { Db } from '../db/core';
 import type { CommandContext } from '../directory/commands';
+import { ApiError } from '../directory/errors';
 import { createPgStorage } from '../directory/pg/storage';
 import { RESERVED_SLUGS, SLUG_RE, normalizeEmail } from './controlPlane';
 
@@ -205,8 +206,14 @@ export const seedTenantDirectory = async (db: Db, payload: OnboardingPayload, ac
   const ctx: CommandContext = { scope: { all: true, labAnchors: [] }, actor, audit: () => {} };
   const report: SeedReport = { institution: 0, structures: 0, skipped: [] };
   const e = payload.establishment;
-  await store.commands.createInstitution({ name: e.name, label: e.nameEn || undefined, uai: e.uai || undefined, ror: e.ror || undefined, idref: e.idref || undefined }, ctx);
-  report.institution = 1;
+  try {
+    await store.commands.createInstitution({ name: e.name, label: e.nameEn || undefined, uai: e.uai || undefined, ror: e.ror || undefined, idref: e.idref || undefined }, ctx);
+    report.institution = 1;
+  } catch (err) {
+    // A retried provisioning (portal « Retry ») finds the institution of the first attempt: kept, not an error.
+    if (!(err instanceof ApiError && err.status === 409)) throw err;
+    report.skipped.push({ acronym: e.name, reason: err.message });
+  }
   const seen = new Set<string>();
   for (const lab of payload.labs) {
     const key = lab.acronym.trim().toUpperCase();

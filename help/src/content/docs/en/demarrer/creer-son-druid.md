@@ -29,7 +29,8 @@ identifiers and builds your space.
    the e-mail domain of the institution. Confirm.
 
 The build takes less than a minute: database, structures, address. You receive an e-mail when
-it is done, and the **Open my Druid** button signs you in directly.
+it is done, and the **Open my Druid** button signs you in directly. If the build fails, the page says so
+and offers **Retry**; if it fails again, contact support.
 
 ## Next
 

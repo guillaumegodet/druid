@@ -12,6 +12,11 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Portail SaaS : bouton « Réessayer »** sur la page de construction quand le provisionnement d'un tenant a échoué
+  (`POST /start/api/tenants/:slug/retry`, propriétaire seulement, refusé si une construction est déjà en file ou en
+  cours) ; le seed de l'annuaire tolère une reprise (établissement déjà créé conservé).
+
 ### Corrigé
 - **Provisionnement d'un tenant SaaS sur une base dont le schéma `public` est vide** (Clever Cloud) : la version de
   l'annuaire était lue par deux requêtes SQL brutes sur `audit_log`, non qualifiées par le schéma du tenant ; le

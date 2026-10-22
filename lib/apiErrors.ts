@@ -38,6 +38,7 @@ export const API_ERRORS = [
   // Tenants of a control plane (druid-internal docs/plan-druid-saas.md, lot 1 e)
   msg`Authentication required`,
   msg`This account is not a member of this Druid`,
+  msg`Only the owner can retry the construction`,
   msg`Not a tenant of the control plane`,
   msg`Invalid request`,
   msg`Invalid e-mail address`,
