@@ -34,8 +34,9 @@ export const createPgDirectoryRepository = ({ db, loadLdapCache }: PgDirectoryRe
   /** Last audit row: id = version (cache key), date = `updatedAt` of the lists. The output column is not named `id`:
    * `ORDER BY id` would then sort the text alias ('999' > '5237') and the version would stop moving. */
   const version = async (): Promise<{ key: string; updatedAt: string }> => {
-    const r = await sql<{ key: string | null; at: Date | null }>`SELECT id::text AS key, at FROM audit_log ORDER BY id DESC LIMIT 1`.execute(db);
-    const row = r.rows[0];
+    // Query builder, not a raw `sql\`…\``: a raw statement is not qualified by `withSchema` and would read the
+    // audit_log of `public` on a multi-tenant database (empty there: « relation "audit_log" does not exist »).
+    const row = await db.selectFrom('audit_log').select([sql<string>`id::text`.as('key'), 'at']).orderBy('id', 'desc').limit(1).executeTakeFirst();
     return { key: row?.key ?? '0', updatedAt: row?.at ? new Date(row.at).toISOString() : '' };
   };
 

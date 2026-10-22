@@ -11,7 +11,7 @@
 //                         `annuaire_rows` = its directory rows (the detection rules of sync_tasks match them)
 // Any other table, or a write these tables do not take, is refused (404 / 501) rather than lost; the schema is the
 // migrations' own (adding tables or columns is a no-op). Every write is one transaction, audited under `actor`.
-import { sql, type Transaction } from 'kysely';
+import type { Transaction } from 'kysely';
 import type { DB } from '../../db/schema.gen';
 import type { Db } from '../../db/client';
 import { ApiError } from '../errors';
@@ -127,8 +127,9 @@ export const createPgTableClient = ({ db, actor = '' }: PgTableClientOptions): G
 
   return {
     docUpdatedAt: async () => {
-      const r = await sql<{ at: Date | null }>`SELECT max(at) AS at FROM audit_log`.execute(db);
-      return r.rows[0]?.at ? new Date(r.rows[0].at).toISOString() : '';
+      // Query builder (qualified by `withSchema` on a tenant schema), never a raw `FROM audit_log`.
+      const r = await db.selectFrom('audit_log').select((eb) => eb.fn.max('at').as('at')).executeTakeFirst();
+      return r?.at ? new Date(r.at as any).toISOString() : '';
     },
     tableIds,
     records,
