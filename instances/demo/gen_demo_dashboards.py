@@ -9,7 +9,12 @@ instances/demo/dashboard-data/ by scripts/prepare-cloudflare-assets.cjs.
 Writes, for the university (udemo, union of the labs) and each lab (lira, bios, lmd):
   dashboard-data/<slug>/dashboard.json  same contract as the druid-biblio export
   dashboard-data/<slug>/news.json       « Veille » tab (static fallback of /api/news/:slug)
-and dashboard-data/index.json (structures) and dashboard-data/mentions.json (« Médias » panel).
+and dashboard-data/index.json (structures), dashboard-data/mentions.json (« Médias » panel) and
+dashboard-data/network.json: the university-wide co-authorship network (same contract as the version 5 export of
+druid-biblio biblio_etl/network_export.py — poles, labs, authors with their Druid uid, publications with their
+OpenAlex topics and cited works) read by the Functions of /api/network/* and /api/researchers/:key/pairs
+(functions/_lib/network.js): « Réseau » tab, « Binômes » sub-tab, suggested connections, « Binômes de recherche »
+block of the record.
 
 Members and authors come from the researchers of the demo Grist doc (demo-data.mjs), so the
 dashboards name the same people as the directory. Everything is fictitious (titles, journals,
@@ -78,7 +83,7 @@ NAT_PARTNERS = [
     ("Université Témoin de Strasbourg", "Strasbourg", 48.5734, 7.7521),
 ]
 
-TODAY = "2026-09-24"
+TODAY = "2026-10-22"
 
 DEMO_LABS = {
     "lira": {
@@ -92,7 +97,8 @@ DEMO_LABS = {
         "subfields": ["Artificial Intelligence", "Computer Networks and Communications",
                       "Computer Security and Cryptography", "Software"],
         "topics": ["Machine learning for networks", "Peer-to-peer systems",
-                   "Privacy-preserving computation", "Graph neural networks"],
+                   "Privacy-preserving computation", "Graph neural networks",
+                   "Machine learning for genomics", "Numerical optimisation"],
         "journals": [("Journal of Fictional Computing", "2000-0001", "Demo Press"),
                      ("Transactions on Applied Networks", "2000-0002", "Sample Publishing"),
                      ("Review of Machine Intelligence (démo)", "2000-0003", "Mock Journals")],
@@ -107,7 +113,8 @@ DEMO_LABS = {
         "domains": ["Life Sciences"],
         "subfields": ["Genetics", "Ecology", "Molecular Biology", "Systems Biology"],
         "topics": ["Functional genomics", "Population ecology modelling",
-                   "Metabolic networks", "Conservation biology"],
+                   "Metabolic networks", "Conservation biology",
+                   "Machine learning for genomics", "Stochastic population models"],
         "journals": [("Fictional Journal of Genomics", "2000-1001", "Demo Life Press"),
                      ("Ecology Letters (échantillon)", "2000-1002", "Sample Bio"),
                      ("Systems Biology Review (démo)", "2000-1003", "Mock Bio")],
@@ -123,7 +130,8 @@ DEMO_LABS = {
         "subfields": ["Analysis", "Probability and Statistics", "Geometry and Topology",
                       "Applied Mathematics"],
         "topics": ["Partial differential equations", "Stochastic processes",
-                   "Differential geometry", "Numerical analysis"],
+                   "Differential geometry", "Numerical analysis",
+                   "Numerical optimisation", "Stochastic population models"],
         "journals": [("Fictional Journal of Analysis", "2000-2001", "Demo Math Press"),
                      ("Annals of Sample Probability", "2000-2002", "Mock Math"),
                      ("Review of Demonstrative Geometry", "2000-2003", "Example Math")],
@@ -194,6 +202,7 @@ def load_members(path):
         departed = bool(end) and end < TODAY
         labs.setdefault(r["LABO"], []).append({
             "label": f"{r['Prenom']} {r['Nom']}",
+            "uid": r["uid_dyna"],
             "team": r.get("team") or None,
             "isPhd": r["Corps_grade"] == "Doctorant",
             "type": "Titulaire" if r.get("TYPE_EMPLOI") in ("TITULAIRE", "EMERITE") else "Contractuel",
@@ -229,7 +238,8 @@ def build_authors(members):
         aid = _next_author_id
         _next_author_id += 1
         teams = [m["team"]] if m["team"] else []
-        authors.append({"id": aid, "label": m["label"], "teams": teams, "isPhd": m["isPhd"]})
+        authors.append({"id": aid, "label": m["label"], "teams": teams, "isPhd": m["isPhd"], "uid": m["uid"],
+                        "departed": m["departed"]})
         if not m["departed"]:
             member_out.append({"label": m["label"], "type": m["type"], "teams": teams,
                                "isPhd": m["isPhd"], "authorId": aid, "employer": m["employer"]})
@@ -447,8 +457,8 @@ def build_lab(slug, cfg, members, lab_teams, sibling_names):
 
 
 # Fixed dates: deterministic output (« Veille » tab, static demo).
-NEWS_FETCHED_AT = "2026-09-24T09:00:00Z"
-NEWS_DATES = [f"2026-{m:02d}-{d:02d}" for m in (7, 8, 9) for d in (3, 9, 15, 21)]
+NEWS_FETCHED_AT = "2026-10-22T09:00:00Z"
+NEWS_DATES = [f"2026-{m:02d}-{d:02d}" for m in (8, 9, 10) for d in (3, 9, 15, 21) if (m, d) <= (10, 21)]
 
 
 def build_news(slug, cfg, data):
@@ -496,7 +506,7 @@ def build_mentions():
         slug = random.choice(list(LABS))
         media, mtype = random.choice(media_outlets())
         day = random.randint(1, 170)
-        date = f"2026-{3 + day // 30:02d}-{1 + day % 28:02d}T08:00:00+00:00"
+        date = f"2026-{5 + day // 30:02d}-{1 + day % 28:02d}T08:00:00+00:00"
         subject = random.choice(TITLE_SUBJECTS)
         items.append({
             "id": f"demo-mention-{i + 1:03d}",
@@ -513,6 +523,145 @@ def build_mentions():
     return {"generated_at": NEWS_FETCHED_AT, "days": 180, "total": len(items), "items": items,
             "collectors": [{"collector": "rss", "last_run": NEWS_FETCHED_AT, "last_status": "ok",
                             "last_count": len(items), "consecutive_empty": 0}]}
+
+
+# ── University-wide co-authorship network (network.json, version 5) ──────────────────────────
+# Same contract as druid-biblio biblio_etl/network_export.py, read by scripts/lib/co_network.cjs:
+#   poles, labs (acronym, slug, pole), fields / subfields / topics vocabularies (indexes in the publications),
+#   refs (OpenAlex W-ids of the cited works, indexes in pubs[].r), authors (id, label, labs, pubs per year,
+#   m = kind of membership per lab, phd, f = profile of OpenAlex fields, uid = Druid record), pubs (y, n, a, doi,
+#   title, w, s, t, r).
+POLES = {"PST": "Pôle Sciences et Technologies", "PVS": "Pôle Vie et Santé"}
+LAB_POLE = {"lira": "PST", "lmd": "PST", "bios": "PVS", "mecademo": "PST", "syndemo": "PST"}
+FIELD_OF_SUBFIELD = {
+    "Artificial Intelligence": ("Computer Science", "Physical Sciences"),
+    "Computer Networks and Communications": ("Computer Science", "Physical Sciences"),
+    "Computer Security and Cryptography": ("Computer Science", "Physical Sciences"),
+    "Software": ("Computer Science", "Physical Sciences"),
+    "Genetics": ("Biochemistry, Genetics and Molecular Biology", "Life Sciences"),
+    "Molecular Biology": ("Biochemistry, Genetics and Molecular Biology", "Life Sciences"),
+    "Systems Biology": ("Biochemistry, Genetics and Molecular Biology", "Life Sciences"),
+    "Ecology": ("Agricultural and Biological Sciences", "Life Sciences"),
+    "Analysis": ("Mathematics", "Physical Sciences"),
+    "Probability and Statistics": ("Mathematics", "Physical Sciences"),
+    "Geometry and Topology": ("Mathematics", "Physical Sciences"),
+    "Applied Mathematics": ("Mathematics", "Physical Sciences"),
+    "Mechanics of Materials": ("Engineering", "Physical Sciences"),
+    "Fluid Flow and Transfer Processes": ("Chemical Engineering", "Physical Sciences"),
+    "Industrial and Manufacturing Engineering": ("Engineering", "Physical Sciences"),
+    "Materials Chemistry": ("Materials Science", "Physical Sciences"),
+    "Control and Systems Engineering": ("Engineering", "Physical Sciences"),
+    "Hardware and Architecture": ("Computer Science", "Physical Sciences"),
+}
+# Cross-lab researcher pairs: (lab of A, lab of B, joint publications). Drawn among the present permanent members
+# so that the « Binômes » sub-tab shows observed pairs between labs and between poles (LIRA/LMD = PST, BIOS = PVS).
+CROSS_LAB_PAIRS = [("lira", "bios", 5), ("lira", "bios", 3), ("lira", "lmd", 4), ("lira", "lmd", 2),
+                   ("bios", "lmd", 3), ("bios", "lmd", 2), ("lira", "bios", 2), ("lmd", "bios", 4)]
+W_PUB_BASE = 80000000
+W_REF_BASE = 90000000
+
+
+def build_network(built, slug):
+    """network.json of the whole fictitious university from the labs' dashboards (authors and publications)."""
+    labs = list(built)
+    lab_acr = {s: built[s]["lab"] for s in labs}
+    acr_lab = {v: k for k, v in lab_acr.items()}
+    # Vocabularies (sorted: stable indexes).
+    subfield_names = sorted({sf for d in built.values() for p in d["publications"] for sf in p["subfields"]})
+    field_names = sorted({FIELD_OF_SUBFIELD[sf][0] for sf in subfield_names})
+    topic_names = sorted({t for d in built.values() for p in d["publications"] for t in p["topics"]})
+    sf_index = {n: i for i, n in enumerate(subfield_names)}
+    field_index = {n: i for i, n in enumerate(field_names)}
+    topic_index = {n: i for i, n in enumerate(topic_names)}
+    # Authors: members (with uid) and fictitious co-authors (publications only).
+    authors = {}
+    members_by_lab = {}
+    for s in labs:
+        for a in built[s]["authors"]:
+            if not a.get("uid"):
+                # Fictitious co-author without a Druid record: resolved to no lab (common co-author of the suggestions).
+                authors[a["id"]] = {"id": a["id"], "label": a["label"], "labs": [], "pubs": {}, "phd": False, "f": {}}
+                continue
+            kind = "assoc" if a.get("departed") else "stat"
+            authors[a["id"]] = {"id": a["id"], "label": a["label"], "labs": [lab_acr[s]], "pubs": {}, "m": {lab_acr[s]: kind},
+                                "phd": bool(a["isPhd"]), "f": {}, "uid": a["uid"]}
+            if kind == "stat" and not a["isPhd"]:
+                members_by_lab.setdefault(s, []).append(a["id"])
+    # Publications, in a stable order, each with an OpenAlex-like id.
+    pubs = []
+    for s in labs:
+        for p in built[s]["publications"]:
+            pubs.append({"lab": s, "y": p["year"], "n": p["authorCount"], "a": list(p["authorIds"]), "doi": p["doi"],
+                         "title": p["title"], "s": sorted(sf_index[x] for x in p["subfields"]),
+                         "t": sorted(topic_index[x] for x in p["topics"])})
+    for i, p in enumerate(pubs):
+        p["w"] = f"W{W_PUB_BASE + i}"
+    # Cross-lab pairs: B co-signs some publications of A's lab. The list names the labs of the demo; another universe
+    # (demo-2) gets a few pairs between its first two labs.
+    pairs_used = set()
+    specs = [t for t in CROSS_LAB_PAIRS if t[0] in members_by_lab and t[1] in members_by_lab]
+    if not specs and len(labs) >= 2:
+        specs = [(labs[0], labs[1], k) for k in (4, 3, 2, 2)]
+    for lab_a, lab_b, k in specs:
+        cands_a = [i for i in members_by_lab[lab_a] if i not in pairs_used]
+        cands_b = [i for i in members_by_lab[lab_b] if i not in pairs_used]
+        if not cands_a or not cands_b:
+            continue
+        a, b = random.choice(cands_a), random.choice(cands_b)
+        pairs_used.update([a, b])
+        joint = [p for p in pubs if p["lab"] == lab_a and a in p["a"] and p["y"] >= 2021]
+        for p in random.sample(joint, min(k, len(joint))):
+            p["a"].append(b)
+            p["n"] = max(p["n"], len(p["a"]))
+    # Cited works: a pool per lab, a pool shared by every lab (bibliographic coupling across labs), plus direct
+    # citations of other demo publications (one lab citing another).
+    refs = []
+    ref_index = {}
+
+    def ref(wid):
+        if wid not in ref_index:
+            ref_index[wid] = len(refs)
+            refs.append(wid)
+        return ref_index[wid]
+    shared_pool = [f"W{W_REF_BASE + i}" for i in range(40)]
+    lab_pool = {s: [f"W{W_REF_BASE + 1000 * (k + 1) + i}" for i in range(80)] for k, s in enumerate(labs)}
+    pubs_with_refs = 0
+    for p in pubs:
+        if random.random() < 0.15:  # no reference list known
+            continue
+        own = random.sample(lab_pool[p["lab"]], random.randint(3, 8))
+        common = random.sample(shared_pool, random.randint(0, 3))
+        cited = []
+        if random.random() < 0.35:  # cites demo publications, often of another lab
+            others = [q for q in pubs if q["y"] < p["y"] and q is not p]
+            cited = [q["w"] for q in random.sample(others, min(len(others), random.randint(1, 3)))]
+        p["r"] = sorted({ref(w) for w in own + common + cited})
+        pubs_with_refs += 1
+    # Per-author production and field profile.
+    for p in pubs:
+        for aid in p["a"]:
+            a = authors[aid]
+            a["pubs"][str(p["y"])] = a["pubs"].get(str(p["y"]), 0) + 1
+            for sfi in p["s"]:
+                fi = str(field_index[FIELD_OF_SUBFIELD[subfield_names[sfi]][0]])
+                a["f"][fi] = a["f"].get(fi, 0) + 1
+    out_pubs = [{k: v for k, v in p.items() if k != "lab"} for p in pubs]
+    signatures = sum(p["n"] for p in pubs)
+    resolved = sum(len(p["a"]) for p in pubs)
+    return {
+        "version": 5, "slug": slug, "generatedAt": NEWS_FETCHED_AT,
+        "poles": [{"acronym": k, "name": v} for k, v in POLES.items()],
+        "labs": [{"acronym": lab_acr[s], "slug": s, "pole": LAB_POLE.get(s),
+                  "authors": sum(1 for a in authors.values() if lab_acr[s] in a["labs"])} for s in labs],
+        "fields": [{"name": n, "domain": next(d for f, d in FIELD_OF_SUBFIELD.values() if f == n)} for n in field_names],
+        "subfields": [{"name": n, "field": FIELD_OF_SUBFIELD[n][0], "domain": FIELD_OF_SUBFIELD[n][1]} for n in subfield_names],
+        "topics": [{"name": n} for n in topic_names],
+        "refs": refs,
+        "coverage": {"authors": len(authors) + 40, "resolvedAuthors": len(authors), "signatures": signatures,
+                     "resolvedSignatures": resolved, "pubsWithRefs": pubs_with_refs},
+        "authors": [authors[i] for i in sorted(authors)],
+        "pubs": out_pubs,
+    }
 
 
 def write_json(path, data, indent=None):
@@ -575,7 +724,9 @@ def main():
     write_json(os.path.join(out, "index.json"),
                {"slugs": slugs, "groups": [], "tabsHidden": {s: ["benchmark"] for s in slugs}}, indent=1)
     write_json(os.path.join(out, "mentions.json"), build_mentions())
-    print(f"index.json: {slugs}; mentions.json")
+    net = build_network(built, agg["slug"])
+    write_json(os.path.join(out, "network.json"), net)
+    print(f"index.json: {slugs}; mentions.json; network.json: {len(net['authors'])} authors, {len(net['pubs'])} publications")
 
 
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ time with the `INSTANCES_REPO_TOKEN` secret when `instances/<slug>/` is absent h
 | Instance | Folder | Access | Grist writes |
 | --- | --- | --- | --- |
 | Centrale Nantes | `centrale/` of `guillaumegodet/druid-instances` (private: real PII) | Cloudflare Access | yes, with an Access identity |
-| Public demo | `demo/` (fictitious data, see its README) — PostgreSQL (Neon) through Hyperdrive since lot 10 c | public | no (`readOnly` in its `instance.json`) |
+| Public demo | `demo/` (fictitious data, see its README) — PostgreSQL (Neon) through Hyperdrive since lot 10 c; calls for proposals, theses and co-authorship network seeded with it | public | no (`readOnly` in its `instance.json`) |
 | Second demo (shared deployment prototype) | `demo-2/` (fictitious data, see its README) | public | no |
 
 ## Instance registry: `instance.json`
@@ -33,8 +33,11 @@ docs/plan-migration-postgresql.md, lot 10):
   unless the doc is public;
 - `postgres`: a PostgreSQL database (schema `db/migrations`, roles `db/roles.sql`) reached through a **Hyperdrive**
   binding of the Pages project named `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` on a shared deployment, like the secrets),
-  with the connection string of the `druid_app` role. No `grist` block, no `GRIST_API_KEY`; the `newsletter` feature
-  is not available yet (its table still lives in a document, lot 10 d). The Functions open one database client per
+  with the connection string of the `druid_app` role. No `grist` block, no `GRIST_API_KEY`; the news items of the
+  newsletter are rows of the database (`newsletter_item`, lot 10 d). The storage also opens the PostgreSQL-only
+  features of the Functions: identifiers of the structures (`HAS_STRUCTURE_IDS`), calls for proposals and theses of
+  the records (`HAS_CALLS`: `functions/api/calls/`, `functions/api/researchers/`), opinions on the suggested
+  connections. The Functions open one database client per
   request (Hyperdrive keeps the pool) and need the Node.js compatibility of the project at runtime (`nodejs_compat`,
   Settings › Runtime, default for a compatibility date from 2026-08-04); the driver is bundled by the build with its
   Node built-ins as `node:*` (`functions/_generated/pg.js`), since the Pages build system compiles the Functions without
@@ -116,6 +119,13 @@ Every domain of every instance must also be attached to the Pages project (Custo
 `/api/news/*` and `/api/newsletter/*` hold Centrale structures and staff filters in their code:
 they answer 404 unless `features.news` / `features.newsletter` is true in `instance.json` (without
 `instance.json`: Centrale only).
+
+`features.network` says that `dashboard-data/network.json` of the instance is the university-wide co-authorship
+network exported by druid-biblio (`biblio_etl/network_export.py`, version 5 with the cited works): the Functions
+`/api/network/*` and `/api/researchers/:key/pairs` (functions/_lib/network.js) then serve the « Réseau » tab in
+inter-lab mode, the « Binômes » sub-tab of Partnerships with the suggested connections, and the « Binômes de
+recherche » block of the record (capability `HAS_NETWORK_API`). Without the feature they answer 404 and the front
+hides these views. The file is read through `env.ASSETS` once per isolate.
 
 A `DRUID_INSTANCE` without a matching `instances/<slug>/` folder fails the build on purpose, so
 a typo cannot silently deploy a site without data.

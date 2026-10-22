@@ -64,6 +64,8 @@ export const resolveInstance = (env = {}, reg = null, { shared = false } = {}) =
     features: {
       news: reg ? !!reg.features?.news : slug === DEFAULT_SLUG,
       newsletter: reg ? !!reg.features?.newsletter : slug === DEFAULT_SLUG,
+      // The dashboards of the instance ship a network.json (functions/_lib/network.js).
+      network: !!reg?.features?.network,
     },
     admins: isSet(e.ADMIN_EMAILS) ? parseAdminEmails(e.ADMIN_EMAILS) : (reg?.admins || []).map((a) => a.toLowerCase()),
     openalexMailto: [e.OPENALEX_MAILTO, reg?.openalexMailto].find(isSet) || null,

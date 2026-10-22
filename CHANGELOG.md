@@ -16,6 +16,20 @@ données à exécuter au déploiement).
 - **Portail SaaS : bouton « Réessayer »** sur la page de construction quand le provisionnement d'un tenant a échoué
   (`POST /start/api/tenants/:slug/retry`, propriétaire seulement, refusé si une construction est déjà en file ou en
   cours) ; le seed de l'annuaire tolère une reprise (établissement déjà créé conservé).
+- **Démo publique à jour des fonctionnalités récentes** (https://druid-demo.pages.dev) : les instances Cloudflare sur
+  PostgreSQL servent désormais les routes des **appels à projets** (`/api/calls/*`, `/api/researchers/:key/calls`),
+  des **thèses** (`/api/researchers/:key/theses`, `by-row`) et, quand leurs tableaux de bord embarquent le réseau de
+  cosignatures de l'établissement (`features.network` dans `instance.json`, fichier `dashboard-data/network.json`
+  version 5 de druid-biblio), celles du **réseau inter-labos et des binômes** (`/api/network/*`,
+  `/api/researchers/:key/pairs` : onglet Réseau en mode inter-labos, sous-onglet Binômes avec les rapprochements
+  suggérés, bloc « Binômes de recherche » de la fiche). Capacités `HAS_CALLS` (stockage PostgreSQL) et
+  `HAS_NETWORK_API` (feature `network`) renvoyées par `/api/me` des Functions. Les données fictives de la démo
+  s'enrichissent en conséquence (`lib/migration/demoExtras.ts`, chargées par le seed à chaque déploiement) : douze
+  appels (clusters Horizon Europe, ERC Starting / Consolidator avec leur fenêtre de thèse, MSCA, axes ANR, un appel
+  régional saisi à la main) appariés aux chercheurs avec leurs propres publications pour preuves, candidats par étape
+  de carrière, thèse de chaque chercheur, quelques avis ; `network.json` fictif (binômes entre labos et entre pôles,
+  références communes, citations directes) ; dates de la veille et des mentions rafraîchies. Sur une instance sans la
+  feature ou sans PostgreSQL, ces routes répondent 404 / 501 et le front masque les vues, comme avant.
 
 ### Corrigé
 - **Provisionnement d'un tenant SaaS sur une base dont le schéma `public` est vide** (Clever Cloud) : la version de
@@ -88,6 +102,9 @@ données à exécuter au déploiement).
   écrits par les commandes de l'annuaire, route Cloudflare de l'hôte, e-mail « votre Druid est prêt »). Lot 2.
 
 ### Modifié
+- `README.md` : description du stockage PostgreSQL (le document Grist n'est plus la source de vérité), des
+  fonctionnalités livrées depuis la version 2.0 (appels à projets, binômes, thèses, identifiants des structures,
+  déploiement multi-établissements) et des variables d'environnement actuelles.
 - Entrée de menu « Alignement des identifiants » (ex-« Alignement des identifiants chercheurs ») : la page porte
   désormais les personnes et les structures.
 
