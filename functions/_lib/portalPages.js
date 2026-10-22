@@ -134,7 +134,10 @@ const job=(j.jobs||[]).find((x)=>x.type==='tenant.provision');const p=(job&&job.
 document.getElementById('detail').textContent=p.step?(STEPS[p.step]||p.step)+(p.structures!=null?' — '+p.structures+' structures':''):'';
 if(j.status==='active'){document.getElementById('msg').textContent='Votre Druid est prêt. · Your Druid is ready.';document.getElementById('actions').innerHTML='<button class="btn" id="open" type="button">Ouvrir mon Druid · Open my Druid</button>';
 document.getElementById('open').onclick=async()=>{const r2=await fetch('/start/api/tenants/${esc(slug)}/open',{method:'POST'});const j2=await r2.json();if(j2.url)location.href=j2.url;else document.getElementById('msg').textContent=j2.error||'Erreur';};return;}
-if(job&&job.status==='failed'){document.getElementById('msg').className='err';document.getElementById('msg').textContent='La construction a échoué : '+(job.error||'')+' — contactez le support. · The build failed, contact support.';return;}
+if(job&&job.status==='failed'){document.getElementById('msg').className='err';document.getElementById('msg').textContent='La construction a échoué : '+(job.error||'')+' · The build failed.';
+document.getElementById('actions').innerHTML='<button class="btn" id="retry" type="button">Réessayer · Retry</button> <span class="muted">Si l\'échec persiste, contactez le support. · If it fails again, contact support.</span>';
+document.getElementById('retry').onclick=async()=>{const r2=await fetch('/start/api/tenants/${esc(slug)}/retry',{method:'POST'});const j2=await r2.json();if(!r2.ok){document.getElementById('msg').textContent=j2.error||'Erreur';return;}
+document.getElementById('actions').innerHTML='';document.getElementById('msg').className='';document.getElementById('msg').textContent='Construction de votre Druid… · Building your Druid…';setTimeout(poll,1500);};return;}
 setTimeout(poll,3000);}catch(e){document.getElementById('msg').textContent='Erreur : '+e.message;setTimeout(poll,8000);}}
 poll();
 </script>`, { narrow: true });

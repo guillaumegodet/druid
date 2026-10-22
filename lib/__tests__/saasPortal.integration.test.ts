@@ -113,6 +113,21 @@ describe.skipIf(!url)('portal: create a tenant, provision it, open it', () => {
     expect(await wait.text()).toContain('Construction de votre Druid');
   });
 
+  it('a failed construction is queued again by the owner (« Retry »), once', async () => {
+    const retry = () => callPortal(`/start/api/tenants/${SLUG}/retry`, { method: 'POST', headers: { Cookie: cookie } });
+    expect((await retry()).status).toBe(409); // the first job is still queued
+    const tenant = await saas!.selectFrom('tenant').select('id').where('slug', '=', SLUG).executeTakeFirstOrThrow();
+    await saas!.updateTable('job').set({ status: 'failed', log: 'boom' }).where('tenant_id', '=', tenant.id).where('type', '=', 'tenant.provision').execute();
+    let st = await (await callPortal(`/start/api/tenants/${SLUG}`, { headers: { Cookie: cookie } })).json() as any;
+    expect(st.jobs).toEqual([expect.objectContaining({ type: 'tenant.provision', status: 'failed', error: 'boom' })]);
+    const again = await retry();
+    expect(again.status).toBe(200);
+    expect(await again.json()).toEqual({ jobId: expect.any(String) });
+    st = await (await callPortal(`/start/api/tenants/${SLUG}`, { headers: { Cookie: cookie } })).json() as any;
+    expect(st.jobs).toEqual([expect.objectContaining({ type: 'tenant.provision', status: 'queued' })]);
+    expect((await retry()).status).toBe(409); // already queued
+  });
+
   it('the runner provisions the tenant: schema, directory, status active', async () => {
     // The provisioning queues the structure alignment (lot 4), run here against registries that answer nothing.
     const emptyRegistries = (async () => ({ ok: true, status: 200, json: async () => ({}), text: async () => '' })) as unknown as typeof fetch;
@@ -121,6 +136,7 @@ describe.skipIf(!url)('portal: create a tenant, provision it, open it', () => {
     expect(out).toEqual({ done: 2, failed: 1, cancelled: 0 });
     const st = await (await callPortal(`/start/api/tenants/${SLUG}`, { headers: { Cookie: cookie } })).json() as any;
     expect(st.status).toBe('active');
+    expect((await callPortal(`/start/api/tenants/${SLUG}/retry`, { method: 'POST', headers: { Cookie: cookie } })).status).toBe(409); // not in provisioning
     expect(st.jobs).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: 'tenant.provision', status: 'done', progress: expect.objectContaining({ step: 'ready', pct: 100 }) }),
       expect.objectContaining({ type: 'structures.align', status: 'done' }),
@@ -135,7 +151,8 @@ describe.skipIf(!url)('portal: create a tenant, provision it, open it', () => {
     } finally {
       await db.destroy();
     }
-    const job = await saas!.selectFrom('job').select('log').where('type', '=', 'tenant.provision').where('tenant_id', '=', (await saas!.selectFrom('tenant').select('id').where('slug', '=', SLUG).executeTakeFirstOrThrow()).id).executeTakeFirstOrThrow();
+    // The newest provisioning job: the first one was marked failed by the « Retry » test above.
+    const job = await saas!.selectFrom('job').select('log').where('type', '=', 'tenant.provision').where('tenant_id', '=', (await saas!.selectFrom('tenant').select('id').where('slug', '=', SLUG).executeTakeFirstOrThrow()).id).orderBy('created_at', 'desc').executeTakeFirstOrThrow();
     expect(job.log).toContain('1 skipped');
   }, 120_000);
 

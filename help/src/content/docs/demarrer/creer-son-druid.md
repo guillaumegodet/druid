@@ -29,7 +29,8 @@ Druid retrouve leurs identifiants et construit votre espace.
    le domaine des adresses e-mail de l'établissement. Validez.
 
 La construction prend moins d'une minute : base de données, structures, adresse. Vous recevez
-un e-mail quand elle est terminée et le bouton **Ouvrir mon Druid** vous connecte directement.
+un e-mail quand elle est terminée et le bouton **Ouvrir mon Druid** vous connecte directement. Si la
+construction échoue, la page l'indique et propose **Réessayer** ; si l'échec persiste, contactez le support.
 
 ## Et ensuite
 

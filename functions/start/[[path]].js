@@ -16,6 +16,7 @@
 //   GET  /start/api/tenants/:slug       status and jobs (member)
 //   POST /start/api/tenants/:slug/open  magic link of the tenant host (member) → { url }
 //   POST /start/api/tenants/:slug/access-request (session)
+//   POST /start/api/tenants/:slug/retry  queues the provisioning again after a failure (owner) → { jobId }
 //   GET  /start/wait/:slug              construction page
 import {
   consumeMagicLink, createAccessRequest, createSession, deleteSession, enqueueJob, findMember, findTenantByRor,
@@ -26,6 +27,7 @@ import {
   OnboardingPayload, esrEstablishmentFromRecord, mailDomainOf, proposeSlug, rnsrStructureFromRecord, rorIdOf,
   rorOrganizationFromRecord, tenantHostOf,
 } from '../../lib/saas/onboarding.ts';
+import { liveJob } from '../../lib/saas/jobs.ts';
 import { LINKS_PER_QUARTER, recentLinks } from '../api/auth/request.js';
 import { assistantPage, homePage, waitPage } from '../_lib/portalPages.js';
 import {
@@ -231,7 +233,7 @@ export async function onRequest(context) {
     return json(result.status, result.body);
   }
 
-  const tenantRoute = path.match(/^\/api\/tenants\/([a-z0-9-]+)(\/open|\/access-request)?$/);
+  const tenantRoute = path.match(/^\/api\/tenants\/([a-z0-9-]+)(\/open|\/access-request|\/retry)?$/);
   if (tenantRoute) {
     const [, slug, action] = tenantRoute;
     return withSaasDb(env, async (db) => {
@@ -247,6 +249,16 @@ export async function onRequest(context) {
       if (!action && method === 'GET') {
         const jobs = (await latestJobs(db, tenant.id)).map(publicJobInfo);
         return json(200, { slug: tenant.slug, label: tenant.label, status: tenant.status, host, plan: tenant.plan_code, jobs });
+      }
+      if (action === '/retry' && method === 'POST') {
+        // A failed provisioning (the construction page says so) is queued again by the owner: the handler is
+        // idempotent (migrations already applied are skipped, a seeded institution or lab is kept).
+        if (member.role !== 'owner') return json(403, { error: 'Only the owner can retry the construction' });
+        if (tenant.status !== 'provisioning') return json(409, { error: 'Invalid request', issues: ['tenant not in provisioning'] });
+        if (await liveJob(db, tenant.id, 'tenant.provision')) return json(409, { error: 'Invalid request', issues: ['construction already queued or running'] });
+        const jobId = await enqueueJob(db, { tenantId: tenant.id, type: 'tenant.provision', params: { host }, createdBy: email });
+        console.log(JSON.stringify({ event: 'portal.tenant.retry', slug: tenant.slug, jobId }));
+        return json(200, { jobId });
       }
       if (action === '/open' && method === 'POST') {
         if (tenant.status !== 'active') return json(409, { error: 'Invalid request', issues: ['tenant not active'] });
