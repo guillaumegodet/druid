@@ -1,0 +1,84 @@
+---
+title: "Lire les objectifs de développement durable"
+description: "Lire la vue Objectifs de développement durable : d'où viennent les ODD d'une publication, les graphiques, le filtre de la liste, les limites de l'étiquetage OpenAlex."
+sidebar:
+  order: 10
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Tous les profils ayant accès à la structure"
+	menu="Tableau de bord › Pilotage › Objectifs de développement durable"
+	disponibilite="toutes les instances, dès que l'export de la structure porte des ODD (tableaux de bord régénérés depuis le 22 octobre 2026)"
+/>
+
+La vue **Objectifs de développement durable** (famille **Pilotage**) montre comment les
+publications de la structure se répartissent entre les **17 ODD** adoptés par les Nations unies en
+2015 (santé, énergie propre, climat, vie aquatique…). Elle sert aux bilans de développement
+durable et de responsabilité sociétale, aux dossiers d'établissement et aux labos qui veulent
+situer leurs thématiques par rapport à ces objectifs.
+
+## D'où viennent les ODD d'une publication
+
+Druid ne classe rien lui-même : il lit les objectifs qu'**OpenAlex** attribue à chaque
+publication. OpenAlex utilise le classifieur du réseau d'universités **Aurora**, un modèle de
+langue entraîné à reconnaître, dans le titre et le résumé, les travaux qui se rapportent à chaque
+objectif. Pour chaque publication, il garde les objectifs dont le **score** dépasse son seuil ;
+une publication peut en porter plusieurs, ou aucun.
+
+Ce qu'il faut en retenir :
+
+- **Environ la moitié d'un corpus porte un ODD.** Les travaux fondamentaux, théoriques ou
+  méthodologiques, et une grande partie des sciences humaines, n'en reçoivent pas : la part
+  « sans ODD » n'est pas une donnée manquante.
+- **Seules les publications connues d'OpenAlex sont étiquetées.** Une notice qui ne vient que de
+  HAL, sans DOI, n'a pas d'ODD.
+- **L'ODD 3 (santé) domine** dans une université qui compte un CHU : la case **Hors ODD 3**
+  permet de lire les seize autres.
+- **Les étiquettes évoluent** : OpenAlex ré-étiquette les publications quand son classifieur
+  change. Les chiffres de deux exports éloignés dans le temps peuvent différer.
+
+## Les graphiques
+
+| Graphique | Ce qu'il montre |
+|---|---|
+| **Chiffres clés** | Publications avec au moins un ODD (et leur part du corpus), nombre d'ODD couverts sur 17, ODD principal, nombre moyen d'ODD par publication étiquetée. |
+| **Publications par ODD** | Une barre par objectif présent, dans l'ordre et aux couleurs officiels. L'infobulle donne la part des publications étiquetées et la part du corpus. Une publication compte dans **chacun** de ses ODD : la somme des barres dépasse le nombre de publications étiquetées. |
+| **Évolution annuelle par ODD** | Aires empilées des six ODD les plus présents sur la période, les autres regroupés dans « Autres ODD ». |
+| **Part des publications étiquetées, par année** | La proportion de publications de chaque année qui portent au moins un ODD. Une courbe stable rassure sur la comparabilité d'une année à l'autre ; une marche signale un changement de classifieur ou de sources. |
+| **ODD par labo ou par équipe** | Sur une structure composite, les ODD de chaque labo membre ; sinon ceux de chaque équipe. **Part (%)** compare les profils, **Publications** compare les volumes. |
+| **Accès ouvert et impact par ODD** | Pour chaque objectif : publications, part en accès ouvert, FWCI moyen, part de top 10 % et part internationale, calculés avec les règles de la [vue Impact](/donnees/indicateurs/#impact). |
+
+Un clic sur une barre, une aire ou un effectif ouvre la **liste des publications** filtrée sur
+cet objectif (et sur l'année, le labo ou l'équipe cliqués). Les quatre graphiques se retrouvent
+dans [Mes rapports](/guides/rapports/ajouter-un-graphique/) et peuvent être
+[intégrés](/guides/tableau-de-bord/integrer-une-dataviz/) dans une page web.
+
+## Dans la liste des publications
+
+Le filtre **Objectif de développement durable** de la [liste](/guides/tableau-de-bord/liste-des-publications/)
+propose chaque objectif présent dans le corpus, **Avec un ODD** et **Sans ODD**. L'export CSV
+ajoute une colonne `sdgs` avec, pour chaque publication, les numéros d'objectif et le score du
+classifieur.
+
+## Limites connues
+
+- **Indicateur d'orientation, pas d'audit** : le classifieur reconnaît des sujets proches des
+  objectifs, il ne juge pas la contribution d'un travail au développement durable. Les ODD 16
+  (paix, justice, institutions) et 4 (éducation) ressortent sur beaucoup de publications de
+  sciences humaines dont le lien avec l'objectif est lointain.
+- **Pas comparable aux classements** : les *THE Impact Rankings* et SciVal reposent sur les
+  requêtes de mots-clés d'Elsevier, pas sur OpenAlex ; les volumes ne coïncident pas.
+- **Comparer des labos d'un même domaine** : un labo de sciences humaines et un labo de santé n'ont
+  pas la même part de publications étiquetées ; lisez toujours la part « sans ODD » à côté.
+- La vue reste **masquée** tant que l'export de la structure ne porte aucun ODD : régénérer le
+  tableau de bord depuis la [console ETL](/guides/administration/console-etl/) suffit.
+
+## Voir aussi
+
+- [Indicateurs](/donnees/indicateurs/#objectifs-de-développement-durable)
+- [Choisir une structure, une période, un périmètre](/guides/tableau-de-bord/structure-periode-perimetre/)
+- [Liste des publications](/guides/tableau-de-bord/liste-des-publications/)
+- [Sources des données](/donnees/sources-des-donnees/)
+- Les 17 objectifs sur le site des Nations unies : [sdgs.un.org/goals](https://sdgs.un.org/goals)

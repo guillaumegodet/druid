@@ -101,6 +101,16 @@ access. The **Steering › APC monitoring** view presents them from three angles
 
 Amounts in foreign currencies are converted into euros at an approximate rate.
 
+## Sustainable Development Goals
+
+The **17 SDGs** of a publication are those **OpenAlex** assigns to it (classifier of the Aurora
+network: only the goals above its threshold are kept, with their score). A publication may carry
+several goals; it then counts in each of them. About half of a corpus carries at least one: the
+« without SDG » share comes from the disciplines and the sources (HAL records without a DOI), not
+from missing data. The figures are not comparable with rankings built on other classifiers (*THE
+Impact Rankings*, SciVal). See
+[Read the Sustainable Development Goals](/en/guides/tableau-de-bord/odd/).
+
 ## Known limitations
 
 - **Dependence on OpenAlex**: FWCI, top 1%/10%, citations and estimated APCs come from

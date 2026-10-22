@@ -12,6 +12,11 @@ instances that have them (see [Instances and features](/en/donnees/instances-fon
 
 ### Dashboard
 
+- **Steering › Sustainable Development Goals view**: the 17 UN goals OpenAlex assigns to the
+  publications — key figures, breakdown by goal in the official colours, yearly evolution, goals
+  by lab or team, open access and impact by goal, « excluding SDG 3 » box. New SDG filter in the
+  publication list; charts available in My reports and as embeds. See
+  [Read the Sustainable Development Goals](/en/guides/tableau-de-bord/odd/).
 - **Seven families of analyses** instead of a row of seventeen tabs: **Overview**,
   **Publications**, **Impact**, **Collaborations**, **People**, **Steering** and **Watch**.
   Click a family, then one of its views on the second row. The Overview ends with an
