@@ -6,7 +6,7 @@
 #
 # Refuses anything that is not an annotated tag vX.Y.Z signed by an allowed signer, whose package.json carries
 # X.Y.Z and whose commit passed the CI. The image is built once per version from a clean checkout of the tag
-# (git worktree), never from a working copy. Before production: dump of the PostgreSQL database, backup of
+# (git worktree), never from a working copy, with the current base image (docker build --pull). Before production: dump of the PostgreSQL database, backup of
 # the Grist doc and of the runtime files; after: health check, automatic return to the previous image on
 # failure. Every run is appended to the deployment log.
 #
@@ -87,7 +87,9 @@ if ! docker image inspect "$IMAGE" >/dev/null 2>&1; then
   AVAIL=$(awk '/MemAvailable/ {print int($2 / 1024)}' /proc/meminfo)
   [ "$AVAIL" -ge "$MIN_MEM_MB" ] || fail "only $AVAIL MB of memory available (minimum $MIN_MEM_MB) — build postponed"
   say "building $IMAGE"
-  docker build -q -t "$IMAGE" --build-arg GIT_SHA="$SHA" --build-arg BUILD_DATE="$(date -u +%FT%TZ)" \
+  # --pull: the base image (node:24-slim) is fetched again at every build, so a release picks up the
+  # current Node.js security fixes instead of reusing the copy cached on the host.
+  docker build -q --pull -t "$IMAGE" --build-arg GIT_SHA="$SHA" --build-arg BUILD_DATE="$(date -u +%FT%TZ)" \
     --build-arg DRUID_VERSION="$VERSION" "$TREE" >/dev/null || fail "build of $IMAGE"
   docker builder prune -a -f >/dev/null 2>&1 || true
 fi

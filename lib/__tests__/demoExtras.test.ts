@@ -3,6 +3,9 @@
 import fs from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { demoExtras, type DemoNetwork, type DemoResearcherRow } from '../migration/demoExtras';
+import { ppnCheck } from '../migration/demoStructureIds';
+import { cellStatus } from '../structures/alignView';
+import { ALIGNED_STRUCTURE_ID_TYPES, STRUCTURE_ID_META, normalizeStructureId } from '../structures/identifiers';
 
 const data = await import('../../instances/demo/demo-data.mjs');
 const rows = data.buildResearchers() as unknown as DemoResearcherRow[];
@@ -60,5 +63,38 @@ describe('demo extras', () => {
       }
     }
     expect(extras.theses.every((t) => t.nnt.includes('DEMO') || t.nnt.startsWith('s'))).toBe(true);
+  });
+
+  it('gives the labs fictitious identifiers of the right shape and every state the alignment tab knows', () => {
+    const labs = (data.STRUCTURES as { type: string; local_id: string }[]).filter((s) => ['UMR', 'UR'].includes(s.type)).map((s) => s.local_id).sort();
+    expect(extras.structures.map((s) => s.localId).sort()).toEqual(labs);
+    const statuses = new Set<string>();
+    for (const s of extras.structures) {
+      for (const i of s.identifiers) expect(normalizeStructureId(i.type, i.value)).toBe(i.value);
+      for (const c of s.candidates) {
+        expect(normalizeStructureId(c.type, c.candidateId)).toBe(c.candidateId);
+        expect(c.evidence.url).toContain(c.candidateId);
+        expect(c.evidence.reasons.length).toBeGreaterThan(0);
+        expect(c.strength === 'conflict' ? c.evidence.conflictWith : 'none').toBeTruthy();
+      }
+      for (const type of ALIGNED_STRUCTURE_ID_TYPES) {
+        const existing = s.identifiers.filter((i) => i.type === type).map((i) => ({ ...i, status: 'confirmed' as const, isPrimary: !!i.isPrimary, checkResult: i.check ?? null, note: null, decidedBy: null, checkedAt: null, url: '' }));
+        const pending = s.candidates.filter((c) => c.type === type).map((c) => ({ ...c, seenAt: '' }));
+        statuses.add(cellStatus(existing, pending, s.searched.some((x) => x.type === type), STRUCTURE_ID_META[type].multi));
+      }
+    }
+    expect([...statuses].sort()).toEqual(['absent', 'ambiguous', 'arbitrate', 'conflict', 'none', 'present', 'strong']);
+    // Never a real record: RNSR numbers of « year » 0000, ROR ids with letters outside its alphabet (i, l, o, u), nine-digit
+    // HAL ids, OpenAlex and Wikidata ids beyond the assigned ranges, IdRef numbers with a wrong check character.
+    const values = extras.structures.flatMap((s) => [...s.identifiers.map((i) => [i.type, i.value]), ...s.candidates.map((c) => [c.type, c.candidateId])]);
+    for (const [type, v] of values) {
+      if (type === 'rnsr') expect(v).toMatch(/^0000/);
+      if (type === 'ror') expect(v).toMatch(/[ilou]/);
+      if (type === 'hal_struct') expect(v).toMatch(/^\d{9}$/);
+      if (type === 'openalex') expect(v).toMatch(/^I\d{11}$/);
+      if (type === 'wikidata') expect(v).toMatch(/^Q\d{11}$/);
+      if (type === 'idref') expect(ppnCheck(v.slice(0, 8))).not.toBe(v[8]);
+      if (type === 'hal_collection') expect(v).toMatch(/^UDEMO-/);
+    }
   });
 });

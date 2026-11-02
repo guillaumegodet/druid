@@ -34,7 +34,9 @@ docker run --rm -v "$PWD":/app -w /app -e DATABASE_URL=postgres://druid_owner:�
 ```
 
 The seed of the demo also writes the fictitious extras of `lib/migration/demoExtras.ts` (`lib/migration/loadDemoExtras.ts`):
-calls for proposals and matches, eligibility rules and candidates, theses and checks, opinions.
+calls for proposals and matches, eligibility rules and candidates, theses and checks, opinions, and the identifiers of the
+three labs with the candidates of their alignment (`lib/migration/demoStructureIds.ts`: the « Structures » tab of the
+alignment page shows every state — confirmed, strong, ambiguous, to review, conflict, not found, never searched).
 
 **Reloaded at each production deployment**: the last step of `npm run build`, `scripts/seed_demo_on_pages.cjs`,
 runs the migrations (dbmate) then the seed when the build is a Cloudflare Pages production build (`CF_PAGES=1`,

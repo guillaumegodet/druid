@@ -3,8 +3,9 @@
  * lot 10 b): the rows of instances/<slug>/demo-data.mjs go through the same transformation and load as a Grist
  * document (lib/migration), in ONE transaction as the database owner. Replayable: the directory and work tables are
  * emptied first, which is the point — the demo is reloaded at each deployment (scripts/seed_demo_on_pages.cjs).
- * The public demo also gets the fictitious calls for proposals, theses and eligibility of lib/migration/demoExtras.ts
- * (its co-authorship network, instances/demo/dashboard-data/network.json, names the publications the matching cites).
+ * The public demo also gets the fictitious calls for proposals, theses, eligibility and lab identifiers (with the candidates of
+ * their alignment) of lib/migration/demoExtras.ts (its co-authorship network, instances/demo/dashboard-data/network.json,
+ * names the publications the matching cites).
  *
  * DRY-RUN by default (loaded, checked by PostgreSQL, rolled back); `--apply` commits.
  *

@@ -1,7 +1,8 @@
 // Fictitious data of the features a demo instance shows beyond its directory (druid-internal docs/plan-funding-calls.md,
 // docs/plan-binomes-citations.md): calls for proposals of the programmes followed by Druid with their matches to the
 // researchers, the rules of the calls reserved by career stage and the candidates they make eligible, the doctoral
-// theses of the researchers. Pure: everything is derived from the researchers of instances/<slug>/demo-data.mjs and,
+// theses of the researchers, the identifiers of the labs and the candidates of their alignment (demoStructureIds.ts). Pure:
+// everything is derived from the researchers of instances/<slug>/demo-data.mjs and,
 // when the instance ships one, from its co-authorship network (dashboard-data/network.json, the titles of the
 // publications the « matching » cites); the database part is lib/migration/loadDemoExtras.ts. Nothing here is real: the
 // calls are invented (ids prefixed DEMO-, pages under example.org), the theses carry a fictitious national number.
@@ -9,6 +10,7 @@
 import { evaluate, rulesFromCallText, type EligibilityRule, type EligibilityVerdict, type EligibilityReason } from '../calls/eligibility';
 import { ANR_AAPG, ANR_FUNDER, EU_FUNDER, HORIZON_EUROPE, PORTAL_PROGRAMMES_BUILT_IN, type Funder, type Programme, type CallStatus } from '../calls/programmes';
 import type { MatchOverall } from '../calls/trm';
+import { demoStructureAlignment, type DemoStructureAlignment } from './demoStructureIds';
 
 /** A researcher of demo-data.mjs, as the builders read it (Annuaire row before the Employeur is resolved). */
 export interface DemoResearcherRow {
@@ -111,6 +113,8 @@ export interface DemoExtras {
   eligibility: DemoEligibility[];
   theses: DemoThesis[];
   feedback: DemoFeedback[];
+  /** Identifiers of the labs and the candidates of the « Structures » alignment tab. */
+  structures: DemoStructureAlignment[];
 }
 
 /** Programmes the demo calls belong to (the built-in ones of lib/calls/programmes.ts, plus a regional one added by hand). */
@@ -433,5 +437,6 @@ export const demoExtras = (rows: DemoResearcherRow[], network: DemoNetwork | nul
     eligibility: demoEligibility(calls, rows, theses, today),
     theses,
     feedback: demoFeedback(matches),
+    structures: demoStructureAlignment(),
   };
 };

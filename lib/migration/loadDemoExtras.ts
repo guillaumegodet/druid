@@ -1,13 +1,18 @@
 // Database part of the fictitious extras of a demo instance (lib/migration/demoExtras.ts): calls for proposals, matching
-// runs and matches, eligibility rules and candidates, theses, opinions — written in the transaction of the seed
+// runs and matches, eligibility rules and candidates, theses, opinions, identifiers of the labs and candidates of their
+// alignment (projected onto the structure rows as a decision would be) — written in the transaction of the seed
 // (scripts/seed_demo_pg.ts), after the directory, as the database owner. The tables are emptied first: the seed replays
 // at each deployment. The funders and programmes of the calls are inserted when missing (the built-in ones already come
 // from the migrations) and never otherwise changed.
 import { sql, type Transaction } from 'kysely';
 import type { DB } from '../db/schema.gen';
 import type { DemoExtras } from './demoExtras';
+import { confirmIdentifier, projectIdentifiers } from '../structures/pg/identifiers';
 
-const EXTRA_TABLES = ['call_match_run', 'funding_call', 'call_feedback', 'call_eligibility_rule', 'person_thesis', 'person_thesis_check'] as const;
+const EXTRA_TABLES = [
+  'call_match_run', 'funding_call', 'call_feedback', 'call_eligibility_rule', 'person_thesis', 'person_thesis_check',
+  'structure_identifier', 'structure_alignment_candidate', 'structure_alignment_search',
+] as const;
 
 export const loadDemoExtras = async (trx: Transaction<DB>, data: DemoExtras): Promise<Record<string, number>> => {
   // CASCADE: call_match, call_passage and call_eligibility follow their run, call and rule.
@@ -99,7 +104,36 @@ export const loadDemoExtras = async (trx: Transaction<DB>, data: DemoExtras): Pr
       candidates += 1;
     }
   }
+  // Labs of the directory just loaded (by local_id): confirmed identifiers with what their verification saw, pending
+  // candidates, searches; then the projection onto the structure row (columns and V2 fields the record reads).
+  const labs = new Map((await trx.selectFrom('structure').select(['id', 'local_id']).where('local_id', 'in', data.structures.map((s) => s.localId)).execute())
+    .map((s) => [String(s.local_id), Number(s.id)]));
+  let identifiers = 0;
+  let structureCandidates = 0;
+  for (const s of data.structures) {
+    const structureId = labs.get(s.localId);
+    if (structureId === undefined) continue;
+    for (const i of s.identifiers) {
+      if (!await confirmIdentifier(trx, structureId, i.type, i.value, { source: i.source, primary: i.isPrimary })) throw new Error(`demo extras: invalid ${i.type} ${i.value} for ${s.localId}`);
+      if (i.check) {
+        await trx.updateTable('structure_identifier').set({ checked_at: sql`now()` as any, check_result: JSON.stringify(i.check) as any })
+          .where('structure_id', '=', String(structureId)).where('type', '=', i.type).where('value', '=', i.value).execute();
+      }
+      identifiers += 1;
+    }
+    for (const c of s.candidates) {
+      await trx.insertInto('structure_alignment_candidate').values({
+        structure_id: String(structureId), type: c.type, candidate_id: c.candidateId, score: String(c.score), strength: c.strength, evidence: JSON.stringify(c.evidence) as any, mode: c.mode,
+      }).execute();
+      structureCandidates += 1;
+    }
+    for (const x of s.searched) {
+      await trx.insertInto('structure_alignment_search').values({ structure_id: String(structureId), type: x.type, mode: x.mode, candidates: x.candidates }).execute();
+    }
+    await projectIdentifiers(trx, structureId);
+  }
   return {
+    structure_identifier: identifiers, structure_alignment_candidate: structureCandidates,
     funding_call: data.calls.length, call_match_run: data.runs.length, call_match: data.matches.length, call_feedback: data.feedback.length,
     call_eligibility_rule: data.eligibility.length, call_eligibility: candidates, person_thesis: theses, person_thesis_check: idrefs.size,
   };

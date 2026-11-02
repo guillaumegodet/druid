@@ -13,10 +13,33 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Filtre « Équipe » dans la liste du personnel**, à côté de « Labo » : équipes du rattachement principal
+  (`lib/teamFilter.ts`), options restreintes aux labos sélectionnés, valeur « Non renseigné », paramètre d'URL
+  `team`. Masqué quand aucune fiche ne porte d'équipe. Permet de sélectionner toute une équipe d'un coup pour
+  l'ajouter à un groupe (demande IMN, équipe PCM, 2026-10-23).
+- **Démo publique : onglet « Structures » de l'alignement des identifiants garni.** Le seed de la démo écrit désormais
+  des identifiants fictifs pour les trois labos (RNSR, ROR, HAL, collection HAL, OpenAlex, IdRef) et les candidats qu'un
+  passage du job d'alignement aurait laissés : candidats forts atteints par les passerelles, ambiguïté entre deux
+  notices IdRef, notices à arbitrer, RNSR confirmé contredit par le registre, recherches sans résultat, type jamais
+  cherché (`lib/migration/demoStructureIds.ts`). Les valeurs ne peuvent désigner aucune notice réelle (RNSR en « 0000… »,
+  ROR hors alphabet, HAL à neuf chiffres, PPN à clé fausse) et sont projetées sur les fiches des structures.
 - **Vue « Objectifs de développement durable » › bloc « Face au groupe de pairs »** (druid-internal
   `docs/plan-odd-sdg.md`, lot 3) : part de chaque ODD dans le corpus local rapportée à sa part chez les universités
   choisies dans la vue Benchmark (même sélection), ODD des pairs lus sur OpenAlex par `POST /api/benchmark/sdg-distribution`
   (relais vers druid-biblio, cache de 180 jours, 15 établissements au plus). Instances reliées à druid-biblio seulement.
+
+### Sécurité
+- **Image Docker construite avec la dernière base Node.js.** `deploy.sh` ajoute `--pull` au `docker build` : la base
+  `node:24-slim` est rafraîchie à chaque release au lieu de réutiliser la copie en cache sur le serveur (Nantes tournait
+  en Node 24.21.0 alors que 24.22.2 corrige les avis de sécurité CERTFR-2026-AVI-1367). Un correctif Node.js
+  s'applique donc par une simple release, et `CONTRIBUTING.md` le documente.
+- **Dépendances corrigées (21 alertes Dependabot, 2026-11-02).** Mise à jour des lockfiles seuls, sans changement de
+  `package.json` : `dompurify` 3.4.16 → 3.4.17 (tiré par `jspdf`, export PDF ; GHSA-cg2g-xh64-v4q7 critique,
+  GHSA-mrv2-3pqr-j5jr, GHSA-c6gr-qvv4-5v3f), `vite` 6.4.1 → 6.4.5 (outil de build, hors image de production ;
+  11 avis dont lecture de fichiers arbitraires par le serveur de dev et failles de `launch-editor`), et dans le centre
+  d'aide `vite` 8.3.0 → 8.3.5 et `undici` 8.11.0 → 8.12.3 (dénis de service ; GHSA-xjj6-f33q-929c, GHSA-qq8j-7v2v-3rwp,
+  GHSA-4qv8-2p9j-2685). Aucun de ces paquets n'est exposé par l'application servie : `dompurify` n'est utilisé qu'à
+  l'export PDF côté navigateur, `vite`/`undici` au build et en développement.
 
 ## [2.15.0] — 2026-10-22
 
