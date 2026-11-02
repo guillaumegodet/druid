@@ -6,6 +6,7 @@ import { MultiSelectFilter } from './MultiSelectFilter';
 import { LDAP_ACCOUNT_LABELS, MEMBERSHIP_LABELS, PRESENCE_LABELS } from '../../lib/researcherLabels';
 import { EMPLOYER_EXTERNAL, EMPLOYER_HOME, EMPLOYER_NONE, LDAP_ACCOUNT_VALUES, PRESENCE_VALUES, isInternalShortcut } from '../../lib/presenceFilter';
 import { MEMBERSHIP_NONE } from '../../lib/membershipFilter';
+import { TEAM_NONE } from '../../lib/teamFilter';
 import type { IdFilters } from '../../hooks/useResearcherFilters';
 import { canWrite, hasCapability } from '../../lib/auth';
 
@@ -26,6 +27,9 @@ interface FilterPanelProps {
   onEmployerChange: (vals: string[]) => void;
   filterLabs: string[];
   onLabChange: (vals: string[]) => void;
+  /** Teams of the primary affiliation (lib/teamFilter.ts); hidden when the list names no team. */
+  filterTeams: string[];
+  onTeamChange: (vals: string[]) => void;
   /** Membership type of the primary affiliation (lib/membershipFilter.ts). */
   filterMemberships: string[];
   onMembershipChange: (vals: string[]) => void;
@@ -49,6 +53,7 @@ interface FilterPanelProps {
   onClearFilters: () => void;
   employers: string[];
   labs: string[];
+  teams: string[];
   grades: string[];
   contractTypes: string[];
   poles: string[];
@@ -116,6 +121,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   filterValidation, onValidationChange,
   filterEmployers, onEmployerChange,
   filterLabs, onLabChange,
+  filterTeams, onTeamChange,
   filterMemberships, onMembershipChange,
   filterGrades, onGradeChange,
   filterContractTypes, onContractTypeChange,
@@ -124,7 +130,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   filterDateStart, filterDateEnd, onDateStartChange, onDateEndChange,
   idFilters, onIdFiltersChange,
   onClearFilters,
-  employers, labs, grades, contractTypes, poles,
+  employers, labs, teams, grades, contractTypes, poles,
   selectedCount, onOpenGroupModal,
   mergeRowIds, onMergeResearchers,
 }) => {
@@ -135,6 +141,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   const showParcours = !!parcoursCount && !!onParcoursChange;
 
   const toOptions = (values: string[]): Option[] => values.map((v) => ({ value: v, label: v }));
+  const teamOptions: Option[] = [...toOptions(teams), { value: TEAM_NONE, label: t`Not specified` }];
   const membershipOptions: Option[] = [
     ...MEMBERSHIP_TYPES.map((m) => ({ value: m, label: t(MEMBERSHIP_LABELS[m]) })),
     { value: MEMBERSHIP_NONE, label: t`Not specified` },
@@ -178,7 +185,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
     ...(selectedIds.length ? [{ key: 'ids', label: t`Identifiers`, value: labelsOf(idOptions, selectedIds), clear: () => setSelectedIds([]) }] : []),
     ...(filterDateStart || filterDateEnd ? [{ key: 'period', label: t`Period`, value: `${filterDateStart || '…'} → ${filterDateEnd || '…'}`, clear: () => { onDateStartChange(''); onDateEndChange(''); } }] : []),
   ];
-  const anyActive = hiddenActive.length > 0 || filterLabs.length > 0 || filterMemberships.length > 0 ||
+  const anyActive = hiddenActive.length > 0 || filterLabs.length > 0 || filterTeams.length > 0 || filterMemberships.length > 0 ||
     filterEmployers.length > 0 || filterGrades.length > 0 || (hasStatusValidation && filterPresence.length > 0);
 
   return (
@@ -223,6 +230,15 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
         selected={filterLabs}
         onChange={onLabChange}
       />
+      {(teams.length > 0 || filterTeams.length > 0) && (
+        <MultiSelectFilter
+          label={t`Team`}
+          title={t`Team of the primary affiliation (follows the Lab filter)`}
+          options={teamOptions}
+          selected={filterTeams}
+          onChange={onTeamChange}
+        />
+      )}
       <MultiSelectFilter
         label={t`Membership`}
         title={t`Membership type in the lab of the primary affiliation`}

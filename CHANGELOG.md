@@ -13,6 +13,10 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Filtre « Équipe » dans la liste du personnel**, à côté de « Labo » : équipes du rattachement principal
+  (`lib/teamFilter.ts`), options restreintes aux labos sélectionnés, valeur « Non renseigné », paramètre d'URL
+  `team`. Masqué quand aucune fiche ne porte d'équipe. Permet de sélectionner toute une équipe d'un coup pour
+  l'ajouter à un groupe (demande IMN, équipe PCM, 2026-10-23).
 - **Démo publique : onglet « Structures » de l'alignement des identifiants garni.** Le seed de la démo écrit désormais
   des identifiants fictifs pour les trois labos (RNSR, ROR, HAL, collection HAL, OpenAlex, IdRef) et les candidats qu'un
   passage du job d'alignement aurait laissés : candidats forts atteints par les passerelles, ambiguïté entre deux
