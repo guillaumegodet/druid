@@ -264,10 +264,13 @@ describe.skipIf(!url)('jobs of a tenant', () => {
 
   it('scheduled refreshes: inside the window, once per period, failed builds retried after a day', async () => {
     const env2 = runnerEnv();
+    // The clock of the scheduler is fixed; the age of the builds is measured against it, never against the real
+    // clock (a real « 40 days ago » drifts: it fell short of the monthly period once the tests ran past 2026-10-31).
+    const night = new Date('2026-10-21T22:00:00Z');
     expect(await scheduleRefreshes(saas!, env2, { now: new Date('2026-10-21T12:00:00Z') })).toEqual([]);           // outside the window
-    expect(await scheduleRefreshes(saas!, env2, { now: new Date('2026-10-21T22:00:00Z') })).toEqual([]);           // built today (both tenants)
-    await saas!.updateTable('job').set({ created_at: new Date(Date.now() - 40 * 86_400_000).toISOString() }).where('type', '=', 'etl.build').execute();
-    const queued = await scheduleRefreshes(saas!, env2, { now: new Date('2026-10-21T22:00:00Z'), batch: 1 });
+    expect(await scheduleRefreshes(saas!, env2, { now: night })).toEqual([]);                                       // built today (both tenants)
+    await saas!.updateTable('job').set({ created_at: new Date(night.getTime() - 40 * 86_400_000).toISOString() }).where('type', '=', 'etl.build').execute();
+    const queued = await scheduleRefreshes(saas!, env2, { now: night, batch: 1 });
     expect(queued).toEqual([SLUG]);
     expect(await scheduleRefreshes(saas!, env2, { ignoreWindow: true })).toEqual([OTHER]);                         // the first one is queued now
     expect(await scheduleRefreshes(saas!, env2, { ignoreWindow: true })).toEqual([]);
