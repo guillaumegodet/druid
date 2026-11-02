@@ -618,3 +618,72 @@ export function computePeerRelativeTopicSignature(
     .sort((a, b) => b.ratio - a.ratio)
     .slice(0, topN);
 }
+
+// --- Sustainable Development Goals vs the peer group (« Sustainable Development Goals » view,
+// druid-internal docs/plan-odd-sdg.md, lot 3): same mechanics as the Topic signature above, with
+// POST /api/benchmark/sdg-distribution (one OpenAlex group_by per institution, cached on the
+// druid-biblio side). Local shares come from DashboardPublication.sdgs (a publication counts in
+// each of its goals, as in sdgAggregates.ts); peer shares from the counts per goal of the group.
+
+/** Response of POST /api/benchmark/sdg-distribution — one entry per requested ROR, goal number as key. */
+export interface PeerSdgDistributionEntry {
+  fetchedAt: string;
+  openalexId: string | null;
+  sdgs: Record<string, PeerTopicCount>;
+}
+export type PeerSdgDistributionResponse = Record<string, PeerSdgDistributionEntry>;
+
+export interface SdgPeerSignature {
+  /** Goal number 1-17. */
+  id: number;
+  count: number;
+  /** Share of this goal in the local goal assignments. */
+  share: number;
+  /** Share of this goal in the goal assignments of the peer group (reference institution excluded). */
+  peerShare: number;
+  /** share / peerShare — > 1 over-represented vs the chosen peers, < 1 under-represented. */
+  ratio: number;
+}
+
+/**
+ * Sustainable Development Goals of the local corpus compared with the peer group whose
+ * distribution was fetched via `peerData`. Every goal with at least `minCount` local
+ * publications and present among the peers, official order.
+ */
+export function computePeerRelativeSdgSignature(
+  pubs: DashboardPublication[],
+  range: YearRange,
+  peerData: PeerSdgDistributionResponse,
+  ownRor: string | null,
+  minCount = MIN_SIGNATURE_COUNT,
+): SdgPeerSignature[] {
+  const counts = new Map<number, number>();
+  let assignments = 0;
+  for (const p of inRangePubs(pubs, range)) {
+    for (const g of new Set((p.sdgs ?? []).map((x) => x.id))) {
+      counts.set(g, (counts.get(g) ?? 0) + 1);
+      assignments += 1;
+    }
+  }
+  const peerCounts = new Map<number, number>();
+  let peerTotal = 0;
+  for (const [ror, entry] of Object.entries(peerData)) {
+    if (ownRor && ror === ownRor) continue;
+    for (const [key, v] of Object.entries(entry.sdgs ?? {})) {
+      const id = Number(key);
+      if (!Number.isInteger(id) || id < 1 || id > 17) continue;
+      peerCounts.set(id, (peerCounts.get(id) ?? 0) + v.count);
+      peerTotal += v.count;
+    }
+  }
+  if (peerTotal === 0 || assignments === 0) return [];
+  return Array.from(counts.entries())
+    .filter(([, count]) => count >= minCount)
+    .map(([id, count]) => {
+      const share = count / assignments;
+      const peerShare = (peerCounts.get(id) ?? 0) / peerTotal;
+      return { id, count, share, peerShare, ratio: peerShare ? share / peerShare : 0 };
+    })
+    .filter((r) => r.peerShare > 0)
+    .sort((a, b) => a.id - b.id);
+}

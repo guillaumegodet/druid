@@ -23,6 +23,10 @@ données à exécuter au déploiement).
   notices IdRef, notices à arbitrer, RNSR confirmé contredit par le registre, recherches sans résultat, type jamais
   cherché (`lib/migration/demoStructureIds.ts`). Les valeurs ne peuvent désigner aucune notice réelle (RNSR en « 0000… »,
   ROR hors alphabet, HAL à neuf chiffres, PPN à clé fausse) et sont projetées sur les fiches des structures.
+- **Vue « Objectifs de développement durable » › bloc « Face au groupe de pairs »** (druid-internal
+  `docs/plan-odd-sdg.md`, lot 3) : part de chaque ODD dans le corpus local rapportée à sa part chez les universités
+  choisies dans la vue Benchmark (même sélection), ODD des pairs lus sur OpenAlex par `POST /api/benchmark/sdg-distribution`
+  (relais vers druid-biblio, cache de 180 jours, 15 établissements au plus). Instances reliées à druid-biblio seulement.
 
 ### Sécurité
 - **Image Docker construite avec la dernière base Node.js.** `deploy.sh` ajoute `--pull` au `docker build` : la base
