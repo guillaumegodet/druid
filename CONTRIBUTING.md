@@ -102,6 +102,9 @@ qu'un retour à la version précédente reste possible.
 Dependabot ouvre une PR à chaque alerte de sécurité, et des PR mensuelles groupées pour les mises à jour
 (npm, centre d'aide, GitHub Actions, image de base Docker). Elles suivent le même chemin que toute
 évolution : CI, test, release. L'audit des dépendances de production (`npm audit`) est affiché par la CI.
+L'image de base `node:24-slim` n'est pas épinglée au correctif près : `deploy.sh` construit chaque release avec
+`docker build --pull`, donc une release embarque la dernière version de Node.js 24 publiée par Docker Hub, et une
+release (même de version inchangée, voir `--skip-test-check`) suffit à appliquer un correctif de sécurité Node.js.
 
 ## Données personnelles et publication
 
