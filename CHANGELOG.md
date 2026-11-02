@@ -20,6 +20,12 @@ données à exécuter au déploiement).
   cherché (`lib/migration/demoStructureIds.ts`). Les valeurs ne peuvent désigner aucune notice réelle (RNSR en « 0000… »,
   ROR hors alphabet, HAL à neuf chiffres, PPN à clé fausse) et sont projetées sur les fiches des structures.
 
+### Sécurité
+- **Image Docker construite avec la dernière base Node.js.** `deploy.sh` ajoute `--pull` au `docker build` : la base
+  `node:24-slim` est rafraîchie à chaque release au lieu de réutiliser la copie en cache sur le serveur (Nantes tournait
+  en Node 24.21.0 alors que 24.22.2 corrige les avis de sécurité CERTFR-2026-AVI-1367). Un correctif Node.js
+  s'applique donc par une simple release, et `CONTRIBUTING.md` le documente.
+
 ## [2.15.0] — 2026-10-22
 
 ### Ajouté
