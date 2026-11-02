@@ -28,6 +28,12 @@ données à exécuter au déploiement).
   choisies dans la vue Benchmark (même sélection), ODD des pairs lus sur OpenAlex par `POST /api/benchmark/sdg-distribution`
   (relais vers druid-biblio, cache de 180 jours, 15 établissements au plus). Instances reliées à druid-biblio seulement.
 
+### Corrigé
+- **`esbuild` déclaré en devDependency.** Une vingtaine de scripts npm (`build:server`, `build:saas`, `build:seed`…) et
+  `scripts/functions_pg_bundle.cjs` l'appellent, mais il n'était présent qu'en dépendance transitive de `vite` 6 et de
+  `@lingui/cli`. Vite 8 ne l'embarque plus (tests en échec « Cannot find module 'esbuild' » sur la PR Dependabot #220) :
+  la déclaration explicite rend le build indépendant de ce détail. Version inchangée (0.25.12).
+
 ### Sécurité
 - **Image Docker construite avec la dernière base Node.js.** `deploy.sh` ajoute `--pull` au `docker build` : la base
   `node:24-slim` est rafraîchie à chaque release au lieu de réutiliser la copie en cache sur le serveur (Nantes tournait
