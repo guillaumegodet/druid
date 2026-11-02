@@ -34,6 +34,13 @@ données à exécuter au déploiement).
   `@lingui/cli`. Vite 8 ne l'embarque plus (tests en échec « Cannot find module 'esbuild' » sur la PR Dependabot #220) :
   la déclaration explicite rend le build indépendant de ce détail. Version inchangée (0.25.12).
 
+### Modifié
+- **Serveur Node passé à Express 5** (4.22 → 5.3, `server.cjs`). Les quatre routes à joker adoptent la syntaxe de
+  path-to-regexp 8 (`/api/v1/*splat`, `/api/grist/*splat`, `/api/reports/*splat`, page de l'application `/{*splat}`) et un
+  petit middleware redonne à `req.body` sa valeur `{}` d'Express 4 quand aucun analyseur n'a lu la requête. Comportement
+  inchangé pour les clients ; les erreurs des gestionnaires asynchrones remontent désormais d'elles-mêmes au gestionnaire
+  d'erreurs JSON.
+
 ### Sécurité
 - **Image Docker construite avec la dernière base Node.js.** `deploy.sh` ajoute `--pull` au `docker build` : la base
   `node:24-slim` est rafraîchie à chaque release au lieu de réutiliser la copie en cache sur le serveur (Nantes tournait

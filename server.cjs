@@ -255,6 +255,9 @@ const canAccessSlug = (access, slug) =>
 // BEFORE the global parser (body-parser skips a request whose body is already read).
 app.use('/api/sync-sovisuplus', express.json({ limit: '64mb' }));
 app.use(express.json({ limit: '10mb' }));
+// Express 5 leaves req.body undefined when no parser consumed the request (Express 4 gave {}). Keep the old
+// contract for the handlers below, which read fields without re-checking the body.
+app.use((req, _res, next) => { if (req.body === undefined) req.body = {}; next(); });
 
 // Session. Fixed SESSION_SECRET (druid/.env): without it, random secret and every
 // session is lost on each container restart.
@@ -2319,7 +2322,7 @@ const { fsBlobs } = require('./scripts/lib/reports_blobs_fs.cjs');
 const REPORT_PDF_DIR = process.env.REPORT_PDF_DIR || path.join(__dirname, 'report-pdfs');
 const reportBlobs = fsBlobs(REPORT_PDF_DIR);
 app.all(
-  ['/api/reports', '/api/reports/*'],
+  ['/api/reports', '/api/reports/*splat'],
   // PDF upload of a generation: raw bytes (the JSON parser leaves them aside).
   express.raw({ type: 'application/pdf', limit: reportsStore.LIMITS.maxPdfBytes }),
   async (req, res) => {
@@ -3098,14 +3101,14 @@ try {
   // Bundle missing (run `npm run build:server`) or configuration error (no Grist document).
   console.error('[api/v1] unavailable:', err.message);
 }
-app.all('/api/v1/*', (req, res, next) => {
+app.all('/api/v1/*splat', (req, res, next) => {
   if (!apiV1Handler) return res.status(503).json({ error: 'API v1 unavailable' });
   apiV1Handler(req, res).catch(next);
 });
 
 // The Grist proxy of the browser is closed (druid-internal docs/plan-migration-postgresql.md, lot 2 g): every read and
 // write goes through the domain API above. An explicit answer, so that a stale client never gets the SPA page instead.
-app.all('/api/grist/*', (req, res) => res.status(410).json({ error: 'Grist proxy removed: use /api/v1' }));
+app.all('/api/grist/*splat', (req, res) => res.status(410).json({ error: 'Grist proxy removed: use /api/v1' }));
 
 // ── LDAP sync ──────────────────────────────────────────────────────────────
 // Lot 2 (docs/plan-architecture-multi-instances.md): formerly execSync (blocking —
@@ -3814,7 +3817,7 @@ for (const cacheFile of ['ldap_status_cache.json', 'ldap_candidates_cache.json',
 }
 app.use(express.static(path.join(__dirname, 'dist')));
 
-app.get('*', (req, res) => {
+app.get('/{*splat}', (req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
