@@ -29,6 +29,9 @@ données à exécuter au déploiement).
   (relais vers druid-biblio, cache de 180 jours, 15 établissements au plus). Instances reliées à druid-biblio seulement.
 
 ### Corrigé
+- **« À traiter » et « Nouveau » visibles par tous les super admins** dans l'en-tête du personnel : ces deux boutons
+  exigeaient aussi le rôle realm `admin`, que le groupe `/NantesUniversite/admin` ne donne pas, si bien que ses membres
+  n'atteignaient ni les tâches ni la création de fiche. Le menu « Synchroniser » garde sa condition.
 - **`esbuild` déclaré en devDependency.** Une vingtaine de scripts npm (`build:server`, `build:saas`, `build:seed`…) et
   `scripts/functions_pg_bundle.cjs` l'appellent, mais il n'était présent qu'en dépendance transitive de `vite` 6 et de
   `@lingui/cli`. Vite 8 ne l'embarque plus (tests en échec « Cannot find module 'esbuild' » sur la PR Dependabot #220) :
