@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.16.0] — 2026-11-04
+
 ### Ajouté
 - **Filtre « Équipe » dans la liste du personnel**, à côté de « Labo » : équipes du rattachement principal
   (`lib/teamFilter.ts`), options restreintes aux labos sélectionnés, valeur « Non renseigné », paramètre d'URL
