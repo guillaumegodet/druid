@@ -5,7 +5,7 @@ import {
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Researcher, ViewState } from '../../types';
 import { ExportService } from '../../lib/exportService';
-import { canUseEstablishmentTools, hasRole } from '../../lib/auth';
+import { canUseEstablishmentTools, hasRole, isSuperAdmin } from '../../lib/auth';
 import { HelpButton } from '../HelpButton';
 import { VIEW_HELP } from '../../lib/helpLinks';
 
@@ -42,6 +42,9 @@ export const ListHeader: React.FC<ListHeaderProps> = ({
   onNewResearcher, showSyncMenu, onToggleSyncMenu, onCloseSyncMenu, sortedResearchers, onOpenAbesExport,
 }) => {
   const { t } = useLingui();
+  const canSynchronize = hasRole('admin') && canUseEstablishmentTools();
+  // Super admins come from the /NantesUniversite/admin group, which grants no realm role.
+  const canCreate = isSuperAdmin() || canSynchronize;
 
   const exportRows = () =>
     sortedResearchers.map(r => ({
@@ -93,49 +96,48 @@ export const ListHeader: React.FC<ListHeaderProps> = ({
         </div>
         {/* Synchronize menu: institution-wide operations (Grist, LDAP, alignments) —
             admin role AND institution right (hidden for a lab director/manager). */}
-        {hasRole('admin') && canUseEstablishmentTools() && (
-          <>
-            <div className="relative">
-              <button onClick={onToggleSyncMenu} className="btn-pill">
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> <Trans>Synchronise</Trans>
-              </button>
-              {showSyncMenu && (
-                <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-cream-100 dark:bg-[#201e1a] border border-white/60 dark:border-white/10 shadow-soft-lg z-20 p-1.5">
-                  <button onClick={() => { onCloseSyncMenu(); onManualSync?.(); }} className={menuItem}>
-                    <RefreshCw className={`w-4 h-4 text-muted-light dark:text-[#8f897c] ${loading ? 'animate-spin' : ''}`} />
-                    <Trans>Force Grist refresh</Trans>
+        {canSynchronize && (
+          <div className="relative">
+            <button onClick={onToggleSyncMenu} className="btn-pill">
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} /> <Trans>Synchronise</Trans>
+            </button>
+            {showSyncMenu && (
+              <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-cream-100 dark:bg-[#201e1a] border border-white/60 dark:border-white/10 shadow-soft-lg z-20 p-1.5">
+                <button onClick={() => { onCloseSyncMenu(); onManualSync?.(); }} className={menuItem}>
+                  <RefreshCw className={`w-4 h-4 text-muted-light dark:text-[#8f897c] ${loading ? 'animate-spin' : ''}`} />
+                  <Trans>Force Grist refresh</Trans>
+                </button>
+                {/* Two entries only (docs/archive/plan-reorganisation-sync-ldap.md): alignments
+                    are in « Outils d'alignement », duplicates and tasks in the « À traiter » section (pill
+                    below), the SoVisu+ export in Administration. */}
+                {onImportValidation && (
+                  <button onClick={() => { onCloseSyncMenu(); onImportValidation(); }} className={menuItem}>
+                    <CheckCircle className="w-4 h-4 text-[#1f7a4d] dark:text-[#5fd39a]" />
+                    <Trans>Import a validated list</Trans>
                   </button>
-                  {/* Two entries only (docs/archive/plan-reorganisation-sync-ldap.md): alignments
-                      are in « Outils d'alignement », duplicates and tasks in the « À traiter » section (pill
-                      below), the SoVisu+ export in Administration. */}
-                  {onImportValidation && (
-                    <button onClick={() => { onCloseSyncMenu(); onImportValidation(); }} className={menuItem}>
-                      <CheckCircle className="w-4 h-4 text-[#1f7a4d] dark:text-[#5fd39a]" />
-                      <Trans>Import a validated list</Trans>
-                    </button>
-                  )}
-                  {onImportSite && (
-                    <button onClick={() => { onCloseSyncMenu(); onImportSite(); }} className={menuItem}>
-                      <Globe className="w-4 h-4 text-muted-light dark:text-[#8f897c]" />
-                      <Trans>Import a lab website directory</Trans>
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-            {onOpenDuplicates && (
-              <button onClick={onOpenDuplicates} className="btn-pill" title={t`Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)`}>
-                <ClipboardList className={`w-4 h-4 ${duplicatesCount > 0 ? 'text-[#b23b3b] dark:text-[#f08c8c]' : 'text-muted-light dark:text-[#8f897c]'}`} />
-                <Trans>To process</Trans>
-                {duplicatesCount > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[rgba(231,111,154,.2)] text-[#b23b3b] dark:text-[#f08c8c] text-[11px] font-bold">{duplicatesCount}</span>}
-              </button>
+                )}
+                {onImportSite && (
+                  <button onClick={() => { onCloseSyncMenu(); onImportSite(); }} className={menuItem}>
+                    <Globe className="w-4 h-4 text-muted-light dark:text-[#8f897c]" />
+                    <Trans>Import a lab website directory</Trans>
+                  </button>
+                )}
+              </div>
             )}
-            {onNewResearcher && (
-              <button onClick={onNewResearcher} className="btn-pill-dark">
-                <Plus className="w-4 h-4" /> <Trans>New</Trans>
-              </button>
-            )}
-          </>
+          </div>
+        )}
+        {/* « À traiter » section: the caller passes the handler to super admins only. */}
+        {onOpenDuplicates && (
+          <button onClick={onOpenDuplicates} className="btn-pill" title={t`Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)`}>
+            <ClipboardList className={`w-4 h-4 ${duplicatesCount > 0 ? 'text-[#b23b3b] dark:text-[#f08c8c]' : 'text-muted-light dark:text-[#8f897c]'}`} />
+            <Trans>To process</Trans>
+            {duplicatesCount > 0 && <span className="ml-1 px-1.5 py-0.5 rounded-full bg-[rgba(231,111,154,.2)] text-[#b23b3b] dark:text-[#f08c8c] text-[11px] font-bold">{duplicatesCount}</span>}
+          </button>
+        )}
+        {onNewResearcher && canCreate && (
+          <button onClick={onNewResearcher} className="btn-pill-dark">
+            <Plus className="w-4 h-4" /> <Trans>New</Trans>
+          </button>
         )}
       </div>
     </header>
