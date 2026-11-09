@@ -1012,6 +1012,9 @@ export function computeIdrefQualinkaDiffFrom(inputs: AlignInputs, texts: AlignTe
     if (!rec) continue;
     if (!keptKeys.has(uid)) continue;
     const f = rec.fields;
+    // IdRef filled in the meantime (stale search entry, e.g. an ambiguous case settled by hand): left out, as in
+    // computeIdrefDiffFrom('search') and computeAlignDiffFrom — the « Vérifier » mode takes over for this record.
+    if (ppnDigits(f['IdRef'])) continue;
     const id = `G-${rec.id}`;
     const displayName = entry.queryName || nameOf(f);
     const labo = f['LABO'] || '';

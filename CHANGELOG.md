@@ -12,6 +12,11 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Alignement des identifiants, IdRef (moteur Qualinka)** : une fiche dont l'IdRef a été renseigné après la
+  recherche ne montre plus les candidats IdRef de cette recherche (cas « ambigu » tranché à la main). Les autres
+  sources ignoraient déjà ces fiches ; la vérification des IdRef existants passe par le mode « Vérifier ».
+
 ## [2.17.0] — 2026-11-09
 
 ### Modifié
