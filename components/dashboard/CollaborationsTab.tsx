@@ -46,23 +46,33 @@ function typologyColors(t: VizTheme): Record<string, string> {
   };
 }
 
-/** Displayed labels of the collaboration categories (keys = short labels of COLLAB_EXCLUSIVE). */
-const TYPOLOGY_LABELS: Record<string, MessageDescriptor> = {
+/** Institution of a dataset: Nantes Université unless the export names another one (SaaS tenant). */
+export const homeNameOf = (dataset: { homeInstitution?: { name: string } | null }): string =>
+  dataset.homeInstitution?.name || 'Nantes Université';
+
+/**
+ * Displayed labels of the collaboration categories (keys = short labels of COLLAB_EXCLUSIVE). The keys keep the
+ * Nantes wording of the ETL (data keys); the labels name the institution of the structure (`home`).
+ */
+const typologyLabelsOf = (home: string): Record<string, MessageDescriptor> => ({
   Internationales: msg({ message: `International`, context: "feminine plural" }),
-  'Nationales (hors NU)': msg`National (outside NU)`,
-  'Autre labo Nantes Université': msg`Other Nantes Université lab`,
+  'Nationales (hors NU)': msg`National (outside ${home})`,
+  'Autre labo Nantes Université': msg`Other ${home} lab`,
   'Entre labos de la structure': msg`Between labs of the structure`,
   'Pas de collaboration': msg`No collaboration`,
-};
+});
 
 /** Stacked yearly evolution per collaboration category (also in the chart registry). */
 export const TypologyEvolutionChart: React.FC<{
   data: { keys: string[]; years: number[]; series: { name: string; data: number[] }[] };
-}> = ({ data }) => {
+  /** Institution of the structure (homeNameOf). */
+  home?: string;
+}> = ({ data, home = 'Nantes Université' }) => {
   const t = useVizTheme();
   const { t: tr } = useLingui();
   const option = useMemo(() => {
     const colors = typologyColors(t);
+    const TYPOLOGY_LABELS = typologyLabelsOf(home);
     return {
       textStyle: baseTextStyle(t),
       tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' }, ...baseTooltip(t) },
@@ -90,7 +100,7 @@ export const TypologyEvolutionChart: React.FC<{
         },
       })),
     };
-  }, [data, t, tr]);
+  }, [data, t, tr, home]);
   return (
     <EChartCard
       title={tr`Evolution of collaboration types`}
@@ -104,10 +114,13 @@ export const TypologyEvolutionChart: React.FC<{
 export const TypologyDonutChart: React.FC<{
   data: { key: string; count: number }[];
   subtitle?: string;
-}> = ({ data, subtitle }) => {
+  /** Institution of the structure (homeNameOf). */
+  home?: string;
+}> = ({ data, subtitle, home = 'Nantes Université' }) => {
   const t = useVizTheme();
   const { t: tr } = useLingui();
   const colors = typologyColors(t);
+  const TYPOLOGY_LABELS = typologyLabelsOf(home);
   return (
     <TeamDonutChart
       title={tr`Collaboration types`}
@@ -271,7 +284,7 @@ const writeSubTab = (sub: SubTab | null, pairsView: PairsView = 'observed') => {
 /**
  * « Collaborations » tab — full port of the Streamlit _tab_collaborations,
  * in four nested scopes: within the structure (composite structures),
- * with the other « Nantes Université » labs, national (outside NU) and
+ * with the other labs of the institution (Nantes Université, or the tenant's: homeNameOf), national and
  * international.
  */
 export const CollaborationsTab: React.FC<{
@@ -283,6 +296,7 @@ export const CollaborationsTab: React.FC<{
 }> = ({ dataset, range, onOpenList, slug }) => {
   const { t: tr } = useLingui();
   const { publications } = dataset;
+  const home = homeNameOf(dataset);
   const composite = useMemo(() => hasSubStructures(publications), [publications]);
   const canPairs = hasCapability('HAS_NETWORK_API') && !!slug;
   const [sub, setSub] = useState<SubTab>(readSubTab);
@@ -327,7 +341,7 @@ export const CollaborationsTab: React.FC<{
   const subTabs: { key: SubTab; label: string }[] = [
     { key: 'typology', label: tr`Typology` },
     ...(composite ? [{ key: 'structure' as SubTab, label: tr`Within the structure` }] : []),
-    { key: 'nantes', label: tr`Nantes Université` },
+    { key: 'nantes', label: home },
     ...(canPairs ? [{ key: 'pairs' as SubTab, label: tr`Researcher pairs` }] : []),
     { key: 'national', label: tr`National` },
     { key: 'international', label: tr({ message: `International`, context: "feminine plural" }) },
@@ -362,12 +376,13 @@ export const CollaborationsTab: React.FC<{
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
               <div className="lg:col-span-2">
                 <TypologyDonutChart
+                  home={home}
                   data={typology.byCategory}
                   subtitle={tr`Broadest category per publication · ${typology.typed.toLocaleString(numberLocale())} typed publications`}
                 />
               </div>
               <div className="lg:col-span-3">
-                <TypologyEvolutionChart data={typology.byYear} />
+                <TypologyEvolutionChart data={typology.byYear} home={home} />
               </div>
             </div>
           )}
@@ -390,8 +405,8 @@ export const CollaborationsTab: React.FC<{
       {sub === 'nantes' && nantes && (
         <InternalCollabSection
           agg={nantes}
-          caption={tr`Co-publications with other Nantes Université labs (outside the current structure)`}
-          metricLabel={tr`publications with ≥ 1 other NU lab`}
+          caption={tr`Co-publications with other ${home} labs (outside the current structure)`}
+          metricLabel={tr`publications with ≥ 1 other ${home} lab`}
           idPrefix="collab-nu"
           labWord={tr`Labs`}
           onOpenList={onOpenList}
@@ -439,7 +454,7 @@ export const CollaborationsTab: React.FC<{
             <div className="flex flex-col gap-4">
               <p className="text-sm text-muted dark:text-[#c3beb0] px-1">
                 <Trans>
-                  Co-signing French institutions (outside Nantes Université) — <strong className="text-ink dark:text-[#f5f2ea]">{national.total.toLocaleString(numberLocale())}</strong> publications with ≥ 1 national partner.
+                  Co-signing French institutions (outside {home}) — <strong className="text-ink dark:text-[#f5f2ea]">{national.total.toLocaleString(numberLocale())}</strong> publications with ≥ 1 national partner.
                 </Trans>
               </p>
               <FranceMapChart points={national.mapPoints} />
