@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.17.0] — 2026-11-09
+
 ### Modifié
 - **Date de naissance imprécise** : la fiche accepte une date de naissance à l'année (`1980`) ou au mois
   (`1980-06`), comme les dates d'emploi (même champ `FuzzyDateInput`, `lib/dates.ts`). Une date incompatible avec
