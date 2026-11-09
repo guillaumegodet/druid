@@ -36,8 +36,13 @@ construction échoue, la page l'indique et propose **Réessayer** ; si l'échec 
 
 - **Charger vos chercheurs** : [fiabiliser l'annuaire d'un laboratoire](/tutoriels/fiabiliser-annuaire-labo/),
   puis lancer l'alignement des identifiants (IdRef, ORCID, IdHAL, OpenAlex).
-- **Compléter les identifiants des structures** (ROR, HAL, OpenAlex) : l'onglet Structures de
-  la page Alignement les propose.
+- **Valider les identifiants des laboratoires** (ROR, HAL, OpenAlex) : dès la construction, Druid
+  les cherche et les propose dans l'onglet Structures de la page Alignement des identifiants.
+  Acceptez les candidats forts (« Cocher tous les candidats forts » puis Appliquer).
+- **Construire les tableaux de bord** : sur la même page, le bouton **Construire les tableaux de
+  bord** moissonne les publications des laboratoires dont l'identifiant OpenAlex ou la collection
+  HAL est validé (plusieurs minutes par laboratoire). Il reste grisé tant qu'aucun ne l'est. Ensuite
+  les tableaux de bord sont rafraîchis automatiquement, la nuit, au rythme de votre offre.
 - **Inviter des collègues** : l'essai gratuit comprend un compte ; les offres Équipe et Complet
   en ajoutent (page « Mon établissement »).
 

@@ -38,7 +38,7 @@ export const StructuresAlignParams = z.object({
   only: z.array(z.string().regex(/^[A-Za-z0-9_.-]{1,64}$/)).max(500).optional(),
   force: z.boolean().default(false),
   limit: z.number().int().min(0).max(10_000).optional(),
-  /** Set by the provisioning: the first dashboards are built once the labs carry their identifiers. */
+  /** Chains a dashboard build after the run (no longer set by the provisioning: its candidates are not confirmed yet). */
   thenEtl: z.boolean().default(false),
 });
 export type StructuresAlignParams = z.infer<typeof StructuresAlignParams>;

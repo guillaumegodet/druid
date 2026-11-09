@@ -262,7 +262,7 @@ describe.skipIf(!url)('jobs of a tenant', () => {
     expect(await runJobsOnce(saas!, runnerEnv())).toEqual({ done: 1, failed: 0, cancelled: 0 });
   }, 30_000);
 
-  it('scheduled refreshes: inside the window, once per period, failed builds retried after a day', async () => {
+  it('scheduled refreshes: inside the window, once per period, failed builds retried after a day, never a first build', async () => {
     const env2 = runnerEnv();
     // The clock of the scheduler is fixed; the age of the builds is measured against it, never against the real
     // clock (a real « 40 days ago » drifts: it fell short of the monthly period once the tests ran past 2026-10-31).
@@ -272,7 +272,16 @@ describe.skipIf(!url)('jobs of a tenant', () => {
     await saas!.updateTable('job').set({ created_at: new Date(night.getTime() - 40 * 86_400_000).toISOString() }).where('type', '=', 'etl.build').execute();
     const queued = await scheduleRefreshes(saas!, env2, { now: night, batch: 1 });
     expect(queued).toEqual([SLUG]);
-    expect(await scheduleRefreshes(saas!, env2, { ignoreWindow: true })).toEqual([OTHER]);                         // the first one is queued now
+    // The other tenant never built its dashboards (its only build was failed by the restart above): its first build is
+    // the establishment's, from the alignment page, once its identifiers are confirmed — never the scheduler's.
+    expect(await scheduleRefreshes(saas!, env2, { ignoreWindow: true })).toEqual([]);
+    // Once it built them, a failed refresh is retried the next night.
+    const other = await saas!.selectFrom('tenant').select('id').where('slug', '=', OTHER).executeTakeFirstOrThrow();
+    const done = await enqueueJob(saas!, { tenantId: other.id, type: 'etl.build', params: {}, key: 'etl.build:done' });
+    await saas!.updateTable('job').set({ status: 'done', created_at: new Date(night.getTime() - 40 * 86_400_000).toISOString() }).where('id', '=', done).execute();
+    await saas!.updateTable('job').set({ created_at: new Date(night.getTime() - 2 * 86_400_000).toISOString() })
+      .where('tenant_id', '=', other.id).where('type', '=', 'etl.build').where('status', '=', 'failed').execute();
+    expect(await scheduleRefreshes(saas!, env2, { ignoreWindow: true })).toEqual([OTHER]);
     expect(await scheduleRefreshes(saas!, env2, { ignoreWindow: true })).toEqual([]);
     await saas!.deleteFrom('job').where('type', '=', 'etl.build').where('status', '=', 'queued').execute();
   });

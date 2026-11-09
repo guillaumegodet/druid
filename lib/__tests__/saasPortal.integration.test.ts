@@ -7,7 +7,7 @@ import { createRequire } from 'node:module';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createDb } from '../db/client';
 import { tenantSchemaName } from '../saas/controlPlane';
-import { runJobsOnce } from '../saas/runner';
+import { runJobsOnce, scheduleRefreshes } from '../saas/runner';
 import { dropTenantSchema, migrateControlPlane, openSaasDb } from '../saas/tenantDb';
 
 const GENERATED = new URL('../../functions/_generated/registry.js', import.meta.url);
@@ -132,17 +132,19 @@ describe.skipIf(!url)('portal: create a tenant, provision it, open it', () => {
     // The provisioning queues the structure alignment (lot 4), run here against registries that answer nothing.
     const emptyRegistries = (async () => ({ ok: true, status: 200, json: async () => ({}), text: async () => '' })) as unknown as typeof fetch;
     const out = await runJobsOnce(saas!, { ownerUrl: url!, appUrl, baseDomain: BASE, cloudflare: null, email: null, log: () => {}, fetchImpl: emptyRegistries });
-    // The alignment then queues the first dashboard build (lot 3 c): no ETL on this runner, it fails and says why.
+    // No dashboard build is chained: the candidates of the alignment are not confirmed yet, the establishment starts the
+    // first build from the alignment page; the nightly scheduler only refreshes tenants that built once.
     const st = await (await callPortal(`/start/api/tenants/${SLUG}`, { headers: { Cookie: cookie } })).json() as any;
     const logs = await saas!.selectFrom('job').innerJoin('tenant', 'tenant.id', 'job.tenant_id').where('tenant.slug', '=', SLUG)
       .select(['job.type', 'job.status', 'job.log']).execute();
-    expect(out, logs.map((j) => `${j.type} ${j.status}\n${j.log ?? ''}`).join('\n')).toEqual({ done: 2, failed: 1, cancelled: 0 });
+    expect(out, logs.map((j) => `${j.type} ${j.status}\n${j.log ?? ''}`).join('\n')).toEqual({ done: 2, failed: 0, cancelled: 0 });
+    expect(logs.map((j) => j.type)).not.toContain('etl.build');
+    expect(await scheduleRefreshes(saas!, { ownerUrl: url!, appUrl, baseDomain: BASE, cloudflare: null, email: null, log: () => {} }, { ignoreWindow: true })).toEqual([]);
     expect(st.status).toBe('active');
     expect((await callPortal(`/start/api/tenants/${SLUG}/retry`, { method: 'POST', headers: { Cookie: cookie } })).status).toBe(409); // not in provisioning
     expect(st.jobs).toEqual(expect.arrayContaining([
       expect.objectContaining({ type: 'tenant.provision', status: 'done', progress: expect.objectContaining({ step: 'ready', pct: 100 }) }),
       expect.objectContaining({ type: 'structures.align', status: 'done' }),
-      expect.objectContaining({ type: 'etl.build', status: 'failed', error: expect.stringContaining('ETL not configured') }),
     ]));
     const db = createDb({ connectionString: appUrl!, max: 1, schema: tenantSchemaName(SLUG), allowExitOnIdle: true });
     try {

@@ -159,9 +159,11 @@ export const provisionTenant: JobHandler = async (job, { saas, env, tenant, prog
   if (owner && env.email?.RESEND_API_KEY) {
     await sendTenantReady(env.email, { to: owner.email, label: tenant.label, loginUrl: `https://${host}/auth/login` }).catch((err) => log(`e-mail failed: ${err.message}`));
   }
-  // The identifiers of the seeded labs (HAL, ROR, OpenAlex…) follow from their RNSR: queued, not awaited; the first
-  // dashboards are built once they are known (thenEtl).
-  await enqueueJob(saas, { tenantId: tenant.id, type: 'structures.align', params: { mode: 'search', thenEtl: true }, createdBy: job.created_by ?? null });
+  // The identifiers of the seeded labs (HAL, ROR, OpenAlex…) follow from their RNSR: queued, not awaited. They are only
+  // candidates until the establishment accepts them, so the first dashboards are NOT chained here: the establishment
+  // builds them from the alignment page once its labs carry a confirmed OpenAlex id or HAL collection (an ETL run
+  // before that harvests nothing and fails every lab).
+  await enqueueJob(saas, { tenantId: tenant.id, type: 'structures.align', params: { mode: 'search' }, createdBy: job.created_by ?? null });
 };
 
 /**
@@ -490,7 +492,9 @@ export const inNightWindow = (now: Date, [start, end]: [number, number]): boolea
 };
 /**
  * Queues an `etl.build` for the active tenants whose last build is older than the refresh period of their plan (a
- * failed build is retried the next night), at most `batch` per call (spreading), inside the night window.
+ * failed build is retried the next night), at most `batch` per call (spreading), inside the night window. Only
+ * REFRESHES: a tenant that never built its dashboards successfully is left to the establishment (first build from
+ * the alignment page, once its identifiers are confirmed), else a fresh tenant would fail every night.
  */
 export const scheduleRefreshes = async (saas: SaasDb, env: RunnerEnv, { now = new Date(), batch = 3, ignoreWindow = false }: { now?: Date; batch?: number; ignoreWindow?: boolean } = {}): Promise<string[]> => {
   if (!ignoreWindow && !inNightWindow(now, env.nightWindow || [20, 6])) return [];
@@ -501,9 +505,12 @@ export const scheduleRefreshes = async (saas: SaasDb, env: RunnerEnv, { now = ne
     if (queued.length >= batch) break;
     const last = await saas.selectFrom('job').select(['status', 'created_at']).where('tenant_id', '=', t.id).where('type', '=', 'etl.build')
       .orderBy('created_at', 'desc').executeTakeFirst();
-    if (last && (last.status === 'queued' || last.status === 'running')) continue;
+    if (!last || last.status === 'queued' || last.status === 'running') continue;
+    const built = await saas.selectFrom('job').select('id').where('tenant_id', '=', t.id).where('type', '=', 'etl.build').where('status', '=', 'done')
+      .limit(1).executeTakeFirst();
+    if (!built) continue;
     const days = last?.status === 'failed' ? 1 : (REFRESH_DAYS[t.refresh] ?? 30);
-    if (last && now.getTime() - new Date(last.created_at).getTime() < days * 86_400_000) continue;
+    if (now.getTime() - new Date(last.created_at).getTime() < days * 86_400_000) continue;
     await enqueueJob(saas, { tenantId: t.id, type: 'etl.build', params: {}, createdBy: 'scheduler' });
     queued.push(t.slug);
   }
