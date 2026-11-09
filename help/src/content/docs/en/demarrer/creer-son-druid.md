@@ -36,8 +36,13 @@ and offers **Retry**; if it fails again, contact support.
 
 - **Load your researchers**: [make the directory of a laboratory reliable](/en/tutoriels/fiabiliser-annuaire-labo/), then
   run the alignment of identifiers (IdRef, ORCID, IdHAL, OpenAlex).
-- **Complete the identifiers of the structures** (ROR, HAL, OpenAlex): the Structures tab of
-  the Alignment page proposes them.
+- **Validate the identifiers of the laboratories** (ROR, HAL, OpenAlex): from the construction on,
+  Druid looks for them and proposes them in the Structures tab of the Identifier alignment page.
+  Accept the strong candidates (« Check all strong candidates » then Apply).
+- **Build the dashboards**: on the same page, the **Build the dashboards** button harvests the
+  publications of the laboratories whose OpenAlex identifier or HAL collection is validated (several
+  minutes per laboratory). It stays greyed out while none is. The dashboards are then refreshed
+  automatically, at night, at the pace of your plan.
 - **Invite colleagues**: the free trial includes one account; the Team and Complete plans add
   more (« My institution » page).
 

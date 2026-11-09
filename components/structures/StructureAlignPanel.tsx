@@ -7,10 +7,11 @@ import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { DirectoryApi } from '../../lib/directoryApi';
 import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
-import { hasCapability } from '../../lib/auth';
+import { getTenantInfo, hasCapability } from '../../lib/auth';
 import { STRUCTURE_ID_META, type StructureIdType } from '../../lib/structures/identifiers';
 import { isActionable, type StructureAlignCell, type StructureAlignOverview, type StructureAlignRow, type StructureCandidateView, type StructureCellStatus } from '../../lib/structures/alignView';
 import { PixelBtn, StatCard } from '../researchers/alignAtoms';
+import { DashboardBuildBar } from './DashboardBuildBar';
 
 /**
  * « Structures » tab of the alignment page (druid-internal docs/plan-druid-saas.md, § 4.5): one row per lab (the only
@@ -344,6 +345,8 @@ export const StructureAlignPanel: React.FC<StructureAlignPanelProps> = ({ writab
           </>
         )}
       </div>
+      {/* A tenant builds its first dashboards from here, once its labs carry confirmed identifiers (lot 3 c). */}
+      {canRun && overview && getTenantInfo() && <DashboardBuildBar overview={overview} onToast={onToast} />}
       {progress && (
         <div className="flex flex-wrap items-center gap-3 px-4 md:px-7 pb-3 text-[11px] font-semibold text-muted dark:text-[#8f897c]">
           <span className={progress.error ? 'text-[#b3441f] dark:text-[#e08a6a]' : ''}>
