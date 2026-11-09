@@ -113,6 +113,8 @@ const tenantUser = async (context, instance) => {
   return json(200, {
     name: email, email, preferred_username: email, roles, access, capabilities,
     instance: publicInstanceInfo(instance), tenant: publicTenantInfo(tenantRow, instance.tenant.plan, members), auth: 'session',
+    // Session opened by the DirlaData console as this member (lot 6 c): the front says so.
+    ...(context.data?.impersonatedBy ? { impersonatedBy: context.data.impersonatedBy } : {}),
   });
 };
 

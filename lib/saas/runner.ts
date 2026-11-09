@@ -21,6 +21,7 @@ import { sql } from 'kysely';
 import pg from 'pg';
 import { createDbWith, type Db } from '../db/core';
 import { createPgDirectoryRepository } from '../directory/pg/repository';
+import { redactSecrets } from './redact';
 import { enqueueJob, primaryHost, type Job, type Plan, type SaasDb, type Tenant } from './controlPlane';
 import { runStructureAlignment } from '../structures/alignRun';
 import { ALIGNED_STRUCTURE_ID_TYPES, isStructureIdType, type StructureIdType } from '../structures/identifiers';
@@ -220,12 +221,8 @@ export interface ChildResult { code: number | null; signal: NodeJS.Signals | nul
 const readJson = (file: string): Record<string, unknown> | null => {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
 };
-/**
- * Secret query parameters masked (`api_key=…` → `api_key=***`): a child's error message may carry the URL it called,
- * key included (requests' HTTPError, 2026-11-09), and its last lines go to the job log (journald, saas.job.log).
- */
-export const redactSecrets = (line: string): string =>
-  line.replace(/((?:[?&;]|%3F|%26)(?:api_key|apikey|api-key|access_token|token|key)(?:=|%3D))(?:(?!%26)[^&\s'"<>])+/gi, '$1***');
+// A child's last lines go to the job log (journald, saas.job.log): their secret parameters are masked (lib/saas/redact.ts).
+export { redactSecrets };
 const tailOf = (file: string, lines = 30): string[] => {
   try { return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).slice(-lines).map(redactSecrets); } catch { return []; }
 };

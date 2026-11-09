@@ -10,7 +10,7 @@ import pg from '../_generated/pg.js';
 import registry from '../_generated/registry.js';
 import { createDbWith } from '../../lib/db/core.ts';
 import {
-  SAAS_SCHEMA, createMagicLink, findMember, findTenantByHost, normalizeHost, sessionEmail,
+  SAAS_SCHEMA, createMagicLink, findMember, findTenantByHost, normalizeHost, sessionOf,
 } from '../../lib/saas/controlPlane.ts';
 import { sendMagicLink } from '../../lib/saas/email.ts';
 import { DEFAULT_GRIST_API_BASE, instanceForRequest, resolveForHost } from './instance.js';
@@ -64,6 +64,13 @@ export const tenantForHost = async (env, host) => {
 
 /** Forgets a host (after a change of the tenant): the isolate memo only — the KV entry expires by itself. */
 export const forgetHost = (host) => memo.delete(normalizeHost(host));
+/** Forgets a host everywhere this deployment caches it: the memo of this isolate and the KV registry (the other
+ *  isolates within their 60 s). After a change of plan or status (DirlaData console, lot 6 c). */
+export const forgetHostEverywhere = async (env, host) => {
+  forgetHost(host);
+  const kv = env?.[SAAS_REGISTRY_BINDING];
+  if (kv) await kv.delete(`host:${normalizeHost(host)}`).catch(() => {});
+};
 
 /**
  * Runtime settings of a tenant, in the shape of functions/_lib/instance.js resolveInstance (what every handler
@@ -153,12 +160,13 @@ export const clearSessionCookie = () => `${SESSION_COOKIE}=; HttpOnly; Secure; S
 /** `{ email, member }` of the session cookie for THIS tenant (both null without a live session). */
 export const saasIdentity = async (env, request, instance) => {
   const sid = readSessionId(request);
-  if (!sid) return { email: null, member: null };
+  if (!sid) return { email: null, member: null, impersonatedBy: null };
   return withSaasDb(env, async (db) => {
-    const email = await sessionEmail(db, sid, instance.tenant.id);
-    if (!email) return { email: null, member: null };
-    const member = await findMember(db, instance.tenant.id, email);
-    return { email, member };
+    const session = await sessionOf(db, sid, instance.tenant.id);
+    if (!session) return { email: null, member: null, impersonatedBy: null };
+    const member = await findMember(db, instance.tenant.id, session.email);
+    // An impersonation (DirlaData console, lot 6 c): the member's rights, the console user named.
+    return { email: session.email, member, impersonatedBy: session.impersonatedBy };
   });
 };
 
@@ -178,9 +186,9 @@ export const sha256Hex = async (s) => [...new Uint8Array(await crypto.subtle.dig
  * (local runs and tests). `verifyUrl` = absolute URL of the verify route of the host that will open the session.
  * Returns the link when it is not sent (dev), else null.
  */
-export const issueMagicLink = async (db, env, { email, tenantId, verifyUrl, nextPath = null, label, deliver = 'email' }) => {
+export const issueMagicLink = async (db, env, { email, tenantId, verifyUrl, nextPath = null, label, deliver = 'email', kind = 'user', impersonatedBy = null, ttlMinutes = 15 }) => {
   const token = generateToken();
-  await createMagicLink(db, { email, tenantId, tokenHash: await sha256Hex(token), nextPath });
+  await createMagicLink(db, { email, tenantId, tokenHash: await sha256Hex(token), nextPath, kind, impersonatedBy, ttlMinutes });
   const link = `${verifyUrl}?token=${token}`;
   // deliver 'return': handed to the caller (the portal opens a tenant for a person already signed in there).
   if (deliver === 'return') return link;

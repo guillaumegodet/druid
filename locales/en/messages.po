@@ -13,39 +13,39 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:146
+#: App.tsx:147
 msgid "Error computing the LDAP diff"
 msgstr "Error computing the LDAP diff"
 
-#: App.tsx:156
+#: App.tsx:157
 msgid "Error searching for duplicates"
 msgstr "Error searching for duplicates"
 
-#: App.tsx:180
-#: App.tsx:186
+#: App.tsx:181
+#: App.tsx:187
 msgid "Researcher not found in the loaded scope"
 msgstr "Researcher not found in the loaded scope"
 
-#: App.tsx:199
+#: App.tsx:200
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:359
+#: App.tsx:360
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:396
+#: App.tsx:397
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:410
+#: App.tsx:411
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:424
+#: App.tsx:425
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -53,106 +53,106 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:426
+#: App.tsx:427
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 
-#: App.tsx:428
+#: App.tsx:429
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:435
+#: App.tsx:436
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:513
-#: App.tsx:520
+#: App.tsx:514
+#: App.tsx:521
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:521
+#: App.tsx:522
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:521
+#: App.tsx:522
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:523
+#: App.tsx:524
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#: App.tsx:533
+#: App.tsx:534
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:543
+#: App.tsx:544
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:557
+#: App.tsx:558
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:569
+#: App.tsx:570
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "LDAP update applied: {updated} record(s) written to Grist."
 
-#: App.tsx:571
+#: App.tsx:572
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:578
+#: App.tsx:579
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:612
+#: App.tsx:613
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation applied: {0} record(s) written to Grist."
 
-#: App.tsx:614
+#: App.tsx:615
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:627
+#: App.tsx:628
 msgid "This record has no Grist row: validation impossible."
 msgstr "This record has no Grist row: validation impossible."
 
-#: App.tsx:639
+#: App.tsx:640
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:658
+#: App.tsx:659
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:689
+#: App.tsx:690
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:703
+#: App.tsx:704
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "LDAP structures: {updated} updated, {created} created in Grist."
 
-#: App.tsx:705
+#: App.tsx:706
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:727
+#: App.tsx:728
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:736
+#: App.tsx:737
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -160,45 +160,45 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:745
+#: App.tsx:746
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:753
+#: App.tsx:754
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:767
+#: App.tsx:768
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:784
-#: App.tsx:800
+#: App.tsx:785
+#: App.tsx:801
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:833
+#: App.tsx:834
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:979
+#: App.tsx:980
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:983
+#: App.tsx:984
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:989
+#: App.tsx:990
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:1009
+#: App.tsx:1010
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:1030
-#: App.tsx:1043
+#: App.tsx:1031
+#: App.tsx:1044
 #: components/admin/EstablishmentAdmin.tsx:81
 #: components/dashboard/CallCandidates.tsx:127
 #: components/dashboard/CallCandidates.tsx:165
@@ -217,20 +217,20 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1053
+#: App.tsx:1054
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1077
+#: App.tsx:1078
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1081
+#: App.tsx:1082
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1126
+#: App.tsx:1128
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -14880,6 +14880,14 @@ msgstr "Querying Keycloak…"
 #: components/rights/RightsPage.tsx:295
 msgid "Keycloak unavailable ({0}) — check the KEYCLOAK_ADMIN_CLIENT_ID/SECRET config and that the institution group exists."
 msgstr "Keycloak unavailable ({0}) — check the KEYCLOAK_ADMIN_CLIENT_ID/SECRET config and that the institution group exists."
+
+#: components/saas/ImpersonationBanner.tsx:14
+msgid "Support session opened by {by} as {as} — traced, ends within two hours."
+msgstr "Support session opened by {by} as {as} — traced, ends within two hours."
+
+#: components/saas/ImpersonationBanner.tsx:15
+msgid "End it"
+msgstr "End it"
 
 #: components/saas/PlanOffer.tsx:28
 msgid "Position your institution and its labs among comparable universities: Leiden ranking, OpenAlex indicators, peers chosen by you."

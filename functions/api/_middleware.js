@@ -15,9 +15,10 @@ export async function onRequest(context) {
   const instance = await instanceForRequestAnywhere(request, env);
   if (!instance) return json(404, { error: 'Unknown Druid instance for this host' });
   if (instance.tenant) {
-    const { email, member } = await saasIdentity(env, request, instance);
+    const { email, member, impersonatedBy } = await saasIdentity(env, request, instance);
     context.data.identity = email;
     context.data.member = member;
+    context.data.impersonatedBy = impersonatedBy || null;
     // A feature the plan of the tenant locks (lot 6 b): refused here, whatever the front shows.
     const feature = featureOfApiPath(new URL(request.url).pathname);
     if (feature && lockedFeaturesOf(instance.tenant.plan).includes(feature)) {

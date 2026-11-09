@@ -69,7 +69,12 @@ export interface MagicLinkTable {
   expires_at: string;
   consumed_at: string | null;
   created_at: Generated<string>;
+  /** `console`: a link of the DirlaData console (lot 6 c). */
+  kind: Generated<SessionKind>;
+  /** Console user opening a tenant session as a member (impersonation, lot 6 c). */
+  impersonated_by: string | null;
 }
+export type SessionKind = 'user' | 'console';
 export interface SessionTable {
   id: Generated<string>;
   email: string;
@@ -78,6 +83,16 @@ export interface SessionTable {
   created_at: Generated<string>;
   last_seen_at: Generated<string>;
   user_agent: string | null;
+  kind: Generated<SessionKind>;
+  impersonated_by: string | null;
+}
+export interface ConsoleEventTable {
+  id: Generated<string>;
+  at: Generated<string>;
+  actor: string;
+  action: string;
+  tenant_id: string | null;
+  details: Generated<Record<string, unknown>>;
 }
 export interface JobTable {
   id: Generated<string>;
@@ -128,6 +143,7 @@ export interface QuoteRequestTable {
 export interface SaasDB {
   access_request: AccessRequestTable;
   quote_request: QuoteRequestTable;
+  console_event: ConsoleEventTable;
   plan: PlanTable;
   tenant: TenantTable;
   tenant_host: TenantHostTable;
@@ -249,11 +265,11 @@ export const countMembers = async (db: SaasDb, tenantId: string): Promise<number
 export const mayRequestLink = (tenant: Pick<Tenant, 'mail_domains'>, member: Member | null, email: string): boolean =>
   !!member || tenant.mail_domains.includes(emailDomain(email));
 
-export interface MagicLinkInput { email: string; tenantId: string | null; tokenHash: string; nextPath?: string | null; ttlMinutes?: number }
-export const createMagicLink = async (db: SaasDb, { email, tenantId, tokenHash, nextPath = null, ttlMinutes = 15 }: MagicLinkInput): Promise<void> => {
+export interface MagicLinkInput { email: string; tenantId: string | null; tokenHash: string; nextPath?: string | null; ttlMinutes?: number; kind?: SessionKind; impersonatedBy?: string | null }
+export const createMagicLink = async (db: SaasDb, { email, tenantId, tokenHash, nextPath = null, ttlMinutes = 15, kind = 'user', impersonatedBy = null }: MagicLinkInput): Promise<void> => {
   await db.insertInto('magic_link').values({
     email: normalizeEmail(email), tenant_id: tenantId, token_hash: tokenHash, next_path: nextPath,
-    expires_at: sql<string>`now() + make_interval(mins => ${ttlMinutes})`,
+    expires_at: sql<string>`now() + make_interval(mins => ${ttlMinutes})`, kind, impersonated_by: impersonatedBy,
   }).execute();
 };
 
@@ -263,11 +279,12 @@ export const consumeMagicLink = async (db: SaasDb, tokenHash: string): Promise<S
     .where('token_hash', '=', tokenHash).where('consumed_at', 'is', null).where('expires_at', '>', sql<string>`now()`)
     .returningAll().executeTakeFirst()) || null;
 
-export interface SessionInput { email: string; tenantId: string | null; userAgent?: string | null; ttlDays?: number }
-export const createSession = async (db: SaasDb, { email, tenantId, userAgent = null, ttlDays = 30 }: SessionInput): Promise<string> => {
+export interface SessionInput { email: string; tenantId: string | null; userAgent?: string | null; ttlDays?: number; ttlHours?: number; kind?: SessionKind; impersonatedBy?: string | null }
+export const createSession = async (db: SaasDb, { email, tenantId, userAgent = null, ttlDays = 30, ttlHours, kind = 'user', impersonatedBy = null }: SessionInput): Promise<string> => {
   const row = await db.insertInto('session').values({
     email: normalizeEmail(email), tenant_id: tenantId, user_agent: userAgent ? String(userAgent).slice(0, 300) : null,
-    expires_at: sql<string>`now() + make_interval(days => ${ttlDays})`,
+    expires_at: ttlHours ? sql<string>`now() + make_interval(hours => ${ttlHours})` : sql<string>`now() + make_interval(days => ${ttlDays})`,
+    kind, impersonated_by: impersonatedBy,
   }).returning('id').executeTakeFirstOrThrow();
   return row.id;
 };
@@ -275,11 +292,23 @@ export const createSession = async (db: SaasDb, { email, tenantId, userAgent = n
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** E-mail of a live session of this tenant (the cookie of another host never opens this one), or null. */
-export const sessionEmail = async (db: SaasDb, sessionId: string | null, tenantId: string | null): Promise<string | null> => {
+export const sessionEmail = async (db: SaasDb, sessionId: string | null, tenantId: string | null): Promise<string | null> =>
+  (await sessionOf(db, sessionId, tenantId))?.email ?? null;
+
+/** Live session of this tenant (or of the portal, `tenantId` null) — never a console session. */
+export const sessionOf = async (db: SaasDb, sessionId: string | null, tenantId: string | null): Promise<{ email: string; impersonatedBy: string | null } | null> => {
   if (!sessionId || !UUID_RE.test(sessionId)) return null;
-  let q = db.selectFrom('session').select('email').where('id', '=', sessionId).where('expires_at', '>', sql<string>`now()`);
+  let q = db.selectFrom('session').select(['email', 'impersonated_by']).where('id', '=', sessionId).where('expires_at', '>', sql<string>`now()`).where('kind', '=', 'user');
   q = tenantId === null ? q.where('tenant_id', 'is', null) : q.where('tenant_id', '=', tenantId);
   const row = await q.executeTakeFirst();
+  return row ? { email: row.email, impersonatedBy: row.impersonated_by } : null;
+};
+
+/** E-mail of a live session of the DirlaData console (lot 6 c), or null. */
+export const consoleSessionEmail = async (db: SaasDb, sessionId: string | null): Promise<string | null> => {
+  if (!sessionId || !UUID_RE.test(sessionId)) return null;
+  const row = await db.selectFrom('session').select('email').where('id', '=', sessionId).where('expires_at', '>', sql<string>`now()`)
+    .where('kind', '=', 'console').where('tenant_id', 'is', null).executeTakeFirst();
   return row?.email || null;
 };
 

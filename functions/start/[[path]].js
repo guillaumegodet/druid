@@ -144,7 +144,7 @@ export async function onRequest(context) {
     if (!token) return redirect(`${origin}/start?reason=invalid`);
     const opened = await withSaasDb(env, async (db) => {
       const link = await consumeMagicLink(db, await sha256Hex(token));
-      if (!link || link.tenant_id !== null) return null;
+      if (!link || link.tenant_id !== null || link.kind !== 'user') return null;  // never a link of the console
       const id = await createSession(db, { email: link.email, tenantId: null, userAgent: request.headers.get('User-Agent') });
       return { id, next: safeNextPath(link.next_path) || '/start' };
     });

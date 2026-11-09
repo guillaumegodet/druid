@@ -91,6 +91,8 @@ interface UserInfo {
   /** Tenant of a multi-tenant deployment (functions/api/me.js, druid-internal docs/plan-druid-saas.md): plan and
    * seats shown by the « My establishment » page; absent elsewhere. */
   tenant?: TenantInfo;
+  /** Session opened by the DirlaData console as this member (druid-internal docs/plan-druid-saas.md, lot 6 c). */
+  impersonatedBy?: string | null;
 }
 
 export interface TenantInfo {
@@ -179,6 +181,8 @@ export const getRoles = (): string[] => _userInfo?.roles ?? [];
 
 /** Tenant of the current deployment (null outside a control plane). */
 export const getTenantInfo = (): TenantInfo | null => _userInfo?.tenant ?? null;
+/** Console user who opened this session as the member (impersonation), or null. */
+export const getImpersonator = (): string | null => _userInfo?.impersonatedBy ?? null;
 
 /** Feature locked by the plan of the tenant (`plan.features.locked`, e.g. `reports`, `media`): the front shows the
  * entry with its upgrade note instead of hiding it. Never locked outside a tenant. */
