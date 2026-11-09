@@ -16,6 +16,9 @@ export interface TabVisibilityInput {
   hasCalls?: boolean;
   /** At least one publication tagged with a UN Sustainable Development Goal (sdg.ts). */
   hasSdg?: boolean;
+  /** Tabs the plan of a hosted Druid locks (lib/saas/planFeatures.ts DASHBOARD_TAB_FEATURE): shown, with their upgrade
+   *  note, whatever data the structure has — still hidden when the admin hides them. */
+  locked?: Iterable<string>;
 }
 
 /**
@@ -24,8 +27,10 @@ export interface TabVisibilityInput {
  */
 export function visibleTabKeys<T extends string>(tabs: readonly T[], input: TabVisibilityInput): T[] {
   const hidden = new Set(input.hidden);
+  const locked = new Set(input.locked ?? []);
   return tabs.filter((key) =>
     key === 'overview' ||
+    (!hidden.has(key) && locked.has(key)) ||
     (!hidden.has(key)
       && (key !== 'themes' || input.hasAxes)
       && (key !== 'benchmark' || input.hasBenchmark)

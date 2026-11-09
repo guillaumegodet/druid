@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { RefreshCw, AlertCircle, Link2, Check, FileText, Settings } from 'lucide-react';
+import { RefreshCw, AlertCircle, Link2, Check, FileText, Lock, Settings } from 'lucide-react';
+import { DASHBOARD_TAB_FEATURE } from '../lib/saas/planFeatures';
+import { LockedFeature } from './saas/PlanOffer';
 import { copyToClipboard } from '../lib/clipboard';
 import { useDashboardData } from './dashboard/useDashboardData';
 import { getYearBounds, YearRange } from './dashboard/overviewAggregates';
@@ -37,7 +39,7 @@ import { sanitizeChartParams } from './dashboard/chartMeta';
 import { NewReportDialog } from './reports/NewReportDialog';
 import { reportsBackend } from './dashboard/report/reportsApi';
 import { hasStaffAttributes } from './dashboard/staffAggregates';
-import { getRoles } from '../lib/auth';
+import { getRoles, isLockedByPlan } from '../lib/auth';
 import { instanceLabel } from '../lib/instanceRuntime';
 import { withDerivedParents } from '../lib/structureHierarchy';
 import { Researcher, Structure, ViewState } from '../types';
@@ -275,13 +277,18 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
   const hasSdg = useMemo(() => (data?.publications ?? []).some((p) => (p.sdgs?.length ?? 0) > 0), [data]);
   // While the directory loads, keep the view in the catalog (hidden later if nothing matches).
   const hasStaff = (staffResearchers?.length ?? 0) > 0 || (researchersLoading && !(slug && groupSlugs.includes(slug)));
+  // Tabs the plan of a hosted Druid locks: shown with a lock, their content replaced by the upgrade note (lot 6 b).
+  const lockedTabs = useMemo(
+    () => new Set(Object.entries(DASHBOARD_TAB_FEATURE).filter(([, f]) => f && isLockedByPlan(f)).map(([k]) => k)),
+    [],
+  );
   const families = useMemo(() => {
     const keys = visibleTabKeys(
       DASHBOARD_TABS.map(({ key }) => key),
-      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff, hasCalls, hasSdg },
+      { hidden: slug ? tabsHiddenBySlug[slug] ?? [] : [], hasAxes, hasBenchmark, hasStaff, hasCalls, hasSdg, locked: lockedTabs },
     );
     return visibleFamilies(keys);
-  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff, hasCalls, hasSdg]);
+  }, [slug, tabsHiddenBySlug, hasAxes, hasBenchmark, hasStaff, hasCalls, hasSdg, lockedTabs]);
   const visibleKeys = useMemo(() => new Set(families.flatMap((f) => f.tabs.map((x) => x.key))), [families]);
   useEffect(() => {
     if (data && !visibleKeys.has(tab)) goTo('overview');
@@ -524,7 +531,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
                 title={t(x.hint)}
                 onClick={() => goTo(x.key)}
               >
-                {t(x.label)}
+                <span className="inline-flex items-center gap-1">{lockedTabs.has(x.key) && <Lock className="w-3 h-3 opacity-70" aria-hidden />}{t(x.label)}</span>
               </button>
             ))}
           </div>
@@ -614,7 +621,8 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               )}
               {tab === 'apc' && <ApcTab dataset={scopedData} range={range} />}
               {tab === 'funders' && <FundersTab dataset={scopedData} range={range} />}
-              {tab === 'calls' && (
+              {lockedTabs.has(tab) && DASHBOARD_TAB_FEATURE[tab] && <LockedFeature feature={DASHBOARD_TAB_FEATURE[tab]!} />}
+              {tab === 'calls' && !lockedTabs.has('calls') && (
                 <CallsTab
                   researchers={staffResearchers}
                   structureLabel={scopedData.lab}
@@ -626,7 +634,7 @@ export const DashboardPage: React.FC<DashboardPageProps> = ({
               )}
               {tab === 'themes' && <AxesTab dataset={scopedData} range={range} onOpenList={openList} />}
               {tab === 'sdg' && <SdgTab dataset={scopedData} range={range} onOpenList={openList} />}
-              {tab === 'benchmark' && <BenchmarkTab dataset={scopedData} range={range} />}
+              {tab === 'benchmark' && !lockedTabs.has('benchmark') && <BenchmarkTab dataset={scopedData} range={range} />}
               {tab === 'charte' && <CharteTab dataset={scopedData} range={range} onOpenList={openList} />}
               {tab === 'news' && <NewsTab dataset={scopedData} slug={slug} />}
               {tab === 'sources' && (

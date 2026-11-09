@@ -251,6 +251,9 @@ export const API_ERRORS = [
   msg`Access request not found`,
   msg`Too many mail domains`,
   msg`Invalid mail domain`,
+  // Plans of a tenant (lot 6 b: functions/api/_middleware.js, functions/api/tenant)
+  msg`Not included in the plan of this Druid`,
+  msg`Too many quote requests today`,
   // Structure identifiers alignment (druid-internal docs/plan-druid-saas.md, lot 4)
   msg`Structure alignment already running`,
   // Jobs of a tenant (druid-internal docs/plan-druid-saas.md, lot 3 a: functions/_lib/jobs.js, functions/api/jobs)

@@ -113,8 +113,21 @@ export interface AccessRequestTable {
   created_at: Generated<string>;
   handled_at: string | null;
 }
+export interface QuoteRequestTable {
+  id: Generated<string>;
+  tenant_id: string;
+  email: string;
+  plan_code: string;
+  researchers: number | null;
+  accounts: number | null;
+  message: string | null;
+  feature: string | null;
+  created_at: Generated<string>;
+  handled_at: string | null;
+}
 export interface SaasDB {
   access_request: AccessRequestTable;
+  quote_request: QuoteRequestTable;
   plan: PlanTable;
   tenant: TenantTable;
   tenant_host: TenantHostTable;

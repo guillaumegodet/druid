@@ -7,12 +7,15 @@
 //   POST   /api/tenant/access-requests/:id/accept { role, labScope? }   invites the requester
 //   POST   /api/tenant/access-requests/:id/dismiss
 //   PUT    /api/tenant/mail-domains { mailDomains: [] }
+// Every member (lot 6 b):
+//   GET    /api/tenant/offer                         the plan of the tenant and the plans, cheapest first (locked features)
+//   POST   /api/tenant/quote { plan, researchers?, accounts?, message?, feature? }   e-mail to DirlaData + quote_request
 // The rules (seats, last owner, domains) live in lib/saas/members.ts.
 import {
   MemberError, dismissAccessRequest, findAccessRequest, findMemberById, inviteMember, listAccessRequests, listMembers, removeMember, seatsOf,
   setMailDomains, updateMember,
 } from '../../../lib/saas/members.ts';
-import { sendInvitation } from '../../_lib/email.js';
+import { sendInvitation, sendQuoteRequest } from '../../_lib/email.js';
 import { forgetHost, json, withSaasDb } from '../../_lib/saas.js';
 import { tenantMember } from '../../_lib/jobs.js';
 
@@ -32,6 +35,56 @@ const invite = async (context, instance, inviter, member) => {
   }
 };
 
+/** Plans in the order of the grid (seats ascending, unlimited last): the first one unlocking a feature is the cheapest. */
+const plansInOrder = async (db) => {
+  const rows = await db.selectFrom('plan').select(['code', 'label', 'seats', 'history_years', 'refresh', 'features']).execute();
+  const rank = (p) => (p.code === 'trial' ? -1 : p.seats === null ? Number.MAX_SAFE_INTEGER : p.seats);
+  return rows.sort((a, b) => rank(a) - rank(b)).map((p) => ({ code: p.code, label: p.label, seats: p.seats, historyYears: p.history_years, refresh: p.refresh, features: p.features }));
+};
+
+const offer = (context, instance) => withSaasDb(context.env, async (db) => {
+  const plan = instance.tenant.plan;
+  return json(200, { plan: plan ? { code: plan.code, label: plan.label } : null, plans: await plansInOrder(db) });
+});
+
+const QUOTE_PLANS = ['team', 'complete', 'onsite'];
+const QUOTES_PER_DAY = 5;
+const intOrNull = (v, max) => {
+  if (v === undefined || v === null || v === '') return null;
+  const n = Number(v);
+  return Number.isInteger(n) && n >= 0 && n <= max ? n : undefined;
+};
+
+/** « Request a quote »: kept in quote_request, e-mailed to DirlaData (SAAS_SALES_EMAIL) with the requester as Reply-To. */
+const quote = async (context, instance, identity) => {
+  let body;
+  try { body = await context.request.json(); } catch { return json(400, { error: 'Invalid request' }); }
+  const plan = String(body?.plan || '');
+  const researchers = intOrNull(body?.researchers, 1_000_000);
+  const accounts = intOrNull(body?.accounts, 100_000);
+  const message = body?.message ? String(body.message).trim().slice(0, 4000) : null;
+  const feature = body?.feature ? String(body.feature).slice(0, 40) : null;
+  if (!QUOTE_PLANS.includes(plan) || researchers === undefined || accounts === undefined) return json(400, { error: 'Invalid request' });
+  const tenant = instance.tenant;
+  return withSaasDb(context.env, async (db) => {
+    const recent = await db.selectFrom('quote_request').select(({ fn }) => fn.countAll().as('n')).where('tenant_id', '=', tenant.id)
+      .where('created_at', '>', new Date(Date.now() - 86_400_000).toISOString()).executeTakeFirst();
+    if (Number(recent?.n || 0) >= QUOTES_PER_DAY) return json(429, { error: 'Too many quote requests today' });
+    await db.insertInto('quote_request').values({ tenant_id: tenant.id, email: identity, plan_code: plan, researchers, accounts, message, feature }).execute();
+    let sent = false;
+    if (context.env.RESEND_API_KEY && context.env.SAAS_SALES_EMAIL) {
+      try {
+        await sendQuoteRequest(context.env, { to: context.env.SAAS_SALES_EMAIL, label: instance.label, slug: tenant.slug, requester: identity, plan, researchers, accounts, message, feature });
+        sent = true;
+      } catch (err) {
+        console.error(JSON.stringify({ event: 'tenant.quote.mail_failed', instance: instance.slug, error: String(err?.message || err) }));
+      }
+    }
+    console.log(JSON.stringify({ event: 'tenant.quote', instance: instance.slug, plan, feature, sent }));
+    return json(201, { recorded: true });
+  });
+};
+
 export async function onRequest(context) {
   const t = tenantMember(context);
   if (t.refusal) return t.refusal;
@@ -39,6 +92,8 @@ export async function onRequest(context) {
   const { request } = context;
   const method = request.method;
   const parts = new URL(request.url).pathname.replace(/^\/api\/tenant\/?/, '').replace(/\/$/, '').split('/').filter(Boolean);
+  if (parts[0] === 'offer' && parts.length === 1 && method === 'GET') return offer(context, instance);
+  if (parts[0] === 'quote' && parts.length === 1 && method === 'POST') return quote(context, instance, identity);
   const isOwner = member.role === 'owner';
   if (!isOwner && member.role !== 'admin') return json(403, { error: 'Owner right required' });
   if (method !== 'GET') {
