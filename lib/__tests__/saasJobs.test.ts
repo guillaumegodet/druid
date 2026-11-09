@@ -6,7 +6,7 @@ import { estimateAlignment, alignGroupOf, alignTargetOf } from '../saas/alignEst
 import { dashboardIndexOf, etlLabsOf, labSlugOf, yamlOf } from '../saas/etlConfig';
 import { jobKeyOf, legacyProgressOf, parseJobParams, peopleAlignParamsOfQuery, structuresAlignParamsOfQuery } from '../saas/jobs';
 import { EMPTY_PAYLOAD_HASH, canonicalUri, memoryAssetStore, createS3AssetStore, signS3Request } from '../saas/r2';
-import { childEnvOf, inNightWindow } from '../saas/runner';
+import { childEnvOf, inNightWindow, redactSecrets } from '../saas/runner';
 import { decryptSecret, encryptSecret, generateSecretsKey } from '../saas/secrets';
 
 describe('job parameters and keys', () => {
@@ -153,3 +153,13 @@ describe('runner rules', () => {
     expect(env).toEqual({ PATH: '/bin', HTTPS_PROXY: 'p', DRUID_DATABASE_SCHEMA: 't_x', SCOPUS_API_KEY: 'k' });
   });
 });
+
+describe('runner: secrets out of the job log', () => {
+  it('masks the key parameters of a URL quoted by a child', () => {
+    expect(redactSecrets('400 Client Error: Bad Request for url: https://api.openalex.org/works?filter=x&mailto=a%40b.fr&api_key=SECRET1&cursor=%2A'))
+      .toBe('400 Client Error: Bad Request for url: https://api.openalex.org/works?filter=x&mailto=a%40b.fr&api_key=***&cursor=%2A');
+    expect(redactSecrets('…%3Fapi_key%3DSECRET%26x=1 ?token=abc')).toBe('…%3Fapi_key%3D***%26x=1 ?token=***');
+    expect(redactSecrets('OpenAlex : 202 publications téléchargées…')).toBe('OpenAlex : 202 publications téléchargées…');
+  });
+});
+

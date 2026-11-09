@@ -220,14 +220,21 @@ export interface ChildResult { code: number | null; signal: NodeJS.Signals | nul
 const readJson = (file: string): Record<string, unknown> | null => {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
 };
+/**
+ * Secret query parameters masked (`api_key=…` → `api_key=***`): a child's error message may carry the URL it called,
+ * key included (requests' HTTPError, 2026-11-09), and its last lines go to the job log (journald, saas.job.log).
+ */
+export const redactSecrets = (line: string): string =>
+  line.replace(/((?:[?&;]|%3F|%26)(?:api_key|apikey|api-key|access_token|token|key)(?:=|%3D))(?:(?!%26)[^&\s'"<>])+/gi, '$1***');
 const tailOf = (file: string, lines = 30): string[] => {
-  try { return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).slice(-lines); } catch { return []; }
+  try { return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).slice(-lines).map(redactSecrets); } catch { return []; }
 };
 
 /** Runs a child process, relays its progress file, stops it when asked (SIGTERM then SIGKILL) or after `timeoutMs`. */
 export const runChild = async (run: ChildRun, ctx: { log: (l: string) => void; isCancelRequested: () => Promise<boolean>; spawnImpl?: typeof nodeSpawn }): Promise<ChildResult> => {
   const spawn = ctx.spawnImpl || nodeSpawn;
-  const out = fs.openSync(run.outputFile, 'a');
+  // Truncated at each run: appended, the tail of a successful run still showed the errors of the previous one.
+  const out = fs.openSync(run.outputFile, 'w');
   let child: ChildProcess;
   try {
     child = spawn(run.command, run.args, { cwd: run.cwd, env: run.env, stdio: ['ignore', out, out] });
