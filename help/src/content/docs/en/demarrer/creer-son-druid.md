@@ -1,4 +1,7 @@
 ---
+# Hidden from the public help (draft: excluded from the build, the sidebar and the search): the hosted offer is
+# documented by its operator, not in the help of Druid.
+draft: true
 title: "Create the Druid of your institution"
 description: "The « Create my Druid » portal: institution, laboratories, address, then automatic build."
 sidebar:

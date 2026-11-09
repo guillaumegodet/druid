@@ -110,7 +110,7 @@ export const AdminPage: React.FC<{
           <h2 className="font-disp font-bold text-xl text-ink dark:text-[#f5f2ea] leading-tight">
             <Trans>Administration</Trans>
           </h2>
-          <HelpButton path={ADMIN_TAB_HELP[tab]} />
+          {ADMIN_TAB_HELP[tab] && <HelpButton path={ADMIN_TAB_HELP[tab]!} />}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {tabs.map((k) => (

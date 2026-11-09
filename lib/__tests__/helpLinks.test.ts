@@ -44,6 +44,8 @@ describe('helpLinks', () => {
     const [pagePath, anchor] = link.split('#');
     const file = pageFile(pagePath);
     expect(file, `no page for ${pagePath}`).not.toBeNull();
+    // A draft page is not published (Starlight drops it from the build): the link would lead nowhere.
+    expect(fs.readFileSync(file!, 'utf8'), `${pagePath} is a draft`).not.toMatch(/^draft:\s*true\s*$/m);
     if (anchor) expect([...anchorsOf(file!)]).toContain(anchor);
   });
 
