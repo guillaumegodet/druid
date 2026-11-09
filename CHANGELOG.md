@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.17.1] — 2026-11-09
+
 ### Corrigé
 - **Alignement des identifiants, IdRef (moteur Qualinka)** : une fiche dont l'IdRef a été renseigné après la
   recherche ne montre plus les candidats IdRef de cette recherche (cas « ambigu » tranché à la main). Les autres
