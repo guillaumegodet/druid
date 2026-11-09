@@ -21,6 +21,7 @@ const AdminPage = React.lazy(() =>
 );
 import type { AdminTab } from './lib/auth';
 import { LockedFeature, TrialBanner } from './components/saas/PlanOffer';
+import { ImpersonationBanner } from './components/saas/ImpersonationBanner';
 import { ViewState, Researcher, Structure, ResearcherStatus, StructureLevel } from './types';
 import { GristService, NEW_STRUCTURE_ID, LdapDiff, StructuresLdapDiff, IdrefCandidate, AlignMode, AlignCandidate, DECISION_MIXED, ReviewDecision, AlignGroup, UnifiedAlignDiff, UnifiedAlignSource, UNIFIED_ALIGN_SOURCES, PersonAlignUpdate, unifiedCandidateId, DuplicatesDiff } from './lib/gristService';
 import { runUnifiedAlign, stopUnifiedRun, UnifiedRunProgress } from './lib/unifiedAlignRuns';
@@ -1085,6 +1086,7 @@ function App() {
         </div>
       )}
       <TrialBanner />
+      <ImpersonationBanner />
       {renderContent()}
       {mergeRowIds && (
         <MergeResearchersModal

@@ -35,12 +35,18 @@ export async function onRequestPost(context) {
   const tenantId = instance.tenant.id;
   const opened = await withSaasDb(env, async (db) => {
     const link = await consumeMagicLink(db, await sha256Hex(token));
-    if (!link || link.tenant_id !== tenantId) return null;
+    if (!link || link.tenant_id !== tenantId || link.kind !== 'user') return null;
+    // An impersonation of the DirlaData console (lot 6 c): a 2-hour session marked with the console user, the member's
+    // last sign-in left as it was.
+    if (link.impersonated_by) {
+      const id = await createSession(db, { email: link.email, tenantId, userAgent: request.headers.get('User-Agent'), ttlHours: 2, impersonatedBy: link.impersonated_by });
+      return { id, next: safeNextPath(link.next_path) || '/', impersonated: true };
+    }
     await touchLogin(db, tenantId, link.email);
     const id = await createSession(db, { email: link.email, tenantId, userAgent: request.headers.get('User-Agent') });
     return { id, next: safeNextPath(link.next_path) || '/' };
   });
   if (!opened) return Response.redirect(loginUrl(origin, { reason: 'expired' }), 302);
-  console.log(JSON.stringify({ event: 'auth.login', instance: instance.slug }));
-  return new Response(null, { status: 303, headers: { Location: new URL(opened.next, origin).toString(), 'Set-Cookie': sessionCookie(opened.id) } });
+  console.log(JSON.stringify({ event: opened.impersonated ? 'auth.impersonation' : 'auth.login', instance: instance.slug }));
+  return new Response(null, { status: 303, headers: { Location: new URL(opened.next, origin).toString(), 'Set-Cookie': sessionCookie(opened.id, opened.impersonated ? 2 * 3600 : undefined) } });
 }
