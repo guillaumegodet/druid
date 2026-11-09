@@ -87,6 +87,20 @@ describe('ETL configuration', () => {
     expect(String(c.bso_url)).toContain('bso-publications-latest_201722241F_enriched.jsonl.gz');
     expect(report.labs[1].config).toMatchObject({ openalex_id: '', bso_url: '', hal_collection: 'CRCI2NA', bso_markers: ['crci2na'] });
     expect(etlLabsOf([lab({})], { historyYears: null, mailto: null, now }).labs[0].config.year_from).toBe(2016);
+    // No establishment: no home_institution (druid-biblio falls back on Nantes Université).
+    expect(c).not.toHaveProperty('home_institution');
+    // The establishment of a tenant: every lab sees the others (OpenAlex ids normalized) as labs of its institution.
+    const homed = etlLabsOf([
+      lab({}),
+      lab({ acronym: 'TEMOS', rnsrId: '', identifiers: { openalexIds: ['https://openalex.org/i4210000002'] } }),
+      lab({ acronym: 'TEAM', level: StructureLevel.EQUIPE, identifiers: { openalexIds: ['I4210000009'] } }),
+    ], { historyYears: 3, mailto: null, now, home: { name: 'Le Mans Université', openalexIds: ['I1294671590', ''] } });
+    expect(homed.labs.map((l) => l.config.home_institution)).toEqual([
+      { name: 'Le Mans Université', openalex_ids: ['I1294671590'], labs: { I4210100000: 'LS2N', I4210000002: 'TEMOS' } },
+      { name: 'Le Mans Université', openalex_ids: ['I1294671590'], labs: { I4210100000: 'LS2N', I4210000002: 'TEMOS' } },
+    ]);
+    expect(homed.labs[1].config.openalex_id).toBe('I4210000002');
+    expect(yamlOf(homed.labs[1].config)).toContain('home_institution:');
     const yaml = yamlOf({ ...c, name: 'Lab: with colon', teams: [], team_aliases: {}, bso_markers: ['a', '1'], grist: { labo_acronyme: 'LS2N' }, flag: true, n: 0, empty: '' });
     expect(yaml).toContain("name: 'Lab: with colon'\n");
     expect(yaml).toContain('teams: []\nsous_structures: []');

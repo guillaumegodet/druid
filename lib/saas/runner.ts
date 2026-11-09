@@ -354,7 +354,11 @@ export const buildEtl: JobHandler = async (job, ctx) => {
   const db = tenantDbOf(env, tenant);
   let structures;
   try { structures = (await createPgDirectoryRepository({ db }).structures()).items; } finally { await db.destroy(); }
-  const report = etlLabsOf(structures, { historyYears: plan?.history_years ?? null, mailto });
+  // The establishment of the tenant (onboarding: ROR → OpenAlex), whose other labs are the « internal » partners.
+  const homeOpenalex = typeof settings.openalex === 'string' && settings.openalex ? [settings.openalex] : [];
+  const establishment = ((tenant.onboarding || {}) as { establishment?: { name?: string } }).establishment;
+  const homeName = String(establishment?.name || '').trim() || tenant.label;
+  const report = etlLabsOf(structures, { historyYears: plan?.history_years ?? null, mailto, home: { name: homeName, openalexIds: homeOpenalex } });
   for (const s of report.skipped) log(`skipped ${s.acronym}: ${s.reason}`);
   const labs = params.slugs ? report.labs.filter((l) => params.slugs!.includes(l.slug)) : report.labs;
   const dataDir = path.join(env.etl.dataDir, tenant.slug);

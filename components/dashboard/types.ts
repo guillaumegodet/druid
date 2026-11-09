@@ -369,6 +369,9 @@ export interface DashboardDataset {
   etpr: number | null;
   /** Default scope of the structure: true = restricted to the headcounts. */
   filterToEffectifs: boolean;
+  /** Institution whose other labs are the « internal » partners (`nantesPartners`): Nantes Université when absent
+   *  (dashboards exported before 2026-11-09), the tenant's establishment on a SaaS tenant (druid-biblio home_institution). */
+  homeInstitution?: { name: string } | null;
   /** Signature model of the NU charter for the structure (null if missing). */
   charteModele: string | null;
   /** Composite: no signature of its own, aggregated tracking of the member labs. */

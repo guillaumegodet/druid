@@ -105,6 +105,7 @@ import {
   InternalCollabSubfieldsChart,
   TypologyDonutChart,
   TypologyEvolutionChart,
+  homeNameOf,
 } from './CollaborationsTab';
 import { axisColorOf } from './AxesTab';
 import { ApcByLaboChart, aggregateDealByLabo } from './ApcTab';
@@ -865,7 +866,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
         [p.dataset, p.range],
       );
       return (
-        <YearlyEvolutionChart data={d.byYear} title={i18n._(msg`Co-publications with NU labs per year`)} exportName="collab-nu-evolution" colorSlot={2} />
+        <YearlyEvolutionChart data={d.byYear} title={i18n._(msg`Co-publications with ${homeNameOf(p.dataset)} labs per year`)} exportName="collab-nu-evolution" colorSlot={2} />
       );
     },
   },
@@ -889,7 +890,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
         () => aggregateCollabTypology(p.dataset.publications, p.range),
         [p.dataset, p.range],
       );
-      return <TypologyDonutChart data={d.byCategory} subtitle={i18n._(msg`Broadest category per publication`)} />;
+      return <TypologyDonutChart data={d.byCategory} home={homeNameOf(p.dataset)} subtitle={i18n._(msg`Broadest category per publication`)} />;
     },
   },
   'collab-typologie-evolution': {
@@ -899,7 +900,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
         () => aggregateCollabTypology(p.dataset.publications, p.range),
         [p.dataset, p.range],
       );
-      return <TypologyEvolutionChart data={d.byYear} />;
+      return <TypologyEvolutionChart data={d.byYear} home={homeNameOf(p.dataset)} />;
     },
   },
   'collab-structure-domaines': {
@@ -953,7 +954,7 @@ export const EMBED_CHARTS: Record<string, Entry> = {
       );
       return (
         <RankBarChart
-          title={i18n._(msg`Most co-signing Nantes Université labs`)}
+          title={i18n._(msg`Most co-signing ${homeNameOf(p.dataset)} labs`)}
           exportName="collab-nu-top"
           data={d.topLabs.map((l) => ({ label: l.key, count: l.count, teams: [] }))}
           colorSlot={2}

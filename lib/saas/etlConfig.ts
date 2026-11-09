@@ -18,16 +18,33 @@ export interface EtlConfigOptions {
   /** Years of history the plan allows (null = everything since 2016, the first BSO year). */
   historyYears: number | null;
   mailto: string | null;
+  /** Establishment of the tenant: its other labs are the « internal » partners of each lab (druid-biblio
+   *  home_institution; without it, the ETL falls back on Nantes Université). */
+  home?: { name: string; openalexIds: string[] } | null;
   now?: Date;
 }
 export interface EtlLabsReport { labs: EtlLab[]; skipped: { acronym: string; reason: string }[] }
 
 /** The labs of the directory (level 2) with at least one harvesting key, as druid-biblio configurations. */
-export const etlLabsOf = (structures: Structure[], { historyYears, mailto, now = new Date() }: EtlConfigOptions): EtlLabsReport => {
+/** OpenAlex institution ids of a structure, normalized (`https://openalex.org/i123` → `I123`). */
+const openalexIdsOf = (s: Structure): string[] =>
+  (s.identifiers?.openalexIds || []).map((v) => String(v).trim().replace(/\/+$/, '').split('/').pop()!.toUpperCase()).filter((v) => /^I\d{3,}$/.test(v));
+
+export const etlLabsOf = (structures: Structure[], { historyYears, mailto, home = null, now = new Date() }: EtlConfigOptions): EtlLabsReport => {
   const yearTo = now.getUTCFullYear();
   const yearFrom = historyYears ? Math.max(2016, yearTo - historyYears + 1) : 2016;
   const report: EtlLabsReport = { labs: [], skipped: [] };
   const seen = new Set<string>();
+  // Every lab of the tenant with an OpenAlex id, so that each one sees the others as labs of its institution.
+  const homeLabs: Record<string, string> = {};
+  for (const s of structures) {
+    const acr = String(s.acronym || '').trim();
+    if (String(s.level) !== StructureLevel.ENTITE || !acr) continue;
+    for (const id of openalexIdsOf(s)) homeLabs[id] ??= acr;
+  }
+  const homeInstitution = home?.name
+    ? { name: home.name, openalex_ids: [...new Set(home.openalexIds.map((v) => String(v).trim().replace(/\/+$/, '').split('/').pop()!.toUpperCase()).filter((v) => /^I\d+$/.test(v)))], labs: homeLabs }
+    : null;
   for (const s of structures) {
     if (String(s.level) !== StructureLevel.ENTITE) continue;
     const acronym = String(s.acronym || '').trim();
@@ -35,7 +52,7 @@ export const etlLabsOf = (structures: Structure[], { historyYears, mailto, now =
     const slug = labSlugOf(acronym);
     if (!slug) { report.skipped.push({ acronym, reason: 'no usable slug' }); continue; }
     if (seen.has(slug)) { report.skipped.push({ acronym, reason: `slug ${slug} already used` }); continue; }
-    const openalex = (s.identifiers?.openalexIds || []).map((v) => String(v).trim().toUpperCase()).filter((v) => /^I\d{3,}$/.test(v));
+    const openalex = openalexIdsOf(s);
     const rnsr = String(s.rnsrId || '').trim().toUpperCase();
     const halCollection = String(s.halCollectionUrl || '').trim().replace(/^https?:\/\/hal\.science\/|\/$/gi, '').toUpperCase();
     if (!openalex.length && !rnsr && !halCollection) { report.skipped.push({ acronym, reason: 'no OpenAlex id, RNSR or HAL collection' }); continue; }
@@ -64,6 +81,7 @@ export const etlLabsOf = (structures: Structure[], { historyYears, mailto, now =
       etpr: 0,
       team_aliases: {},
       grist: { labo_acronyme: acronym },
+      ...(homeInstitution ? { home_institution: homeInstitution } : {}),
     };
     report.labs.push({ slug, acronym, config });
   }
