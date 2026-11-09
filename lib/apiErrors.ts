@@ -239,6 +239,18 @@ export const API_ERRORS = [
   msg`Alignment already running`,
   msg`Unknown alignment source`,
   msg`No alignment running`,
+  // Accounts of a tenant (druid-internal docs/plan-druid-saas.md, lot 6 a-1: lib/saas/members.ts, functions/api/tenant)
+  msg`Owner right required`,
+  msg`Unknown role`,
+  msg`A lab account needs at least one lab`,
+  msg`This address is already a member`,
+  msg`Account limit of the plan reached`,
+  msg`Member not found`,
+  msg`The last owner of a Druid keeps the role`,
+  msg`The last owner of a Druid cannot be removed`,
+  msg`Access request not found`,
+  msg`Too many mail domains`,
+  msg`Invalid mail domain`,
   // Structure identifiers alignment (druid-internal docs/plan-druid-saas.md, lot 4)
   msg`Structure alignment already running`,
   // Jobs of a tenant (druid-internal docs/plan-druid-saas.md, lot 3 a: functions/_lib/jobs.js, functions/api/jobs)

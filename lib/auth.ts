@@ -218,9 +218,12 @@ export const isMediaAdmin = (): boolean => _userInfo?.access.isMediaAdmin ?? fal
 export const canAdminMediaSources = (): boolean => isSuperAdmin() || isMediaAdmin();
 
 /** Tabs of the Administration section available to the user (display order). */
-export type AdminTab = 'console' | 'rights' | 'media' | 'institutions' | 'calls';
+export type AdminTab = 'establishment' | 'console' | 'rights' | 'media' | 'institutions' | 'calls';
 export const adminTabsFor = (): AdminTab[] => {
   const tabs: AdminTab[] = [];
+  // « My institution » of a tenant (druid-internal docs/plan-druid-saas.md, lot 6 a-1): the owners manage it, the
+  // admins read it.
+  if (getTenantInfo() && (isSuperAdmin() || getRoles().includes('admin'))) tabs.push('establishment');
   // console/rights assume a server (ETL relay, Keycloak admin API): absent on
   // Cloudflare Functions (Centrale) → tab removed rather than crashing on data that never
   // arrives (see docs/archive/plan-fusion-centrale-2026-09.md, sub-lot 4).

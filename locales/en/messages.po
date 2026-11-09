@@ -199,6 +199,7 @@ msgstr "Loading dashboard…"
 
 #: App.tsx:1029
 #: App.tsx:1041
+#: components/admin/EstablishmentAdmin.tsx:79
 #: components/dashboard/CallCandidates.tsx:127
 #: components/dashboard/CallCandidates.tsx:165
 #: components/dashboard/EmbedPage.tsx:90
@@ -241,7 +242,7 @@ msgid "Unknown"
 msgstr "Unknown"
 
 #: components/AccountMenu.tsx:100
-#: components/admin/AdminPage.tsx:109
+#: components/admin/AdminPage.tsx:111
 msgid "Administration"
 msgstr "Administration"
 
@@ -811,6 +812,7 @@ msgstr "Export PDF"
 
 #: components/ResearcherDetail.tsx:321
 #: components/StructureDetail.tsx:139
+#: components/admin/EstablishmentAdmin.tsx:247
 #: components/admin/InstitutionsAdmin.tsx:219
 #: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
@@ -1206,61 +1208,65 @@ msgstr "Previous"
 msgid "Next"
 msgstr "Next"
 
-#: components/admin/AdminPage.tsx:83
+#: components/admin/AdminPage.tsx:84
+msgid "My institution"
+msgstr "My institution"
+
+#: components/admin/AdminPage.tsx:85
 msgid "ETL console"
 msgstr "ETL console"
 
-#: components/admin/AdminPage.tsx:84
+#: components/admin/AdminPage.tsx:86
 msgid "Access rights"
 msgstr "Access rights"
 
-#: components/admin/AdminPage.tsx:85
+#: components/admin/AdminPage.tsx:87
 msgid "Media sources"
 msgstr "Media sources"
 
-#: components/admin/AdminPage.tsx:86
+#: components/admin/AdminPage.tsx:88
 msgid "Institutions"
 msgstr "Institutions"
 
-#: components/admin/AdminPage.tsx:87
+#: components/admin/AdminPage.tsx:89
 #: components/dashboard/dashboardNav.ts:111
 #: components/researchers/CallsSection.tsx:99
 msgid "Calls for proposals"
 msgstr "Calls for proposals"
 
-#: components/admin/AdminPage.tsx:99
+#: components/admin/AdminPage.tsx:101
 msgid "Section reserved for administrators."
 msgstr "Section reserved for administrators."
 
-#: components/admin/AdminPage.tsx:121
+#: components/admin/AdminPage.tsx:123
 msgid "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
 msgstr "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
 
-#: components/admin/AdminPage.tsx:124
+#: components/admin/AdminPage.tsx:126
 msgid "Synchronise with SoVisu+"
 msgstr "Synchronise with SoVisu+"
 
-#: components/admin/AdminPage.tsx:131
+#: components/admin/AdminPage.tsx:133
 msgid "Last export to SoVisu+:"
 msgstr "Last export to SoVisu+:"
 
 #. placeholder {0}: exportStatus.structures.count
 #. placeholder {1}: formatStatusDate(exportStatus.structures.updatedAt)
-#: components/admin/AdminPage.tsx:133
+#: components/admin/AdminPage.tsx:135
 msgid "structures.csv — {0} structures, {1}"
 msgstr "structures.csv — {0} structures, {1}"
 
-#: components/admin/AdminPage.tsx:134
+#: components/admin/AdminPage.tsx:136
 msgid "structures.csv — never generated"
 msgstr "structures.csv — never generated"
 
 #. placeholder {0}: exportStatus.people.count
 #. placeholder {1}: formatStatusDate(exportStatus.people.updatedAt)
-#: components/admin/AdminPage.tsx:137
+#: components/admin/AdminPage.tsx:139
 msgid "people.csv — {0} people, {1}"
 msgstr "people.csv — {0} people, {1}"
 
-#: components/admin/AdminPage.tsx:138
+#: components/admin/AdminPage.tsx:140
 msgid "people.csv — never generated"
 msgstr "people.csv — never generated"
 
@@ -1419,6 +1425,181 @@ msgstr "done"
 #: components/admin/CallsProgrammesAdmin.tsx:177
 msgid "{0, plural, one {# error} other {# errors}}"
 msgstr "{0, plural, one {# error} other {# errors}}"
+
+#: components/admin/EstablishmentAdmin.tsx:50
+#: components/rights/RightsPage.tsx:68
+msgid "Administrator"
+msgstr "Administrator"
+
+#: components/admin/EstablishmentAdmin.tsx:50
+msgid "Owner"
+msgstr "Owner"
+
+#: components/admin/EstablishmentAdmin.tsx:50
+msgid "Reader"
+msgstr "Reader"
+
+#: components/admin/EstablishmentAdmin.tsx:50
+msgid "Lab account"
+msgstr "Lab account"
+
+#: components/admin/EstablishmentAdmin.tsx:52
+msgid "Everything, including the accounts and the plan"
+msgstr "Everything, including the accounts and the plan"
+
+#: components/admin/EstablishmentAdmin.tsx:53
+msgid "Writes in the directory, runs the alignments and the dashboards"
+msgstr "Writes in the directory, runs the alignments and the dashboards"
+
+#: components/admin/EstablishmentAdmin.tsx:54
+msgid "Reads everything, writes nothing"
+msgstr "Reads everything, writes nothing"
+
+#: components/admin/EstablishmentAdmin.tsx:55
+msgid "Reads and writes its labs only"
+msgstr "Reads and writes its labs only"
+
+#: components/admin/EstablishmentAdmin.tsx:74
+msgid "Invitation sent to {who}."
+msgstr "Invitation sent to {who}."
+
+#. placeholder {0}: r.loginUrl ?? ''
+#: components/admin/EstablishmentAdmin.tsx:74
+msgid "{who} is a member; no e-mail could be sent — send them this link: {0}"
+msgstr "{who} is a member; no e-mail could be sent — send them this link: {0}"
+
+#: components/admin/EstablishmentAdmin.tsx:92
+msgid "Plan"
+msgstr "Plan"
+
+#: components/admin/EstablishmentAdmin.tsx:96
+msgid "Accounts"
+msgstr "Accounts"
+
+#. placeholder {0}: data.seats.used
+#: components/admin/EstablishmentAdmin.tsx:98
+msgid "{0} (unlimited)"
+msgstr "{0} (unlimited)"
+
+#: components/admin/EstablishmentAdmin.tsx:102
+msgid "Publication history"
+msgstr "Publication history"
+
+#. placeholder {0}: data.plan.historyYears
+#: components/admin/EstablishmentAdmin.tsx:103
+msgid "{0} years"
+msgstr "{0} years"
+
+#: components/admin/EstablishmentAdmin.tsx:103
+msgid "Complete"
+msgstr "Complete"
+
+#: components/admin/EstablishmentAdmin.tsx:107
+msgid "Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote."
+msgstr "Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote."
+
+#: components/admin/EstablishmentAdmin.tsx:111
+msgid "This Druid is suspended: it can be read, nothing can be changed."
+msgstr "This Druid is suspended: it can be read, nothing can be changed."
+
+#. placeholder {0}: data.accessRequests.length
+#: components/admin/EstablishmentAdmin.tsx:126
+msgid "Access requests ({0})"
+msgstr "Access requests ({0})"
+
+#: components/admin/EstablishmentAdmin.tsx:135
+msgid "Every account of the plan is used"
+msgstr "Every account of the plan is used"
+
+#: components/admin/EstablishmentAdmin.tsx:137
+msgid "Invite as reader"
+msgstr "Invite as reader"
+
+#: components/admin/EstablishmentAdmin.tsx:140
+msgid "Dismiss"
+msgstr "Dismiss"
+
+#. placeholder {0}: data.members.length
+#: components/admin/EstablishmentAdmin.tsx:152
+msgid "Members ({0})"
+msgstr "Members ({0})"
+
+#: components/admin/EstablishmentAdmin.tsx:158
+msgid "E-mail"
+msgstr "E-mail"
+
+#: components/admin/EstablishmentAdmin.tsx:159
+#: components/admin/EstablishmentAdmin.tsx:217
+msgid "Role"
+msgstr "Role"
+
+#: components/admin/EstablishmentAdmin.tsx:160
+#: components/dashboard/CallCandidates.tsx:176
+#: components/dashboard/CollaborationsTab.tsx:398
+#: components/dashboard/CollaborationsTab.tsx:411
+#: components/dashboard/report/reportTables.ts:59
+msgid "Labs"
+msgstr "Labs"
+
+#: components/admin/EstablishmentAdmin.tsx:161
+msgid "Last sign-in"
+msgstr "Last sign-in"
+
+#: components/admin/EstablishmentAdmin.tsx:170
+msgid "you"
+msgstr "you"
+
+#. placeholder {0}: m.email
+#: components/admin/EstablishmentAdmin.tsx:173
+msgid "Role of {0}"
+msgstr "Role of {0}"
+
+#: components/admin/EstablishmentAdmin.tsx:176
+msgid "Labs of this account (acronyms, separated by commas)"
+msgstr "Labs of this account (acronyms, separated by commas)"
+
+#: components/admin/EstablishmentAdmin.tsx:185
+msgid "Invited, never signed in"
+msgstr "Invited, never signed in"
+
+#: components/admin/EstablishmentAdmin.tsx:189
+msgid "Resend"
+msgstr "Resend"
+
+#. placeholder {0}: m.email
+#: components/admin/EstablishmentAdmin.tsx:193
+msgid "Remove {0}"
+msgstr "Remove {0}"
+
+#. placeholder {0}: m.email
+#: components/admin/EstablishmentAdmin.tsx:194
+msgid "Remove {0} from this Druid? Their sessions are closed at once."
+msgstr "Remove {0} from this Druid? Their sessions are closed at once."
+
+#: components/admin/EstablishmentAdmin.tsx:213
+msgid "Invite a colleague"
+msgstr "Invite a colleague"
+
+#: components/admin/EstablishmentAdmin.tsx:224
+msgid "Labs (acronyms)"
+msgstr "Labs (acronyms)"
+
+#: components/admin/EstablishmentAdmin.tsx:229
+msgid "Invite"
+msgstr "Invite"
+
+#: components/admin/EstablishmentAdmin.tsx:239
+#: components/admin/EstablishmentAdmin.tsx:246
+msgid "Mail domains of the institution"
+msgstr "Mail domains of the institution"
+
+#: components/admin/EstablishmentAdmin.tsx:242
+msgid "A colleague with an address of these domains who asks for a sign-in link without an account sends you an access request (you receive an e-mail)."
+msgstr "A colleague with an address of these domains who asks for a sign-in link without an account sends you an access request (you receive an e-mail)."
+
+#: components/admin/EstablishmentAdmin.tsx:245
+msgid "Mail domains saved."
+msgstr "Mail domains saved."
 
 #: components/admin/GraphActionsPanel.tsx:80
 msgid "Identifier removals sent to the CRISalid graph"
@@ -3378,13 +3559,6 @@ msgstr "{0, plural, one {# candidate} other {# candidates}}"
 #: components/researchers/TasksPage.tsx:173
 msgid "Researcher"
 msgstr "Researcher"
-
-#: components/dashboard/CallCandidates.tsx:176
-#: components/dashboard/CollaborationsTab.tsx:398
-#: components/dashboard/CollaborationsTab.tsx:411
-#: components/dashboard/report/reportTables.ts:59
-msgid "Labs"
-msgstr "Labs"
 
 #: components/dashboard/CallCandidates.tsx:178
 msgid "PhD"
@@ -14589,10 +14763,6 @@ msgstr "empty record"
 msgid "Profiles already in the directory — the candidate will be added to this list"
 msgstr "Profiles already in the directory — the candidate will be added to this list"
 
-#: components/rights/RightsPage.tsx:68
-msgid "Administrator"
-msgstr "Administrator"
-
 #: components/rights/RightsPage.tsx:70
 msgid "All rights on the scope. At institution level (root), equivalent to a global administrator — this role is what grants access to this tab."
 msgstr "All rights on the scope. At institution level (root), equivalent to a global administrator — this role is what grants access to this tab."
@@ -14952,18 +15122,13 @@ msgid "Cluster (derived — read only)"
 msgstr "Cluster (derived — read only)"
 
 #: components/structures/IdentifiersTab.tsx:72
-msgid "Source of the value"
-msgstr "Source of the value"
-
-#: components/structures/IdentifiersTab.tsx:72
 #: components/structures/StructureAlignPanel.tsx:170
 msgid "checked on"
 msgstr "checked on"
 
-#: components/structures/IdentifiersTab.tsx:73
-#: components/structures/StructureAlignPanel.tsx:173
-msgid "record not found"
-msgstr "record not found"
+#: components/structures/IdentifiersTab.tsx:72
+msgid "Source of the value"
+msgstr "Source of the value"
 
 #: components/structures/IdentifiersTab.tsx:73
 #: components/structures/StructureAlignPanel.tsx:37
@@ -14972,18 +15137,23 @@ msgid "closed record"
 msgstr "closed record"
 
 #: components/structures/IdentifiersTab.tsx:73
+#: components/structures/StructureAlignPanel.tsx:173
+msgid "record not found"
+msgstr "record not found"
+
+#: components/structures/IdentifiersTab.tsx:73
 msgid "record names something else"
 msgstr "record names something else"
-
-#. placeholder {0}: i.value
-#: components/structures/IdentifiersTab.tsx:77
-msgid "Remove {0}? It will not be suggested again by the alignment."
-msgstr "Remove {0}? It will not be suggested again by the alignment."
 
 #: components/structures/IdentifiersTab.tsx:77
 #: components/structures/StructureAlignPanel.tsx:179
 msgid "remove"
 msgstr "remove"
+
+#. placeholder {0}: i.value
+#: components/structures/IdentifiersTab.tsx:77
+msgid "Remove {0}? It will not be suggested again by the alignment."
+msgstr "Remove {0}? It will not be suggested again by the alignment."
 
 #: components/structures/IdentifiersTab.tsx:85
 msgid "Identifier or URL"
@@ -16390,106 +16560,150 @@ msgid "No alignment running"
 msgstr "No alignment running"
 
 #: lib/apiErrors.ts:243
+msgid "Owner right required"
+msgstr "Owner right required"
+
+#: lib/apiErrors.ts:244
+msgid "Unknown role"
+msgstr "Unknown role"
+
+#: lib/apiErrors.ts:245
+msgid "A lab account needs at least one lab"
+msgstr "A lab account needs at least one lab"
+
+#: lib/apiErrors.ts:246
+msgid "This address is already a member"
+msgstr "This address is already a member"
+
+#: lib/apiErrors.ts:247
+msgid "Account limit of the plan reached"
+msgstr "Account limit of the plan reached"
+
+#: lib/apiErrors.ts:248
+msgid "Member not found"
+msgstr "Member not found"
+
+#: lib/apiErrors.ts:249
+msgid "The last owner of a Druid keeps the role"
+msgstr "The last owner of a Druid keeps the role"
+
+#: lib/apiErrors.ts:250
+msgid "The last owner of a Druid cannot be removed"
+msgstr "The last owner of a Druid cannot be removed"
+
+#: lib/apiErrors.ts:251
+msgid "Access request not found"
+msgstr "Access request not found"
+
+#: lib/apiErrors.ts:252
+msgid "Too many mail domains"
+msgstr "Too many mail domains"
+
+#: lib/apiErrors.ts:253
+msgid "Invalid mail domain"
+msgstr "Invalid mail domain"
+
+#: lib/apiErrors.ts:255
 msgid "Structure alignment already running"
 msgstr "Structure alignment already running"
 
-#: lib/apiErrors.ts:245
+#: lib/apiErrors.ts:257
 msgid "Institution right required"
 msgstr "Institution right required"
 
-#: lib/apiErrors.ts:246
+#: lib/apiErrors.ts:258
 msgid "Job already finished"
 msgstr "Job already finished"
 
-#: lib/apiErrors.ts:247
+#: lib/apiErrors.ts:259
 msgid "Job already running"
 msgstr "Job already running"
 
-#: lib/apiErrors.ts:248
+#: lib/apiErrors.ts:260
 msgid "Dashboard build already running"
 msgstr "Dashboard build already running"
 
-#: lib/apiErrors.ts:249
+#: lib/apiErrors.ts:261
 msgid "Unknown job type"
 msgstr "Unknown job type"
 
-#: lib/apiErrors.ts:250
+#: lib/apiErrors.ts:262
 msgid "Method not allowed"
 msgstr "Method not allowed"
 
-#: lib/apiErrors.ts:251
+#: lib/apiErrors.ts:263
 msgid "Structure alignment needs the PostgreSQL storage"
 msgstr "Structure alignment needs the PostgreSQL storage"
 
-#: lib/apiErrors.ts:252
+#: lib/apiErrors.ts:264
 msgid "Unknown identifier type"
 msgstr "Unknown identifier type"
 
-#: lib/apiErrors.ts:253
+#: lib/apiErrors.ts:265
 msgid "Invalid identifier"
 msgstr "Invalid identifier"
 
-#: lib/apiErrors.ts:254
+#: lib/apiErrors.ts:266
 msgid "Candidate not found"
 msgstr "Candidate not found"
 
-#: lib/apiErrors.ts:255
+#: lib/apiErrors.ts:267
 msgid "Identifier not found"
 msgstr "Identifier not found"
 
-#: lib/apiErrors.ts:256
+#: lib/apiErrors.ts:268
 msgid "Structure not found"
 msgstr "Structure not found"
 
-#: lib/apiErrors.ts:257
+#: lib/apiErrors.ts:269
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:259
+#: lib/apiErrors.ts:271
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:260
+#: lib/apiErrors.ts:272
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:261
+#: lib/apiErrors.ts:273
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:262
+#: lib/apiErrors.ts:274
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:264
+#: lib/apiErrors.ts:276
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:266
+#: lib/apiErrors.ts:278
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:267
+#: lib/apiErrors.ts:279
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:268
+#: lib/apiErrors.ts:280
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:269
+#: lib/apiErrors.ts:281
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:271
+#: lib/apiErrors.ts:283
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:272
+#: lib/apiErrors.ts:284
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:273
+#: lib/apiErrors.ts:285
 msgid "Load failed"
 msgstr "Load failed"
 

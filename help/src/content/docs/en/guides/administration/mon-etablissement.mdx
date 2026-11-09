@@ -1,0 +1,46 @@
+---
+title: "My institution: accounts and invitations"
+description: "Plan, accounts, invitations, roles, access requests and mail domains of a hosted Druid."
+sidebar:
+  order: 1
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Owner of the Druid (the administrators can read)"
+	menu="Administration › My institution"
+	disponibilite="hosted Druid (created from the portal)"
+/>
+
+The **My institution** tab gathers what concerns the Druid of your institution: its plan, its accounts and how
+your colleagues get in.
+
+## Plan and accounts
+
+The top band shows the **plan** (Trial, Team, Complete), the **accounts** used out of those allowed and the depth of
+the **publication history**. The trial includes one account, yours; the Team and Complete plans add more. An invited
+account that has not signed in yet already counts.
+
+## Invite a colleague
+
+1. In **Members**, enter their e-mail address and choose their **role**:
+   - **Owner**: everything, including the accounts and the plan;
+   - **Administrator**: edits the directory, runs the alignments and the dashboard builds;
+   - **Reader**: reads everything, edits nothing;
+   - **Lab account**: reads and edits its labs only (enter their acronyms).
+2. Click **Invite**. Your colleague receives an e-mail that opens the login page of your Druid, address already
+   filled in: they ask for a sign-in link and are in.
+
+Until they sign in, the row shows « Invited, never signed in » and **Resend** sends the invitation again. The role
+menu changes the role of a member; the bin removes them and closes their sessions at once. The last owner of a Druid
+can be neither demoted nor removed.
+
+## Access requests
+
+Enter the **mail domains** of the institution (for instance `univ-example.fr`). A colleague with an address of these
+domains, without an account, who asks for a link on the login page sends you an **access request**: you receive an
+e-mail and the request shows at the top of the tab. **Invite as reader** opens an account for them (you can change
+the role afterwards), **Dismiss** files the request.
+
+The login page always answers the same, account or not: it does not reveal who has an account.

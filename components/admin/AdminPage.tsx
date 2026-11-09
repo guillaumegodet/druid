@@ -11,6 +11,7 @@ import { ADMIN_TAB_HELP } from '../../lib/helpLinks';
 import { numberLocale } from '../../lib/i18n';
 import { GraphActionsPanel } from './GraphActionsPanel';
 import { InstitutionsAdmin } from './InstitutionsAdmin';
+import { EstablishmentAdmin } from './EstablishmentAdmin';
 import { CallsProgrammesAdmin } from './CallsProgrammesAdmin';
 import { ManualCallsAdmin } from './ManualCallsAdmin';
 
@@ -80,6 +81,7 @@ export const AdminPage: React.FC<{
   }, [tab]);
 
   const labels: Record<AdminTab, React.ReactNode> = {
+    establishment: <Trans>My institution</Trans>,
     console: <Trans>ETL console</Trans>,
     rights: <Trans>Access rights</Trans>,
     media: <Trans>Media sources</Trans>,
@@ -140,6 +142,7 @@ export const AdminPage: React.FC<{
       )}
       {onSyncToSovisu && !syncingSovisu && <GraphActionsPanel onOpenResearcher={onOpenResearcherUid} />}
 
+      {tab === 'establishment' && <EstablishmentAdmin />}
       {tab === 'console' && (
         <EtlConsolePage struct={struct ?? null} onOpenDashboard={onOpenDashboard} />
       )}

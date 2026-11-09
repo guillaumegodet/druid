@@ -51,3 +51,30 @@ ${button(loginUrl, 'Ouvrir mon Druid · Open my Druid')}${footer}`);
   const text = `Druid — ${label}\n\nVotre Druid est prêt / Your Druid is ready:\n${loginUrl}\n`;
   return sendEmail(env, { to, subject: `Votre Druid est prêt · Your Druid is ready (${label})`, html, text });
 };
+
+const ROLE_LABELS: Record<string, [string, string]> = {
+  owner: ['propriétaire', 'owner'], admin: ['administrateur', 'administrator'], viewer: ['lecteur', 'reader'], lab: ['compte laboratoire', 'lab account'],
+};
+
+/** Invitation to a tenant (lot 6 a-1): link to its login page, where the invitee asks for a magic link. */
+export const sendInvitation = (env: EmailEnv, { to, label, loginUrl, invitedBy, role }: { to: string; label: string; loginUrl: string; invitedBy: string; role: string }): Promise<void> => {
+  const [fr, en] = ROLE_LABELS[role] || [role, role];
+  const title = `Druid — ${label}`;
+  const html = wrap(title, `
+<p style="font-size:15px;line-height:1.6;margin:0 0 20px">Bonjour,<br>${escape(invitedBy)} vous invite à rejoindre le Druid de ${escape(label)} (${escape(fr)}). Druid est le référentiel des structures, des chercheurs et de leurs publications de l'établissement. Pour vous connecter, saisissez votre adresse sur la page de connexion : vous recevrez un lien.</p>
+<p style="font-size:13px;color:#6f6a5e;margin:0 0 20px">Hello, ${escape(invitedBy)} invites you to join the Druid of ${escape(label)} (${escape(en)}). To sign in, enter your address on the login page: you will receive a link.</p>
+${button(loginUrl, 'Rejoindre · Join')}${footer}`);
+  const text = `Druid — ${label}\n\n${invitedBy} vous invite / invites you (${fr} / ${en}):\n${loginUrl}\n`;
+  return sendEmail(env, { to, subject: `Invitation au Druid de ${label} · Invitation to the Druid of ${label}`, html, text });
+};
+
+/** A colleague of a mail domain of the tenant asked for access (lot 6 a-1): to the owners, link to « My institution ». */
+export const sendAccessRequestNotice = (env: EmailEnv, { to, label, requester, adminUrl }: { to: string; label: string; requester: string; adminUrl: string }): Promise<void> => {
+  const title = `Druid — ${label}`;
+  const html = wrap(title, `
+<p style="font-size:15px;line-height:1.6;margin:0 0 20px">${escape(requester)} demande un accès au Druid de ${escape(label)}. Vous pouvez l'inviter ou écarter la demande dans Administration › Mon établissement.</p>
+<p style="font-size:13px;color:#6f6a5e;margin:0 0 20px">${escape(requester)} asks for access to the Druid of ${escape(label)}. Invite them or dismiss the request in Administration › My institution.</p>
+${button(adminUrl, 'Voir la demande · See the request')}`);
+  const text = `Druid — ${label}\n\n${requester} demande un accès / asks for access:\n${adminUrl}\n`;
+  return sendEmail(env, { to, subject: `Demande d'accès au Druid de ${label} · Access request (${label})`, html, text });
+};
