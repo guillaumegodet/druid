@@ -67,9 +67,8 @@ export const TODO_TAB_HELP: Record<TodoTab, string> = {
   conflits: '/guides/personnes/taches-a-traiter/',
 };
 
-/** Help page of each Administration tab. */
-export const ADMIN_TAB_HELP: Record<AdminTab, string> = {
-  establishment: '/guides/administration/mon-etablissement/',
+/** Help page of each Administration tab (none for « My institution »: the hosted offer is not in the public help). */
+export const ADMIN_TAB_HELP: Partial<Record<AdminTab, string>> = {
   console: '/guides/administration/console-etl/',
   rights: '/guides/administration/donner-des-droits/',
   media: '/guides/veille/sources-medias/',
