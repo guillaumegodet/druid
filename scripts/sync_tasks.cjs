@@ -261,6 +261,11 @@ const isoDay = (v) => {
   const m = s.match(/^(\d{4})-?(\d{2})-?(\d{2})/);
   return m ? `${m[1]}-${m[2]}-${m[3]}` : '';
 };
+/** Reduced-precision date cell (YYYY, YYYY-MM, YYYY-MM-DD, epoch or DD-MM-YYYY) → canonical text, '' when unreadable. */
+const fuzzyDay = (v) => {
+  const s = String(v ?? '').trim();
+  return /^\d{4}(-\d{2})?$/.test(s) ? s : isoDay(v);
+};
 /** Does the uid look like the record's last name? Any word of the uid (« dupont-j », « martin-dupont-j »,
  * « eldupont-j ») against the whole name or one of its words (« Martin-Dupont », « Le Goff »). */
 const uidMatchesName = (uid, f) => {
@@ -300,8 +305,9 @@ function ldapUidSwitches(annuaire, ldap) {
     const warnings = [];
     if (!uidMatchesName(to, f)) {
       warnings.push(`l’uid ${to} ne ressemble pas au nom ${nameOf(f)} (nom d’usage, ou n° agent erroné ?)`);
-      const [gristBirth, ldapBirth] = [isoDay(f.DATE_DE_NAISSANCE_JJ_MM_AAAA), isoDay(e.birthDate)];
-      if (gristBirth && ldapBirth && gristBirth !== ldapBirth) warnings.push(`dates de naissance différentes (fiche ${gristBirth}, LDAP ${ldapBirth}) : n° agent probablement erroné`);
+      // The record may know the year or the month only (YYYY, YYYY-MM): it contradicts LDAP when it is not a prefix of it.
+      const [gristBirth, ldapBirth] = [fuzzyDay(f.DATE_DE_NAISSANCE_JJ_MM_AAAA), isoDay(e.birthDate)];
+      if (gristBirth && ldapBirth && !ldapBirth.startsWith(gristBirth)) warnings.push(`dates de naissance différentes (fiche ${gristBirth}, LDAP ${ldapBirth}) : n° agent probablement erroné`);
     }
     out.push({ rec, to, hrId, etat: e.etat || '', categorie: e.categorie || '', warnings });
   }

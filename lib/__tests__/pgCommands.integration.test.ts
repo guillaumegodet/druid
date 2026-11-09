@@ -84,7 +84,7 @@ const STEPS: [string, Step][] = [
   ['update a single-row record (identity, identifiers, links, employment, validation)', (s, people) => {
     const r = people.find((p) => p.gristRowId === 105)!;
     return s.commands.updatePerson(105, {
-      ...r, lastName: 'Petit-Grand', firstName: 'Denis', civility: 'M', email: 'd@example.org', birthDate: '1975-03-04',
+      ...r, lastName: 'Petit-Grand', firstName: 'Denis', civility: 'M', email: 'd@example.org', birthDate: '1975-03',
       identifiers: { ...r.identifiers, orcid: ' 0000-0004-0000-0004 ', scopusId: 'absent' },
       socials: { ...r.socials, linkedin: 'https://linkedin.com/in/d' }, profiles: { ...r.profiles, website: 'https://d.example.org' },
       employment: { ...r.employment, employer: 'NANTES UNIVERSITE', grade: 'MCF', startDate: '2010', endDate: '2031-08', fte: 1, researchFte: null },

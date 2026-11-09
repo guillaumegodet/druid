@@ -68,6 +68,9 @@ export const AFFILIATION_START_COL = 'affiliation_start_date';
 
 export const AFFILIATION_END_COL = 'affiliation_end_date';
 
+/** Birth date: reduced-precision date (lib/dates.ts) — only the year, or the month, may be known. */
+export const BIRTH_DATE_COL = 'DATE_DE_NAISSANCE_JJ_MM_AAAA';
+
 /** Membership type (Grist Choice: stat_mmb / assoc_mmb / second_mmb / visit_mmb, created on 2026-09-14). */
 export const MEMBERSHIP_TYPE_COL = 'membership_type';
 
@@ -208,7 +211,7 @@ export function gristDirectoryRow(record: GristRecord): DirectoryRow {
     nationality: fields['Nationalite'] || '',
     photoUrl: fields['photo_url'] || '',
     annuaireUrl: fields['annuaire_url'] || '',
-    birthDate: fromGristDate(fields['DATE_DE_NAISSANCE_JJ_MM_AAAA']),
+    birthDate: fromGristFuzzyDate(fields['DATE_DE_NAISSANCE_JJ_MM_AAAA']),
     corpsGrade: fields['Corps_grade'] ?? null,
     employmentType: fields['TYPE_EMPLOI'] ?? null,
     employmentTypeLabel: fields['LIB_TYPE_EMPLOI'] ?? null,

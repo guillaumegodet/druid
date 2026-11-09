@@ -12,7 +12,7 @@ import { HR_ID_COLUMN, hrIdCell } from '../hrId';
 import { HAL_ID_NUM_SECONDARY_COLUMN, joinHalIdNums, secondaryHalIdNums } from '../halIds';
 import { STATUT_DYNA_MAP } from '../ldapCodes';
 import {
-  AFFILIATION_END_COL, AFFILIATION_START_COL, Institution, MEMBERSHIP_TYPE_COL, RATTACHEMENT_COL, RattachementRole,
+  AFFILIATION_END_COL, AFFILIATION_START_COL, BIRTH_DATE_COL, Institution, MEMBERSHIP_TYPE_COL, RATTACHEMENT_COL, RattachementRole,
   fromGristDate, fromGristFuzzyDate,
 } from './gristMapping';
 
@@ -73,11 +73,11 @@ export function planAffiliationRows(
   return { primary, mainRole, patches, creates, deletes: pool };
 }
 
-/** The four employment / membership date columns holding reduced-precision dates (lib/dates.ts):
+/** The employment / membership / birth date columns holding reduced-precision dates (lib/dates.ts):
  * `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. Text columns once scripts/migrate_fuzzy_dates.cjs has run on the
  * document; still Date (epoch) columns before that — both are read, the writer adapts (see
- * `fuzzyDateCellEncoder`). */
-export const FUZZY_DATE_COLS = ['employment_start_date', 'employment_end_date', AFFILIATION_START_COL, AFFILIATION_END_COL] as const;
+ * `fuzzyDateCellEncoder`; a Date column keeps the first day of a year or month only). */
+export const FUZZY_DATE_COLS = ['employment_start_date', 'employment_end_date', AFFILIATION_START_COL, AFFILIATION_END_COL, BIRTH_DATE_COL] as const;
 
 /** Encodes a Druid date (ISO YYYY-MM-DD, or legacy DD-MM-YYYY text) for a Grist Date column:
  * epoch seconds, the only valid representation whatever the column's `dateFormat`. Until
@@ -160,7 +160,7 @@ export function researcherCreateFields(researcher: Researcher, ctx: AnnuaireWrit
     'uid_dyna': researcher.uid,
     'Email': researcher.email,
     'Nationalite': researcher.nationality,
-    'DATE_DE_NAISSANCE_JJ_MM_AAAA': toGristDateCell(researcher.birthDate),
+    [BIRTH_DATE_COL]: encodeDate(BIRTH_DATE_COL, researcher.birthDate),
     // Affiliations: LABO (text, acronym) + Employeur (Reference, resolved by label)
     'LABO': researcher.affiliations[0]?.structureName || '',
     ...employerFieldsFor(ctx.institutions, researcher.employment.employer),
@@ -221,7 +221,7 @@ export function researcherUpdateFields(researcher: Researcher, plan: Affiliation
     'Civilite': researcher.civility,
     'Email': researcher.email,
     'Nationalite': researcher.nationality,
-    'DATE_DE_NAISSANCE_JJ_MM_AAAA': toGristDateCell(researcher.birthDate),
+    [BIRTH_DATE_COL]: encodeDate(BIRTH_DATE_COL, researcher.birthDate),
     // Affiliations: LABO (text, acronym) + Employeur (Reference, resolved by label)
     ...membershipFieldsOf(encodeDate, plan.primary),
     ...(plan.mainRole !== undefined ? { [RATTACHEMENT_COL]: plan.mainRole || null } : {}),

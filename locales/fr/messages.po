@@ -656,7 +656,7 @@ msgstr "Sélections transverses de chercheurs (conseil scientifique, projets, co
 #: components/admin/CallsProgrammesAdmin.tsx:158
 #: components/dashboard/PairsSection.tsx:81
 #: components/dashboard/pairsKpis.ts:40
-#: components/researchers/ListHeader.tsx:135
+#: components/researchers/ListHeader.tsx:139
 #: components/researchers/ResearcherPairsSection.tsx:69
 msgid "New"
 msgstr "Nouveau"
@@ -1019,7 +1019,7 @@ msgstr "Acronyme"
 #: components/reports/NewReportDialog.tsx:301
 #: components/researchers/LdapMovesPanel.tsx:167
 #: components/researchers/LdapMovesPanel.tsx:222
-#: components/researchers/ListHeader.tsx:48
+#: components/researchers/ListHeader.tsx:51
 #: lib/chartExport.ts:134
 #: lib/chartExport.ts:153
 #: lib/chartExport.ts:169
@@ -1034,7 +1034,7 @@ msgstr "Tutelles"
 
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
-#: components/researchers/ListHeader.tsx:50
+#: components/researchers/ListHeader.tsx:53
 #: components/researchers/TasksPage.tsx:176
 msgid "Status"
 msgstr "Statut"
@@ -1052,17 +1052,17 @@ msgid "Create a structure (team, unit, faculty, institution) in Grist"
 msgstr "Créer une structure (équipe, unité, composante, établissement) dans Grist"
 
 #: components/StructureList.tsx:250
-#: components/researchers/ListHeader.tsx:72
+#: components/researchers/ListHeader.tsx:75
 msgid "Export"
 msgstr "Exporter"
 
 #: components/StructureList.tsx:269
-#: components/researchers/ListHeader.tsx:100
+#: components/researchers/ListHeader.tsx:102
 msgid "Synchronise"
 msgstr "Synchroniser"
 
 #: components/StructureList.tsx:278
-#: components/researchers/ListHeader.tsx:106
+#: components/researchers/ListHeader.tsx:108
 msgid "Force Grist refresh"
 msgstr "Forcer la mise à jour Grist"
 
@@ -5341,7 +5341,7 @@ msgstr "Citations (déjà reçues)"
 #: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
-#: components/researchers/ListHeader.tsx:51
+#: components/researchers/ListHeader.tsx:54
 #: components/structures/StructureAlignPanel.tsx:394
 #: lib/importConflicts.ts:75
 msgid "Lab"
@@ -6326,7 +6326,7 @@ msgstr "Laboratoire"
 #: components/dashboard/PublicationsListTab.tsx:351
 #: components/researchers/FilterPanel.tsx:183
 #: components/researchers/FilterPanel.tsx:335
-#: components/researchers/GeneralTab.tsx:317
+#: components/researchers/GeneralTab.tsx:319
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Type d'emploi"
@@ -6889,7 +6889,7 @@ msgstr "Population"
 
 #: components/dashboard/StaffSection.tsx:295
 #: components/dashboard/StaffSection.tsx:311
-#: components/researchers/GeneralTab.tsx:364
+#: components/researchers/GeneralTab.tsx:366
 msgid "Research FTE"
 msgstr "ETP recherche"
 
@@ -11653,7 +11653,7 @@ msgstr "Toutes les fiches du périmètre (relance complète)"
 
 #: components/researchers/AlignLaunchModal.tsx:129
 #: components/researchers/DuplicatesPage.tsx:146
-#: components/researchers/ListHeader.tsx:129
+#: components/researchers/ListHeader.tsx:133
 #: components/researchers/TodoPage.tsx:61
 msgid "To process"
 msgstr "À traiter"
@@ -12093,7 +12093,7 @@ msgstr "Validation"
 
 #: components/researchers/FilterPanel.tsx:184
 #: components/researchers/FilterPanel.tsx:325
-#: components/researchers/GeneralTab.tsx:400
+#: components/researchers/GeneralTab.tsx:402
 msgid "Cluster"
 msgstr "Pôle"
 
@@ -12251,94 +12251,98 @@ msgstr "Nationalité"
 msgid "Date of birth"
 msgstr "Date de naissance"
 
-#: components/researchers/GeneralTab.tsx:267
+#: components/researchers/GeneralTab.tsx:262
+msgid "Date of birth: YYYY-MM-DD, or YYYY-MM / YYYY when only the month or the year is known."
+msgstr "Date de naissance : AAAA-MM-JJ, ou AAAA-MM / AAAA si seuls le mois ou l’année sont connus."
+
+#: components/researchers/GeneralTab.tsx:269
 #: components/researchers/LdapUidLookup.tsx:49
 msgid "UID (Dyna)"
 msgstr "UID (Dyna)"
 
-#: components/researchers/GeneralTab.tsx:280
+#: components/researchers/GeneralTab.tsx:282
 msgid "HR staff number (Mangue), from LDAP or the HR lists — read-only"
 msgstr "Numéro d'agent RH (Mangue), issu du LDAP ou des listes RH — non modifiable"
 
-#: components/researchers/GeneralTab.tsx:280
+#: components/researchers/GeneralTab.tsx:282
 msgid "Staff number"
 msgstr "N° agent"
 
-#: components/researchers/GeneralTab.tsx:289
+#: components/researchers/GeneralTab.tsx:291
 msgid "Employment & contract"
 msgstr "Emploi & contrat"
 
-#: components/researchers/GeneralTab.tsx:292
+#: components/researchers/GeneralTab.tsx:294
 msgid "Employing institution"
 msgstr "Établissement employeur"
 
-#: components/researchers/GeneralTab.tsx:298
+#: components/researchers/GeneralTab.tsx:300
 msgid "— None —"
 msgstr "— Aucun —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:300
+#: components/researchers/GeneralTab.tsx:302
 msgid "{0} (not in list)"
 msgstr "{0} (hors liste)"
 
-#: components/researchers/GeneralTab.tsx:308
+#: components/researchers/GeneralTab.tsx:310
 msgid "Grade / Rank"
 msgstr "Grade / Corps"
 
-#: components/researchers/GeneralTab.tsx:324
+#: components/researchers/GeneralTab.tsx:326
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Non défini —"
 
-#: components/researchers/GeneralTab.tsx:349
+#: components/researchers/GeneralTab.tsx:351
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Début d'emploi"
 
-#: components/researchers/GeneralTab.tsx:349
+#: components/researchers/GeneralTab.tsx:351
 msgid "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Dates du contrat / de l'emploi (colonnes Grist employment_*), distinctes des dates d'appartenance au labo saisies dans la carte Appartenances. Date imprécise acceptée : AAAA ou AAAA-MM."
 
-#: components/researchers/GeneralTab.tsx:353
+#: components/researchers/GeneralTab.tsx:355
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Fin d'emploi"
 
-#: components/researchers/GeneralTab.tsx:353
+#: components/researchers/GeneralTab.tsx:355
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Fin de contrat / d'emploi (AAAA, AAAA-MM ou AAAA-MM-JJ). Pour une fiche externe (sans état LDAP), une date passée fait passer le statut à « Parti » ; avec une fin d'appartenance passée aussi, « Parti » s'applique même à une fiche validée."
 
-#: components/researchers/GeneralTab.tsx:360
+#: components/researchers/GeneralTab.tsx:362
 msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 msgstr "Part d'un temps plein (0 à 1, ex. 0,5). Vide = non renseigné."
 
-#: components/researchers/GeneralTab.tsx:360
+#: components/researchers/GeneralTab.tsx:362
 msgid "FTE (working time)"
 msgstr "ETP (quotité)"
 
-#: components/researchers/GeneralTab.tsx:364
+#: components/researchers/GeneralTab.tsx:366
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Équivalent temps plein recherche (0 à 1) : en général 0,5 pour un enseignant-chercheur, 1 pour un chercheur à temps plein. Vide = non renseigné (le tableau de bord appliquera une valeur par défaut selon le grade) ; 0 = aucun temps de recherche."
 
-#: components/researchers/GeneralTab.tsx:378
+#: components/researchers/GeneralTab.tsx:380
 msgid "Accredited to supervise research (HDR)"
 msgstr "Habilité à diriger des recherches (HDR)"
 
-#: components/researchers/GeneralTab.tsx:383
+#: components/researchers/GeneralTab.tsx:385
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "Année HDR"
 
-#: components/researchers/GeneralTab.tsx:404
+#: components/researchers/GeneralTab.tsx:406
 msgid "Faculty"
 msgstr "Composante"
 
-#: components/researchers/GeneralTab.tsx:408
+#: components/researchers/GeneralTab.tsx:410
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "ED de rattachement"
 
-#: components/researchers/GeneralTab.tsx:412
+#: components/researchers/GeneralTab.tsx:414
 msgid "Location (site)"
 msgstr "Localisation (site)"
 
@@ -12452,8 +12456,8 @@ msgid "edited since the import"
 msgstr "modifiée depuis l'import"
 
 #: components/researchers/ImportConflictsPage.tsx:213
-msgid "dd/mm/yyyy"
-msgstr "jj/mm/aaaa"
+msgid "dd/mm/yyyy, mm/yyyy or yyyy"
+msgstr "jj/mm/aaaa, mm/aaaa ou aaaa"
 
 #: components/researchers/ImportConflictsPage.tsx:221
 msgid "Keep the current value"
@@ -12898,39 +12902,39 @@ msgstr "Écriture…"
 msgid "Apply ({0})"
 msgstr "Appliquer ({0})"
 
-#: components/researchers/ListHeader.tsx:49
+#: components/researchers/ListHeader.tsx:52
 #: components/researchers/SiteImportReview.tsx:13
 #: lib/importConflicts.ts:69
 msgid "Email"
 msgstr "Email"
 
-#: components/researchers/ListHeader.tsx:59
+#: components/researchers/ListHeader.tsx:62
 msgid "Research staff"
 msgstr "Personnel de recherche"
 
-#: components/researchers/ListHeader.tsx:65
+#: components/researchers/ListHeader.tsx:68
 msgid "Management and validation of researcher identities"
 msgstr "Gestion et validation des identités chercheurs"
 
-#: components/researchers/ListHeader.tsx:88
+#: components/researchers/ListHeader.tsx:91
 msgid "Identifiers, affiliations and notes missing from IdRef records, for ABES"
 msgstr "Identifiants, affiliations et notes manquants dans les notices IdRef, pour l'ABES"
 
-#: components/researchers/ListHeader.tsx:90
+#: components/researchers/ListHeader.tsx:93
 msgid "ABES export (IdRef)"
 msgstr "Export ABES (IdRef)"
 
-#: components/researchers/ListHeader.tsx:114
+#: components/researchers/ListHeader.tsx:116
 #: components/researchers/ValidationImportReview.tsx:76
 msgid "Import a validated list"
 msgstr "Importer une liste fiabilisée"
 
-#: components/researchers/ListHeader.tsx:120
+#: components/researchers/ListHeader.tsx:122
 #: components/researchers/SiteImportReview.tsx:115
 msgid "Import a lab website directory"
 msgstr "Importer un annuaire de site"
 
-#: components/researchers/ListHeader.tsx:127
+#: components/researchers/ListHeader.tsx:131
 msgid "Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)"
 msgstr "Doublons à fusionner ou qualifier, et tâches à réaliser hors Druid (IdRef, ORCID, HAL…)"
 
@@ -14868,13 +14872,18 @@ msgid "Cluster (derived — read only)"
 msgstr "Pôle (dérivé — lecture seule)"
 
 #: components/structures/IdentifiersTab.tsx:72
+msgid "Source of the value"
+msgstr "Source de la valeur"
+
+#: components/structures/IdentifiersTab.tsx:72
 #: components/structures/StructureAlignPanel.tsx:169
 msgid "checked on"
 msgstr "vérifié le"
 
-#: components/structures/IdentifiersTab.tsx:72
-msgid "Source of the value"
-msgstr "Source de la valeur"
+#: components/structures/IdentifiersTab.tsx:73
+#: components/structures/StructureAlignPanel.tsx:172
+msgid "record not found"
+msgstr "notice introuvable"
 
 #: components/structures/IdentifiersTab.tsx:73
 #: components/structures/StructureAlignPanel.tsx:36
@@ -14883,23 +14892,18 @@ msgid "closed record"
 msgstr "notice fermée"
 
 #: components/structures/IdentifiersTab.tsx:73
-#: components/structures/StructureAlignPanel.tsx:172
-msgid "record not found"
-msgstr "notice introuvable"
-
-#: components/structures/IdentifiersTab.tsx:73
 msgid "record names something else"
 msgstr "la notice désigne autre chose"
-
-#: components/structures/IdentifiersTab.tsx:77
-#: components/structures/StructureAlignPanel.tsx:178
-msgid "remove"
-msgstr "retirer"
 
 #. placeholder {0}: i.value
 #: components/structures/IdentifiersTab.tsx:77
 msgid "Remove {0}? It will not be suggested again by the alignment."
 msgstr "Retirer {0} ? L’alignement ne le proposera plus."
+
+#: components/structures/IdentifiersTab.tsx:77
+#: components/structures/StructureAlignPanel.tsx:178
+msgid "remove"
+msgstr "retirer"
 
 #: components/structures/IdentifiersTab.tsx:85
 msgid "Identifier or URL"

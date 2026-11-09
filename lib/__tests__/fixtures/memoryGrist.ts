@@ -7,7 +7,8 @@ import { parseGristSql } from '../../directory/pg/tableClient';
 /** In-memory Grist: the tables of the fixture, writable, with the column types of a migrated Annuaire. */
 export const memoryGrist = (initial: Record<string, GristRecord[]>): GristClient => {
   const tables: Record<string, GristRecord[]> = JSON.parse(JSON.stringify(initial));
-  const typeOf = (c: string) => (c === 'DATE_DE_NAISSANCE_JJ_MM_AAAA' || c === 'validation_date' ? 'Date' : c === 'Employeur' ? 'Ref:Etablissements'
+  // Reduced-precision dates (employment, membership, birth) are Text columns, as on a migrated document.
+  const typeOf = (c: string) => (c === 'validation_date' ? 'Date' : c === 'Employeur' ? 'Ref:Etablissements'
     : ['etp_quotite', 'etp_recherche', 'ID_SCOPUS', 'N_ID_UNIV_NANTES_revu_SI_RH_MANGUE_'].includes(c) ? 'Numeric' : c === 'validated' ? 'Bool' : 'Text');
   const annuaireColumns = ['uid_dyna', 'Nom', 'Prenom', 'Civilite', 'Email', 'Nationalite', 'DATE_DE_NAISSANCE_JJ_MM_AAAA', 'LABO', 'team',
     'affiliation_start_date', 'affiliation_end_date', 'membership_type', 'rattachement', 'doublon_decision', 'Employeur', 'employment_start_date',

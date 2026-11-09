@@ -241,6 +241,14 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       expect(out[0].description).toContain('Attention : l’uid blanc-a ne ressemble pas au nom MARTIN Alice');
       expect(out[0].description).toContain('dates de naissance différentes (fiche 1991-05-01, LDAP 1990-05-01)');
     });
+
+    it('compares a birth date known to the year or the month only with the LDAP date', () => {
+      const birth = (v: string) => detect([rec(1, { uid_dyna: 'ext_martin-a', Nom: 'Martin', Prenom: 'Alice', [HR]: 333, DATE_DE_NAISSANCE_JJ_MM_AAAA: v })])[0].description;
+      expect(birth('1990')).not.toContain('dates de naissance');
+      expect(birth('1990-05')).not.toContain('dates de naissance');
+      expect(birth('1991')).toContain('dates de naissance différentes (fiche 1991, LDAP 1990-05-01)');
+      expect(birth('1990-06')).toContain('dates de naissance différentes (fiche 1990-06, LDAP 1990-05-01)');
+    });
   });
 
   describe('hebergement_fin — hosted LDAP account of another employer closing (D3)', () => {

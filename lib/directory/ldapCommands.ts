@@ -129,7 +129,8 @@ export const createGristLdapCommands = ({ grist, repository, ldap, annuaireColum
         if (!match) { unknown++; continue; }
         resolved.push({ gristRowId: e.gristRowId, email: (proposal ?? ambiguous).email, ldap: match });
       }
-      const { patches, skippedDuplicates } = ldapCandidatePatches(resolved, await annuaire(), todayIso());
+      const encodeDate = fuzzyDateEncoderFor(await annuaireColumns().catch(() => null));
+      const { patches, skippedDuplicates } = ldapCandidatePatches(resolved, await annuaire(), todayIso(), encodeDate);
       const updated = patches.length ? await patchInChunks('Annuaire', patches, ctx) : 0;
       return { updated, skippedDuplicates, unknown };
     }),
