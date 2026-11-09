@@ -17,7 +17,8 @@ interface JobView {
   id: string;
   type: string;
   status: 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
-  progress?: { step?: string; total?: number; done?: number; lab?: string; built?: number; failed?: number } | null;
+  progress?: { step?: string; pct?: number; total?: number; done?: number; lab?: string; detail?: string; built?: number; failed?: number } | null;
+  startedAt?: string | null;
   finishedAt?: string | null;
   createdAt?: string;
   cancelRequested?: boolean;
@@ -75,18 +76,20 @@ export const DashboardBuildBar: React.FC<{ overview: StructureAlignOverview; onT
 
   const p = job?.progress || {};
   const when = (iso?: string | null) => (iso ? new Date(iso).toLocaleString(numberLocale()) : '');
+  const running = live(job);
+  // Elapsed time of a live build, refreshed with the polling (every 4 s).
+  const minutes = job?.startedAt ? Math.max(0, Math.floor((Date.now() - new Date(job.startedAt).getTime()) / 60_000)) : 0;
   let state: string;
-  if (!loaded) state = '';
+  if (!loaded || running) state = '';
   else if (!job) state = t`Not built yet.`;
-  else if (job.status === 'queued') state = t`Build queued…`;
-  else if (job.status === 'running') state = p.total ? t`Building: ${p.done ?? 0}/${p.total} lab(s)${p.lab ? ` (${p.lab})` : ''}…` : t`Building…`;
   else if (job.status === 'done') state = t`Built on ${when(job.finishedAt)}: ${p.built ?? 0} dashboard(s), ${p.failed ?? 0} lab(s) failed.`;
   else if (job.status === 'cancelled') state = t`Last build stopped on ${when(job.finishedAt)}.`;
   else state = t`Last build failed on ${when(job.finishedAt)}: ${job.error || ''}`;
-  const running = live(job);
+  const pct = Math.max(job?.status === 'running' ? 3 : 0, Math.min(100, Number(p.pct ?? 0)));
 
   return (
-    <div className="flex flex-wrap items-center gap-3 mx-4 md:mx-7 mb-4 px-4 py-3 rounded-card bg-white/60 dark:bg-white/5 border border-ink/10 dark:border-white/10 text-[13px]">
+    <div className="mx-4 md:mx-7 mb-4 px-4 py-3 rounded-card bg-white/60 dark:bg-white/5 border border-ink/10 dark:border-white/10 text-[13px]">
+    <div className="flex flex-wrap items-center gap-3">
       <BarChart3 className="w-4 h-4 shrink-0 text-muted dark:text-[#8f897c]" />
       <div className="flex-1 min-w-[220px]">
         <div className="font-semibold text-ink dark:text-[#f5f2ea]">
@@ -109,6 +112,31 @@ export const DashboardBuildBar: React.FC<{ overview: StructureAlignOverview; onT
         {running || busy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <BarChart3 className="w-4 h-4" />}
         {job?.status === 'done' ? t`Rebuild the dashboards` : t`Build the dashboards`}
       </PixelBtn>
+    </div>
+      {running && job && (
+        <div className="mt-3 pt-3 border-t border-ink/10 dark:border-white/10" role="status" aria-live="polite">
+          <div className="flex flex-wrap items-baseline justify-between gap-2 font-semibold text-ink dark:text-[#f5f2ea]">
+            <span className="inline-flex items-center gap-2">
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              {job.status === 'queued'
+                ? t`Queued: the computing server picks it up within a few seconds.`
+                : p.total
+                  ? t`Building lab ${Math.min((p.done ?? 0) + 1, p.total)} of ${p.total}${p.lab ? ` — ${p.lab}` : ''}`
+                  : t`Preparing the labs…`}
+            </span>
+            {job.status === 'running' && (
+              <span className="text-[12px] text-muted dark:text-[#8f897c]">
+                {t`${p.built ?? 0} built · ${p.failed ?? 0} failed · ${minutes} min`}
+              </span>
+            )}
+          </div>
+          <div className="mt-2 h-2 rounded-full bg-ink/10 dark:bg-white/10 overflow-hidden">
+            <div className={`h-full rounded-full bg-accent-strong transition-all duration-700 ${job.status === 'queued' ? 'w-1/12 animate-pulse' : ''}`} style={job.status === 'queued' ? undefined : { width: `${pct}%` }} />
+          </div>
+          {p.detail && <div className="mt-1.5 text-[11.5px] font-mono text-muted-faint truncate" title={p.detail}>{p.detail}</div>}
+          <div className="mt-1 text-[11.5px] text-muted dark:text-[#8f897c]">{t`Several minutes per lab; you can leave this page, the build goes on.`}</div>
+        </div>
+      )}
     </div>
   );
 };
