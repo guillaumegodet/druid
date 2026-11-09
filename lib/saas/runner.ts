@@ -381,7 +381,8 @@ export const buildEtl: JobHandler = async (job, ctx) => {
     const result = await runChild({
       command: cmd[0], args: cmd.slice(1), cwd: dataDir, env: childEnv, outputFile: path.join(dataDir, lab.slug, 'etl_run.log'),
       progressFile: statusFile, timeoutMs: env.etl.timeoutMs ?? 4 * 3600_000,
-      onProgress: (p) => { const lines = Array.isArray(p.log) ? p.log : []; void ctx.progress('etl', Math.round((i / labs.length) * 100), { total: labs.length, done: i, lab: lab.slug, step: String(lines[lines.length - 1] || ''), built: built.length, failed: failed.length }); },
+      // `detail`, not `step`: progress() sets `step` itself ('etl'), which overwrote the lab's last log line.
+      onProgress: (p) => { const lines = Array.isArray(p.log) ? p.log : []; void ctx.progress('etl', Math.round((i / labs.length) * 100), { total: labs.length, done: i, lab: lab.slug, detail: redactSecrets(String(lines[lines.length - 1] || '')).slice(0, 300), built: built.length, failed: failed.length }); },
     }, { log, isCancelRequested: ctx.isCancelRequested, spawnImpl: env.spawnImpl });
     if (result.cancelled) throw new JobCancelled(`stopped by the user after ${built.length} lab(s)`);
     if (result.code !== 0 || result.timedOut) { failed.push(lab.slug); log(`${lab.slug}: ETL failed (${result.timedOut ? 'timeout' : `code ${result.code}`})`); continue; }

@@ -14274,7 +14274,7 @@ msgid "Stops this source: the records in progress finish, what was found is kept
 msgstr "Stops this source: the records in progress finish, what was found is kept; the next run resumes with the records not searched yet"
 
 #: components/researchers/UnifiedAlignPage.tsx:661
-#: components/structures/DashboardBuildBar.tsx:104
+#: components/structures/DashboardBuildBar.tsx:107
 #: components/structures/StructureAlignPanel.tsx:356
 msgid "Stop"
 msgstr "Stop"
@@ -14744,70 +14744,80 @@ msgstr "HCÉRES research areas"
 msgid "e.g. ST6 | SHS5"
 msgstr "e.g. ST6 | SHS5"
 
-#: components/structures/DashboardBuildBar.tsx:66
+#: components/structures/DashboardBuildBar.tsx:67
 msgid "Dashboard build queued."
 msgstr "Dashboard build queued."
 
-#: components/structures/DashboardBuildBar.tsx:80
+#: components/structures/DashboardBuildBar.tsx:84
 msgid "Not built yet."
 msgstr "Not built yet."
-
-#: components/structures/DashboardBuildBar.tsx:81
-msgid "Build queued…"
-msgstr "Build queued…"
-
-#. placeholder {0}: p.done ?? 0
-#. placeholder {1}: p.total
-#. placeholder {2}: p.lab ? ` (${p.lab})` : ''
-#: components/structures/DashboardBuildBar.tsx:82
-msgid "Building: {0}/{1} lab(s){2}…"
-msgstr "Building: {0}/{1} lab(s){2}…"
-
-#: components/structures/DashboardBuildBar.tsx:82
-msgid "Building…"
-msgstr "Building…"
 
 #. placeholder {0}: when(job.finishedAt)
 #. placeholder {1}: p.built ?? 0
 #. placeholder {2}: p.failed ?? 0
-#: components/structures/DashboardBuildBar.tsx:83
+#: components/structures/DashboardBuildBar.tsx:85
 msgid "Built on {0}: {1} dashboard(s), {2} lab(s) failed."
 msgstr "Built on {0}: {1} dashboard(s), {2} lab(s) failed."
 
 #. placeholder {0}: when(job.finishedAt)
-#: components/structures/DashboardBuildBar.tsx:84
+#: components/structures/DashboardBuildBar.tsx:86
 msgid "Last build stopped on {0}."
 msgstr "Last build stopped on {0}."
 
 #. placeholder {0}: when(job.finishedAt)
 #. placeholder {1}: job.error || ''
-#: components/structures/DashboardBuildBar.tsx:85
+#: components/structures/DashboardBuildBar.tsx:87
 msgid "Last build failed on {0}: {1}"
 msgstr "Last build failed on {0}: {1}"
 
-#: components/structures/DashboardBuildBar.tsx:93
+#: components/structures/DashboardBuildBar.tsx:96
 msgid "Dashboards: {ready} of {total} lab(s) ready"
 msgstr "Dashboards: {ready} of {total} lab(s) ready"
 
-#: components/structures/DashboardBuildBar.tsx:97
+#: components/structures/DashboardBuildBar.tsx:100
 msgid "Accept at least one OpenAlex identifier or HAL collection (strong candidates below) before building the dashboards: the bibliometric ETL harvests the confirmed values only."
 msgstr "Accept at least one OpenAlex identifier or HAL collection (strong candidates below) before building the dashboards: the bibliometric ETL harvests the confirmed values only."
 
-#: components/structures/DashboardBuildBar.tsx:98
+#: components/structures/DashboardBuildBar.tsx:101
 msgid "A lab is ready when its OpenAlex identifier or HAL collection is confirmed; the others are left out until then."
 msgstr "A lab is ready when its OpenAlex identifier or HAL collection is confirmed; the others are left out until then."
 
-#: components/structures/DashboardBuildBar.tsx:108
+#: components/structures/DashboardBuildBar.tsx:111
 msgid "Harvests the publications of the ready labs (OpenAlex, HAL, BSO) and builds their dashboards; several minutes per lab"
 msgstr "Harvests the publications of the ready labs (OpenAlex, HAL, BSO) and builds their dashboards; several minutes per lab"
 
-#: components/structures/DashboardBuildBar.tsx:110
+#: components/structures/DashboardBuildBar.tsx:113
 msgid "Rebuild the dashboards"
 msgstr "Rebuild the dashboards"
 
-#: components/structures/DashboardBuildBar.tsx:110
+#: components/structures/DashboardBuildBar.tsx:113
 msgid "Build the dashboards"
 msgstr "Build the dashboards"
+
+#: components/structures/DashboardBuildBar.tsx:122
+msgid "Queued: the computing server picks it up within a few seconds."
+msgstr "Queued: the computing server picks it up within a few seconds."
+
+#. placeholder {0}: Math.min((p.done ?? 0) + 1, p.total)
+#. placeholder {1}: p.total
+#. placeholder {2}: p.lab ? ` — ${p.lab}` : ''
+#: components/structures/DashboardBuildBar.tsx:124
+msgid "Building lab {0} of {1}{2}"
+msgstr "Building lab {0} of {1}{2}"
+
+#: components/structures/DashboardBuildBar.tsx:125
+msgid "Preparing the labs…"
+msgstr "Preparing the labs…"
+
+#. placeholder {0}: p.built ?? 0
+#. placeholder {1}: p.failed ?? 0
+#: components/structures/DashboardBuildBar.tsx:129
+msgid "{0} built · {1} failed · {minutes} min"
+msgstr "{0} built · {1} failed · {minutes} min"
+
+#: components/structures/DashboardBuildBar.tsx:137
+msgid "Several minutes per lab; you can leave this page, the build goes on."
+msgstr "Several minutes per lab; you can leave this page, the build goes on."
 
 #: components/structures/GovernanceTab.tsx:36
 msgid "Add by UAI code (external institution)"
