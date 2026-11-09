@@ -136,6 +136,9 @@ describe.skipIf(!url)('Functions of a tenant', () => {
     const list = await call(v1.onRequest, { host, path: '/api/v1/structures', headers: { Cookie: owner.cookie } });
     expect(list.status).toBe(200);
     expect(((await list.json()) as any).items.map((s: any) => s.acronym)).toEqual(['LAB1']);
+    // The alignment review (raw statements read public, empty on the managed database: HTTP 502 on 2026-11-09).
+    const align = await call(v1.onRequest, { host, path: '/api/v1/alignments/unified?mode=search&sources=idref,orcid,hal,openalex,scopus', headers: { Cookie: owner.cookie } });
+    expect(align.status, await align.clone().text()).toBe(200);
     const viewer = (await signIn(host, 'viewer-alpha@example.org'))!;
     expect((await call(v1.onRequest, { host, path: '/api/v1/structures', headers: { Cookie: viewer.cookie } })).status).toBe(200);
     const refused = await call(v1.onRequest, { host, path: '/api/v1/structures', method: 'POST', headers: { Cookie: viewer.cookie, 'Content-Type': 'application/json' }, body: body.replace(/LAB1/g, 'LAB2') });

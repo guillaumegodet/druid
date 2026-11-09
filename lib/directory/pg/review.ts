@@ -24,12 +24,14 @@ const day = (v: unknown): string | null => {
  * person without uid (its first membership), the record id going into Annuaire_id.
  */
 export const readReviewRecords = async (db: any, source: UnifiedAlignSource): Promise<GristRecord[]> => {
-  const rows = await sql<any>`
-    SELECT a.*, p.uid, (SELECT min(m.id) FROM membership m WHERE m.person_id = a.person_id) AS record_id
-    FROM alignment_candidate a JOIN person p ON p.id = a.person_id
-    WHERE a.source = ${source} ORDER BY a.id`.execute(db);
+  // Query builder, not a raw statement: only the builder is qualified by the schema of a tenant (withSchema), a raw
+  // `FROM alignment_candidate` would read public (empty on the managed database of the SaaS: HTTP 502).
+  const rows: any[] = await db.selectFrom('alignment_candidate as a').innerJoin('person as p', 'p.id', 'a.person_id')
+    .selectAll('a').select('p.uid')
+    .select((eb: any) => eb.selectFrom('membership as m').select(eb.fn.min('m.id').as('min_id')).whereRef('m.person_id', '=', 'a.person_id').as('record_id'))
+    .where('a.source', '=', source).orderBy('a.id').execute();
   const idColumn = REVIEW_ID_COLUMN[source];
-  return rows.rows.map((r: any) => {
+  return rows.map((r: any) => {
     const payload = (r.payload || {}) as Record<string, any>;
     const recordId = r.record_id === null ? 0 : Number(r.record_id);
     return {
