@@ -12,6 +12,20 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **Date de naissance imprécise** : la fiche accepte une date de naissance à l'année (`1980`) ou au mois
+  (`1980-06`), comme les dates d'emploi (même champ `FuzzyDateInput`, `lib/dates.ts`). Une date incompatible avec
+  celle du LDAP (`1981` contre `1980-05-01`) reste signalée par la tâche « uid LDAP disponible » ; une année ou un
+  mois compatible ne l'est plus. L'âge du tableau de bord et l'export ABES ne lisaient déjà que l'année.
+
+### Migration
+- `20261109090000_person_birth_fuzzy.sql` : `person.birth_date` passe du type `date` au domaine `fuzzy_date`
+  (texte `AAAA`, `AAAA-MM` ou `AAAA-MM-JJ`) ; les dates existantes gardent leur valeur `AAAA-MM-JJ`. Le retour
+  arrière ramène une date imprécise à son premier jour : à faire avant de revenir à une version antérieure, qui
+  n'afficherait pas une date imprécise et l'effacerait à l'enregistrement de la fiche.
+- Instance encore sur Grist : `scripts/migrate_fuzzy_dates.cjs` passe aussi `DATE_DE_NAISSANCE_JJ_MM_AAAA` en
+  Texte (dry-run puis `--apply`). Tant qu'elle reste en Date, une année ou un mois est enregistré au premier jour.
+
 ## [2.16.0] — 2026-11-04
 
 ### Ajouté

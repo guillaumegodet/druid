@@ -9,7 +9,7 @@ import QuiOu from '../../../../components/QuiOu.astro';
 
 <QuiOu
 	profils="Tous les profils ayant accès à la fiche"
-	menu="Personnel › fiche › cartes Emploi & contrat et Appartenances & historique"
+	menu="Personnel › fiche › cartes Emploi & contrat, Appartenances & historique et Informations personnelles"
 />
 
 On ne connaît pas toujours la date exacte d'une arrivée ou d'un départ : un laboratoire
@@ -25,6 +25,10 @@ l'année, au mois ou au jour**, pour ne pas inventer une précision qu'on n'a pa
 
 Elles ne coïncident pas toujours : voir
 [Appartenances et rattachement](/donnees/appartenances-rattachement/).
+
+La **date de naissance** (carte **Informations personnelles**) accepte les mêmes formats :
+`1980` quand seule l'année est connue, `1980-06` pour le mois. Elle n'est pas modifiable
+quand elle vient du LDAP, qui donne toujours une date complète.
 
 ## Étapes
 
@@ -58,7 +62,8 @@ Elles ne coïncident pas toujours : voir
 - **Une période n'est passée qu'une fois entièrement écoulée** : une fin `2026` ne fait
   partir la personne qu'à partir du 1er janvier 2027. Si vous savez que le départ a eu lieu
   en juin, saisissez `2026-06`.
-- **La date de naissance** reste une date complète.
+- **Date de naissance** : l'âge du tableau de bord ne retient que l'année, et l'export
+  ABES/IdRef ne transmet que l'année de naissance ; une année seule suffit donc.
 - **Le bouton → fin d'emploi** remplace une fin d'emploi existante : Druid vous le signale
   quand elle est différente.
 

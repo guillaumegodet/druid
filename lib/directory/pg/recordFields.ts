@@ -64,7 +64,7 @@ export const readRecordFields = (p: Record<string, any>, m: Record<string, any>,
   for (const [field, col] of Object.entries(PERSON_TEXT)) out[field] = p[col] ?? '';
   out.uid_dyna = p.uid ?? '';
   out.Civilite = has(e, 'Civilite') ? e.Civilite : (p.civility ?? '');
-  out.DATE_DE_NAISSANCE_JJ_MM_AAAA = has(e, 'DATE_DE_NAISSANCE_JJ_MM_AAAA') ? e.DATE_DE_NAISSANCE_JJ_MM_AAAA : epochOf(p.birth_date);
+  out.DATE_DE_NAISSANCE_JJ_MM_AAAA = has(e, 'DATE_DE_NAISSANCE_JJ_MM_AAAA') ? e.DATE_DE_NAISSANCE_JJ_MM_AAAA : (p.birth_date ?? '');
   out.ANNEE_HDR = has(e, 'ANNEE_HDR') ? e.ANNEE_HDR : (p.hdr_year !== null && p.hdr_year !== undefined ? String(p.hdr_year) : '');
   out.Employeur = has(e, 'Employeur') ? e.Employeur : (p.employer_id !== null && p.employer_id !== undefined ? Number(p.employer_id) : 0);
   out.employment_start_date = has(e, 'employment_start_date') ? e.employment_start_date : (p.employment_start ?? '');
@@ -169,10 +169,16 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
         if (c === 'F' || c === 'M' || c === '') { set.civility = c || null; done(field); } else { set.civility = null; keep(field, value); }
         continue;
       }
-      case 'DATE_DE_NAISSANCE_JJ_MM_AAAA': case 'validation_date': {
-        const col = field === 'validation_date' ? 'presence_validated_on' : 'birth_date';
+      case 'validation_date': {
         const d = blank(value) || value === 0 ? '' : fromGristDate(value);
-        if (!d || (/^\d{4}-\d{2}-\d{2}$/.test(d) && normalizeFuzzyDate(d) === d)) { set[col] = d || null; done(field); } else { set[col] = null; keep(field, value); }
+        if (!d || (/^\d{4}-\d{2}-\d{2}$/.test(d) && normalizeFuzzyDate(d) === d)) { set.presence_validated_on = d || null; done(field); } else { set.presence_validated_on = null; keep(field, value); }
+        continue;
+      }
+      case 'DATE_DE_NAISSANCE_JJ_MM_AAAA': {
+        // Reduced-precision date (YYYY, YYYY-MM or YYYY-MM-DD); 0 is the empty sentinel of the former Grist Date column.
+        const d = blank(value) || value === 0 ? null : normalizeFuzzyDate(fromGristFuzzyDate(value)) || null;
+        set.birth_date = d;
+        if (d || blank(value) || value === 0) done(field); else keep(field, value);
         continue;
       }
       case 'ANNEE_HDR':

@@ -210,7 +210,7 @@ export const ImportConflictsPage: React.FC<Props> = ({ tables, onOpenResearcher,
                                     value={other[c.id] ?? c.imported}
                                     onChange={(e) => setOther((o) => ({ ...o, [c.id]: e.target.value }))}
                                     onKeyDown={(e) => { if (e.key === 'Enter') resolve([{ id: c.id, choice: 'other', value: other[c.id] ?? c.imported }]); if (e.key === 'Escape') setEditing(null); }}
-                                    placeholder={isDateField(c.field) ? t`dd/mm/yyyy` : ''}
+                                    placeholder={isDateField(c.field) ? t`dd/mm/yyyy, mm/yyyy or yyyy` : ''}
                                     className="input-soft !h-8 !py-1 text-[12px] w-44"
                                   />
                                   <button type="button" disabled={busy} onClick={() => resolve([{ id: c.id, choice: 'other', value: other[c.id] ?? c.imported }])} className="btn-pill h-8 text-[12px]"><Check className="w-3.5 h-3.5" /></button>

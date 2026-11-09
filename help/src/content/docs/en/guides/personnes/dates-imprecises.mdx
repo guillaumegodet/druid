@@ -9,7 +9,7 @@ import QuiOu from '../../../../../components/QuiOu.astro';
 
 <QuiOu
 	profils="All profiles with access to the record"
-	menu="People › record › Employment & contract and Affiliations & history cards"
+	menu="People › record › Employment & contract, Affiliations & history and Personal details cards"
 />
 
 The exact date of an arrival or a departure is not always known: a laboratory says “left in
@@ -25,6 +25,10 @@ so as not to invent a precision you do not have.
 
 They do not always coincide: see
 [Memberships and affiliation](/en/donnees/appartenances-rattachement/).
+
+The **date of birth** (**Personal details** card) accepts the same formats: `1980` when only
+the year is known, `1980-06` for the month. It cannot be edited when it comes from LDAP, which
+always gives a full date.
 
 ## Steps
 
@@ -57,7 +61,8 @@ They do not always coincide: see
 
 - **A period is only past once it is entirely over**: an end of `2026` only makes the person
   leave from 1 January 2027. If you know the departure took place in June, enter `2026-06`.
-- **The date of birth** remains a full date.
+- **Date of birth**: the dashboard age keeps only the year, and the ABES/IdRef export sends
+  only the year of birth; a year alone is therefore enough.
 - **The → employment end button** replaces an existing employment end: Druid warns you when
   it is different.
 

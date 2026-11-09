@@ -55,9 +55,9 @@ export const RECORD_FIELDS: AnnuaireColumnMeta[] = [
     'Profil_GS', 'Site_web', 'Commentaires', 'Data_source', 'validated_status', 'validation_source', 'validation_scope', 'validated_by',
     'doublon_decision', 'ABES_export_hash', 'ABES_export_date']
     .map((id) => ({ id, label: id, type: 'Text', isFormula: false })),
-  ...['employment_start_date', 'employment_end_date', 'affiliation_start_date', 'affiliation_end_date']
+  // Reduced-precision dates (lib/dates.ts): Text, so that fuzzyDateEncoderFor writes them as typed.
+  ...['employment_start_date', 'employment_end_date', 'affiliation_start_date', 'affiliation_end_date', 'DATE_DE_NAISSANCE_JJ_MM_AAAA']
     .map((id) => ({ id, label: id, type: 'Text', isFormula: false })),
-  { id: 'DATE_DE_NAISSANCE_JJ_MM_AAAA', label: 'DATE_DE_NAISSANCE_JJ_MM_AAAA', type: 'Date', isFormula: false },
   { id: 'validation_date', label: 'validation_date', type: 'Date', isFormula: false },
   { id: 'validated', label: 'validated', type: 'Bool', isFormula: false },
   { id: 'Employeur', label: 'Employeur', type: 'Ref:Etablissements', isFormula: false },
@@ -214,7 +214,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     const values: Record<string, any> = {
       last_name: String(r.lastName ?? ''), first_name: orNull(r.firstName),
       civility: civility === 'F' || civility === 'M' ? civility : null,
-      email: orNull(r.email), nationality: orNull(r.nationality), birth_date: isoDate(r.birthDate),
+      email: orNull(r.email), nationality: orNull(r.nationality), birth_date: fuzzy(r.birthDate),
       employment_start: fuzzy(r.employment?.startDate), employment_end: fuzzy(r.employment?.endDate),
       corps_grade: orNull(r.employment?.grade), employment_type: orNull(r.employment?.contractType),
       fte_ratio: parseFteCell(r.employment?.fte), fte_research: parseFteCell(r.employment?.researchFte),

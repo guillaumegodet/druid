@@ -337,7 +337,8 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
     // Dates.
     // 0 = an emptied Date cell (the application reads it as empty).
     if (f.DATE_DE_NAISSANCE_JJ_MM_AAAA === 0) counters.birthZero.push(kept.id);
-    const birth = f.DATE_DE_NAISSANCE_JJ_MM_AAAA === 0 ? null : toIsoDate(f.DATE_DE_NAISSANCE_JJ_MM_AAAA);
+    // A birth date may be known to the year or the month only (YYYY, YYYY-MM: Text column once migrated).
+    const birth = f.DATE_DE_NAISSANCE_JJ_MM_AAAA === 0 ? null : toIsoDate(f.DATE_DE_NAISSANCE_JJ_MM_AAAA) ?? (normalizeFuzzyDate(f.DATE_DE_NAISSANCE_JJ_MM_AAAA) || null);
     if (!birth && !isEmpty(f.DATE_DE_NAISSANCE_JJ_MM_AAAA) && f.DATE_DE_NAISSANCE_JJ_MM_AAAA !== 0) keepRaw('DATE_DE_NAISSANCE_JJ_MM_AAAA', f.DATE_DE_NAISSANCE_JJ_MM_AAAA, 'date_invalid');
     const fuzzy = (col: string): string | null => {
       if (isEmpty(f[col])) return null;

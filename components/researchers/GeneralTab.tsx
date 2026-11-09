@@ -254,12 +254,14 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
             </div>
             <div>
               <LdapFieldLabel label={t`Date of birth`} fromLdap={researcher.ldapFields?.includes('birthDate')} />
-              <input
-                type="date"
+              {/* Reduced-precision date (lib/dates.ts): the year or the month alone when the day is not known. */}
+              <FuzzyDateInput
                 value={researcher.birthDate || ''}
-                onChange={(e) => onUpdateField('birthDate', e.target.value)}
+                onChange={(d) => onUpdateField('birthDate', d)}
                 disabled={researcher.ldapFields?.includes('birthDate')}
+                title={t`Date of birth: YYYY-MM-DD, or YYYY-MM / YYYY when only the month or the year is known.`}
                 className={`input-soft${researcher.ldapFields?.includes('birthDate') ? ' opacity-60 cursor-not-allowed' : ''}`}
+                wrapperClassName="w-full"
               />
             </div>
             {!onLdapLookup && (

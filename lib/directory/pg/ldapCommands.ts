@@ -98,7 +98,7 @@ export const createPgLdapCommands = ({ db, repository, ldap, today }: PgLdapComm
           if (!match) { unknown++; continue; }
           resolved.push({ gristRowId: e.gristRowId, email: (proposal ?? ambiguous).email, ldap: match });
         }
-        const { patches, skippedDuplicates } = ldapCandidatePatches(resolved, await readRecords(trx), todayIso());
+        const { patches, skippedDuplicates } = ldapCandidatePatches(resolved, await readRecords(trx), todayIso(), encodeDate);
         await writeRecordPatches(trx, patches);
         return { updated: audited(ctx, 'Annuaire', patches), skippedDuplicates, unknown };
       });

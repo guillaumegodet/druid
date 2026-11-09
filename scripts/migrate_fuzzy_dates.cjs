@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 /**
- * Migrates the four employment / membership date columns of the Grist Annuaire from Date (epoch)
- * to Text so they can hold reduced-precision dates (`YYYY`, `YYYY-MM`, `YYYY-MM-DD` — lib/dates.ts,
- * decision of 2026-09-22). Existing epochs are rewritten as `YYYY-MM-DD` strings (UTC calendar day,
+ * Migrates the employment / membership date columns (decision of 2026-09-22) and the birth date column
+ * (2026-11-09) of the Grist Annuaire from Date (epoch) to Text so they can hold reduced-precision dates
+ * (`YYYY`, `YYYY-MM`, `YYYY-MM-DD` — lib/dates.ts). Columns already in Text are left as they are.
+ * Existing epochs are rewritten as `YYYY-MM-DD` strings (UTC calendar day,
  * the same value the app displayed).
  *
  * Usage (dry-run by default, nothing written):
@@ -19,7 +20,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const COLS = ['employment_start_date', 'employment_end_date', 'affiliation_start_date', 'affiliation_end_date'];
+const COLS = ['employment_start_date', 'employment_end_date', 'affiliation_start_date', 'affiliation_end_date', 'DATE_DE_NAISSANCE_JJ_MM_AAAA'];
 const TABLE = 'Annuaire';
 const BATCH = 500;
 

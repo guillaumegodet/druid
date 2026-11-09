@@ -197,7 +197,7 @@ export function computeLdapDiffFrom(records: GristRecord[], etablissementsRows: 
         push('Corps_grade', 'Grade', f['Corps_grade'] || '', gradeTarget);
         push('TYPE_EMPLOI', 'Type emploi', f['TYPE_EMPLOI'] || '', e.categorie || '');
       }
-      push('DATE_DE_NAISSANCE_JJ_MM_AAAA', 'Date naissance', fromGristDate(f['DATE_DE_NAISSANCE_JJ_MM_AAAA']), fmtBirth(e.birthDate || ''));
+      push('DATE_DE_NAISSANCE_JJ_MM_AAAA', 'Date naissance', fromGristFuzzyDate(f['DATE_DE_NAISSANCE_JJ_MM_AAAA']), fmtBirth(e.birthDate || ''));
       // Employment end: « [datefin=…] » of supannEmpProfil (`dateFin` cache, YYYY-MM-DD). Added on
       // 2026-09-15: before, an LDAP departure never surfaced the date in employment_end_date.
       if (!externalEmployer) push('employment_end_date', "Fin d'emploi", fromGristFuzzyDate(f['employment_end_date']), e.dateFin || '');
@@ -287,8 +287,8 @@ export function ldapUpdatePatches(entries: LdapDiff['aMettreAJour'], byId: Recor
         const cell = encodeDate(c.field, c.after);   // fuzzy-date column (text once migrated, else epoch)
         if (cell !== null) fields[c.field] = cell;
       } else if (c.field === 'DATE_DE_NAISSANCE_JJ_MM_AAAA') {
-        const ep = toGristEpoch(c.after);
-        if (ep !== null) fields[c.field] = ep; // Date column = epoch seconds
+        const cell = encodeDate(c.field, c.after);   // fuzzy-date column (text once migrated, else epoch)
+        if (cell !== null) fields[c.field] = cell;
       } else if (c.field === HR_ID_COLUMN) {
         fields[c.field] = hrIdCell(c.after);   // Numeric column
       } else if (c.field === 'validated_status') {
@@ -370,7 +370,7 @@ export function computeLdapCandidatesDiffFrom(cache: any, records: GristRecord[]
 
 /** Cells written by « attach to LDAP » for resolved entries: uid_dyna, and Civilite / Corps_grade / birth date only when
  * empty; a uid already carried by another row of the same lab is skipped (formerly GristService.applyLdapCandidates). */
-export function ldapCandidatePatches(entries: LdapResolved[], records: GristRecord[], today: string): { patches: RecordPatch[]; skippedDuplicates: { gristRowId: number; uid: string; existingRowId: number }[] } {
+export function ldapCandidatePatches(entries: LdapResolved[], records: GristRecord[], today: string, encodeDate: FuzzyDateEncoder): { patches: RecordPatch[]; skippedDuplicates: { gristRowId: number; uid: string; existingRowId: number }[] } {
   const byId: Record<number, any> = {};
   records.forEach((r: any) => { byId[r.id] = r.fields; });
 
@@ -410,8 +410,8 @@ export function ldapCandidatePatches(entries: LdapResolved[], records: GristReco
     setIfEmpty('Corps_grade', grade);
     if (!String(cur['DATE_DE_NAISSANCE_JJ_MM_AAAA'] || '').trim()) {
       const nb = normBirth(p.ldap.birthDate || '');
-      const ep = nb ? toGristEpoch(nb) : null;
-      if (ep !== null) fields['DATE_DE_NAISSANCE_JJ_MM_AAAA'] = ep;
+      const cell = nb ? encodeDate('DATE_DE_NAISSANCE_JJ_MM_AAAA', nb) : null;
+      if (cell !== null) fields['DATE_DE_NAISSANCE_JJ_MM_AAAA'] = cell;
     }
     // Traceability (same convention as the LDAP status sync)
     const curSrc = (cur['Data_source'] || '').toString();

@@ -110,7 +110,7 @@ export interface Researcher {
   lastName: string;        // Usual last name
   firstName: string;       // First name
   birthName?: string;      // Family / birth name
-  birthDate?: string;      // YYYY-MM-DD
+  birthDate?: string;      // YYYY, YYYY-MM or YYYY-MM-DD (lib/dates.ts)
   nationality?: string;
   
   displayName: string;     // Name formatted for lists (e.g. "DUPONT Jean")

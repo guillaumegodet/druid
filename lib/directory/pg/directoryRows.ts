@@ -70,7 +70,7 @@ export const pgDirectoryRow = (p: PgPerson, m: PgMembership, x: PersonExtras): D
     nationality: p.nationality ?? '',
     photoUrl: p.photo_url ?? '',
     annuaireUrl: p.directory_url ?? '',
-    birthDate: p.birth_date ?? fromGristDate(e.DATE_DE_NAISSANCE_JJ_MM_AAAA),
+    birthDate: p.birth_date ?? fromGristFuzzyDate(e.DATE_DE_NAISSANCE_JJ_MM_AAAA),
     corpsGrade: p.corps_grade,
     employmentType: p.employment_type,
     employmentTypeLabel: p.employment_type_label,
