@@ -1,4 +1,4 @@
-// GET /auth/login[?next=…&sent=1&reason=…] — login page of a tenant of the control plane (druid-internal
+// GET /auth/login[?next=…&sent=1&reason=…&email=…] — login page of a tenant of the control plane (druid-internal
 // docs/plan-druid-saas.md, lot 1 e): an e-mail address, a magic link (POST /api/auth/request). Outside /api, so the
 // tenant is resolved here. On an instance of the build-time registry there is no login page (Cloudflare Access or a
 // public instance): back to the home page.
@@ -6,7 +6,7 @@ import { instanceForRequestAnywhere, safeNextPath } from '../_lib/saas.js';
 
 const escape = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-export const loginPage = ({ label, next, sent, reason }) => {
+export const loginPage = ({ label, next, sent, reason, email = '' }) => {
   const messages = {
     invalid: 'Lien invalide. · Invalid link.',
     expired: 'Ce lien a expiré ou a déjà servi : demandez-en un nouveau. · This link has expired or was already used: ask for a new one.',
@@ -23,11 +23,11 @@ button{margin-top:1rem;width:100%;padding:.75rem;border:0;border-radius:999px;ba
 </style></head><body><main>
 <h1>Druid</h1><p class="muted">${escape(label)}</p>
 ${reason && messages[reason] ? `<p class="err">${messages[reason]}</p>` : ''}
-${sent ? `<p class="ok">Si cette adresse est connue, un lien de connexion vient de lui être envoyé (valable 15 minutes). · If this address is known, a sign-in link was just sent to it (valid 15 minutes).</p>`
+${sent ? `<p class="ok">Si cette adresse est connue, un lien de connexion vient de lui être envoyé (valable 15 minutes). Une adresse de l'établissement sans compte transmet une demande d'accès à l'administrateur. · If this address is known, a sign-in link was just sent to it (valid 15 minutes). An address of the institution without an account sends an access request to the administrator.</p>`
   : `<form method="POST" action="/api/auth/request" id="f">
 <input type="hidden" name="next" value="${escape(next || '')}">
 <label for="email">Adresse e-mail · E-mail address</label>
-<input id="email" name="email" type="email" required autocomplete="email" autofocus placeholder="prenom.nom@example.org">
+<input id="email" name="email" type="email" required autocomplete="email" autofocus placeholder="prenom.nom@example.org"${email ? ` value="${escape(email)}"` : ''}>
 <button type="submit">Recevoir un lien de connexion · Send me a sign-in link</button>
 <p class="muted">Pas de mot de passe : le lien reçu par e-mail ouvre votre session. · No password: the link you receive opens your session.</p>
 </form>
@@ -49,6 +49,8 @@ export async function onRequestGet(context) {
   if (!instance || !instance.tenant) return Response.redirect(`${url.origin}/`, 302);
   const html = loginPage({
     label: instance.label, next: safeNextPath(url.searchParams.get('next')), sent: url.searchParams.get('sent') === '1', reason: url.searchParams.get('reason') || '',
+    // Prefilled by the link of an invitation (lot 6 a-1).
+    email: /^[^\s@<>"']{1,64}@[^\s@<>"']{1,255}$/.test(url.searchParams.get('email') || '') ? url.searchParams.get('email') : '',
   });
   return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } });
 }

@@ -69,6 +69,7 @@ export const TODO_TAB_HELP: Record<TodoTab, string> = {
 
 /** Help page of each Administration tab. */
 export const ADMIN_TAB_HELP: Record<AdminTab, string> = {
+  establishment: '/guides/administration/mon-etablissement/',
   console: '/guides/administration/console-etl/',
   rights: '/guides/administration/donner-des-droits/',
   media: '/guides/veille/sources-medias/',

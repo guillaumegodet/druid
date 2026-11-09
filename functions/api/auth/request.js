@@ -2,7 +2,9 @@
 // Always 200 for a well-formed address (no account enumeration): the link is only sent to a MEMBER of the tenant.
 // At most 5 links per address and quarter of an hour. Without RESEND_API_KEY, `SAAS_DEV_LINKS=true` returns the link in
 // the response (local runs and tests only).
-import { findMember, isValidEmail, normalizeEmail } from '../../../lib/saas/controlPlane.ts';
+import { createAccessRequest, findMember, isValidEmail, normalizeEmail } from '../../../lib/saas/controlPlane.ts';
+import { mayAskAccess, ownerEmails } from '../../../lib/saas/members.ts';
+import { sendAccessRequestNotice } from '../../_lib/email.js';
 import { instanceOf } from '../../_lib/instance.js';
 import { issueMagicLink, json, safeNextPath, withSaasDb } from '../../_lib/saas.js';
 
@@ -35,7 +37,23 @@ export async function onRequestPost(context) {
   try {
     await withSaasDb(env, async (db) => {
       const member = await findMember(db, tenant.id, email);
-      if (!member) return;
+      if (!member) {
+        // A colleague of a mail domain of the establishment (lot 6 a-1): an access request, the owners told once. The
+        // answer stays the same (no enumeration of the members).
+        if (mayAskAccess({ mail_domains: tenant.mailDomains || [] }, email)
+          && !(await db.selectFrom('access_request').select('id').where('tenant_id', '=', tenant.id).where('email', '=', email).executeTakeFirst())) {
+          await createAccessRequest(db, tenant.id, email, null);
+          const adminUrl = `${new URL(request.url).origin}/?page=ADMIN&tab=establishment`;
+          if (env.RESEND_API_KEY) {
+            for (const to of await ownerEmails(db, tenant.id)) {
+              await sendAccessRequestNotice(env, { to, label: instance.label, requester: email, adminUrl }).catch((err) =>
+                console.error(JSON.stringify({ event: 'auth.access_request.notice_failed', instance: instance.slug, error: String(err?.message || err) })));
+            }
+          }
+          console.log(JSON.stringify({ event: 'auth.access_request', instance: instance.slug }));
+        }
+        return;
+      }
       if (await recentLinks(db, email, tenant.id) >= LINKS_PER_QUARTER) return;
       devLink = await issueMagicLink(db, env, { email, tenantId: tenant.id, verifyUrl: `${new URL(request.url).origin}/api/auth/verify`, nextPath, label: instance.label });
     });
