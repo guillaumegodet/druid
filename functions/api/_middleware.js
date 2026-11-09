@@ -5,7 +5,9 @@
 //  - on a control-plane deployment (SAAS_HYPERDRIVE bound), a host that no instance.json declares is looked up in the
 //    `saas` schema (tenant_host); the session of the user is resolved at the same time (context.data.identity,
 //    context.data.member — the Access header is then ignored, functions/_lib/identity.js);
-//  - otherwise 404 — never the data of another instance.
+//  - otherwise 404 — never the data of another instance;
+//  - on a tenant, the routes of a feature its plan locks are refused (lib/saas/planFeatures.ts, lot 6 b).
+import { featureOfApiPath, lockedFeaturesOf } from '../../lib/saas/planFeatures.ts';
 import { instanceForRequestAnywhere, json, saasIdentity } from '../_lib/saas.js';
 
 export async function onRequest(context) {
@@ -16,6 +18,11 @@ export async function onRequest(context) {
     const { email, member } = await saasIdentity(env, request, instance);
     context.data.identity = email;
     context.data.member = member;
+    // A feature the plan of the tenant locks (lot 6 b): refused here, whatever the front shows.
+    const feature = featureOfApiPath(new URL(request.url).pathname);
+    if (feature && lockedFeaturesOf(instance.tenant.plan).includes(feature)) {
+      return json(403, { error: 'Not included in the plan of this Druid', feature });
+    }
   }
   context.data.instance = instance;
   return context.next();

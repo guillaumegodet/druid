@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Users, Building2, Layers, UserSearch, Wrench, ChevronDown, BarChart3, Sparkles, FileText, Menu, X } from 'lucide-react';
+import { Users, Building2, Layers, UserSearch, Wrench, ChevronDown, BarChart3, Sparkles, FileText, Lock, Menu, X } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { ViewState } from '../types';
-import { canUseEstablishmentTools, isSuperAdmin, hasCapability } from '../lib/auth';
+import { canUseEstablishmentTools, isSuperAdmin, hasCapability, isLockedByPlan } from '../lib/auth';
 import { AccountMenuButton, AccountPanel } from './AccountMenu';
 import { versionDetails, versionLabel } from '../lib/buildInfo';
 
@@ -159,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ currentView, onChangeView, isO
     ...(canUseEstablishmentTools() ? [{ view: ViewState.STRUCTURES_LIST, active: isStructures, label: t`Structures`, icon: <Building2 className="w-5 h-5" /> }] : []),
     ...(isSuperAdmin() ? [{ view: ViewState.GROUPS_LIST, active: isGroups, label: t`Groups`, icon: <Layers className="w-5 h-5" /> }] : []),
     { view: ViewState.DASHBOARD, active: isDashboard, label: t`Dashboard`, icon: <BarChart3 className="w-5 h-5" /> },
-    { view: ViewState.REPORTS, active: isReports, label: t`My reports`, icon: <FileText className="w-5 h-5" /> },
+    { view: ViewState.REPORTS, active: isReports, label: t`My reports`, icon: isLockedByPlan('reports') ? <Lock className="w-5 h-5" /> : <FileText className="w-5 h-5" /> },
   ];
   // Alignment tools: institution-wide synchronizations (LDAP, IdRef…), not views to restrict per lab —
   // reserved to institution-level rights (admins, central services), see lib/auth.canUseEstablishmentTools.

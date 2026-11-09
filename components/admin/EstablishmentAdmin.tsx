@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, CheckCircle2, Globe, Inbox, Loader2, Mail, RefreshCw, Send, Trash2, UserPlus, Users, X } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Globe, Inbox, Loader2, Mail, RefreshCw, Send, Sparkles, Trash2, UserPlus, Users, X } from 'lucide-react';
+import { QuoteDialog } from '../saas/PlanOffer';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
@@ -46,6 +47,7 @@ export const EstablishmentAdmin: React.FC = () => {
   const [role, setRole] = useState<Role>('viewer');
   const [labs, setLabs] = useState('');
   const [domains, setDomains] = useState('');
+  const [quoteOpen, setQuoteOpen] = useState(false);
 
   const roleLabel: Record<Role, string> = { owner: t`Owner`, admin: t`Administrator`, viewer: t`Reader`, lab: t`Lab account` };
   const roleHint: Record<Role, string> = {
@@ -102,6 +104,11 @@ export const EstablishmentAdmin: React.FC = () => {
           <div className="text-[11px] font-semibold uppercase tracking-wide text-muted dark:text-[#c3beb0]"><Trans>Publication history</Trans></div>
           <div className="font-disp font-bold text-lg text-ink dark:text-[#f5f2ea]">{data.plan?.historyYears ? t`${data.plan.historyYears} years` : t`Complete`}</div>
         </div>
+        {data.plan?.code !== 'complete' && (
+          <button type="button" onClick={() => setQuoteOpen(true)} className={`${btnDark} ml-auto`}>
+            <Sparkles className="w-3.5 h-3.5" /> <Trans>Request a quote</Trans>
+          </button>
+        )}
         {full && (
           <p className="basis-full text-[12px] text-muted dark:text-[#c3beb0]">
             <Trans>Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote.</Trans>
@@ -232,6 +239,8 @@ export const EstablishmentAdmin: React.FC = () => {
           </form>
         )}
       </div>
+
+      {quoteOpen && <QuoteDialog onClose={() => setQuoteOpen(false)} plan={data.plan?.code === 'trial' ? 'team' : 'complete'} />}
 
       {/* ── Mail domains ───────────────────────────────────────────────── */}
       <div className="glass-card p-4 flex flex-col gap-3">

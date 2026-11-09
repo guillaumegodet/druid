@@ -20,11 +20,12 @@ const AdminPage = React.lazy(() =>
   import('./components/admin/AdminPage').then((m) => ({ default: m.AdminPage }))
 );
 import type { AdminTab } from './lib/auth';
+import { LockedFeature, TrialBanner } from './components/saas/PlanOffer';
 import { ViewState, Researcher, Structure, ResearcherStatus, StructureLevel } from './types';
 import { GristService, NEW_STRUCTURE_ID, LdapDiff, StructuresLdapDiff, IdrefCandidate, AlignMode, AlignCandidate, DECISION_MIXED, ReviewDecision, AlignGroup, UnifiedAlignDiff, UnifiedAlignSource, UNIFIED_ALIGN_SOURCES, PersonAlignUpdate, unifiedCandidateId, DuplicatesDiff } from './lib/gristService';
 import { runUnifiedAlign, stopUnifiedRun, UnifiedRunProgress } from './lib/unifiedAlignRuns';
 import { useDruidData } from './hooks/useDruidData';
-import { isSuperAdmin, hasFullAccess, canUseEstablishmentTools, isLabViewer, hasCapability, canWrite } from './lib/auth';
+import { isSuperAdmin, hasFullAccess, canUseEstablishmentTools, isLabViewer, hasCapability, canWrite, isLockedByPlan } from './lib/auth';
 import { useUrlState } from './hooks/useUrlState';
 import { MainLayout } from './components/layout/MainLayout';
 import { ChatWidget } from './components/ChatWidget';
@@ -1030,7 +1031,8 @@ function App() {
               </div>
             }
           >
-            <ReportsPage reportId={reportId} onOpenReport={openReport} shareCandidates={shareCandidates} />
+            {isLockedByPlan('reports') ? <LockedFeature feature="reports" />
+              : <ReportsPage reportId={reportId} onOpenReport={openReport} shareCandidates={shareCandidates} />}
           </React.Suspense>
         );
       case ViewState.ADMIN:
@@ -1082,6 +1084,7 @@ function App() {
           )}
         </div>
       )}
+      <TrialBanner />
       {renderContent()}
       {mergeRowIds && (
         <MergeResearchersModal

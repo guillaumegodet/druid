@@ -8,12 +8,12 @@ export interface EmailEnv { RESEND_API_KEY?: string; EMAIL_FROM?: string }
 
 const escape = (s: unknown): string => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string));
 
-export const sendEmail = async (env: EmailEnv, { to, subject, html, text }: { to: string; subject: string; html: string; text: string }): Promise<void> => {
+export const sendEmail = async (env: EmailEnv, { to, subject, html, text, replyTo }: { to: string; subject: string; html: string; text: string; replyTo?: string }): Promise<void> => {
   if (!env.RESEND_API_KEY) throw new Error('RESEND_API_KEY not configured');
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { authorization: `Bearer ${env.RESEND_API_KEY}`, 'content-type': 'application/json' },
-    body: JSON.stringify({ from: env.EMAIL_FROM || 'Druid <no-reply@example.org>', to, subject, html, text }),
+    body: JSON.stringify({ from: env.EMAIL_FROM || 'Druid <no-reply@example.org>', to, subject, html, text, ...(replyTo ? { reply_to: replyTo } : {}) }),
   });
   if (!res.ok) throw new Error(`Resend ${res.status}: ${(await res.text()).slice(0, 200)}`);
 };
@@ -77,4 +77,21 @@ export const sendAccessRequestNotice = (env: EmailEnv, { to, label, requester, a
 ${button(adminUrl, 'Voir la demande · See the request')}`);
   const text = `Druid — ${label}\n\n${requester} demande un accès / asks for access:\n${adminUrl}\n`;
   return sendEmail(env, { to, subject: `Demande d'accès au Druid de ${label} · Access request (${label})`, html, text });
+};
+
+/** A quote request of a tenant (lot 6 b), to DirlaData (`SAAS_SALES_EMAIL`), answerable to the requester. */
+export const sendQuoteRequest = (env: EmailEnv, { to, label, slug, requester, plan, researchers, accounts, message, feature }: {
+  to: string; label: string; slug: string; requester: string; plan: string; researchers: number | null; accounts: number | null; message: string | null; feature: string | null;
+}): Promise<void> => {
+  const rows: [string, string][] = [
+    ['Établissement', `${label} (${slug})`], ['Demandeur', requester], ['Offre demandée', plan],
+    ['Chercheurs (estimation)', researchers === null ? '—' : String(researchers)], ['Comptes souhaités', accounts === null ? '—' : String(accounts)],
+    ['Depuis', feature ? `fonction verrouillée « ${feature} »` : 'Mon établissement'],
+  ];
+  const html = wrap(`Demande de devis — ${label}`, `
+<table style="font-size:14px;line-height:1.6;border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="padding:2px 16px 2px 0;color:#6f6a5e">${escape(k)}</td><td style="font-weight:600">${escape(v)}</td></tr>`).join('')}</table>
+${message ? `<p style="font-size:14px;line-height:1.6;white-space:pre-wrap;margin:20px 0 0">${escape(message)}</p>` : ''}
+<p style="font-size:12px;color:#9a9486;margin:24px 0 0">Répondre à ce message écrit au demandeur.</p>`);
+  const text = `${rows.map(([k, v]) => `${k} : ${v}`).join('\n')}\n\n${message || ''}\n`;
+  return sendEmail(env, { to, subject: `Demande de devis Druid — ${label} (${plan})`, html, text, replyTo: requester });
 };
