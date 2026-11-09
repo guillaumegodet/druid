@@ -96,13 +96,13 @@ export const createThesisStore = (db: Kysely<DB>) => {
 
   /** Coverage of the checks: people with an IdRef, checked, with a defended thesis. */
   const coverage = async (): Promise<{ withIdref: number; checked: number; withPhd: number }> => {
-    const r = await sql<{ with_idref: string; checked: string; with_phd: string }>`
-      SELECT
-        (SELECT count(DISTINCT person_id) FROM person_identifier WHERE scheme = 'idref' AND is_primary) AS with_idref,
-        (SELECT count(*) FROM person_thesis_check) AS checked,
-        (SELECT count(DISTINCT person_id) FROM person_thesis WHERE status = 'defended') AS with_phd`.execute(db);
-    const row = r.rows[0];
-    return { withIdref: Number(row?.with_idref ?? 0), checked: Number(row?.checked ?? 0), withPhd: Number(row?.with_phd ?? 0) };
+    // Query builder (qualified by the schema of a tenant), not a raw statement that would read public.
+    const withIdref = await db.selectFrom('person_identifier').select(sql<string>`count(DISTINCT person_id)`.as('n'))
+      .where('scheme', '=', 'idref').where('is_primary', '=', true).executeTakeFirst();
+    const checked = await db.selectFrom('person_thesis_check').select(sql<string>`count(*)`.as('n')).executeTakeFirst();
+    const withPhd = await db.selectFrom('person_thesis').select(sql<string>`count(DISTINCT person_id)`.as('n'))
+      .where('status', '=', 'defended').executeTakeFirst();
+    return { withIdref: Number(withIdref?.n ?? 0), checked: Number(checked?.n ?? 0), withPhd: Number(withPhd?.n ?? 0) };
   };
 
   return { due, saveCheck, thesesOfUid, thesesOfRow, coverage };
