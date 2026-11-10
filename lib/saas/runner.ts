@@ -15,7 +15,8 @@
  *    the files, the schema and the rows of the tenant (lib/saas/lifecycle.ts).
  * A « Stop » of the UI (job.cancel_requested_at) ends the child process (SIGTERM: the alignment scripts save what they
  * have) and the job ends `cancelled`. Scheduled refreshes (lot 3 d), the alerts on repeated failures (lot 3 e), the
- * removal of expired exports and the queueing of due deletions (lot 6 a-3) are here too.
+ * removal of expired exports and the queueing of due deletions (lot 6 a-3), the e-mails of a failed job and of an
+ * inactive tenant (lot 6 d, lib/saas/notices.ts) are here too.
  */
 import { spawn as nodeSpawn, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
@@ -30,7 +31,7 @@ import { enqueueJob, primaryHost, type Job, type Plan, type SaasDb, type Tenant 
 import { runStructureAlignment } from '../structures/alignRun';
 import { ALIGNED_STRUCTURE_ID_TYPES, isStructureIdType, type StructureIdType } from '../structures/identifiers';
 import { createRegistryClient } from '../structures/registryClient';
-import { sendEmail, sendExportReady, sendTenantDeleted, sendTenantReady, type EmailEnv } from './email';
+import { sendEmail, sendExportReady, sendInactivityNotice, sendJobFailed, sendTenantDeleted, sendTenantReady, type EmailEnv } from './email';
 import { OnboardingPayload, seedTenantDirectory, tenantHostOf } from './onboarding';
 import { dropTenantSchema, migrateTenantSchema, setTenantStatus, type TenantDbOptions } from './tenantDb';
 import { EtlBuildParams, PeopleAlignParams, StructuresAlignParams } from './jobs';
@@ -43,6 +44,9 @@ import {
   EXPORT_TTL_DAYS, dueDeletions, expiredExports, exportBaseName, exportObjectKey, isDeletionDue, markExportPurged, tombstoneTenant,
 } from './lifecycle';
 import { logConsole } from './console';
+import {
+  failureReason, failureRecipients, inNoticeHours, inactiveTenants, jobLabelOf, jobPagePath, markInactivityNotified, ownerEmailsOf, previousRunOf,
+} from './notices';
 
 export interface CloudflareRouteEnv {
   /** API token with Workers Routes: Edit on the zone. */
@@ -607,17 +611,34 @@ const appendLog = async (saas: SaasDb, id: string, line: string) => {
   await sql`UPDATE saas.job SET log = concat_ws(E'\\n', log, ${line}::text) WHERE id = ${id}::uuid`.execute(saas);
 };
 
-/** Two failures in a row of the same key (this one included) → the ops address is told (lot 3 e). */
+/** Jobs of the platform, retried by nobody and told to nobody else: the ops address hears of their first failure. */
+const PLATFORM_JOB_TYPES = ['tenant.provision', 'tenant.delete'];
+
+/** Two failures in a row of the same key (this one included), or one of a platform job → the ops address is told (lot 3 e). */
 export const alertOnRepeatedFailure = async (saas: SaasDb, env: RunnerEnv, job: Job, tenant: Tenant | null, message: string): Promise<boolean> => {
   if (!env.alertEmail || !env.email?.RESEND_API_KEY) return false;
-  const previous = await saas.selectFrom('job').select('status').where('tenant_id', '=', job.tenant_id).where('key', '=', job.key)
-    .where('id', '<>', job.id).where('created_at', '<', job.created_at).orderBy('created_at', 'desc').executeTakeFirst();
-  if (previous?.status !== 'failed') return false;
-  const subject = `[Druid SaaS] ${tenant?.slug || job.tenant_id}: ${job.type} failed twice`;
-  const text = `Tenant ${tenant?.label || ''} (${tenant?.slug || job.tenant_id})\nJob ${job.id} (${job.type}, key ${job.key}) failed twice in a row.\n\n${message}\n`;
+  const once = PLATFORM_JOB_TYPES.includes(job.type);
+  if (!once && (await previousRunOf(saas, job))?.status !== 'failed') return false;
+  const subject = `[Druid SaaS] ${tenant?.slug || job.tenant_id}: ${job.type} failed${once ? '' : ' twice'}`;
+  const text = `Tenant ${tenant?.label || ''} (${tenant?.slug || job.tenant_id})\nJob ${job.id} (${job.type}, key ${job.key}) failed${once ? '' : ' twice in a row'}.\n\n${message}\n`;
   await sendEmail(env.email, { to: env.alertEmail, subject, text, html: `<pre>${text.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c] as string))}</pre>` })
     .catch((err) => (env.log || (() => {}))(`alert e-mail failed: ${err instanceof Error ? err.message : String(err)}`));
   return true;
+};
+
+/** A failed job of the establishment → the member who started it, or the owners for a scheduled one (lot 6 d). */
+export const notifyJobFailure = async (saas: SaasDb, env: RunnerEnv, job: Job, tenant: Tenant | null, message: string): Promise<string[]> => {
+  if (!tenant || !env.email?.RESEND_API_KEY) return [];
+  const recipients = await failureRecipients(saas, job, tenant);
+  if (!recipients.length) return [];
+  const host = (await primaryHost(saas, tenant.id)) || tenantHostOf(tenant.slug, env.baseDomain);
+  const sent: string[] = [];
+  for (const to of recipients) {
+    await sendJobFailed(env.email, {
+      to, label: tenant.label, what: jobLabelOf(job), reason: failureReason(message), pageUrl: `https://${host}${jobPagePath(job.type)}`, retried: job.created_by === 'scheduler',
+    }).then(() => sent.push(to), (err) => (env.log || (() => {}))(`failure e-mail failed: ${err instanceof Error ? err.message : String(err)}`));
+  }
+  return sent;
 };
 
 /** Runs one claimed job: progress and log on the row, `done`, `cancelled` or `failed` at the end. */
@@ -653,7 +674,10 @@ export const runJob = async (saas: SaasDb, env: RunnerEnv, job: Job, handlers = 
     await appendLog(saas, job.id, `${cancelled ? 'cancelled' : 'failed'}: ${message}`).catch(() => {});
     await saas.updateTable('job').set({ status: cancelled ? 'cancelled' : 'failed', finished_at: sql<string>`now()` }).where('id', '=', job.id).execute();
     (env.log || (() => {}))(`job ${job.id} (${job.type}) ${cancelled ? 'cancelled' : 'failed'}: ${message}`);
-    if (!cancelled) await alertOnRepeatedFailure(saas, env, job, tenant, message).catch(() => {});
+    if (!cancelled) {
+      await alertOnRepeatedFailure(saas, env, job, tenant, message).catch(() => {});
+      await notifyJobFailure(saas, env, job, tenant, message).catch(() => {});
+    }
     return cancelled ? 'cancelled' : 'failed';
   }
 };
@@ -703,10 +727,11 @@ export const scheduleRefreshes = async (saas: SaasDb, env: RunnerEnv, { now = ne
 };
 
 /**
- * Lifecycle of the tenants (lot 6 a-3), every tick of the scheduler whatever the hour: the archives of expired exports
- * are removed from the asset store, a `tenant.delete` is queued for each tenant whose deletion is due.
+ * Lifecycle of the tenants, every tick of the scheduler: the archives of expired exports are removed from the asset
+ * store, a `tenant.delete` is queued for each tenant whose deletion is due (lot 6 a-3), and in office hours the owners
+ * of a tenant nobody signed in to for 90 days are told (lot 6 d).
  */
-export const scheduleLifecycle = async (saas: SaasDb, env: RunnerEnv, now = new Date()): Promise<{ purged: number; deletions: string[] }> => {
+export const scheduleLifecycle = async (saas: SaasDb, env: RunnerEnv, now = new Date()): Promise<{ purged: number; deletions: string[]; inactive: string[] }> => {
   let purged = 0;
   if (env.assets) {
     for (const e of await expiredExports(saas, now)) {
@@ -720,7 +745,22 @@ export const scheduleLifecycle = async (saas: SaasDb, env: RunnerEnv, now = new 
     await enqueueJob(saas, { tenantId: t.id, type: 'tenant.delete', params: {}, createdBy: 'scheduler' });
     deletions.push(t.slug);
   }
-  return { purged, deletions };
+  const inactive: string[] = [];
+  if (env.email?.RESEND_API_KEY && inNoticeHours(now)) {
+    for (const t of await inactiveTenants(saas, now)) {
+      const owners = await ownerEmailsOf(saas, t.id);
+      const host = (await primaryHost(saas, t.id)) || tenantHostOf(t.slug, env.baseDomain);
+      let sent = 0;
+      for (const to of owners) {
+        await sendInactivityNotice(env.email, { to, label: t.label, lastActivity: t.lastActivity, loginUrl: `https://${host}/auth/login`, adminUrl: `https://${host}/?page=ADMIN&tab=establishment` })
+          .then(() => { sent++; }, (err) => (env.log || (() => {}))(`inactivity e-mail failed (${t.slug}): ${err instanceof Error ? err.message : String(err)}`));
+      }
+      // Marked even without an owner: a tenant left without one is a matter for the console, not a daily retry.
+      if (sent || !owners.length) await markInactivityNotified(saas, t.id, now);
+      if (sent) inactive.push(t.slug);
+    }
+  }
+  return { purged, deletions, inactive };
 };
 
 /** MemAvailable of /proc/meminfo in MiB (null elsewhere than Linux). */
@@ -749,9 +789,10 @@ export const runForever = async (saas: SaasDb, env: RunnerEnv, intervalMs = 10_0
       lastSchedule = Date.now();
       const queued = await scheduleRefreshes(saas, env).catch((err) => { log(`scheduler error: ${err.message}`); return [] as string[]; });
       if (queued.length) log(`scheduled etl.build for ${queued.join(', ')}`);
-      const life = await scheduleLifecycle(saas, env).catch((err) => { log(`lifecycle error: ${err.message}`); return { purged: 0, deletions: [] as string[] }; });
+      const life = await scheduleLifecycle(saas, env).catch((err) => { log(`lifecycle error: ${err.message}`); return { purged: 0, deletions: [] as string[], inactive: [] as string[] }; });
       if (life.purged) log(`${life.purged} expired export(s) removed`);
       if (life.deletions.length) log(`scheduled tenant.delete for ${life.deletions.join(', ')}`);
+      if (life.inactive.length) log(`inactivity e-mail sent for ${life.inactive.join(', ')}`);
     }
     const { done, failed, cancelled } = await runJobsOnce(saas, env, handlers).catch((err) => { log(`runner error: ${err.message}`); return { done: 0, failed: 0, cancelled: 0 }; });
     if (done + failed + cancelled === 0) await new Promise((r) => setTimeout(r, intervalMs));

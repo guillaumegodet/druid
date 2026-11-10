@@ -103,3 +103,14 @@ day an owner can **Cancel the deletion** from the same card, and the Druid gets 
 export first if you want to keep the data.
 
 The backups of the host that still hold a copy expire on their own; they cannot be restored from your side.
+
+## The e-mails you receive
+
+- **Your Druid is ready**: at the end of its build, to the account that created it.
+- **Invitation** and **access request**: see above.
+- **Failed task** (build of the dashboards, alignment of the researchers or of the structures, export): to the account
+  that started it, or to the owners for a scheduled refresh. One e-mail per series of failures: the next ones stay
+  silent until a run succeeds. If it fails again, the team hosting your Druid is told.
+- **Export ready**, **deletion planned** and **Druid deleted**: see the two previous sections.
+- **Inactivity**: when nobody signed in for 90 days, the owners receive a reminder, once until somebody signs in
+  again.

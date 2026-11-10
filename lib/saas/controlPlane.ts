@@ -49,6 +49,8 @@ export interface TenantTable {
   delete_after: string | null;
   /** Status a cancelled deletion gives back. */
   status_before_delete: 'active' | 'suspended' | null;
+  /** Owners last told that nobody signed in for 90 days (lot 6 d, lib/saas/notices.ts). */
+  inactivity_notified_at: string | null;
 }
 export interface TenantHostTable {
   host: string;
