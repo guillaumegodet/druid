@@ -812,7 +812,7 @@ msgstr "Export PDF"
 
 #: components/ResearcherDetail.tsx:321
 #: components/StructureDetail.tsx:139
-#: components/admin/EstablishmentAdmin.tsx:263
+#: components/admin/EstablishmentAdmin.tsx:275
 #: components/admin/InstitutionsAdmin.tsx:219
 #: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
@@ -1701,6 +1701,7 @@ msgid "Complete"
 msgstr "Complete"
 
 #: components/admin/EstablishmentAdmin.tsx:114
+#: components/admin/EstablishmentAdmin.tsx:251
 #: components/saas/PlanOffer.tsx:84
 #: components/saas/PlanOffer.tsx:86
 #: components/saas/PlanOffer.tsx:145
@@ -1708,8 +1709,8 @@ msgid "Request a quote"
 msgstr "Request a quote"
 
 #: components/admin/EstablishmentAdmin.tsx:119
-msgid "Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote."
-msgstr "Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote."
+msgid "Every account of the plan is used. The Team and Complete plans add accounts: request a quote."
+msgstr "Every account of the plan is used. The Team and Complete plans add accounts: request a quote."
 
 #. placeholder {0}: date(data.deletion.deleteAfter)
 #: components/admin/EstablishmentAdmin.tsx:123
@@ -1726,6 +1727,7 @@ msgid "Access requests ({0})"
 msgstr "Access requests ({0})"
 
 #: components/admin/EstablishmentAdmin.tsx:149
+#: components/admin/EstablishmentAdmin.tsx:228
 msgid "Every account of the plan is used"
 msgstr "Every account of the plan is used"
 
@@ -1806,16 +1808,21 @@ msgstr "Labs (acronyms)"
 msgid "Invite"
 msgstr "Invite"
 
-#: components/admin/EstablishmentAdmin.tsx:255
-#: components/admin/EstablishmentAdmin.tsx:262
+#. placeholder {0}: data.seats.allowed ?? 0
+#: components/admin/EstablishmentAdmin.tsx:248
+msgid "{0, plural, one {Your plan includes # account, already used: no colleague can be invited.} other {Your plan includes # accounts, all used: no colleague can be invited.}}"
+msgstr "{0, plural, one {Your plan includes # account, already used: no colleague can be invited.} other {Your plan includes # accounts, all used: no colleague can be invited.}}"
+
+#: components/admin/EstablishmentAdmin.tsx:267
+#: components/admin/EstablishmentAdmin.tsx:274
 msgid "Mail domains of the institution"
 msgstr "Mail domains of the institution"
 
-#: components/admin/EstablishmentAdmin.tsx:258
+#: components/admin/EstablishmentAdmin.tsx:270
 msgid "A colleague with an address of these domains who asks for a sign-in link without an account sends you an access request (you receive an e-mail)."
 msgstr "A colleague with an address of these domains who asks for a sign-in link without an account sends you an access request (you receive an e-mail)."
 
-#: components/admin/EstablishmentAdmin.tsx:261
+#: components/admin/EstablishmentAdmin.tsx:273
 msgid "Mail domains saved."
 msgstr "Mail domains saved."
 
@@ -15125,8 +15132,8 @@ msgstr "On site (installed at the institution)"
 
 #. placeholder {0}: getUserInfo().email
 #: components/saas/PlanOffer.tsx:92
-msgid "Your request is sent. DirlaData answers you by e-mail ({0}) with a quote."
-msgstr "Your request is sent. DirlaData answers you by e-mail ({0}) with a quote."
+msgid "Your request is sent. We answer you by e-mail ({0}) with a quote."
+msgstr "Your request is sent. We answer you by e-mail ({0}) with a quote."
 
 #: components/saas/PlanOffer.tsx:98
 msgid "Public institutions pay on invoice with a purchase order; the price depends on the number of researchers. Nothing is committed by this request."
@@ -15427,13 +15434,18 @@ msgid "Cluster (derived — read only)"
 msgstr "Cluster (derived — read only)"
 
 #: components/structures/IdentifiersTab.tsx:72
+msgid "Source of the value"
+msgstr "Source of the value"
+
+#: components/structures/IdentifiersTab.tsx:72
 #: components/structures/StructureAlignPanel.tsx:170
 msgid "checked on"
 msgstr "checked on"
 
-#: components/structures/IdentifiersTab.tsx:72
-msgid "Source of the value"
-msgstr "Source of the value"
+#: components/structures/IdentifiersTab.tsx:73
+#: components/structures/StructureAlignPanel.tsx:173
+msgid "record not found"
+msgstr "record not found"
 
 #: components/structures/IdentifiersTab.tsx:73
 #: components/structures/StructureAlignPanel.tsx:37
@@ -15442,23 +15454,18 @@ msgid "closed record"
 msgstr "closed record"
 
 #: components/structures/IdentifiersTab.tsx:73
-#: components/structures/StructureAlignPanel.tsx:173
-msgid "record not found"
-msgstr "record not found"
-
-#: components/structures/IdentifiersTab.tsx:73
 msgid "record names something else"
 msgstr "record names something else"
-
-#: components/structures/IdentifiersTab.tsx:77
-#: components/structures/StructureAlignPanel.tsx:179
-msgid "remove"
-msgstr "remove"
 
 #. placeholder {0}: i.value
 #: components/structures/IdentifiersTab.tsx:77
 msgid "Remove {0}? It will not be suggested again by the alignment."
 msgstr "Remove {0}? It will not be suggested again by the alignment."
+
+#: components/structures/IdentifiersTab.tsx:77
+#: components/structures/StructureAlignPanel.tsx:179
+msgid "remove"
+msgstr "remove"
 
 #: components/structures/IdentifiersTab.tsx:85
 msgid "Identifier or URL"

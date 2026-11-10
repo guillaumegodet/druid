@@ -89,7 +89,7 @@ export const QuoteDialog: React.FC<{ onClose: () => void; feature?: PlanFeature 
         {done ? (
           <div className="flex flex-col gap-3 text-[14px] text-ink dark:text-[#f5f2ea]">
             <p className="flex items-start gap-2"><CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
-              <Trans>Your request is sent. DirlaData answers you by e-mail ({getUserInfo().email}) with a quote.</Trans></p>
+              <Trans>Your request is sent. We answer you by e-mail ({getUserInfo().email}) with a quote.</Trans></p>
             <button type="button" onClick={onClose} className="self-end inline-flex items-center h-9 px-4 rounded-full text-sm font-semibold bg-ink text-white dark:bg-[#f5f2ea] dark:text-[#1c1a14]"><Trans>Close</Trans></button>
           </div>
         ) : (

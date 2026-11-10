@@ -3,7 +3,7 @@ import { AlertCircle, CheckCircle2, Globe, Inbox, Loader2, Mail, RefreshCw, Send
 import { QuoteDialog } from '../saas/PlanOffer';
 import { ClientKeys } from './ClientKeys';
 import { DataLifecycle, type DeletionView } from './DataLifecycle';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
 
@@ -116,7 +116,7 @@ export const EstablishmentAdmin: React.FC = () => {
         )}
         {full && (
           <p className="basis-full text-[12px] text-muted dark:text-[#c3beb0]">
-            <Trans>Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote.</Trans>
+            <Trans>Every account of the plan is used. The Team and Complete plans add accounts: request a quote.</Trans>
           </p>
         )}
         {data.deletion ? (
@@ -225,7 +225,7 @@ export const EstablishmentAdmin: React.FC = () => {
             }}>
             <label className="flex flex-col gap-1 text-[11.5px] font-semibold text-muted dark:text-[#c3beb0]">
               <Trans>Invite a colleague</Trans>
-              <input type="email" required className={`${inputCls} w-64`} value={email} placeholder="prenom.nom@example.org" onChange={(e) => setEmail(e.target.value)} disabled={full} />
+              <input type="email" required className={`${inputCls} w-64`} value={email} placeholder="prenom.nom@example.org" onChange={(e) => setEmail(e.target.value)} disabled={full} title={full ? t`Every account of the plan is used` : undefined} />
             </label>
             <label className="flex flex-col gap-1 text-[11.5px] font-semibold text-muted dark:text-[#c3beb0]">
               <Trans>Role</Trans>
@@ -242,7 +242,19 @@ export const EstablishmentAdmin: React.FC = () => {
             <button type="submit" className={btnDark} disabled={busy || full || !email.trim()}>
               {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Mail className="w-3.5 h-3.5" />} <Trans>Invite</Trans>
             </button>
-            <p className="basis-full text-[11.5px] text-muted dark:text-[#8f897c]">{roleHint[role]}</p>
+            {full ? (
+              <p className="basis-full flex flex-wrap items-center gap-2 text-[12px] font-semibold text-[#8a6113] dark:text-[#f0c266]">
+                <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                <Plural value={data.seats.allowed ?? 0} one="Your plan includes # account, already used: no colleague can be invited." other="Your plan includes # accounts, all used: no colleague can be invited." />
+                {data.plan?.code !== 'complete' && (
+                  <button type="button" onClick={() => setQuoteOpen(true)} className={btnLight}>
+                    <Sparkles className="w-3.5 h-3.5" /> <Trans>Request a quote</Trans>
+                  </button>
+                )}
+              </p>
+            ) : (
+              <p className="basis-full text-[11.5px] text-muted dark:text-[#8f897c]">{roleHint[role]}</p>
+            )}
           </form>
         )}
       </div>
