@@ -18,6 +18,9 @@
 //   POST /start/api/tenants/:slug/access-request (session)
 //   POST /start/api/tenants/:slug/retry  queues the provisioning again after a failure (owner) → { jobId }
 //   GET  /start/wait/:slug              construction page
+//
+// SAAS_TERMS_URL and SAAS_PRIVACY_URL (https, optional): the terms and the privacy policy of the operator, linked where
+// they are accepted (the sign-in form and the creation of a Druid).
 import {
   consumeMagicLink, createAccessRequest, createSession, deleteSession, enqueueJob, findMember, findTenantByRor,
   findTenantBySlug, isValidEmail, isValidSlug, latestJobs, normalizeEmail, normalizeHost, primaryHost, publicJobInfo,
@@ -29,7 +32,7 @@ import {
 } from '../../lib/saas/onboarding.ts';
 import { liveJob } from '../../lib/saas/jobs.ts';
 import { LINKS_PER_QUARTER, recentLinks } from '../api/auth/request.js';
-import { assistantPage, homePage, waitPage } from '../_lib/portalPages.js';
+import { assistantPage, homePage, httpsUrlOf, waitPage } from '../_lib/portalPages.js';
 import {
   clearSessionCookie, html, isControlPlane, issueMagicLink, json, readSessionId, safeNextPath, sessionCookie, sha256Hex,
   verifyInterstitial, withSaasDb,
@@ -157,15 +160,17 @@ export async function onRequest(context) {
   }
 
   const email = await sessionOf(env, request);
+  // Terms and privacy policy of the operator, shown where they are accepted (lot 7): deployment variables.
+  const legal = { terms: httpsUrlOf(env.SAAS_TERMS_URL), privacy: httpsUrlOf(env.SAAS_PRIVACY_URL) };
 
   // ── Pages ──
   if (path === '/' && method === 'GET') {
     const tenants = email ? await withSaasDb(env, (db) => tenantsOfEmail(db, email)) : [];
-    return html(homePage({ email, tenants, sent: url.searchParams.get('sent') === '1', reason: url.searchParams.get('reason') || '', baseDomain }));
+    return html(homePage({ email, tenants, sent: url.searchParams.get('sent') === '1', reason: url.searchParams.get('reason') || '', baseDomain, legal }));
   }
   if (path === '/new' && method === 'GET') {
     if (!email) return redirect(`${origin}/start`);
-    return html(assistantPage({ email, baseDomain }));
+    return html(assistantPage({ email, baseDomain, legal }));
   }
   const wait = path.match(/^\/wait\/([a-z0-9-]+)$/);
   if (wait && method === 'GET') {
