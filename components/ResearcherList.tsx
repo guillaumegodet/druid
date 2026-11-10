@@ -40,6 +40,8 @@ interface ResearcherListProps {
   /** Opens Tableau de bord › People › Directory on the lab of the filter (null = default structure). */
   onOpenStaffDashboard?: (labAcronym: string | null) => void;
   onImportSite?: () => void;
+  /** Import of a spreadsheet of researchers (SaaS lot 5 a). */
+  onImportFile?: () => void;
   /** Opens the ORCID or HAL alignment page (search = missing, verify = check existing). */
   /** Opens the merge assistant on two records (Grist row numbers) */
   onMergeResearchers?: (rowIds: [number, number]) => void;
@@ -61,7 +63,7 @@ interface ResearcherListProps {
 export const ResearcherList: React.FC<ResearcherListProps> = ({
   researchers, setResearchers, onSelectResearcher, onNewResearcher,
   loading = false, onManualSync, onOpenDuplicates, duplicatesCount,
-  onImportValidation, onImportSite, onMergeResearchers, onOpenStaffDashboard,
+  onImportValidation, onImportSite, onImportFile, onMergeResearchers, onOpenStaffDashboard,
 }) => {
   const { t } = useLingui();
   // Career-path signals (docs/archive/plan-parcours-affiliations.md, lot 4): server job only; a failure just
@@ -176,6 +178,7 @@ export const ResearcherList: React.FC<ResearcherListProps> = ({
         duplicatesCount={duplicatesCount}
         onImportValidation={onImportValidation}
         onImportSite={onImportSite}
+        onImportFile={onImportFile}
         onNewResearcher={onNewResearcher}
         showSyncMenu={showSyncMenu}
         onToggleSyncMenu={() => setShowSyncMenu(v => !v)}
