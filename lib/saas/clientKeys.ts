@@ -259,7 +259,7 @@ export const removeClientKeys = async (db: SaasDb, tenantId: string, group: KeyG
 
 /**
  * Environment of a handler of the tenant: its own language model when it set one (address and model defaulting to
- * ILaaS, never to the deployment's), else the deployment's per-instance key (instanceEnv, D7: DirlaData's own link).
+ * ILaaS, never to the deployment's), else the deployment's per-instance key (instanceEnv, D7: the host's own link).
  */
 export const llmEnvOf = (secrets: Record<string, string>): Record<string, string> =>
   secrets.ILAAS_API_KEY

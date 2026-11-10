@@ -10,7 +10,7 @@ describe('client keys — input', () => {
     expect(normalizeLlmBase('')).toBe(DEFAULT_LLM_BASE);
     expect(normalizeLlmBase(' https://api.mistral.ai/v1/ ')).toBe('https://api.mistral.ai/v1');
     expect(normalizeLlmBase('https://api.openai.com/v1/chat/completions')).toBe('https://api.openai.com/v1');
-    for (const bad of ['http://api.mistral.ai/v1', 'https://localhost/v1', 'https://10.0.0.2/v1', 'https://[::1]/v1', 'https://u:p@x.example.org/v1', 'ftp://x', 'nonsense']) {
+    for (const bad of ['http://api.mistral.ai/v1', 'https://localhost/v1', 'https://10.0.0.2/v1', 'https://[::1]/v1', 'https://user:pw@example.org/v1', 'ftp://x', 'nonsense']) {
       expect(() => normalizeLlmBase(bad), bad).toThrow('Invalid address of the language model');
     }
   });
