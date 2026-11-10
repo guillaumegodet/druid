@@ -48,7 +48,7 @@ export const StructuresLdapReview: React.FC<Props> = ({ diff, applying = false, 
         <div className="p-6 overflow-auto space-y-8">
           <div className="flex items-center gap-3 px-4 py-3 rounded-card bg-accent/20 dark:bg-accent/10 border border-accent-strong/40 dark:border-accent/20 text-[13px] font-semibold text-ink dark:text-[#f0c266]">
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <Trans>Limited LDAP data (type, name, codes). Checked records will be written to Grist. Rich data (ror/scopus/hal…) is still handled by the bridge.</Trans>
+            <Trans>Limited LDAP data (type, name, codes). Checked records will be written to the directory. Rich data (ror/scopus/hal…) is still handled by the bridge.</Trans>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -118,7 +118,7 @@ export const StructuresLdapReview: React.FC<Props> = ({ diff, applying = false, 
 
           {/* Orphans */}
           <section>
-            <div className="flex items-center gap-2 pb-2 mb-3 border-b border-ink/5 dark:border-white/5 text-muted-lighter dark:text-[#8f897c]"><UserMinus className="w-4 h-4" /><h3 className="font-disp text-base font-bold tracking-tight text-ink dark:text-[#f5f2ea]"><Trans>Grist structures outside the LDAP scope ({diff.orphelins.length})</Trans></h3></div>
+            <div className="flex items-center gap-2 pb-2 mb-3 border-b border-ink/5 dark:border-white/5 text-muted-lighter dark:text-[#8f897c]"><UserMinus className="w-4 h-4" /><h3 className="font-disp text-base font-bold tracking-tight text-ink dark:text-[#f5f2ea]"><Trans>Directory structures outside the LDAP scope ({diff.orphelins.length})</Trans></h3></div>
             <div className="flex flex-wrap gap-1.5 max-h-28 overflow-auto">
               {diff.orphelins.map((o) => <span key={o.id} className="px-2.5 py-0.5 rounded-full bg-white/40 dark:bg-white/5 border border-ink/5 dark:border-white/10 text-[11px] text-muted-light dark:text-[#8f897c]">{o.displayName} <span className="font-mono">({o.local_id})</span></span>)}
             </div>

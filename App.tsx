@@ -424,7 +424,7 @@ function App() {
       const skippedMsg = skippedDuplicates.length
         ? t`\n${skippedDuplicates.length} skipped: uid already carried by another row of the same lab (${skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')}) — use “Merge”.`
         : '';
-      alert(t`LDAP attachment: ${updated} record(s) attached (uid_dyna written to Grist).${skippedMsg}`);
+      alert(t`LDAP attachment: ${updated} record(s) attached (uid_dyna written to the directory).${skippedMsg}`);
     } catch (err: any) {
       setError(apiErrorText(err) || t`Error attaching LDAP records`);
       // Batched writes: a partial failure has already written the previous batches to Grist (code
@@ -567,7 +567,7 @@ function App() {
       setError('');
       await refreshData();
       await loadLdapDiff();
-      alert(t`LDAP update applied: ${updated} record(s) written to Grist.`);
+      alert(t`LDAP update applied: ${updated} record(s) written to the directory.`);
     } catch (err: any) {
       setError(apiErrorText(err) || t`Error writing the LDAP updates`);
       // Batched writes: a partial failure has already written the previous batches to Grist (code
@@ -610,7 +610,7 @@ function App() {
       setError('');
       setValidationImportOpen(false);
       await refreshData();
-      alert(t`Validation applied: ${entries.length} record(s) written to Grist.`);
+      alert(t`Validation applied: ${entries.length} record(s) written to the directory.`);
     } catch (err: any) {
       setError(apiErrorText(err) || t`Error applying the validations`);
     } finally {
@@ -625,7 +625,7 @@ function App() {
    */
   const handleValidateResearcher = async (updated: Researcher) => {
     if (!updated.gristRowId) {
-      setError(t`This record has no Grist row: validation impossible.`);
+      setError(t`This record has no directory row: validation impossible.`);
       return;
     }
     try {
@@ -701,7 +701,7 @@ function App() {
       setError('');
       setStructDiff(null);
       await refreshData();
-      alert(t`LDAP structures: ${updated} updated, ${created} created in Grist.`);
+      alert(t`LDAP structures: ${updated} updated, ${created} created in the directory.`);
     } catch (err: any) {
       setError(apiErrorText(err) || t`Error writing the LDAP structures`);
     } finally {
@@ -987,7 +987,7 @@ function App() {
                 // Opens the Druid record of the clicked Annuaire row (identified by its Grist row
                 // number, the only safe identifier when the uid is shared).
                 const r = researchers.find((res) => res.gristRowId === gristRowId);
-                if (!r) { setError(t`Grist row ${gristRowId} not found in the loaded scope`); return; }
+                if (!r) { setError(t`Directory row ${gristRowId} not found in the loaded scope`); return; }
                 handleResearcherSelect(r);
               },
             }}

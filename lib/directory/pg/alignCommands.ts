@@ -57,7 +57,7 @@ export const pgWriting = async <T>(db: Db, ctx: CommandContext, fn: (trx: Transa
 export const writeRecordPatches = async (trx: Transaction<DB>, patches: { id: number; fields: Record<string, any> }[]): Promise<number> => {
   for (const p of patches) {
     const m = await trx.selectFrom('membership').select(['id', 'person_id']).where('id', '=', String(p.id)).executeTakeFirst();
-    if (!m) throw new ApiError(404, `Record not found in Grist: uid ${p.id}`);
+    if (!m) throw new ApiError(404, `Record not found in the directory: uid ${p.id}`);
     await writeRecordFields(trx, m.person_id, m.id, p.fields);
   }
   return patches.length;

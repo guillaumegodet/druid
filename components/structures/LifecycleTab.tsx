@@ -54,7 +54,7 @@ export const LifecycleTab: React.FC<LifecycleTabProps> = ({
           <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
           <p className="text-[13px] leading-relaxed">
             <Trans>
-              Tab not yet connected to Grist: the entries below are not saved (nor reloaded). Still to be developed — see docs/archive/plan-fusion-demo-2026-09.md, sub-lot “structure lineage”.
+              Tab not yet connected to the directory: the entries below are not saved (nor reloaded). Still to be developed — see docs/archive/plan-fusion-demo-2026-09.md, sub-lot “structure lineage”.
             </Trans>
           </p>
        </div>

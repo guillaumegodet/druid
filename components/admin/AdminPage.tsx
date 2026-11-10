@@ -120,7 +120,7 @@ export const AdminPage: React.FC<{
           ))}
           {onSyncToSovisu && (
             <button type="button" onClick={onSyncToSovisu} disabled={syncingSovisu}
-              title={t`Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory`}
+              title={t`Regenerates structures.csv (from the Directory) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory`}
               className="ml-2 pill px-4 py-1.5 text-[13px] inline-flex items-center gap-2 bg-white/60 dark:bg-white/10 text-ink dark:text-[#f5f2ea] hover:bg-white dark:hover:bg-white/15 border border-[rgba(224,158,42,.45)] transition-colors disabled:opacity-50">
               <RefreshCw className={`w-4 h-4 text-[#e09e2a] ${syncingSovisu ? 'animate-spin' : ''}`} />
               <Trans>Synchronise with SoVisu+</Trans>

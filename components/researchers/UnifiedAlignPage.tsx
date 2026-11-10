@@ -521,7 +521,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
     if (!onApply || !updates.length) return;
     const n = await onApply({ selected: [...selected], chosen, decisions });
     const count = typeof n === 'number' ? n : updates.length;
-    setToast(t`${count} record(s) written to Grist.`);
+    setToast(t`${count} record(s) written to the directory.`);
     setSelected(new Set());
     setChosen({});
     setDecisions({});
@@ -531,7 +531,7 @@ export const UnifiedAlignPage: React.FC<UnifiedAlignPageProps> = ({ diff, mode, 
   const updatePpn = async (row: PersonAlignRow, r: Redirection) => {
     if (!onApplyRedirection) return;
     const n = await onApplyRedirection(row.id, r.ppn);
-    if (n) setToast(t`IdRef updated in Grist: ${r.ppn} → ${r.newPpn}.`);
+    if (n) setToast(t`IdRef updated in the directory: ${r.ppn} → ${r.newPpn}.`);
   };
   const confirmRerun = () => {
     if (hasUnsaved && !window.confirm(t`Some selections or decisions are not applied yet — rerunning will clear them. Continue?`)) return;

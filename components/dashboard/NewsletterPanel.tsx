@@ -105,7 +105,7 @@ export const NewsletterPanel: React.FC<{
       setItems((prev) => prev.map((i) => (i.id === id ? { ...i, ...fields } as NlItem : i)));
       setError('');
     } catch (e: any) {
-      setError(t`Could not write to Grist: ${apiErrorText(e)}`);
+      setError(t`Could not save: ${apiErrorText(e)}`);
     } finally {
       setSavingId(null);
     }

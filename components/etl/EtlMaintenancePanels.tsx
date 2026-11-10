@@ -57,7 +57,7 @@ export const EffectifsPanel: React.FC<{ slug: string; gristLabo: string; disable
         setError(r.warning || t`Nothing to synchronise`);
       }
     } catch (e) {
-      setError(e instanceof Error ? apiErrorText(e) : t`Grist error`);
+      setError(e instanceof Error ? apiErrorText(e) : t`Directory error`);
     } finally {
       setSyncing(false);
     }
@@ -69,11 +69,11 @@ export const EffectifsPanel: React.FC<{ slug: string; gristLabo: string; disable
   return (
     <section className={cardCls}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h4 className="section-label flex items-center gap-2"><Users className="w-4 h-4" /> <Trans>Staff (Grist directory)</Trans></h4>
+        <h4 className="section-label flex items-center gap-2"><Users className="w-4 h-4" /> <Trans>Staff (Directory)</Trans></h4>
         <button type="button" className="btn-pill !h-8 px-3 text-xs" onClick={() => void sync()} disabled={disabled || syncing || !gristLabo}
-          title={gristLabo ? t`Filter LABO = “${gristLabo}”, validated researchers excluding departures` : t`Fill in the Grist acronym (section 3) and save`}>
+          title={gristLabo ? t`Filter LABO = “${gristLabo}”, validated researchers excluding departures` : t`Fill in the Directory acronym (section 3) and save`}>
           {syncing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-          <Trans>Resynchronise from Grist</Trans>
+          <Trans>Resynchronise from the Directory</Trans>
         </button>
       </div>
       <p className="text-[12.5px] text-muted-light dark:text-[#8f897c]">

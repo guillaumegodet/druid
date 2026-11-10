@@ -105,7 +105,7 @@ export const ListHeader: React.FC<ListHeaderProps> = ({
               <div className="absolute right-0 mt-2 w-72 rounded-2xl bg-cream-100 dark:bg-[#201e1a] border border-white/60 dark:border-white/10 shadow-soft-lg z-20 p-1.5">
                 <button onClick={() => { onCloseSyncMenu(); onManualSync?.(); }} className={menuItem}>
                   <RefreshCw className={`w-4 h-4 text-muted-light dark:text-[#8f897c] ${loading ? 'animate-spin' : ''}`} />
-                  <Trans>Force Grist refresh</Trans>
+                  <Trans>Force directory refresh</Trans>
                 </button>
                 {/* Two entries only (docs/archive/plan-reorganisation-sync-ldap.md): alignments
                     are in « Outils d'alignement », duplicates and tasks in the « À traiter » section (pill

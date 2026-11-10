@@ -72,7 +72,7 @@ export function useDruidData() {
       setStructures(visibleStructures);
     } catch (err) {
       console.error('Failed to sync with Grist:', err);
-      setError(t`Unable to synchronize with Grist.`);
+      setError(t`Unable to load the directory.`);
     } finally {
       setLoading(false);
     }

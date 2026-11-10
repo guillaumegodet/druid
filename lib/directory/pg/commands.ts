@@ -145,17 +145,17 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
   const assertLabsInScope = (scope: DirectoryScope, labs: unknown[]): void => {
     if (scope.all) return;
     const anchors = anchorsOf(scope);
-    if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
+    if (anchors.size === 0) throw new ApiError(403, 'Directory writes require the institution right');
     if (labs.some((v) => !anchors.has(normalizeAcronym(String(v ?? ''))))) throw new ApiError(403, 'Write outside scope: LABO');
   };
   /** Memberships of the given record ids, checked against the scope (unknown or outside → 403). */
   const membershipsInScope = async (trx: Transaction<DB>, scope: DirectoryScope, ids: number[]) => {
-    if (!ids.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+    if (!ids.every(isRowId)) throw new ApiError(400, 'Invalid record identifiers');
     const unique = [...new Set(ids)];
     const rows = unique.length ? await trx.selectFrom('membership').selectAll().where('id', 'in', unique.map(String)).execute() : [];
     if (!scope.all) {
       const anchors = anchorsOf(scope);
-      if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
+      if (anchors.size === 0) throw new ApiError(403, 'Directory writes require the institution right');
       const byId = new Map(rows.map((r) => [Number(r.id), r]));
       if (unique.some((id) => !byId.has(id) || !anchors.has(normalizeAcronym(String(byId.get(id)!.lab_label || ''))))) {
         throw new ApiError(403, 'Rows outside scope or unknown: Annuaire');
@@ -165,7 +165,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
   };
   const personOfRecord = async (trx: Transaction<DB>, scope: DirectoryScope, recordId: number) => {
     const [m] = await membershipsInScope(trx, scope, [recordId]);
-    if (!m) throw new ApiError(404, `Record not found in Grist: uid ${recordId}`);
+    if (!m) throw new ApiError(404, `Record not found in the directory: uid ${recordId}`);
     return trx.selectFrom('person').selectAll().where('id', '=', m.person_id).executeTakeFirstOrThrow();
   };
 
@@ -299,7 +299,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     }),
 
     updatePerson: (recordId, researcher, ctx) => writing(ctx, async (trx) => {
-      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist ID (gristRowId missing)');
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
       const person = await personOfRecord(trx, ctx.scope, recordId);
       // The person's other memberships the scope sees (a lab right only rewrites the rows of its labs).
       const anchors = anchorsOf(ctx.scope);
@@ -417,7 +417,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     },
 
     updateStructure: (recordId, structure, ctx) => writing(ctx, async (trx) => {
-      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifiers');
       const fields = structureUpdateFields(structure);
       const current = await trx.selectFrom('structure').selectAll().where('id', '=', String(recordId)).executeTakeFirst();
       assertStructureLabels(ctx.scope, [fields['short_labels']]);
@@ -445,7 +445,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
 
     updateInstitution: async (recordId, input, ctx) => {
       if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
-      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifiers');
       const existing = (await repository.institutions()).items;
       if (!existing.some((e) => e.id === recordId)) throw new ApiError(404, `Institution not found: ${recordId}`);
       return writing(ctx, async (trx) => {
@@ -466,7 +466,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       if (mode !== 'a_revoir' && (principalRowId === undefined || !rowIds.includes(principalRowId))) {
         throw new ApiError(400, 'Qualification: primary row required');
       }
-      if (!rowIds.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (!rowIds.every(isRowId)) throw new ApiError(400, 'Invalid record identifiers');
       const decision = `${mode === 'a_revoir' ? 'A_REVOIR' : mode === 'concomitant' ? 'CONCOMITANT' : 'SUCCESSIF'} ${todayIso()} ${author}`;
       const rows = await rowsInScope(trx, ctx.scope, rowIds);
       for (const m of rows) {
@@ -512,7 +512,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
         ? await rowsInScope(trx, ctx.scope, (await trx.selectFrom('membership as m').innerJoin('person as p', 'p.id', 'm.person_id')
           .select('m.id').where('p.uid', '=', fromUid).execute()).map((r) => Number(r.id)))
         : rowId ? await rowsInScope(trx, ctx.scope, [rowId]) : [];
-      if (!rows.length) throw new ApiError(404, `Record not found in Grist: uid ${fromUid || '—'}`);
+      if (!rows.length) throw new ApiError(404, `Record not found in the directory: uid ${fromUid || '—'}`);
       const note = `[${todayIso()}] uid ${fromUid || '(vide)'} → ${toUid} (n° agent = compte LDAP), par ${author}`;
       for (const personId of [...new Set(rows.map((m) => m.person_id))]) {
         const p = await trx.selectFrom('person').select('note').where('id', '=', personId).executeTakeFirstOrThrow();
@@ -530,11 +530,11 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
      */
     mergeRows: ({ keepRowId, dropRowId, fields, author, note = '' }, ctx) => writing(ctx, async (trx) => {
       if (keepRowId === dropRowId) throw new ApiError(400, 'Merge: both rows are identical');
-      if (![keepRowId, dropRowId].every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (![keepRowId, dropRowId].every(isRowId)) throw new ApiError(400, 'Invalid record identifiers');
       const rows = await rowsInScope(trx, ctx.scope, [keepRowId, dropRowId]);
       const keepM = rows.find((m) => Number(m.id) === keepRowId);
       const dropM = rows.find((m) => Number(m.id) === dropRowId);
-      if (!keepM || !dropM) throw new ApiError(404, 'Merge: one of the rows no longer exists in Grist');
+      if (!keepM || !dropM) throw new ApiError(404, 'Merge: one of the records no longer exists in the directory');
       const writable = new Set(RECORD_FIELDS.filter((c) => !c.isFormula).map((c) => c.id));
       const patch: Record<string, any> = {};
       for (const [k, v] of Object.entries(fields || {})) if (writable.has(k)) patch[k] = v;
@@ -559,7 +559,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
      * row. The log is flagged as soon as the row exists again.
      */
     restoreMerge: (logId, ctx) => writing(ctx, async (trx) => {
-      if (!isRowId(logId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (!isRowId(logId)) throw new ApiError(400, 'Invalid record identifiers');
       const log = await trx.selectFrom('merge_log').selectAll().where('id', '=', String(logId)).executeTakeFirst();
       if (!log) throw new ApiError(404, `Merge not found: ${logId}`);
       if (log.restored) throw new ApiError(409, `Merge already restored: ${logId}`);
@@ -621,7 +621,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
   function assertStructureLabels(scope: DirectoryScope, labels: unknown[]): void {
     if (scope.all) return;
     const anchors = anchorsOf(scope);
-    if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
+    if (anchors.size === 0) throw new ApiError(403, 'Directory writes require the institution right');
     if (labels.some((v) => !anchors.has(normalizeAcronym(parseMultiLabel(v))))) throw new ApiError(403, 'Write outside scope: short_labels');
   }
 

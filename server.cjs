@@ -3261,7 +3261,7 @@ app.post('/api/researchers/:key/affiliation-history/refresh', async (req, res) =
   if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
   let labos;
   try { labos = await annuaireLabosOf(key); }
-  catch (err) { console.error('[affiliation-history] Grist', err.message); return res.status(502).json({ error: 'Grist unreachable' }); }
+  catch (err) { console.error('[affiliation-history] Grist', err.message); return res.status(502).json({ error: 'Directory unreachable' }); }
   if (!labos.length) return res.status(404).json({ error: 'No Annuaire record for this key' });
   if (!AH_STORE.canRefresh(access, labos, normalizeAcronym)) return res.status(403).json({ error: 'Refresh outside your scope' });
   let job = ahRefreshing.get(key);
@@ -3386,7 +3386,7 @@ app.get('/api/researchers/:key/suggestions', async (req, res) => {
   if (!AH_STORE.isValidKey(key)) return res.status(400).json({ error: 'Invalid record key' });
   let rows;
   try { rows = await annuaireRowsForKey(key); }
-  catch (err) { console.error('[suggestions] Grist', err.message); return res.status(502).json({ error: 'Grist unreachable' }); }
+  catch (err) { console.error('[suggestions] Grist', err.message); return res.status(502).json({ error: 'Directory unreachable' }); }
   if (!rows.length) return res.status(404).json({ error: 'No Annuaire record for this key' });
   const { RULES } = require('./scripts/sync_tasks.cjs');
   const { isHorsRechercheEmployment } = require('./scripts/lib/align_common.cjs');

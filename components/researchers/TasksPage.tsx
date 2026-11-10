@@ -128,7 +128,7 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
         </label>
         <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t`Search (title, name, lab…)`} className="input-soft !h-9 !py-1 text-[13px] w-56" />
         <div className="flex-1" />
-        <PixelBtn onClick={reload} disabled={loading} title={t`Re-reads the Grist table`}>
+        <PixelBtn onClick={reload} disabled={loading} title={t`Re-reads the task list`}>
           {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <RotateCw className="w-4 h-4" />} <Trans>Refresh</Trans>
         </PixelBtn>
         <PixelBtn onClick={runDetection} disabled={!!detect?.running} title={t`Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically`}>
@@ -197,7 +197,7 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
                                 <User className="w-3.5 h-3.5" /> {x.nom || x.uid_dyna}
                               </button>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9a6a12] dark:text-[#f0c266]" title={t`No Directory record linked: link it from the Grist table`}>
+                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#9a6a12] dark:text-[#f0c266]" title={t`No Directory record linked to this task`}>
                                 <AlertTriangle className="w-3.5 h-3.5" /> <Trans>To complete</Trans>
                               </span>
                             )}

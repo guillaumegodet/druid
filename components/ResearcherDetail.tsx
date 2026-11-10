@@ -478,7 +478,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
                 )}
               </label>
               <p className="text-xs text-muted-light dark:text-[#8f897c]">
-                <Trans>The change will be written to Grist (photo_url column) when you click “Save”.</Trans>
+                <Trans>The change will be saved (photo_url field) when you click “Save”.</Trans>
               </p>
             </div>
 

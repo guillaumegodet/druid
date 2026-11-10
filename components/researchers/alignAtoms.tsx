@@ -68,7 +68,7 @@ export const MatchedBadge: React.FC<{ ids?: string[] }> = ({ ids }) => {
   return (
   <>
     {(ids || []).map((m) => (
-      <span key={m} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[rgba(46,160,102,.16)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.22)] dark:text-[#5fd39a] text-[11px] font-semibold" title={t`The Grist record and the candidate already share the same ${m} — near-certain match`}>
+      <span key={m} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[rgba(46,160,102,.16)] text-[#1f7a4d] dark:bg-[rgba(46,160,102,.22)] dark:text-[#5fd39a] text-[11px] font-semibold" title={t`The directory record and the candidate already share the same ${m} — near-certain match`}>
         <Link2 className="w-3 h-3" /> <Trans>shared {m}</Trans>
       </span>
     ))}
@@ -81,7 +81,7 @@ export const MixedBtn: React.FC<{ onClick: () => void; compact?: boolean }> = ({
   const { t } = useLingui();
   return (
   <button onClick={onClick}
-    title={t`Mixed identity: this profile merges several people — neither validated nor rejected, a ticket to untangle at the source (Grist review table)`}
+    title={t`Mixed identity: this profile merges several people — neither validated nor rejected, a ticket to untangle at the source (review table)`}
     className={`inline-flex items-center gap-1 rounded-full font-disp font-semibold text-muted-light dark:text-[#8f897c] border border-transparent hover:text-[#6b3fbf] dark:hover:text-[#b9a1f0] hover:border-[rgba(112,72,232,.35)] hover:bg-[rgba(112,72,232,.08)] transition-colors ${compact ? 'px-2 py-1 text-[11px]' : 'px-2.5 py-1 text-[12px]'}`}>
     <Shuffle className={compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} /> <Trans>Mixed identity</Trans>
   </button>
@@ -125,7 +125,7 @@ export const RejectBtn: React.FC<{ onClick: () => void; compact?: boolean }> = (
   const { t } = useLingui();
   return (
   <button onClick={onClick}
-    title={t`Wrong candidate: never suggest it again for this person (Grist blacklist Alignement_IdRef)`}
+    title={t`Wrong candidate: never suggest it again for this person (blacklist)`}
     className={`inline-flex items-center gap-1 rounded-full font-disp font-semibold text-muted-light dark:text-[#8f897c] border border-transparent hover:text-[#b23b3b] dark:hover:text-[#f08c8c] hover:border-[rgba(214,69,69,.35)] hover:bg-[rgba(214,69,69,.08)] transition-colors ${compact ? 'px-2 py-1 text-[11px]' : 'px-2.5 py-1 text-[12px]'}`}>
     <Unlink className={compact ? 'w-3 h-3' : 'w-3.5 h-3.5'} /> <Trans>Wrong candidate</Trans>
   </button>
@@ -150,7 +150,7 @@ export const ArbitrageCard: React.FC<{ a: IdrefDiff['aArbitrer'][number]; dec?: 
       </div>
       <div className={`grid grid-cols-1 ${large ? 'sm:grid-cols-2' : 'sm:grid-cols-2'} gap-3`}>
         <div className="rounded-xl bg-white/60 dark:bg-white/5 border border-ink/5 dark:border-white/10 p-3">
-          <div className="text-[10.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c] mb-1"><Trans>Grist record</Trans></div>
+          <div className="text-[10.5px] font-bold uppercase tracking-[.09em] text-muted-lighter dark:text-[#8f897c] mb-1"><Trans>Directory record</Trans></div>
           <div className="font-disp text-[14px] font-semibold text-ink dark:text-[#f5f2ea]">{a.displayName || '—'}</div>
           <div className="text-[12px] font-mono text-muted-light dark:text-[#8f897c] mt-1"><Trans>ORCID: {a.grist.orcid || '∅'}<br />IdHAL: {a.grist.idhal || '∅'}</Trans></div>
         </div>

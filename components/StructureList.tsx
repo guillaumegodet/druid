@@ -241,7 +241,7 @@ export const StructureList: React.FC<StructureListProps> = ({ structures, onSele
 
         <div className="flex flex-wrap items-center gap-2.5">
           {onCreate && (
-            <button onClick={onCreate} disabled={loading} className="btn-pill disabled:opacity-60" title={t`Create a structure (team, unit, faculty, institution) in Grist`}>
+            <button onClick={onCreate} disabled={loading} className="btn-pill disabled:opacity-60" title={t`Create a structure (team, unit, faculty, institution) in the directory`}>
               <Plus className="w-4 h-4" /> <Trans>New structure</Trans>
             </button>
           )}
@@ -275,7 +275,7 @@ export const StructureList: React.FC<StructureListProps> = ({ structures, onSele
                   className="w-full text-left px-4 py-3 text-[13px] font-semibold text-ink dark:text-[#f5f2ea] hover:bg-accent/15 border-b border-ink/5 dark:border-white/5 flex items-center gap-2.5 transition-colors"
                 >
                   <RefreshCw className={`w-4 h-4 text-[#3b5bdb] ${loading ? 'animate-spin' : ''}`} />
-                  <Trans>Force Grist refresh</Trans>
+                  <Trans>Force directory refresh</Trans>
                 </button>
                 {/* LDAP import: only on instances with the HAS_LDAP capability (decided in App.tsx) —
                     absent on Cloudflare. The export to SoVisu+ (structures.csv) lives in Administration. */}
