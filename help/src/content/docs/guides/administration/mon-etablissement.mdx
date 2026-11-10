@@ -3,7 +3,7 @@
 # documented by its operator, not in the help of Druid.
 draft: true
 title: "Mon établissement : comptes et invitations"
-description: "Offre, comptes, invitations, rôles, demandes d'accès et domaines mail d'un Druid hébergé."
+description: "Offre, comptes, invitations, rôles, demandes d'accès, domaines mail et clés d'API d'un Druid hébergé."
 sidebar:
   order: 1
 ---
@@ -56,3 +56,22 @@ vous recevez un e-mail et la demande apparaît en haut de l'onglet. **Inviter co
 (vous pourrez changer son rôle ensuite), **Écarter** classe la demande.
 
 La page de connexion répond toujours la même chose, compte ou pas : elle ne révèle pas qui a un compte.
+
+## Les clés d'API de l'établissement
+
+Certaines fonctions passent par des services dont votre établissement détient l'accès. Le propriétaire saisit leurs
+clés dans la carte **Clés d'API de l'établissement** ; les administrateurs voient seulement si elles sont configurées.
+
+- **Modèle de langage** : rédige les textes IA des rapports et fait la recherche thématique des collaborations. Tout
+  service compatible OpenAI convient (ILaaS, Mistral, Albert, un modèle hébergé par votre DSI…) : indiquez l'**adresse
+  de l'API** (par exemple `https://api.mistral.ai/v1`), le **modèle** et la **clé**.
+- **Elsevier** : ouvre l'alignement des chercheurs sur Scopus. Une clé Elsevier ne fonctionne en général que depuis le
+  réseau de l'établissement abonné ; Druid l'interroge depuis l'extérieur, il lui faut donc aussi le **jeton
+  d'établissement** (*insttoken*) qu'Elsevier délivre sur demande de votre bibliothèque. Une **clé de secours** prend le
+  relais quand le quota hebdomadaire de la première est atteint.
+
+**Tester et enregistrer** essaie d'abord la clé (un court échange avec le service) : si le test échoue, rien n'est
+enregistré et la raison s'affiche (clé refusée, modèle inconnu, jeton d'établissement manquant…). **Enregistrer quand
+même** garde la clé malgré l'échec, par exemple quand le service est momentanément indisponible. Les clés sont
+conservées chiffrées et ne sont jamais réaffichées : pour en changer, saisissez la nouvelle ; un champ de clé laissé
+vide garde la clé enregistrée. **Tester à nouveau** refait le test, **Supprimer** retire les clés du groupe.

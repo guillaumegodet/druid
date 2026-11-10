@@ -31,6 +31,7 @@ import { OnboardingPayload, seedTenantDirectory, tenantHostOf } from './onboardi
 import { migrateTenantSchema, setTenantStatus, type TenantDbOptions } from './tenantDb';
 import { EtlBuildParams, PeopleAlignParams, StructuresAlignParams } from './jobs';
 import { cacheNamesOfSource, writeAlignCache } from './alignCache';
+import { llmEnvOf } from './clientKeys';
 import { readTenantSecrets } from './secrets';
 import { dashboardIndexOf, etlLabsOf, yamlOf } from './etlConfig';
 import type { AssetStore } from './r2';
@@ -367,7 +368,7 @@ export const buildEtl: JobHandler = async (job, ctx) => {
   log(`${labs.length} lab(s) configured in ${dataDir}${params.slugs ? ` (of ${report.labs.length})` : ''}`);
   if (!labs.length) { await ctx.progress('done', 100, { labs: 0, built: 0, failed: 0 }); return; }
   const secrets = await readTenantSecrets(saas, tenant.id, env.secretsKey, log);
-  const childEnv = childEnvOf({ BIBLIO_DATA_DIR: dataDir, OPENALEX_API_KEY: secrets.OPENALEX_API_KEY || env.openalexApiKey || undefined, ILAAS_API_KEY: secrets.ILAAS_API_KEY });
+  const childEnv = childEnvOf({ BIBLIO_DATA_DIR: dataDir, OPENALEX_API_KEY: secrets.OPENALEX_API_KEY || env.openalexApiKey || undefined, ...llmEnvOf(secrets) });
   const built: string[] = [];
   const failed: string[] = [];
   for (const [i, lab] of labs.entries()) {

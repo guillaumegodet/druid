@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle2, Globe, Inbox, Loader2, Mail, RefreshCw, Send, Sparkles, Trash2, UserPlus, Users, X } from 'lucide-react';
 import { QuoteDialog } from '../saas/PlanOffer';
+import { ClientKeys } from './ClientKeys';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
 
 /**
  * « My institution » tab of the Administration page on a tenant (druid-internal docs/plan-druid-saas.md, lot 6 a-1):
- * the plan and its seats, the members (invite, role, remove), the access requests of colleagues, the mail domains.
+ * the plan and its seats, the members (invite, role, remove), the access requests of colleagues, the mail domains, the
+ * API keys of the institution (lot 6 a-2, components/admin/ClientKeys.tsx).
  * The owners write, the admins read. API: functions/api/tenant, rules in lib/saas/members.ts.
  */
 
@@ -259,6 +261,9 @@ export const EstablishmentAdmin: React.FC = () => {
           <p className="text-[13px] text-ink dark:text-[#f5f2ea]">{data.mailDomains.join(', ') || '—'}</p>
         )}
       </div>
+
+      {/* ── API keys of the institution (lot 6 a-2) ────────────────────── */}
+      <ClientKeys owner={owner} />
     </div>
   );
 };

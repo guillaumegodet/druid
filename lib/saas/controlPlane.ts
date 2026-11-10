@@ -120,6 +120,15 @@ export interface TenantSecretTable {
   iv: string;
   updated_at: Generated<string>;
 }
+export interface TenantKeyCheckTable {
+  tenant_id: string;
+  key_group: string;
+  checked_at: Generated<string>;
+  ok: boolean;
+  code: string;
+  message: string | null;
+  checked_by: string | null;
+}
 export interface AccessRequestTable {
   id: Generated<string>;
   tenant_id: string;
@@ -152,6 +161,7 @@ export interface SaasDB {
   session: SessionTable;
   job: JobTable;
   tenant_secret: TenantSecretTable;
+  tenant_key_check: TenantKeyCheckTable;
 }
 export type SaasDb = Kysely<SaasDB>;
 export type Tenant = Selectable<TenantTable>;
