@@ -13,7 +13,9 @@ import {
   SAAS_SCHEMA, createMagicLink, findMember, findTenantByHost, normalizeHost, sessionOf,
 } from '../../lib/saas/controlPlane.ts';
 import { sendMagicLink } from '../../lib/saas/email.ts';
-import { DEFAULT_GRIST_API_BASE, instanceForRequest, resolveForHost } from './instance.js';
+import { llmEnvOf } from '../../lib/saas/clientKeys.ts';
+import { readTenantSecrets } from '../../lib/saas/secrets.ts';
+import { DEFAULT_GRIST_API_BASE, instanceEnv, instanceForRequest, instanceOf, resolveForHost } from './instance.js';
 
 export const SAAS_BINDING = 'SAAS_HYPERDRIVE';
 /** Optional KV namespace caching host → tenant (5 min); without it, the isolate memo below (60 s) is the only cache. */
@@ -140,6 +142,39 @@ export const withTenantDb = async (env, instance, fn) => {
     await db.destroy().catch(() => {});
   }
 };
+
+// ── Keys of the establishment (lot 6 a-2) ──────────────────────────────────────────────────────────────────────────────
+const secretsMemo = new Map();
+
+/** Decrypted secrets of a tenant (lib/saas/secrets.ts), cached per isolate for 60 s; {} without SAAS_SECRETS_KEY. */
+export const tenantSecretsOf = async (env, instance) => {
+  const id = instance?.tenant?.id;
+  if (!id || !env?.SAAS_SECRETS_KEY) return {};
+  const now = Date.now();
+  const m = secretsMemo.get(id);
+  if (m && m.until > now) return m.value;
+  const value = await withSaasDb(env, (db) => readTenantSecrets(db, id, env.SAAS_SECRETS_KEY));
+  secretsMemo.set(id, { value, until: now + MEMO_MS });
+  return value;
+};
+/** After a change of the keys (this isolate at once, the others within 60 s). */
+export const forgetTenantSecrets = (tenantId) => secretsMemo.delete(tenantId);
+
+/**
+ * Environment of a handler for the instance of the request (functions/_lib/instance.js instanceEnv), plus, on a
+ * tenant, the language model of the establishment when it entered one (« My institution › API keys »).
+ */
+export const requestEnv = async (context) => {
+  const instance = instanceOf(context);
+  const env = instanceEnv(context.env, instance);
+  if (!instance?.tenant) return env;
+  return { ...env, ...llmEnvOf(await tenantSecretsOf(context.env, instance)) };
+};
+
+/** Error of an AI route without a language model: on a tenant it points to the settings, not to Cloudflare. */
+export const noLlmError = (instance) => (instance?.tenant
+  ? 'No language model is configured for this Druid (My institution › API keys)'
+  : 'ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)');
 
 /** R2 bucket of the private files of the tenants (dashboards, lot 3 c): binding `SAAS_ASSETS`, optional. */
 export const SAAS_ASSETS_BINDING = 'SAAS_ASSETS';

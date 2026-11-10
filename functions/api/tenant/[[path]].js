@@ -7,16 +7,24 @@
 //   POST   /api/tenant/access-requests/:id/accept { role, labScope? }   invites the requester
 //   POST   /api/tenant/access-requests/:id/dismiss
 //   PUT    /api/tenant/mail-domains { mailDomains: [] }
+//   GET    /api/tenant/keys                          API keys of the establishment: which are set, last test (lot 6 a-2)
+//   PUT    /api/tenant/keys/llm { apiBase, model, apiKey?, force? }        tests then stores (409 + outcome if the test fails)
+//   PUT    /api/tenant/keys/scopus { apiKey?, instToken?, apiKey2?, instToken2?, keep*?, force? }
+//   POST   /api/tenant/keys/:group/test                                    tests the stored keys again
+//   DELETE /api/tenant/keys/:group
 // Every member (lot 6 b):
 //   GET    /api/tenant/offer                         the plan of the tenant and the plans, cheapest first (locked features)
 //   POST   /api/tenant/quote { plan, researchers?, accounts?, message?, feature? }   e-mail to DirlaData + quote_request
-// The rules (seats, last owner, domains) live in lib/saas/members.ts.
+// The rules (seats, last owner, domains) live in lib/saas/members.ts; those of the keys in lib/saas/clientKeys.ts.
+import {
+  ClientKeyError, describeClientKeys, isKeyGroup, removeClientKeys, retestClientKeys, saveClientKeys,
+} from '../../../lib/saas/clientKeys.ts';
 import {
   MemberError, dismissAccessRequest, findAccessRequest, findMemberById, inviteMember, listAccessRequests, listMembers, removeMember, seatsOf,
   setMailDomains, updateMember,
 } from '../../../lib/saas/members.ts';
 import { sendInvitation, sendQuoteRequest } from '../../_lib/email.js';
-import { forgetHost, json, withSaasDb } from '../../_lib/saas.js';
+import { forgetHost, forgetTenantSecrets, json, withSaasDb } from '../../_lib/saas.js';
 import { tenantMember } from '../../_lib/jobs.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -85,6 +93,38 @@ const quote = async (context, instance, identity) => {
   });
 };
 
+/**
+ * API keys of the establishment (lot 6 a-2). Owners write, admins read; the values never leave the server, except the
+ * address and model of the language model. The Worker needs SAAS_SECRETS_KEY (the runner's) to encrypt and test.
+ */
+const keys = async (context, db, instance, identity, method, group, action, body) => {
+  const tenantId = instance.tenant.id;
+  const secretsKey = context.env.SAAS_SECRETS_KEY || null;
+  if (!group && method === 'GET') return json(200, { available: !!secretsKey, groups: await describeClientKeys(db, tenantId, secretsKey) });
+  if (!isKeyGroup(group)) return json(404, { error: 'Not found' });
+  if (!secretsKey) return json(503, { error: 'SAAS_SECRETS_KEY not configured' });
+  const log = (event, extra = {}) => console.log(JSON.stringify({ event: `tenant.keys.${event}`, instance: instance.slug, group, ...extra }));
+  if (!action && method === 'PUT') {
+    const check = await saveClientKeys(db, tenantId, group, body, secretsKey, { by: identity, force: body?.force === true });
+    const stored = check.ok || body?.force === true;
+    forgetTenantSecrets(tenantId);
+    log('saved', { ok: check.ok, code: check.code, stored });
+    return json(stored ? 200 : 409, { stored, check, ...(stored ? {} : { error: 'The key test failed' }) });
+  }
+  if (action === 'test' && method === 'POST') {
+    const check = await retestClientKeys(db, tenantId, group, secretsKey, { by: identity });
+    log('tested', { ok: check.ok, code: check.code });
+    return json(200, { check });
+  }
+  if (!action && method === 'DELETE') {
+    await removeClientKeys(db, tenantId, group);
+    forgetTenantSecrets(tenantId);
+    log('removed');
+    return json(200, { removed: true });
+  }
+  return json(404, { error: 'Not found' });
+};
+
 export async function onRequest(context) {
   const t = tenantMember(context);
   if (t.refusal) return t.refusal;
@@ -124,6 +164,7 @@ export async function onRequest(context) {
         try { body = text.trim() ? JSON.parse(text) || {} : {}; } catch { return json(400, { error: 'Invalid request' }); }
       }
       const [section, id, action] = parts;
+      if (section === 'keys') return keys(context, db, instance, identity, method, id, action, body);
       if (id && !UUID_RE.test(id)) return json(404, { error: 'Not found' });
       if (section === 'members' && !id && method === 'POST') {
         const created = await inviteMember(db, tenant, tenant.plan, { email: body.email, role: body.role, labScope: body.labScope, invitedBy: identity });
@@ -161,7 +202,7 @@ export async function onRequest(context) {
       return json(404, { error: 'Not found' });
     });
   } catch (err) {
-    if (err instanceof MemberError) return json(err.status, { error: err.message });
+    if (err instanceof MemberError || err instanceof ClientKeyError) return json(err.status, { error: err.message });
     throw err;
   }
 }

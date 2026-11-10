@@ -104,6 +104,16 @@ export const API_ERRORS = [
   // configuration
   msg`ILAAS_API_KEY not configured (druid service env)`,
   msg`ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)`,
+  // API keys of the institution (hosted Druid, lot 6 a-2)
+  msg`No language model is configured for this Druid (My institution › API keys)`,
+  msg`SAAS_SECRETS_KEY not configured`,
+  msg`The key test failed`,
+  msg`Invalid address of the language model`,
+  msg`Invalid model name`,
+  msg`Invalid API key`,
+  msg`Invalid institution token`,
+  msg`The API key is required`,
+  msg`No key is stored`,
   msg`VITE_GRIST_DOC_ID not configured`,
   msg`GRIST_API_KEY not configured`,
   msg`GRIST_API_KEY not configured on Cloudflare`,

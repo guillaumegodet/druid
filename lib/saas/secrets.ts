@@ -7,7 +7,11 @@
  */
 import type { SaasDb } from './controlPlane';
 
-export const TENANT_SECRET_NAMES = ['SCOPUS_API_KEY', 'SCOPUS_API_KEY_2', 'OPENALEX_API_KEY', 'ILAAS_API_KEY'] as const;
+export const TENANT_SECRET_NAMES = [
+  'SCOPUS_API_KEY', 'SCOPUS_INST_TOKEN', 'SCOPUS_API_KEY_2', 'SCOPUS_INST_TOKEN_2', 'OPENALEX_API_KEY',
+  // Language model of the establishment (lot 6 a-2): any OpenAI-compatible service; the names stay those Druid reads.
+  'ILAAS_API_KEY', 'ILAAS_API_BASE', 'ILAAS_MODEL',
+] as const;
 export type TenantSecretName = typeof TENANT_SECRET_NAMES[number];
 export const isTenantSecretName = (v: unknown): v is TenantSecretName => TENANT_SECRET_NAMES.includes(v as TenantSecretName);
 
@@ -51,6 +55,9 @@ export const writeTenantSecret = async (db: SaasDb, tenantId: string, name: Tena
   await db.insertInto('tenant_secret').values({ tenant_id: tenantId, name, ciphertext, iv })
     .onConflict((oc) => oc.columns(['tenant_id', 'name']).doUpdateSet({ ciphertext, iv, updated_at: new Date().toISOString() })).execute();
 };
+
+/** Settings kept with the secrets whose value the settings page shows back (an address, a model name — not a key). */
+export const TENANT_PUBLIC_SETTINGS: readonly TenantSecretName[] = ['ILAAS_API_BASE', 'ILAAS_MODEL'];
 
 /** Names of the secrets a tenant holds (never the values: the settings page shows « set »). */
 export const listTenantSecretNames = async (db: SaasDb, tenantId: string): Promise<string[]> =>

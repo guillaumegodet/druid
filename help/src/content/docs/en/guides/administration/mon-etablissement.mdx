@@ -3,7 +3,7 @@
 # documented by its operator, not in the help of Druid.
 draft: true
 title: "My institution: accounts and invitations"
-description: "Plan, accounts, invitations, roles, access requests and mail domains of a hosted Druid."
+description: "Plan, accounts, invitations, roles, access requests, mail domains and API keys of a hosted Druid."
 sidebar:
   order: 1
 ---
@@ -56,3 +56,22 @@ e-mail and the request shows at the top of the tab. **Invite as reader** opens a
 the role afterwards), **Dismiss** files the request.
 
 The login page always answers the same, account or not: it does not reveal who has an account.
+
+## API keys of the institution
+
+Some features go through services your institution has access to. The owner enters their keys in the **API keys of
+the institution** card; administrators only see whether they are set.
+
+- **Language model**: writes the AI texts of the reports and runs the thematic search of the collaborations. Any
+  OpenAI-compatible service will do (ILaaS, Mistral, Albert, a model hosted by your IT department…): enter the
+  **address of the API** (for example `https://api.mistral.ai/v1`), the **model** and the **key**.
+- **Elsevier**: opens the alignment of the researchers on Scopus. An Elsevier key usually only works from the network
+  of the subscribing institution; Druid calls it from outside, so it also needs the **institution token**
+  (*insttoken*) Elsevier issues at the request of your library. A **backup key** takes over once the weekly quota of
+  the first one is reached.
+
+**Test and save** first tries the key (a short exchange with the service): if the test fails, nothing is saved and the
+reason is shown (key refused, unknown model, missing institution token…). **Save anyway** keeps the key despite the
+failure, for example when the service is briefly unavailable. The keys are stored encrypted and never shown again: to
+change one, enter the new one; a key field left empty keeps the stored key. **Test again** runs the test again,
+**Remove** removes the keys of the group.
