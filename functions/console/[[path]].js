@@ -12,6 +12,7 @@
 //   GET  /console/api/tenants/:slug      facts, members, jobs, access requests, journal
 //   POST /console/api/tenants/:slug/plan { plan }
 //   POST /console/api/tenants/:slug/status { status: active | suspended }
+//   POST /console/api/tenants/:slug/cancel-deletion   cancels the deletion an owner asked (lot 6 a-3)
 //   POST /console/api/tenants/:slug/jobs/:id/retry
 //   POST /console/api/tenants/:slug/quotes/:id/handled
 //   POST /console/api/tenants/:slug/impersonate { memberId, reason } → { url } (2-hour tenant session, marked)
@@ -20,7 +21,7 @@ import {
   consoleSessionEmail, consumeMagicLink, createSession, deleteSession, isValidEmail, normalizeEmail, normalizeHost,
 } from '../../lib/saas/controlPlane.ts';
 import {
-  ConsoleError, consoleEvents, isSuperadmin, logConsole, markQuoteHandled, retryJob, setTenantPlan, setTenantStatus, tenantBySlug, tenantDetail,
+  ConsoleError, cancelTenantDeletion, consoleEvents, isSuperadmin, logConsole, markQuoteHandled, retryJob, setTenantPlan, setTenantStatus, tenantBySlug, tenantDetail,
   tenantsOverview,
 } from '../../lib/saas/console.ts';
 import { LINKS_PER_QUARTER, recentLinks } from '../api/auth/request.js';
@@ -125,7 +126,7 @@ export async function onRequest(context) {
     return await withSaasDb(env, async (db) => {
       if (path === '/api/tenants' && method === 'GET') return json(200, { tenants: await tenantsOverview(db) });
       if (path === '/api/events' && method === 'GET') return json(200, { events: await consoleEvents(db) });
-      const m = path.match(/^\/api\/tenants\/([a-z0-9-]+)(?:\/(plan|status|impersonate)|\/jobs\/([^/]+)\/retry|\/quotes\/([^/]+)\/handled)?$/);
+      const m = path.match(/^\/api\/tenants\/([a-z0-9-]+)(?:\/(plan|status|impersonate|cancel-deletion)|\/jobs\/([^/]+)\/retry|\/quotes\/([^/]+)\/handled)?$/);
       if (!m) return json(404, { error: 'Not found' });
       const [, slug, action, jobId, quoteId] = m;
       if (quoteId) {
@@ -146,6 +147,11 @@ export async function onRequest(context) {
         await setTenantStatus(db, slug, body.status, actor);
         await forgetTenant(env, db, slug);
         return json(200, { status: body.status });
+      }
+      if (action === 'cancel-deletion') {
+        const status = await cancelTenantDeletion(db, slug, actor);
+        await forgetTenant(env, db, slug);
+        return json(200, { status });
       }
       if (jobId) {
         if (!UUID_RE.test(jobId)) return json(404, { error: 'Not found' });

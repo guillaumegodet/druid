@@ -104,6 +104,14 @@ export const API_ERRORS = [
   // configuration
   msg`ILAAS_API_KEY not configured (druid service env)`,
   msg`ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)`,
+  // Export and deletion of the data (hosted Druid, lot 6 a-3)
+  msg`An export is already running`,
+  msg`Export not found`,
+  msg`This export has expired: ask for a new one`,
+  msg`No file store on this deployment`,
+  msg`Type the name of the Druid to confirm`,
+  msg`A deletion is already planned`,
+  msg`No deletion is planned`,
   // API keys of the institution (hosted Druid, lot 6 a-2)
   msg`No language model is configured for this Druid (My institution › API keys)`,
   msg`SAAS_SECRETS_KEY not configured`,

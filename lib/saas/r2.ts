@@ -3,14 +3,26 @@
  * @description Private files of the tenants (the dashboards of druid-biblio; druid-internal docs/plan-druid-saas.md,
  * lot 3 c and decision D5): the runner writes them to an R2 bucket through its S3 API (Signature V4, Node crypto — no
  * SDK), the Functions read them through the R2 binding of the Worker (functions/_lib/instanceAssets.js). Keys are
- * `<tenant slug>/dashboard-data/<lab slug>/dashboard.json.gz` and `<tenant slug>/dashboard-data/index.json`.
+ * `<tenant slug>/dashboard-data/<lab slug>/dashboard.json.gz`, `<tenant slug>/dashboard-data/index.json` and the
+ * exports of the data, `<tenant slug>/exports/<file>.tar.gz` (lot 6 a-3); every key of a tenant starts with its slug,
+ * which is what its deletion removes.
  */
 import { createHash, createHmac } from 'node:crypto';
 
 export interface AssetStore {
   put(key: string, body: Uint8Array, contentType?: string): Promise<void>;
   delete(key: string): Promise<void>;
+  /** Keys starting with `prefix` (every page). */
+  list(prefix: string): Promise<string[]>;
 }
+
+/** Deletes every object under `prefix` (a tenant slug followed by `/`); returns how many. */
+export const deletePrefix = async (store: AssetStore, prefix: string): Promise<number> => {
+  if (!/^[a-z0-9][a-z0-9-]*\//.test(prefix)) throw new Error(`refusing to delete under "${prefix}": not a tenant prefix`);
+  const keys = await store.list(prefix);
+  for (const key of keys) await store.delete(key);
+  return keys.length;
+};
 
 /** In-memory store (tests, dry runs). */
 export const memoryAssetStore = (): AssetStore & { objects: Map<string, { body: Uint8Array; contentType: string }> } => {
@@ -19,7 +31,18 @@ export const memoryAssetStore = (): AssetStore & { objects: Map<string, { body: 
     objects,
     put: async (key, body, contentType = 'application/octet-stream') => { objects.set(key, { body, contentType }); },
     delete: async (key) => { objects.delete(key); },
+    list: async (prefix) => [...objects.keys()].filter((k) => k.startsWith(prefix)).sort(),
   };
+};
+
+const XML_ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+const xmlText = (s: string): string => s.replace(/&(amp|lt|gt|quot|apos);/g, (_, e) => XML_ENTITIES[e]);
+/** Keys, truncation and continuation token of a ListObjectsV2 answer. */
+export const parseListObjects = (xml: string): { keys: string[]; next: string | null } => {
+  const keys = [...xml.matchAll(/<Key>([\s\S]*?)<\/Key>/g)].map((m) => xmlText(m[1]));
+  const truncated = /<IsTruncated>true<\/IsTruncated>/.test(xml);
+  const token = xml.match(/<NextContinuationToken>([\s\S]*?)<\/NextContinuationToken>/);
+  return { keys, next: truncated && token ? xmlText(token[1]) : null };
 };
 
 const sha256Hex = (data: string | Uint8Array): string => createHash('sha256').update(data).digest('hex');
@@ -79,7 +102,7 @@ export interface S3StoreOptions {
 
 const amzDateOf = (d: Date): string => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}Z$/, 'Z');
 
-/** S3-compatible store (R2): PUT and DELETE of one object, path-style, signed per request. */
+/** S3-compatible store (R2): PUT and DELETE of one object, ListObjectsV2 of a prefix, path-style, signed per request. */
 export const createS3AssetStore = ({ endpoint, bucket, accessKeyId, secretAccessKey, region = 'auto', fetchImpl = fetch, now = () => new Date() }: S3StoreOptions): AssetStore => {
   const base = endpoint.replace(/\/+$/, '');
   const urlOf = (key: string) => new URL(`${base}/${bucket}/${key.split('/').map(encodeSegment).join('/')}`);
@@ -92,9 +115,28 @@ export const createS3AssetStore = ({ endpoint, bucket, accessKeyId, secretAccess
     const res = await fetchImpl(url, { method, headers: signed, body: body as BodyInit | undefined });
     if (!res.ok && !(method === 'DELETE' && res.status === 404)) throw new Error(`S3 ${method} ${key}: HTTP ${res.status} ${(await res.text().catch(() => '')).slice(0, 200)}`);
   };
+  const list = async (prefix: string): Promise<string[]> => {
+    const out: string[] = [];
+    let token: string | null = null;
+    do {
+      const url = new URL(`${base}/${bucket}`);
+      url.searchParams.set('list-type', '2');
+      url.searchParams.set('prefix', prefix);
+      if (token) url.searchParams.set('continuation-token', token);
+      const signed = signS3Request({ method: 'GET', url, headers: {}, payloadHash: EMPTY_PAYLOAD_HASH, amzDate: amzDateOf(now()), region, accessKeyId, secretAccessKey });
+      const res = await fetchImpl(url, { method: 'GET', headers: signed });
+      const text = await res.text();
+      if (!res.ok) throw new Error(`S3 LIST ${prefix}: HTTP ${res.status} ${text.slice(0, 200)}`);
+      const page = parseListObjects(text);
+      out.push(...page.keys);
+      token = page.next;
+    } while (token);
+    return out;
+  };
   return {
     put: (key, body, contentType = 'application/octet-stream') => send('PUT', key, body, contentType),
     delete: (key) => send('DELETE', key),
+    list,
   };
 };
 

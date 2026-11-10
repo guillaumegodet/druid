@@ -8,10 +8,14 @@
  *  - `people.align` (lot 3 b): one of scripts/sync_*.cjs as a child process on the schema of the tenant
  *    (DRUID_DATABASE_SCHEMA), its cache stored in the tenant's `align_cache` table once the run is over;
  *  - `etl.build` (lot 3 c): the druid-biblio configuration of every lab, the ETL as a child process per lab, the
- *    dashboards uploaded to the asset store (R2).
+ *    dashboards uploaded to the asset store (R2);
+ *  - `tenant.export` (lot 6 a-3): `pg_dump` of the schema, the dashboards and the accounts in one archive uploaded to
+ *    the asset store for 7 days, the owner told by e-mail;
+ *  - `tenant.delete` (lot 6 a-3): once the 30 days of a deletion asked by the owner are over, the route, the objects,
+ *    the files, the schema and the rows of the tenant (lib/saas/lifecycle.ts).
  * A « Stop » of the UI (job.cancel_requested_at) ends the child process (SIGTERM: the alignment scripts save what they
- * have) and the job ends `cancelled`. Scheduled refreshes (lot 3 d) and the alerts on repeated failures (lot 3 e) are
- * here too.
+ * have) and the job ends `cancelled`. Scheduled refreshes (lot 3 d), the alerts on repeated failures (lot 3 e), the
+ * removal of expired exports and the queueing of due deletions (lot 6 a-3) are here too.
  */
 import { spawn as nodeSpawn, type ChildProcess } from 'node:child_process';
 import fs from 'node:fs';
@@ -26,15 +30,19 @@ import { enqueueJob, primaryHost, type Job, type Plan, type SaasDb, type Tenant 
 import { runStructureAlignment } from '../structures/alignRun';
 import { ALIGNED_STRUCTURE_ID_TYPES, isStructureIdType, type StructureIdType } from '../structures/identifiers';
 import { createRegistryClient } from '../structures/registryClient';
-import { sendEmail, sendTenantReady, type EmailEnv } from './email';
+import { sendEmail, sendExportReady, sendTenantDeleted, sendTenantReady, type EmailEnv } from './email';
 import { OnboardingPayload, seedTenantDirectory, tenantHostOf } from './onboarding';
-import { migrateTenantSchema, setTenantStatus, type TenantDbOptions } from './tenantDb';
+import { dropTenantSchema, migrateTenantSchema, setTenantStatus, type TenantDbOptions } from './tenantDb';
 import { EtlBuildParams, PeopleAlignParams, StructuresAlignParams } from './jobs';
 import { cacheNamesOfSource, writeAlignCache } from './alignCache';
 import { llmEnvOf } from './clientKeys';
 import { readTenantSecrets } from './secrets';
 import { dashboardIndexOf, etlLabsOf, yamlOf } from './etlConfig';
-import type { AssetStore } from './r2';
+import { deletePrefix, type AssetStore } from './r2';
+import {
+  EXPORT_TTL_DAYS, dueDeletions, expiredExports, exportBaseName, exportObjectKey, isDeletionDue, markExportPurged, tombstoneTenant,
+} from './lifecycle';
+import { logConsole } from './console';
 
 export interface CloudflareRouteEnv {
   /** API token with Workers Routes: Edit on the zone. */
@@ -86,6 +94,8 @@ export interface RunnerEnv {
   memoryFloorMb?: number;
   /** Night window (UTC hours, start → end) of the scheduled refreshes; default 20 → 6. */
   nightWindow?: [number, number];
+  /** pg_dump of the exports (lot 6 a-3), at least the major version of the server (default `pg_dump` in PATH). */
+  pgDumpBin?: string;
   /** Overrides for the tests (no network, no real child process). */
   fetchImpl?: typeof fetch;
   spawnImpl?: typeof nodeSpawn;
@@ -125,6 +135,21 @@ export const ensureWorkerRoute = async (cf: CloudflareRouteEnv, host: string, fe
   const out = (await created.json()) as { success: boolean; errors?: unknown[] };
   if (!out.success) throw new Error(`Cloudflare route ${pattern}: ${JSON.stringify(out.errors)}`);
   return 'created';
+};
+
+/** Removes the route `<host>/*` of the Worker (deletion of a tenant): 'absent' when there was none. */
+export const removeWorkerRoute = async (cf: CloudflareRouteEnv, host: string, fetchImpl: typeof fetch = fetch): Promise<'removed' | 'absent'> => {
+  const base = `https://api.cloudflare.com/client/v4/zones/${cf.zoneId}/workers/routes`;
+  const headers = { Authorization: `Bearer ${cf.apiToken}`, 'Content-Type': 'application/json' };
+  const listed = await fetchImpl(base, { headers });
+  const list = (await listed.json()) as { success: boolean; result?: { id: string; pattern: string }[]; errors?: unknown[] };
+  if (!list.success) throw new Error(`Cloudflare routes: ${JSON.stringify(list.errors)}`);
+  const route = (list.result || []).find((r) => r.pattern === `${host}/*`);
+  if (!route) return 'absent';
+  const removed = await fetchImpl(`${base}/${route.id}`, { method: 'DELETE', headers });
+  const out = (await removed.json()) as { success: boolean; errors?: unknown[] };
+  if (!out.success) throw new Error(`Cloudflare route ${host}/*: ${JSON.stringify(out.errors)}`);
+  return 'removed';
 };
 
 /** `tenant.provision`: the schema, the directory, the route, the status, the e-mail. */
@@ -403,8 +428,158 @@ export const buildEtl: JobHandler = async (job, ctx) => {
   if (failed.length) log(`${failed.length} lab(s) failed: ${failed.join(', ')}`);
 };
 
+// ── Export and deletion (lot 6 a-3) ───────────────────────────────────────────────────────────────────────────────────
+/** libpq environment of a connection string (the password never goes on a command line). */
+export const libpqEnvOf = (connectionString: string): Record<string, string> => {
+  const u = new URL(connectionString);
+  const out: Record<string, string> = {
+    PGHOST: u.hostname, PGPORT: u.port || '5432', PGUSER: decodeURIComponent(u.username), PGDATABASE: decodeURIComponent(u.pathname.replace(/^\//, '')),
+  };
+  if (u.password) out.PGPASSWORD = decodeURIComponent(u.password);
+  const sslmode = u.searchParams.get('sslmode');
+  if (sslmode) out.PGSSLMODE = sslmode;
+  return out;
+};
+
+const csvCell = (v: unknown): string => {
+  const s = Array.isArray(v) ? v.join(' ') : v === null || v === undefined ? '' : String(v);
+  return /[",\n;]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
+const exportReadme = (tenant: Tenant, base: string, at: Date, labs: string[]): string => `Druid — ${tenant.label}
+Export du ${at.toISOString().slice(0, 10)} · Export of ${at.toISOString().slice(0, 10)}
+
+FR
+- database.sql : toutes les tables de votre Druid (référentiel, appartenances, alignements, rapports, journal…),
+  schéma PostgreSQL « ${tenant.schema_name} » (pg_dump, format texte). Restauration dans une base PostgreSQL vide
+  (version 17 ou plus) : psql -d <base> -v ON_ERROR_STOP=1 -f database.sql
+- dashboards/<labo>/ : les tableaux de bord de publications calculés pour chaque laboratoire (JSON compressé).
+- members.csv : les comptes (adresse, rôle, laboratoires, dates).
+L'archive contient des données personnelles (chercheurs, comptes) : conservez-la en lieu sûr.
+
+EN
+- database.sql: every table of your Druid (directory, affiliations, alignments, reports, journal…), PostgreSQL schema
+  "${tenant.schema_name}" (pg_dump, plain format). Restore into an empty PostgreSQL database (version 17 or later):
+  psql -d <database> -v ON_ERROR_STOP=1 -f database.sql
+- dashboards/<lab>/: the publication dashboards computed for each lab (compressed JSON).
+- members.csv: the accounts (address, role, labs, dates).
+The archive holds personal data (researchers, accounts): keep it safe.
+
+${base} · ${labs.length} dashboard(s)
+`;
+
+/**
+ * `tenant.export` (lot 6 a-3): `pg_dump --schema` of the tenant, its dashboards (the files of the ETL on disk) and its
+ * accounts, archived as `<base>.tar.gz` and uploaded under `<slug>/exports/`; the result stays in `job.progress`
+ * (lib/saas/lifecycle.ts ExportResult) for `EXPORT_TTL_DAYS` days, the requester is told by e-mail.
+ */
+export const exportTenant: JobHandler = async (job, ctx) => {
+  const { env, tenant, log, saas } = ctx;
+  if (!env.assets) throw new Error('No asset store on this runner (SAAS_R2_*): the export has nowhere to go');
+  const at = new Date();
+  const base = exportBaseName(tenant.slug, job.id, at);
+  const work = path.join(workDirOf(env, tenant), `export-${job.id}`);
+  const dir = path.join(work, base);
+  fs.rmSync(work, { recursive: true, force: true });
+  fs.mkdirSync(dir, { recursive: true });
+  try {
+    await ctx.progress('database', 10);
+    const dumped = await runChild({
+      command: env.pgDumpBin || 'pg_dump',
+      args: ['--schema', tenant.schema_name, '--no-owner', '--no-privileges', '--format', 'plain', '--file', path.join(dir, 'database.sql')],
+      cwd: work, env: childEnvOf(libpqEnvOf(env.ownerUrl)), outputFile: path.join(work, 'pg_dump.log'), timeoutMs: 3600_000,
+    }, { log, isCancelRequested: ctx.isCancelRequested, spawnImpl: env.spawnImpl });
+    if (dumped.cancelled) throw new JobCancelled('stopped by the user');
+    if (dumped.code !== 0 || !fs.existsSync(path.join(dir, 'database.sql'))) throw new Error(`pg_dump failed (${dumped.timedOut ? 'timeout' : `code ${dumped.code}`})`);
+
+    await ctx.progress('dashboards', 50);
+    const labs: string[] = [];
+    const etlDir = env.etl ? path.join(env.etl.dataDir, tenant.slug) : null;
+    if (etlDir && fs.existsSync(etlDir)) {
+      for (const lab of fs.readdirSync(etlDir).sort()) {
+        if (!/^[a-z0-9][a-z0-9-]{0,63}$/.test(lab)) continue;
+        for (const file of ['dashboard.json.gz', 'dashboard.public.json.gz']) {
+          const src = path.join(etlDir, lab, file);
+          if (!fs.existsSync(src)) continue;
+          fs.mkdirSync(path.join(dir, 'dashboards', lab), { recursive: true });
+          fs.copyFileSync(src, path.join(dir, 'dashboards', lab, file));
+          if (!labs.includes(lab)) labs.push(lab);
+        }
+      }
+    }
+    const members = await saas.selectFrom('member').select(['email', 'role', 'lab_scope', 'invited_by', 'created_at', 'last_login_at'])
+      .where('tenant_id', '=', tenant.id).orderBy('created_at').execute();
+    const header = ['email', 'role', 'labs', 'invited_by', 'created_at', 'last_login_at'];
+    const rows = members.map((m) => [m.email, m.role, m.lab_scope, m.invited_by, m.created_at ? new Date(m.created_at).toISOString() : '', m.last_login_at ? new Date(m.last_login_at).toISOString() : ''].map(csvCell).join(','));
+    fs.writeFileSync(path.join(dir, 'members.csv'), `${header.join(',')}\n${rows.join('\n')}\n`);
+    fs.writeFileSync(path.join(dir, 'README.txt'), exportReadme(tenant, base, at, labs));
+
+    await ctx.progress('archive', 70, { dashboards: labs.length, members: members.length });
+    const archive = path.join(work, `${base}.tar.gz`);
+    const tarred = await runChild({
+      command: 'tar', args: ['-czf', archive, '-C', work, base], cwd: work, env: childEnvOf({}), outputFile: path.join(work, 'tar.log'), timeoutMs: 3600_000,
+    }, { log, isCancelRequested: ctx.isCancelRequested, spawnImpl: env.spawnImpl });
+    if (tarred.cancelled) throw new JobCancelled('stopped by the user');
+    if (tarred.code !== 0 || !fs.existsSync(archive)) throw new Error(`tar failed (code ${tarred.code})`);
+
+    await ctx.progress('upload', 85);
+    const body = new Uint8Array(fs.readFileSync(archive));
+    const objectKey = exportObjectKey(tenant.slug, job.id, at);
+    await env.assets.put(objectKey, body, 'application/gzip');
+    const expiresAt = new Date(at.getTime() + EXPORT_TTL_DAYS * 86_400_000).toISOString();
+    await ctx.progress('done', 100, { objectKey, fileName: `${base}.tar.gz`, size: body.byteLength, expiresAt, dashboards: labs.length, members: members.length });
+    log(`export ${base}.tar.gz: ${body.byteLength} bytes, ${labs.length} dashboard(s), ${members.length} account(s), until ${expiresAt}`);
+    const to = job.created_by && job.created_by.includes('@') ? job.created_by : null;
+    if (to && env.email?.RESEND_API_KEY) {
+      const host = (await primaryHost(saas, tenant.id)) || tenantHostOf(tenant.slug, env.baseDomain);
+      await sendExportReady(env.email, { to, label: tenant.label, adminUrl: `https://${host}/?page=ADMIN&tab=establishment`, expiresAt })
+        .catch((err) => log(`e-mail failed: ${err.message}`));
+    }
+  } finally {
+    fs.rmSync(work, { recursive: true, force: true });
+  }
+};
+
+/**
+ * `tenant.delete` (lot 6 a-3), queued by the scheduler once `delete_after` is past: checks again that the deletion is
+ * still asked, then removes the routes, the objects of the asset store (`<slug>/…`), the files of the runner, the
+ * schema, and last the rows (lib/saas/lifecycle.ts tombstoneTenant). Each step is idempotent: a failed run is retried
+ * the next day from the start.
+ */
+export const deleteTenant: JobHandler = async (job, ctx) => {
+  const { env, tenant, log, saas } = ctx;
+  if (!isDeletionDue(tenant)) { log(`deletion of ${tenant.slug} not due (status ${tenant.status}, delete_after ${tenant.delete_after ?? '—'}): nothing done`); return; }
+  const owners = (await saas.selectFrom('member').select('email').where('tenant_id', '=', tenant.id).where('role', '=', 'owner').execute()).map((m) => m.email);
+  const hosts = (await saas.selectFrom('tenant_host').select('host').where('tenant_id', '=', tenant.id).execute()).map((h) => h.host);
+  await ctx.progress('routes', 10);
+  for (const host of hosts) {
+    if (!env.cloudflare) { log(`route ${host}/*: no Cloudflare configuration, skipped`); continue; }
+    log(`route ${host}/*: ${await removeWorkerRoute(env.cloudflare, host, env.fetchImpl)}`);
+  }
+  await ctx.progress('files', 30);
+  if (env.assets) log(`asset store: ${await deletePrefix(env.assets, `${tenant.slug}/`)} object(s) removed`);
+  else log('asset store: none configured, skipped');
+  for (const dir of [path.join(env.workDir || path.join(env.druidRoot || process.cwd(), 'saas-work'), tenant.slug), env.etl ? path.join(env.etl.dataDir, tenant.slug) : null]) {
+    if (!dir || !fs.existsSync(dir)) continue;
+    fs.rmSync(dir, { recursive: true, force: true });
+    log(`folder ${dir} removed`);
+  }
+  await ctx.progress('schema', 60);
+  await dropTenantSchema(tenant.schema_name, { ownerUrl: env.ownerUrl });
+  log(`schema ${tenant.schema_name} dropped`);
+  await ctx.progress('rows', 90);
+  await tombstoneTenant(saas, tenant.id, job.id);
+  await logConsole(saas, { actor: 'runner', action: 'deleted', tenantId: tenant.id, details: { slug: tenant.slug, schema: tenant.schema_name, hosts, requestedAt: tenant.delete_requested_at } });
+  await ctx.progress('done', 100, { hosts: hosts.length });
+  log(`tenant ${tenant.slug} deleted`);
+  if (env.email?.RESEND_API_KEY) {
+    for (const to of owners) await sendTenantDeleted(env.email, { to, label: tenant.label }).catch((err) => log(`e-mail failed: ${err.message}`));
+  }
+};
+
 export const HANDLERS: Record<string, JobHandler> = {
   'tenant.provision': provisionTenant, 'structures.align': alignStructures, 'people.align': alignPeople, 'etl.build': buildEtl,
+  'tenant.export': exportTenant, 'tenant.delete': deleteTenant,
 };
 
 // ── Claiming and running ──────────────────────────────────────────────────────────────────────────────────────────────
@@ -527,6 +702,27 @@ export const scheduleRefreshes = async (saas: SaasDb, env: RunnerEnv, { now = ne
   return queued;
 };
 
+/**
+ * Lifecycle of the tenants (lot 6 a-3), every tick of the scheduler whatever the hour: the archives of expired exports
+ * are removed from the asset store, a `tenant.delete` is queued for each tenant whose deletion is due.
+ */
+export const scheduleLifecycle = async (saas: SaasDb, env: RunnerEnv, now = new Date()): Promise<{ purged: number; deletions: string[] }> => {
+  let purged = 0;
+  if (env.assets) {
+    for (const e of await expiredExports(saas, now)) {
+      await env.assets.delete(e.objectKey);
+      await markExportPurged(saas, e.id, now);
+      purged++;
+    }
+  }
+  const deletions: string[] = [];
+  for (const t of await dueDeletions(saas, now)) {
+    await enqueueJob(saas, { tenantId: t.id, type: 'tenant.delete', params: {}, createdBy: 'scheduler' });
+    deletions.push(t.slug);
+  }
+  return { purged, deletions };
+};
+
 /** MemAvailable of /proc/meminfo in MiB (null elsewhere than Linux). */
 export const memAvailableMb = (): number | null => {
   try {
@@ -553,6 +749,9 @@ export const runForever = async (saas: SaasDb, env: RunnerEnv, intervalMs = 10_0
       lastSchedule = Date.now();
       const queued = await scheduleRefreshes(saas, env).catch((err) => { log(`scheduler error: ${err.message}`); return [] as string[]; });
       if (queued.length) log(`scheduled etl.build for ${queued.join(', ')}`);
+      const life = await scheduleLifecycle(saas, env).catch((err) => { log(`lifecycle error: ${err.message}`); return { purged: 0, deletions: [] as string[] }; });
+      if (life.purged) log(`${life.purged} expired export(s) removed`);
+      if (life.deletions.length) log(`scheduled tenant.delete for ${life.deletions.join(', ')}`);
     }
     const { done, failed, cancelled } = await runJobsOnce(saas, env, handlers).catch((err) => { log(`runner error: ${err.message}`); return { done: 0, failed: 0, cancelled: 0 }; });
     if (done + failed + cancelled === 0) await new Promise((r) => setTimeout(r, intervalMs));

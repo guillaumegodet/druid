@@ -43,6 +43,12 @@ export interface TenantTable {
   created_by: string | null;
   created_at: Generated<string>;
   updated_at: Generated<string>;
+  /** Deletion asked by the owner (lot 6 a-3): suspended until `delete_after`, then dropped by the runner. */
+  delete_requested_at: string | null;
+  delete_requested_by: string | null;
+  delete_after: string | null;
+  /** Status a cancelled deletion gives back. */
+  status_before_delete: 'active' | 'suspended' | null;
 }
 export interface TenantHostTable {
   host: string;
@@ -237,13 +243,18 @@ export const capabilitiesForTenant = (
   return out;
 };
 
-/** Public block `tenant` of /api/me: what the front shows (plan, locked features, seats) — never an id or a secret. */
-export const publicTenantInfo = (tenant: Tenant, plan: Plan | null, memberCount: number) => ({
+/**
+ * Public block `tenant` of /api/me: what the front shows (plan, locked features, seats, the role of the member, a
+ * planned deletion) — never an id or a secret.
+ */
+export const publicTenantInfo = (tenant: Pick<Tenant, 'slug' | 'status' | 'mail_domains'> & { delete_after?: string | null }, plan: Plan | null, memberCount: number, role: MemberRole | null = null) => ({
   slug: tenant.slug,
   status: tenant.status,
   plan: plan ? { code: plan.code, label: plan.label, seats: plan.seats, historyYears: plan.history_years, refresh: plan.refresh, features: plan.features } : null,
   members: memberCount,
   mailDomains: tenant.mail_domains,
+  role,
+  deleteAfter: tenant.delete_after ? new Date(tenant.delete_after).toISOString() : null,
 });
 
 // ── Queries ───────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -332,7 +343,7 @@ export const touchLogin = async (db: SaasDb, tenantId: string, email: string): P
 };
 
 // ── Jobs (lot 2 d, lot 3) ────────────────────────────────────────────────────────────────────────────────────────────
-export const JOB_TYPES = ['tenant.provision', 'structures.align', 'etl.build', 'people.align'] as const;
+export const JOB_TYPES = ['tenant.provision', 'structures.align', 'etl.build', 'people.align', 'tenant.export', 'tenant.delete'] as const;
 export type JobType = typeof JOB_TYPES[number];
 
 export const enqueueJob = async (db: SaasDb, { tenantId, type, params = {}, createdBy = null, key }: { tenantId: string; type: JobType; params?: Record<string, unknown>; createdBy?: string | null; key?: string }): Promise<string> => {

@@ -109,10 +109,10 @@ const tenantUser = async (context, instance) => {
   const capabilities = capabilitiesForTenant({ ...CAPABILITIES, HAS_STATUS_VALIDATION: instance.statusValidation, HAS_STRUCTURE_IDS: true, HAS_SERVER_JOBS: true, HAS_QUALINKA: true }, instance.tenant.plan, { settings: instance.tenant.settings, status: instance.tenant.status });
   capabilities.READ_ONLY = instance.readOnly;
   const members = await withSaasDb(context.env, (db) => countMembers(db, instance.tenant.id)).catch(() => 0);
-  const tenantRow = { slug: instance.tenant.slug, status: instance.tenant.status, mail_domains: instance.tenant.mailDomains };
+  const tenantRow = { slug: instance.tenant.slug, status: instance.tenant.status, mail_domains: instance.tenant.mailDomains, delete_after: instance.tenant.deleteAfter };
   return json(200, {
     name: email, email, preferred_username: email, roles, access, capabilities,
-    instance: publicInstanceInfo(instance), tenant: publicTenantInfo(tenantRow, instance.tenant.plan, members), auth: 'session',
+    instance: publicInstanceInfo(instance), tenant: publicTenantInfo(tenantRow, instance.tenant.plan, members, member.role), auth: 'session',
     // Session opened by the DirlaData console as this member (lot 6 c): the front says so.
     ...(context.data?.impersonatedBy ? { impersonatedBy: context.data.impersonatedBy } : {}),
   });

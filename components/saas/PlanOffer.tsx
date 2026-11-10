@@ -4,6 +4,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { apiErrorText } from '../../lib/apiErrors';
+import { numberLocale } from '../../lib/i18n';
 import { getTenantInfo, getUserInfo, isLockedByPlan } from '../../lib/auth';
 import { planUnlocking, type PlanFeature } from '../../lib/saas/planFeatures';
 
@@ -153,9 +154,18 @@ export const LockedFeature: React.FC<{ feature: PlanFeature }> = ({ feature }) =
 export const LockMark: React.FC<{ feature: PlanFeature }> = ({ feature }) =>
   isLockedByPlan(feature) ? <Lock className="w-3 h-3 opacity-70 shrink-0" aria-hidden /> : null;
 
-/** Thin banner of a trial: « Trial — powered by Druid », and the quote. */
+/** Thin banner of a trial: « Trial — powered by Druid », and the quote; of a planned deletion (lot 6 a-3), its date. */
 export const TrialBanner: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const deleteAfter = getTenantInfo()?.deleteAfter;
+  if (deleteAfter) {
+    const day = new Date(deleteAfter).toLocaleDateString(numberLocale(), { day: 'numeric', month: 'long', year: 'numeric' });
+    return (
+      <div className="mb-3 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 px-4 py-1.5 rounded-full text-[12px] font-semibold bg-[#b23b3b]/15 text-[#8f2c2c] dark:text-[#f08c8c]">
+        <span><Trans>This Druid will be deleted on {day}: it is read-only until then.</Trans></span>
+      </div>
+    );
+  }
   if (getTenantInfo()?.plan?.code !== 'trial') return null;
   return (
     <>
