@@ -75,3 +75,31 @@ reason is shown (key refused, unknown model, missing institution token…). **Sa
 failure, for example when the service is briefly unavailable. The keys are stored encrypted and never shown again: to
 change one, enter the new one; a key field left empty keeps the stored key. **Test again** runs the test again,
 **Remove** removes the keys of the group.
+
+## Export the data
+
+The **Data of the institution** card (owners only) prepares an archive of everything your Druid holds: **Prepare an
+export** has it built on the server and you receive an e-mail once it is ready. It is then downloaded from the same
+card for 7 days, after which it is removed.
+
+The archive (`.tar.gz`) holds:
+
+- `database.sql`: every table of the Druid (directory, affiliations, alignments, reports, journal…), in PostgreSQL
+  format, restorable as is into an empty database (version 17 or later) with
+  `psql -d <database> -v ON_ERROR_STOP=1 -f database.sql`;
+- `dashboards/`: the publication dashboards of each lab;
+- `members.csv`: the accounts, their role and their labs;
+- `README.txt`: these instructions.
+
+It holds personal data (researchers, accounts): keep it safe. An export is still possible while a deletion is
+planned.
+
+## Delete the Druid
+
+At the bottom of the card, **Ask for the deletion of this Druid and of all its data** asks you to type the name of the
+Druid to confirm. The Druid becomes **read-only** at once for every account and every owner receives an e-mail.
+**Thirty days later** it is deleted for good: database, dashboards, exports, accounts, keys and address. Until the last
+day an owner can **Cancel the deletion** from the same card, and the Druid gets back its previous state. Prepare an
+export first if you want to keep the data.
+
+The backups of the host that still hold a copy expire on their own; they cannot be restored from your side.

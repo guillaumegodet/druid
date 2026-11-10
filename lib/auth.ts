@@ -101,6 +101,10 @@ export interface TenantInfo {
   plan: { code: string; label: string; seats: number | null; historyYears: number | null; refresh: string; features: Record<string, unknown> } | null;
   members: number;
   mailDomains: string[];
+  /** Role of the member (absent before lot 6 a-3). */
+  role?: 'owner' | 'admin' | 'viewer' | 'lab' | null;
+  /** Planned deletion (lot 6 a-3): the tenant is suspended until then. */
+  deleteAfter?: string | null;
 }
 
 const EMPTY_ACCESS: DruidAccess = { isSuperAdmin: false, isMediaAdmin: false, isLabViewer: false, annuaireLabs: [], allowedSlugs: [] };
@@ -227,7 +231,9 @@ export const adminTabsFor = (): AdminTab[] => {
   const tabs: AdminTab[] = [];
   // « My institution » of a tenant (druid-internal docs/plan-druid-saas.md, lot 6 a-1): the owners manage it, the
   // admins read it.
-  if (getTenantInfo() && (isSuperAdmin() || getRoles().includes('admin'))) tabs.push('establishment');
+  // A suspended tenant gives nobody the admin role, but its owners still export their data or cancel its deletion there.
+  const tenant = getTenantInfo();
+  if (tenant && (isSuperAdmin() || getRoles().includes('admin') || tenant.role === 'owner' || tenant.role === 'admin')) tabs.push('establishment');
   // console/rights assume a server (ETL relay, Keycloak admin API): absent on
   // Cloudflare Functions (Centrale) → tab removed rather than crashing on data that never
   // arrives (see docs/archive/plan-fusion-centrale-2026-09.md, sub-lot 4).

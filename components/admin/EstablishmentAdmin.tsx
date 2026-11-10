@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { AlertCircle, CheckCircle2, Globe, Inbox, Loader2, Mail, RefreshCw, Send, Sparkles, Trash2, UserPlus, Users, X } from 'lucide-react';
 import { QuoteDialog } from '../saas/PlanOffer';
 import { ClientKeys } from './ClientKeys';
+import { DataLifecycle, type DeletionView } from './DataLifecycle';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
@@ -9,7 +10,8 @@ import { numberLocale } from '../../lib/i18n';
 /**
  * « My institution » tab of the Administration page on a tenant (druid-internal docs/plan-druid-saas.md, lot 6 a-1):
  * the plan and its seats, the members (invite, role, remove), the access requests of colleagues, the mail domains, the
- * API keys of the institution (lot 6 a-2, components/admin/ClientKeys.tsx).
+ * API keys of the institution (lot 6 a-2, components/admin/ClientKeys.tsx), the export and the deletion of the data (lot 6 a-3,
+ * components/admin/DataLifecycle.tsx — owners only, also on a suspended tenant).
  * The owners write, the admins read. API: functions/api/tenant, rules in lib/saas/members.ts.
  */
 
@@ -22,6 +24,7 @@ interface TenantView {
   plan: PlanView | null; plans: PlanView[];
   seats: { used: number; allowed: number | null };
   members: MemberView[]; accessRequests: AccessRequestView[]; mailDomains: string[];
+  deletion: DeletionView | null;
   me: { email: string; role: Role };
 }
 
@@ -116,7 +119,9 @@ export const EstablishmentAdmin: React.FC = () => {
             <Trans>Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote.</Trans>
           </p>
         )}
-        {data.status !== 'active' && (
+        {data.deletion ? (
+          <p className="basis-full text-[12px] font-semibold text-[#b3441f] dark:text-[#e08a6a]"><Trans>This Druid will be deleted on {date(data.deletion.deleteAfter)}: until then it can be read, nothing can be changed.</Trans></p>
+        ) : data.status !== 'active' && (
           <p className="basis-full text-[12px] font-semibold text-[#8a6113] dark:text-[#f0c266]"><Trans>This Druid is suspended: it can be read, nothing can be changed.</Trans></p>
         )}
       </div>
@@ -264,6 +269,9 @@ export const EstablishmentAdmin: React.FC = () => {
 
       {/* ── API keys of the institution (lot 6 a-2) ────────────────────── */}
       <ClientKeys owner={owner} />
+
+      {/* ── Export and deletion (lot 6 a-3) ────────────────────────────── */}
+      {data.me.role === 'owner' && <DataLifecycle slug={data.slug} deletion={data.deletion ?? null} />}
     </div>
   );
 };

@@ -153,9 +153,11 @@ msgid "Error saving the structure"
 msgstr "Erreur lors de l'enregistrement de la structure"
 
 #: App.tsx:737
-msgid "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
+msgid ""
+"Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
-msgstr "Profil {candidateId} marqué « Identité mêlée » pour {displayName}.\n"
+msgstr ""
+"Profil {candidateId} marqué « Identité mêlée » pour {displayName}.\n"
 "Note (facultative) : qui possède quoi, ce qu'il faudrait scinder…"
 
 #: App.tsx:746
@@ -197,7 +199,7 @@ msgstr "Chargement du tableau de bord…"
 
 #: App.tsx:1031
 #: App.tsx:1044
-#: components/admin/EstablishmentAdmin.tsx:83
+#: components/admin/EstablishmentAdmin.tsx:86
 #: components/dashboard/CallCandidates.tsx:127
 #: components/dashboard/CallCandidates.tsx:165
 #: components/dashboard/EmbedPage.tsx:90
@@ -466,16 +468,16 @@ msgstr "à l'international"
 msgid "members"
 msgstr "membres"
 
-#. placeholder {0}: data.lab
-#: components/DashboardPage.tsx:402
-msgid "Dashboard — {0}"
-msgstr "Tableau de bord — {0}"
-
 #: components/DashboardPage.tsx:402
 #: components/Sidebar.tsx:161
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Tableau de bord"
+
+#. placeholder {0}: data.lab
+#: components/DashboardPage.tsx:402
+msgid "Dashboard — {0}"
+msgstr "Tableau de bord — {0}"
 
 #: components/DashboardPage.tsx:416
 #: components/reports/ReportControls.tsx:44
@@ -809,18 +811,18 @@ msgid "Export PDF"
 msgstr "Export PDF"
 
 #: components/ResearcherDetail.tsx:321
-msgid "Create the record"
-msgstr "Créer la fiche"
-
-#: components/ResearcherDetail.tsx:321
 #: components/StructureDetail.tsx:139
-#: components/admin/EstablishmentAdmin.tsx:258
+#: components/admin/EstablishmentAdmin.tsx:263
 #: components/admin/InstitutionsAdmin.tsx:219
 #: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
+
+#: components/ResearcherDetail.tsx:321
+msgid "Create the record"
+msgstr "Créer la fiche"
 
 #: components/ResearcherDetail.tsx:353
 #: components/ResearcherDetail.tsx:354
@@ -950,7 +952,7 @@ msgstr "Alignement LDAP"
 #: components/reports/ReportEditor.tsx:312
 #: components/reports/ReportsPage.tsx:100
 #: components/reports/ReportsPage.tsx:116
-#: components/saas/PlanOffer.tsx:31
+#: components/saas/PlanOffer.tsx:32
 msgid "My reports"
 msgstr "Mes rapports"
 
@@ -1230,7 +1232,7 @@ msgstr "Établissements"
 #: components/admin/AdminPage.tsx:89
 #: components/dashboard/dashboardNav.ts:111
 #: components/researchers/CallsSection.tsx:99
-#: components/saas/PlanOffer.tsx:35
+#: components/saas/PlanOffer.tsx:36
 msgid "Calls for proposals"
 msgstr "Appels à projets"
 
@@ -1547,122 +1549,209 @@ msgstr "Clé d'API de secours"
 msgid "Its institution token"
 msgstr "Son jeton d'établissement"
 
-#: components/admin/EstablishmentAdmin.tsx:54
+#: components/admin/DataLifecycle.tsx:71
+msgid "Waiting for the server…"
+msgstr "En attente du serveur…"
+
+#: components/admin/DataLifecycle.tsx:72
+msgid "Being prepared…"
+msgstr "En préparation…"
+
+#. placeholder {0}: e.error ?? ''
+#: components/admin/DataLifecycle.tsx:73
+msgid "Failed: {0}"
+msgstr "Échec : {0}"
+
+#: components/admin/DataLifecycle.tsx:74
+msgid "Stopped"
+msgstr "Arrêté"
+
+#. placeholder {0}: sizeOf(e.size)
+#. placeholder {1}: date(e.expiresAt)
+#: components/admin/DataLifecycle.tsx:75
+msgid "Ready — {0}, until {1}"
+msgstr "Prêt — {0}, jusqu'au {1}"
+
+#: components/admin/DataLifecycle.tsx:76
+msgid "Expired (removed after 7 days)"
+msgstr "Expiré (supprimé au bout de 7 jours)"
+
+#: components/admin/DataLifecycle.tsx:82
+msgid "Data of the institution"
+msgstr "Données de l'établissement"
+
+#: components/admin/DataLifecycle.tsx:88
+msgid "Export the data"
+msgstr "Exporter les données"
+
+#: components/admin/DataLifecycle.tsx:90
+msgid "One archive with everything this Druid holds: the database (PostgreSQL, restorable as is), the dashboards of the labs and the list of the accounts. It is prepared on the server, you receive an e-mail when it is ready, and it can be downloaded here for 7 days. It holds personal data: keep it safe."
+msgstr "Une archive avec tout ce que contient ce Druid : la base de données (PostgreSQL, restaurable telle quelle), les tableaux de bord des laboratoires et la liste des comptes. Elle est préparée sur le serveur, vous recevez un e-mail quand elle est prête, et elle se télécharge ici pendant 7 jours. Elle contient des données personnelles : conservez-la en lieu sûr."
+
+#: components/admin/DataLifecycle.tsx:94
+msgid "Prepare an export"
+msgstr "Préparer un export"
+
+#: components/admin/DataLifecycle.tsx:105
+msgid "Download"
+msgstr "Télécharger"
+
+#: components/admin/DataLifecycle.tsx:116
+msgid "Delete this Druid"
+msgstr "Supprimer ce Druid"
+
+#. placeholder {0}: date(deletion.deleteAfter)
+#. placeholder {1}: deletion.requestedBy ?? '—'
+#. placeholder {2}: date(deletion.requestedAt)
+#: components/admin/DataLifecycle.tsx:121
+msgid "Deletion planned on {0} (asked by {1} on {2}). Until then the Druid is read-only; export its data now if you need them."
+msgstr "Suppression prévue le {0} (demandée par {1} le {2}). D'ici là, le Druid est en lecture seule ; exportez ses données maintenant si vous en avez besoin."
+
+#: components/admin/DataLifecycle.tsx:124
+msgid "Cancel the deletion? The Druid becomes writable again."
+msgstr "Annuler la suppression ? Le Druid redevient modifiable."
+
+#: components/admin/DataLifecycle.tsx:125
+msgid "Cancel the deletion"
+msgstr "Annuler la suppression"
+
+#: components/admin/DataLifecycle.tsx:131
+msgid "Ask for the deletion of this Druid and of all its data"
+msgstr "Demander la suppression de ce Druid et de toutes ses données"
+
+#: components/admin/DataLifecycle.tsx:134
+msgid "The Druid becomes read-only at once for every account, and is deleted for good 30 days later: database, dashboards, exports, accounts and keys. Every owner receives an e-mail; until the last day an owner can cancel here. Prepare an export first if you want to keep the data."
+msgstr "Le Druid passe aussitôt en lecture seule pour tous les comptes, puis il est supprimé définitivement 30 jours plus tard : base de données, tableaux de bord, exports, comptes et clés. Chaque propriétaire reçoit un e-mail ; jusqu'au dernier jour, un propriétaire peut annuler ici. Préparez d'abord un export si vous voulez garder les données."
+
+#: components/admin/DataLifecycle.tsx:138
+msgid "Type <0>{slug}</0> to confirm"
+msgstr "Tapez <0>{slug}</0> pour confirmer"
+
+#: components/admin/DataLifecycle.tsx:142
+msgid "Delete in 30 days"
+msgstr "Supprimer dans 30 jours"
+
+#: components/admin/EstablishmentAdmin.tsx:57
 #: components/rights/RightsPage.tsx:68
 msgid "Administrator"
 msgstr "Administrateur"
 
-#: components/admin/EstablishmentAdmin.tsx:54
+#: components/admin/EstablishmentAdmin.tsx:57
 msgid "Owner"
 msgstr "Propriétaire"
 
-#: components/admin/EstablishmentAdmin.tsx:54
+#: components/admin/EstablishmentAdmin.tsx:57
 msgid "Reader"
 msgstr "Lecteur"
 
-#: components/admin/EstablishmentAdmin.tsx:54
+#: components/admin/EstablishmentAdmin.tsx:57
 msgid "Lab account"
 msgstr "Compte laboratoire"
 
-#: components/admin/EstablishmentAdmin.tsx:56
+#: components/admin/EstablishmentAdmin.tsx:59
 msgid "Everything, including the accounts and the plan"
 msgstr "Tout, y compris les comptes et l'offre"
 
-#: components/admin/EstablishmentAdmin.tsx:57
+#: components/admin/EstablishmentAdmin.tsx:60
 msgid "Writes in the directory, runs the alignments and the dashboards"
 msgstr "Modifie l'annuaire, lance les alignements et les tableaux de bord"
 
-#: components/admin/EstablishmentAdmin.tsx:58
+#: components/admin/EstablishmentAdmin.tsx:61
 msgid "Reads everything, writes nothing"
 msgstr "Consulte tout, ne modifie rien"
 
-#: components/admin/EstablishmentAdmin.tsx:59
+#: components/admin/EstablishmentAdmin.tsx:62
 msgid "Reads and writes its labs only"
 msgstr "Consulte et modifie seulement ses laboratoires"
 
-#: components/admin/EstablishmentAdmin.tsx:78
+#: components/admin/EstablishmentAdmin.tsx:81
 msgid "Invitation sent to {who}."
 msgstr "Invitation envoyée à {who}."
 
 #. placeholder {0}: r.loginUrl ?? ''
-#: components/admin/EstablishmentAdmin.tsx:78
+#: components/admin/EstablishmentAdmin.tsx:81
 msgid "{who} is a member; no e-mail could be sent — send them this link: {0}"
 msgstr "{who} est membre ; aucun e-mail n'a pu partir — transmettez-lui ce lien : {0}"
 
-#: components/admin/EstablishmentAdmin.tsx:96
-#: components/saas/PlanOffer.tsx:99
+#: components/admin/EstablishmentAdmin.tsx:99
+#: components/saas/PlanOffer.tsx:100
 msgid "Plan"
 msgstr "Offre"
 
-#: components/admin/EstablishmentAdmin.tsx:100
+#: components/admin/EstablishmentAdmin.tsx:103
 msgid "Accounts"
 msgstr "Comptes"
 
 #. placeholder {0}: data.seats.used
-#: components/admin/EstablishmentAdmin.tsx:102
+#: components/admin/EstablishmentAdmin.tsx:105
 msgid "{0} (unlimited)"
 msgstr "{0} (illimité)"
 
-#: components/admin/EstablishmentAdmin.tsx:106
+#: components/admin/EstablishmentAdmin.tsx:109
 msgid "Publication history"
 msgstr "Historique des publications"
 
 #. placeholder {0}: data.plan.historyYears
-#: components/admin/EstablishmentAdmin.tsx:107
+#: components/admin/EstablishmentAdmin.tsx:110
 msgid "{0} years"
 msgstr "{0} ans"
 
-#: components/admin/EstablishmentAdmin.tsx:107
+#: components/admin/EstablishmentAdmin.tsx:110
 msgid "Complete"
 msgstr "Complet"
 
-#: components/admin/EstablishmentAdmin.tsx:111
-#: components/saas/PlanOffer.tsx:83
-#: components/saas/PlanOffer.tsx:85
-#: components/saas/PlanOffer.tsx:144
+#: components/admin/EstablishmentAdmin.tsx:114
+#: components/saas/PlanOffer.tsx:84
+#: components/saas/PlanOffer.tsx:86
+#: components/saas/PlanOffer.tsx:145
 msgid "Request a quote"
 msgstr "Demander un devis"
 
-#: components/admin/EstablishmentAdmin.tsx:116
+#: components/admin/EstablishmentAdmin.tsx:119
 msgid "Every account of the plan is used. The Team and Complete plans add accounts: ask DirlaData for a quote."
 msgstr "Tous les comptes de l'offre sont utilisés. Les offres Équipe et Complet en ajoutent : demandez un devis à DirlaData."
 
-#: components/admin/EstablishmentAdmin.tsx:120
+#. placeholder {0}: date(data.deletion.deleteAfter)
+#: components/admin/EstablishmentAdmin.tsx:123
+msgid "This Druid will be deleted on {0}: until then it can be read, nothing can be changed."
+msgstr "Ce Druid sera supprimé le {0} : d'ici là, il se consulte mais rien ne peut être modifié."
+
+#: components/admin/EstablishmentAdmin.tsx:125
 msgid "This Druid is suspended: it can be read, nothing can be changed."
 msgstr "Ce Druid est suspendu : il se consulte, rien ne peut être modifié."
 
 #. placeholder {0}: data.accessRequests.length
-#: components/admin/EstablishmentAdmin.tsx:135
+#: components/admin/EstablishmentAdmin.tsx:140
 msgid "Access requests ({0})"
 msgstr "Demandes d'accès ({0})"
 
-#: components/admin/EstablishmentAdmin.tsx:144
+#: components/admin/EstablishmentAdmin.tsx:149
 msgid "Every account of the plan is used"
 msgstr "Tous les comptes de l'offre sont utilisés"
 
-#: components/admin/EstablishmentAdmin.tsx:146
+#: components/admin/EstablishmentAdmin.tsx:151
 msgid "Invite as reader"
 msgstr "Inviter comme lecteur"
 
-#: components/admin/EstablishmentAdmin.tsx:149
+#: components/admin/EstablishmentAdmin.tsx:154
 msgid "Dismiss"
 msgstr "Écarter"
 
 #. placeholder {0}: data.members.length
-#: components/admin/EstablishmentAdmin.tsx:161
+#: components/admin/EstablishmentAdmin.tsx:166
 msgid "Members ({0})"
 msgstr "Membres ({0})"
 
-#: components/admin/EstablishmentAdmin.tsx:167
+#: components/admin/EstablishmentAdmin.tsx:172
 msgid "E-mail"
 msgstr "E-mail"
 
-#: components/admin/EstablishmentAdmin.tsx:168
-#: components/admin/EstablishmentAdmin.tsx:226
+#: components/admin/EstablishmentAdmin.tsx:173
+#: components/admin/EstablishmentAdmin.tsx:231
 msgid "Role"
 msgstr "Rôle"
 
-#: components/admin/EstablishmentAdmin.tsx:169
+#: components/admin/EstablishmentAdmin.tsx:174
 #: components/dashboard/CallCandidates.tsx:176
 #: components/dashboard/CollaborationsTab.tsx:398
 #: components/dashboard/CollaborationsTab.tsx:411
@@ -1670,63 +1759,63 @@ msgstr "Rôle"
 msgid "Labs"
 msgstr "Labos"
 
-#: components/admin/EstablishmentAdmin.tsx:170
+#: components/admin/EstablishmentAdmin.tsx:175
 msgid "Last sign-in"
 msgstr "Dernière connexion"
 
-#: components/admin/EstablishmentAdmin.tsx:179
+#: components/admin/EstablishmentAdmin.tsx:184
 msgid "you"
 msgstr "vous"
 
 #. placeholder {0}: m.email
-#: components/admin/EstablishmentAdmin.tsx:182
+#: components/admin/EstablishmentAdmin.tsx:187
 msgid "Role of {0}"
 msgstr "Rôle de {0}"
 
-#: components/admin/EstablishmentAdmin.tsx:185
+#: components/admin/EstablishmentAdmin.tsx:190
 msgid "Labs of this account (acronyms, separated by commas)"
 msgstr "Laboratoires de ce compte (sigles séparés par des virgules)"
 
-#: components/admin/EstablishmentAdmin.tsx:194
+#: components/admin/EstablishmentAdmin.tsx:199
 msgid "Invited, never signed in"
 msgstr "Invité, jamais connecté"
 
-#: components/admin/EstablishmentAdmin.tsx:198
+#: components/admin/EstablishmentAdmin.tsx:203
 msgid "Resend"
 msgstr "Renvoyer"
 
 #. placeholder {0}: m.email
-#: components/admin/EstablishmentAdmin.tsx:202
+#: components/admin/EstablishmentAdmin.tsx:207
 msgid "Remove {0}"
 msgstr "Retirer {0}"
 
 #. placeholder {0}: m.email
-#: components/admin/EstablishmentAdmin.tsx:203
+#: components/admin/EstablishmentAdmin.tsx:208
 msgid "Remove {0} from this Druid? Their sessions are closed at once."
 msgstr "Retirer {0} de ce Druid ? Ses sessions sont fermées aussitôt."
 
-#: components/admin/EstablishmentAdmin.tsx:222
+#: components/admin/EstablishmentAdmin.tsx:227
 msgid "Invite a colleague"
 msgstr "Inviter un collègue"
 
-#: components/admin/EstablishmentAdmin.tsx:233
+#: components/admin/EstablishmentAdmin.tsx:238
 msgid "Labs (acronyms)"
 msgstr "Laboratoires (sigles)"
 
-#: components/admin/EstablishmentAdmin.tsx:238
+#: components/admin/EstablishmentAdmin.tsx:243
 msgid "Invite"
 msgstr "Inviter"
 
-#: components/admin/EstablishmentAdmin.tsx:250
-#: components/admin/EstablishmentAdmin.tsx:257
+#: components/admin/EstablishmentAdmin.tsx:255
+#: components/admin/EstablishmentAdmin.tsx:262
 msgid "Mail domains of the institution"
 msgstr "Domaines mail de l'établissement"
 
-#: components/admin/EstablishmentAdmin.tsx:253
+#: components/admin/EstablishmentAdmin.tsx:258
 msgid "A colleague with an address of these domains who asks for a sign-in link without an account sends you an access request (you receive an e-mail)."
 msgstr "Un collègue qui a une adresse de ces domaines et demande un lien de connexion sans avoir de compte vous envoie une demande d'accès (vous recevez un e-mail)."
 
-#: components/admin/EstablishmentAdmin.tsx:256
+#: components/admin/EstablishmentAdmin.tsx:261
 msgid "Mail domains saved."
 msgstr "Domaines mail enregistrés."
 
@@ -1972,8 +2061,8 @@ msgstr "Ajouter un appel"
 #: components/researchers/SiteImportReview.tsx:117
 #: components/researchers/SiteImportReview.tsx:323
 #: components/researchers/UnifiedAlignPage.tsx:748
-#: components/saas/PlanOffer.tsx:86
-#: components/saas/PlanOffer.tsx:92
+#: components/saas/PlanOffer.tsx:87
+#: components/saas/PlanOffer.tsx:93
 #: components/structures/StructureAlignPanel.tsx:411
 msgid "Close"
 msgstr "Fermer"
@@ -2163,14 +2252,14 @@ msgid "The file could not be read"
 msgstr "Le fichier n'a pas pu être lu"
 
 #: components/admin/ManualCallsAdmin.tsx:402
-#: components/researchers/DuplicatesPage.tsx:181
-msgid "new"
-msgstr "nouveau"
-
-#: components/admin/ManualCallsAdmin.tsx:402
 #: components/researchers/UnifiedAlignPage.tsx:651
 msgid "error"
 msgstr "erreur"
+
+#: components/admin/ManualCallsAdmin.tsx:402
+#: components/researchers/DuplicatesPage.tsx:181
+msgid "new"
+msgstr "nouveau"
 
 #: components/admin/ManualCallsAdmin.tsx:402
 msgid "update"
@@ -2791,14 +2880,14 @@ msgid "Share (%)"
 msgstr "Part (%)"
 
 #: components/dashboard/AxesTab.tsx:412
-msgid "Strategic axes by team (share of each team's publications)"
-msgstr "Axes stratégiques par équipe (part des publications de chaque équipe)"
-
-#: components/dashboard/AxesTab.tsx:412
 #: components/dashboard/embedRegistry.tsx:682
 #: components/dashboard/embedRegistry.tsx:687
 msgid "Strategic axes by team"
 msgstr "Axes stratégiques par équipe"
+
+#: components/dashboard/AxesTab.tsx:412
+msgid "Strategic axes by team (share of each team's publications)"
+msgstr "Axes stratégiques par équipe (part des publications de chaque équipe)"
 
 #: components/dashboard/AxesTab.tsx:425
 msgid "Keywords by strategic axis"
@@ -4291,17 +4380,17 @@ msgstr "Institutions les plus co-signataires"
 
 #: components/dashboard/CountryCharts.tsx:41
 #: components/dashboard/countryKpis.ts:62
-#: components/dashboard/partnerKpis.ts:175
-msgid "Teams involved"
-msgstr "Équipes impliquées"
-
-#: components/dashboard/CountryCharts.tsx:41
-#: components/dashboard/countryKpis.ts:62
 #: components/dashboard/embedRegistry.tsx:1043
 #: components/dashboard/embedRegistry.tsx:1048
 #: components/dashboard/partnerKpis.ts:175
 msgid "Labs involved"
 msgstr "Labos impliqués"
+
+#: components/dashboard/CountryCharts.tsx:41
+#: components/dashboard/countryKpis.ts:62
+#: components/dashboard/partnerKpis.ts:175
+msgid "Teams involved"
+msgstr "Équipes impliquées"
 
 #. placeholder {0}: focus.label
 #: components/dashboard/CountryCharts.tsx:52
@@ -6903,22 +6992,22 @@ msgid "Yearly evolution by goal"
 msgstr "Évolution annuelle par ODD"
 
 #: components/dashboard/SdgTab.tsx:425
-msgid "Goals by lab (share of each lab's tagged publications)"
-msgstr "ODD par labo (part des publications étiquetées de chaque labo)"
-
-#: components/dashboard/SdgTab.tsx:425
 #: components/dashboard/embedRegistry.tsx:725
 msgid "Goals by lab"
 msgstr "ODD par labo"
 
-#: components/dashboard/SdgTab.tsx:426
-msgid "Goals by team (share of each team's tagged publications)"
-msgstr "ODD par équipe (part des publications étiquetées de chaque équipe)"
+#: components/dashboard/SdgTab.tsx:425
+msgid "Goals by lab (share of each lab's tagged publications)"
+msgstr "ODD par labo (part des publications étiquetées de chaque labo)"
 
 #: components/dashboard/SdgTab.tsx:426
 #: components/dashboard/embedRegistry.tsx:725
 msgid "Goals by team"
 msgstr "ODD par équipe"
+
+#: components/dashboard/SdgTab.tsx:426
+msgid "Goals by team (share of each team's tagged publications)"
+msgstr "ODD par équipe (part des publications étiquetées de chaque équipe)"
 
 #: components/dashboard/SdgTab.tsx:445
 msgid "Official titles and colours of the United Nations. The figures are not comparable with rankings built on other classifiers (THE Impact Rankings, SciVal)."
@@ -8168,7 +8257,7 @@ msgid "FWCI, top 1 % / 10 %, most cited publications, by team and researcher."
 msgstr "FWCI, top 1 % / 10 %, publications les plus citées, par équipe et par chercheur."
 
 #: components/dashboard/dashboardNav.ts:80
-#: components/saas/PlanOffer.tsx:27
+#: components/saas/PlanOffer.tsx:28
 msgid "Benchmark"
 msgstr "Benchmark"
 
@@ -11811,13 +11900,13 @@ msgid "Concurrent affiliation (directory row qualified SECONDAIRE)"
 msgstr "Rattachement concomitant (ligne Annuaire qualifiée SECONDAIRE)"
 
 #: components/researchers/AffiliationsTable.tsx:124
-msgid "former"
-msgstr "historique"
-
-#: components/researchers/AffiliationsTable.tsx:124
 #: components/researchers/UnifiedAlignPage.tsx:77
 msgid "secondary"
 msgstr "secondaire"
+
+#: components/researchers/AffiliationsTable.tsx:124
+msgid "former"
+msgstr "historique"
 
 #: components/researchers/AffiliationsTable.tsx:132
 msgid "— Structure —"
@@ -12318,6 +12407,11 @@ msgstr "Déclarer un multi-rattachement (concomitant ou successif) ou marquer «
 msgid "Qualify"
 msgstr "Qualifier"
 
+#: components/researchers/DuplicatesPage.tsx:212
+#: components/researchers/TasksPage.tsx:330
+msgid "Open the merge assistant"
+msgstr "Ouvrir l'assistant de fusion"
+
 #. placeholder {0}: a.name
 #. placeholder {1}: a.labo || '∅'
 #. placeholder {2}: b.name
@@ -12325,11 +12419,6 @@ msgstr "Qualifier"
 #: components/researchers/DuplicatesPage.tsx:212
 msgid "Merge {0} ({1}) and {2} ({3})"
 msgstr "Fusionner {0} ({1}) et {2} ({3})"
-
-#: components/researchers/DuplicatesPage.tsx:212
-#: components/researchers/TasksPage.tsx:330
-msgid "Open the merge assistant"
-msgstr "Ouvrir l'assistant de fusion"
 
 #: components/researchers/DuplicatesPage.tsx:216
 #: components/researchers/LdapCandidatesPage.tsx:223
@@ -14685,10 +14774,12 @@ msgid "List (paste: name, email, uid, status)"
 msgstr "Liste (coller : nom, email, uid, statut)"
 
 #: components/researchers/ValidationImportReview.tsx:92
-msgid "name,email,uid\n"
+msgid ""
+"name,email,uid\n"
 "DUPONT Jean,jean.dupont@x.fr,jdupont\n"
 "…"
-msgstr "nom,email,uid\n"
+msgstr ""
+"nom,email,uid\n"
 "DUPONT Jean,jean.dupont@x.fr,jdupont\n"
 "…"
 
@@ -15000,81 +15091,85 @@ msgstr "Session de support ouverte par {by} en tant que {as} — tracée, elle p
 msgid "End it"
 msgstr "Y mettre fin"
 
-#: components/saas/PlanOffer.tsx:28
+#: components/saas/PlanOffer.tsx:29
 msgid "Position your institution and its labs among comparable universities: Leiden ranking, OpenAlex indicators, peers chosen by you."
 msgstr "Situez votre établissement et ses labos parmi des universités comparables : classement de Leiden, indicateurs OpenAlex, pairs que vous choisissez."
 
-#: components/saas/PlanOffer.tsx:32
+#: components/saas/PlanOffer.tsx:33
 msgid "Build reports from the charts of the dashboards, share them with colleagues and export them as PDF — for a lab assessment, a board or a partner."
 msgstr "Composez des rapports à partir des graphiques des tableaux de bord, partagez-les avec vos collègues et exportez-les en PDF — pour une évaluation de labo, un conseil ou un partenaire."
 
-#: components/saas/PlanOffer.tsx:36
+#: components/saas/PlanOffer.tsx:37
 msgid "The open calls of the funding programmes (Horizon Europe, ANR, Region…) matched with the researchers whose publications relate to them."
 msgstr "Les appels ouverts des programmes de financement (Horizon Europe, ANR, Région…) rapprochés des chercheurs dont les publications s'y rapportent."
 
-#: components/saas/PlanOffer.tsx:39
+#: components/saas/PlanOffer.tsx:40
 msgid "Media watch"
 msgstr "Veille médias"
 
-#: components/saas/PlanOffer.tsx:40
+#: components/saas/PlanOffer.tsx:41
 msgid "Press mentions of your researchers and a research newsletter built from the latest publications."
 msgstr "Les mentions de vos chercheurs dans la presse et une lettre de la recherche construite à partir des dernières publications."
 
-#: components/saas/PlanOffer.tsx:43
+#: components/saas/PlanOffer.tsx:44
 msgid "AI assistants"
 msgstr "Assistants IA"
 
-#: components/saas/PlanOffer.tsx:44
+#: components/saas/PlanOffer.tsx:45
 msgid "Summaries of reports and a project assistant, with the language model keys of your institution."
 msgstr "Synthèses de rapports et assistant de projet, avec les clés de modèle de langage de votre établissement."
 
-#: components/saas/PlanOffer.tsx:64
+#: components/saas/PlanOffer.tsx:65
 msgid "On site (installed at the institution)"
 msgstr "Sur site (installé dans l'établissement)"
 
 #. placeholder {0}: getUserInfo().email
-#: components/saas/PlanOffer.tsx:91
+#: components/saas/PlanOffer.tsx:92
 msgid "Your request is sent. DirlaData answers you by e-mail ({0}) with a quote."
 msgstr "Votre demande est envoyée. DirlaData vous répond par e-mail ({0}) avec un devis."
 
-#: components/saas/PlanOffer.tsx:97
+#: components/saas/PlanOffer.tsx:98
 msgid "Public institutions pay on invoice with a purchase order; the price depends on the number of researchers. Nothing is committed by this request."
 msgstr "Les établissements publics règlent sur facture avec un bon de commande ; le prix dépend du nombre de chercheurs. Cette demande n'engage à rien."
 
-#: components/saas/PlanOffer.tsx:105
+#: components/saas/PlanOffer.tsx:106
 msgid "Researchers (approx.)"
 msgstr "Chercheurs (environ)"
 
-#: components/saas/PlanOffer.tsx:108
+#: components/saas/PlanOffer.tsx:109
 msgid "Accounts needed"
 msgstr "Comptes souhaités"
 
-#: components/saas/PlanOffer.tsx:112
+#: components/saas/PlanOffer.tsx:113
 msgid "Message (optional)"
 msgstr "Message (facultatif)"
 
-#: components/saas/PlanOffer.tsx:114
+#: components/saas/PlanOffer.tsx:115
 msgid "Context, deadline, who will use Druid…"
 msgstr "Contexte, échéance, qui utilisera Druid…"
 
-#: components/saas/PlanOffer.tsx:118
+#: components/saas/PlanOffer.tsx:119
 msgid "Send the request"
 msgstr "Envoyer la demande"
 
 #. placeholder {0}: unlocking.label
-#: components/saas/PlanOffer.tsx:141
+#: components/saas/PlanOffer.tsx:142
 msgid "Available with the {0} plan."
 msgstr "Disponible avec l'offre {0}."
 
-#: components/saas/PlanOffer.tsx:141
+#: components/saas/PlanOffer.tsx:142
 msgid "Not included in your plan."
 msgstr "Non compris dans votre offre."
 
-#: components/saas/PlanOffer.tsx:163
+#: components/saas/PlanOffer.tsx:165
+msgid "This Druid will be deleted on {day}: it is read-only until then."
+msgstr "Ce Druid sera supprimé le {day} : il est en lecture seule d'ici là."
+
+#: components/saas/PlanOffer.tsx:173
 msgid "Trial — powered by Druid"
 msgstr "Essai — propulsé par Druid"
 
-#: components/saas/PlanOffer.tsx:164
+#: components/saas/PlanOffer.tsx:174
 msgid "Discover the plans"
 msgstr "Découvrir les offres"
 
@@ -15929,7 +16024,7 @@ msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
-#. placeholder {0}: entry.scopus
+#. placeholder {0}: entry.scopus!
 #: lib/alignTextsI18n.ts:29
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
@@ -15938,7 +16033,7 @@ msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est ad
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
-#. placeholder {0}: entry.orcid
+#. placeholder {0}: entry.orcid!
 #: lib/alignTextsI18n.ts:31
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
@@ -15947,8 +16042,8 @@ msgstr "{0} : format ou clé de contrôle incorrects"
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
-#. placeholder {0}: entry.scopus
-#. placeholder {1}: entry.merged
+#. placeholder {0}: entry.scopus!
+#. placeholder {1}: entry.merged!
 #: lib/alignTextsI18n.ts:33
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
@@ -15958,7 +16053,7 @@ msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à j
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#. placeholder {0}: cand.fullName
+#. placeholder {0}: cand.fullName!
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
 #: lib/alignTextsI18n.ts:35
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
@@ -16265,699 +16360,727 @@ msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY non configurée côté Cloudflare (secret + redéploiement)"
 
 #: lib/apiErrors.ts:108
+msgid "An export is already running"
+msgstr "Un export est déjà en cours"
+
+#: lib/apiErrors.ts:109
+msgid "Export not found"
+msgstr "Export introuvable"
+
+#: lib/apiErrors.ts:110
+msgid "This export has expired: ask for a new one"
+msgstr "Cet export a expiré : demandez-en un nouveau"
+
+#: lib/apiErrors.ts:111
+msgid "No file store on this deployment"
+msgstr "Aucun stockage de fichiers sur ce déploiement"
+
+#: lib/apiErrors.ts:112
+msgid "Type the name of the Druid to confirm"
+msgstr "Tapez le nom du Druid pour confirmer"
+
+#: lib/apiErrors.ts:113
+msgid "A deletion is already planned"
+msgstr "Une suppression est déjà prévue"
+
+#: lib/apiErrors.ts:114
+msgid "No deletion is planned"
+msgstr "Aucune suppression n'est prévue"
+
+#: lib/apiErrors.ts:116
 msgid "No language model is configured for this Druid (My institution › API keys)"
 msgstr "Aucun modèle de langage n'est configuré pour ce Druid (Mon établissement › Clés d'API)"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:117
 msgid "SAAS_SECRETS_KEY not configured"
 msgstr "SAAS_SECRETS_KEY non configurée"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:118
 msgid "The key test failed"
 msgstr "Le test de la clé a échoué"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:119
 msgid "Invalid address of the language model"
 msgstr "Adresse du modèle de langage invalide"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:120
 msgid "Invalid model name"
 msgstr "Nom de modèle invalide"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:121
 msgid "Invalid API key"
 msgstr "Clé d'API invalide"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:122
 msgid "Invalid institution token"
 msgstr "Jeton d'établissement invalide"
 
-#: lib/apiErrors.ts:115
+#: lib/apiErrors.ts:123
 msgid "The API key is required"
 msgstr "La clé d'API est obligatoire"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:124
 msgid "No key is stored"
 msgstr "Aucune clé n'est enregistrée"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:125
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID non configurée"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:126
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY non configurée"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:127
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY non configurée côté Cloudflare"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:128
 msgid "HYPERDRIVE binding not configured on Cloudflare"
 msgstr "Liaison HYPERDRIVE non configurée sur Cloudflare"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:130
 msgid "Unknown API route"
 msgstr "Route d'API inconnue"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:131
 msgid "Directory storage unavailable"
 msgstr "Stockage de l'annuaire indisponible"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:132
 msgid "Another record already holds this value"
 msgstr "Une autre fiche porte déjà cette valeur"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:133
 msgid "API v1 unavailable"
 msgstr "API v1 indisponible sur ce serveur"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:134
 msgid "Grist proxy removed: use /api/v1"
 msgstr "Proxy Grist supprimé : utilisez /api/v1"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:135
 msgid "Not available on the PostgreSQL storage yet"
 msgstr "Pas encore disponible avec le stockage PostgreSQL"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:136
 msgid "Invalid record"
 msgstr "Fiche invalide"
 
-#: lib/apiErrors.ts:129
+#: lib/apiErrors.ts:137
 msgid "Invalid lab"
 msgstr "Laboratoire invalide"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:138
 msgid "Invalid import file"
 msgstr "Fichier d’import invalide"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:139
 msgid "Replaced IdRef record not found"
 msgstr "Notice IdRef remplacée introuvable"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:140
 msgid "Review table missing, run the alignment script first"
 msgstr "Table de revue absente, lancez d'abord l'alignement de cette source"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:141
 msgid "Grist error (partial write)"
 msgstr "Erreur Grist (écriture partielle)"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:142
 msgid "Qualification: primary row required"
 msgstr "Qualification : ligne principale requise"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:143
 msgid "Invalid LDAP uid"
 msgstr "uid LDAP invalide"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:144
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "Cet uid a déjà une fiche dans l'annuaire, fusionnez plutôt les deux fiches"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:145
 msgid "Record not found in Grist"
 msgstr "Fiche introuvable dans Grist"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:146
 msgid "Merge: both rows are identical"
 msgstr "Fusion : les deux lignes sont identiques"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:147
 msgid "Merge: one of the rows no longer exists in Grist"
 msgstr "Fusion : une des lignes n'existe plus dans Grist"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:148
 msgid "Grist error (writing the kept row)"
 msgstr "Erreur Grist (écriture de la ligne conservée)"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:149
 msgid "Grist error (deleting the absorbed row)"
 msgstr "Erreur Grist (suppression de la ligne absorbée)"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:150
 msgid "Merge not found"
 msgstr "Fusion introuvable"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:151
 msgid "Merge already restored"
 msgstr "Fusion déjà restaurée"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:152
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Ligne recréée mais journal des fusions non mis à jour, ne relancez pas la restauration"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:153
 msgid "Row re-created but kept row not restored"
 msgstr "Ligne recréée mais ligne conservée non restaurée"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:154
 msgid "The acronym / short name is required"
 msgstr "Le sigle / nom court est obligatoire"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:155
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "Une équipe doit être incluse dans un labo (onglet Appartenances)"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:156
 msgid "A structure with this acronym already exists"
 msgstr "Une structure porte déjà ce sigle"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:157
 msgid "local_id already used"
 msgstr "local_id déjà utilisé"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:158
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Code d'entité invalide (lettres, chiffres, « - », « _ » ou « . » seulement)"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:160
 msgid "The institution name is required"
 msgstr "Le nom de l'établissement est obligatoire"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:161
 msgid "The institution name is too long"
 msgstr "Le nom de l'établissement est trop long"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:162
 msgid "Invalid UAI code"
 msgstr "Code UAI invalide"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:163
 msgid "Invalid ROR identifier"
 msgstr "Identifiant ROR invalide"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:164
 msgid "Invalid IdRef PPN"
 msgstr "PPN IdRef invalide"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:165
 msgid "An institution with this name already exists"
 msgstr "Un établissement porte déjà ce nom"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:166
 msgid "An institution with this UAI already exists"
 msgstr "Un établissement porte déjà cet UAI"
 
-#: lib/apiErrors.ts:159
+#: lib/apiErrors.ts:167
 msgid "Institutions require the institution right"
 msgstr "Les établissements demandent le droit établissement"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:168
 msgid "Institution not found"
 msgstr "Établissement introuvable"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:169
 #: lib/gristService.ts:139
 msgid "Invalid Grist ID (gristRowId missing)"
 msgstr "ID Grist invalide (gristRowId manquant)"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:170
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Plusieurs appartenances ne peuvent être enregistrées que pour une personne ayant un identifiant d'annuaire (uid_dyna)."
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:171
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "Cette personne a d'autres lignes d'annuaire non qualifiées : traitez-les dans la page Doublons avant d'ajouter une appartenance."
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:172
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement des groupes — la colonne « groupes » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:173
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Erreur d'enregistrement de l'ID auteur — la colonne « openalex_author_id » existe-t-elle dans l'Annuaire ? (provisioning : node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:174
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "Pas d'identifiant OpenAlex configuré pour cette structure"
 
-#: lib/apiErrors.ts:167
+#: lib/apiErrors.ts:175
 msgid "No dashboard data for this structure"
 msgstr "Aucune donnée de tableau de bord pour cette structure"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:177
 msgid "messages[] required"
 msgstr "messages[] requis"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:178
 msgid "Assistant unavailable"
 msgstr "Assistant indisponible"
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:179
 msgid "Help assistant not configured"
 msgstr "Assistant d'aide non configuré"
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:180
 msgid "Project assistant not configured"
 msgstr "Assistant « Mon projet » non configuré"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:181
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "La newsletter n'est disponible que pour les structures avec un identifiant OpenAlex (pas les groupes)"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:182
 msgid "Generation interrupted"
 msgstr "Génération interrompue"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:183
 msgid "Generation failed"
 msgstr "Échec de la génération"
 
-#: lib/apiErrors.ts:176
+#: lib/apiErrors.ts:184
 msgid "Analysis failed"
 msgstr "Échec de l'analyse"
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:185
 msgid "Missing theme"
 msgstr "Thématique manquante"
 
-#: lib/apiErrors.ts:178
+#: lib/apiErrors.ts:186
 msgid "No publication to analyze"
 msgstr "Aucune publication à analyser"
 
-#: lib/apiErrors.ts:179
+#: lib/apiErrors.ts:187
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex injoignable"
 
-#: lib/apiErrors.ts:181
+#: lib/apiErrors.ts:189
 msgid "Report not found"
 msgstr "Rapport introuvable"
 
-#: lib/apiErrors.ts:182
+#: lib/apiErrors.ts:190
 msgid "Not allowed on this report"
 msgstr "Action non autorisée sur ce rapport"
 
-#: lib/apiErrors.ts:183
+#: lib/apiErrors.ts:191
 msgid "Invalid report definition"
 msgstr "Définition de rapport invalide"
 
-#: lib/apiErrors.ts:184
+#: lib/apiErrors.ts:192
 msgid "Report changed since it was loaded"
 msgstr "Le rapport a été modifié depuis son chargement"
 
-#: lib/apiErrors.ts:185
+#: lib/apiErrors.ts:193
 msgid "Invalid report share"
 msgstr "Partage de rapport invalide"
 
-#: lib/apiErrors.ts:186
+#: lib/apiErrors.ts:194
 msgid "Invalid report generation"
 msgstr "Génération de rapport invalide"
 
-#: lib/apiErrors.ts:187
+#: lib/apiErrors.ts:195
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Instance en lecture seule : les rapports sont conservés dans le navigateur"
 
-#: lib/apiErrors.ts:188
+#: lib/apiErrors.ts:196
 msgid "Invalid AI task"
 msgstr "Tâche IA invalide"
 
-#: lib/apiErrors.ts:189
+#: lib/apiErrors.ts:197
 msgid "PDF archiving is not configured on this instance"
 msgstr "L'archivage des PDF n'est pas configuré sur cette instance"
 
-#: lib/apiErrors.ts:190
+#: lib/apiErrors.ts:198
 msgid "Invalid PDF"
 msgstr "PDF invalide"
 
-#: lib/apiErrors.ts:191
+#: lib/apiErrors.ts:199
 msgid "Generation not found"
 msgstr "Génération introuvable"
 
-#: lib/apiErrors.ts:192
+#: lib/apiErrors.ts:200
 msgid "PDF not archived"
 msgstr "PDF non archivé"
 
-#: lib/apiErrors.ts:194
+#: lib/apiErrors.ts:202
 msgid "Invalid record key"
 msgstr "Clé de fiche invalide"
 
-#: lib/apiErrors.ts:195
+#: lib/apiErrors.ts:203
 msgid "Career path not computed yet for this record"
 msgstr "Parcours pas encore calculé pour cette fiche"
 
-#: lib/apiErrors.ts:196
+#: lib/apiErrors.ts:204
 msgid "Grist unreachable"
 msgstr "Grist injoignable"
 
-#: lib/apiErrors.ts:197
+#: lib/apiErrors.ts:205
 msgid "No Annuaire record for this key"
 msgstr "Aucune fiche de l’Annuaire pour cette clé"
 
-#: lib/apiErrors.ts:198
+#: lib/apiErrors.ts:206
 msgid "Refresh outside your scope"
 msgstr "Recalcul hors de votre périmètre"
 
-#: lib/apiErrors.ts:199
+#: lib/apiErrors.ts:207
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Trop de recalculs en cours, réessayez dans une minute"
 
-#: lib/apiErrors.ts:200
+#: lib/apiErrors.ts:208
 msgid "Career-path computation failed"
 msgstr "Le calcul du parcours a échoué"
 
-#: lib/apiErrors.ts:201
+#: lib/apiErrors.ts:209
 msgid "No usable identifier for this record"
 msgstr "Aucun identifiant exploitable pour cette fiche"
 
-#: lib/apiErrors.ts:202
+#: lib/apiErrors.ts:210
 msgid "Unknown suggestion"
 msgstr "Suggestion inconnue"
 
-#: lib/apiErrors.ts:204
+#: lib/apiErrors.ts:212
 msgid "Task not found"
 msgstr "Tâche introuvable"
 
-#: lib/apiErrors.ts:205
+#: lib/apiErrors.ts:213
 msgid "Unknown event action"
 msgstr "Action d’événement inconnue"
 
-#: lib/apiErrors.ts:206
+#: lib/apiErrors.ts:214
 msgid "Empty comment"
 msgstr "Commentaire vide"
 
-#: lib/apiErrors.ts:207
+#: lib/apiErrors.ts:215
 msgid "Nothing to update"
 msgstr "Rien à mettre à jour"
 
-#: lib/apiErrors.ts:208
+#: lib/apiErrors.ts:216
 msgid "Unknown task type"
 msgstr "Type de tâche inconnu"
 
-#: lib/apiErrors.ts:209
+#: lib/apiErrors.ts:217
 msgid "Unknown status"
 msgstr "Statut inconnu"
 
-#: lib/apiErrors.ts:210
+#: lib/apiErrors.ts:218
 msgid "Transition not allowed"
 msgstr "Transition non autorisée"
 
-#: lib/apiErrors.ts:211
+#: lib/apiErrors.ts:219
 msgid "Task detection already running"
 msgstr "Détection des tâches déjà en cours"
 
-#: lib/apiErrors.ts:213
+#: lib/apiErrors.ts:221
 msgid "Name required"
 msgstr "Nom requis"
 
-#: lib/apiErrors.ts:214
+#: lib/apiErrors.ts:222
 msgid "Empty list"
 msgstr "Liste vide"
 
-#: lib/apiErrors.ts:215
+#: lib/apiErrors.ts:223
 msgid "List of identifiers expected"
 msgstr "Liste d'identifiants attendue"
 
-#: lib/apiErrors.ts:216
+#: lib/apiErrors.ts:224
 msgid "Invalid mention identifier"
 msgstr "Identifiant de mention invalide"
 
-#: lib/apiErrors.ts:217
+#: lib/apiErrors.ts:225
 msgid "Invalid source identifier"
 msgstr "Identifiant de source invalide"
 
-#: lib/apiErrors.ts:218
+#: lib/apiErrors.ts:226
 msgid "researchers and structures arrays required"
 msgstr "Tableaux researchers et structures requis"
 
-#: lib/apiErrors.ts:219
+#: lib/apiErrors.ts:227
 msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
 msgstr "Les retraits d'identifiants n'ont pas pu partir vers le graphe CRISalid, réessayez plus tard"
 
-#: lib/apiErrors.ts:220
+#: lib/apiErrors.ts:228
 msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 msgstr "Trop de retraits d'identifiants à envoyer d'un coup au graphe CRISalid, un administrateur doit les vérifier"
 
-#: lib/apiErrors.ts:221
+#: lib/apiErrors.ts:229
 msgid "Cannot send the identifier removals to the CRISalid graph"
 msgstr "Impossible d'envoyer les retraits d'identifiants au graphe CRISalid"
 
-#: lib/apiErrors.ts:222
+#: lib/apiErrors.ts:230
 msgid "Cannot read the removals sent to the CRISalid graph"
 msgstr "Impossible de lire les retraits envoyés au graphe CRISalid"
 
-#: lib/apiErrors.ts:223
+#: lib/apiErrors.ts:231
 msgid "Keycloak admin API unreachable"
 msgstr "API d'administration Keycloak injoignable"
 
-#: lib/apiErrors.ts:224
+#: lib/apiErrors.ts:232
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "API ETL (druid-etl-api) injoignable"
 
-#: lib/apiErrors.ts:226
+#: lib/apiErrors.ts:234
 msgid "Grist path not allowed by the proxy"
 msgstr "Chemin Grist non autorisé par le proxy"
 
-#: lib/apiErrors.ts:227
+#: lib/apiErrors.ts:235
 msgid "Writing to the document root is refused"
 msgstr "Écriture sur la racine du document refusée"
 
-#: lib/apiErrors.ts:228
+#: lib/apiErrors.ts:236
 msgid "Writing to the table definition is refused"
 msgstr "Écriture sur la définition de la table refusée"
 
-#: lib/apiErrors.ts:229
+#: lib/apiErrors.ts:237
 msgid "Method not relayed"
 msgstr "Méthode non relayée"
 
-#: lib/apiErrors.ts:230
+#: lib/apiErrors.ts:238
 msgid "Method not relayed on /tables"
 msgstr "Méthode non relayée sur /tables"
 
-#: lib/apiErrors.ts:231
+#: lib/apiErrors.ts:239
 msgid "Table creation not allowed"
 msgstr "Création de table non autorisée"
 
-#: lib/apiErrors.ts:232
+#: lib/apiErrors.ts:240
 msgid "Table not writable through the proxy"
 msgstr "Table non modifiable via le proxy"
 
-#: lib/apiErrors.ts:233
+#: lib/apiErrors.ts:241
 msgid "Write outside scope"
 msgstr "Écriture hors périmètre"
 
-#: lib/apiErrors.ts:234
+#: lib/apiErrors.ts:242
 msgid "Creation outside scope"
 msgstr "Création hors périmètre"
 
-#: lib/apiErrors.ts:235
+#: lib/apiErrors.ts:243
 msgid "Rows outside scope or unknown"
 msgstr "Ligne(s) hors périmètre ou inconnue(s)"
 
-#: lib/apiErrors.ts:236
+#: lib/apiErrors.ts:244
 msgid "Scope check failed"
 msgstr "Vérification du périmètre impossible"
 
-#: lib/apiErrors.ts:237
+#: lib/apiErrors.ts:245
 msgid "Grist writes require the institution right"
 msgstr "Écriture Grist réservée au droit établissement"
 
-#: lib/apiErrors.ts:238
+#: lib/apiErrors.ts:246
 msgid "Writes require an authenticated user (Cloudflare Access)"
 msgstr "Écriture réservée aux utilisateurs identifiés (Cloudflare Access)"
 
-#: lib/apiErrors.ts:239
+#: lib/apiErrors.ts:247
 msgid "Read-only instance: writes are disabled"
 msgstr "Instance en lecture seule : les modifications sont désactivées"
 
-#: lib/apiErrors.ts:240
+#: lib/apiErrors.ts:248
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter indisponible sur cette instance"
 
-#: lib/apiErrors.ts:241
+#: lib/apiErrors.ts:249
 msgid "Missing id for PATCH"
 msgstr "id manquant pour PATCH"
 
-#: lib/apiErrors.ts:242
+#: lib/apiErrors.ts:250
 msgid "Invalid Grist identifiers"
 msgstr "Identifiants Grist invalides"
 
-#: lib/apiErrors.ts:243
+#: lib/apiErrors.ts:251
 msgid "Body with a records array expected"
 msgstr "Corps avec un tableau records attendu"
 
-#: lib/apiErrors.ts:245
+#: lib/apiErrors.ts:253
 msgid "An LDAP synchronization is already running"
 msgstr "Une synchronisation LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:246
+#: lib/apiErrors.ts:254
 msgid "An LDAP structures synchronization is already running"
 msgstr "Une synchronisation LDAP structures est déjà en cours"
 
-#: lib/apiErrors.ts:247
+#: lib/apiErrors.ts:255
 msgid "An LDAP search is already running"
 msgstr "Une recherche LDAP est déjà en cours"
 
-#: lib/apiErrors.ts:248
+#: lib/apiErrors.ts:256
 msgid "An IdRef alignment is already running"
 msgstr "Un alignement IdRef est déjà en cours"
 
-#: lib/apiErrors.ts:249
+#: lib/apiErrors.ts:257
 msgid "Alignment already running"
 msgstr "Un alignement est déjà en cours"
 
-#: lib/apiErrors.ts:250
+#: lib/apiErrors.ts:258
 msgid "Unknown alignment source"
 msgstr "Source d'alignement inconnue"
 
-#: lib/apiErrors.ts:251
+#: lib/apiErrors.ts:259
 msgid "No alignment running"
 msgstr "Aucun alignement en cours"
 
-#: lib/apiErrors.ts:253
+#: lib/apiErrors.ts:261
 msgid "Owner right required"
 msgstr "Droit de propriétaire requis"
 
-#: lib/apiErrors.ts:254
+#: lib/apiErrors.ts:262
 msgid "Unknown role"
 msgstr "Rôle inconnu"
 
-#: lib/apiErrors.ts:255
+#: lib/apiErrors.ts:263
 msgid "A lab account needs at least one lab"
 msgstr "Un compte laboratoire demande au moins un laboratoire"
 
-#: lib/apiErrors.ts:256
+#: lib/apiErrors.ts:264
 msgid "This address is already a member"
 msgstr "Cette adresse est déjà membre"
 
-#: lib/apiErrors.ts:257
+#: lib/apiErrors.ts:265
 msgid "Account limit of the plan reached"
 msgstr "Limite de comptes de l'offre atteinte"
 
-#: lib/apiErrors.ts:258
+#: lib/apiErrors.ts:266
 msgid "Member not found"
 msgstr "Membre introuvable"
 
-#: lib/apiErrors.ts:259
+#: lib/apiErrors.ts:267
 msgid "The last owner of a Druid keeps the role"
 msgstr "Le dernier propriétaire d'un Druid garde ce rôle"
 
-#: lib/apiErrors.ts:260
+#: lib/apiErrors.ts:268
 msgid "The last owner of a Druid cannot be removed"
 msgstr "Le dernier propriétaire d'un Druid ne peut pas être retiré"
 
-#: lib/apiErrors.ts:261
+#: lib/apiErrors.ts:269
 msgid "Access request not found"
 msgstr "Demande d'accès introuvable"
 
-#: lib/apiErrors.ts:262
+#: lib/apiErrors.ts:270
 msgid "Too many mail domains"
 msgstr "Trop de domaines mail"
 
-#: lib/apiErrors.ts:263
+#: lib/apiErrors.ts:271
 msgid "Invalid mail domain"
 msgstr "Domaine mail invalide"
 
-#: lib/apiErrors.ts:265
+#: lib/apiErrors.ts:273
 msgid "Not included in the plan of this Druid"
 msgstr "Non compris dans l'offre de ce Druid"
 
-#: lib/apiErrors.ts:266
+#: lib/apiErrors.ts:274
 msgid "Too many quote requests today"
 msgstr "Trop de demandes de devis aujourd'hui"
 
-#: lib/apiErrors.ts:268
+#: lib/apiErrors.ts:276
 msgid "Structure alignment already running"
 msgstr "Un alignement des structures est déjà en cours"
 
-#: lib/apiErrors.ts:270
+#: lib/apiErrors.ts:278
 msgid "Institution right required"
 msgstr "Droit établissement requis"
 
-#: lib/apiErrors.ts:271
+#: lib/apiErrors.ts:279
 msgid "Job already finished"
 msgstr "Tâche déjà terminée"
 
-#: lib/apiErrors.ts:272
+#: lib/apiErrors.ts:280
 msgid "Job already running"
 msgstr "Tâche déjà en cours"
 
-#: lib/apiErrors.ts:273
+#: lib/apiErrors.ts:281
 msgid "Dashboard build already running"
 msgstr "Construction des tableaux de bord déjà en cours"
 
-#: lib/apiErrors.ts:274
+#: lib/apiErrors.ts:282
 msgid "Unknown job type"
 msgstr "Type de tâche inconnu"
 
-#: lib/apiErrors.ts:275
+#: lib/apiErrors.ts:283
 msgid "Method not allowed"
 msgstr "Méthode non autorisée"
 
-#: lib/apiErrors.ts:276
+#: lib/apiErrors.ts:284
 msgid "Structure alignment needs the PostgreSQL storage"
 msgstr "L’alignement des structures nécessite le stockage PostgreSQL"
 
-#: lib/apiErrors.ts:277
+#: lib/apiErrors.ts:285
 msgid "Unknown identifier type"
 msgstr "Type d’identifiant inconnu"
 
-#: lib/apiErrors.ts:278
+#: lib/apiErrors.ts:286
 msgid "Invalid identifier"
 msgstr "Identifiant invalide"
 
-#: lib/apiErrors.ts:279
+#: lib/apiErrors.ts:287
 msgid "Candidate not found"
 msgstr "Candidat introuvable"
 
-#: lib/apiErrors.ts:280
+#: lib/apiErrors.ts:288
 msgid "Identifier not found"
 msgstr "Identifiant introuvable"
 
-#: lib/apiErrors.ts:281
+#: lib/apiErrors.ts:289
 msgid "Structure not found"
 msgstr "Structure introuvable"
 
-#: lib/apiErrors.ts:282
+#: lib/apiErrors.ts:290
 msgid "No run yet"
 msgstr "Aucun run encore effectué"
 
-#: lib/apiErrors.ts:284
+#: lib/apiErrors.ts:292
 msgid "LDAP not configured on this instance"
 msgstr "LDAP non configuré sur cette instance"
 
-#: lib/apiErrors.ts:285
+#: lib/apiErrors.ts:293
 msgid "Invalid uid"
 msgstr "uid invalide"
 
-#: lib/apiErrors.ts:286
+#: lib/apiErrors.ts:294
 msgid "No LDAP entry for this uid"
 msgstr "Aucune entrée LDAP pour cet uid"
 
-#: lib/apiErrors.ts:287
+#: lib/apiErrors.ts:295
 msgid "LDAP directory unreachable"
 msgstr "Annuaire LDAP injoignable"
 
-#: lib/apiErrors.ts:289
+#: lib/apiErrors.ts:297
 msgid "Invalid date"
 msgstr "Date invalide"
 
-#: lib/apiErrors.ts:291
+#: lib/apiErrors.ts:299
 msgid "No network data"
 msgstr "Pas de données de réseau"
 
-#: lib/apiErrors.ts:292
+#: lib/apiErrors.ts:300
 msgid "Unreadable network data"
 msgstr "Données de réseau illisibles"
 
-#: lib/apiErrors.ts:293
+#: lib/apiErrors.ts:301
 msgid "Structure not in the university network"
 msgstr "Structure absente du réseau de l'université"
 
-#: lib/apiErrors.ts:294
+#: lib/apiErrors.ts:302
 msgid "Invalid node ids"
 msgstr "Identifiants de nœuds invalides"
 
-#: lib/apiErrors.ts:296
+#: lib/apiErrors.ts:304
 msgid "Failed to fetch"
 msgstr "Serveur injoignable (réseau)"
 
-#: lib/apiErrors.ts:297
+#: lib/apiErrors.ts:305
 msgid "NetworkError when attempting to fetch resource."
 msgstr "Erreur réseau lors de l'appel au serveur."
 
-#: lib/apiErrors.ts:298
+#: lib/apiErrors.ts:306
 msgid "Load failed"
 msgstr "Chargement impossible (réseau)"
 

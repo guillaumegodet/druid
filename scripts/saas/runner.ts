@@ -14,7 +14,9 @@
 //   SAAS_WORK_DIR                          per-tenant files of the alignment scripts (default: <root>/saas-work)
 //   SAAS_ETL_DATA_DIR, SAAS_ETL_COMMAND     ETL of druid-biblio (lot 3 c): data folder of the tenants, command of one
 //                                          lab with {slug} (e.g. "python3 /opt/druid-biblio/scripts/run_structure_etl.py {slug}")
-//   SAAS_R2_ENDPOINT, SAAS_R2_BUCKET, SAAS_R2_ACCESS_KEY_ID, SAAS_R2_SECRET_ACCESS_KEY   dashboards (lib/saas/r2.ts)
+//   SAAS_R2_ENDPOINT, SAAS_R2_BUCKET, SAAS_R2_ACCESS_KEY_ID, SAAS_R2_SECRET_ACCESS_KEY   dashboards and exports (lib/saas/r2.ts)
+//   SAAS_PG_DUMP                           pg_dump of the exports (lot 6 a-3), same major version as the server or later
+//                                          (default: pg_dump in PATH); tar in PATH too
 //   SAAS_MEMORY_FLOOR_MB                   no job claimed under this MemAvailable (default 1200)
 //   SAAS_NIGHT_WINDOW=20-6                 UTC hours of the scheduled refreshes (lot 3 d)
 //   SAAS_RUNNER_NAME                       name of this runner (default <host>:<pid>)
@@ -54,6 +56,7 @@ const main = async (): Promise<void> => {
     secretsKey: process.env.SAAS_SECRETS_KEY || null,
     etl: process.env.SAAS_ETL_DATA_DIR && etlCommand.length ? { dataDir: process.env.SAAS_ETL_DATA_DIR, command: etlCommand } : null,
     assets: assetStoreFromEnv(process.env),
+    pgDumpBin: process.env.SAAS_PG_DUMP || undefined,
     memoryFloorMb: process.env.SAAS_MEMORY_FLOOR_MB === undefined ? 1200 : Math.max(0, Number(process.env.SAAS_MEMORY_FLOOR_MB) || 0),
     nightWindow: nightWindowOf(process.env.SAAS_NIGHT_WINDOW),
     log: (l) => console.log(`[saas-runner] ${new Date().toISOString()} ${l}`),

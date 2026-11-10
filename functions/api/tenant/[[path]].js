@@ -12,6 +12,12 @@
 //   PUT    /api/tenant/keys/scopus { apiKey?, instToken?, apiKey2?, instToken2?, keep*?, force? }
 //   POST   /api/tenant/keys/:group/test                                    tests the stored keys again
 //   DELETE /api/tenant/keys/:group
+// Owners only, also on a suspended tenant (lot 6 a-3; rules in lib/saas/lifecycle.ts):
+//   GET    /api/tenant/exports                       the latest exports (status, size, expiry)
+//   POST   /api/tenant/exports                       queues a `tenant.export` job → 202 (409 + the live one)
+//   GET    /api/tenant/exports/:id/download          the archive (410 once expired)
+//   POST   /api/tenant/deletion { confirm: <slug> }  suspends the tenant, deleted after 30 days; owners told by e-mail
+//   DELETE /api/tenant/deletion                      cancels a planned deletion
 // Every member (lot 6 b):
 //   GET    /api/tenant/offer                         the plan of the tenant and the plans, cheapest first (locked features)
 //   POST   /api/tenant/quote { plan, researchers?, accounts?, message?, feature? }   e-mail to DirlaData + quote_request
@@ -20,11 +26,15 @@ import {
   ClientKeyError, describeClientKeys, isKeyGroup, removeClientKeys, retestClientKeys, saveClientKeys,
 } from '../../../lib/saas/clientKeys.ts';
 import {
+  LifecycleError, cancelDeletion, deletionOf, exportToDownload, exportViewOf, listExports, requestDeletion, requestExport,
+} from '../../../lib/saas/lifecycle.ts';
+import { logConsole } from '../../../lib/saas/console.ts';
+import {
   MemberError, dismissAccessRequest, findAccessRequest, findMemberById, inviteMember, listAccessRequests, listMembers, removeMember, seatsOf,
   setMailDomains, updateMember,
 } from '../../../lib/saas/members.ts';
-import { sendInvitation, sendQuoteRequest } from '../../_lib/email.js';
-import { forgetHost, forgetTenantSecrets, json, withSaasDb } from '../../_lib/saas.js';
+import { sendDeletionScheduled, sendInvitation, sendQuoteRequest } from '../../_lib/email.js';
+import { SAAS_ASSETS_BINDING, forgetHost, forgetHostEverywhere, forgetTenantSecrets, json, withSaasDb } from '../../_lib/saas.js';
 import { tenantMember } from '../../_lib/jobs.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -125,6 +135,71 @@ const keys = async (context, db, instance, identity, method, group, action, body
   return json(404, { error: 'Not found' });
 };
 
+/** Every host of the tenant forgotten by the caches (its status changed: read-only at once everywhere). */
+const forgetTenantHosts = async (env, db, tenantId) => {
+  const hosts = await db.selectFrom('tenant_host').select('host').where('tenant_id', '=', tenantId).execute();
+  for (const h of hosts) await forgetHostEverywhere(env, h.host);
+};
+
+/**
+ * Export and deletion (lot 6 a-3), owners only and also on a suspended tenant: its data stays the establishment's, which
+ * exports it or cancels the deletion until the last day.
+ */
+const lifecycle = async (context, instance, identity, method, section, id, action) => {
+  const { env, request } = context;
+  const tenant = instance.tenant;
+  const log = (event, extra = {}) => console.log(JSON.stringify({ event: `tenant.${event}`, instance: instance.slug, ...extra }));
+  return withSaasDb(env, async (db) => {
+    if (section === 'exports' && !id && method === 'GET') return json(200, { exports: await listExports(db, tenant.id) });
+    if (section === 'exports' && !id && method === 'POST') {
+      const { job, created } = await requestExport(db, tenant.id, identity);
+      if (created) log('export.requested');
+      return json(created ? 202 : 409, { export: exportViewOf(job), ...(created ? {} : { error: 'An export is already running' }) });
+    }
+    if (section === 'exports' && id && action === 'download' && method === 'GET') {
+      if (!UUID_RE.test(id)) return json(404, { error: 'Not found' });
+      const bucket = env[SAAS_ASSETS_BINDING];
+      if (!bucket) return json(503, { error: 'No file store on this deployment' });
+      const file = await exportToDownload(db, tenant.id, id);
+      const object = await bucket.get(file.objectKey);
+      if (!object) return json(410, { error: 'This export has expired: ask for a new one' });
+      log('export.downloaded');
+      return new Response(object.body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/gzip', 'Content-Disposition': `attachment; filename="${file.fileName}"`,
+          ...(file.size ? { 'Content-Length': String(file.size) } : {}), 'Cache-Control': 'no-store',
+        },
+      });
+    }
+    if (section === 'deletion' && !id && method === 'POST') {
+      let body = {};
+      try { body = (await request.json()) || {}; } catch { return json(400, { error: 'Invalid request' }); }
+      const deletion = await requestDeletion(db, tenant, { by: identity, confirm: body.confirm });
+      await logConsole(db, { actor: identity, action: 'deletion-requested', tenantId: tenant.id, details: { deleteAfter: deletion.deleteAfter } });
+      await forgetTenantHosts(env, db, tenant.id);
+      log('deletion.requested', { deleteAfter: deletion.deleteAfter });
+      if (env.RESEND_API_KEY) {
+        const owners = await db.selectFrom('member').select('email').where('tenant_id', '=', tenant.id).where('role', '=', 'owner').execute();
+        const adminUrl = `${new URL(request.url).origin}/?page=ADMIN&tab=establishment`;
+        for (const o of owners) {
+          await sendDeletionScheduled(env, { to: o.email, label: instance.label, requestedBy: identity, deleteAfter: deletion.deleteAfter, adminUrl })
+            .catch((err) => console.error(JSON.stringify({ event: 'tenant.deletion.mail_failed', instance: instance.slug, error: String(err?.message || err) })));
+        }
+      }
+      return json(200, { deletion });
+    }
+    if (section === 'deletion' && !id && method === 'DELETE') {
+      const status = await cancelDeletion(db, tenant.id);
+      await logConsole(db, { actor: identity, action: 'deletion-cancelled', tenantId: tenant.id, details: { status } });
+      await forgetTenantHosts(env, db, tenant.id);
+      log('deletion.cancelled', { status });
+      return json(200, { cancelled: true, status });
+    }
+    return json(404, { error: 'Not found' });
+  });
+};
+
 export async function onRequest(context) {
   const t = tenantMember(context);
   if (t.refusal) return t.refusal;
@@ -136,6 +211,15 @@ export async function onRequest(context) {
   if (parts[0] === 'quote' && parts.length === 1 && method === 'POST') return quote(context, instance, identity);
   const isOwner = member.role === 'owner';
   if (!isOwner && member.role !== 'admin') return json(403, { error: 'Owner right required' });
+  if (parts[0] === 'exports' || parts[0] === 'deletion') {
+    if (!isOwner) return json(403, { error: 'Owner right required' });
+    try {
+      return await lifecycle(context, instance, identity, method, parts[0], parts[1], parts[2]);
+    } catch (err) {
+      if (err instanceof LifecycleError) return json(err.status, { error: err.message });
+      throw err;
+    }
+  }
   if (method !== 'GET') {
     if (!isOwner) return json(403, { error: 'Owner right required' });
     if (instance.readOnly) return json(403, { error: 'Read-only instance: writes are disabled' });
@@ -144,7 +228,8 @@ export async function onRequest(context) {
   try {
     return await withSaasDb(context.env, async (db) => {
       if (!parts.length && method === 'GET') {
-        const row = await db.selectFrom('tenant').select(['label', 'mail_domains', 'created_at']).where('id', '=', tenant.id).executeTakeFirstOrThrow();
+        const row = await db.selectFrom('tenant').select(['label', 'mail_domains', 'created_at', 'delete_requested_at', 'delete_requested_by', 'delete_after'])
+          .where('id', '=', tenant.id).executeTakeFirstOrThrow();
         const plans = await db.selectFrom('plan').select(['code', 'label', 'seats', 'history_years', 'refresh', 'features']).orderBy('created_at').execute();
         return json(200, {
           slug: tenant.slug, label: row.label, status: tenant.status, createdAt: row.created_at,
@@ -154,6 +239,7 @@ export async function onRequest(context) {
           members: await listMembers(db, tenant.id),
           accessRequests: await listAccessRequests(db, tenant.id),
           mailDomains: row.mail_domains,
+          deletion: deletionOf(row),
           me: { email: identity, role: member.role },
         });
       }

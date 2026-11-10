@@ -98,6 +98,8 @@ export const tenantInstance = ({ tenant, plan }) => {
     tenant: {
       id: tenant.id, slug: tenant.slug, schema: tenant.schema_name, status: tenant.status, planCode: tenant.plan_code,
       plan: plan || null, mailDomains: tenant.mail_domains || [], settings,
+      // Deletion planned by the owner (lot 6 a-3): the app says when.
+      deleteAfter: tenant.delete_after || null,
     },
   };
 };

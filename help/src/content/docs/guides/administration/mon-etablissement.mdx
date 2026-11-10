@@ -75,3 +75,32 @@ enregistré et la raison s'affiche (clé refusée, modèle inconnu, jeton d'éta
 même** garde la clé malgré l'échec, par exemple quand le service est momentanément indisponible. Les clés sont
 conservées chiffrées et ne sont jamais réaffichées : pour en changer, saisissez la nouvelle ; un champ de clé laissé
 vide garde la clé enregistrée. **Tester à nouveau** refait le test, **Supprimer** retire les clés du groupe.
+
+## Exporter les données
+
+La carte **Données de l'établissement** (propriétaires seulement) prépare une archive de tout ce que contient votre
+Druid : **Préparer un export** la fait construire sur le serveur et vous recevez un e-mail quand elle est prête.
+Elle se télécharge ensuite depuis la même carte pendant 7 jours, puis elle est supprimée.
+
+L'archive (`.tar.gz`) contient :
+
+- `database.sql` : toutes les tables du Druid (référentiel, appartenances, alignements, rapports, journal…), au format
+  PostgreSQL, restaurable telle quelle dans une base vide (version 17 ou plus) avec
+  `psql -d <base> -v ON_ERROR_STOP=1 -f database.sql` ;
+- `dashboards/` : les tableaux de bord de publications de chaque laboratoire ;
+- `members.csv` : les comptes, leur rôle et leurs laboratoires ;
+- `README.txt` : ce mode d'emploi.
+
+Elle contient des données personnelles (chercheurs, comptes) : conservez-la en lieu sûr. L'export reste possible
+pendant une suppression programmée.
+
+## Supprimer le Druid
+
+En bas de la carte, **Demander la suppression de ce Druid et de toutes ses données** demande de taper le nom du Druid
+pour confirmer. Le Druid passe aussitôt en **lecture seule** pour tous les comptes et chaque propriétaire reçoit un
+e-mail. **Trente jours plus tard**, il est supprimé définitivement : base de données, tableaux de bord, exports,
+comptes, clés et adresse. Jusqu'au dernier jour, un propriétaire peut **Annuler la suppression** depuis la même carte,
+et le Druid retrouve son état d'avant. Préparez un export avant si vous voulez garder les données.
+
+Les sauvegardes de l'hébergeur qui contiennent encore une copie expirent d'elles-mêmes, sans restauration possible
+de votre côté.

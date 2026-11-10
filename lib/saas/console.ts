@@ -9,6 +9,7 @@ import { sql } from 'kysely';
 import { liveJob } from './jobs';
 import { normalizeEmail, publicJobInfo, type Job, type SaasDb, type Tenant } from './controlPlane';
 import { redactSecrets } from './redact';
+import { cancelDeletion, deletionOf } from './lifecycle';
 
 /** Addresses allowed on the console (comma, space or semicolon separated). */
 export const superadminEmails = (raw: unknown): string[] =>
@@ -26,11 +27,13 @@ export interface TenantOverview {
   lastJob: { type: string; status: string; createdAt: string } | null;
   failedJobs7d: number;
   pendingQuotes: number;
+  /** Deletion planned by the owner (lot 6 a-3). */
+  deleteAfter: string | null;
 }
 
 /** Every tenant but the deleted ones, newest first, with what the console list shows. */
 export const tenantsOverview = async (db: SaasDb): Promise<TenantOverview[]> => {
-  const rows = await db.selectFrom('tenant').select(['id', 'slug', 'label', 'status', 'plan_code', 'created_at'])
+  const rows = await db.selectFrom('tenant').select(['id', 'slug', 'label', 'status', 'plan_code', 'created_at', 'delete_after'])
     .select((eb) => [
       eb.selectFrom('tenant_host').select('host').whereRef('tenant_host.tenant_id', '=', 'tenant.id').where('is_primary', '=', true).limit(1).as('host'),
       eb.selectFrom('member').select(eb.fn.countAll<string>().as('n')).whereRef('member.tenant_id', '=', 'tenant.id').as('members'),
@@ -49,6 +52,7 @@ export const tenantsOverview = async (db: SaasDb): Promise<TenantOverview[]> => 
       lastJob: last ? { type: last.type, status: last.status, createdAt: String(last.created_at) } : null,
       failedJobs7d: Number(r.failed7 || 0),
       pendingQuotes: Number(r.quotes || 0),
+      deleteAfter: r.delete_after ? new Date(r.delete_after).toISOString() : null,
     });
   }
   return out;
@@ -76,6 +80,7 @@ export const tenantDetail = async (db: SaasDb, slug: string) => {
     tenant: {
       slug: t.slug, label: t.label, status: t.status, plan: t.plan_code, schema: t.schema_name, ror: t.ror, uai: t.uai,
       mailDomains: t.mail_domains, createdBy: t.created_by, createdAt: String(t.created_at),
+      deletion: deletionOf(t),
     },
     plans: plans.map((p) => ({ code: p.code, label: p.label, seats: p.seats })),
     hosts,
@@ -119,11 +124,21 @@ export const setTenantPlan = async (db: SaasDb, slug: string, planCode: string, 
 export const setTenantStatus = async (db: SaasDb, slug: string, status: 'active' | 'suspended', actor: string): Promise<void> => {
   const t = await tenantBySlug(db, slug);
   if (t.status !== 'active' && t.status !== 'suspended') throw new ConsoleError(409, 'Only an active or suspended tenant can change status');
+  if (t.delete_after) throw new ConsoleError(409, 'A deletion is planned: cancel it first');
   if (t.status === status) return;
   await db.transaction().execute(async (trx) => {
     await trx.updateTable('tenant').set({ status, updated_at: sql`now()` as any }).where('id', '=', t.id).execute();
     await logConsole(trx as unknown as SaasDb, { actor, action: status === 'suspended' ? 'suspend' : 'reactivate', tenantId: t.id });
   });
+};
+
+/** Cancels the deletion an owner asked (lot 6 a-3): the tenant gets back its previous status. */
+export const cancelTenantDeletion = async (db: SaasDb, slug: string, actor: string): Promise<string> => {
+  const t = await tenantBySlug(db, slug);
+  if (!t.delete_after) throw new ConsoleError(409, 'No deletion is planned');
+  const status = await cancelDeletion(db, t.id);
+  await logConsole(db, { actor, action: 'deletion-cancelled', tenantId: t.id, details: { status, deleteAfter: new Date(t.delete_after).toISOString() } });
+  return status;
 };
 
 /** Queues a job again (same type, parameters and key): 409 when one of its key is already queued or running. */

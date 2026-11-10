@@ -95,3 +95,38 @@ ${message ? `<p style="font-size:14px;line-height:1.6;white-space:pre-wrap;margi
   const text = `${rows.map(([k, v]) => `${k} : ${v}`).join('\n')}\n\n${message || ''}\n`;
   return sendEmail(env, { to, subject: `Demande de devis Druid — ${label} (${plan})`, html, text, replyTo: requester });
 };
+
+const dateFr = (iso: string): string => new Date(iso).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' });
+const dateEn = (iso: string): string => new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Paris' });
+
+/** The export of the data is ready (lot 6 a-3): link to « My institution », where it is downloaded (owners only). */
+export const sendExportReady = (env: EmailEnv, { to, label, adminUrl, expiresAt }: { to: string; label: string; adminUrl: string; expiresAt: string }): Promise<void> => {
+  const title = `Druid — ${label}`;
+  const html = wrap(title, `
+<p style="font-size:15px;line-height:1.6;margin:0 0 20px">L'export des données du Druid de ${escape(label)} est prêt. Téléchargez-le depuis Administration › Mon établissement (connexion requise) avant le ${escape(dateFr(expiresAt))} : il sera supprimé ensuite.</p>
+<p style="font-size:13px;color:#6f6a5e;margin:0 0 20px">The data export of the Druid of ${escape(label)} is ready. Download it from Administration › My institution (sign-in required) before ${escape(dateEn(expiresAt))}: it is removed afterwards.</p>
+${button(adminUrl, 'Télécharger · Download')}`);
+  const text = `Druid — ${label}\n\nExport prêt jusqu'au ${dateFr(expiresAt)} / Export ready until ${dateEn(expiresAt)}:\n${adminUrl}\n`;
+  return sendEmail(env, { to, subject: `Export de votre Druid prêt · Your Druid export is ready (${label})`, html, text });
+};
+
+/** A deletion was asked (lot 6 a-3): to every owner, with the date and how to cancel. */
+export const sendDeletionScheduled = (env: EmailEnv, { to, label, requestedBy, deleteAfter, adminUrl }: { to: string; label: string; requestedBy: string; deleteAfter: string; adminUrl: string }): Promise<void> => {
+  const title = `Druid — ${label}`;
+  const html = wrap(title, `
+<p style="font-size:15px;line-height:1.6;margin:0 0 20px">${escape(requestedBy)} a demandé la suppression du Druid de ${escape(label)}. Il est désormais en lecture seule et sera supprimé définitivement le ${escape(dateFr(deleteAfter))} : base de données, tableaux de bord, comptes et clés. D'ici là, un propriétaire peut exporter les données ou annuler la suppression dans Administration › Mon établissement.</p>
+<p style="font-size:13px;color:#6f6a5e;margin:0 0 20px">${escape(requestedBy)} asked for the deletion of the Druid of ${escape(label)}. It is now read-only and will be deleted for good on ${escape(dateEn(deleteAfter))}: database, dashboards, accounts and keys. Until then, an owner can export the data or cancel the deletion in Administration › My institution.</p>
+${button(adminUrl, 'Mon établissement · My institution')}`);
+  const text = `Druid — ${label}\n\nSuppression prévue le ${dateFr(deleteAfter)} / Deletion planned on ${dateEn(deleteAfter)} (${requestedBy}).\n${adminUrl}\n`;
+  return sendEmail(env, { to, subject: `Suppression de votre Druid prévue · Deletion of your Druid planned (${label})`, html, text });
+};
+
+/** The deletion is done (lot 6 a-3): to the owners it had, as a record. */
+export const sendTenantDeleted = (env: EmailEnv, { to, label }: { to: string; label: string }): Promise<void> => {
+  const title = `Druid — ${label}`;
+  const html = wrap(title, `
+<p style="font-size:15px;line-height:1.6;margin:0 0 20px">Le Druid de ${escape(label)} a été supprimé comme demandé : sa base de données, ses tableaux de bord, ses exports, ses comptes et ses clés n'existent plus. Les sauvegardes de l'hébergeur qui en gardent une copie expirent d'elles-mêmes.</p>
+<p style="font-size:13px;color:#6f6a5e;margin:0">The Druid of ${escape(label)} was deleted as asked: its database, dashboards, exports, accounts and keys are gone. The backups of the host that still hold a copy expire on their own.</p>`);
+  const text = `Druid — ${label}\n\nLe Druid a été supprimé. / The Druid was deleted.\n`;
+  return sendEmail(env, { to, subject: `Votre Druid a été supprimé · Your Druid was deleted (${label})`, html, text });
+};
