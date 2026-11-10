@@ -153,11 +153,9 @@ msgid "Error saving the structure"
 msgstr "Erreur lors de l'enregistrement de la structure"
 
 #: App.tsx:737
-msgid ""
-"Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
+msgid "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
-msgstr ""
-"Profil {candidateId} marqué « Identité mêlée » pour {displayName}.\n"
+msgstr "Profil {candidateId} marqué « Identité mêlée » pour {displayName}.\n"
 "Note (facultative) : qui possède quoi, ce qu'il faudrait scinder…"
 
 #: App.tsx:746
@@ -468,16 +466,16 @@ msgstr "à l'international"
 msgid "members"
 msgstr "membres"
 
+#. placeholder {0}: data.lab
+#: components/DashboardPage.tsx:402
+msgid "Dashboard — {0}"
+msgstr "Tableau de bord — {0}"
+
 #: components/DashboardPage.tsx:402
 #: components/Sidebar.tsx:161
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Tableau de bord"
-
-#. placeholder {0}: data.lab
-#: components/DashboardPage.tsx:402
-msgid "Dashboard — {0}"
-msgstr "Tableau de bord — {0}"
 
 #: components/DashboardPage.tsx:416
 #: components/reports/ReportControls.tsx:44
@@ -811,6 +809,10 @@ msgid "Export PDF"
 msgstr "Export PDF"
 
 #: components/ResearcherDetail.tsx:321
+msgid "Create the record"
+msgstr "Créer la fiche"
+
+#: components/ResearcherDetail.tsx:321
 #: components/StructureDetail.tsx:139
 #: components/admin/EstablishmentAdmin.tsx:256
 #: components/admin/InstitutionsAdmin.tsx:219
@@ -819,10 +821,6 @@ msgstr "Export PDF"
 #: components/reports/ShareDialog.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
-
-#: components/ResearcherDetail.tsx:321
-msgid "Create the record"
-msgstr "Créer la fiche"
 
 #: components/ResearcherDetail.tsx:353
 #: components/ResearcherDetail.tsx:354
@@ -2044,14 +2042,14 @@ msgid "The file could not be read"
 msgstr "Le fichier n'a pas pu être lu"
 
 #: components/admin/ManualCallsAdmin.tsx:402
-#: components/researchers/UnifiedAlignPage.tsx:651
-msgid "error"
-msgstr "erreur"
-
-#: components/admin/ManualCallsAdmin.tsx:402
 #: components/researchers/DuplicatesPage.tsx:181
 msgid "new"
 msgstr "nouveau"
+
+#: components/admin/ManualCallsAdmin.tsx:402
+#: components/researchers/UnifiedAlignPage.tsx:651
+msgid "error"
+msgstr "erreur"
 
 #: components/admin/ManualCallsAdmin.tsx:402
 msgid "update"
@@ -2672,14 +2670,14 @@ msgid "Share (%)"
 msgstr "Part (%)"
 
 #: components/dashboard/AxesTab.tsx:412
+msgid "Strategic axes by team (share of each team's publications)"
+msgstr "Axes stratégiques par équipe (part des publications de chaque équipe)"
+
+#: components/dashboard/AxesTab.tsx:412
 #: components/dashboard/embedRegistry.tsx:682
 #: components/dashboard/embedRegistry.tsx:687
 msgid "Strategic axes by team"
 msgstr "Axes stratégiques par équipe"
-
-#: components/dashboard/AxesTab.tsx:412
-msgid "Strategic axes by team (share of each team's publications)"
-msgstr "Axes stratégiques par équipe (part des publications de chaque équipe)"
 
 #: components/dashboard/AxesTab.tsx:425
 msgid "Keywords by strategic axis"
@@ -4172,17 +4170,17 @@ msgstr "Institutions les plus co-signataires"
 
 #: components/dashboard/CountryCharts.tsx:41
 #: components/dashboard/countryKpis.ts:62
+#: components/dashboard/partnerKpis.ts:175
+msgid "Teams involved"
+msgstr "Équipes impliquées"
+
+#: components/dashboard/CountryCharts.tsx:41
+#: components/dashboard/countryKpis.ts:62
 #: components/dashboard/embedRegistry.tsx:1043
 #: components/dashboard/embedRegistry.tsx:1048
 #: components/dashboard/partnerKpis.ts:175
 msgid "Labs involved"
 msgstr "Labos impliqués"
-
-#: components/dashboard/CountryCharts.tsx:41
-#: components/dashboard/countryKpis.ts:62
-#: components/dashboard/partnerKpis.ts:175
-msgid "Teams involved"
-msgstr "Équipes impliquées"
 
 #. placeholder {0}: focus.label
 #: components/dashboard/CountryCharts.tsx:52
@@ -6790,22 +6788,22 @@ msgid "Yearly evolution by goal"
 msgstr "Évolution annuelle par ODD"
 
 #: components/dashboard/SdgTab.tsx:425
+msgid "Goals by lab (share of each lab's tagged publications)"
+msgstr "ODD par labo (part des publications étiquetées de chaque labo)"
+
+#: components/dashboard/SdgTab.tsx:425
 #: components/dashboard/embedRegistry.tsx:725
 msgid "Goals by lab"
 msgstr "ODD par labo"
 
-#: components/dashboard/SdgTab.tsx:425
-msgid "Goals by lab (share of each lab's tagged publications)"
-msgstr "ODD par labo (part des publications étiquetées de chaque labo)"
+#: components/dashboard/SdgTab.tsx:426
+msgid "Goals by team (share of each team's tagged publications)"
+msgstr "ODD par équipe (part des publications étiquetées de chaque équipe)"
 
 #: components/dashboard/SdgTab.tsx:426
 #: components/dashboard/embedRegistry.tsx:725
 msgid "Goals by team"
 msgstr "ODD par équipe"
-
-#: components/dashboard/SdgTab.tsx:426
-msgid "Goals by team (share of each team's tagged publications)"
-msgstr "ODD par équipe (part des publications étiquetées de chaque équipe)"
 
 #: components/dashboard/SdgTab.tsx:445
 msgid "Official titles and colours of the United Nations. The figures are not comparable with rankings built on other classifiers (THE Impact Rankings, SciVal)."
@@ -11698,13 +11696,13 @@ msgid "Concurrent affiliation (directory row qualified SECONDAIRE)"
 msgstr "Rattachement concomitant (ligne Annuaire qualifiée SECONDAIRE)"
 
 #: components/researchers/AffiliationsTable.tsx:124
+msgid "former"
+msgstr "historique"
+
+#: components/researchers/AffiliationsTable.tsx:124
 #: components/researchers/UnifiedAlignPage.tsx:77
 msgid "secondary"
 msgstr "secondaire"
-
-#: components/researchers/AffiliationsTable.tsx:124
-msgid "former"
-msgstr "historique"
 
 #: components/researchers/AffiliationsTable.tsx:132
 msgid "— Structure —"
@@ -12205,11 +12203,6 @@ msgstr "Déclarer un multi-rattachement (concomitant ou successif) ou marquer «
 msgid "Qualify"
 msgstr "Qualifier"
 
-#: components/researchers/DuplicatesPage.tsx:212
-#: components/researchers/TasksPage.tsx:330
-msgid "Open the merge assistant"
-msgstr "Ouvrir l'assistant de fusion"
-
 #. placeholder {0}: a.name
 #. placeholder {1}: a.labo || '∅'
 #. placeholder {2}: b.name
@@ -12217,6 +12210,11 @@ msgstr "Ouvrir l'assistant de fusion"
 #: components/researchers/DuplicatesPage.tsx:212
 msgid "Merge {0} ({1}) and {2} ({3})"
 msgstr "Fusionner {0} ({1}) et {2} ({3})"
+
+#: components/researchers/DuplicatesPage.tsx:212
+#: components/researchers/TasksPage.tsx:330
+msgid "Open the merge assistant"
+msgstr "Ouvrir l'assistant de fusion"
 
 #: components/researchers/DuplicatesPage.tsx:216
 #: components/researchers/LdapCandidatesPage.tsx:223
@@ -14572,12 +14570,10 @@ msgid "List (paste: name, email, uid, status)"
 msgstr "Liste (coller : nom, email, uid, statut)"
 
 #: components/researchers/ValidationImportReview.tsx:92
-msgid ""
-"name,email,uid\n"
+msgid "name,email,uid\n"
 "DUPONT Jean,jean.dupont@x.fr,jdupont\n"
 "…"
-msgstr ""
-"nom,email,uid\n"
+msgstr "nom,email,uid\n"
 "DUPONT Jean,jean.dupont@x.fr,jdupont\n"
 "…"
 
@@ -15818,7 +15814,7 @@ msgstr "{0} : aucun profil — à corriger dans l'Annuaire"
 msgid "Invalid ID_SCOPUS"
 msgstr "ID_SCOPUS invalide"
 
-#. placeholder {0}: entry.scopus!
+#. placeholder {0}: entry.scopus
 #: lib/alignTextsI18n.ts:29
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est admis pour marquer une absence vérifiée)"
@@ -15827,7 +15823,7 @@ msgstr "{0} : pas un identifiant Scopus numérique (le texte « absent » est ad
 msgid "Invalid ORCID"
 msgstr "ORCID invalide"
 
-#. placeholder {0}: entry.orcid!
+#. placeholder {0}: entry.orcid
 #: lib/alignTextsI18n.ts:31
 msgid "{0}: wrong format or check digit"
 msgstr "{0} : format ou clé de contrôle incorrects"
@@ -15836,8 +15832,8 @@ msgstr "{0} : format ou clé de contrôle incorrects"
 msgid "Profile merged by Scopus"
 msgstr "Profil fusionné par Scopus"
 
-#. placeholder {0}: entry.scopus!
-#. placeholder {1}: entry.merged!
+#. placeholder {0}: entry.scopus
+#. placeholder {1}: entry.merged
 #: lib/alignTextsI18n.ts:33
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à jour ID_SCOPUS"
@@ -15847,7 +15843,7 @@ msgstr "{0} → {1} : Scopus a fusionné ce profil dans un autre — mettre à j
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — vérifier le profil, le marquer « Identité mêlée » si besoin"
 
-#. placeholder {0}: cand.fullName!
+#. placeholder {0}: cand.fullName
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
 #: lib/alignTextsI18n.ts:35
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
