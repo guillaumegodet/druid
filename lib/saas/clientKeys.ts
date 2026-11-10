@@ -9,7 +9,7 @@
  * code the page translates (the message of the provider is kept as a detail, never a key).
  */
 import type { SaasDb } from './controlPlane';
-import { TENANT_PUBLIC_SETTINGS, decryptSecret, writeTenantSecret, type TenantSecretName } from './secrets';
+import { TENANT_PUBLIC_SETTINGS, decryptSecret, writeTenantSecret, type TenantSecretName } from './secrets.ts';
 
 export const KEY_GROUPS = {
   llm: ['ILAAS_API_BASE', 'ILAAS_MODEL', 'ILAAS_API_KEY'],
@@ -28,7 +28,9 @@ export type CheckCode = 'ok' | 'invalid_key' | 'not_entitled' | 'model_not_found
 export interface KeyCheck { ok: boolean; code: CheckCode; detail: string | null }
 
 export class ClientKeyError extends Error {
-  constructor(message: string, public status = 400) { super(message); }
+  // No parameter property: the Functions guards run this file with Node's type stripping.
+  status: number;
+  constructor(message: string, status = 400) { super(message); this.status = status; }
 }
 
 type FetchLike = (url: string, init: { method: string; headers: Record<string, string>; body?: string; signal?: AbortSignal }) =>
