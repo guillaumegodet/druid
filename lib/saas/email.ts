@@ -130,3 +130,32 @@ export const sendTenantDeleted = (env: EmailEnv, { to, label }: { to: string; la
   const text = `Druid — ${label}\n\nLe Druid a été supprimé. / The Druid was deleted.\n`;
   return sendEmail(env, { to, subject: `Votre Druid a été supprimé · Your Druid was deleted (${label})`, html, text });
 };
+
+/**
+ * A job of the establishment failed (lot 6 d): to the member who started it, or to the owners for a scheduled one
+ * (`retried`: the scheduler tries again the next night). Sent once per series of failures (lib/saas/notices.ts).
+ */
+export const sendJobFailed = (env: EmailEnv, { to, label, what, reason, pageUrl, retried }: { to: string; label: string; what: [string, string]; reason: string; pageUrl: string; retried: boolean }): Promise<void> => {
+  const title = `Druid — ${label}`;
+  const why = reason ? `<p style="font-size:13px;font-family:ui-monospace,Menlo,monospace;background:#f4f0e6;border-radius:10px;padding:10px 12px;margin:0 0 20px;word-break:break-word">${escape(reason)}</p>` : '';
+  const next = retried
+    ? ['Une nouvelle tentative aura lieu la nuit prochaine ; vous pouvez aussi la relancer vous-même.', 'It will be tried again next night; you can also start it again yourself.']
+    : ['Vous pouvez la relancer depuis la page ci-dessous.', 'You can start it again from the page below.'];
+  const html = wrap(title, `
+<p style="font-size:15px;line-height:1.6;margin:0 0 12px">${escape(what[0])} du Druid de ${escape(label)} a échoué. ${escape(next[0])} Si l'échec se répète, nous en sommes prévenus et revenons vers vous.</p>
+${why}<p style="font-size:13px;color:#6f6a5e;margin:0 0 20px">${escape(what[1])} of the Druid of ${escape(label)} failed. ${escape(next[1])} If it fails again, we are told and come back to you.</p>
+${button(pageUrl, 'Ouvrir Druid · Open Druid')}`);
+  const text = `Druid — ${label}\n\n${what[0]} a échoué. / ${what[1]} failed.\n${reason ? `\n${reason}\n` : ''}\n${pageUrl}\n`;
+  return sendEmail(env, { to, subject: `Échec : ${what[0].charAt(0).toLowerCase()}${what[0].slice(1)} · Failed: ${what[1].charAt(0).toLowerCase()}${what[1].slice(1)} (${label})`, html, text });
+};
+
+/** Nobody signed in for 90 days (lot 6 d): to the owners, once per inactive spell (lib/saas/notices.ts). */
+export const sendInactivityNotice = (env: EmailEnv, { to, label, lastActivity, loginUrl, adminUrl }: { to: string; label: string; lastActivity: string; loginUrl: string; adminUrl: string }): Promise<void> => {
+  const title = `Druid — ${label}`;
+  const html = wrap(title, `
+<p style="font-size:15px;line-height:1.6;margin:0 0 20px">Personne ne s'est connecté au Druid de ${escape(label)} depuis le ${escape(dateFr(lastActivity))}. Ses publications et tableaux de bord continuent d'être actualisés. Si vous ne l'utilisez plus, un propriétaire peut exporter les données ou supprimer le Druid dans Administration › Mon établissement (<a href="${escape(adminUrl)}" style="color:#1c1b19">lien</a>).</p>
+<p style="font-size:13px;color:#6f6a5e;margin:0 0 20px">Nobody signed in to the Druid of ${escape(label)} since ${escape(dateEn(lastActivity))}. Its publications and dashboards are still refreshed. If you no longer use it, an owner can export the data or delete the Druid in Administration › My institution.</p>
+${button(loginUrl, 'Ouvrir mon Druid · Open my Druid')}`);
+  const text = `Druid — ${label}\n\nAucune connexion depuis le ${dateFr(lastActivity)} / No sign-in since ${dateEn(lastActivity)}.\n${loginUrl}\n\nExport ou suppression / Export or deletion: ${adminUrl}\n`;
+  return sendEmail(env, { to, subject: `Votre Druid vous attend · Your Druid is waiting for you (${label})`, html, text });
+};
