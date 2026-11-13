@@ -22,6 +22,16 @@ const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean }> = ({ label
   </div>
 );
 
+/** OpenAlex A-ids of the record: the reviewed list (`OpenAlex_ids`, order kept: the first one is the primary in
+ * PostgreSQL), then the author id confirmed by hand (`openalex_author_id`) when it is not in the list. URLs and
+ * separators tolerated, deduplicated. */
+const openalexIdsOf = (list?: string | null, authorId?: string | null): { id: string; confirmed: boolean }[] => {
+  const parse = (v?: string | null) => (String(v || '').match(/A\d{4,}/gi) || []).map((x) => x.toUpperCase());
+  const confirmed = parse(authorId)[0];
+  const ids = [...new Set([...parse(list), ...(confirmed ? [confirmed] : [])])];
+  return ids.map((id) => ({ id, confirmed: id === confirmed }));
+};
+
 /** « Nantes Université » block (`Pôle`/`Composante`/`ED`/`Localisation`) hidden for now. */
 const SHOW_NU_BLOCK = false;
 
@@ -75,6 +85,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
 }) => {
   const { t } = useLingui();
   const showFte = useFteColumns();
+  const openalexIds = openalexIdsOf(researcher.identifiers.openalexIds, researcher.identifiers.openalexId);
   const secondaryHalIds = secondaryHalIdNums(researcher.identifiers.halIdNum, researcher.identifiers.halIdNumSecondary);
   /** Swaps a secondary HAL identifier with the primary one (decision D1: the person may change it by hand). */
   const promoteSecondaryHalId = (id: string) => {
@@ -85,7 +96,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
   return (
     // `contents`: the cards become items of the 2-column grid defined
     // in ResearcherDetail (left col. 300px: photo + identifiers; right col.:
-    // memberships + civil status; secondary sections full width below).
+    // memberships, then civil status + employment stacked; other sections full width below).
     <div className="contents">
        {/* Researcher identifiers — left column, stretches under the photo */}
        <div className="glass-card p-5 flex flex-col lg:col-start-1 lg:row-start-2">
@@ -206,6 +217,39 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                   <input type="text" value={researcher.identifiers.scopusId || ''} onChange={(e) => onUpdateField('scopusId', e.target.value, 'identifiers')} className={idInput} />
                 </div>
              </div>
+             {/* OpenAlex — read-only: the A-id list (OpenAlex_ids) is written by the OpenAlex alignment, the author id
+                 (openalex_author_id) by the group dashboards; the record form does not save them. */}
+             <div className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-white/5 border border-ink/5 dark:border-white/10">
+                <span className="w-9 h-9 rounded-xl bg-primary/15 text-primary dark:bg-primary-light/15 dark:text-primary-light flex items-center justify-center text-[11px] font-extrabold flex-shrink-0">OA</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]" title={t`Read-only: maintained by the OpenAlex alignment`}>OpenAlex</span>
+                    {openalexIds.length > 0 && (
+                      <a href={`https://openalex.org/authors/${openalexIds[0].id}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-primary dark:text-primary-light hover:underline">
+                        <ExternalLink className="w-3 h-3" /> openalex.org
+                      </a>
+                    )}
+                  </div>
+                  {openalexIds.length > 0 ? (
+                    <div className="flex flex-wrap gap-1.5">
+                      {openalexIds.map(({ id, confirmed }) => (
+                        <a
+                          key={id}
+                          href={`https://openalex.org/authors/${id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title={confirmed ? t`Author ID confirmed by hand (group dashboards)` : undefined}
+                          className="inline-flex items-center gap-0.5 rounded-lg bg-cream-100 dark:bg-white/10 px-1.5 py-0.5 text-[12px] font-semibold text-ink dark:text-[#e7e2d6] hover:underline"
+                        >
+                          {id}{confirmed && <span aria-hidden="true">&nbsp;✓</span>}
+                        </a>
+                      ))}
+                    </div>
+                  ) : (
+                    <span className="text-[12px] text-muted-faint dark:text-[#8f897c]"><Trans>No OpenAlex author ID</Trans></span>
+                  )}
+                </div>
+             </div>
           </div>
        </div>
 
@@ -225,8 +269,11 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
          />
        </div>
 
-       {/* Civil status — right column (bottom), aligns at the bottom with the identifiers */}
-       <div className="glass-card p-5 md:p-6 lg:col-start-2 lg:row-start-2 min-w-0">
+       {/* Right column (bottom): civil status then employment, stacked so that together they balance the
+           identifiers card (the identifiers alone are taller than the civil status). */}
+       <div className="flex flex-col gap-5 lg:col-start-2 lg:row-start-2 min-w-0">
+       {/* Civil status */}
+       <div className="glass-card p-5 md:p-6 min-w-0">
          <div className="section-label mb-4"><Trans>Personal details</Trans></div>
          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {onLdapLookup && (
@@ -286,8 +333,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
          </div>
        </div>
 
-       {/* Emploi & contrat — pleine largeur, style secondaire */}
-       <div className="rounded-panel bg-white/40 dark:bg-white/[.03] border border-dashed border-ink/15 dark:border-white/15 p-5 md:p-6 lg:col-span-2 lg:col-start-1 lg:row-start-3">
+       {/* Employment & contract — under the civil status, secondary style; stretches when the identifiers are taller */}
+       <div className="flex-1 rounded-panel bg-white/40 dark:bg-white/[.03] border border-dashed border-ink/15 dark:border-white/15 p-5 md:p-6 min-w-0">
           <div className="text-xs font-bold uppercase tracking-[.09em] text-muted-faint dark:text-[#8f897c] mb-4"><Trans>Employment & contract</Trans></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div>
@@ -390,12 +437,13 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
              <ThesisInfo uid={researcher.uid || ''} rowId={researcher.gristRowId} labelClassName={secLabel} />
           </div>
        </div>
+       </div>
 
        {/* Nantes Université (`Pôle` / `Composante` / `ED` / `Localisation`) — hidden for
            now (little use). Set SHOW_NU_BLOCK to true to show it again;
            the nuFields data stays loaded and saved. */}
        {SHOW_NU_BLOCK && (
-       <div className="rounded-panel bg-white/40 dark:bg-white/[.03] border border-dashed border-ink/15 dark:border-white/15 p-5 md:p-6 lg:col-span-2 lg:col-start-1 lg:row-start-4">
+       <div className="rounded-panel bg-white/40 dark:bg-white/[.03] border border-dashed border-ink/15 dark:border-white/15 p-5 md:p-6 lg:col-span-2 lg:col-start-1 lg:row-start-3">
           <div className="text-xs font-bold uppercase tracking-[.09em] text-muted-faint dark:text-[#8f897c] mb-4">Nantes Université</div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
              <div>

@@ -17770,3 +17770,15 @@ msgstr "Erreur lors de l'alignement {lbl}"
 #: lib/unifiedAlignRuns.ts:153
 msgid "Estimate failed: {0}"
 msgstr "Échec de l’estimation : {0}"
+
+#: components/researchers/GeneralTab.tsx:226
+msgid "Read-only: maintained by the OpenAlex alignment"
+msgstr "Lecture seule : tenu à jour par l’alignement OpenAlex"
+
+#: components/researchers/GeneralTab.tsx:241
+msgid "Author ID confirmed by hand (group dashboards)"
+msgstr "Identifiant auteur confirmé à la main (tableaux de bord de groupe)"
+
+#: components/researchers/GeneralTab.tsx:249
+msgid "No OpenAlex author ID"
+msgstr "Aucun identifiant auteur OpenAlex"
