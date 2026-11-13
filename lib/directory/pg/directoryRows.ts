@@ -63,6 +63,7 @@ export const pgDirectoryRow = (p: PgPerson, m: PgMembership, x: PersonExtras): D
   return {
     rowId,
     uid: p.uid ?? '',
+    personKey: String(p.id),
     lastName: p.last_name,
     firstName: p.first_name ?? '',
     civility: has(e, 'Civilite') ? String(e.Civilite) : (p.civility ?? ''),

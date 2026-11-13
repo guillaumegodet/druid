@@ -13,39 +13,39 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:147
+#: App.tsx:148
 msgid "Error computing the LDAP diff"
 msgstr "Error computing the LDAP diff"
 
-#: App.tsx:157
+#: App.tsx:158
 msgid "Error searching for duplicates"
 msgstr "Error searching for duplicates"
 
-#: App.tsx:181
-#: App.tsx:187
+#: App.tsx:182
+#: App.tsx:188
 msgid "Researcher not found in the loaded scope"
 msgstr "Researcher not found in the loaded scope"
 
-#: App.tsx:200
+#: App.tsx:201
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:360
+#: App.tsx:362
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:397
+#: App.tsx:399
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:411
+#: App.tsx:413
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:425
+#: App.tsx:427
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -53,106 +53,106 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:427
+#: App.tsx:429
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
 
-#: App.tsx:429
+#: App.tsx:431
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:436
+#: App.tsx:438
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:514
-#: App.tsx:521
+#: App.tsx:516
+#: App.tsx:523
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:522
+#: App.tsx:524
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:522
+#: App.tsx:524
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:524
+#: App.tsx:526
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#: App.tsx:534
+#: App.tsx:536
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:544
+#: App.tsx:546
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:558
+#: App.tsx:560
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:570
+#: App.tsx:572
 msgid "LDAP update applied: {updated} record(s) written to Grist."
 msgstr "LDAP update applied: {updated} record(s) written to Grist."
 
-#: App.tsx:572
+#: App.tsx:574
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:579
+#: App.tsx:581
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:613
+#: App.tsx:615
 msgid "Validation applied: {0} record(s) written to Grist."
 msgstr "Validation applied: {0} record(s) written to Grist."
 
-#: App.tsx:615
+#: App.tsx:617
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:628
+#: App.tsx:630
 msgid "This record has no Grist row: validation impossible."
 msgstr "This record has no Grist row: validation impossible."
 
-#: App.tsx:640
+#: App.tsx:642
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:659
+#: App.tsx:661
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:690
+#: App.tsx:692
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:704
+#: App.tsx:706
 msgid "LDAP structures: {updated} updated, {created} created in Grist."
 msgstr "LDAP structures: {updated} updated, {created} created in Grist."
 
-#: App.tsx:706
+#: App.tsx:708
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:728
+#: App.tsx:730
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:737
+#: App.tsx:739
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -160,45 +160,45 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:746
+#: App.tsx:748
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:754
+#: App.tsx:756
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:768
+#: App.tsx:770
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:785
-#: App.tsx:801
+#: App.tsx:787
+#: App.tsx:803
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:834
+#: App.tsx:836
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:980
+#: App.tsx:983
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:984
+#: App.tsx:987
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:990
+#: App.tsx:993
 msgid "Grist row {gristRowId} not found in the loaded scope"
 msgstr "Grist row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:1010
+#: App.tsx:1013
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:1031
-#: App.tsx:1044
+#: App.tsx:1034
+#: App.tsx:1047
 #: components/admin/EstablishmentAdmin.tsx:86
 #: components/dashboard/CallCandidates.tsx:127
 #: components/dashboard/CallCandidates.tsx:165
@@ -217,20 +217,20 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1054
+#: App.tsx:1057
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1078
+#: App.tsx:1081
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1082
+#: App.tsx:1085
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1128
+#: App.tsx:1134
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -587,7 +587,7 @@ msgid "Loading the directory…"
 msgstr "Loading the directory…"
 
 #: components/GroupList.tsx:84
-#: components/ResearcherList.tsx:142
+#: components/ResearcherList.tsx:144
 msgid "Error saving groups."
 msgstr "Error saving groups."
 
@@ -624,6 +624,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
 #: components/researchers/MergeResearchersModal.tsx:291
+#: components/researchers/PeopleFileImport.tsx:299
 #: components/researchers/SiteImportReview.tsx:323
 #: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
@@ -657,7 +658,7 @@ msgstr "Cross-cutting selections of researchers (scientific council, projects, c
 #: components/admin/CallsProgrammesAdmin.tsx:158
 #: components/dashboard/PairsSection.tsx:81
 #: components/dashboard/pairsKpis.ts:40
-#: components/researchers/ListHeader.tsx:139
+#: components/researchers/ListHeader.tsx:146
 #: components/researchers/ResearcherPairsSection.tsx:69
 msgid "New"
 msgstr "New"
@@ -1022,7 +1023,7 @@ msgstr "Acronym"
 #: components/reports/NewReportDialog.tsx:301
 #: components/researchers/LdapMovesPanel.tsx:167
 #: components/researchers/LdapMovesPanel.tsx:222
-#: components/researchers/ListHeader.tsx:51
+#: components/researchers/ListHeader.tsx:52
 #: lib/chartExport.ts:134
 #: lib/chartExport.ts:153
 #: lib/chartExport.ts:169
@@ -1037,7 +1038,7 @@ msgstr "Supervising bodies"
 
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
-#: components/researchers/ListHeader.tsx:53
+#: components/researchers/ListHeader.tsx:54
 #: components/researchers/TasksPage.tsx:176
 msgid "Status"
 msgstr "Status"
@@ -1055,17 +1056,17 @@ msgid "Create a structure (team, unit, faculty, institution) in Grist"
 msgstr "Create a structure (team, unit, faculty, institution) in Grist"
 
 #: components/StructureList.tsx:250
-#: components/researchers/ListHeader.tsx:75
+#: components/researchers/ListHeader.tsx:76
 msgid "Export"
 msgstr "Export"
 
 #: components/StructureList.tsx:269
-#: components/researchers/ListHeader.tsx:102
+#: components/researchers/ListHeader.tsx:103
 msgid "Synchronise"
 msgstr "Synchronise"
 
 #: components/StructureList.tsx:278
-#: components/researchers/ListHeader.tsx:108
+#: components/researchers/ListHeader.tsx:109
 msgid "Force Grist refresh"
 msgstr "Force Grist refresh"
 
@@ -2065,6 +2066,8 @@ msgstr "Add a call"
 #: components/reports/ShareDialog.tsx:94
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
+#: components/researchers/PeopleFileImport.tsx:160
+#: components/researchers/PeopleFileImport.tsx:299
 #: components/researchers/SiteImportReview.tsx:117
 #: components/researchers/SiteImportReview.tsx:323
 #: components/researchers/UnifiedAlignPage.tsx:748
@@ -4892,6 +4895,7 @@ msgstr "Citations"
 #: components/researchers/AffiliationsTable.tsx:226
 #: components/researchers/AffiliationsTable.tsx:266
 #: components/researchers/FilterPanel.tsx:235
+#: components/researchers/PeopleFileImport.tsx:14
 #: components/researchers/SiteImportReview.tsx:13
 #: lib/importConflicts.ts:74
 #: lib/structureLabels.ts:17
@@ -5732,7 +5736,8 @@ msgstr "Citations (already received)"
 #: components/researchers/LdapCandidatesPage.tsx:187
 #: components/researchers/LdapMovesPanel.tsx:170
 #: components/researchers/LdapMovesPanel.tsx:223
-#: components/researchers/ListHeader.tsx:54
+#: components/researchers/ListHeader.tsx:55
+#: components/researchers/PeopleFileImport.tsx:14
 #: components/structures/StructureAlignPanel.tsx:397
 #: lib/importConflicts.ts:75
 msgid "Lab"
@@ -6819,6 +6824,7 @@ msgstr "None"
 #: components/dashboard/ResearchersTab.tsx:208
 #: components/researchers/AbesExportModal.tsx:228
 #: components/researchers/FilterPanel.tsx:266
+#: components/researchers/PeopleFileImport.tsx:14
 #: components/researchers/ResearcherTable.tsx:88
 #: lib/importConflicts.ts:73
 msgid "Employer"
@@ -12053,7 +12059,7 @@ msgstr "All records of the scope (full rerun)"
 
 #: components/researchers/AlignLaunchModal.tsx:129
 #: components/researchers/DuplicatesPage.tsx:146
-#: components/researchers/ListHeader.tsx:133
+#: components/researchers/ListHeader.tsx:140
 #: components/researchers/TodoPage.tsx:61
 msgid "To process"
 msgstr "To process"
@@ -12634,10 +12640,12 @@ msgid "Title"
 msgstr "Title"
 
 #: components/researchers/GeneralTab.tsx:244
+#: components/researchers/PeopleFileImport.tsx:14
 msgid "Last name"
 msgstr "Last name"
 
 #: components/researchers/GeneralTab.tsx:248
+#: components/researchers/PeopleFileImport.tsx:14
 msgid "First name"
 msgstr "First name"
 
@@ -12885,6 +12893,7 @@ msgid "in the current selection"
 msgstr "in the current selection"
 
 #: components/researchers/KeyFiguresStrip.tsx:28
+#: components/researchers/PeopleFileImport.tsx:15
 #: lib/importConflicts.ts:80
 msgid "ORCID"
 msgstr "ORCID"
@@ -13302,39 +13311,45 @@ msgstr "Writing…"
 msgid "Apply ({0})"
 msgstr "Apply ({0})"
 
-#: components/researchers/ListHeader.tsx:52
+#: components/researchers/ListHeader.tsx:53
+#: components/researchers/PeopleFileImport.tsx:14
 #: components/researchers/SiteImportReview.tsx:13
 #: lib/importConflicts.ts:69
 msgid "Email"
 msgstr "Email"
 
-#: components/researchers/ListHeader.tsx:62
+#: components/researchers/ListHeader.tsx:63
 msgid "Research staff"
 msgstr "Research staff"
 
-#: components/researchers/ListHeader.tsx:68
+#: components/researchers/ListHeader.tsx:69
 msgid "Management and validation of researcher identities"
 msgstr "Management and validation of researcher identities"
 
-#: components/researchers/ListHeader.tsx:91
+#: components/researchers/ListHeader.tsx:92
 msgid "Identifiers, affiliations and notes missing from IdRef records, for ABES"
 msgstr "Identifiers, affiliations and notes missing from IdRef records, for ABES"
 
-#: components/researchers/ListHeader.tsx:93
+#: components/researchers/ListHeader.tsx:94
 msgid "ABES export (IdRef)"
 msgstr "ABES export (IdRef)"
 
-#: components/researchers/ListHeader.tsx:116
+#: components/researchers/ListHeader.tsx:117
 #: components/researchers/ValidationImportReview.tsx:76
 msgid "Import a validated list"
 msgstr "Import a validated list"
 
-#: components/researchers/ListHeader.tsx:122
+#: components/researchers/ListHeader.tsx:123
+#: components/researchers/PeopleFileImport.tsx:158
+msgid "Import researchers from a file"
+msgstr "Import researchers from a file"
+
+#: components/researchers/ListHeader.tsx:129
 #: components/researchers/SiteImportReview.tsx:115
 msgid "Import a lab website directory"
 msgstr "Import a lab website directory"
 
-#: components/researchers/ListHeader.tsx:131
+#: components/researchers/ListHeader.tsx:138
 msgid "Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)"
 msgstr "Duplicates to merge or qualify, and tasks to carry out outside Druid (IdRef, ORCID, HAL…)"
 
@@ -13500,6 +13515,220 @@ msgstr "{0} selected"
 #: components/researchers/MultiSelectFilter.tsx:77
 msgid "Clear selection"
 msgstr "Clear selection"
+
+#: components/researchers/PeopleFileImport.tsx:15
+#: lib/importConflicts.ts:81
+msgid "IdRef"
+msgstr "IdRef"
+
+#: components/researchers/PeopleFileImport.tsx:15
+#: lib/importConflicts.ts:82
+msgid "IdHAL"
+msgstr "IdHAL"
+
+#: components/researchers/PeopleFileImport.tsx:15
+#: components/researchers/SiteImportReview.tsx:14
+msgid "Corps / grade"
+msgstr "Corps / grade"
+
+#: components/researchers/PeopleFileImport.tsx:15
+msgid "Position"
+msgstr "Position"
+
+#: components/researchers/PeopleFileImport.tsx:15
+msgid "Local identifier"
+msgstr "Local identifier"
+
+#: components/researchers/PeopleFileImport.tsx:18
+msgid "no last name"
+msgstr "no last name"
+
+#: components/researchers/PeopleFileImport.tsx:18
+msgid "no lab"
+msgstr "no lab"
+
+#: components/researchers/PeopleFileImport.tsx:18
+msgid "lab not in the directory"
+msgstr "lab not in the directory"
+
+#: components/researchers/PeopleFileImport.tsx:18
+msgid "same person twice in this lab"
+msgstr "same person twice in this lab"
+
+#: components/researchers/PeopleFileImport.tsx:66
+msgid "File {name}"
+msgstr "File {name}"
+
+#: components/researchers/PeopleFileImport.tsx:106
+msgid "This file could not be read: save it as .xlsx or .csv."
+msgstr "This file could not be read: save it as .xlsx or .csv."
+
+#: components/researchers/PeopleFileImport.tsx:112
+msgid "The file has no rows under its headers."
+msgstr "The file has no rows under its headers."
+
+#: components/researchers/PeopleFileImport.tsx:122
+#: components/researchers/SiteImportReview.tsx:63
+msgid "The file could not be read."
+msgstr "The file could not be read."
+
+#: components/researchers/PeopleFileImport.tsx:147
+#: components/researchers/SiteImportReview.tsx:102
+msgid "The import could not be applied."
+msgstr "The import could not be applied."
+
+#: components/researchers/PeopleFileImport.tsx:168
+msgid "One row per person and lab: last name, first name, lab acronym, and if you have them the email, team, employer, position, corps-grade and identifiers. Druid recognizes the usual headers, matches the people it already has and shows what it will do: nothing is written before you apply."
+msgstr "One row per person and lab: last name, first name, lab acronym, and if you have them the email, team, employer, position, corps-grade and identifiers. Druid recognizes the usual headers, matches the people it already has and shows what it will do: nothing is written before you apply."
+
+#: components/researchers/PeopleFileImport.tsx:171
+msgid "Template (.xlsx)"
+msgstr "Template (.xlsx)"
+
+#: components/researchers/PeopleFileImport.tsx:172
+msgid "Template (.csv)"
+msgstr "Template (.csv)"
+
+#: components/researchers/PeopleFileImport.tsx:174
+msgid "Choose the file (.xlsx, .csv)"
+msgstr "Choose the file (.xlsx, .csv)"
+
+#: components/researchers/PeopleFileImport.tsx:179
+#: components/researchers/SiteImportReview.tsx:132
+msgid "Working…"
+msgstr "Working…"
+
+#: components/researchers/PeopleFileImport.tsx:185
+msgid "Columns read"
+msgstr "Columns read"
+
+#: components/researchers/PeopleFileImport.tsx:189
+msgid "Column ignored"
+msgstr "Column ignored"
+
+#. placeholder {0}: reading.missing.map((f) => t(FIELD_LABELS[f])).join(', ')
+#: components/researchers/PeopleFileImport.tsx:196
+msgid "Required column not found: {0}. Use the headers of the template."
+msgstr "Required column not found: {0}. Use the headers of the template."
+
+#: components/researchers/PeopleFileImport.tsx:204
+#: components/researchers/SiteImportReview.tsx:140
+msgid "Import applied"
+msgstr "Import applied"
+
+#. placeholder {0}: result.created
+#: components/researchers/PeopleFileImport.tsx:206
+msgid "{0, plural, one {# record created} other {# records created}}"
+msgstr "{0, plural, one {# record created} other {# records created}}"
+
+#. placeholder {0}: result.joined
+#: components/researchers/PeopleFileImport.tsx:206
+msgid "{0, plural, one {# membership added} other {# memberships added}}"
+msgstr "{0, plural, one {# membership added} other {# memberships added}}"
+
+#. placeholder {0}: result.updated
+#: components/researchers/PeopleFileImport.tsx:206
+msgid "{0, plural, one {# record completed} other {# records completed}}"
+msgstr "{0, plural, one {# record completed} other {# records completed}}"
+
+#. placeholder {0}: result.teamsCreated
+#: components/researchers/PeopleFileImport.tsx:206
+msgid "{0, plural, one {# team created} other {# teams created}}"
+msgstr "{0, plural, one {# team created} other {# teams created}}"
+
+#. placeholder {0}: result.stale
+#: components/researchers/PeopleFileImport.tsx:208
+msgid "{0, plural, one {# item no longer applied (the directory changed since the preview)} other {# items no longer applied (the directory changed since the preview)}}"
+msgstr "{0, plural, one {# item no longer applied (the directory changed since the preview)} other {# items no longer applied (the directory changed since the preview)}}"
+
+#. placeholder {0}: plan.rowCount
+#: components/researchers/PeopleFileImport.tsx:216
+msgid "{0, plural, one {# row read} other {# rows read}}"
+msgstr "{0, plural, one {# row read} other {# rows read}}"
+
+#. placeholder {0}: plan.creations.length
+#: components/researchers/PeopleFileImport.tsx:216
+msgid "{0, plural, one {# new person} other {# new people}}"
+msgstr "{0, plural, one {# new person} other {# new people}}"
+
+#. placeholder {0}: plan.joins.length
+#: components/researchers/PeopleFileImport.tsx:216
+msgid "{0, plural, one {# new membership} other {# new memberships}}"
+msgstr "{0, plural, one {# new membership} other {# new memberships}}"
+
+#. placeholder {0}: plan.updates.length
+#: components/researchers/PeopleFileImport.tsx:216
+msgid "{0, plural, one {# person to complete} other {# people to complete}}"
+msgstr "{0, plural, one {# person to complete} other {# people to complete}}"
+
+#. placeholder {0}: plan.unchanged
+#: components/researchers/PeopleFileImport.tsx:216
+msgid "{0, plural, one {# already up to date} other {# already up to date}}"
+msgstr "{0, plural, one {# already up to date} other {# already up to date}}"
+
+#: components/researchers/PeopleFileImport.tsx:219
+msgid "Teams to create"
+msgstr "Teams to create"
+
+#: components/researchers/PeopleFileImport.tsx:220
+#: components/researchers/PeopleFileImport.tsx:228
+msgid "All / none"
+msgstr "All / none"
+
+#: components/researchers/PeopleFileImport.tsx:227
+msgid "People to create"
+msgstr "People to create"
+
+#: components/researchers/PeopleFileImport.tsx:237
+msgid "Memberships to add to existing records"
+msgstr "Memberships to add to existing records"
+
+#: components/researchers/PeopleFileImport.tsx:246
+msgid "Values to add (Druid has none)"
+msgstr "Values to add (Druid has none)"
+
+#: components/researchers/PeopleFileImport.tsx:262
+msgid "Differences (tick when the file is right)"
+msgstr "Differences (tick when the file is right)"
+
+#: components/researchers/PeopleFileImport.tsx:278
+msgid "Ambiguous (homonyms in the lab: left out)"
+msgstr "Ambiguous (homonyms in the lab: left out)"
+
+#: components/researchers/PeopleFileImport.tsx:282
+msgid "Rows left out"
+msgstr "Rows left out"
+
+#. placeholder {0}: r.index + 2
+#. placeholder {0}: w.index + 2
+#: components/researchers/PeopleFileImport.tsx:283
+#: components/researchers/PeopleFileImport.tsx:287
+msgid "Row {0}"
+msgstr "Row {0}"
+
+#: components/researchers/PeopleFileImport.tsx:286
+msgid "Values not recognized (ignored)"
+msgstr "Values not recognized (ignored)"
+
+#: components/researchers/PeopleFileImport.tsx:287
+#: lib/chartExport.ts:60
+#: lib/chartExport.ts:116
+#: lib/chartExport.ts:153
+#: lib/chartExport.ts:169
+#: lib/chartExport.ts:183
+#: lib/chartExport.ts:214
+#: lib/chartExport.ts:227
+#: lib/chartExport.ts:251
+msgid "Value"
+msgstr "Value"
+
+#: components/researchers/PeopleFileImport.tsx:292
+msgid "Mark the created records as validated (this list is the establishment's reference)"
+msgstr "Mark the created records as validated (this list is the establishment's reference)"
+
+#: components/researchers/PeopleFileImport.tsx:303
+msgid "{total, plural, one {Apply # change} other {Apply # changes}}"
+msgstr "{total, plural, one {Apply # change} other {Apply # changes}}"
 
 #: components/researchers/PresenceBadge.tsx:35
 msgid "No status"
@@ -13695,21 +13924,9 @@ msgstr "Membership type"
 msgid "Photo"
 msgstr "Photo"
 
-#: components/researchers/SiteImportReview.tsx:14
-msgid "Corps / grade"
-msgstr "Corps / grade"
-
 #: components/researchers/SiteImportReview.tsx:52
 msgid "This file is not JSON."
 msgstr "This file is not JSON."
-
-#: components/researchers/SiteImportReview.tsx:63
-msgid "The file could not be read."
-msgstr "The file could not be read."
-
-#: components/researchers/SiteImportReview.tsx:102
-msgid "The import could not be applied."
-msgstr "The import could not be applied."
 
 #: components/researchers/SiteImportReview.tsx:125
 msgid "File produced from the lab's website by the « sync-annuaire-grist » skill of druid-biblio (export mode). Nothing is written before you apply."
@@ -13718,14 +13935,6 @@ msgstr "File produced from the lab's website by the « sync-annuaire-grist » sk
 #: components/researchers/SiteImportReview.tsx:128
 msgid "Choose the file (.json)"
 msgstr "Choose the file (.json)"
-
-#: components/researchers/SiteImportReview.tsx:132
-msgid "Working…"
-msgstr "Working…"
-
-#: components/researchers/SiteImportReview.tsx:140
-msgid "Import applied"
-msgstr "Import applied"
 
 #. placeholder {0}: result.teamsCreated
 #: components/researchers/SiteImportReview.tsx:141
@@ -17095,17 +17304,6 @@ msgstr "NetworkError when attempting to fetch resource."
 msgid "Load failed"
 msgstr "Load failed"
 
-#: lib/chartExport.ts:60
-#: lib/chartExport.ts:116
-#: lib/chartExport.ts:153
-#: lib/chartExport.ts:169
-#: lib/chartExport.ts:183
-#: lib/chartExport.ts:214
-#: lib/chartExport.ts:227
-#: lib/chartExport.ts:251
-msgid "Value"
-msgstr "Value"
-
 #. placeholder {0}: i + 1
 #: lib/chartExport.ts:60
 #: lib/chartExport.ts:263
@@ -17165,10 +17363,10 @@ msgid "Indicator"
 msgstr "Indicator"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:27
-#: lib/directoryApi.ts:36
-#: lib/directoryApi.ts:51
-#: lib/directoryApi.ts:72
+#: lib/directoryApi.ts:28
+#: lib/directoryApi.ts:37
+#: lib/directoryApi.ts:52
+#: lib/directoryApi.ts:73
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Directory unavailable ({resource}, HTTP {0})."
 
@@ -17187,14 +17385,6 @@ msgstr "Affiliation start"
 #: lib/importConflicts.ts:79
 msgid "Affiliation end"
 msgstr "Affiliation end"
-
-#: lib/importConflicts.ts:81
-msgid "IdRef"
-msgstr "IdRef"
-
-#: lib/importConflicts.ts:82
-msgid "IdHAL"
-msgstr "IdHAL"
 
 #: lib/importConflicts.ts:83
 msgid "IdHAL (numeric)"

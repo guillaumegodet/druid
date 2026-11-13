@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  CheckCircle, RefreshCw, FileDown, ClipboardList, Plus, Globe,
+  CheckCircle, RefreshCw, FileDown, ClipboardList, Plus, Globe, FileSpreadsheet,
 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { Researcher, ViewState } from '../../types';
@@ -26,6 +26,7 @@ interface ListHeaderProps {
   onImportValidation?: () => void;
   /** Import of a lab website directory (lot 8 d): institution right, writable instance. */
   onImportSite?: () => void;
+  onImportFile?: () => void;
   onNewResearcher?: () => void;
   showSyncMenu: boolean;
   onToggleSyncMenu: () => void;
@@ -38,7 +39,7 @@ interface ListHeaderProps {
  * ResearcherList.tsx (lot 3 of the multi-instance architecture plan, refactor sub-lot
  * ResearcherList). */
 export const ListHeader: React.FC<ListHeaderProps> = ({
-  count, compact, loading, onManualSync, onImportValidation, onImportSite, onOpenDuplicates, duplicatesCount = 0,
+  count, compact, loading, onManualSync, onImportValidation, onImportSite, onImportFile, onOpenDuplicates, duplicatesCount = 0,
   onNewResearcher, showSyncMenu, onToggleSyncMenu, onCloseSyncMenu, sortedResearchers, onOpenAbesExport,
 }) => {
   const { t } = useLingui();
@@ -114,6 +115,12 @@ export const ListHeader: React.FC<ListHeaderProps> = ({
                   <button onClick={() => { onCloseSyncMenu(); onImportValidation(); }} className={menuItem}>
                     <CheckCircle className="w-4 h-4 text-[#1f7a4d] dark:text-[#5fd39a]" />
                     <Trans>Import a validated list</Trans>
+                  </button>
+                )}
+                {onImportFile && (
+                  <button onClick={() => { onCloseSyncMenu(); onImportFile(); }} className={menuItem}>
+                    <FileSpreadsheet className="w-4 h-4 text-muted-light dark:text-[#8f897c]" />
+                    <Trans>Import researchers from a file</Trans>
                   </button>
                 )}
                 {onImportSite && (
