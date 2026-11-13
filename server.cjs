@@ -47,6 +47,7 @@ const activity = createActivityLog({ dir: process.env.DRUID_LOG_DIR || '', envir
 // Service tokens (scripts/lib/service_tokens.cjs, plan-migration-postgresql.md lot 8 a): machine clients reading the
 // directory through /api/v1 without a session. Fingerprints only, in DRUID_SERVICE_TOKENS.
 const serviceTokens = require('./scripts/lib/service_tokens.cjs');
+const kcSessionTokens = require('./scripts/lib/kc_session_tokens.cjs');
 const SERVICE_TOKENS = (() => {
   const { tokens, rejected } = serviceTokens.parseServiceTokens(process.env.DRUID_SERVICE_TOKENS);
   if (rejected.length) console.warn(`[Service tokens] DRUID_SERVICE_TOKENS: ignored ${rejected.join(', ')} (expected <name>:<sha256 hex>)`);
@@ -104,7 +105,8 @@ const CAPABILITIES = {
   HAS_LDAP: !!process.env.LDAP_URL,
   HAS_KEYCLOAK_ADMIN: !!(process.env.KEYCLOAK_ADMIN_CLIENT_ID && process.env.KEYCLOAK_ADMIN_CLIENT_SECRET),
   HAS_ETL_API: !!process.env.ETL_API_URL,
-  HAS_PIPELINES_CHAT: !!process.env.PIPELINES_API_KEY,
+  // « Données CRISalid » tab of the assistant: CRISalid ≥ 1.7 agents chat API (user token forwarded, see /api/chat).
+  HAS_PIPELINES_CHAT: !!process.env.CRISALID_CHAT_API_URL,
   // « Aide Druid » tab of the assistant: ILAAS answers from the help centre pages.
   HAS_HELP_CHAT: !!process.env.ILAAS_API_KEY && fs.existsSync(HELP_DOCS_DIR),
   HAS_SOVISU_EXPORT: fs.existsSync(path.dirname(process.env.CDB_STRUCT_PATH || '/cdb-data/structures.csv')),
@@ -408,6 +410,8 @@ app.get('/auth/callback', async (req, res) => {
       roles: payload.realm_access?.roles || [],
       access,
     };
+    // Server-side only (never in /api/me): forwarded by /api/chat to the CRISalid agents chat API.
+    req.session.kcTokens = kcSessionTokens.tokensFromResponse(tokenData);
     activity.audit('auth.login', {
       user: req.session.user.preferred_username, ip: req.ip, superAdmin: access.isSuperAdmin,
       scope: access.allSlugs ? 'all' : access.labAnchors, labViewer: access.isLabViewer,
@@ -590,15 +594,36 @@ app.get('/api/public/photo', async (req, res) => {
 });
 
 // ── Conversational assistant (chat widget) ─────────────────────────────────
-// Streaming relay to the Open WebUI Pipelines server (LangGraph agent
-// crisalid_graph_agent_pipeline → MCP toolbox → Neo4j, openwebui profile).
-// The API key stays server-side; access is protected by the Keycloak guard
-// above. The frontend (ChatWidget.tsx) parses the OpenAI-format SSE as is.
-const PIPELINES_URL = process.env.PIPELINES_URL || 'http://crisalid-pipelines:9099';
-const PIPELINES_API_KEY = process.env.PIPELINES_API_KEY || '';
-const CHAT_MODEL = process.env.CHAT_MODEL || 'crisalid_graph_agent_pipeline';
+// Streaming relay to the OpenAI-compatible route of the CRISalid agents chat API (CRISalid ≥ 1.7: agent
+// generic_agent → MCP toolbox → Neo4j). No shared key: the access token of the signed-in user is forwarded, so the
+// agent queries the graph under the identity of the person. The Keycloak client of Druid must carry the
+// crisalid-agents-audience scope and be listed in AGENT_ALLOW_LIST of the chat API. Access is protected by the
+// Keycloak guard above. The frontend (ChatWidget.tsx) parses the OpenAI-format SSE as is.
+const CRISALID_CHAT_API_URL = process.env.CRISALID_CHAT_API_URL || '';
+const CHAT_MODEL = process.env.CHAT_MODEL || 'generic_agent';
 
-app.post('/api/chat', (req, res) => {
+const refreshKeycloakToken = async (refreshToken) => {
+  const r = await fetch(`${KC_BASE}/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'refresh_token', client_id: KEYCLOAK_CLIENT_ID, refresh_token: refreshToken }),
+  });
+  if (!r.ok) {
+    console.error(`[Chat] Keycloak token refresh refused: ${r.status}`);
+    return null;
+  }
+  return r.json();
+};
+
+app.post('/api/chat', async (req, res) => {
+  if (!CRISALID_CHAT_API_URL) return res.status(503).json({ error: 'Assistant not configured' });
+  const fresh = await kcSessionTokens.freshAccessToken(req.session.kcTokens, refreshKeycloakToken);
+  if (!fresh) {
+    // Keycloak session over (or a session opened before the tokens were kept): the widget asks for a reload,
+    // which goes back through the login once this session is gone.
+    return req.session.destroy(() => res.status(401).json({ error: 'reauthentication_required' }));
+  }
+  req.session.kcTokens = fresh.tokens;
   const messages = Array.isArray(req.body?.messages) ? req.body.messages : [];
   // Caps the relayed history (the agent needs no more, and it prevents the
   // LLM prompt from growing over a long conversation).
@@ -629,12 +654,12 @@ app.post('/api/chat', (req, res) => {
     res.end();
   };
 
-  const upstreamReq = http.request(`${PIPELINES_URL}/v1/chat/completions`, {
+  const upstreamReq = http.request(`${CRISALID_CHAT_API_URL}/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Content-Length': Buffer.byteLength(payload),
-      Authorization: `Bearer ${PIPELINES_API_KEY}`,
+      Authorization: `Bearer ${fresh.accessToken}`,
     },
   }, (upstream) => {
     if (upstream.statusCode !== 200) {
