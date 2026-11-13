@@ -8,8 +8,8 @@ import { hasCapability } from '../lib/auth';
 /**
  * « Assistant CRISalid » chat widget — floating button at the bottom right,
  * expandable panel, up to three modes (tabs) depending on the instance capabilities:
- * - « Données CRISalid » (HAS_PIPELINES_CHAT): the LangGraph agent of the Open WebUI
- *   pipelines, through the streaming relay /api/chat of server.cjs;
+ * - « Données CRISalid » (HAS_PIPELINES_CHAT): the generic agent of the CRISalid agents chat API (≥ 1.7,
+ *   under the identity of the signed-in user), through the streaming relay /api/chat of server.cjs;
  * - « Aide Druid » (HAS_HELP_CHAT): answers from the help centre pages through ILAAS,
  *   /api/help-chat (docs/archive/plan-documentation-utilisateur.md, lot 8);
  * - « Mon projet » (HAS_CALLS_CHAT): the open calls for proposals that fit a project described by the user,
