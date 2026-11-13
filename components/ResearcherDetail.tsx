@@ -325,7 +325,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
         </div>
 
         {/* Body: two balanced columns (left 300px: photo + identifiers;
-            right: dark memberships + civil status) then full-width sections.
+            right: dark memberships, then civil status + employment) then full-width sections.
             GeneralTab uses `display:contents`: its cards are placed in this grid. */}
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-5 items-stretch">
 
