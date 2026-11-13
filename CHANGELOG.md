@@ -12,6 +12,48 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Import de chercheurs depuis un fichier** (Synchroniser › « Importer des chercheurs depuis un fichier », droit
+  établissement) : CSV (`;` ou `,`) ou XLSX, modèle téléchargeable, en-têtes reconnus en français et en anglais.
+  Les lignes d'une même personne sont regroupées (deux labos = une fiche à deux appartenances) ; rapprochement par
+  uid, e-mail, ORCID, IdRef ou IdHAL, puis par nom dans le labo ; une fiche trouvée reçoit des compléments (cochés),
+  des différences (décochées) et les appartenances manquantes ; les équipes inconnues sont proposées à la création.
+  Moteur `lib/directory/peopleImport.ts`, routes `POST /api/v1/people-imports/preview|apply`.
+- **Identifiants OpenAlex sur la fiche chercheur** : ligne « OA » sous Scopus (une puce par A-id d'`OpenAlex_ids`,
+  la première étant la principale, puis `openalex_author_id` s'il n'y figure pas, marqué ✓), en lecture seule.
+- **Offre hébergée** (instances SaaS uniquement, sans effet sur Nantes) : premier tableau de bord lancé par
+  l'établissement après l'alignement, avec sa progression ; collaborations rapportées aux labos de l'établissement ;
+  « Mon établissement » (comptes, invitations, demandes d'accès) ; offres avec fonctions verrouillées, demandes de
+  devis et bandeau d'essai ; clés API de l'établissement (modèle de langue, Elsevier) testées à la saisie ; export
+  et suppression des données d'un établissement ; e-mails sur l'échec d'un job ou l'inactivité ; console
+  d'exploitation (établissements, offre, suspension, relance de job, impersonation) ; liens vers les conditions
+  d'utilisation et la politique de confidentialité sur le portail.
+
+### Modifié
+- **Assistant conversationnel (CRISalid 1.7)** : `/api/chat` relaie la question à l'API de chat des agents CRISalid
+  (`CRISALID_CHAT_API_URL`, modèle `CHAT_MODEL`, défaut `generic_agent`) avec le jeton Keycloak de l'utilisateur,
+  gardé en session et rafraîchi au besoin ; l'ancien serveur pipelines (`PIPELINES_URL`, `PIPELINES_API_KEY`) n'est
+  plus utilisé. Session Keycloak expirée : le widget demande de recharger la page.
+- **Fiche chercheur** : « État civil » et « Emploi & contrat » empilés dans la colonne de droite, grilles plus
+  compactes, pour ne plus laisser de grand vide à côté de la carte des identifiants.
+- **Messages sans « Grist »** : sur une instance PostgreSQL, les messages, info-bulles et erreurs d'API parlent de
+  « l'Annuaire » au lieu de Grist (le lien vers le document Grist et les erreurs de configuration Grist restent, ils
+  ne s'affichent que sur une instance Grist).
+- **Appartenances multiples sans uid (PostgreSQL)** : les lignes de l'annuaire sont regroupées par uid, sinon par
+  personne ; une appartenance peut s'ajouter à une fiche sans uid. Sans effet attendu sur Nantes (chaque ligne Grist
+  sans uid y est devenue une personne distincte à la migration).
+- **Aide en ligne** : les pages de l'offre hébergée sont retirées de l'aide publique (brouillons), l'onglet
+  « Mon établissement » n'a plus de bouton d'aide.
+- Dépendances : Lingui 5 → 6 (identifiants des messages recalculés, `@lingui/message-utils` déclaré), `vite` ≥ 6.3,
+  `fast-xml-parser` 5.12.0, `hono` 4.13.16.
+
+### Migration
+- Nantes : `druid/druid.yaml` doit définir `CRISALID_CHAT_API_URL=http://crisalid-agents-chat-api:9100` et
+  `CHAT_MODEL=generic_agent` (à la place de `PIPELINES_URL` / `PIPELINES_API_KEY`), et le client Keycloak `druid`
+  porter le scope `crisalid-agents-audience`. Déjà en place depuis la montée CRISalid 1.7 du 2026-11-13.
+- Offre hébergée : migrations de la base de contrôle `db/saas/migrations/20261109120000_quote_request.sql` à
+  `20261111090000_inactivity_notice.sql` (aucune migration de la base d'une instance).
+
 ## [2.17.1] — 2026-11-09
 
 ### Corrigé
