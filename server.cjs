@@ -621,7 +621,7 @@ app.post('/api/chat', async (req, res) => {
   if (!fresh) {
     // Keycloak session over (or a session opened before the tokens were kept): the widget asks for a reload,
     // which goes back through the login once this session is gone.
-    return req.session.destroy(() => res.status(401).json({ error: 'reauthentication_required' }));
+    return req.session.destroy(() => res.status(401).json({ error: 'Unauthorized' }));
   }
   req.session.kcTokens = fresh.tokens;
   const messages = Array.isArray(req.body?.messages) ? req.body.messages : [];

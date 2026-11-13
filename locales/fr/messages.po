@@ -16644,6 +16644,10 @@ msgid "Project assistant not configured"
 msgstr "Assistant « Mon projet » non configuré"
 
 #: lib/apiErrors.ts:181
+msgid "Assistant not configured"
+msgstr "Assistant non configuré"
+
+#: lib/apiErrors.ts:181
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "La newsletter n'est disponible que pour les structures avec un identifiant OpenAlex (pas les groupes)"
 
