@@ -23,6 +23,9 @@ export interface DirectoryRow {
   /** Record id: Grist Annuaire row id = PostgreSQL membership id (stable ids). */
   rowId: number;
   uid: string;
+  /** Person the row belongs to when the store knows it (PostgreSQL person id): groups the rows of a person without
+   *  uid_dyna (an establishment without LDAP). Grist rows have none: the uid alone groups them. */
+  personKey?: string;
   lastName: string;
   firstName: string;
   /** Civility as stored (« Mme », « M. », F, M…): normalized here. */
@@ -67,15 +70,21 @@ export interface DirectoryRow {
 export type EmployerIndex = Map<number, { name: string; uai: string }>;
 
 /**
- * Groups the QUALIFIED Annuaire rows of the same person (same uid_dyna, exactly one
- * `rattachement = PRINCIPAL` row) into a single Druid researcher carried by the principal row,
+ * Groups the QUALIFIED Annuaire rows of the same person (same uid_dyna — or, without one, same person of the
+ * PostgreSQL store — and exactly one `rattachement = PRINCIPAL` row) into a single Druid researcher carried by the
+ * principal row,
  * with one membership per row (SECONDAIRE = concurrent, HISTORIQUE = ended).
  * Unqualified groups remain distinct records (visible for arbitration).
  * In-place mutation; returns the filtered list.
  */
 export function groupQualifiedRows(researchers: any[], rowRole: Record<number, RattachementRole | ''>, rowEnd: Record<number, string>): any[] {
   const byUid = new Map<string, any[]>();
-  for (const r of researchers) if (r.uid) { if (!byUid.has(r.uid)) byUid.set(r.uid, []); byUid.get(r.uid)!.push(r); }
+  for (const r of researchers) {
+    const key = r.uid ? `u:${r.uid}` : r.personKey ? `p:${r.personKey}` : '';
+    if (!key) continue;
+    if (!byUid.has(key)) byUid.set(key, []);
+    byUid.get(key)!.push(r);
+  }
   const drop = new Set<number>();
   for (const rows of byUid.values()) {
     if (rows.length < 2) continue;
@@ -245,6 +254,7 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
       id: '',                 // filled after the map (real uid, otherwise ext_<name>-<initial>) — see assignPublicIds
       gristRowId: row.rowId,  // record id, technical key of the writes
       uid: uid || '',
+      ...(row.personKey ? { personKey: row.personKey } : {}),
       civility: researcherCivility,
       lastName: row.lastName,
       firstName: row.firstName,
@@ -319,6 +329,7 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
     rowEnd[row.rowId] = row.membershipEnd || row.employmentEnd;
   }
   const researchersGrouped = groupQualifiedRows(researchersMapped, rowRole, rowEnd);
+  for (const r of researchersGrouped as any[]) delete r.personKey;
 
   // Public/central identifier: real uid when present, otherwise ext_<name>-<initial>.
   // The record id (gristRowId) stays internal for writes. See useUrlState / updateResearcher.

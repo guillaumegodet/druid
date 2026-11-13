@@ -15,6 +15,7 @@ import type { NewsletterEditableField } from './publications/store';
 import type { AxisCorrectionRow } from './publications/axes';
 import type { AxisReview, AxisReviewInput } from './publications/axisReviews';
 import type { SiteImportPlan, SiteImportResult, SiteImportSelection } from './directory/siteImport';
+import type { PeopleImportInput, PeopleImportPlan, PeopleImportResult, PeopleImportSelection } from './directory/peopleImport';
 import type { StructureIdType, StructureIdentifier } from './structures/identifiers';
 import type { StructureAlignOverview } from './structures/alignView';
 
@@ -149,4 +150,8 @@ export const DirectoryApi = {
   siteImportPreview: (document: unknown): Promise<SiteImportPlan> => send('POST', 'site-imports/preview', { document }),
   siteImportApply: (document: unknown, selection: SiteImportSelection): Promise<SiteImportResult> =>
     send('POST', 'site-imports/apply', { document, selection }),
+  // Spreadsheet of researchers (SaaS lot 5 a).
+  peopleImportPreview: (input: PeopleImportInput): Promise<PeopleImportPlan> => send('POST', 'people-imports/preview', { input }),
+  peopleImportApply: (input: PeopleImportInput, selection: PeopleImportSelection): Promise<PeopleImportResult> =>
+    send('POST', 'people-imports/apply', { input, selection }),
 };

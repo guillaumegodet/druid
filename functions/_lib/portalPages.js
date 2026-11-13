@@ -22,11 +22,36 @@ dl{display:grid;grid-template-columns:max-content 1fr;gap:.3rem 1rem;margin:.5re
 code{background:#faf7ee;padding:.1rem .35rem;border-radius:6px}
 `;
 
+/**
+ * Links to the terms and the privacy policy of the operator (SAAS_TERMS_URL, SAAS_PRIVACY_URL of the deployment, https
+ * only); nothing when the deployment sets none. `what` is the act that accepts them, in French and in English.
+ */
+export const legalNotice = (legal, [fr, en]) => {
+  const terms = legal?.terms;
+  const privacy = legal?.privacy;
+  if (!terms && !privacy) return '';
+  const link = (href, text) => `<a href="${esc(href)}" target="_blank" rel="noopener">${text}</a>`;
+  const frParts = [terms && link(terms, "les conditions d'utilisation (avec l'accord de sous-traitance)"), privacy && link(privacy, 'la politique de confidentialité')].filter(Boolean);
+  const enParts = [terms && link(terms, 'the terms of use (with the data processing agreement)'), privacy && link(privacy, 'the privacy policy')].filter(Boolean);
+  return `<p class="muted">${fr}, vous acceptez ${frParts.join(' et ')}. · ${en}, you accept ${enParts.join(' and ')}.</p>`;
+};
+
+/** An https URL, or null (a deployment variable is never trusted to be one). */
+export const httpsUrlOf = (value) => {
+  try {
+    const u = new URL(String(value || ''));
+    return u.protocol === 'https:' ? u.toString() : null;
+  } catch { return null; }
+};
+
 const page = (title, body, { narrow = false } = {}) => `<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${esc(title)}</title><style>${CSS}</style></head><body><main${narrow ? ' class="narrow"' : ''}>${body}</main></body></html>`;
 
 /** Home: an e-mail form, or the Druids of the signed-in person and the button to create one. */
-export const homePage = ({ email, tenants, sent, reason, baseDomain }) => {
+/** @typedef {{ terms?: string | null, privacy?: string | null } | null} LegalLinks */
+
+/** @param {{ email: string | null, tenants: any[], sent: boolean, reason: string, baseDomain: string, legal?: LegalLinks }} p */
+export const homePage = ({ email, tenants, sent, reason, baseDomain, legal = null }) => {
   const messages = { invalid: 'Lien invalide. · Invalid link.', expired: 'Ce lien a expiré ou a déjà servi. · This link has expired or was already used.' };
   if (!email) {
     return page('Druid — créer mon Druid', `
@@ -40,6 +65,7 @@ ${sent ? `<p class="ok">Un lien de connexion vient d'être envoyé à cette adre
 <input id="email" name="email" type="email" required autocomplete="email" autofocus placeholder="prenom.nom@example.org">
 <p><button class="btn" type="submit">Recevoir un lien de connexion · Send me a sign-in link</button></p>
 <p class="muted">Pas de mot de passe : le lien reçu par e-mail ouvre votre session. · No password: the link opens your session.</p>
+${legalNotice(legal, ['En demandant un lien', 'By asking for a link'])}
 </form>
 <script>document.getElementById('f').addEventListener('submit',async(e)=>{e.preventDefault();const b=e.target.querySelector('button');b.disabled=true;
 try{const r=await fetch('/start/auth/request',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:e.target.email.value})});const j=await r.json().catch(()=>({}));if(j.link){location.href=j.link;return;}}catch{}
@@ -53,7 +79,8 @@ ${tenants.length ? `<table><thead><tr><th>Établissement</th><th>Offre</th><th>�
 };
 
 /** The assistant: three steps, all client-side on the relays of /start/api. */
-export const assistantPage = ({ email, baseDomain }) => page('Druid — créer mon Druid', `
+/** @param {{ email: string, baseDomain: string, legal?: LegalLinks }} p */
+export const assistantPage = ({ email, baseDomain, legal = null }) => page('Druid — créer mon Druid', `
 <div class="row"><h1 class="grow">Créer mon Druid</h1><span class="muted">${esc(email)} · <a href="/start">Mes Druid</a></span></div>
 <div class="steps"><span id="s1" class="on">1 · Établissement</span><span id="s2">2 · Laboratoires</span><span id="s3">3 · Confirmation</span></div>
 <div id="step1">
@@ -81,6 +108,7 @@ export const assistantPage = ({ email, baseDomain }) => page('Druid — créer m
 <input id="domain" type="text" placeholder="universite.fr">
 <p class="muted">Vous serez l'administrateur (<code>${esc(email)}</code>). L'essai gratuit comprend un compte ; les offres Équipe et Complet en ajoutent. · You will be the administrator; the free trial includes one account, the Team and Complete plans add more.</p>
 <p id="recap" class="muted"></p>
+${legalNotice(legal, ['En créant ce Druid pour votre établissement', 'By creating this Druid for your establishment'])}
 <p id="createMsg"></p>
 <p class="row"><button class="btn secondary" type="button" id="back2">← Laboratoires</button><button class="btn" type="button" id="create">Créer mon Druid · Create my Druid</button></p>
 </div>

@@ -129,7 +129,7 @@ export const normName = (s: unknown): string =>
   String(s ?? '').normalize('NFD').toLowerCase().replace(/\p{M}/gu, '')
     .replace(/[-'’]/g, ' ').replace(/\s+/g, ' ').trim();
 
-const normLab = (s: unknown): string =>
+export const normLab = (s: unknown): string =>
   String(s ?? '').toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/²/g, '2').replace(/[^a-z0-9]/g, '');
 
 /** Same value for the import: an email compared without case (« Ali.Assaf@… » = « ali.assaf@… »). */
@@ -364,7 +364,7 @@ export const presenceOfSite = (status: string): 'PRESENT' | 'DEPART' | 'PARTI' =
   return s === 'DEPART' || s === 'PARTI' ? s : 'PRESENT';
 };
 
-const validationOf = (status: string, source: string, today: string, actor: string) => ({
+export const validationOf = (status: string, source: string, today: string, actor: string) => ({
   validated: true, validatedStatus: presenceOfSite(status), validationDate: today, validationSource: source,
   validationScope: ['statut', 'rattachement'], validatedBy: actor,
 });

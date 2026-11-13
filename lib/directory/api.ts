@@ -34,6 +34,8 @@
 //   POST  /api/v1/merges/<logId>/restore        → { restoredRowId }
 //   POST  /api/v1/site-imports/preview          { document }             → SiteImportPlan        (lot 8 d)
 //   POST  /api/v1/site-imports/apply            { document, selection }  → SiteImportResult
+//   POST  /api/v1/people-imports/preview        { input }                → PeopleImportPlan      (SaaS lot 5 a)
+//   POST  /api/v1/people-imports/apply          { input, selection }     → PeopleImportResult
 // LDAP review (lot 2 d, Nantes only — no route without the `ldap` binding; institution right):
 //   GET  /api/v1/ldap/diff | /ldap/candidates | /ldap/structures      diffs computed by the server
 //   POST /api/v1/ldap/updates { ids }   /ldap/departures { uid, date, accountLabel }
@@ -68,6 +70,7 @@ import { STRUCTURE_ID_TYPES } from '../structures/identifiers';
 import { UNIFIED_ALIGN_SOURCES, UnifiedAlignSource } from './alignments';
 import { ApiError } from './errors';
 import { applySiteImport, planSiteImport, SiteImportDocumentSchema, SiteImportSelectionSchema } from './siteImport';
+import { applyPeopleImport, PeopleImportInputSchema, PeopleImportSelectionSchema, planPeopleImport } from './peopleImport';
 
 export interface DirectoryApiBindings {
   repository: DirectoryRepository;
@@ -154,6 +157,8 @@ const AxisReviewBody = z.object({
 });
 const SiteImportPreviewBody = z.object({ document: SiteImportDocumentSchema });
 const SiteImportApplyBody = z.object({ document: SiteImportDocumentSchema, selection: SiteImportSelectionSchema });
+const PeopleImportPreviewBody = z.object({ input: PeopleImportInputSchema });
+const PeopleImportApplyBody = z.object({ input: PeopleImportInputSchema, selection: PeopleImportSelectionSchema });
 const GroupsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, groups: z.array(z.string()) })) });
 const OpenalexBody = z.object({ openalexId: z.string() });
 const ValidationsBody = z.object({ entries: z.array(z.object({ recordId: RecordId, validation: z.looseObject({}) })) });
@@ -523,6 +528,29 @@ export const createDirectoryApi = (): Hono<Env> => {
     ]);
     const result = await applySiteImport({
       doc: body.document, selection: body.selection, people: people.items, institutions: institutions.items, structures: structures.items,
+      commands: c.env.commands!, ctx: ctxOf(c), today: new Date().toISOString().slice(0, 10), actor: c.env.actor || 'druid',
+    });
+    return c.json(result, 200, NO_STORE);
+  });
+  // Import of a spreadsheet of researchers (SaaS lot 5 a): same rights and same preview / apply split as the site import.
+  writes.post('/people-imports/preview', async (c) => {
+    if (!c.env.scope!.all) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    const body = await bodyOf(c, PeopleImportPreviewBody);
+    if (!body) return c.json({ error: 'Invalid import file' }, 400, NO_STORE);
+    const [people, institutions, structures] = await Promise.all([
+      c.env.repository.people(c.env.scope!), c.env.repository.institutions(), c.env.repository.structures(),
+    ]);
+    return c.json(planPeopleImport(body.input, people.items, institutions.items, structures.items), 200, NO_STORE);
+  });
+  writes.post('/people-imports/apply', async (c) => {
+    if (!c.env.scope!.all) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
+    const body = await bodyOf(c, PeopleImportApplyBody);
+    if (!body) return c.json({ error: 'Invalid import file' }, 400, NO_STORE);
+    const [people, institutions, structures] = await Promise.all([
+      c.env.repository.people(c.env.scope!), c.env.repository.institutions(), c.env.repository.structures(),
+    ]);
+    const result = await applyPeopleImport({
+      input: body.input, selection: body.selection, people: people.items, institutions: institutions.items, structures: structures.items,
       commands: c.env.commands!, ctx: ctxOf(c), today: new Date().toISOString().slice(0, 10), actor: c.env.actor || 'druid',
     });
     return c.json(result, 200, NO_STORE);

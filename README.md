@@ -140,7 +140,7 @@ Principales variables d'environnement (`.env`) :
 - `DRUID_AMQP_URL`, `DRUID_GRAPH_ACTIONS` (`off` | `dry-run` | `on`) : envoi au graphe CRISalid des retraits
   d'identifiants.
 - `ILAAS_API_KEY`, `ILAAS_MODEL`, `EMBEDDING_API_URL`, `EMBEDDING_API_MODEL` : modèles de langue (rapports,
-  assistant « Mon projet », traductions des appels) ; `PIPELINES_URL`, `PIPELINES_API_KEY` : assistant de recherche
+  assistant « Mon projet », traductions des appels) ; `CRISALID_CHAT_API_URL` (`CHAT_MODEL`, `generic_agent` par défaut) : assistant de recherche
   CRISalid.
 - `OPENALEX_API_KEY`, `SCOPUS_API_KEY` : clés des sources externes (veille, alignement Scopus).
 - `VITE_HELP_URL` : adresse du centre d'aide.

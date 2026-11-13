@@ -308,8 +308,9 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
         .filter((m) => ctx.scope.all || anchors.has(normalizeAcronym(String(m.lab_label || ''))));
       const qualified = siblings.filter((m) => m.role).map((m) => Number(m.id));
       const plan = planAffiliationRows(recordId, researcher.affiliations || [], qualified, todayIso());
+      // The memberships of a person are grouped by person here (lib/directory/people.ts groupQualifiedRows, personKey):
+      // no uid_dyna needed, unlike the Grist store, whose rows only the uid ties together.
       if (plan.patches.length + plan.creates.length > 0) {
-        if (!person.uid) throw new ApiError(400, 'Several affiliations can only be saved for a person with a directory identifier (uid_dyna).');
         if (qualified.length < siblings.length) {
           throw new ApiError(409, 'This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation.');
         }
