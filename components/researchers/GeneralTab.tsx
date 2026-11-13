@@ -275,7 +275,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
        {/* Civil status */}
        <div className="glass-card p-5 md:p-6 min-w-0">
          <div className="section-label mb-4"><Trans>Personal details</Trans></div>
-         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {onLdapLookup && (
               <LdapUidLookup uid={researcher.uid || ''} onUidChange={(v) => onUpdateField('uid', v)} onLookup={onLdapLookup} autoRun={ldapAutoRun} />
             )}
@@ -336,7 +336,10 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
        {/* Employment & contract — under the civil status, secondary style; stretches when the identifiers are taller */}
        <div className="flex-1 rounded-panel bg-white/40 dark:bg-white/[.03] border border-dashed border-ink/15 dark:border-white/15 p-5 md:p-6 min-w-0">
           <div className="text-xs font-bold uppercase tracking-[.09em] text-muted-faint dark:text-[#8f897c] mb-4"><Trans>Employment & contract</Trans></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Compact rows (employer / grade / type, then dates and FTE, then HDR and thesis): the card stays about as
+              tall as the identifiers card on a typical record. */}
+          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
              <div>
                <label className={secLabel}><Trans>Employing institution</Trans></label>
                <select
@@ -393,7 +396,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                  <option value="VACATAIRE">VACATAIRE</option>
                </select>
              </div>
-             <div className="grid grid-cols-2 gap-4">
+          </div>
+          <div className={`grid grid-cols-1 sm:grid-cols-2 gap-4${showFte ? ' xl:grid-cols-4' : ''}`}>
                <div>
                  <label className={secLabel} title={t`Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM.`}><Trans>Employment start</Trans></label>
                  <FuzzyDateInput value={researcher.employment.startDate || ''} onChange={(d) => onUpdateField('startDate', d, 'employment')} className={secInput} wrapperClassName="w-full" />
@@ -402,9 +406,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                  <label className={secLabel} title={t`Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record.`}><Trans>Employment end</Trans></label>
                  <FuzzyDateInput value={researcher.employment.endDate || ''} onChange={(d) => onUpdateField('endDate', d, 'employment')} className={secInput} wrapperClassName="w-full" />
                </div>
-             </div>
              {showFte && (
-               <div className="grid grid-cols-2 gap-4">
+               <>
                  <div>
                    <label className={secLabel} title={t`Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided.`}><Trans>FTE (working time)</Trans></label>
                    <FteInput value={researcher.employment.fte} onChange={(v) => onUpdateField('fte', v, 'employment')} className={secInput} />
@@ -413,10 +416,11 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                    <label className={secLabel} title={t`Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time.`}><Trans>Research FTE</Trans></label>
                    <FteInput value={researcher.employment.researchFte} onChange={(v) => onUpdateField('researchFte', v, 'employment')} className={secInput} />
                  </div>
-               </div>
+               </>
              )}
-             <div className="flex gap-6 items-end md:col-span-2">
-               <div className="flex-1">
+          </div>
+             {/* HDR: checkbox and year on one line */}
+             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
                   <label className="flex items-center gap-3 cursor-pointer">
                      <input
                        type="checkbox"
@@ -426,12 +430,13 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                      />
                      <span className="text-[13px] font-semibold text-[#4b473e] dark:text-[#e7e2d6]"><Trans>Accredited to supervise research (HDR)</Trans></span>
                   </label>
-               </div>
                {researcher.nuFields?.hdr && (
-                 <div className="w-1/3">
-                    <label className={secLabel}><Trans>HDR year</Trans></label>
-                    <input type="text" value={researcher.nuFields?.hdrYear || ''} onChange={(e) => onUpdateField('hdrYear', e.target.value, 'nuFields')} className={secInput} />
-                 </div>
+                 <label className="flex items-center gap-2">
+                    <span className="text-xs text-muted-faint dark:text-[#8f897c]"><Trans>HDR year</Trans></span>
+                    <span className="w-24">
+                      <input type="text" value={researcher.nuFields?.hdrYear || ''} onChange={(e) => onUpdateField('hdrYear', e.target.value, 'nuFields')} className={secInput} />
+                    </span>
+                 </label>
                )}
              </div>
              <ThesisInfo uid={researcher.uid || ''} rowId={researcher.gristRowId} labelClassName={secLabel} />
