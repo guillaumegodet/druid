@@ -105,14 +105,14 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
   const assertLabsInScope = (scope: DirectoryScope, labs: unknown[]): void => {
     if (scope.all) return;
     const anchors = anchorsOf(scope);
-    if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
+    if (anchors.size === 0) throw new ApiError(403, 'Directory writes require the institution right');
     if (labs.some((v) => !anchors.has(normalizeAcronym(String(v ?? ''))))) throw new ApiError(403, 'Write outside scope: LABO');
   };
   const assertRowsInScope = async (scope: DirectoryScope, ids: number[]): Promise<void> => {
-    if (!ids.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+    if (!ids.every(isRowId)) throw new ApiError(400, 'Invalid record identifiers');
     if (scope.all || ids.length === 0) return;
     const anchors = anchorsOf(scope);
-    if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
+    if (anchors.size === 0) throw new ApiError(403, 'Directory writes require the institution right');
     const unique = [...new Set(ids)];
     const labOf = new Map<number, unknown>();
     for (let i = 0; i < unique.length; i += 500) {   // SQLite variable limit
@@ -128,10 +128,10 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
   // Structures: scope column `short_labels` (« LS2N[fr]|LS2N[en] » → its French label), as the proxy.
   const structureAnchor = (raw: unknown) => normalizeAcronym(parseMultiLabel(raw));
   const assertStructuresInScope = async (scope: DirectoryScope, ids: number[], newLabels: unknown[]): Promise<void> => {
-    if (!ids.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+    if (!ids.every(isRowId)) throw new ApiError(400, 'Invalid record identifiers');
     if (scope.all) return;
     const anchors = anchorsOf(scope);
-    if (anchors.size === 0) throw new ApiError(403, 'Grist writes require the institution right');
+    if (anchors.size === 0) throw new ApiError(403, 'Directory writes require the institution right');
     if (newLabels.some((v) => !anchors.has(structureAnchor(v)))) throw new ApiError(403, 'Write outside scope: short_labels');
     if (ids.length === 0) return;
     const rows = await grist.sql(`SELECT id, short_labels AS v FROM ${STRUCTURES} WHERE id IN (${ids.map(() => '?').join(',')})`, ids);
@@ -214,7 +214,7 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
       if (mode !== 'a_revoir' && (principalRowId === undefined || !rowIds.includes(principalRowId))) {
         throw new ApiError(400, 'Qualification: primary row required');
       }
-      if (!rowIds.every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (!rowIds.every(isRowId)) throw new ApiError(400, 'Invalid record identifiers');
       await ensureAffiliationColumns(ctx);
       const encodeDate = fuzzyDateEncoderFor(await annuaireColumns().catch(() => null));
       const decision = `${mode === 'a_revoir' ? 'A_REVOIR' : mode === 'concomitant' ? 'CONCOMITANT' : 'SUCCESSIF'} ${todayIso()} ${author}`;
@@ -260,7 +260,7 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
       }
       const rows = fromUid ? await rowsInScope(ctx.scope, { uid_dyna: [fromUid] })
         : rowId ? await rowsInScope(ctx.scope, { id: [rowId] }) : [];
-      if (!rows.length) throw new ApiError(404, `Record not found in Grist: uid ${fromUid || '—'}`);
+      if (!rows.length) throw new ApiError(404, `Record not found in the directory: uid ${fromUid || '—'}`);
       const note = `[${todayIso()}] uid ${fromUid || '(vide)'} → ${toUid} (n° agent = compte LDAP), par ${author}`;
       await update(ctx, ANNUAIRE, rows.map((r) => {
         const com = String(r.fields['Commentaires'] || '').trimEnd();
@@ -276,11 +276,11 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
      */
     mergeRows: ({ keepRowId, dropRowId, fields, author, note = '' }, ctx) => writing(async () => {
       if (keepRowId === dropRowId) throw new ApiError(400, 'Merge: both rows are identical');
-      if (![keepRowId, dropRowId].every(isRowId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (![keepRowId, dropRowId].every(isRowId)) throw new ApiError(400, 'Invalid record identifiers');
       const rows = await rowsInScope(ctx.scope, { id: [keepRowId, dropRowId] });
       const keep = rows.find((r) => r.rowId === keepRowId);
       const drop = rows.find((r) => r.rowId === dropRowId);
-      if (!keep || !drop) throw new ApiError(404, 'Merge: one of the rows no longer exists in Grist');
+      if (!keep || !drop) throw new ApiError(404, 'Merge: one of the records no longer exists in the directory');
       const writable = await writableColumns();
       const patch: Record<string, any> = {};
       for (const [k, v] of Object.entries(fields || {})) if (writable.has(k)) patch[k] = v;
@@ -288,9 +288,9 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
       await ensureMergeLogTable(ctx);
       const [logId] = await add(ctx, MERGE_LOG_TABLE, [{ fields: buildMergeLogRow({ keep, drop, patch, author, note }) }]);
       if (Object.keys(patch).length > 0) {
-        await step(() => update(ctx, ANNUAIRE, [{ id: keepRowId, fields: patch }]), `Grist error (writing the kept row): merge log ${logId}`);
+        await step(() => update(ctx, ANNUAIRE, [{ id: keepRowId, fields: patch }]), `Directory error (writing the kept row): merge log ${logId}`);
       }
-      await step(() => remove(ctx, ANNUAIRE, [dropRowId]), `Grist error (deleting the absorbed row): merge log ${logId}`);
+      await step(() => remove(ctx, ANNUAIRE, [dropRowId]), `Directory error (deleting the absorbed row): merge log ${logId}`);
       return { logId };
     }),
 
@@ -300,7 +300,7 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
      * is recreated, so that a later failure never leads to recreating it twice.
      */
     restoreMerge: (logId, ctx) => writing(async () => {
-      if (!isRowId(logId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (!isRowId(logId)) throw new ApiError(400, 'Invalid record identifiers');
       const tableIds = await grist.tableIds();
       const rec = tableIds.includes(MERGE_LOG_TABLE) ? (await grist.records(MERGE_LOG_TABLE, { id: [logId] }))[0] : undefined;
       if (!rec) throw new ApiError(404, `Merge not found: ${logId}`);
@@ -351,7 +351,7 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
 
     updateInstitution: (recordId, input, ctx) => writing(async () => {
       if (!ctx.scope.all) throw new ApiError(403, 'Institutions require the institution right');
-      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist identifiers');
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifiers');
       const existing = (await repository.institutions()).items;
       if (!existing.some((e) => e.id === recordId)) throw new ApiError(404, `Institution not found: ${recordId}`);
       const fields = prepareInstitutionWrite(input, existing, recordId);
@@ -366,7 +366,7 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
     }),
 
     updatePerson: (recordId, researcher, ctx) => writing(async () => {
-      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid Grist ID (gristRowId missing)');
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
       // One Annuaire row per membership (grouped back by groupQualifiedRows on read). A lab right only sees
       // — and may only rewrite — the rows of its labs, as when the browser read them through the proxy.
       const uid = String(researcher.uid || '').trim();

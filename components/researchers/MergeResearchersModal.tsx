@@ -50,7 +50,7 @@ export const MergeResearchersModal: React.FC<MergeResearchersModalProps> = ({ ro
           GristService.fetchInstitutionLabels().catch(() => ({} as Record<number, string>)),
         ]);
         if (cancelled) return;
-        if (rs.length !== 2) throw new Error(t`One of the two rows cannot be found in Grist (already merged or deleted?)`);
+        if (rs.length !== 2) throw new Error(t`One of the two records cannot be found in the directory (already merged or deleted?)`);
         setRows(rs);
         setColumns(cols);
         setEtab(labels);
@@ -143,7 +143,7 @@ export const MergeResearchersModal: React.FC<MergeResearchersModalProps> = ({ ro
             <GitMerge className="w-5 h-5 text-ink dark:text-accent" />
             <div>
               <h2 className="font-disp text-lg font-bold tracking-tight text-ink dark:text-[#f5f2ea]"><Trans>Merge two records</Trans></h2>
-              <p className="text-[12px] text-muted-light dark:text-[#8f897c]"><Trans>The kept row is completed, then the other one is deleted. The operation is logged in Grist (Fusions_log table) and can be restored.</Trans></p>
+              <p className="text-[12px] text-muted-light dark:text-[#8f897c]"><Trans>The kept row is completed, then the other one is deleted. The operation is logged in the merge log and can be restored.</Trans></p>
             </div>
           </div>
           <button onClick={onClose} disabled={saving} className="p-2 rounded-full hover:bg-ink/5 dark:hover:bg-white/10 text-muted dark:text-[#8f897c]"><X className="w-5 h-5" /></button>

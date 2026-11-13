@@ -395,7 +395,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
              </div>
              <div className="grid grid-cols-2 gap-4">
                <div>
-                 <label className={secLabel} title={t`Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM.`}><Trans>Employment start</Trans></label>
+                 <label className={secLabel} title={t`Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM.`}><Trans>Employment start</Trans></label>
                  <FuzzyDateInput value={researcher.employment.startDate || ''} onChange={(d) => onUpdateField('startDate', d, 'employment')} className={secInput} wrapperClassName="w-full" />
                </div>
                <div>

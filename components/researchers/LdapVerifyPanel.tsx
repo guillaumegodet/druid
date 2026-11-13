@@ -74,7 +74,7 @@ export const LdapVerifyPanel: React.FC<Props> = ({ diff, progress, applying = fa
       <div className="flex-1 overflow-auto px-4 md:px-7 py-4 space-y-8" data-page-scroll>
         <div className="flex items-center gap-3 px-4 py-3 rounded-card bg-accent/20 dark:bg-accent/10 border border-accent-strong/40 dark:border-accent/20 text-[13px] font-semibold text-ink dark:text-[#f0c266]">
           <AlertTriangle className="w-4 h-4 shrink-0" />
-          <Trans>Only the checked records under “To update” will be written to Grist. No record is created (update only).</Trans>
+          <Trans>Only the checked records under “To update” will be written to the directory. No record is created (update only).</Trans>
         </div>
         {conflictCount > 0 && (
           <div className="flex items-center gap-3 px-4 py-3 rounded-card bg-[rgba(224,158,42,.18)] dark:bg-[rgba(224,158,42,.14)] border border-[rgba(224,158,42,.45)] text-[13px] font-semibold text-[#9a6a12] dark:text-[#f0c266]">

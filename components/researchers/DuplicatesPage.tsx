@@ -186,7 +186,7 @@ export const DuplicatesPage: React.FC<Props> = ({ diff, loading = false, onRefre
                                   type="button"
                                   onClick={() => onOpenResearcher?.(row.gristRowId)}
                                   disabled={!onOpenResearcher}
-                                  title={t`Open the record (Grist row ${row.gristRowId}) — source: ${row.dataSource || '—'}`}
+                                  title={t`Open the record (row ${row.gristRowId}) — source: ${row.dataSource || '—'}`}
                                   className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/70 dark:bg-white/10 border border-white/80 dark:border-white/10 text-[12px] font-semibold text-ink dark:text-[#e7e2d6] hover:bg-white dark:hover:bg-white/15 transition-colors disabled:cursor-default"
                                 >
                                   <span>{row.name || '—'}</span>

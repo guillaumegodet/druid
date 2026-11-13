@@ -418,7 +418,7 @@ export const EtlConsolePage: React.FC<{
             </label>
           </div>
           <p className="text-[12px] text-muted-light dark:text-[#8f897c]">
-            <Trans>Staff (Grist directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation.</Trans>
+            <Trans>Staff (Directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation.</Trans>
             {files && !files.hlmExport.exists && (
               <> <Trans>Nantilus HLM export missing: the “journal access” step will be skipped.</Trans></>
             )}
@@ -427,21 +427,21 @@ export const EtlConsolePage: React.FC<{
 
         {/* Grist directory */}
         <section className={cardCls}>
-          <h4 className="section-label"><Trans>3. Grist directory</Trans></h4>
+          <h4 className="section-label"><Trans>3. Directory</Trans></h4>
           <label className={labelCls}>
-            <Trans>Acronym in the Grist directory (LABO field)</Trans>
+            <Trans>Acronym in the Directory (LABO field)</Trans>
             <input className={inputCls} value={form.grist_labo_acronyme}
               onChange={(e) => update('grist_labo_acronyme', e.target.value)} placeholder="LPPL" disabled={busy} />
           </label>
           <div>
             <h5 className="text-xs font-semibold text-muted dark:text-[#c3beb0] flex items-center gap-1.5 mb-1">
               <Users className="w-3.5 h-3.5" />
-              <Trans>Teams read from Grist (Structures table, read-only)</Trans>
+              <Trans>Teams read from the Directory (structures, read-only)</Trans>
             </h5>
             {teams === null && !isNew && <p className="text-[12px] text-muted-light"><Trans>Loading…</Trans></p>}
             {teams && teams.length === 0 && (
               <p className="text-[12px] text-muted-light dark:text-[#8f897c]">
-                <Trans>No team found in Grist for this structure (auto-discovered from the staff list).</Trans>
+                <Trans>No team found in the Directory for this structure (auto-discovered from the staff list).</Trans>
               </p>
             )}
             {teams && teams.length > 0 && (

@@ -116,7 +116,7 @@ export const createGristAlignCommands = ({ grist, repository, caches, texts, has
       }
     } catch (err) {
       console.error('[api/v1] alignment write:', (err as Error).message);
-      throw new ApiError(502, `Grist error (partial write): ${updated} records written`, { updated });
+      throw new ApiError(502, `Directory error (partial write): ${updated} records written`, { updated });
     } finally {
       repository.invalidate();
     }

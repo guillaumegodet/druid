@@ -53,9 +53,9 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:429
-msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
-msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to Grist).{skippedMsg}"
+#: App.tsx:427
+msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to the directory).{skippedMsg}"
+msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to the directory).{skippedMsg}"
 
 #: App.tsx:431
 msgid "Error attaching LDAP records"
@@ -101,9 +101,9 @@ msgstr "LDAP synchronization trigger failed: {0}"
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:572
-msgid "LDAP update applied: {updated} record(s) written to Grist."
-msgstr "LDAP update applied: {updated} record(s) written to Grist."
+#: App.tsx:570
+msgid "LDAP update applied: {updated} record(s) written to the directory."
+msgstr "LDAP update applied: {updated} record(s) written to the directory."
 
 #: App.tsx:574
 msgid "Error writing the LDAP updates"
@@ -116,17 +116,17 @@ msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:615
-msgid "Validation applied: {0} record(s) written to Grist."
-msgstr "Validation applied: {0} record(s) written to Grist."
+#: App.tsx:613
+msgid "Validation applied: {0} record(s) written to the directory."
+msgstr "Validation applied: {0} record(s) written to the directory."
 
 #: App.tsx:617
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:630
-msgid "This record has no Grist row: validation impossible."
-msgstr "This record has no Grist row: validation impossible."
+#: App.tsx:628
+msgid "This record has no directory row: validation impossible."
+msgstr "This record has no directory row: validation impossible."
 
 #: App.tsx:642
 msgid "Error validating the record"
@@ -140,9 +140,9 @@ msgstr "Error while saving"
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:706
-msgid "LDAP structures: {updated} updated, {created} created in Grist."
-msgstr "LDAP structures: {updated} updated, {created} created in Grist."
+#: App.tsx:704
+msgid "LDAP structures: {updated} updated, {created} created in the directory."
+msgstr "LDAP structures: {updated} updated, {created} created in the directory."
 
 #: App.tsx:708
 msgid "Error writing the LDAP structures"
@@ -189,9 +189,9 @@ msgstr "Qualification error"
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:993
-msgid "Grist row {gristRowId} not found in the loaded scope"
-msgstr "Grist row {gristRowId} not found in the loaded scope"
+#: App.tsx:990
+msgid "Directory row {gristRowId} not found in the loaded scope"
+msgstr "Directory row {gristRowId} not found in the loaded scope"
 
 #: App.tsx:1013
 msgid "Loading dashboard…"
@@ -861,8 +861,8 @@ msgid "The URL must start with http:// or https://."
 msgstr "The URL must start with http:// or https://."
 
 #: components/ResearcherDetail.tsx:481
-msgid "The change will be written to Grist (photo_url column) when you click “Save”."
-msgstr "The change will be written to Grist (photo_url column) when you click “Save”."
+msgid "The change will be saved (photo_url field) when you click “Save”."
+msgstr "The change will be saved (photo_url field) when you click “Save”."
 
 #: components/ResearcherDetail.tsx:491
 msgid "Remove photo"
@@ -1052,8 +1052,8 @@ msgid "Directory of labs and teams"
 msgstr "Directory of labs and teams"
 
 #: components/StructureList.tsx:244
-msgid "Create a structure (team, unit, faculty, institution) in Grist"
-msgstr "Create a structure (team, unit, faculty, institution) in Grist"
+msgid "Create a structure (team, unit, faculty, institution) in the directory"
+msgstr "Create a structure (team, unit, faculty, institution) in the directory"
 
 #: components/StructureList.tsx:250
 #: components/researchers/ListHeader.tsx:76
@@ -1066,9 +1066,9 @@ msgid "Synchronise"
 msgstr "Synchronise"
 
 #: components/StructureList.tsx:278
-#: components/researchers/ListHeader.tsx:109
-msgid "Force Grist refresh"
-msgstr "Force Grist refresh"
+#: components/researchers/ListHeader.tsx:108
+msgid "Force directory refresh"
+msgstr "Force directory refresh"
 
 #: components/StructureList.tsx:288
 msgid "Import from LDAP"
@@ -1242,8 +1242,8 @@ msgid "Section reserved for administrators."
 msgstr "Section reserved for administrators."
 
 #: components/admin/AdminPage.tsx:123
-msgid "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
-msgstr "Regenerates structures.csv (from Grist) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
+msgid "Regenerates structures.csv (from the Directory) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
+msgstr "Regenerates structures.csv (from the Directory) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
 
 #: components/admin/AdminPage.tsx:126
 msgid "Synchronise with SoVisu+"
@@ -5864,8 +5864,8 @@ msgstr "Could not load"
 
 #. placeholder {0}: apiErrorText(e)
 #: components/dashboard/NewsletterPanel.tsx:108
-msgid "Could not write to Grist: {0}"
-msgstr "Could not write to Grist: {0}"
+msgid "Could not save: {0}"
+msgstr "Could not save: {0}"
 
 #. placeholder {0}: apiErrorText(e)
 #: components/dashboard/NewsletterPanel.tsx:134
@@ -10644,28 +10644,28 @@ msgid "CRISalid structure uid (graph)"
 msgstr "CRISalid structure uid (graph)"
 
 #: components/etl/EtlConsolePage.tsx:421
-msgid "Staff (Grist directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation."
-msgstr "Staff (Grist directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation."
+msgid "Staff (Directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation."
+msgstr "Staff (Directory, validated researchers), Scimago quartiles and journal access (Nantilus + ISTEX) are handled automatically at each generation."
 
 #: components/etl/EtlConsolePage.tsx:423
 msgid "Nantilus HLM export missing: the “journal access” step will be skipped."
 msgstr "Nantilus HLM export missing: the “journal access” step will be skipped."
 
 #: components/etl/EtlConsolePage.tsx:430
-msgid "3. Grist directory"
-msgstr "3. Grist directory"
+msgid "3. Directory"
+msgstr "3. Directory"
 
 #: components/etl/EtlConsolePage.tsx:432
-msgid "Acronym in the Grist directory (LABO field)"
-msgstr "Acronym in the Grist directory (LABO field)"
+msgid "Acronym in the Directory (LABO field)"
+msgstr "Acronym in the Directory (LABO field)"
 
 #: components/etl/EtlConsolePage.tsx:439
-msgid "Teams read from Grist (Structures table, read-only)"
-msgstr "Teams read from Grist (Structures table, read-only)"
+msgid "Teams read from the Directory (structures, read-only)"
+msgstr "Teams read from the Directory (structures, read-only)"
 
 #: components/etl/EtlConsolePage.tsx:444
-msgid "No team found in Grist for this structure (auto-discovered from the staff list)."
-msgstr "No team found in Grist for this structure (auto-discovered from the staff list)."
+msgid "No team found in the Directory for this structure (auto-discovered from the staff list)."
+msgstr "No team found in the Directory for this structure (auto-discovered from the staff list)."
 
 #: components/etl/EtlConsolePage.tsx:461
 msgid "4. Sub-structures and display"
@@ -10783,24 +10783,24 @@ msgid "Nothing to synchronise"
 msgstr "Nothing to synchronise"
 
 #: components/etl/EtlMaintenancePanels.tsx:60
-msgid "Grist error"
-msgstr "Grist error"
+msgid "Directory error"
+msgstr "Directory error"
 
 #: components/etl/EtlMaintenancePanels.tsx:72
-msgid "Staff (Grist directory)"
-msgstr "Staff (Grist directory)"
+msgid "Staff (Directory)"
+msgstr "Staff (Directory)"
 
 #: components/etl/EtlMaintenancePanels.tsx:74
 msgid "Filter LABO = “{gristLabo}”, validated researchers excluding departures"
 msgstr "Filter LABO = “{gristLabo}”, validated researchers excluding departures"
 
 #: components/etl/EtlMaintenancePanels.tsx:74
-msgid "Fill in the Grist acronym (section 3) and save"
-msgstr "Fill in the Grist acronym (section 3) and save"
+msgid "Fill in the Directory acronym (section 3) and save"
+msgstr "Fill in the Directory acronym (section 3) and save"
 
 #: components/etl/EtlMaintenancePanels.tsx:76
-msgid "Resynchronise from Grist"
-msgstr "Resynchronise from Grist"
+msgid "Resynchronise from the Directory"
+msgstr "Resynchronise from the Directory"
 
 #. placeholder {0}: data.count
 #. placeholder {1}: fmtDate(data.updatedAt)
@@ -10835,8 +10835,8 @@ msgid "Search error"
 msgstr "Search error"
 
 #: components/groups/AuthorResolveModal.tsx:51
-msgid "Record without a Grist row id — cannot save."
-msgstr "Record without a Grist row id — cannot save."
+msgid "Record without a row id — cannot save."
+msgstr "Record without a row id — cannot save."
 
 #: components/groups/AuthorResolveModal.tsx:75
 msgid "Identify the OpenAlex author"
@@ -12404,8 +12404,8 @@ msgstr "Open the records to decide, or click “Merge”: the assistant compares
 #. placeholder {0}: row.gristRowId
 #. placeholder {1}: row.dataSource || '—'
 #: components/researchers/DuplicatesPage.tsx:189
-msgid "Open the record (Grist row {0}) — source: {1}"
-msgstr "Open the record (Grist row {0}) — source: {1}"
+msgid "Open the record (row {0}) — source: {1}"
+msgstr "Open the record (row {0}) — source: {1}"
 
 #: components/researchers/DuplicatesPage.tsx:194
 #: components/researchers/LdapVerifyPanel.tsx:135
@@ -12518,8 +12518,8 @@ msgid "Merge the two selected records"
 msgstr "Merge the two selected records"
 
 #: components/researchers/FilterPanel.tsx:214
-msgid "Select exactly two Grist records to merge"
-msgstr "Select exactly two Grist records to merge"
+msgid "Select exactly two records to merge"
+msgstr "Select exactly two records to merge"
 
 #: components/researchers/FilterPanel.tsx:217
 #: components/structures/LifecycleTab.tsx:135
@@ -12708,8 +12708,8 @@ msgid "Employment start"
 msgstr "Employment start"
 
 #: components/researchers/GeneralTab.tsx:351
-msgid "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
-msgstr "Contract / employment dates (Grist employment_* columns), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
+msgid "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
+msgstr "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 
 #: components/researchers/GeneralTab.tsx:355
 #: lib/importConflicts.ts:72
@@ -13225,8 +13225,8 @@ msgid "Loading the LDAP comparison…"
 msgstr "Loading the LDAP comparison…"
 
 #: components/researchers/LdapVerifyPanel.tsx:77
-msgid "Only the checked records under “To update” will be written to Grist. No record is created (update only)."
-msgstr "Only the checked records under “To update” will be written to Grist. No record is created (update only)."
+msgid "Only the checked records under “To update” will be written to the directory. No record is created (update only)."
+msgstr "Only the checked records under “To update” will be written to the directory. No record is created (update only)."
 
 #: components/researchers/LdapVerifyPanel.tsx:82
 msgid "{conflictCount, plural, one {# record has a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting.} other {# records have a manually validated status that LDAP contradicts — unchecked by default. Decide before overwriting.}}"
@@ -13379,8 +13379,8 @@ msgid "restored (G-{0})"
 msgstr "restored (G-{0})"
 
 #: components/researchers/MergeResearchersModal.tsx:53
-msgid "One of the two rows cannot be found in Grist (already merged or deleted?)"
-msgstr "One of the two rows cannot be found in Grist (already merged or deleted?)"
+msgid "One of the two records cannot be found in the directory (already merged or deleted?)"
+msgstr "One of the two records cannot be found in the directory (already merged or deleted?)"
 
 #: components/researchers/MergeResearchersModal.tsx:87
 msgid "yes"
@@ -13427,8 +13427,8 @@ msgid "Merge two records"
 msgstr "Merge two records"
 
 #: components/researchers/MergeResearchersModal.tsx:146
-msgid "The kept row is completed, then the other one is deleted. The operation is logged in Grist (Fusions_log table) and can be restored."
-msgstr "The kept row is completed, then the other one is deleted. The operation is logged in Grist (Fusions_log table) and can be restored."
+msgid "The kept row is completed, then the other one is deleted. The operation is logged in the merge log and can be restored."
+msgstr "The kept row is completed, then the other one is deleted. The operation is logged in the merge log and can be restored."
 
 #: components/researchers/MergeResearchersModal.tsx:158
 msgid "Loading both rows…"
@@ -14368,8 +14368,8 @@ msgid "Search (title, name, lab…)"
 msgstr "Search (title, name, lab…)"
 
 #: components/researchers/TasksPage.tsx:131
-msgid "Re-reads the Grist table"
-msgstr "Re-reads the Grist table"
+msgid "Re-reads the task list"
+msgstr "Re-reads the task list"
 
 #: components/researchers/TasksPage.tsx:134
 msgid "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
@@ -14421,8 +14421,8 @@ msgid "Generated by a detection rule — closed automatically when the situation
 msgstr "Generated by a detection rule — closed automatically when the situation disappears"
 
 #: components/researchers/TasksPage.tsx:200
-msgid "No Directory record linked: link it from the Grist table"
-msgstr "No Directory record linked: link it from the Grist table"
+msgid "No Directory record linked to this task"
+msgstr "No Directory record linked to this task"
 
 #: components/researchers/TasksPage.tsx:201
 msgid "To complete"
@@ -14768,14 +14768,14 @@ msgid "Search this record again on {0}"
 msgstr "Search this record again on {0}"
 
 #: components/researchers/UnifiedAlignPage.tsx:524
-msgid "{count} record(s) written to Grist."
-msgstr "{count} record(s) written to Grist."
+msgid "{count} record(s) written to the directory."
+msgstr "{count} record(s) written to the directory."
 
 #. placeholder {0}: r.ppn
 #. placeholder {1}: r.newPpn
 #: components/researchers/UnifiedAlignPage.tsx:534
-msgid "IdRef updated in Grist: {0} → {1}."
-msgstr "IdRef updated in Grist: {0} → {1}."
+msgid "IdRef updated in the directory: {0} → {1}."
+msgstr "IdRef updated in the directory: {0} → {1}."
 
 #: components/researchers/UnifiedAlignPage.tsx:537
 #: components/researchers/UnifiedAlignPage.tsx:548
@@ -15073,16 +15073,16 @@ msgid "{matchedCount, plural, one {Validate # record} other {Validate # records}
 msgstr "{matchedCount, plural, one {Validate # record} other {Validate # records}}"
 
 #: components/researchers/alignAtoms.tsx:71
-msgid "The Grist record and the candidate already share the same {m} — near-certain match"
-msgstr "The Grist record and the candidate already share the same {m} — near-certain match"
+msgid "The directory record and the candidate already share the same {m} — near-certain match"
+msgstr "The directory record and the candidate already share the same {m} — near-certain match"
 
 #: components/researchers/alignAtoms.tsx:72
 msgid "shared {m}"
 msgstr "shared {m}"
 
 #: components/researchers/alignAtoms.tsx:84
-msgid "Mixed identity: this profile merges several people — neither validated nor rejected, a ticket to untangle at the source (Grist review table)"
-msgstr "Mixed identity: this profile merges several people — neither validated nor rejected, a ticket to untangle at the source (Grist review table)"
+msgid "Mixed identity: this profile merges several people — neither validated nor rejected, a ticket to untangle at the source (review table)"
+msgstr "Mixed identity: this profile merges several people — neither validated nor rejected, a ticket to untangle at the source (review table)"
 
 #: components/researchers/alignAtoms.tsx:86
 msgid "Mixed identity"
@@ -15106,8 +15106,8 @@ msgid "reported on {0}"
 msgstr "reported on {0}"
 
 #: components/researchers/alignAtoms.tsx:128
-msgid "Wrong candidate: never suggest it again for this person (Grist blacklist Alignement_IdRef)"
-msgstr "Wrong candidate: never suggest it again for this person (Grist blacklist Alignement_IdRef)"
+msgid "Wrong candidate: never suggest it again for this person (blacklist)"
+msgstr "Wrong candidate: never suggest it again for this person (blacklist)"
 
 #: components/researchers/alignAtoms.tsx:130
 msgid "Wrong candidate"
@@ -15118,8 +15118,8 @@ msgid "Probable error"
 msgstr "Probable error"
 
 #: components/researchers/alignAtoms.tsx:153
-msgid "Grist record"
-msgstr "Grist record"
+msgid "Directory record"
+msgstr "Directory record"
 
 #. placeholder {0}: a.grist.orcid || '∅'
 #. placeholder {1}: a.grist.idhal || '∅'
@@ -15738,8 +15738,8 @@ msgid "Nantes Université, …"
 msgstr "Nantes Université, …"
 
 #: components/structures/LifecycleTab.tsx:56
-msgid "Tab not yet connected to Grist: the entries below are not saved (nor reloaded). Still to be developed — see docs/archive/plan-fusion-demo-2026-09.md, sub-lot “structure lineage”."
-msgstr "Tab not yet connected to Grist: the entries below are not saved (nor reloaded). Still to be developed — see docs/archive/plan-fusion-demo-2026-09.md, sub-lot “structure lineage”."
+msgid "Tab not yet connected to the directory: the entries below are not saved (nor reloaded). Still to be developed — see docs/archive/plan-fusion-demo-2026-09.md, sub-lot “structure lineage”."
+msgstr "Tab not yet connected to the directory: the entries below are not saved (nor reloaded). Still to be developed — see docs/archive/plan-fusion-demo-2026-09.md, sub-lot “structure lineage”."
 
 #: components/structures/LifecycleTab.tsx:64
 msgid "Current state"
@@ -16107,8 +16107,8 @@ msgid "LDAP import of structures"
 msgstr "LDAP import of structures"
 
 #: components/structures/StructuresLdapReview.tsx:51
-msgid "Limited LDAP data (type, name, codes). Checked records will be written to Grist. Rich data (ror/scopus/hal…) is still handled by the bridge."
-msgstr "Limited LDAP data (type, name, codes). Checked records will be written to Grist. Rich data (ror/scopus/hal…) is still handled by the bridge."
+msgid "Limited LDAP data (type, name, codes). Checked records will be written to the directory. Rich data (ror/scopus/hal…) is still handled by the bridge."
+msgstr "Limited LDAP data (type, name, codes). Checked records will be written to the directory. Rich data (ror/scopus/hal…) is still handled by the bridge."
 
 #: components/structures/StructuresLdapReview.tsx:56
 msgid "To update"
@@ -16134,8 +16134,8 @@ msgstr "To create ({0})"
 
 #. placeholder {0}: diff.orphelins.length
 #: components/structures/StructuresLdapReview.tsx:121
-msgid "Grist structures outside the LDAP scope ({0})"
-msgstr "Grist structures outside the LDAP scope ({0})"
+msgid "Directory structures outside the LDAP scope ({0})"
+msgstr "Directory structures outside the LDAP scope ({0})"
 
 #. placeholder {0}: new Date(diff.generatedAt).toLocaleString(i18n.locale)
 #: components/structures/StructuresLdapReview.tsx:129
@@ -16149,8 +16149,8 @@ msgid "Apply ({0} updates + {1} new)"
 msgstr "Apply ({0} updates + {1} new)"
 
 #: hooks/useDruidData.ts:75
-msgid "Unable to synchronize with Grist."
-msgstr "Unable to synchronize with Grist."
+msgid "Unable to load the directory."
+msgstr "Unable to load the directory."
 
 #: lib/alignTextsI18n.ts:7
 msgid "Identifier mismatch"
@@ -16700,8 +16700,8 @@ msgid "Review table missing, run the alignment script first"
 msgstr "Review table missing, run the alignment script first"
 
 #: lib/apiErrors.ts:141
-msgid "Grist error (partial write)"
-msgstr "Grist error (partial write)"
+msgid "Directory error (partial write)"
+msgstr "Directory error (partial write)"
 
 #: lib/apiErrors.ts:142
 msgid "Qualification: primary row required"
@@ -16716,24 +16716,24 @@ msgid "This uid already has a directory record, merge the two records instead"
 msgstr "This uid already has a directory record, merge the two records instead"
 
 #: lib/apiErrors.ts:145
-msgid "Record not found in Grist"
-msgstr "Record not found in Grist"
+msgid "Record not found in the directory"
+msgstr "Record not found in the directory"
 
 #: lib/apiErrors.ts:146
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
 #: lib/apiErrors.ts:147
-msgid "Merge: one of the rows no longer exists in Grist"
-msgstr "Merge: one of the rows no longer exists in Grist"
+msgid "Merge: one of the records no longer exists in the directory"
+msgstr "Merge: one of the records no longer exists in the directory"
 
 #: lib/apiErrors.ts:148
-msgid "Grist error (writing the kept row)"
-msgstr "Grist error (writing the kept row)"
+msgid "Directory error (writing the kept row)"
+msgstr "Directory error (writing the kept row)"
 
 #: lib/apiErrors.ts:149
-msgid "Grist error (deleting the absorbed row)"
-msgstr "Grist error (deleting the absorbed row)"
+msgid "Directory error (deleting the absorbed row)"
+msgstr "Directory error (deleting the absorbed row)"
 
 #: lib/apiErrors.ts:150
 msgid "Merge not found"
@@ -16809,8 +16809,8 @@ msgstr "Institution not found"
 
 #: lib/apiErrors.ts:169
 #: lib/gristService.ts:139
-msgid "Invalid Grist ID (gristRowId missing)"
-msgstr "Invalid Grist ID (gristRowId missing)"
+msgid "Invalid record identifier (row id missing)"
+msgstr "Invalid record identifier (row id missing)"
 
 #: lib/apiErrors.ts:170
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
@@ -16941,8 +16941,8 @@ msgid "Career path not computed yet for this record"
 msgstr "Career path not computed yet for this record"
 
 #: lib/apiErrors.ts:204
-msgid "Grist unreachable"
-msgstr "Grist unreachable"
+msgid "Directory unreachable"
+msgstr "Directory unreachable"
 
 #: lib/apiErrors.ts:205
 msgid "No Annuaire record for this key"
@@ -17093,8 +17093,8 @@ msgid "Scope check failed"
 msgstr "Scope check failed"
 
 #: lib/apiErrors.ts:245
-msgid "Grist writes require the institution right"
-msgstr "Grist writes require the institution right"
+msgid "Directory writes require the institution right"
+msgstr "Directory writes require the institution right"
 
 #: lib/apiErrors.ts:246
 msgid "Writes require an authenticated user (Cloudflare Access)"
@@ -17113,8 +17113,8 @@ msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
 #: lib/apiErrors.ts:250
-msgid "Invalid Grist identifiers"
-msgstr "Invalid Grist identifiers"
+msgid "Invalid record identifiers"
+msgstr "Invalid record identifiers"
 
 #: lib/apiErrors.ts:251
 msgid "Body with a records array expected"

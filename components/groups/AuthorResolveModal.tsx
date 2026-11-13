@@ -48,7 +48,7 @@ export const AuthorResolveModal: React.FC<{
 
   const choose = async (candidate: AuthorCandidate) => {
     if (!researcher.gristRowId) {
-      setError(t`Record without a Grist row id — cannot save.`);
+      setError(t`Record without a row id — cannot save.`);
       return;
     }
     setSavingId(candidate.id);

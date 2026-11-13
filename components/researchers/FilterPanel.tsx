@@ -211,7 +211,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
           <button
             disabled={!mergeRowIds}
             onClick={() => mergeRowIds && onMergeResearchers?.(mergeRowIds)}
-            title={mergeRowIds ? t`Merge the two selected records` : t`Select exactly two Grist records to merge`}
+            title={mergeRowIds ? t`Merge the two selected records` : t`Select exactly two records to merge`}
             className={`btn-pill h-10 ${mergeRowIds ? '' : 'opacity-50 cursor-not-allowed'}`}
           >
             <Merge className="w-3.5 h-3.5" /> <Trans context="noun">Merge</Trans>

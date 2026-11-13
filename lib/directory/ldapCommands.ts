@@ -74,7 +74,7 @@ export const createGristLdapCommands = ({ grist, repository, ldap, annuaireColum
       }
     } catch (err) {
       console.error('[api/v1] LDAP write:', (err as Error).message);
-      throw new ApiError(502, `Grist error (partial write): ${updated} records written`, { updated });
+      throw new ApiError(502, `Directory error (partial write): ${updated} records written`, { updated });
     }
     return updated;
   };
@@ -151,7 +151,7 @@ export const createGristLdapCommands = ({ grist, repository, ldap, annuaireColum
         }
       } catch (err) {
         console.error('[api/v1] LDAP structures:', (err as Error).message);
-        throw new ApiError(502, `Grist error (partial write): ${updated + created} records written`, { updated, created });
+        throw new ApiError(502, `Directory error (partial write): ${updated + created} records written`, { updated, created });
       }
       return { updated, created };
     }),

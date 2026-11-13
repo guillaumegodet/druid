@@ -136,7 +136,7 @@ export const GristService = {
     // Fallback to the old `G-<rowId>` id format for caches possibly older than the uid pivot.
     const gristId = researcher.gristRowId
       ?? (researcher.id.startsWith('G-') ? parseInt(researcher.id.slice(2)) : NaN);
-    if (!gristId || isNaN(gristId)) throw new Error(t`Invalid Grist ID (gristRowId missing)`);
+    if (!gristId || isNaN(gristId)) throw new Error(t`Invalid record identifier (row id missing)`);
     await DirectoryApi.updatePerson(gristId, researcher);
   },
 

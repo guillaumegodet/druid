@@ -273,7 +273,7 @@ export const createDirectoryApi = (): Hono<Env> => {
   app.get('/duplicates', async (c) => c.json(await c.env.repository.duplicates(c.env.scope!), 200, NO_STORE));
   app.get('/people/rows', async (c) => {
     const ids = String(c.req.query('ids') || '').split(',').filter(Boolean).map(Number);
-    if (ids.length === 0 || ids.length > 500 || !ids.every((n) => Number.isInteger(n) && n > 0)) return c.json({ error: 'Invalid Grist identifiers' }, 400, NO_STORE);
+    if (ids.length === 0 || ids.length > 500 || !ids.every((n) => Number.isInteger(n) && n > 0)) return c.json({ error: 'Invalid record identifiers' }, 400, NO_STORE);
     return c.json({ items: await c.env.repository.recordRows(ids, c.env.scope!) }, 200, NO_STORE);
   });
   app.get('/people/uid/:uid/labs', async (c) =>
@@ -413,7 +413,7 @@ export const createDirectoryApi = (): Hono<Env> => {
   });
   writes.post('/merges/:logId/restore', async (c) => {
     const logId = recordIdOf(c.req.param('logId'));
-    if (!logId) return c.json({ error: 'Invalid Grist identifiers' }, 400, NO_STORE);
+    if (!logId) return c.json({ error: 'Invalid record identifiers' }, 400, NO_STORE);
     return c.json(await c.env.commands!.restoreMerge(logId, ctxOf(c)), 200, NO_STORE);
   });
   writes.post('/ldap/updates', async (c) => {
