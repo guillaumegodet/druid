@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.18.0] — 2026-11-20
+
 ### Ajouté
 - **Import de chercheurs depuis un fichier** (Synchroniser › « Importer des chercheurs depuis un fichier », droit
   établissement) : CSV (`;` ou `,`) ou XLSX, modèle téléchargeable, en-têtes reconnus en français et en anglais.
