@@ -87,8 +87,9 @@ export const readRecordFields = (p: Record<string, any>, m: Record<string, any>,
   out[HAL_ID_NUM_SECONDARY_COLUMN] = joinHalIdNums(sortHalIdNums(parts.identifiers.filter((i) => i.scheme === 'idhal_i' && !i.is_primary).map((i) => i.value)));
   const scopus = primary('scopus');
   out.ID_SCOPUS = has(e, 'ID_SCOPUS') ? e.ID_SCOPUS : scopus ? Number(scopus) : parts.scopusAbsent ? 'absent' : 0;
-  out.OpenAlex_ids = has(e, 'OpenAlex_ids') ? e.OpenAlex_ids
-    : parts.identifiers.filter((i) => i.scheme === 'openalex' && i.source !== OPENALEX_AUTHOR_SOURCE).map((i) => i.value).join('|');
+  // Always the person's list (person_identifier): a cell kept in extra by the Grist migration listed the A-ids of one
+  // row only, and writers that read it to complete the list would drop the others.
+  out.OpenAlex_ids = parts.identifiers.filter((i) => i.scheme === 'openalex' && i.source !== OPENALEX_AUTHOR_SOURCE).map((i) => i.value).join('|');
   out.openalex_author_id = parts.identifiers.find((i) => i.scheme === 'openalex' && i.source === OPENALEX_AUTHOR_SOURCE)?.value ?? '';
   for (const [field, kind] of Object.entries(LINK_FIELDS)) {
     out[field] = has(e, field) ? e[field] : parts.links.filter((l) => l.kind === kind).map((l) => l.url).join('; ');
@@ -246,7 +247,7 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
           await trx.insertInto('person_identifier').values({ person_id: personId, scheme: 'openalex', value: v, is_primary: i === 0, source: OPENALEX_LIST_SOURCE })
             .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: i === 0, source: OPENALEX_LIST_SOURCE })).execute();
         }
-        if (list.join('|') === String(value ?? '')) done(field); else keep(field, blank(value) ? '' : value);
+        done(field); // the rows are the list: no verbatim copy in extra (it would hide later changes)
         continue;
       }
       case HAL_ID_NUM_SECONDARY_COLUMN: {

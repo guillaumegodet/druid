@@ -103,8 +103,8 @@ export const pgDirectoryRow = (p: PgPerson, m: PgMembership, x: PersonExtras): D
       halIdNumSecondary: joinHalIdNums(sortHalIdNums(ids.filter((i) => i.scheme === 'idhal_i' && !i.is_primary).map((i) => i.value))),
       scopusId: has(e, 'ID_SCOPUS') ? String(e.ID_SCOPUS) : (primary('scopus') || (x.scopusAbsent ? 'absent' : '')),
       openalexId: ids.find((i) => i.scheme === 'openalex' && i.source === 'grist:openalex_author_id')?.value ?? '',
-      openalexIds: has(e, 'OpenAlex_ids') ? String(e.OpenAlex_ids)
-        : ids.filter((i) => i.scheme === 'openalex' && i.source !== 'grist:openalex_author_id').map((i) => i.value).join('|'),
+      // Always the person's list: a former `extra.OpenAlex_ids` (Grist cell of one row) is ignored.
+      openalexIds: ids.filter((i) => i.scheme === 'openalex' && i.source !== 'grist:openalex_author_id').map((i) => i.value).join('|'),
     },
     socials: { bluesky: primary('bluesky'), mastodon: primary('mastodon'), ...socials } as DirectoryRow['socials'],
     profiles: profiles as DirectoryRow['profiles'],

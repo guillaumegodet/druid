@@ -8,6 +8,7 @@ import { sql } from 'kysely';
 import { createDb } from '../db/client';
 import { createGristDirectoryRepository, type DirectoryRepository, type GristClient } from '../directory/repository';
 import { createPgDirectoryRepository } from '../directory/pg/repository';
+import { readRecords } from '../directory/pg/recordFields';
 import type { GristRecord } from '../directory/gristMapping';
 import { transformDirectory } from '../migration/gristToPg';
 import { transformWork } from '../migration/gristToPgWork';
@@ -121,5 +122,25 @@ describe.skipIf(!url)('DirectoryRepository contract: Grist = PostgreSQL', () => 
     })).rejects.toBeInstanceOf(Rollback);
     expect(seen[0].updatedAt).toBe('2030-01-01T00:00:00.000Z');
     expect(seen[1]).toEqual({ updatedAt: '2030-01-02T00:00:00.000Z', orcid: '0000-0002-0000-0002' });
+  });
+
+  // The Grist import used to keep the cell of the person's main row in extra.OpenAlex_ids when the A-ids of all its rows
+  // read differently; the list and the record showed that partial copy. They read person_identifier only.
+  it('OpenAlex A-ids: the person\'s list, never a former extra.OpenAlex_ids', async () => {
+    const directory = transformDirectory(gristDirectoryFixture());
+    let got: { list: string; record: string[] } | null = null;
+    await expect(db!.transaction().execute(async (trx) => {
+      await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
+      await loadDirectory(trx, directory.rows, directory.report);
+      await sql`UPDATE person SET extra = extra || '{"OpenAlex_ids": "A1"}'::jsonb WHERE uid = 'dupont-a'`.execute(trx);
+      const pg = createPgDirectoryRepository({ db: trx, loadLdapCache: async () => ({ data: {}, version: 'l1' }) });
+      const records = await readRecords(trx);
+      got = {
+        list: (await pg.people(ALL)).items.find((p) => p.id === 'dupont-a')!.identifiers.openalexIds ?? '',
+        record: records.filter((r) => r.fields.uid_dyna === 'dupont-a').map((r) => r.fields.OpenAlex_ids),
+      };
+      throw new Rollback();
+    })).rejects.toBeInstanceOf(Rollback);
+    expect(got).toEqual({ list: 'A1|A2', record: ['A1|A2', 'A1|A2'] });
   });
 });
