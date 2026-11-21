@@ -215,6 +215,12 @@ export interface Establishment {
   updated_at: Generated<Timestamp>;
 }
 
+export interface FieldSourcePriority {
+  field: string;
+  rank: number;
+  source: string;
+}
+
 export interface Funder {
   category: string;
   country: Generated<string>;
@@ -431,6 +437,22 @@ export interface Person {
   sources: Generated<string[]>;
   uid: string | null;
   updated_at: Generated<Timestamp>;
+}
+
+export interface PersonFieldValue {
+  acknowledged: Generated<Json>;
+  asserted_at: Generated<Timestamp>;
+  asserted_by: string | null;
+  created_at: Generated<Timestamp>;
+  field: string;
+  id: Generated<Int8>;
+  import_batch_id: Int8 | null;
+  note: string | null;
+  observed_at: Generated<Timestamp>;
+  person_id: string;
+  source: string;
+  updated_at: Generated<Timestamp>;
+  value: string | null;
 }
 
 export interface PersonIdentifier {
@@ -656,6 +678,7 @@ export interface DB {
   call_passage: CallPassage;
   collab_pair_feedback: CollabPairFeedback;
   establishment: Establishment;
+  field_source_priority: FieldSourcePriority;
   funder: Funder;
   funding_call: FundingCall;
   funding_programme: FundingProgramme;
@@ -669,6 +692,7 @@ export interface DB {
   merge_log: MergeLog;
   newsletter_item: NewsletterItem;
   person: Person;
+  person_field_value: PersonFieldValue;
   person_identifier: PersonIdentifier;
   person_identifier_check: PersonIdentifierCheck;
   person_link: PersonLink;
