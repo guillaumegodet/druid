@@ -12,6 +12,14 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Provenance par champ et fusion par priorité de sources** (base technique, sans effet visible pour l'instant) :
+  chaque source (LDAP, fichier RH, fichier labo, site annuaire, saisie manuelle) garde sa propre valeur dans
+  `person_field_value` ; la colonne de `person` devient une projection recalculée (`lib/directory/fieldMerge.ts`).
+  Une correction manuelle l'emporte toujours et n'est plus écrasée par un réimport ; une source qui change ensuite
+  lève un conflit. Premiers champs : date de naissance et corps-grade ; ordre des sources dans
+  `field_source_priority`.
+
 ### Corrigé
 - **Identifiants OpenAlex incomplets sur quelques fiches (PostgreSQL)** : pour une personne qui avait plusieurs lignes
   dans Grist, la migration gardait dans `person.extra.OpenAlex_ids` la cellule de sa ligne principale, et la liste
@@ -23,6 +31,9 @@ données à exécuter au déploiement).
 ### Migration
 - `20261120150000_person_extra_openalex_list.sql` : retire `OpenAlex_ids` de `person.extra` (3 fiches à Nantes).
   Rien à restaurer au retour arrière : les A-ids sont dans `person_identifier`.
+- `20261121150000_person_field_value` (dbmate) : crée les deux tables et reprend les valeurs actuelles ; une valeur
+  écrite en dernier par un utilisateur nommé (journal d'audit) devient une correction manuelle, les autres passent en
+  source `legacy`, au dernier rang.
 
 ## [2.18.0] — 2026-11-20
 
