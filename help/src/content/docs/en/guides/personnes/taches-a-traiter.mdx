@@ -9,7 +9,7 @@ import QuiOu from '../../../../../components/QuiOu.astro';
 
 <QuiOu
 	profils="Druid administrators"
-	menu="People › To process › Tasks; record › Report a correction"
+	menu="People › To process › Tasks; People › To process › Source conflicts; record › Report a correction"
 	disponibilite="instances where task tracking is enabled"
 />
 
@@ -88,6 +88,25 @@ Other rules deal with the directory (see [Statuses of people](/en/donnees/statut
 | **Employer to enter** | A record validated “external” before October 2026 without an employer: fill in the employer (CNRS, Inserm, university hospital…). |
 | **PhD student who defended the thesis: update the status** | The record still says « PhD student » (employment type or grade) while its IdRef carries a defended thesis on theses.fr. Update the employment (postdoc, departure…): the task closes by itself once the record no longer says « PhD student » or the person is validated as left. |
 | **PhD student with an old thesis on the IdRef: namesake?** | The thesis found is more than six years old: the IdRef of the record is probably that of a namesake. Check on theses.fr (link of the task) and fix the IdRef. |
+
+## Source conflicts
+
+On instances on PostgreSQL, the date of birth and the grade of a record keep the value of each
+source (see [Read a record](/en/guides/personnes/lire-une-fiche/#where-the-date-of-birth-and-the-grade-come-from)).
+A correction typed in Druid always wins. The **Source conflicts** tab lists the corrections that a
+source contradicts **since** they were made: the LDAP changed the date of birth, a new HR file gives
+another grade…
+
+For each record, three choices:
+
+| Button | Effect |
+|---|---|
+| **Keep the correction** | The correction stays. The current values of the sources are acknowledged: the conflict only comes back if a source changes again. |
+| **Back to the sources** | The correction is removed: the most trusted source gives the value. |
+| **Another value** | Type the right value: it becomes the new correction. |
+
+A source that already said something else when the correction was made is not listed: the person
+who corrected the value had it in front of them.
 
 ## What happens next
 

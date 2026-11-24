@@ -3,7 +3,7 @@
 // overrides, grouping of qualified multi-row people, public ids. Both stores feed them the same `DirectoryRow`
 // view: the Grist Annuaire rows (gristMapping.ts) and the PostgreSQL people and memberships (lib/directory/pg/).
 // Moved from gristMapping.mapAnnuaireRecords, rules unchanged. Pure.
-import { Researcher, MembershipType } from '../../types';
+import { Researcher, MembershipType, type FieldProvenance } from '../../types';
 import { getPoleFromLab } from '../mappings';
 import { ResearcherListSchema } from '../schemas';
 import { ldapGradeFor, resolveGrade, isRetireeWithoutEmeritus, EmeritusSignals } from '../emeritus';
@@ -38,6 +38,9 @@ export interface DirectoryRow {
   birthDate: string;
   /** Corps / grade, employment type and its label, as stored (null when the cell is empty). */
   corpsGrade: string | null;
+  /** PostgreSQL: provenance of the fields merged by source (birth_date, corps_grade). Present ⇒ no LDAP overlay on
+   *  them: the LDAP values are a source of the merge (lib/directory/pg/ldapObserve.ts). Absent on Grist. */
+  provenance?: Record<string, FieldProvenance>;
   employmentType: string | null;
   employmentTypeLabel: string | null;
   /** Employer: id of the institution (0 = none), or a label typed in place of a reference. */
@@ -216,8 +219,9 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
 
     let researcherBirthDate = row.birthDate;
     let birthDateFromLdap = false;
+    const merged = row.provenance;
 
-    if (uid && ldapCache[uid] && (ldapCache[uid] as any).birthDate) {
+    if (!merged && uid && ldapCache[uid] && (ldapCache[uid] as any).birthDate) {
       const ldapBirth = (ldapCache[uid] as any).birthDate;
       if (/^\d{8}$/.test(ldapBirth)) {
         researcherBirthDate = `${ldapBirth.substring(0, 4)}-${ldapBirth.substring(4, 6)}-${ldapBirth.substring(6, 8)}`;
@@ -230,7 +234,8 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
 
     // Emeritus status / retirement (see lib/emeritus.ts): trace of emeritus status ⇒ emeritus grade (PREM, MCFEM,
     // DREM, CREM) even if the stored grade is not normalized yet; retired without emeritus status ⇒ Parti.
-    const baseGrade: string = ldapGrade ?? row.corpsGrade ?? '';
+    // Merged by source (PostgreSQL): the stored grade is already the merge of the LDAP and the other sources.
+    const baseGrade: string = (merged ? null : ldapGrade) ?? row.corpsGrade ?? '';
     const emeritusSignals: EmeritusSignals = {
       grade: baseGrade, typeEmploi: row.employmentType, libTypeEmploi: row.employmentTypeLabel, ldapCategory,
     };
@@ -279,7 +284,7 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
         grade: finalGrade,
         ldapFields: [
           ...(ldapCategory ? ['contractType'] : []),
-          ...(ldapGrade !== null ? ['grade'] : []),
+          ...(ldapGrade !== null && !merged ? ['grade'] : []),
         ],
         internalTypology: row.employmentTypeLabel || '',
         startDate: row.employmentStart,
@@ -298,6 +303,10 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
         isPrimary: true
       }],
       ldapFields: [...(birthDateFromLdap ? ['birthDate'] : [])],
+      ...(merged ? { fieldProvenance: {
+        ...(merged.birth_date ? { birthDate: merged.birth_date } : {}),
+        ...(merged.corps_grade ? { grade: merged.corps_grade } : {}),
+      } } : {}),
       groups: row.groups,
       identifiers: { ...row.identifiers },
       // Declared public social media accounts (media monitoring), editable from the record.

@@ -2430,6 +2430,30 @@ const withConflicts = (handler) => async (req, res) => {
   }
 };
 
+// « To process › Source conflicts » (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 d): manual corrections that a
+// source contradicts since they were made. PostgreSQL only: elsewhere the list is empty and the tab stays hidden.
+app.get('/api/field-conflicts', requireSuperAdmin, async (req, res) => {
+  const store = storage().fieldConflicts;
+  if (!store) return res.json({ available: false, items: [] });
+  try {
+    res.json({ available: true, items: await store.list() });
+  } catch (e) {
+    console.error('[field-conflicts] list failed:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+app.post('/api/field-conflicts/resolve', requireSuperAdmin, async (req, res) => {
+  const store = storage().fieldConflicts;
+  if (!store) return res.status(501).json({ error: 'Source conflicts need the PostgreSQL storage' });
+  try {
+    await store.resolve(req.body || {}, req.session.user.preferred_username);
+    res.json({ ok: true });
+  } catch (e) {
+    if (!e.status) console.error('[field-conflicts] resolve failed:', e.message);
+    res.status(e.status || 500).json({ error: e.message });
+  }
+});
+
 // Tables with their number of actionable conflicts (tab + counter; a settled table stays listed with 0).
 app.get('/api/import-conflicts', requireSuperAdmin, withConflicts(async (req, res, conflicts) => {
   res.json({ tables: await conflicts.tables() });
@@ -3148,7 +3172,15 @@ app.get('/api/sync-ldap-trigger', requireEstablishmentScope, (req, res) => {
   if (running) return res.status(409).json({ error: 'An LDAP synchronization is already running', progress: running });
   try {
     console.log('[Sync] Triggering LDAP sync...');
-    startBackgroundRun('LDAP', LDAP_PROGRESS_PATH, {}, ['scripts/sync_ldap.cjs', `--progress=${LDAP_PROGRESS_PATH}`]);
+    const child = startBackgroundRun('LDAP', LDAP_PROGRESS_PATH, {}, ['scripts/sync_ldap.cjs', `--progress=${LDAP_PROGRESS_PATH}`]);
+    // PostgreSQL: the birth date and grade of the fresh cache stored as the `ldap` source of the fields merged by
+    // source, which replace the display overlay (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 a).
+    child.on('exit', (code) => {
+      if (code !== 0 || !serverStorage?.observeLdapFields) return;
+      serverStorage.observeLdapFields()
+        .then((s) => console.log('[Sync LDAP] merged fields', JSON.stringify(s)))
+        .catch((err) => console.error('[Sync LDAP] merged fields failed:', err.message));
+    });
     res.json({ started: true });
   } catch (err) {
     console.error('[Sync Error]', err);

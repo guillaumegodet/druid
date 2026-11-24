@@ -15,6 +15,7 @@ import { transformWork } from '../migration/gristToPgWork';
 import { loadDirectory, loadWork } from '../migration/loadPg';
 import { gristDirectoryFixture } from './fixtures/gristDirectory';
 import { gristWorkFixture } from './fixtures/gristWork';
+import { observeLdapFields } from '../directory/pg/ldapObserve';
 
 const url = process.env.DATABASE_URL;
 const db = url ? createDb({ connectionString: url, max: 1 }) : null;
@@ -44,6 +45,23 @@ const differences = (a: unknown, b: unknown, path = ''): string[] => {
   return [`${path}: ${JSON.stringify(a)} ≠ ${JSON.stringify(b)}`];
 };
 
+/**
+ * Fields merged by source (PostgreSQL, druid-internal `docs/plan-maj-chercheurs.md`): once the LDAP values are observed
+ * (ldapObserve.ts), both stores show the same values, but Grist locks them as LDAP fields while PostgreSQL shows their
+ * provenance and lets them be corrected — documented difference, left out of the comparison.
+ */
+const withoutMergedMarks = (x: unknown) => JSON.parse(JSON.stringify(x ?? null), (_k, v) => {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
+  const { fieldProvenance: _p, ...rest } = v;
+  if (Array.isArray(rest.ldapFields)) rest.ldapFields = rest.ldapFields.filter((f: string) => f !== 'birthDate' && f !== 'grade');
+  return rest;
+});
+/** PostgreSQL as in production: the stored values seeded as sources, then the LDAP values observed. */
+const mergeBySource = async (trx: any, ldapCache: Record<string, any>) => {
+  await sql`SELECT seed_person_field_value('contract')`.execute(trx);
+  await observeLdapFields(trx, ldapCache);
+};
+
 const LDAP = { 'dupont-a': { etat: 'ACTIF', civilite: 'Madame', categorie: 'ENSEIGNANT-CHERCHEUR', empCorps: '300', birthDate: '19800504' }, 'Petit-D': 'DEPART' };
 const ALL = { all: true, labAnchors: [] };
 const LAB1 = { all: false, labAnchors: ['lab1'] };
@@ -66,6 +84,7 @@ describe.skipIf(!url)('DirectoryRepository contract: Grist = PostgreSQL', () => 
       await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
       await loadDirectory(trx, directory.rows, directory.report);
       await loadWork(trx, transformWork(work, directory.rows).rows);
+      await mergeBySource(trx, LDAP);
       const pg = createPgDirectoryRepository({ db: trx, loadLdapCache: async () => ({ data: LDAP, version: 'l1' }) });
       await both('people', async (r) => (await r.people(ALL)).items, pg);
       await both('people LAB1', async (r) => (await r.people(LAB1)).items, pg);
@@ -84,7 +103,7 @@ describe.skipIf(!url)('DirectoryRepository contract: Grist = PostgreSQL', () => 
 
     for (const name of ['people', 'people LAB1', 'people LAB2', 'people without LDAP', 'institutions', 'merges', 'abes', 'labs of Petit-D',
       'labs of ext_durand-c in LAB1', 'labs of dupont-a']) {
-      expect(differences(got[name][0], got[name][1], name)).toEqual([]);
+      expect(differences(withoutMergedMarks(got[name][0]), withoutMergedMarks(got[name][1]), name)).toEqual([]);
     }
     const people = got.people[1] as any[];
     expect(people.map((p) => [p.id, p.gristRowId, p.affiliations.length])).toEqual([

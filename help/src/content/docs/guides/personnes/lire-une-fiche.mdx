@@ -57,6 +57,20 @@ page d'aide.
    date complète (voir [Saisir des dates imprécises](/guides/personnes/dates-imprecises/)).
 3. Cliquez sur **Enregistrer** en haut de la fiche.
 
+### D'où viennent la date de naissance et le grade
+
+Sur les instances sur PostgreSQL, ces deux champs gardent la valeur de **chaque source** : annuaire
+LDAP, fichier RH, annuaire partenaire, site du labo, fichier d'un labo. La fiche affiche la valeur
+de la source la plus fiable, et une étiquette à côté du nom du champ indique laquelle (**LDAP**,
+**Fichier RH**, **Site du labo**…).
+
+- **Une valeur saisie dans la fiche est une correction** : étiquette **Corrigée**, elle l'emporte
+  sur toutes les sources, y compris le LDAP, et un nouvel import ne l'écrase plus.
+- **Si une source change de valeur après la correction**, l'étiquette **À revoir** apparaît et la
+  fiche est listée dans [À traiter › Conflits de sources](/guides/personnes/taches-a-traiter/#les-conflits-de-sources).
+  Rien ne change tant qu'un administrateur n'a pas choisi.
+- Réenregistrer la fiche sans toucher au champ ne crée pas de correction.
+
 La photo se change avec le crayon sur la photo (**Modifier la photo (URL)**) : indiquez
 l'adresse d'une image publique (page du labo, annuaire, HAL). Sans photo, Druid affiche les
 initiales.
@@ -69,9 +83,9 @@ les tableaux de bord à leur prochaine régénération.
 
 ## Limites connues
 
-- **Les données de l'annuaire LDAP priment à l'affichage** pour la civilité, la date de
-  naissance et le grade : une correction faite dans Druid sur ces champs peut être masquée
-  par la valeur de l'annuaire. Pour une erreur de ce type, voir
+- **Les données de l'annuaire LDAP priment à l'affichage** pour la civilité (et, sur une
+  instance sur Grist, pour la date de naissance et le grade) : une correction faite dans Druid
+  sur ces champs peut être masquée par la valeur de l'annuaire. Pour une erreur de ce type, voir
   [Où corriger quoi](/guides/corriger/ou-corriger-quoi/).
 - **Une personne peut avoir plusieurs fiches** (une par laboratoire). La fiche affiche
   toutes ses appartenances, mais la validation et l'enregistrement portent sur la fiche

@@ -65,6 +65,7 @@ export const TODO_TAB_HELP: Record<TodoTab, string> = {
   doublons: '/guides/personnes/traiter-un-doublon/',
   taches: '/guides/personnes/taches-a-traiter/',
   conflits: '/guides/personnes/taches-a-traiter/',
+  sources: '/guides/personnes/taches-a-traiter/',
 };
 
 /** Help page of each Administration tab (none for « My institution »: the hosted offer is not in the public help). */

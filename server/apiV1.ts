@@ -55,6 +55,9 @@ interface NodeResponse {
   locals?: Record<string, unknown>;
 }
 
+import { observeLdapFields } from '../lib/directory/pg/ldapObserve';
+import { createFieldConflictsStore } from '../lib/directory/pg/fieldConflicts';
+
 export interface ApiV1Options {
   gristApiBase: string;
   gristDocId: string;
@@ -209,6 +212,15 @@ export const createServerStorage = (options: ApiV1Options) => {
     return {
       kind, grist: main, publications, repository, commands, tables,
       ldap: options.hasLdap ? createPgLdapCommands({ db, repository, ldap: ldapSource }) : undefined,
+      /** After each LDAP sync (server.cjs): LDAP values of the fields merged by source, stored as the `ldap` source
+       * (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 a). */
+      observeLdapFields: options.hasLdap ? async () => {
+        const summary = await observeLdapFields(db, (await ldapStatus()).data || {});
+        repository.invalidate();
+        return summary;
+      } : null,
+      /** « To process › Source conflicts » (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 d), PostgreSQL only. */
+      fieldConflicts: createFieldConflictsStore(db),
       align: align!,
       structureAlign,
       /** Ports of the work routes (tasks, arbitrations, peer lists, reports), writes audited under `actor`. */
@@ -250,6 +262,8 @@ export const createServerStorage = (options: ApiV1Options) => {
     ldap: options.hasLdap ? createGristLdapCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, ldap: ldapSource }) : undefined,
     align: createGristAlignCommands({ grist: main, repository, annuaireColumns: commands.annuaireColumns, texts: tokenAlignTexts, hasQualinka, caches }),
     workPorts: null,
+    observeLdapFields: null,
+    fieldConflicts: null,
     graph: null,
     graphOverview: null,
     graphMode: 'off' as GraphActionsMode,

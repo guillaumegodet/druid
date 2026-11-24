@@ -16,6 +16,7 @@ import { fromGristDate, fromGristFuzzyDate } from '../gristMapping';
 import { HAL_ID_NUM_SECONDARY_COLUMN, joinHalIdNums, normalizeHalIdNum, secondaryHalIdNums, sortHalIdNums } from '../../halIds';
 import { toGristEpoch } from '../annuaireWrite';
 import type { PgIdentifier, PgLink } from './directoryRows';
+import { MERGED_RECORD_FIELDS, writeMergedField } from './fieldValues';
 
 /** Source of an OpenAlex author id typed in the record (the import uses the same tag). */
 export const OPENALEX_AUTHOR_SOURCE = 'grist:openalex_author_id';
@@ -151,7 +152,18 @@ export const readRecords = async (db: any, memberships?: any[]): Promise<{ id: n
  * field goes to its column, identifier, link, sync trace or membership; a field without a normalized home goes to
  * `extra`. Values come as cells (dates as epoch seconds or text, employer as an id or a label).
  */
-export const writeRecordFields = async (trx: Transaction<DB>, personId: string, membershipId: string, fields: Record<string, any>): Promise<void> => {
+/**
+ * How a write treats the fields merged by source (birth date, corps-grade — lib/directory/pg/fieldValues.ts): by
+ * default a human choice (record form, arbitration, merge of duplicates) that becomes a manual correction when the
+ * merge does not already give it; with `source`, a value that source reports (`explicit: false`: the ranks decide).
+ */
+export interface MergedFieldsMode {
+  source?: string;
+  explicit: boolean;
+}
+
+export const writeRecordFields = async (trx: Transaction<DB>, personId: string, membershipId: string, fields: Record<string, any>,
+  mergedMode: MergedFieldsMode = { explicit: true }): Promise<void> => {
   const person = await trx.selectFrom('person').selectAll().where('id', '=', personId).executeTakeFirstOrThrow();
   const extra: Record<string, any> = { ...(person.extra as object) };
   const set: Record<string, any> = {};
@@ -159,9 +171,21 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
   const keep = (field: string, value: unknown) => { extra[field] = value; };
   const done = (field: string) => { delete extra[field]; };
   const sync = new Map<string, { last_run?: string | null; changed_fields?: string[] }>();
+  const merged: [string, string | null][] = [];
 
   for (const [field, value] of Object.entries(fields)) {
     if (field === 'id' || field === 'manualSort') continue;
+    if (MERGED_RECORD_FIELDS[field]) {
+      // Never written to the column: stored by source, then projected (writeMergedField, after the person update).
+      if (field === 'DATE_DE_NAISSANCE_JJ_MM_AAAA') {
+        // Reduced-precision date (YYYY, YYYY-MM or YYYY-MM-DD); 0 is the empty sentinel of the former Grist Date column.
+        const d = blank(value) || value === 0 ? null : normalizeFuzzyDate(fromGristFuzzyDate(value)) || null;
+        if (d || blank(value) || value === 0) { done(field); merged.push([MERGED_RECORD_FIELDS[field], d]); } else keep(field, value);
+      } else {
+        merged.push([MERGED_RECORD_FIELDS[field], blank(value) ? null : String(value)]);
+      }
+      continue;
+    }
     if (PERSON_TEXT[field]) { set[PERSON_TEXT[field]] = field === 'Nom' ? String(value ?? '') : (blank(value) ? null : String(value)); continue; }
     switch (field) {
       case 'uid_dyna': set.uid = blank(value) ? null : String(value).trim(); continue;
@@ -173,13 +197,6 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
       case 'validation_date': {
         const d = blank(value) || value === 0 ? '' : fromGristDate(value);
         if (!d || (/^\d{4}-\d{2}-\d{2}$/.test(d) && normalizeFuzzyDate(d) === d)) { set.presence_validated_on = d || null; done(field); } else { set.presence_validated_on = null; keep(field, value); }
-        continue;
-      }
-      case 'DATE_DE_NAISSANCE_JJ_MM_AAAA': {
-        // Reduced-precision date (YYYY, YYYY-MM or YYYY-MM-DD); 0 is the empty sentinel of the former Grist Date column.
-        const d = blank(value) || value === 0 ? null : normalizeFuzzyDate(fromGristFuzzyDate(value)) || null;
-        set.birth_date = d;
-        if (d || blank(value) || value === 0) done(field); else keep(field, value);
         continue;
       }
       case 'ANNEE_HDR':
@@ -316,6 +333,11 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
   }
 
   await trx.updateTable('person').set({ ...set, extra: JSON.stringify(extra) as any }).where('id', '=', personId).execute();
+  for (const [field, value] of merged) {
+    await writeMergedField(trx, personId, field, {
+      value, explicit: mergedMode.explicit, ...(mergedMode.source ? { observed: { source: mergedMode.source, value } } : {}),
+    });
+  }
   for (const [source, v] of sync) {
     await trx.insertInto('sync_state').values({ person_id: personId, source, last_run: v.last_run ?? null, changed_fields: v.changed_fields ?? [] })
       .onConflict((oc) => oc.columns(['person_id', 'source']).doUpdateSet({

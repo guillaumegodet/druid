@@ -32,6 +32,7 @@ import { MainLayout } from './components/layout/MainLayout';
 import { ChatWidget } from './components/ChatWidget';
 import { TodoPage, type TodoTab } from './components/researchers/TodoPage';
 import { useImportConflicts } from './hooks/useImportConflicts';
+import { useFieldConflicts } from './hooks/useFieldConflicts';
 import { TaskForm } from './components/researchers/TaskForm';
 import { useTasks } from './hooks/useTasks';
 import type { Task } from './lib/tasks';
@@ -170,6 +171,7 @@ function App() {
   const tasksEnabled = isSuperAdmin() && hasCapability('HAS_TASKS');
   const tasksState = useTasks(tasksEnabled);
   const conflictsState = useImportConflicts(tasksEnabled);
+  const fieldConflictsState = useFieldConflicts(tasksEnabled);
   // Conflicts settled one by one: the researchers are reloaded once the admin pauses.
   const conflictsRefreshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const afterConflictResolved = () => {
@@ -279,7 +281,7 @@ function App() {
       setUrlVersion((v) => v + 1);
       // Legacy « Doublons » page URL → « À traiter » section, Doublons tab.
       if (String(newState.page) === 'DUPLICATES') { setCurrentView(ViewState.TASKS); setTodoTab('doublons'); return; }
-      if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'conflits')) setTodoTab(newState.tab);
+      if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'conflits' || newState.tab === 'sources')) setTodoTab(newState.tab);
       if (newState.page === ViewState.REPORTS) {
         const n = Number(newState.id);
         setReportId(Number.isInteger(n) && n > 0 ? n : null);
@@ -859,7 +861,7 @@ function App() {
             loading={loading}
             onManualSync={() => refreshData()}
             onOpenDuplicates={isSuperAdmin() ? () => openTodo() : undefined}
-            duplicatesCount={duplicatesCount + tasksState.openCount + conflictsState.openCount}
+            duplicatesCount={duplicatesCount + tasksState.openCount + conflictsState.openCount + fieldConflictsState.openCount}
             onMergeResearchers={writable ? (rowIds) => setMergeRowIds(rowIds) : undefined}
             onImportValidation={writable && hasCapability('HAS_STATUS_VALIDATION') ? () => setValidationImportOpen(true) : undefined}
             onImportSite={writable && canUseEstablishmentTools() ? () => setSiteImportOpen(true) : undefined}
@@ -968,6 +970,7 @@ function App() {
             conflictTables={conflictsState.tables}
             onOpenConflictRecord={openConflictRecord}
             onConflictsResolved={afterConflictResolved}
+            fieldConflicts={fieldConflictsState}
             duplicates={{
               diff: dupDiff,
               loading: dupLoading,

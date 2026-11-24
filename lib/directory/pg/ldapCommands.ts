@@ -18,6 +18,7 @@ import {
 } from '../ldap';
 import { RECORD_FIELDS } from './commands';
 import { readRecords } from './recordFields';
+import { MERGED_RECORD_FIELDS } from './fieldValues';
 import { insertStructure, patchStructure, readStructureRecords } from './structures';
 import { pgWriting, writeRecordPatches } from './alignCommands';
 
@@ -47,7 +48,7 @@ export const createPgLdapCommands = ({ db, repository, ldap, today }: PgLdapComm
 
   const diff = async (conn: any = db) => {
     const [records, etablissements, status] = await Promise.all([readRecords(conn), employerRecords(conn), ldap.status()]);
-    return computeLdapDiffFrom(records, etablissements, status.data);
+    return computeLdapDiffFrom(records, etablissements, status.data, { mergedFields: Object.keys(MERGED_RECORD_FIELDS) });
   };
   const structuresDiff = async (conn: any = db) => computeStructuresLdapDiffFrom(await readStructureRecords(conn), await ldap.structures(), todayIso());
 
@@ -99,7 +100,8 @@ export const createPgLdapCommands = ({ db, repository, ldap, today }: PgLdapComm
           resolved.push({ gristRowId: e.gristRowId, email: (proposal ?? ambiguous).email, ldap: match });
         }
         const { patches, skippedDuplicates } = ldapCandidatePatches(resolved, await readRecords(trx), todayIso(), encodeDate);
-        await writeRecordPatches(trx, patches);
+        // Birth date and grade of the attached entry: what the LDAP says (source `ldap`), the ranks decide.
+        await writeRecordPatches(trx, patches, { source: 'ldap', explicit: false });
         return { updated: audited(ctx, 'Annuaire', patches), skippedDuplicates, unknown };
       });
     },

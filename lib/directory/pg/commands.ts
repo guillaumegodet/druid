@@ -25,6 +25,8 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
+import { writeMergedField } from './fieldValues';
+import { FieldValueError } from '../fieldMerge';
 import { OPENALEX_AUTHOR_SOURCE, linkTeamLabels, loadPersonParts, readRecordFields, resolveStructures, writeHalIdNumSecondaries, writeRecordFields } from './recordFields';
 import { HAL_ID_NUM_SECONDARY_COLUMN, secondaryHalIdNums } from '../../halIds';
 import { insertStructure, writeStructure } from './structures';
@@ -214,9 +216,10 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     const values: Record<string, any> = {
       last_name: String(r.lastName ?? ''), first_name: orNull(r.firstName),
       civility: civility === 'F' || civility === 'M' ? civility : null,
-      email: orNull(r.email), nationality: orNull(r.nationality), birth_date: fuzzy(r.birthDate),
+      // birth_date and corps_grade: merged by source, written by writeMerged below (never the column directly).
+      email: orNull(r.email), nationality: orNull(r.nationality),
       employment_start: fuzzy(r.employment?.startDate), employment_end: fuzzy(r.employment?.endDate),
-      corps_grade: orNull(r.employment?.grade), employment_type: orNull(r.employment?.contractType),
+      employment_type: orNull(r.employment?.contractType),
       fte_ratio: parseFteCell(r.employment?.fte), fte_research: parseFteCell(r.employment?.researchFte),
       photo_url: orNull(String(r.photoUrl ?? '').trim()),
       // Lab website directory page: written by the site imports only (the record form does not edit it).
@@ -229,6 +232,25 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     // A civility outside F / M is kept as typed (the record shows it normalized, like a Grist cell).
     const extra: Record<string, any> = civility && !values.civility ? { Civilite: civility } : {};
     return { values, replaced, extra };
+  };
+  /**
+   * Fields merged by source (druid-internal `docs/plan-maj-chercheurs.md`): the record's values are a human choice
+   * (form, import line kept); the values of an import are first stored under its source (ctx.fieldObservation).
+   */
+  const writeMerged = async (trx: Transaction<DB>, personId: string, r: Researcher, ctx: CommandContext) => {
+    // An unreadable date is refused (400), not taken as a cleared field.
+    const chosen = { birth_date: blank(r.birthDate) ? null : fuzzy(r.birthDate) ?? r.birthDate, corps_grade: orNull(r.employment?.grade) };
+    const obs = ctx.fieldObservation;
+    for (const field of ['birth_date', 'corps_grade'] as const) {
+      const observed = obs && Object.prototype.hasOwnProperty.call(obs.values, field)
+        ? { source: obs.source, value: obs.values[field], importBatchId: obs.importBatchId } : undefined;
+      try {
+        await writeMergedField(trx, personId, field, { value: chosen[field], explicit: true, ...(observed ? { observed } : {}) });
+      } catch (e) {
+        if (!(e instanceof FieldValueError)) throw e;
+        throw new ApiError(400, e.message);
+      }
+    }
   };
   const writeIdentifiers = async (trx: Transaction<DB>, personId: string, r: Researcher, extra: Record<string, any>) => {
     for (const [scheme, raw] of Object.entries(identifiersOf(r))) {
@@ -287,6 +309,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
           } : researcher.importSource ? { sources: [researcher.importSource] } : {}),
         } as any).returning('id').executeTakeFirstOrThrow();
         personId = inserted.id;
+        await writeMerged(trx, personId, researcher, ctx);
         const personExtra: Record<string, any> = { ...extra };
         await writeIdentifiers(trx, personId, researcher, personExtra);
         await writeLinks(trx, personId, researcher, personExtra);
@@ -330,6 +353,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       for (const k of replaced) delete personExtra[k];
       Object.assign(personExtra, extra);
       await trx.updateTable('person').set(values as any).where('id', '=', person.id).execute();
+      await writeMerged(trx, person.id, researcher, ctx);
       await writeIdentifiers(trx, person.id, researcher, personExtra);
       await writeLinks(trx, person.id, researcher, personExtra);
 

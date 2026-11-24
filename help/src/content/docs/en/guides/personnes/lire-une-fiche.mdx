@@ -56,6 +56,19 @@ page.
    [Enter imprecise employment dates](/en/guides/personnes/dates-imprecises/)).
 3. Click **Save** at the top of the record.
 
+### Where the date of birth and the grade come from
+
+On instances on PostgreSQL, these two fields keep the value of **each source**: LDAP directory,
+HR file, partner directory, lab website, lab file. The record shows the value of the most trusted
+source, and a label next to the field name says which one (**LDAP**, **HR file**, **Lab website**…).
+
+- **A value typed in the record is a correction**: labelled **Corrected**, it wins over every
+  source, the LDAP included, and a later import no longer overwrites it.
+- **If a source changes its value after the correction**, the **To review** label appears and the
+  record is listed in [To process › Source conflicts](/en/guides/personnes/taches-a-traiter/#source-conflicts).
+  Nothing changes until an administrator chooses.
+- Saving the record again without touching the field does not create a correction.
+
 The photo is changed with the pencil on the photo (**Edit photo (URL)**): enter the address
 of a public image (lab page, directory, HAL). Without a photo, Druid shows the initials.
 
@@ -67,8 +80,9 @@ regeneration.
 
 ## Known limitations
 
-- **LDAP directory data take precedence on display** for title, date of birth and grade: a
-  correction made in Druid on these fields can be hidden by the directory's value. For an
+- **LDAP directory data take precedence on display** for the title (and, on an instance on
+  Grist, for the date of birth and the grade): a correction made in Druid on these fields can be
+  hidden by the directory's value. For an
   error of this kind, see [Where to fix what](/en/guides/corriger/ou-corriger-quoi/).
 - **A person can have several records** (one per laboratory). The record shows all their
   memberships, but validation and saving apply to the record that is open.

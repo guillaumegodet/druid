@@ -432,6 +432,14 @@ export const newPersonOf = (c: PeopleImportCreation, source: string, validation:
 } as unknown as Researcher);
 
 /** A researcher with new memberships and the kept field values written. */
+/**
+ * Command context of a write that also reports the grade of the file (source `lab_file` of the fields merged by source,
+ * druid-internal `docs/plan-maj-chercheurs.md`; the nature of the file — HR, lab, partner directory — is decision D3).
+ */
+export const PEOPLE_IMPORT_SOURCE = 'lab_file';
+const fileObservation = (ctx: any, grade: string | undefined) =>
+  (grade ? { ...ctx, fieldObservation: { source: PEOPLE_IMPORT_SOURCE, values: { corps_grade: grade } } } : ctx);
+
 export const withImport = (r: Researcher, joins: PeopleImportJoin[], fields: { lab: string; field: PeopleImportUpdateField; value: string }[]): Researcher => {
   const out: Researcher = structuredClone(r);
   if (joins.length) {
@@ -479,10 +487,11 @@ export async function applyPeopleImport(args: {
     if (!c) { result.stale++; continue; }
     const person = newPersonOf(c, source, selection.validateNew ? validationOf('PRESENT', source, today, actor) : null);
     try {
-      const { recordId } = await commands.createPerson({ ...person, affiliations: person.affiliations.slice(0, 1) }, ctx);
+      const withGrade = fileObservation(ctx, c.grade);
+      const { recordId } = await commands.createPerson({ ...person, affiliations: person.affiliations.slice(0, 1) }, withGrade);
       result.created++;
       if (person.affiliations.length > 1) {
-        await commands.updatePerson(recordId, { ...person, gristRowId: recordId } as Researcher, ctx);
+        await commands.updatePerson(recordId, { ...person, gristRowId: recordId } as Researcher, withGrade);
         result.joined += person.affiliations.length - 1;
       }
     } catch (e) { fail(index, `${c.firstName} ${c.lastName}`.trim(), e); }
@@ -516,7 +525,11 @@ export async function applyPeopleImport(args: {
     const r = byId.get(researcherId);
     try {
       if (!r?.gristRowId) throw new Error('record without row id');
-      await commands.updatePerson(r.gristRowId, withImport(r, w.joins, w.fields), ctx);
+      // The grade the file gives, kept or not by the reviewer: stored as the file's value.
+      const fileGrade = plan.updates.filter((u) => u.researcherId === researcherId)
+        .flatMap((u) => [...u.complements.map((c) => (c.field === 'grade' ? c.value : '')), ...u.differences.map((d) => (d.field === 'grade' ? d.file : ''))])
+        .find(Boolean);
+      await commands.updatePerson(r.gristRowId, withImport(r, w.joins, w.fields), fileObservation(ctx, fileGrade));
       result.joined += w.joins.length;
       if (w.fields.length) result.updated++;
     } catch (e) { fail(w.index, w.name, e); }

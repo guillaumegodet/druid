@@ -1,16 +1,18 @@
 import React from 'react';
-import { ClipboardList, Copy, GitCompareArrows } from 'lucide-react';
+import { ClipboardList, Copy, GitCompareArrows, GitMerge } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useCompactHeader } from '../../hooks/useCompactHeader';
 import { DuplicatesPage } from './DuplicatesPage';
 import { TasksPage } from './TasksPage';
 import { ImportConflictsPage } from './ImportConflictsPage';
+import { FieldConflictsPage } from './FieldConflictsPage';
+import type { FieldConflict } from '../../lib/fieldConflicts';
 import type { ConflictTable } from '../../lib/importConflicts';
 import { HelpButton } from '../HelpButton';
 import { TODO_TAB_HELP } from '../../lib/helpLinks';
 
-export type TodoTab = 'doublons' | 'taches' | 'conflits';
-const TODO_TABS: readonly string[] = ['doublons', 'taches', 'conflits'];
+export type TodoTab = 'doublons' | 'taches' | 'conflits' | 'sources';
+const TODO_TABS: readonly string[] = ['doublons', 'taches', 'conflits', 'sources'];
 
 type DuplicatesProps = React.ComponentProps<typeof DuplicatesPage>;
 type TasksProps = React.ComponentProps<typeof TasksPage>;
@@ -28,6 +30,8 @@ interface Props {
   conflictTables: ConflictTable[];
   onOpenConflictRecord: (record: number, uid: string) => void;
   onConflictsResolved: () => void;
+  /** Source conflicts (fields merged by source, PostgreSQL): the tab shows when the storage has them. */
+  fieldConflicts: { available: boolean; items: FieldConflict[]; reload: () => Promise<void> };
 }
 
 /**
@@ -39,10 +43,11 @@ interface Props {
  * URL ?page=TASKS&tab=doublons|taches|conflits (any other value ⇒ doublons); the pill of the
  * Personnel header carries the sum of both counters. Admin-only (decision of 2026-09-23).
  */
-export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, duplicatesCount, tasksOpenCount, duplicates, tasks, withTasks, conflictTables, onOpenConflictRecord, onConflictsResolved }) => {
+export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, duplicatesCount, tasksOpenCount, duplicates, tasks, withTasks, conflictTables, onOpenConflictRecord, onConflictsResolved, fieldConflicts }) => {
   const withConflicts = withTasks && conflictTables.length > 0;
+  const withSources = withTasks && fieldConflicts.available;
   const tab: TodoTab = !withTasks || !TODO_TABS.includes(requestedTab) || (requestedTab === 'conflits' && !withConflicts)
-    ? 'doublons' : requestedTab;
+    || (requestedTab === 'sources' && !withSources) ? 'doublons' : requestedTab;
   // One import source ⇒ named in the tab (« Directory conflicts Centrale »); several ⇒ chosen in the tab.
   const conflictSource = conflictTables.length === 1 ? conflictTables[0].source : '';
   const conflictsOpen = conflictTables.reduce((n, x) => n + x.open, 0);
@@ -64,7 +69,9 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
                   ? <Trans>Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation</Trans>
                   : tab === 'taches'
                     ? <Trans>Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands</Trans>
-                    : <Trans>Values of an imported directory that differ from Druid — choose which one to keep</Trans>}
+                    : tab === 'sources'
+                      ? <Trans>Manual corrections that a source contradicts since they were made — keep them or go back to the sources</Trans>
+                      : <Trans>Values of an imported directory that differ from Druid — choose which one to keep</Trans>}
               </p>
             </div>
             <HelpButton path={TODO_TAB_HELP[tab]} />
@@ -84,12 +91,18 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
                   <GitCompareArrows className="w-4 h-4" /> {conflictSource ? t`Directory conflicts ${conflictSource}` : t`Directory conflicts`} {counter(conflictsOpen)}
                 </button>
               )}
+              {withSources && (
+                <button onClick={() => onTabChange('sources')} className={tabCls(tab === 'sources')} title={t`Manual corrections contradicted by a source since`}>
+                  <GitMerge className="w-4 h-4" /> <Trans>Source conflicts</Trans> {counter(fieldConflicts.items.length)}
+                </button>
+              )}
             </>
           )}
         </div>
       </header>
       {tab === 'doublons' ? <DuplicatesPage embedded {...duplicates} />
         : tab === 'taches' ? <TasksPage {...tasks} />
+          : tab === 'sources' ? <FieldConflictsPage items={fieldConflicts.items} onReload={fieldConflicts.reload} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />
           : <ImportConflictsPage tables={conflictTables} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />}
     </div>
   );

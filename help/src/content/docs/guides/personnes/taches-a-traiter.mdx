@@ -9,7 +9,7 @@ import QuiOu from '../../../../components/QuiOu.astro';
 
 <QuiOu
 	profils="Administrateurs Druid"
-	menu="Personnel › À traiter › Tâches ; fiche › Signaler une correction"
+	menu="Personnel › À traiter › Tâches ; Personnel › À traiter › Conflits de sources ; fiche › Signaler une correction"
 	disponibilite="instances où le suivi des tâches est activé"
 />
 
@@ -90,6 +90,25 @@ D'autres règles portent sur l'annuaire (voir [Statuts des personnes](/donnees/s
 | **Employeur à renseigner** | Fiche validée « externe » avant octobre 2026 sans employeur : renseignez l'employeur (CNRS, Inserm, CHU…). |
 | **Doctorant ayant soutenu sa thèse : mettre à jour le statut** | La fiche dit encore « doctorant » (type d'emploi ou grade) alors que son IdRef porte une thèse soutenue sur theses.fr. Mettez à jour l'emploi (post-doctorat, départ…) : la tâche se ferme seule quand la fiche ne dit plus « doctorant » ou que la personne est validée partie. |
 | **Doctorant avec une thèse ancienne sur son IdRef : homonyme ?** | La thèse trouvée a plus de six ans : l'IdRef de la fiche est sans doute celui d'un homonyme. Vérifiez sur theses.fr (lien de la tâche) et corrigez l'IdRef. |
+
+## Les conflits de sources
+
+Sur les instances sur PostgreSQL, la date de naissance et le grade d'une fiche gardent la valeur
+de chaque source (voir [Lire une fiche](/guides/personnes/lire-une-fiche/#doù-viennent-la-date-de-naissance-et-le-grade)).
+Une correction saisie dans Druid l'emporte toujours. L'onglet **Conflits de sources** liste les
+corrections qu'une source contredit **depuis** leur saisie : le LDAP a changé la date de
+naissance, un nouveau fichier RH donne un autre grade…
+
+Pour chaque fiche, trois choix :
+
+| Bouton | Effet |
+|---|---|
+| **Garder la correction** | La correction reste. Les valeurs actuelles des sources sont prises en compte : le conflit ne revient que si une source change encore. |
+| **Revenir aux sources** | La correction est retirée : la source la plus fiable donne la valeur. |
+| **Autre valeur** | Saisissez la bonne valeur : elle devient la nouvelle correction. |
+
+Une source qui disait déjà autre chose au moment de la correction n'est pas listée : la
+personne qui a corrigé l'avait sous les yeux.
 
 ## Ce qui se passe ensuite
 

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Lock, ExternalLink } from 'lucide-react';
-import { Researcher, Affiliation } from '../../types';
+import { Lock, ExternalLink, AlertTriangle } from 'lucide-react';
+import { Researcher, Affiliation, type FieldProvenance } from '../../types';
 import { AffiliationsTable, TeamOption } from './AffiliationsTable';
 import { GradeSelect } from './GradeSelect';
 import { FuzzyDateInput } from './FuzzyDateInput';
@@ -11,7 +11,40 @@ import { ThesisInfo } from './ThesisInfo';
 import { halIdNumSearchUrl, promoteHalIdNum, secondaryHalIdNums } from '../../lib/halIds';
 import { Trans, useLingui } from '@lingui/react/macro';
 
-const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean }> = ({ label, fromLdap }) => (
+/**
+ * Source of a field merged by source (druid-internal `docs/plan-maj-chercheurs.md`): where the shown value comes from,
+ * and the sources that changed since a manual correction (« Source conflicts » in « To do »). No lock: typing a value
+ * makes it a manual correction that wins over the sources.
+ */
+const ProvenanceBadge: React.FC<{ provenance: FieldProvenance }> = ({ provenance }) => {
+  const { t } = useLingui();
+  const labels: Record<string, string> = {
+    manual: t`Corrected`, ldap: 'LDAP', hr_file: t`HR file`, lab_file: t`Lab file`, site: t`Lab website`,
+    partner_directory: t`Partner directory`, legacy: t`Before tracking`,
+  };
+  if (!provenance.source) return null;
+  const label = labels[provenance.source] ?? provenance.source;
+  const by = provenance.correctedBy ?? '';
+  const on = provenance.correctedAt ? provenance.correctedAt.slice(0, 10) : '';
+  const title = provenance.source === 'manual'
+    ? t`Manual correction by ${by} on ${on}: it wins over the imports and the LDAP.`
+    : t`Value given by this source. Typing another value makes it a manual correction.`;
+  return (
+    <>
+      <span title={title} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-primary/10 text-primary dark:bg-primary-light/15 dark:text-primary-light">
+        {label}
+      </span>
+      {provenance.conflicts > 0 && (
+        <span title={t`A source changed its value since the correction: to review in To do › Source conflicts.`}
+          className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
+          <AlertTriangle className="w-2.5 h-2.5" />{t({ message: 'To review', context: 'needs rework' })}
+        </span>
+      )}
+    </>
+  );
+};
+
+const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean; provenance?: FieldProvenance }> = ({ label, fromLdap, provenance }) => (
   <div className="flex items-center gap-2 mb-1">
     <label className="block text-xs text-muted-lighter dark:text-[#8f897c]">{label}</label>
     {fromLdap && (
@@ -19,6 +52,7 @@ const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean }> = ({ label
         <Lock className="w-2.5 h-2.5" />LDAP
       </span>
     )}
+    {!fromLdap && provenance && <ProvenanceBadge provenance={provenance} />}
   </div>
 );
 
@@ -300,7 +334,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               <input type="text" value={researcher.nationality || ''} onChange={(e) => onUpdateField('nationality', e.target.value)} className="input-soft" />
             </div>
             <div>
-              <LdapFieldLabel label={t`Date of birth`} fromLdap={researcher.ldapFields?.includes('birthDate')} />
+              <LdapFieldLabel label={t`Date of birth`} fromLdap={researcher.ldapFields?.includes('birthDate')} provenance={researcher.fieldProvenance?.birthDate} />
               {/* Reduced-precision date (lib/dates.ts): the year or the month alone when the day is not known. */}
               <FuzzyDateInput
                 value={researcher.birthDate || ''}
@@ -354,7 +388,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                </select>
              </div>
              <div>
-               <LdapFieldLabel label={t`Grade / Rank`} fromLdap={researcher.employment.ldapFields?.includes('grade')} />
+               <LdapFieldLabel label={t`Grade / Rank`} fromLdap={researcher.employment.ldapFields?.includes('grade')} provenance={researcher.fieldProvenance?.grade} />
                <GradeSelect
                  value={researcher.employment.grade || ''}
                  onChange={(code) => onUpdateField('grade', code, 'employment')}
