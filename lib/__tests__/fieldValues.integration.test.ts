@@ -69,6 +69,51 @@ describe.skipIf(!url)('person_field_value', () => {
     }, 'test:fields');
   });
 
+  it('the seed takes the provenance of the last write from the audit log', async () => {
+    await inRollback(async (trx) => {
+      const as = (actor: string) => sql`SELECT set_config('druid.actor', ${actor}, true)`.execute(trx);
+      const create = async (values: Record<string, unknown>) =>
+        (await trx.insertInto('person').values({ last_name: 'Lovelace', first_name: 'Ada', ...values } as any).returning('id').executeTakeFirstOrThrow()).id;
+
+      await as('seed.typist');
+      const typed = await create({ birth_date: '1980' });
+      await as('seed.importer');
+      const imported = [await create({ corps_grade: 'MCF' }), await create({ corps_grade: 'PR' })];
+      await as('seed.reviewer');
+      const reviewed = await create({ note: '[2026-06-02] MAJ Site : Email' });
+      await trx.updateTable('person').set({ birth_date: '1980-05-12', note: '[2026-06-02] MAJ Site : Email\n[2026-10-09] MAJ LDAP: Date naissance' } as any)
+        .where('id', '=', reviewed).execute();
+      await as('job:seed');
+      const arbitrated = await create({});
+      const byJob = await create({ corps_grade: 'IE' });
+      await as('seed.arbiter');
+      await trx.updateTable('person').set({ corps_grade: 'DR', note: '[2026-10-13] Arbitrage DRPI (seed.arbiter): Corps_grade' } as any)
+        .where('id', '=', arbitrated).execute();
+
+      expect(await sql<{ n: number }>`SELECT seed_person_field_value('seed test') AS n`.execute(trx).then((r) => r.rows[0].n)).toBeGreaterThanOrEqual(6);
+      const rows = await trx.selectFrom('person_field_value').select(['person_id', 'field', 'source', 'value', 'asserted_by'])
+        .where('note', '=', 'seed test').execute();
+      const of = (id: string) => rows.filter((r) => r.person_id === id).map(({ field, source, value }) => ({ field, source, value }));
+      expect(of(typed)).toEqual([{ field: 'birth_date', source: 'manual', value: '1980' }]);
+      expect(imported.flatMap(of).map((r) => r.source)).toEqual(['legacy', 'legacy']);
+      expect(of(reviewed)).toEqual([{ field: 'birth_date', source: 'ldap', value: '1980-05-12' }]);
+      expect(of(arbitrated)).toEqual([{ field: 'corps_grade', source: 'hr_file', value: 'DR' }]);
+      expect(of(byJob)).toEqual([{ field: 'corps_grade', source: 'legacy', value: 'IE' }]);
+
+      // Run again: pairs that already have a row are left alone.
+      expect(await sql<{ n: number }>`SELECT seed_person_field_value('seed test') AS n`.execute(trx).then((r) => r.rows[0].n)).toBe(0);
+    });
+  });
+
+  it('two sources cannot share a rank for the same field', async () => {
+    await inRollback(async (trx) => {
+      await sql`SAVEPOINT s`.execute(trx);
+      await expect(trx.insertInto('field_source_priority').values({ field: 'birth_date', source: 'other_file', rank: 10 } as any).execute())
+        .rejects.toThrow(/unique|duplicate/);
+      await sql`ROLLBACK TO SAVEPOINT s`.execute(trx);
+    });
+  });
+
   it('only the application writes rows: a manual row cannot hide acknowledged values on a source row', async () => {
     await inRollback(async (trx) => {
       const id = await person(trx);

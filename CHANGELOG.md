@@ -31,9 +31,13 @@ données à exécuter au déploiement).
 ### Migration
 - `20261120150000_person_extra_openalex_list.sql` : retire `OpenAlex_ids` de `person.extra` (3 fiches à Nantes).
   Rien à restaurer au retour arrière : les A-ids sont dans `person_identifier`.
-- `20261121150000_person_field_value` (dbmate) : crée les deux tables et reprend les valeurs actuelles ; une valeur
-  écrite en dernier par un utilisateur nommé (journal d'audit) devient une correction manuelle, les autres passent en
-  source `legacy`, au dernier rang.
+- `20261121150000_person_field_value` (dbmate) : crée les deux tables (rang unique par champ, colonne `customized`
+  pour les réglages d'une instance) et reprend les valeurs actuelles par la fonction `seed_person_field_value`. La
+  dernière écriture de chaque valeur dans le journal d'audit décide de sa source : la ligne datée qu'elle a ajoutée
+  aux commentaires de la fiche (`MAJ LDAP` → `ldap`, `Arbitrage DRPI` → `hr_file`, autre arbitrage →
+  `partner_directory`, `Fusion` → `legacy`) ; une écriture en lot (autre fiche du même auteur à moins de 2 s) ou
+  technique → `legacy` ; sinon une saisie dans la fiche → correction manuelle. Les valeurs reprises de Grist passent
+  en `legacy`, au dernier rang. La fonction reste en base : le lot qui branchera les imports la relancera.
 
 ## [2.18.0] — 2026-11-20
 

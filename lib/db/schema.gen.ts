@@ -216,6 +216,7 @@ export interface Establishment {
 }
 
 export interface FieldSourcePriority {
+  customized: Generated<boolean>;
   field: string;
   rank: number;
   source: string;
