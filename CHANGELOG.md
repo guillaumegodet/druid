@@ -12,6 +12,18 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Identifiants OpenAlex incomplets sur quelques fiches (PostgreSQL)** : pour une personne qui avait plusieurs lignes
+  dans Grist, la migration gardait dans `person.extra.OpenAlex_ids` la cellule de sa ligne principale, et la liste
+  comme la fiche affichaient cette copie partielle au lieu des A-ids réunis de toutes ses lignes (4 au lieu de 5 sur
+  une fiche de Nantes). L'alignement OpenAlex, qui complète la liste lue sur la fiche, aurait pu effacer les A-ids
+  manquants. La liste et la fiche lisent désormais `person_identifier` seulement ; l'enregistrement de
+  `OpenAlex_ids` et la migration Grist → PostgreSQL ne recréent plus cette copie.
+
+### Migration
+- `20261120150000_person_extra_openalex_list.sql` : retire `OpenAlex_ids` de `person.extra` (3 fiches à Nantes).
+  Rien à restaurer au retour arrière : les A-ids sont dans `person_identifier`.
+
 ## [2.18.0] — 2026-11-20
 
 ### Ajouté

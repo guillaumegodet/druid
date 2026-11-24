@@ -83,7 +83,7 @@ export const ISSUE_EXPLANATIONS = {
   team_unresolved: 'Équipe sans structure de même acronyme (ou plusieurs, aucune sous le labo de l’appartenance) : libellé gardé (team_labels), pas de lien membership_team.',
   link_split: 'Cellule de profil web contenant plusieurs URL : une ligne person_link par URL.',
   identifier_trimmed: 'Identifiant entouré d’espaces dans Grist : importé sans ces espaces.',
-  cell_kept_for_record: 'Liens ou identifiants OpenAlex réunis sur plusieurs lignes (ou découpés) : liste complète en base, cellule de la ligne retenue gardée dans extra pour l’affichage de la fiche.',
+  cell_kept_for_record: 'Liens réunis sur plusieurs lignes (ou découpés) : liste complète en base, cellule de la ligne retenue gardée dans extra pour l’affichage de la fiche.',
   column_unmapped: 'Colonne de l’Annuaire inconnue de l’import : gardée dans extra (à classer).',
   establishment_duplicate_name: 'Etablissements : nom en double, première ligne gardée, les références des autres lignes y sont rattachées.',
   establishment_duplicate_uai: 'Etablissements : UAI en double, gardée sur la première ligne seulement (copie dans extra).',
@@ -438,13 +438,7 @@ export const transformDirectory = (input: GristDirectoryInput, now = () => new D
       }
     }
     person_identifier.push(...identifierRows);
-    // The record shows the kept row's cell; when the person's list (all its rows) reads differently, that cell is kept.
-    const keptCell = (col: string) => (isEmpty(f[col]) ? '' : String(f[col]));
-    const openalexList = identifierRows.filter((i) => i.scheme === 'openalex' && i.source === 'grist:OpenAlex_ids').map((i) => i.value).join('|');
-    if (openalexList !== keptCell('OpenAlex_ids')) {
-      extra.OpenAlex_ids = keptCell('OpenAlex_ids');
-      issue('cell_kept_for_record', 'Annuaire', [kept.id], ['OpenAlex_ids']);
-    }
+    // OpenAlex_ids: the record reads the person's list (union of its rows), no copy of the kept row's cell.
     if (scopusAbsent) {
       person_identifier_check.push({ person_id: id, scheme: 'scopus', result: 'absent' });
       issue('scopus_absent', 'Annuaire', [kept.id]);

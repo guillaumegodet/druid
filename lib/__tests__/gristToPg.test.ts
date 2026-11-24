@@ -123,4 +123,16 @@ describe('Grist → PostgreSQL transformation', () => {
     expect(r.person).toEqual([]);
     expect(rep.issues.filter((i) => i.code === 'table_missing').map((i) => i.table)).toEqual(['Structures', 'Etablissements', 'Corps_Categorie']);
   });
+
+  it('OpenAlex A-ids spread over several rows: the person gets the union, no copy of the kept cell in extra', () => {
+    const dir = fixture();
+    dir.Annuaire = dir.Annuaire!.map((r) => (r.id === 102 ? row(102, { ...r.fields, OpenAlex_ids: 'A2 A3' }) : r));
+    const { rows: r, report: rep } = transformDirectory(dir, () => '2026-10-09T00:00:00.000Z');
+    const a = r.person.find((p) => p.uid === 'dupont-a')!;
+    expect(r.person_identifier.filter((i) => i.person_id === a.id && i.scheme === 'openalex').map((i) => [i.value, i.is_primary]))
+      .toEqual([['A1', true], ['A2', false], ['A3', false]]);
+    // The record reads this list (A1|A2|A3); keeping the kept row's cell (A1|A2) would hide A3.
+    expect('OpenAlex_ids' in a.extra).toBe(false);
+    expect(rep.issues.filter((i) => i.code === 'cell_kept_for_record' && i.columns?.includes('OpenAlex_ids'))).toEqual([]);
+  });
 });
