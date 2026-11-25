@@ -276,10 +276,15 @@ const uidMatchesName = (uid, f) => {
   return parts.some((p) => names.some((n) => close(p, n)));
 };
 
+/** Student account uid (« E123456U »): a student or a PhD student who may have become staff since. */
+const isStudentUid = (uid) => /^e\d+u$/i.test(String(uid || ''));
+
 /**
- * Records that should carry an LDAP uid: `ext_` or empty uid, an HR staff number equal to the
- * supannEmpId of exactly one LDAP account, and no Annuaire record on that uid yet. Warnings (uid
- * unlike the name, then different birth dates) point to a wrong staff number rather than to the person.
+ * Records that should carry an LDAP uid: `ext_`, student (E…U) or empty uid, an HR staff number equal to
+ * the supannEmpId of exactly one LDAP account, and no Annuaire record on that uid yet. A student uid keeps
+ * the record on the student account, closed at the end of the studies or of the doctoral contract, while
+ * the person works on under a staff account. Warnings (uid unlike the name, then different birth dates)
+ * point to a wrong staff number rather than to the person.
  */
 function ldapUidSwitches(annuaire, ldap) {
   const byHrId = new Map();
@@ -293,7 +298,7 @@ function ldapUidSwitches(annuaire, ldap) {
   for (const rec of annuaire) {
     const f = rec.fields;
     const uid = String(f.uid_dyna || '');
-    if ((uid && !uid.startsWith('ext_')) || seen.has(rec.key)) continue;
+    if ((uid && !uid.startsWith('ext_') && !isStudentUid(uid)) || seen.has(rec.key)) continue;
     const hrId = normHrId(f[HR_ID_COL]);
     const targets = hrId ? byHrId.get(hrId) || [] : [];
     if (targets.length !== 1 || carried.has(targets[0])) continue;
@@ -309,7 +314,8 @@ function ldapUidSwitches(annuaire, ldap) {
       const [gristBirth, ldapBirth] = [fuzzyDay(f.DATE_DE_NAISSANCE_JJ_MM_AAAA), isoDay(e.birthDate)];
       if (gristBirth && ldapBirth && !ldapBirth.startsWith(gristBirth)) warnings.push(`dates de naissance différentes (fiche ${gristBirth}, LDAP ${ldapBirth}) : n° agent probablement erroné`);
     }
-    out.push({ rec, to, hrId, etat: e.etat || '', categorie: e.categorie || '', warnings });
+    const student = isStudentUid(uid) ? { uid, etat: (ldap[uid] || {}).etat || '', dateFin: (ldap[uid] || {}).dateFin || '' } : null;
+    out.push({ rec, to, hrId, etat: e.etat || '', categorie: e.categorie || '', warnings, student });
   }
   return out;
 }
@@ -511,6 +517,7 @@ const RULES = {
         description: [
           `Le n° agent ${s.hrId} de cette fiche (${s.rec.fields.uid_dyna || 'sans uid'}) est celui du compte LDAP ${s.to}`
             + ` (état ${s.etat || '?'}${s.categorie ? `, ${s.categorie}` : ''}), qu’aucune fiche ne porte.`,
+          ...(s.student ? [`${s.student.uid} est un compte étudiant (${s.student.etat ? `état ${s.student.etat}` : 'absent du LDAP personnel'}${s.student.dateFin ? `, fin ${s.student.dateFin}` : ''}) : l’étudiant ou le doctorant est devenu personnel, et la fiche suit encore son compte étudiant (statut, fin d’emploi).`] : []),
           ...s.warnings.map((w) => `Attention : ${w}.`),
           'À faire : bouton « Passer à l’uid LDAP » (toutes les lignes de la fiche). La synchronisation LDAP s’applique ensuite à la fiche.',
           ...(s.rec.fields.uid_dyna ? [`SoVisu+ connaît cette personne sous ${s.rec.fields.uid_dyna} : une tâche de suivi est créée pour retirer ses identifiants de l’ancienne personne, sinon SoVisu+ refuse ${s.to} (« Conflicting identifiers »).`] : []),

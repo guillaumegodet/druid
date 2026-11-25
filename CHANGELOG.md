@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- Tâches : la tâche **« Passer à l'uid LDAP »** repère aussi les fiches restées sur un **compte étudiant** (uid
+  `E…U`) dont le n° agent est celui d'un compte personnel qu'aucune fiche ne porte : étudiant ou doctorant devenu
+  personnel, que Druid affichait parti à la fermeture du compte étudiant. Après la bascule, la tâche de suivi SoVisu+
+  est ouverte pour tout ancien uid, plus seulement pour les `ext_`.
+
 ## [2.20.0] — 2026-11-25
 
 ### Ajouté
