@@ -12,6 +12,13 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Fusion de doublons et fusion par source** (PostgreSQL) : quand la fiche absorbée était une autre personne, ses
+  valeurs par source (date de naissance, grade), corrections manuelles comprises, disparaissaient avec elle. Elles
+  passent désormais sur la personne gardée ; une correction de la fiche absorbée devient la source « Fiche fusionnée »,
+  et un conflit de sources quand elle contredit une correction de la fiche gardée. Une fusion annulée recrée la personne
+  avec des valeurs `legacy` (plus de correction manuelle implicite).
+
 ### Ajouté
 - Tâches : la tâche **« Passer à l'uid LDAP »** repère aussi les fiches restées sur un **compte étudiant** (uid
   `E…U`) dont le n° agent est celui d'un compte personnel qu'aucune fiche ne porte : étudiant ou doctorant devenu
