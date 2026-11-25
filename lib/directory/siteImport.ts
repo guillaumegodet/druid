@@ -370,7 +370,7 @@ const presenceOfSite = (status: string): 'PRESENT' | 'DEPART' | 'PARTI' => {
  * Command context of a write that also reports the grade read on the site (source `site` of the fields merged by source,
  * druid-internal `docs/plan-maj-chercheurs.md`): stored as the site's value even when the reviewer did not keep it.
  */
-const siteObservation = (ctx: any, values: { corps_grade?: string; employment_type?: string }, importBatchId: string | null = null) => {
+const siteObservation = (ctx: any, values: { corps_grade?: string; employment_type?: string; employer_id?: string }, importBatchId: string | null = null) => {
   const given = Object.fromEntries(Object.entries(values).filter(([, v]) => !!v));
   return Object.keys(given).length ? { ...ctx, fieldObservation: { source: 'site', values: given, importBatchId } } : ctx;
 };
@@ -443,7 +443,7 @@ export async function applySiteImport(args: {
   const plan = planSiteImport(doc, people, institutions, structures);
   const source = doc.source || `Site ${doc.lab}`;
   const batchOf = lazyImportBatch(commands, 'site', source, ctx);
-  const observing = async (values: { corps_grade?: string; employment_type?: string }) =>
+  const observing = async (values: { corps_grade?: string; employment_type?: string; employer_id?: string }) =>
     siteObservation(ctx, values, Object.values(values).some(Boolean) ? await batchOf() : null);
   // Lab label as the directory writes it (the file may differ in case or accents).
   const lab = people.flatMap((r) => r.affiliations || []).find((a) => normLab(a.structureName) === normLab(doc.lab))?.structureName || doc.lab;
@@ -469,7 +469,9 @@ export async function applySiteImport(args: {
     if (!c) { result.stale++; continue; }
     try {
       const created = newResearcherOf(c, lab, source, selection.validateNew ? validationOf(c.person.status, source, today, actor) : null);
-      await commands.createPerson(created, await observing({ corps_grade: created.employment?.grade, employment_type: created.employment?.contractType }));
+      await commands.createPerson(created, await observing({
+        corps_grade: created.employment?.grade, employment_type: created.employment?.contractType, employer_id: created.employment?.employer,
+      }));
       result.created++;
     } catch (e) { fail(index, `${c.person.firstName} ${c.person.lastName}`.trim(), e); }
   }

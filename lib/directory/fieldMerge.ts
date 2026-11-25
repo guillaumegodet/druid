@@ -112,6 +112,14 @@ const FIELD_RULES: Record<string, FieldRule> = {
   // Employment type: the LDAP category (« TITULAIRE », « CDD UNIVERSITE ») or the type a site or file gives; compared
   // without case.
   employment_type: textRule,
+  // Employer: id of the institution (establishment.id); a label is resolved before (pg/commands.ts, recordFields.ts).
+  employer_id: { ...textRule, normalize: (raw) => {
+    const s = raw === null || raw === undefined ? '' : String(raw).trim();
+    return s === '' || s === '0' ? '' : /^\d+$/.test(s) ? s : null;
+  } },
+  // Employment dates: reduced-precision dates, like the birth date (lib/dates.ts).
+  employment_start: fuzzyDateRule,
+  employment_end: fuzzyDateRule,
 };
 
 const ruleOf = (field: string): FieldRule => FIELD_RULES[field] ?? textRule;

@@ -181,6 +181,20 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
         // Reduced-precision date (YYYY, YYYY-MM or YYYY-MM-DD); 0 is the empty sentinel of the former Grist Date column.
         const d = blank(value) || value === 0 ? null : normalizeFuzzyDate(fromGristFuzzyDate(value)) || null;
         if (d || blank(value) || value === 0) { done(field); merged.push([MERGED_RECORD_FIELDS[field], d]); } else keep(field, value);
+      } else if (field === 'Employeur') {
+        // Id of the institution (0 / empty = none); a typed label is resolved by name and kept as typed (shown so).
+        if (value === 0 || blank(value)) { done(field); merged.push(['employer_id', null]); continue; }
+        if (typeof value === 'number') {
+          const e = await trx.selectFrom('establishment').select('id').where('id', '=', String(value)).executeTakeFirst();
+          if (e) { done(field); merged.push(['employer_id', String(e.id)]); } else { keep(field, value); merged.push(['employer_id', null]); }
+          continue;
+        }
+        const e = await trx.selectFrom('establishment').select('id').where(sql`lower(name)`, '=', String(value).trim().toLowerCase()).executeTakeFirst();
+        keep(field, value);
+        merged.push(['employer_id', e ? String(e.id) : null]);
+      } else if (field === 'employment_start_date' || field === 'employment_end_date') {
+        const d = blank(value) ? null : normalizeFuzzyDate(fromGristFuzzyDate(value)) || null;
+        if (d || blank(value)) { done(field); merged.push([MERGED_RECORD_FIELDS[field], d]); } else keep(field, value);
       } else if (field === 'Civilite') {
         // F / M; another civility is kept as typed (the record shows it normalized, like a Grist cell).
         const c = String(value ?? '').trim().toUpperCase();
@@ -202,25 +216,6 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
         if (blank(value)) { set.hdr_year = null; done(field); } else if (/^\s*\d{4}\s*$/.test(String(value))) { set.hdr_year = Number(String(value).trim()); done(field); }
         else { set.hdr_year = null; keep(field, value); }
         continue;
-      case 'Employeur': {
-        if (value === 0 || blank(value)) { set.employer_id = null; done(field); continue; }
-        if (typeof value === 'number') {
-          const e = await trx.selectFrom('establishment').select('id').where('id', '=', String(value)).executeTakeFirst();
-          if (e) { set.employer_id = e.id; done(field); } else { set.employer_id = null; keep(field, value); }
-          continue;
-        }
-        const e = await trx.selectFrom('establishment').select('id').where(sql`lower(name)`, '=', String(value).trim().toLowerCase()).executeTakeFirst();
-        set.employer_id = e?.id ?? null;
-        keep(field, value); // a typed label is shown as typed
-        continue;
-      }
-      case 'employment_start_date': case 'employment_end_date': {
-        const col = field === 'employment_start_date' ? 'employment_start' : 'employment_end';
-        const d = blank(value) ? null : normalizeFuzzyDate(fromGristFuzzyDate(value)) || null;
-        set[col] = d;
-        if (d || blank(value)) done(field); else keep(field, value);
-        continue;
-      }
       case HR_ID_COLUMN: {
         const id = value === 0 || blank(value) ? '' : normalizeHrId(value);
         set.hr_id = id || null;

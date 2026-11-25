@@ -20,7 +20,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
  * and, for a correction on a writable record, « Back to the sources ».
  */
 /** Fields merged by source (lib/directory/pg/fieldValues.ts MergedField). */
-type MergedFieldCode = 'birth_date' | 'corps_grade' | 'civility' | 'employment_type';
+type MergedFieldCode = 'birth_date' | 'corps_grade' | 'civility' | 'employment_type' | 'employer_id' | 'employment_start' | 'employment_end';
 
 const ProvenanceBadge: React.FC<{
   provenance: FieldProvenance; field: MergedFieldCode; recordId?: number; canCorrect?: boolean;
@@ -455,7 +455,16 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
           <div className="text-xs font-bold uppercase tracking-[.09em] text-muted-faint dark:text-[#8f897c] mb-4"><Trans>Employment & contract</Trans></div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
              <div>
-               <label className={secLabel}><Trans>Employing institution</Trans></label>
+               <div className="flex items-center gap-2">
+                 <label className={secLabel}><Trans>Employing institution</Trans></label>
+                 {researcher.fieldProvenance?.employer && (
+                   <ProvenanceBadge provenance={researcher.fieldProvenance.employer} field="employer_id" recordId={researcher.gristRowId} canCorrect={canCorrect}
+                     onDropped={(value, provenance) => {
+                       onUpdateField('employer', value ?? '', 'employment');
+                       onUpdateField('fieldProvenance', { ...researcher.fieldProvenance, employer: provenance });
+                     }} />
+                 )}
+               </div>
                <select
                  value={researcher.employment.employer}
                  onChange={(e) => onUpdateField('employer', e.target.value, 'employment')}
@@ -522,11 +531,29 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
              </div>
              <div className="grid grid-cols-2 gap-4">
                <div>
+                 <div className="flex items-center gap-2">
                  <label className={secLabel} title={t`Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM.`}><Trans>Employment start</Trans></label>
+                 {researcher.fieldProvenance?.employmentStart && (
+                   <ProvenanceBadge provenance={researcher.fieldProvenance.employmentStart} field="employment_start" recordId={researcher.gristRowId} canCorrect={canCorrect}
+                     onDropped={(value, provenance) => {
+                       onUpdateField('startDate', value ?? '', 'employment');
+                       onUpdateField('fieldProvenance', { ...researcher.fieldProvenance, employmentStart: provenance });
+                     }} />
+                 )}
+                 </div>
                  <FuzzyDateInput value={researcher.employment.startDate || ''} onChange={(d) => onUpdateField('startDate', d, 'employment')} className={secInput} wrapperClassName="w-full" />
                </div>
                <div>
+                 <div className="flex items-center gap-2">
                  <label className={secLabel} title={t`Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record.`}><Trans>Employment end</Trans></label>
+                 {researcher.fieldProvenance?.employmentEnd && (
+                   <ProvenanceBadge provenance={researcher.fieldProvenance.employmentEnd} field="employment_end" recordId={researcher.gristRowId} canCorrect={canCorrect}
+                     onDropped={(value, provenance) => {
+                       onUpdateField('endDate', value ?? '', 'employment');
+                       onUpdateField('fieldProvenance', { ...researcher.fieldProvenance, employmentEnd: provenance });
+                     }} />
+                 )}
+                 </div>
                  <FuzzyDateInput value={researcher.employment.endDate || ''} onChange={(d) => onUpdateField('endDate', d, 'employment')} className={secInput} wrapperClassName="w-full" />
                </div>
              </div>

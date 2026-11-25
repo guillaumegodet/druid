@@ -160,16 +160,16 @@ describe.skipIf(!url)('person_field_value', () => {
         .returning('id').executeTakeFirstOrThrow()).id;
       await observeFieldValue(trx, { personId: hosted, field: 'corps_grade', source: 'ldap', value: 'IR' });
       const cache = {
-        'test-noether-e': { etat: 'N', birthDate: '19820309', empCorps: '', categorie: 'TITULAIRE', civilite: 'Madame' },
-        'test-germain-s': { etat: 'N', birthDate: '19760401', empCorps: '', categorie: 'CDI UNIVERSITE', civilite: 'Mme' },
+        'test-noether-e': { etat: 'N', birthDate: '19820309', empCorps: '', categorie: 'TITULAIRE', civilite: 'Madame', dateFin: '2027-08-31' },
+        'test-germain-s': { etat: 'N', birthDate: '19760401', empCorps: '', categorie: 'CDI UNIVERSITE', civilite: 'Mme', dateFin: '2026-12-31' },
       };
       await observeFieldValue(trx, { personId: hosted, field: 'employment_type', source: 'ldap', value: 'CDI UNIVERSITE' });
       // The observer opens its own transactions: run it on this one.
       const first = await observeLdapFields(trx as any, cache);
       expect(first).toMatchObject({ persons: 2, removed: 2, invalid: 0 });
       expect((await column(trx, inside)).birth_date).toBe('1982-03-09');
-      const insideRow = await trx.selectFrom('person').select(['civility', 'employment_type']).where('id', '=', inside).executeTakeFirstOrThrow();
-      expect(insideRow).toEqual({ civility: 'F', employment_type: 'TITULAIRE' });
+      const insideRow = await trx.selectFrom('person').select(['civility', 'employment_type', 'employment_end']).where('id', '=', inside).executeTakeFirstOrThrow();
+      expect(insideRow).toEqual({ civility: 'F', employment_type: 'TITULAIRE', employment_end: '2027-08-31' });
       expect((await column(trx, hosted)).corps_grade).toBeNull();
       // Hosted account: birth date and civility kept, no grade nor employment type from the LDAP.
       expect(await trx.selectFrom('person_field_value').select(['field', 'source', 'value']).where('person_id', '=', hosted).orderBy('field').execute())

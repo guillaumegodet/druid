@@ -202,7 +202,10 @@ export interface Researcher {
   ldapFields?: string[];   // Root fields whose value comes from LDAP (not editable)
   /** PostgreSQL: where the value of each field merged by source comes from (druid-internal `docs/plan-maj-chercheurs.md`).
    *  Such a field stays editable: a typed value is a manual correction that wins over the sources. */
-  fieldProvenance?: { birthDate?: FieldProvenance; grade?: FieldProvenance; civility?: FieldProvenance; contractType?: FieldProvenance };
+  fieldProvenance?: {
+    birthDate?: FieldProvenance; grade?: FieldProvenance; civility?: FieldProvenance; contractType?: FieldProvenance;
+    employer?: FieldProvenance; employmentStart?: FieldProvenance; employmentEnd?: FieldProvenance;
+  };
   lastSync?: string;       // Date of the last update from an external source
   validation?: ValidationInfo; // Manual reliability layer (takes precedence over the derived status)
   /** Set by « Fill from LDAP » on a record being created (lib/ldapPerson.ts): createResearcher then

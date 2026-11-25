@@ -93,8 +93,9 @@ D'autres règles portent sur l'annuaire (voir [Statuts des personnes](/donnees/s
 
 ## Les conflits de sources
 
-Sur les instances sur PostgreSQL, la date de naissance, le grade, la civilité et le type d'emploi d'une fiche gardent
-la valeur de chaque source (voir [Lire une fiche](/guides/personnes/lire-une-fiche/#doù-viennent-la-date-de-naissance-le-grade-la-civilité-et-le-type-demploi)).
+Sur les instances sur PostgreSQL, l'état civil et l'emploi d'une fiche (date de naissance, grade, civilité, type d'emploi,
+employeur, dates d'emploi) gardent la valeur de chaque source (voir
+[Lire une fiche](/guides/personnes/lire-une-fiche/#doù-viennent-les-valeurs-détat-civil-et-demploi)).
 Une correction saisie dans Druid l'emporte toujours. L'onglet **Conflits de sources** liste les
 corrections qu'une source contredit **depuis** leur saisie : le LDAP a changé la date de
 naissance, un nouveau fichier RH donne un autre grade…

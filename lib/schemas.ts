@@ -144,6 +144,8 @@ export const ResearcherSchema = z.object({
   fieldProvenance: z.object({
     birthDate: FieldProvenanceSchema.optional(), grade: FieldProvenanceSchema.optional(),
     civility: FieldProvenanceSchema.optional(), contractType: FieldProvenanceSchema.optional(),
+    employer: FieldProvenanceSchema.optional(), employmentStart: FieldProvenanceSchema.optional(),
+    employmentEnd: FieldProvenanceSchema.optional(),
   }).optional(),
   lastSync: z.string().optional().nullable(),
   validation: ValidationInfoSchema.optional(),

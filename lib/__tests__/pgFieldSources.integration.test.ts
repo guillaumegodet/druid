@@ -100,6 +100,37 @@ describe.skipIf(!url)('record and fields merged by source', () => {
     });
   });
 
+  it('employer: an institution id merged by source, a label resolved, names in the sources panel', async () => {
+    await inRollback(async (trx) => {
+      const inst = async (name: string) => String((await trx.insertInto('establishment').values({ name } as any).returning('id').executeTakeFirstOrThrow()).id);
+      const a = await inst('TEST INSTITUTION A');
+      const b = await inst('TEST INSTITUTION B');
+      const id = (await trx.insertInto('person').values({ last_name: 'Carver', first_name: 'George', uid: 'test-carver-g' } as any)
+        .returning('id').executeTakeFirstOrThrow()).id;
+      const recordId = Number((await trx.insertInto('membership').values({ person_id: id, lab_label: 'LABX' } as any)
+        .returning('id').executeTakeFirstOrThrow()).id);
+      await observeFieldValue(trx, { personId: id, field: 'employer_id', source: 'legacy', value: a });
+      const repository = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository, today: () => '2026-11-26' });
+      const employer = async () => String((await trx.selectFrom('person').select('employer_id').where('id', '=', id).executeTakeFirstOrThrow()).employer_id);
+      const loaded = (await repository.people(ALL)).items.find((p) => p.uid === 'test-carver-g')!;
+      expect([loaded.employment.employer, loaded.fieldProvenance?.employer?.source]).toEqual(['TEST INSTITUTION A', 'legacy']);
+
+      // A lab file names institution B (by label): stored as its id, and it wins over `legacy`.
+      await commands.updatePerson(recordId, loaded, { ...ctx, fieldObservation: { source: 'lab_file', values: { employer_id: 'test institution b' } } });
+      expect(await employer()).toBe(b);
+      // Corrected in the record back to A: a manual correction; the panel shows the institutions' names.
+      repository.invalidate();
+      const fresh = (await repository.people(ALL)).items.find((p) => p.uid === 'test-carver-g')!;
+      await commands.updatePerson(recordId, { ...fresh, employment: { ...fresh.employment, employer: 'TEST INSTITUTION A' } }, ctx);
+      expect(await employer()).toBe(a);
+      const panel = (await commands.fieldSources!(recordId, ctx)).employer_id;
+      expect(panel.value).toBe('TEST INSTITUTION A');
+      expect(panel.sources.map((x) => [x.source, x.value])).toEqual([['manual', 'TEST INSTITUTION A'], ['lab_file', 'TEST INSTITUTION B'], ['legacy', 'TEST INSTITUTION A']]);
+      expect(await commands.dropFieldCorrection!(recordId, 'employer_id', ctx)).toMatchObject({ value: 'TEST INSTITUTION B', provenance: { source: 'lab_file' } });
+    });
+  });
+
   it('merging duplicates moves the values by source of the absorbed person; two corrections that differ are a conflict', async () => {
     await inRollback(async (trx) => {
       const person = async (uid: string, last: string) => {

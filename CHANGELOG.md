@@ -12,6 +12,19 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Employeur et dates d'emploi fusionnés par source** (PostgreSQL), comme l'état civil : une correction dans la fiche
+  l'emporte sur les imports, une source qui change ensuite lève un conflit, étiquette de provenance et panneau des
+  sources (noms des établissements). La fin d'emploi LDAP (« datefin ») devient une source, pour un employeur interne
+  et quand le LDAP en donne une : la revue LDAP ne la propose plus. Les imports de fichier et de site enregistrent
+  l'employeur qu'ils donnent.
+
+### Migration
+- `20261126150000_merge_employer_employment_dates` (dbmate) : rangs des sources pour `employer_id`,
+  `employment_start`, `employment_end`, reprise des valeurs actuelles (à Nantes : 3 employeurs et 5 débuts d'emploi en
+  correction manuelle, 222 fins d'emploi issues de la revue LDAP). **Après le déploiement : relancer la synchronisation
+  LDAP** (une seule fin d'emploi nouvelle attendue à Nantes).
+
 ## [2.21.0] — 2026-11-25
 
 ### Ajouté

@@ -52,6 +52,9 @@ export const MERGED_FIELD_LABELS: Record<string, MessageDescriptor> = {
   corps_grade: msg`Grade`,
   civility: msg`Title`,
   employment_type: msg`Employment type`,
+  employer_id: msg`Employer`,
+  employment_start: msg`Employment start`,
+  employment_end: msg`Employment end`,
 };
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
