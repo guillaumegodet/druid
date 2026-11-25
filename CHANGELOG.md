@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.20.0] — 2026-11-25
+
 ### Ajouté
 - **Sources d'une valeur dans la fiche** (date de naissance, grade ; PostgreSQL) : un clic sur l'étiquette de provenance
   montre ce que dit chaque source (valeur, date, écart) ; sur une valeur corrigée, **Revenir aux sources** retire la
