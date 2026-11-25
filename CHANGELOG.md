@@ -20,6 +20,17 @@ données à exécuter au déploiement).
   avec des valeurs `legacy` (plus de correction manuelle implicite).
 
 ### Ajouté
+- **Annuler un import** (PostgreSQL ; À traiter › Conflits de sources › Imports récents, administrateurs) : chaque
+  import de fichier ou de site enregistre son lot, et les valeurs qu'il apporte à la date de naissance et au grade le
+  référencent. « Annuler les valeurs de cet import » les retire et recalcule les fiches ; les fiches, appartenances et
+  identifiants créés par l'import restent.
+
+### Migration
+- `20261125150000_import_batch_kind` (dbmate) : `import_batch.kind` (`arbitration` par défaut pour les lots existants,
+  `import` pour les imports), `created_by`, `undone_at`, `undone_by` ; index sur `person_field_value.import_batch_id`.
+  Les écrans d'arbitrage ne listent que les lots `arbitration`.
+
+### Ajouté
 - Tâches : la tâche **« Passer à l'uid LDAP »** repère aussi les fiches restées sur un **compte étudiant** (uid
   `E…U`) dont le n° agent est celui d'un compte personnel qu'aucune fiche ne porte : étudiant ou doctorant devenu
   personnel, que Druid affichait parti à la fermeture du compte étudiant. Après la bascule, la tâche de suivi SoVisu+

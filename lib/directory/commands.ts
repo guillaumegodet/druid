@@ -48,6 +48,11 @@ export interface CommandContext {
 
 export interface DirectoryCommands {
   /**
+   * PostgreSQL: opens the batch of a file or site import (`import_batch`, kind `import`); the values it observes for
+   * the fields merged by source carry its id, so that « cancel an import » removes them together. Absent on Grist.
+   */
+  openImportBatch?(source: string, label: string, ctx: CommandContext): Promise<string>;
+  /**
    * PostgreSQL: the sources of the fields merged by source of a record's person (druid-internal
    * `docs/plan-maj-chercheurs.md`), each with its value; absent on Grist.
    */

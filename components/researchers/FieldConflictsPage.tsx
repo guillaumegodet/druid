@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Check, PencilLine, RefreshCw, RotateCw, Undo2 } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Check, FileX2, PencilLine, RefreshCw, RotateCw, Undo2 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { FieldConflictsApi, MERGED_FIELD_LABELS, SOURCE_LABELS, type FieldConflict, type FieldConflictAction } from '../../lib/fieldConflicts';
+import { FieldConflictsApi, MERGED_FIELD_LABELS, SOURCE_LABELS, type FieldConflict, type FieldConflictAction, type FieldImport } from '../../lib/fieldConflicts';
 
 interface Props {
   items: FieldConflict[];
@@ -25,6 +25,32 @@ export const FieldConflictsPage: React.FC<Props> = ({ items, onReload, onOpenRes
   const [loading, setLoading] = useState(false);
 
   const label = (map: Record<string, any>, code: string) => (map[code] ? i18n._(map[code]) : code);
+
+  // Recent file and site imports, and « cancel an import » (case 19 of the plan).
+  const [imports, setImports] = useState<FieldImport[]>([]);
+  const [confirming, setConfirming] = useState<string | null>(null);
+  const [undoneNote, setUndoneNote] = useState('');
+  const loadImports = useCallback(async () => {
+    try { setImports((await FieldConflictsApi.imports()).items); } catch (e) { console.warn('Imports:', e); }
+  }, []);
+  useEffect(() => { loadImports(); }, [loadImports]);
+  const undo = async (imp: FieldImport) => {
+    setBusy(`import:${imp.id}`);
+    setError('');
+    try {
+      const r = await FieldConflictsApi.undoImport(imp.id);
+      const n = r.values;
+      const p = r.persons;
+      setUndoneNote(t`${n} values removed, ${p} records recomputed.`);
+      setConfirming(null);
+      await Promise.all([loadImports(), onReload()]);
+      onResolved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  };
   const keyOf = (c: FieldConflict) => `${c.personId}|${c.field}`;
   const day = (iso: string | null) => (iso ? iso.slice(0, 10) : '');
 
@@ -120,6 +146,49 @@ export const FieldConflictsPage: React.FC<Props> = ({ items, onReload, onOpenRes
             </div>
           );
         })}
+        {imports.length > 0 && (
+          <section className="pt-4">
+            <h2 className="font-disp text-[15px] font-semibold text-ink dark:text-[#f5f2ea] mb-1"><Trans>Recent imports</Trans></h2>
+            <p className="text-[12px] text-muted dark:text-[#8f897c] mb-2">
+              <Trans>Cancelling an import removes the values it brought to the date of birth and the grade; the records take the value of the other sources again. The records, memberships and identifiers it created stay.</Trans>
+            </p>
+            {undoneNote && <p className="text-[12px] font-semibold text-ink dark:text-[#f5f2ea] mb-2">{undoneNote}</p>}
+            <div className="space-y-2">
+              {imports.map((imp) => {
+                const when = imp.createdAt.slice(0, 10);
+                const who = imp.createdBy ?? '';
+                const n = imp.values;
+                const p = imp.persons;
+                const undoneOn = imp.undoneAt ? imp.undoneAt.slice(0, 10) : '';
+                const undoneBy = imp.undoneBy ?? '';
+                return (
+                  <div key={imp.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-ink/10 dark:border-white/10 bg-white/40 dark:bg-white/[.04] px-3 py-2 text-[12px]">
+                    <span className="font-semibold text-ink dark:text-[#f5f2ea]">{imp.label || label(SOURCE_LABELS, imp.source)}</span>
+                    <span className="px-1.5 py-0.5 rounded text-[11px] bg-primary/10 text-primary dark:bg-primary-light/15 dark:text-primary-light">{label(SOURCE_LABELS, imp.source)}</span>
+                    <span className="text-muted dark:text-[#8f897c]"><Trans>{when} by {who}</Trans></span>
+                    {imp.undoneAt
+                      ? <span className="text-muted dark:text-[#8f897c] italic"><Trans>cancelled on {undoneOn} by {undoneBy}</Trans></span>
+                      : <span className="text-muted dark:text-[#8f897c]"><Trans>{n} values, {p} records</Trans></span>}
+                    <span className="flex-1" />
+                    {!imp.undoneAt && imp.values > 0 && (confirming === imp.id ? (
+                      <>
+                        <span className="font-semibold text-ink dark:text-[#f5f2ea]"><Trans>Remove these {n} values?</Trans></span>
+                        <button type="button" disabled={busy === `import:${imp.id}`} onClick={() => undo(imp)} className="btn-pill h-8 text-[12px]">
+                          {busy === `import:${imp.id}` ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Check className="w-3.5 h-3.5" />} <Trans>Confirm</Trans>
+                        </button>
+                        <button type="button" onClick={() => setConfirming(null)} className="btn-pill h-8 text-[12px]"><Trans>Cancel</Trans></button>
+                      </>
+                    ) : (
+                      <button type="button" onClick={() => { setConfirming(imp.id); setUndoneNote(''); }} className="btn-pill h-8 text-[12px]">
+                        <FileX2 className="w-3.5 h-3.5" /> <Trans>Cancel this import's values</Trans>
+                      </button>
+                    ))}
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
     </div>
   );

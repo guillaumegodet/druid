@@ -305,6 +305,11 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
   return {
     annuaireColumns: async () => RECORD_FIELDS,
 
+    // Batch of a file or site import (case 19 of druid-internal `docs/plan-maj-chercheurs.md`).
+    openImportBatch: (source, label, ctx) => writing(ctx, async (trx) =>
+      String((await trx.insertInto('import_batch').values({ kind: 'import', source, label: label.slice(0, 300) || null, created_by: ctx.actor ?? null } as any)
+        .returning('id').executeTakeFirstOrThrow()).id)),
+
     // Fields merged by source (druid-internal `docs/plan-maj-chercheurs.md`): the record's « sources » panel.
     fieldSources: async (recordId, ctx) => {
       if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
