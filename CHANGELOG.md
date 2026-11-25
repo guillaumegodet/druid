@@ -35,12 +35,12 @@ données à exécuter au déploiement).
   avec des valeurs `legacy` (plus de correction manuelle implicite).
 
 ### Migration
-- `20261126090000_merge_civility_employment_type` (dbmate) : rangs des sources pour `civility` et `employment_type`,
-  reprise des valeurs actuelles (27 civilités et 1 type d'emploi en correction manuelle à Nantes). **Après le
-  déploiement : relancer la synchronisation LDAP** pour enregistrer les valeurs LDAP de ces deux champs.
 - `20261125150000_import_batch_kind` (dbmate) : `import_batch.kind` (`arbitration` par défaut pour les lots existants,
   `import` pour les imports), `created_by`, `undone_at`, `undone_by` ; index sur `person_field_value.import_batch_id`.
   Les écrans d'arbitrage ne listent que les lots `arbitration`.
+- `20261126090000_merge_civility_employment_type` (dbmate) : rangs des sources pour `civility` et `employment_type`,
+  reprise des valeurs actuelles (27 civilités et 1 type d'emploi en correction manuelle à Nantes). **Après le
+  déploiement : relancer la synchronisation LDAP** pour enregistrer les valeurs LDAP de ces deux champs.
 
 ## [2.20.0] — 2026-11-25
 
