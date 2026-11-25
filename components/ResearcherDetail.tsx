@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ArrowLeft, Save, RefreshCw, FileDown, ExternalLink, Database, ShieldCheck, X, Pencil, ImageOff, ClipboardList } from 'lucide-react';
-import { Researcher, ResearcherStatus, Affiliation, Structure, StructureLevel, ViewState } from '../types';
+import { Researcher, Affiliation, Structure, StructureLevel, ViewState } from '../types';
 import { GristService } from '../lib/gristService';
 import { DirectoryApi } from '../lib/directoryApi';
 import { ExportService } from '../lib/exportService';

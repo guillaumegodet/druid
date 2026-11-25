@@ -17,11 +17,11 @@ function inRangePubs(pubs: DashboardPublication[], range: YearRange): DashboardP
 // ── Journals (full port of the Streamlit _tab_journals) ───────────────────────
 
 /** Nantilus access categories, labels and semantic colors (constants.py). */
-export const JOURNAL_ACCESS_ORDER = [
+const JOURNAL_ACCESS_ORDER = [
   'abonnement_courant', 'archives', 'licence_nationale',
   'oa_nantilus', 'oa_hors_nantilus', 'ferme', 'inconnu',
 ];
-export const JOURNAL_ACCESS_LABELS: Record<string, MessageDescriptor> = {
+const JOURNAL_ACCESS_LABELS: Record<string, MessageDescriptor> = {
   abonnement_courant: msg`Current subscription (NU)`,
   archives: msg`Archives (former subscription)`,
   licence_nationale: msg`National licence (ISTEX)`,
@@ -100,7 +100,7 @@ export interface JournalsAggregates {
 }
 
 /** FNEGE ranks from best to worst (EM = emerging journal). */
-export const FNEGE_RANK_ORDER = ['1*', '1', '2', '3', '4', 'EM'];
+const FNEGE_RANK_ORDER = ['1*', '1', '2', '3', '4', 'EM'];
 
 export function aggregateJournals(
   pubs: DashboardPublication[],
@@ -235,7 +235,7 @@ export function aggregateJournals(
 
 // ── Keywords (OpenAlex topics) ────────────────────────────────────────────────
 
-export interface KeywordsAggregates {
+interface KeywordsAggregates {
   topTopics: CountItem[];
   topSubfields: CountItem[];
 }
@@ -280,7 +280,7 @@ export function aggregateKeywords(
 
 export const AXE_OTHER = 'Autre / Non classé';
 
-export interface AxesAggregates {
+interface AxesAggregates {
   axeNames: string[]; // config order + `Autre` last
   byAxe: CountItem[];
   byYear: StackedByYear;
@@ -367,7 +367,7 @@ export function shareByCategory(data: StackedByCategory): StackedByCategory {
 
 // ── Signature charter ─────────────────────────────────────────────────────────
 
-export const CRITERE_LABELS: Record<string, string> = {
+const CRITERE_LABELS: Record<string, string> = {
   nantes_universite: '« Nantes Université »',
   structure: 'Structure (acronyme / nom)',
   code_unite: 'Code unité (UMR/UR…)',
@@ -386,7 +386,7 @@ export function charterCompliant(p: DashboardPublication, seuil: number): boolea
   return c.criteres?.nantes_universite === true && c.score >= seuil;
 }
 
-export interface CharteAggregates {
+interface CharteAggregates {
   total: number; // publications of the period
   analysable: number;
   conformes: number;

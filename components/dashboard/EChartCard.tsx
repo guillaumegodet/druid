@@ -34,9 +34,11 @@ import { Download, Maximize2, ChevronDown, Minimize2, Share2, Copy, Check, Exter
 import { chartDoc } from './report/chartDocs';
 import { VIZ_DARK, VIZ_LIGHT, VizTheme } from './palette';
 import { EMBEDDABLE_IDS, REPORT_ONLY_IDS } from './embedIds';
-import { downloadBlob, renderChartSvg, svgToPdf, toStaticOption } from './chartFileExport';
+import { renderChartSvg, svgToPdf, toStaticOption } from './chartFileExport';
+import { downloadBlob } from '../../lib/download';
 import { chartTables, toCsv, type DataTable } from '../../lib/chartExport';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 echarts.use([
   BarChart, PieChart, LineChart, MapChart, LinesChart, ScatterChart, EffectScatterChart,
@@ -76,7 +78,7 @@ export const ReportCaptureContext = React.createContext<ReportCapture | null>(nu
  * range): when present, each chart of the registry exposes
  * a « Partager » button that builds the matching public /embed URL.
  */
-export interface ShareScope {
+interface ShareScope {
   slug: string;
   range: { start: number; end: number };
   /** Current corpus scope — carried over into shared links. */
@@ -152,7 +154,7 @@ export function useWorldMap(): boolean {
 }
 
 /** Follows the `dark` class set on <html> by App.tsx (same mechanism as Tailwind). */
-export function useIsDark(): boolean {
+function useIsDark(): boolean {
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
   useEffect(() => {
     const obs = new MutationObserver(() =>
@@ -463,14 +465,7 @@ export const EChartCard: React.FC<EChartCardProps> = ({
     return () => window.clearTimeout(id);
   }, [fullscreen]);
 
-  useEffect(() => {
-    if (!fullscreen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setFullscreen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [fullscreen]);
+  useEscapeKey(() => setFullscreen(false), fullscreen);
 
   const [exportOpen, setExportOpen] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -480,14 +475,7 @@ export const EChartCard: React.FC<EChartCardProps> = ({
     [exportOpen, exportTables, option],
   );
 
-  useEffect(() => {
-    if (!exportOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setExportOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [exportOpen]);
+  useEscapeKey(() => setExportOpen(false), exportOpen);
 
   const runExport = async (format: 'png' | 'svg' | 'pdf' | 'csv') => {
     setExportOpen(false);

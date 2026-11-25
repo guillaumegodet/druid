@@ -71,7 +71,7 @@ export interface SunburstNode {
   value?: number;
   children?: SunburstNode[];
 }
-export interface FlowAggregates {
+interface FlowAggregates {
   sankey: { nodes: FlowNode[]; links: FlowLink[] };
   sunburst: SunburstNode[];
 }
@@ -231,7 +231,7 @@ export function aggregateCountryHeatmap(
 
 // ── Evolution of the main partner countries (curves per country) ─────────────
 
-export interface CountryEvolution {
+interface CountryEvolution {
   countries: string[]; // FR labels, order = global ranking
   years: number[];
   series: { name: string; data: number[] }[];
@@ -286,7 +286,7 @@ export function aggregateCountryEvolution(
 
 export type MarketDimension = 'country' | 'team' | 'org';
 
-export interface MarketIndex {
+interface MarketIndex {
   /** value -> indices of the publications concerned (in the inRange array). */
   byValue: Map<string, Set<number>>;
   /** values ranked by decreasing number of publications. */
@@ -335,7 +335,7 @@ export function buildMarketIndex(
   return { byValue, ranking, inRange };
 }
 
-export interface MarketShare {
+interface MarketShare {
   selected: number;
   total: number;
   pct: number | null;

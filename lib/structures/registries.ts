@@ -53,13 +53,13 @@ const base = (type: StructureIdType, id: string, label: string, url: string): Re
 });
 
 /** `Nantes Cedex 3` → `Nantes`. */
-export const cityOf = (raw: unknown): string | null => {
+const cityOf = (raw: unknown): string | null => {
   const c = str(raw).replace(/\s+CEDEX.*$/i, '').replace(/\s+\d{5}\s*$/, '').trim();
   return c || null;
 };
 
 // ── RNSR (fr-esr-structures-recherche-publiques-actives, API Explore v2.1) ────────────────────────────────────────────
-export const RNSR_DATASET = 'fr-esr-structures-recherche-publiques-actives';
+const RNSR_DATASET = 'fr-esr-structures-recherche-publiques-actives';
 export const RNSR_API = `https://data.enseignementsup-recherche.gouv.fr/api/explore/v2.1/catalog/datasets/${RNSR_DATASET}/records`;
 
 export const rnsrRecord = (raw: any): RegistryRecord | null => {
@@ -125,9 +125,9 @@ export const rorRecord = (raw: any): RegistryRecord | null => {
 };
 
 // ── AureHAL structures (api.archives-ouvertes.fr/ref/structure) and HAL collections ──────────────────────────────────
-export const HAL_STRUCTURE_API = 'https://api.archives-ouvertes.fr/ref/structure/';
+const HAL_STRUCTURE_API = 'https://api.archives-ouvertes.fr/ref/structure/';
 export const HAL_SEARCH_API = 'https://api.archives-ouvertes.fr/search/';
-export const HAL_STRUCTURE_FIELDS = 'docid,label_s,name_s,acronym_s,rnsr_s,ror_s,idref_s,isni_s,parentDocid_i,parentName_s,parentAcronym_s,valid_s,type_s,address_s,country_s,url_s,startDate_s,endDate_s';
+const HAL_STRUCTURE_FIELDS = 'docid,label_s,name_s,acronym_s,rnsr_s,ror_s,idref_s,isni_s,parentDocid_i,parentName_s,parentAcronym_s,valid_s,type_s,address_s,country_s,url_s,startDate_s,endDate_s';
 
 export const halStructureRecord = (raw: any): RegistryRecord | null => {
   const id = normalizeStructureId('hal_struct', raw?.docid);
@@ -197,7 +197,7 @@ export const openalexRecord = (raw: any): RegistryRecord | null => {
 };
 
 // ── IdRef corporate bodies (Solr) ────────────────────────────────────────────────────────────────────────────────────
-export const IDREF_SOLR = 'https://www.idref.fr/Sru/Solr';
+const IDREF_SOLR = 'https://www.idref.fr/Sru/Solr';
 
 export const idrefRecord = (doc: any): RegistryRecord | null => {
   const id = normalizeStructureId('idref', doc?.ppn_z);
@@ -222,7 +222,7 @@ export const idrefPpnQuery = (ppn: string): string => `${IDREF_SOLR}?q=${encodeU
 // ── Wikidata ─────────────────────────────────────────────────────────────────────────────────────────────────────────
 export const WIKIDATA_API = 'https://www.wikidata.org/w/api.php';
 /** Properties that carry the identifiers Druid aligns. */
-export const WIKIDATA_PROPS: Record<string, StructureIdType> = { P6782: 'ror', P2427: 'grid', P213: 'isni', P269: 'idref', P10283: 'openalex' };
+const WIKIDATA_PROPS: Record<string, StructureIdType> = { P6782: 'ror', P2427: 'grid', P213: 'isni', P269: 'idref', P10283: 'openalex' };
 
 export const wikidataRecord = (entity: any): RegistryRecord | null => {
   const id = normalizeStructureId('wikidata', entity?.id);

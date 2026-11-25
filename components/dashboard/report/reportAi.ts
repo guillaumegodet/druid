@@ -22,14 +22,14 @@ import type { ReportDefinition } from './definition';
 import type { ResolvedBlock } from './resolveReport';
 import { restrictDataset } from './restrictDataset';
 
-export type AiTask = 'executive' | 'domains';
+type AiTask = 'executive' | 'domains';
 
-export interface AiProgress {
+interface AiProgress {
   done: number;
   total: number;
 }
 
-export interface AiResult {
+interface AiResult {
   text: string;
   model: string;
 }

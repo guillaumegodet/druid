@@ -16,7 +16,7 @@ import { levelOf } from './pg/alignCommands';
 import { readStructureIdentifiers } from './pg/identifiers';
 import type { Registry } from './registryClient';
 
-export interface AlignRunOptions {
+interface AlignRunOptions {
   mode: AlignMode;
   types?: StructureIdType[];
   /** Only these labs (row ids or acronyms); default: every lab. Teams, groupings and institutions are never aligned:
@@ -34,7 +34,7 @@ export interface AlignRunOptions {
   shouldStop?: () => boolean;
 }
 
-export interface AlignRunReport {
+interface AlignRunReport {
   total: number;
   done: number;
   candidates: number;
@@ -45,7 +45,7 @@ export interface AlignRunReport {
 }
 
 /** Facts of a structure as the engine wants them, from the record and its confirmed identifiers. */
-export const factsOf = (s: Structure, ids: Partial<Record<StructureIdType, string[]>>, countryCode?: string | null): StructureFacts => ({
+const factsOf = (s: Structure, ids: Partial<Record<StructureIdType, string[]>>, countryCode?: string | null): StructureFacts => ({
   id: Number(String(s.id).replace(/^S-/, '')) || 0,
   acronym: s.acronym,
   name: s.officialName || s.acronym,

@@ -37,7 +37,6 @@ export const GroupDashboardSection: React.FC<{
   const pollRef = useRef<number | null>(null);
 
   const harvestable = members.filter(isHarvestable);
-  const harvestableCount = harvestable.length;
 
   const refreshInfo = useCallback(async () => {
     try {

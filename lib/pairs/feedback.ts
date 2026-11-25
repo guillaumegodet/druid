@@ -6,7 +6,6 @@ import { sql, type Kysely } from 'kysely';
 import type { DB } from '../db/schema.gen';
 
 export type PairVerdict = 'relevant' | 'already_in_contact' | 'not_relevant';
-export const PAIR_VERDICTS: readonly PairVerdict[] = ['relevant', 'already_in_contact', 'not_relevant'];
 
 /** Stable key of one researcher of a pair. */
 export const pairAuthorKey = (a: { uid?: string | null; label: string }): string =>
@@ -32,7 +31,7 @@ export function withFeedback<T extends { key: string }>(items: T[], feedback: Ma
   return [...out.filter((s) => !aside(s)), ...out.filter(aside)];
 }
 
-export interface PairFeedbackInput {
+interface PairFeedbackInput {
   pairKey: string;
   slug: string;
   a: { label: string; labs: string[] };
@@ -97,4 +96,3 @@ export function createPairFeedbackStore(db: Kysely<DB>) {
 
   return { save, remove, forPairs, annotate, rows, pairKeyOf };
 }
-export type PairFeedbackStore = ReturnType<typeof createPairFeedbackStore>;

@@ -25,7 +25,7 @@ interface DruidAccess {
  * single flag `VITE_HIDE_NANTES_FEATURES` (Centrale/Cloudflare) with one flag
  * per integration, computed server-side (server.cjs / functions/api/me.js)
  * from the environment variables/secrets actually configured. */
-export interface DruidCapabilities {
+interface DruidCapabilities {
   /** Directory sync from the university LDAP. */
   HAS_LDAP: boolean;
   /** Administration section → « Gestion des droits » tab (Keycloak admin API). */
@@ -95,7 +95,7 @@ interface UserInfo {
   impersonatedBy?: string | null;
 }
 
-export interface TenantInfo {
+interface TenantInfo {
   slug: string;
   status: 'provisioning' | 'active' | 'suspended' | 'deleted';
   plan: { code: string; label: string; seats: number | null; historyYears: number | null; refresh: string; features: Record<string, unknown> } | null;
@@ -220,10 +220,10 @@ export const isSuperAdmin = (): boolean => _userInfo?.access.isSuperAdmin ?? fal
 
 /** media_admin role (communications officer): access to the media monitoring
  * Sources page, without the other super admin rights. */
-export const isMediaAdmin = (): boolean => _userInfo?.access.isMediaAdmin ?? false;
+const isMediaAdmin = (): boolean => _userInfo?.access.isMediaAdmin ?? false;
 
 /** Right to manage the media monitoring sources (Sources page). */
-export const canAdminMediaSources = (): boolean => isSuperAdmin() || isMediaAdmin();
+const canAdminMediaSources = (): boolean => isSuperAdmin() || isMediaAdmin();
 
 /** Tabs of the Administration section available to the user (display order). */
 export type AdminTab = 'establishment' | 'console' | 'rights' | 'media' | 'institutions' | 'calls';
@@ -249,7 +249,6 @@ export const canSeeAdmin = (): boolean => adminTabsFor().length > 0;
 
 /** Generic lab right (lab derived from the Annuaire): for the welcome message. */
 export const isLabViewer = (): boolean => _userInfo?.access.isLabViewer ?? false;
-export const getAnnuaireLabs = (): string[] => _userInfo?.access.annuaireLabs ?? [];
 
 /** Institution-level right (or super admin): sees everything, unfiltered. */
 export const hasFullAccess = (): boolean => _userInfo?.access.allowedSlugs === 'all';

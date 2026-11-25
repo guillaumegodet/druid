@@ -11,21 +11,21 @@
 import type { SaasDb } from './controlPlane';
 import { TENANT_PUBLIC_SETTINGS, decryptSecret, writeTenantSecret, type TenantSecretName } from './secrets.ts';
 
-export const KEY_GROUPS = {
+const KEY_GROUPS = {
   llm: ['ILAAS_API_BASE', 'ILAAS_MODEL', 'ILAAS_API_KEY'],
   scopus: ['SCOPUS_API_KEY', 'SCOPUS_INST_TOKEN', 'SCOPUS_API_KEY_2', 'SCOPUS_INST_TOKEN_2'],
 } as const satisfies Record<string, readonly TenantSecretName[]>;
-export type KeyGroup = keyof typeof KEY_GROUPS;
+type KeyGroup = keyof typeof KEY_GROUPS;
 export const isKeyGroup = (v: unknown): v is KeyGroup => typeof v === 'string' && Object.prototype.hasOwnProperty.call(KEY_GROUPS, v);
 
 export const DEFAULT_LLM_BASE = 'https://llm.ilaas.fr/v1';
-export const DEFAULT_LLM_MODEL = 'mistral-small-4-119b';
+const DEFAULT_LLM_MODEL = 'mistral-small-4-119b';
 const ELSEVIER = 'https://api.elsevier.com/content';
 const TIMEOUT_MS = 15_000;
 
 /** Outcome of a test: `code` is what the page translates; `detail` is the provider's own words (truncated). */
-export type CheckCode = 'ok' | 'invalid_key' | 'not_entitled' | 'model_not_found' | 'quota' | 'unreachable' | 'http_error';
-export interface KeyCheck { ok: boolean; code: CheckCode; detail: string | null }
+type CheckCode = 'ok' | 'invalid_key' | 'not_entitled' | 'model_not_found' | 'quota' | 'unreachable' | 'http_error';
+interface KeyCheck { ok: boolean; code: CheckCode; detail: string | null }
 
 export class ClientKeyError extends Error {
   // No parameter property: the Functions guards run this file with Node's type stripping.
@@ -168,7 +168,7 @@ const recordCheck = async (db: SaasDb, tenantId: string, group: KeyGroup, check:
     .onConflict((oc) => oc.columns(['tenant_id', 'key_group']).doUpdateSet(values)).execute();
 };
 
-export interface KeyGroupView {
+interface KeyGroupView {
   /** Which names are stored (never a key's value). */
   set: Record<string, boolean>;
   /** Values that are not secrets (address and model of the language model). */
@@ -197,7 +197,7 @@ export const describeClientKeys = async (db: SaasDb, tenantId: string, keyB64: s
   return out;
 };
 
-export interface SaveOptions { by: string | null; force?: boolean; fetchImpl?: FetchLike }
+interface SaveOptions { by: string | null; force?: boolean; fetchImpl?: FetchLike }
 
 /** Input of a group → the values to store (a key left empty keeps the stored one), validated. */
 const valuesOf = (group: KeyGroup, input: Record<string, unknown>, stored: Partial<Record<TenantSecretName, string>>): Partial<Record<TenantSecretName, string | null>> => {

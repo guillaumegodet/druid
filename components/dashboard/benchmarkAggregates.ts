@@ -28,14 +28,14 @@ function inRangePubs(pubs: DashboardPublication[], range: YearRange): DashboardP
   );
 }
 
-export interface SubfieldShare {
+interface SubfieldShare {
   key: string;
   count: number;
   /** Share of this field in the total assignments (a publication may count in several). */
   share: number;
 }
 
-export type DomainShare = SubfieldShare;
+type DomainShare = SubfieldShare;
 
 export interface SignatureSubfield extends SubfieldShare {
   /** OpenAlex world share of this subfield (works_count / world total). */
@@ -44,7 +44,7 @@ export interface SignatureSubfield extends SubfieldShare {
   ratio: number;
 }
 
-export interface SpecialisationProfile {
+interface SpecialisationProfile {
   totalPubs: number;
   nbSubfields: number;
   topSubfields: SubfieldShare[];
@@ -116,7 +116,7 @@ export function computeSpecialisationProfile(
   };
 }
 
-export interface SpecialisationReading {
+interface SpecialisationReading {
   /** « généraliste » / « modérément concentré » / « très spécialisé ». */
   qualifier: string;
   /** 1 / Herfindahl: number of equal-weight subfields giving the same
@@ -254,7 +254,7 @@ export function computePeerGroupIndicators(
 /** Weight per indicator (0 = excluded from the score). Same keys as LEIDEN_INDICATOR_KEYS on the ETL side. */
 export type LeidenWeights = Record<string, number>;
 
-export interface LeidenWeightPreset {
+interface LeidenWeightPreset {
   label: MessageDescriptor;
   description: MessageDescriptor;
   weights: LeidenWeights;
@@ -288,7 +288,7 @@ export const LEIDEN_WEIGHT_PRESETS: Record<string, LeidenWeightPreset> = {
   },
 };
 
-export interface WeightedScore {
+interface WeightedScore {
   /** Weighted mean of the retained percentiles (0-100), null if no weight > 0. */
   score: number | null;
   /** Detail per retained indicator (weight > 0 and percentile available). */
@@ -544,7 +544,7 @@ export function rankPeersByWeightedScore(
 // name rather than by ID.
 
 /** An OpenAlex topic of a peer institution, as returned by the API. */
-export interface PeerTopicCount {
+interface PeerTopicCount {
   name: string;
   count: number;
 }

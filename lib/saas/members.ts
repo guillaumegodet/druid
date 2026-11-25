@@ -11,9 +11,9 @@
 import { sql } from 'kysely';
 import { emailDomain, isValidEmail, normalizeAcronym, normalizeEmail, type Member, type MemberRole, type Plan, type SaasDb, type Tenant } from './controlPlane';
 
-export const MEMBER_ROLES: MemberRole[] = ['owner', 'admin', 'viewer', 'lab'];
-export const isMemberRole = (v: unknown): v is MemberRole => MEMBER_ROLES.includes(v as MemberRole);
-export const MAX_MAIL_DOMAINS = 10;
+const MEMBER_ROLES: MemberRole[] = ['owner', 'admin', 'viewer', 'lab'];
+const isMemberRole = (v: unknown): v is MemberRole => MEMBER_ROLES.includes(v as MemberRole);
+const MAX_MAIL_DOMAINS = 10;
 const DOMAIN_RE = /^(?=.{3,253}$)(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
 
 /** A refusal of an account operation: HTTP status + English message (lib/apiErrors.ts). */
@@ -21,7 +21,7 @@ export class MemberError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
-export interface MemberView {
+interface MemberView {
   id: string;
   email: string;
   role: MemberRole;
@@ -32,7 +32,7 @@ export interface MemberView {
   /** Invited, never signed in. */
   pending: boolean;
 }
-export const memberView = (m: Member): MemberView => ({
+const memberView = (m: Member): MemberView => ({
   id: m.id, email: m.email, role: m.role, labScope: m.lab_scope || [], invitedBy: m.invited_by,
   createdAt: String(m.created_at), lastLoginAt: m.last_login_at ? String(m.last_login_at) : null, pending: !m.last_login_at,
 });
@@ -40,7 +40,7 @@ export const memberView = (m: Member): MemberView => ({
 export const listMembers = async (db: SaasDb, tenantId: string): Promise<MemberView[]> =>
   (await db.selectFrom('member').selectAll().where('tenant_id', '=', tenantId).orderBy('created_at').execute()).map(memberView);
 
-export interface AccessRequestView { id: string; email: string; note: string | null; createdAt: string }
+interface AccessRequestView { id: string; email: string; note: string | null; createdAt: string }
 export const listAccessRequests = async (db: SaasDb, tenantId: string): Promise<AccessRequestView[]> =>
   (await db.selectFrom('access_request').selectAll().where('tenant_id', '=', tenantId).where('handled_at', 'is', null).orderBy('created_at').execute())
     .map((r) => ({ id: r.id, email: r.email, note: r.note, createdAt: String(r.created_at) }));
@@ -59,7 +59,7 @@ const labScopeOf = (role: MemberRole, labScope: unknown): string[] => {
   return labs;
 };
 
-export interface InviteInput { email: string; role: MemberRole; labScope?: string[]; invitedBy: string }
+interface InviteInput { email: string; role: MemberRole; labScope?: string[]; invitedBy: string }
 
 /** Adds a member within the seats of the plan: 409 when the address is already a member or the plan is full. */
 export const inviteMember = async (db: SaasDb, tenant: Pick<Tenant, 'id'>, plan: Pick<Plan, 'seats'> | null, input: InviteInput): Promise<MemberView> => {

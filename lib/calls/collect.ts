@@ -65,7 +65,7 @@ export interface CollectStats {
   errors: string[];
 }
 
-export interface CollectOptions {
+interface CollectOptions {
   /** Programmes to collect (active ones of the portal source). */
   programmes: Programme[];
   /** The listing, as chunks of its JSON text. */
@@ -80,7 +80,7 @@ export interface CollectOptions {
   log?: (message: string) => void;
 }
 
-export const PORTAL_TOPIC_PAGE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
+const PORTAL_TOPIC_PAGE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
 
 export const contentHashOf = (objectives: string, scope: string): string =>
   createHash('sha1').update(`${objectives}\n\u0000\n${scope}`).digest('hex');

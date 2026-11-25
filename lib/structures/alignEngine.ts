@@ -74,7 +74,7 @@ export interface StructureAlignResult {
   searched: { type: StructureIdType; mode: AlignMode; candidates: number; error?: string }[];
 }
 
-export interface AlignOptions {
+interface AlignOptions {
   mode: AlignMode;
   /** Types to work on (default: the aligned types). */
   types?: StructureIdType[];

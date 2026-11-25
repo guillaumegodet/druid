@@ -11,7 +11,7 @@ export type StructureIdType = typeof STRUCTURE_ID_TYPES[number];
 /** The types the alignment page shows as columns, in this order (the others are kept as bridges only). */
 export const ALIGNED_STRUCTURE_ID_TYPES: StructureIdType[] = ['rnsr', 'ror', 'hal_struct', 'hal_collection', 'openalex', 'idref', 'wikidata'];
 
-export interface StructureIdTypeMeta {
+interface StructureIdTypeMeta {
   label: string;
   /** Several confirmed values are normal (HAL structure records, OpenAlex institutions). */
   multi: boolean;

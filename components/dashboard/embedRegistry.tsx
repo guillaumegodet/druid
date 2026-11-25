@@ -118,7 +118,7 @@ import {
 } from './CountryCharts';
 import type { TeamRadarLevel } from './structureAggregates';
 
-export interface EmbedChartProps {
+interface EmbedChartProps {
   dataset: DashboardDataset;
   range: YearRange;
   /**

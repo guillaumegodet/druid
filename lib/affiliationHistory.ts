@@ -75,7 +75,7 @@ export interface AhEntry {
   pubs: AhPublication[];
 }
 export interface AhRun { running: boolean; done: number; total: number; startedAt: string | null }
-export type AhResponse = { entry: AhEntry; run: AhRun | null };
+type AhResponse = { entry: AhEntry; run: AhRun | null };
 
 /** Error of the API carrying its HTTP status (404 = not computed yet, with the run state). */
 export class AhError extends Error {
@@ -217,8 +217,8 @@ export const fetchAffiliationSignals = async (): Promise<AhSignalsByKey> => {
 };
 
 /** Values of the « Career path » filter of the list. */
-export const PARCOURS_FILTERS = ['depart', 'depart_confirme', 'statut_incoherent', 'identifiant_suspect'] as const;
-export type ParcoursFilter = (typeof PARCOURS_FILTERS)[number];
+const PARCOURS_FILTERS = ['depart', 'depart_confirme', 'statut_incoherent', 'identifiant_suspect'] as const;
+type ParcoursFilter = (typeof PARCOURS_FILTERS)[number];
 const DEPARTURE_TYPES: AhSignalType[] = ['depart_confirme', 'depart_declare', 'nouveau_poste_declare', 'depart_observe'];
 
 /** A probable departure: declared (ORCID), observed (publications) or confirmed — the current Scopus

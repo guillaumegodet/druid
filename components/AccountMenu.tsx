@@ -19,7 +19,7 @@ interface AccountPanelProps {
 }
 
 /** Initials avatar of the signed-in user. */
-export const UserAvatar: React.FC<{ size?: 'sm' | 'md' }> = ({ size = 'sm' }) => {
+const UserAvatar: React.FC<{ size?: 'sm' | 'md' }> = ({ size = 'sm' }) => {
   const userInfo = getUserInfo() as any;
   const initials = userInfo?.name?.substring(0, 2).toUpperCase() || '??';
   const dims = size === 'md' ? 'w-10 h-10 text-[14px]' : 'w-8 h-8 text-[13px]';

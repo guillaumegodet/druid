@@ -80,13 +80,6 @@ export interface IdrefDiff {
   melees?: ReviewMixedItem[];
 }
 
-/** A concrete write decided by the UI: Grist fields → value. */
-export interface IdrefUpdate {
-  id: string;
-  uid: string;
-  displayName: string;
-  fields: Record<string, string>; // ex. { IdRef: '028736036', ORCID: '0000-...' }
-}
 
 // --- ORCID / HAL / OpenAlex alignments (<source>_align_cache.json caches produced by
 // scripts/sync_orcid.cjs, sync_hal.cjs, sync_openalex.cjs; see docs/archive/plan-alignement-orcid-hal.md and
@@ -159,7 +152,7 @@ export const ALIGN_SOURCE_META: Record<AlignSource, { label: string; table: stri
 };
 
 /** Numeric Scopus Author ID of an ID_SCOPUS cell ('' when empty, 0, or an explicit text such as « absent »). */
-export const scopusIdOf = (v: any): string => {
+const scopusIdOf = (v: any): string => {
   const d = String(v ?? '').replace(/\D/g, '');
   return /^\d{6,12}$/.test(d) && String(v).trim() !== '0' ? d : '';
 };
@@ -357,7 +350,7 @@ export const unifiedCandidateId = (src: UnifiedAlignSource, c: AlignCandidate | 
   (src === 'idref' ? (c as IdrefCandidate).ppn : (c as AlignCandidate).id);
 
 /** Target Annuaire column of an authority source (the one written when arbitrating an ambiguous case). */
-export const unifiedTargetField = (src: UnifiedAlignSource): string =>
+const unifiedTargetField = (src: UnifiedAlignSource): string =>
   (src === 'idref' ? 'IdRef' : ALIGN_SOURCE_META[src].targetField);
 
 /** Selection key of a « strong » candidate (status `strong`) — direct checkbox in the row
@@ -464,7 +457,7 @@ export function buildUnifiedUpdates(
  * Secondaries proposed by the verification are added as they are. The current record is taken into account at write
  * time (halPatchFields).
  */
-export function halCheckedFields(row: PersonAlignRow, cell: PersonAlignCell, selected: ReadonlySet<string>, chosen: Readonly<Record<string, string>>): Record<string, string> {
+function halCheckedFields(row: PersonAlignRow, cell: PersonAlignCell, selected: ReadonlySet<string>, chosen: Readonly<Record<string, string>>): Record<string, string> {
   const checked: (AlignFieldProposal | IdrefFieldProposal)[][] = [];
   for (const f of cell.fill || []) {
     if (selected.has(unifiedFillKey(row.id, 'hal', unifiedCandidateId('hal', f.candidate)))) checked.push(f.proposals);
@@ -523,7 +516,7 @@ export const IDREF_REVIEW_TABLE = 'Alignement_IdRef';
  * red) — the alignment proposals are strings (`ID_SCOPUS` of the Scopus alignment, or of an ORCID
  * profile): coerced to numbers according to the column type before the PATCH. Mutates and returns `fields`.
  */
-export function coerceNumericColumns(cols: AnnuaireColumnMeta[], fields: Record<string, any>): Record<string, any> {
+function coerceNumericColumns(cols: AnnuaireColumnMeta[], fields: Record<string, any>): Record<string, any> {
   for (const [k, v] of Object.entries(fields)) {
     const type = cols.find((c) => c.id === k)?.type || '';
     if ((type === 'Numeric' || type === 'Int') && typeof v === 'string' && /^\s*-?\d+(\.\d+)?\s*$/.test(v)) fields[k] = Number(v);
@@ -553,15 +546,14 @@ export function traceColumnsFor(cols: AnnuaireColumnMeta[], label: string, today
  * scripts/lib/align_common.cjs (--group filter of the scripts). */
 export type AlignGroup = 'personnel' | 'doctorants' | 'hors_recherche';
 
-export const ALIGN_GROUPS: AlignGroup[] = ['personnel', 'doctorants', 'hors_recherche'];
 
 /** PhD student — the raw `TYPE_EMPLOI` code (e.g. 'DOCTORANT') is reliable; `LIB_TYPE_EMPLOI` (HR label)
  * is empty for almost every PhD student in the Nantes Annuaire (checked 2026-09-07: 187/192 empty). */
-export const isDoctorantTypology = (f: any): boolean => String(f?.['TYPE_EMPLOI'] || '').trim().toUpperCase() === 'DOCTORANT';
+const isDoctorantTypology = (f: any): boolean => String(f?.['TYPE_EMPLOI'] || '').trim().toUpperCase() === 'DOCTORANT';
 
 /** Staff without statutory research duty — HR label `LIB_TYPE_EMPLOI` « Personnel titulaire /
  * non titulaire n'ayant pas d'obligation statutaire de recherche » (~1,200 records in the Nantes Annuaire). */
-export const isNonResearchTypology = (f: any): boolean =>
+const isNonResearchTypology = (f: any): boolean =>
   /n'ayant pas d'obligation statutaire de recherche/i.test(String(f?.['LIB_TYPE_EMPLOI'] || '').replace(/[’‘]/g, "'"));
 
 /** PhD student (TYPE_EMPLOI, takes precedence) > no research duty > staff. */
@@ -572,15 +564,15 @@ export const alignGroupOf = (f: any): AlignGroup =>
  * ("19XX", "17.."). Used to discard upfront candidates who died before DEATH_MIN_YEAR (obviously
  * wrong candidate: we look for current staff/PhD students) — see computeIdrefAlignDiff
  * and scripts/sync_idref_qualinka.cjs::candidateDeathYear (same threshold, same logic). */
-export const DEATH_MIN_YEAR = 2015;
+const DEATH_MIN_YEAR = 2015;
 
-export const candidateDeathYear = (death: any): number | null => {
+const candidateDeathYear = (death: any): number | null => {
   const m = /^(\d{4})$/.exec(String(death || '').trim());
   return m ? parseInt(m[1], 10) : null;
 };
 
 /** Distinct labs (LABO column) of the Annuaire records, sorted — for the structure filter. */
-export const distinctLabos = (records: any[]): string[] =>
+const distinctLabos = (records: any[]): string[] =>
   Array.from(new Set(records.map((r: any) => String(r.fields['LABO'] || '').trim()).filter(Boolean)))
     .sort((a, b) => a.localeCompare(b, 'fr'));
 
@@ -601,21 +593,20 @@ export const DECISION_MIXED = 'Identité mêlée';
 
 export type ReviewDecision = 'Rejeté' | typeof DECISION_MIXED;
 
-export const REVIEW_DECISIONS = ['À traiter', 'Validé', 'Rejeté', DECISION_MIXED];
+const REVIEW_DECISIONS = ['À traiter', 'Validé', 'Rejeté', DECISION_MIXED];
 
-export const DECISION_CHOICE_OPTIONS = {
+const DECISION_CHOICE_OPTIONS = {
   'À traiter': { fillColor: '#FFE5B4', textColor: '#000000' },
   'Validé': { fillColor: '#C7F0C2', textColor: '#000000' },
   'Rejeté': { fillColor: '#F2C2C2', textColor: '#000000' },
   [DECISION_MIXED]: { fillColor: '#D9C8F5', textColor: '#000000' },
 };
 
-export const isDecided = (d: string) => d === 'Validé' || d === 'Rejeté' || d === DECISION_MIXED;
 
 /** Excluded from proposals: rejected or mixed identity. */
-export const isExcluded = (d: string) => d === 'Rejeté' || d === DECISION_MIXED;
+const isExcluded = (d: string) => d === 'Rejeté' || d === DECISION_MIXED;
 
-export const reviewDecisionColumns = (table: string): { id: string; fields: Record<string, any> }[] => [
+const reviewDecisionColumns = (table: string): { id: string; fields: Record<string, any> }[] => [
   { id: 'Decision', fields: { label: 'Décision', type: 'Choice', widgetOptions: JSON.stringify({ choices: REVIEW_DECISIONS, choiceOptions: DECISION_CHOICE_OPTIONS }) } },
   { id: 'Note', fields: { label: 'Note (identité mêlée : qui possède quoi)', type: 'Text' } },
   { id: 'Signale_le', fields: { label: 'Signalé à la source le', type: 'Text' } },
@@ -636,7 +627,7 @@ export const reviewDecisionColumns = (table: string): { id: string; fields: Reco
 /** « Identité mêlée » row of the Alignement_IdRef table → ReviewMixedItem. The record id is found
  * by uid_dyna in the Annuaire index: the IdRef table has no Annuaire_id column (unlike the
  * ORCID/HAL/OpenAlex tables of the scripts), `G-${Annuaire_id}` always gave « G- » (review lot 2, finding 9). */
-export const idrefMelee = (r: any, byUid: Record<string, any>): ReviewMixedItem => {
+const idrefMelee = (r: any, byUid: Record<string, any>): ReviewMixedItem => {
   const uid = String(r.fields['uid_dyna'] || '');
   const rowId = byUid[uid]?.id ?? r.fields['Annuaire_id'] ?? '';
   const ppn = String(r.fields['PPN_candidat'] || '').match(/([0-9]{6,}[0-9X])/i)?.[1]?.toUpperCase() || '';
@@ -737,7 +728,7 @@ export const buildIdrefReviewColumns = (): { id: string; fields: Record<string, 
 
 /** What a diff computation reads: the Annuaire rows, the cache of the alignment script (null when absent) and the
  * rows of the review table of the source (null when the table does not exist yet). */
-export interface AlignInputs {
+interface AlignInputs {
   records: GristRecord[];
   cache: Record<string, any> | null;
   reviewRecords: GristRecord[] | null;
@@ -751,7 +742,7 @@ export interface AlignInputs {
  * - verify: aEnrichir (ORCID/IdHAL missing), conflicts (value ≠ record / diverging name)
  * NEVER proposes to overwrite a non-empty cell (same rule as LDAP).
  */
-export function computeIdrefDiffFrom(mode: 'search' | 'verify', inputs: AlignInputs, texts: AlignTexts): IdrefDiff {
+function computeIdrefDiffFrom(mode: 'search' | 'verify', inputs: AlignInputs, texts: AlignTexts): IdrefDiff {
   const cache: Record<string, any> = inputs.cache || {};
 
   const records = inputs.records;
@@ -1319,7 +1310,7 @@ export function computeAlignDiffFrom(source: AlignSource, mode: AlignMode, input
 
 /** Inputs of a unified diff: the Annuaire rows and, per source, the cache and the review rows (IdRef: the Solr cache
  * `idref` and, where the instance has it, the Qualinka cache `idrefQualinka`). */
-export interface UnifiedAlignInputs {
+interface UnifiedAlignInputs {
   records: GristRecord[];
   caches: Partial<Record<UnifiedAlignSource | 'idrefQualinka', Record<string, any> | null>>;
   reviewRecords: Partial<Record<UnifiedAlignSource, GristRecord[] | null>>;
@@ -1401,7 +1392,7 @@ export function unifiedUpdatePatches(updates: PersonAlignUpdate[], byId: Record<
 }
 
 /** Review rows of a rejection (blacklist): created, or set to the decision when the (uid, candidate) row exists. */
-export interface ReviewWrites {
+interface ReviewWrites {
   toCreate: Record<string, any>[];
   toPatch: { id: number; fields: Record<string, any> }[];
 }

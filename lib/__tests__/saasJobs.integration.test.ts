@@ -7,7 +7,6 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { gzipSync } from 'node:zlib';
 import { spawn } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';

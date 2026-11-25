@@ -40,7 +40,7 @@ export const acceptedTypesFromEnv = (env: Record<string, string | undefined>): G
 /** uid (type) of an action, for the logs: never the identifier value. */
 const label = (a: { uid: string; type: string }) => `${a.uid} (${a.type})`;
 
-export interface GraphPassReport {
+interface GraphPassReport {
   mode: GraphActionsMode;
   /** Removals newly queued, blocked, unblocked and cancelled by this pass (dry-run: what it would do). */
   planned: { queued: string[]; blocked: string[]; unblocked: number; cancelled: number; unreadable: string[]; orphans: number };
@@ -48,7 +48,7 @@ export interface GraphPassReport {
   failed: { action: string; error: string }[];
 }
 
-export interface GraphPassOptions {
+interface GraphPassOptions {
   db: Kysely<DB>;
   mode: GraphActionsMode;
   openBus: () => Promise<GraphBus>;
@@ -116,7 +116,7 @@ export const runGraphPass = async ({
   return report;
 };
 
-export interface PeopleCsvPreparation {
+interface PeopleCsvPreparation {
   pass: GraphPassReport | null;
   /** More removals to send than one pass allows: nothing was sent, an administrator checks the plan and forces it. */
   refused: number;

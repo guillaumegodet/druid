@@ -12,8 +12,7 @@ import { enqueueJob, type Job, type JobType, type SaasDb } from './controlPlane'
 
 export const PEOPLE_ALIGN_SOURCES = ['idref', 'orcid', 'hal', 'openalex', 'scopus'] as const;
 export type PeopleAlignSource = typeof PEOPLE_ALIGN_SOURCES[number];
-export const ALIGN_GROUPS = ['personnel', 'doctorants', 'hors_recherche'] as const;
-export type AlignGroup = typeof ALIGN_GROUPS[number];
+const ALIGN_GROUPS = ['personnel', 'doctorants', 'hors_recherche'] as const;
 
 const optionalText = (max: number) => z.string().trim().max(max).optional().transform((v) => v || undefined);
 
@@ -51,14 +50,14 @@ export const EtlBuildParams = z.object({
 export type EtlBuildParams = z.infer<typeof EtlBuildParams>;
 
 /** Types a member may ask for (the others, `tenant.provision`, are internal). */
-export const USER_JOB_TYPES: Record<string, z.ZodType<Record<string, unknown>, any>> = {
+const USER_JOB_TYPES: Record<string, z.ZodType<Record<string, unknown>, any>> = {
   'people.align': PeopleAlignParams as unknown as z.ZodType<Record<string, unknown>, any>,
   'structures.align': StructuresAlignParams as unknown as z.ZodType<Record<string, unknown>, any>,
   'etl.build': EtlBuildParams as unknown as z.ZodType<Record<string, unknown>, any>,
 };
 export const isUserJobType = (type: unknown): type is JobType => typeof type === 'string' && type in USER_JOB_TYPES;
 
-export type ParsedParams = { ok: true; params: Record<string, unknown> } | { ok: false; issues: string[] };
+type ParsedParams = { ok: true; params: Record<string, unknown> } | { ok: false; issues: string[] };
 export const parseJobParams = (type: string, raw: unknown): ParsedParams => {
   const schema = USER_JOB_TYPES[type];
   if (!schema) return { ok: false, issues: [`unknown job type ${type}`] };
@@ -91,7 +90,7 @@ export const structuresAlignParamsOfQuery = (q: URLSearchParams): unknown => ({
 });
 
 /** Shape of the progress files of server.cjs (lib/unifiedAlignRuns.ts UnifiedRunProgress), from a job row. */
-export interface LegacyProgress {
+interface LegacyProgress {
   running: boolean;
   total: number;
   done: number;
@@ -106,7 +105,7 @@ export interface LegacyProgress {
   finishedAt?: string | null;
   step?: string;
 }
-export const lastLogLine = (job: Pick<Job, 'log'>): string => (job.log || '').split('\n').filter(Boolean).slice(-1)[0] || '';
+const lastLogLine = (job: Pick<Job, 'log'>): string => (job.log || '').split('\n').filter(Boolean).slice(-1)[0] || '';
 export const legacyProgressOf = (job: Job | null): LegacyProgress => {
   if (!job) return { running: false, total: 0, done: 0 };
   const p = (job.progress || {}) as Record<string, unknown>;

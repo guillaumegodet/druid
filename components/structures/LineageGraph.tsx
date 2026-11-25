@@ -1,6 +1,6 @@
 import React from 'react';
-import { ArrowRight, History, GitMerge, GitBranch } from 'lucide-react';
-import { Structure, LineageType, LineageLink } from '../../types';
+import { History } from 'lucide-react';
+import { Structure, LineageType } from '../../types';
 
 interface LineageGraphProps {
   currentStructure: Structure;
@@ -29,13 +29,6 @@ export const LineageGraph: React.FC<LineageGraphProps> = ({ currentStructure }) 
     );
   }
 
-  const getTypeIcon = (type: LineageType) => {
-    switch (type) {
-      case LineageType.FUSION: return <GitMerge className="w-4 h-4" />;
-      case LineageType.SCISSION: return <GitBranch className="w-4 h-4" />;
-      default: return <History className="w-4 h-4" />;
-    }
-  };
 
   const getTypeColor = (type: LineageType) => {
     switch (type) {

@@ -372,17 +372,4 @@ export interface Structure {
   rawParticipations?: string;
 }
 
-/** Option for the synchronization menus */
-export interface SyncOption {
-  id: string;
-  label: string;
-  icon?: string;
-}
 
-/** Comparison structure for bidirectional updates */
-export interface ComparisonField {
-  key: string;
-  label: string;
-  localValue: string | null;
-  remoteValue: string | null;
-}

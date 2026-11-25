@@ -43,7 +43,7 @@ export interface LdapMoves {
   departures: LdapMovePerson[];
 }
 
-export interface LdapArrival extends LdapMovePerson {
+interface LdapArrival extends LdapMovePerson {
   /** Labs found among the affectations (principal first), '' entries excluded. */
   labs: string[];
   /** Pre-created account (dynaEtat A): the arrival is still to come. */

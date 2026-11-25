@@ -10,7 +10,7 @@ import type { DB } from './schema.gen';
 export type { DB };
 export type Db = Kysely<DB>;
 /** What `createDbWith` needs from node-postgres. */
-export type PgDriver = Pick<typeof pg, 'Pool' | 'types'>;
+type PgDriver = Pick<typeof pg, 'Pool' | 'types'>;
 
 // `date` columns stay 'YYYY-MM-DD' strings (no JavaScript Date at local midnight): same choice as the generated types.
 const DATE_OID = 1082;

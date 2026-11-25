@@ -207,7 +207,7 @@ const CellDrawer: React.FC<DrawerProps> = ({ type, row, cell, selected, onToggle
   );
 };
 
-export interface StructureAlignPanelProps {
+interface StructureAlignPanelProps {
   writable: boolean;
   onToast: (text: string) => void;
 }

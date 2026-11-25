@@ -25,7 +25,7 @@ both also however therefore thus can may will more most less than then them this
     .filter(Boolean),
 );
 
-export interface KeywordFreq {
+interface KeywordFreq {
   word: string;
   count: number;
 }

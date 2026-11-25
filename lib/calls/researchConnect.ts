@@ -7,9 +7,9 @@
 // Decision D7: these calls stay in the instance that holds the subscription (source `researchconnect`).
 import { categoryOf, dayOf } from './manual';
 
-export const RESEARCHCONNECT_SOURCE = 'researchconnect';
+const RESEARCHCONNECT_SOURCE = 'researchconnect';
 
-export interface ResearchConnectFund {
+interface ResearchConnectFund {
   fundId: string;
   title: string;
   status: string;

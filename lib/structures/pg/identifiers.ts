@@ -31,7 +31,7 @@ export const readStructureIdentifiers = async (db: any, structureIds?: number[])
   return out;
 };
 
-export interface ConfirmOptions {
+interface ConfirmOptions {
   source: string;
   /** Make it the primary of its type (default: when the type is single-valued or has no primary yet). */
   primary?: boolean;

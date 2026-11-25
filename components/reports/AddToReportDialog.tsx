@@ -17,6 +17,7 @@ import {
 import { REPORT_LIMITS } from '../dashboard/report/definition';
 import { resolvePeriod } from '../dashboard/report/restrictDataset';
 import { reportsBackend, type ReportSummary, type StoredReport } from '../dashboard/report/reportsApi';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 const NEW = -1;
 
@@ -37,11 +38,7 @@ export const AddToReportDialog: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [done, setDone] = useState<{ id: number; name: string } | null>(null);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   // Reports the user may edit: their own and those shared with them as editor.
   useEffect(() => {

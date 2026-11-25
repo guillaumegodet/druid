@@ -37,7 +37,7 @@ const FETCHERS: Record<RemoteSource, (r: RemoteRequest) => Promise<unknown>> = {
 const cache = new Map<string, Promise<unknown>>();
 const CACHE_MAX = 40;
 
-export function loadRemote(r: RemoteRequest): Promise<unknown> {
+function loadRemote(r: RemoteRequest): Promise<unknown> {
   let p = cache.get(r.key);
   if (!p) {
     p = FETCHERS[r.source](r).then(

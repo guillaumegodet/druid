@@ -8,7 +8,7 @@ const TEXT_COLUMNS = [
   'chercheur_nom', 'chercheur_email', 'chercheur_photo', 'chercheur_url', 'valide_par', 'commentaire',
 ] as const;
 
-export interface NewsletterImportRow extends Record<(typeof TEXT_COLUMNS)[number], string> {
+interface NewsletterImportRow extends Record<(typeof TEXT_COLUMNS)[number], string> {
   slug: string;
   work_id: string;
   statut: NewsletterStatus;
@@ -16,7 +16,7 @@ export interface NewsletterImportRow extends Record<(typeof TEXT_COLUMNS)[number
   valide_le: Date | null;
 }
 
-export interface NewsletterImportPlan {
+interface NewsletterImportPlan {
   rows: NewsletterImportRow[];
   /** Items already in PostgreSQL (same structure and work): left as they are. */
   alreadyPresent: number;

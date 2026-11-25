@@ -73,7 +73,7 @@ export interface ChartParamDef {
 
 export type ChartParams = Record<string, number | string>;
 
-export interface ChartMeta {
+interface ChartMeta {
   /** DashboardPage tab (same keys as REPORT_SECTIONS). */
   tab: string;
   requires?: DatasetFeature[];
@@ -111,7 +111,7 @@ const charte = (extra: Partial<ChartMeta> = {}): ChartMeta => ({
  * and table: which pairs (different labs or poles, or one couple of poles `A|B`), scope, lab
  * membership, minimum joint publications, distant profiles only, PhD students, large collaborations.
  */
-export const PAIRS_PARAMS: ChartParamDef[] = [
+const PAIRS_PARAMS: ChartParamDef[] = [
   { key: 'relation', values: ['lab', 'pole'], default: 'lab' },
   { key: 'poles', pattern: '^[^|,]{1,18}\\|[^|,]{1,18}$' },
   { key: 'scope', values: ['all', 'structure'], default: 'all' },

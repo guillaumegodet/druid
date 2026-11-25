@@ -6,11 +6,11 @@ import { AuthorMeta, DashboardPublication } from './types';
 import { YearRange } from './overviewAggregates';
 import { TEAM_UNKNOWN } from './structureAggregates';
 
-export const QUARTILES = ['Q1', 'Q2', 'Q3', 'Q4'];
+const QUARTILES = ['Q1', 'Q2', 'Q3', 'Q4'];
 
 export const FWCI_REFERENCE = 1.0;
 /** Display bound of the FWCI histogram (the long tail is folded). */
-export const FWCI_CAP = 8;
+const FWCI_CAP = 8;
 export const FWCI_BIN_WIDTH = 0.5;
 
 export interface ImpactKpis {
@@ -24,7 +24,7 @@ export interface ImpactKpis {
   fwciMean: number | null;
 }
 
-export interface ImpactAggregates {
+interface ImpactAggregates {
   kpis: ImpactKpis;
   quartiles: { key: string; count: number }[];
   quartileKnown: number;
@@ -119,7 +119,7 @@ export interface ImpactGroupRow {
  * publication (sub-structures, teams or authors); only publications with a
  * known FWCI are considered, as in the Streamlit.
  */
-export function aggregateImpactByGroup(
+function aggregateImpactByGroup(
   pubs: DashboardPublication[],
   range: YearRange,
   groupsOf: (p: DashboardPublication) => string[],
@@ -180,14 +180,14 @@ export function impactRowsByGrouping(
 }
 
 /** « chercheur » (researcher) groups: labels of the internal authors of a publication. */
-export function researcherGroupsOf(authors: AuthorMeta[]): (p: DashboardPublication) => string[] {
+function researcherGroupsOf(authors: AuthorMeta[]): (p: DashboardPublication) => string[] {
   const byId = new Map(authors.map((a) => [a.id, a.label]));
   return (p) => p.authorIds.map((id) => byId.get(id)).filter((l): l is string => !!l);
 }
 
 // ── Table of the most cited publications ─────────────────────────────────────
 
-export interface TopPublicationRow {
+interface TopPublicationRow {
   year: number | null;
   title: string | null;
   doi: string | null;

@@ -27,7 +27,7 @@ const FIELD_ORDER = [
  * GristService.mergeAnnuaireRows (logged in Fusions_log, restorable).
  */
 export const MergeResearchersModal: React.FC<MergeResearchersModalProps> = ({ rowIds, onClose, onMerged }) => {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
   const [rows, setRows] = useState<MergeRow[] | null>(null);
   const [columns, setColumns] = useState<AnnuaireColumnMeta[]>([]);
   const [etab, setEtab] = useState<Record<number, string>>({});

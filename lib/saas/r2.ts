@@ -53,7 +53,7 @@ export const EMPTY_PAYLOAD_HASH = sha256Hex('');
 const encodeSegment = (s: string): string => encodeURIComponent(s).replace(/[!'()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`);
 export const canonicalUri = (pathname: string): string => pathname.split('/').map((seg) => encodeSegment(decodeURIComponent(seg))).join('/') || '/';
 
-export interface SignInput {
+interface SignInput {
   method: string;
   url: URL;
   /** Headers to sign, `host` added when missing; names are lower-cased. */
@@ -89,7 +89,7 @@ export const signS3Request = ({ method, url, headers, payloadHash, amzDate, regi
   return h;
 };
 
-export interface S3StoreOptions {
+interface S3StoreOptions {
   /** `https://<account id>.r2.cloudflarestorage.com` (R2) or any S3 endpoint; path-style URLs. */
   endpoint: string;
   bucket: string;

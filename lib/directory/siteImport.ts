@@ -22,7 +22,7 @@ import { z } from 'zod';
 import { MEMBERSHIP_TYPES, StructureLevel, type MembershipType, type Researcher, type Structure } from '../../types';
 import type { Institution } from './gristMapping';
 
-export const SITE_IMPORT_FORMAT = 'druid-site-import';
+const SITE_IMPORT_FORMAT = 'druid-site-import';
 
 const Text = z.string().trim().max(2000).optional().default('');
 export const SitePersonSchema = z.object({
@@ -51,7 +51,7 @@ export const SitePersonSchema = z.object({
 export type SitePerson = z.infer<typeof SitePersonSchema>;
 
 /** A team (or research theme) of the lab as the site presents it. */
-export const SiteTeamSchema = z.object({
+const SiteTeamSchema = z.object({
   acronym: z.string().trim().min(1).max(50),
   name: Text,
   description: z.string().trim().max(10000).optional().default(''),
@@ -70,15 +70,15 @@ export const SiteImportDocumentSchema = z.object({
   /** Teams of the lab on the site (optional): the ones missing under the lab are proposed for creation. */
   teams: z.array(SiteTeamSchema).max(200).optional().default([]),
 });
-export type SiteImportDocument = z.infer<typeof SiteImportDocumentSchema>;
+type SiteImportDocument = z.infer<typeof SiteImportDocumentSchema>;
 
 /** Fields the import may fill in (complement) or replace (difference ticked by the user). */
 export type SiteField = 'email' | 'team' | 'profileUrl' | 'directoryUrl' | 'grade' | 'photoUrl' | 'membershipType';
-export const SITE_FIELDS: SiteField[] = ['email', 'team', 'profileUrl', 'directoryUrl', 'grade', 'photoUrl', 'membershipType'];
+const SITE_FIELDS: SiteField[] = ['email', 'team', 'profileUrl', 'directoryUrl', 'grade', 'photoUrl', 'membershipType'];
 /** Fields never overwritten: a photo is only added where there is none. */
 const COMPLEMENT_ONLY: SiteField[] = ['photoUrl'];
 
-export type MatchedBy = 'uid' | 'email' | 'name' | 'firstName' | 'lastName';
+type MatchedBy = 'uid' | 'email' | 'name' | 'firstName' | 'lastName';
 
 export interface SiteImportCreation {
   /** Index of the person in the file (stable key of the review). */
@@ -361,7 +361,7 @@ export interface SiteImportCommands {
 }
 
 /** Site presence → validated presence (INTERNE / EXTERNE written by older parsers read as PRESENT). */
-export const presenceOfSite = (status: string): 'PRESENT' | 'DEPART' | 'PARTI' => {
+const presenceOfSite = (status: string): 'PRESENT' | 'DEPART' | 'PARTI' => {
   const s = status.trim().toUpperCase();
   return s === 'DEPART' || s === 'PARTI' ? s : 'PRESENT';
 };
@@ -388,7 +388,7 @@ export const validationOf = (status: string, source: string, today: string, acto
 });
 
 /** A researcher with the site's values written on the given fields (the lab's membership for the team). */
-export const withSiteFields = (r: Researcher, lab: string, p: SitePerson, fields: SiteField[]): Researcher => {
+const withSiteFields = (r: Researcher, lab: string, p: SitePerson, fields: SiteField[]): Researcher => {
   const out: Researcher = structuredClone(r);
   for (const field of fields) {
     const v = p[field];
@@ -408,7 +408,7 @@ export const withSiteFields = (r: Researcher, lab: string, p: SitePerson, fields
 };
 
 /** New record of a site person (creation of the plan). */
-export const newResearcherOf = (c: SiteImportCreation, lab: string, source: string, validation: ReturnType<typeof validationOf> | null): Researcher => {
+const newResearcherOf = (c: SiteImportCreation, lab: string, source: string, validation: ReturnType<typeof validationOf> | null): Researcher => {
   const p = c.person;
   return {
     id: '', uid: p.uid, lastName: p.lastName, firstName: p.firstName, displayName: `${p.lastName.toUpperCase()} ${p.firstName}`.trim(),
@@ -491,7 +491,7 @@ export async function applySiteImport(args: {
 
   const toValidate = [...new Set(selection.validate)].map((index) => ({ index, m: matches.get(index) }));
   const entries: { recordId: number; validation: any }[] = [];
-  for (const { index, m } of toValidate) {
+  for (const { m } of toValidate) {
     if (!m || !m.toValidate || !m.recordId) { result.stale++; continue; }
     entries.push({ recordId: m.recordId, validation: validationOf(m.person.status, source, today, actor) });
   }

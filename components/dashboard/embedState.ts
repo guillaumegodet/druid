@@ -41,7 +41,7 @@ export function decodeEmbedParam(raw: string): unknown {
 }
 
 /** `error` set = the link is refused (and `filters` is empty). */
-export interface EmbedFiltersResult {
+interface EmbedFiltersResult {
   filters: PubFilters;
   error: 'malformed' | 'forbidden' | null;
 }

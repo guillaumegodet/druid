@@ -14,7 +14,7 @@ import { createPgDirectoryRepository } from './repository';
 import { createPgTableClient } from './tableClient';
 import { createPgStructureAlignCommands } from '../../structures/pg/alignCommands';
 
-export interface PgStorageOptions {
+interface PgStorageOptions {
   db: Db;
   /** LDAP status cache of the instance (Nantes); absent on Cloudflare. */
   loadLdapCache?: () => Promise<LdapCacheSnapshot>;
@@ -45,4 +45,3 @@ export const createPgStorage = ({ db, loadLdapCache, gristPublications, tablesAc
     structureAlign: createPgStructureAlignCommands({ db, repository }),
   };
 };
-export type PgStorage = ReturnType<typeof createPgStorage>;

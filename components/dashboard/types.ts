@@ -259,7 +259,7 @@ export interface OpenApcData {
  * queried live on /institutions/{id}, independent of the structure's
  * publication corpus (see Benchmark tab, work/druid/benchmark.md §4.1).
  */
-export interface BenchmarkOpenAlex {
+interface BenchmarkOpenAlex {
   openalexId: string;
   ror: string | null;
   worksCount: number | null;

@@ -117,12 +117,12 @@ export function impactKpiItems(kpis: ImpactKpis): KpiItem[] {
 }
 
 /** Context of a key-figure set: PartnerKpiContext, plus the remote payload of the sets that have one. */
-export interface KpiContext extends PartnerKpiContext {
+interface KpiContext extends PartnerKpiContext {
   /** Payload of the set's remote source (REMOTE_KPI_SETS of chartMeta.ts), e.g. a /pairs response. */
   remote?: unknown;
 }
 
-export interface KpiSet {
+interface KpiSet {
   label: MessageDescriptor;
   /**
    * `dataset` = restricted corpus of the block; `ctx` = the whole corpus of its structure and the

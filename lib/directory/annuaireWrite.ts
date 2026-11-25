@@ -27,7 +27,7 @@ export const toGristEpoch = (ymd: string): number | null => {
 export interface AnnuaireColumnMeta { id: string; label: string; type: string; isFormula: boolean }
 
 /** Row plan of a record's memberships, the write-side counterpart of `groupQualifiedRows`. */
-export interface AffiliationRowPlan {
+interface AffiliationRowPlan {
   /** Membership written on the record's own row (the PRINCIPAL one). */
   primary: Affiliation | undefined;
   /** `rattachement` of the record's row: PRINCIPAL when other rows exist, '' when the record is back to
@@ -77,7 +77,7 @@ export function planAffiliationRows(
  * `YYYY`, `YYYY-MM` or `YYYY-MM-DD`. Text columns once scripts/migrate_fuzzy_dates.cjs has run on the
  * document; still Date (epoch) columns before that — both are read, the writer adapts (see
  * `fuzzyDateCellEncoder`; a Date column keeps the first day of a year or month only). */
-export const FUZZY_DATE_COLS = ['employment_start_date', 'employment_end_date', AFFILIATION_START_COL, AFFILIATION_END_COL, BIRTH_DATE_COL] as const;
+const FUZZY_DATE_COLS = ['employment_start_date', 'employment_end_date', AFFILIATION_START_COL, AFFILIATION_END_COL, BIRTH_DATE_COL] as const;
 
 /** Encodes a Druid date (ISO YYYY-MM-DD, or legacy DD-MM-YYYY text) for a Grist Date column:
  * epoch seconds, the only valid representation whatever the column's `dateFormat`. Until
@@ -110,7 +110,7 @@ export const fuzzyDateEncoderFor = (columns: AnnuaireColumnMeta[] | null): Fuzzy
 
 /** `Employeur` (Reference to Etablissements) from the displayed label. Empty → 0 (reference cleared); a label
  * outside the list (legacy data) or institutions unknown → column left untouched. */
-export const employerFieldsFor = (institutions: Institution[] | null, employer?: string): Record<string, number> => {
+const employerFieldsFor = (institutions: Institution[] | null, employer?: string): Record<string, number> => {
   const name = (employer || '').trim();
   if (!name) return { 'Employeur': 0 };
   const match = (institutions || []).find((e) => e.name === name);
@@ -118,24 +118,24 @@ export const employerFieldsFor = (institutions: Institution[] | null, employer?:
 };
 
 /** FTE cells, columns of the document only (lib/fte.ts); columns unknown → nothing written. */
-export const fteFieldsFor = (columns: AnnuaireColumnMeta[] | null, values: { fte?: number | null; researchFte?: number | null }) =>
+const fteFieldsFor = (columns: AnnuaireColumnMeta[] | null, values: { fte?: number | null; researchFte?: number | null }) =>
   (columns ? fteGristFields(columns, values) : {});
 
 /** Directory page of the lab website (`annuaire_url`, filled by the site imports), only when it has a value — the
  * record form does not edit it — and when the Annuaire has the column. */
-export const directoryUrlFieldsFor = (columns: AnnuaireColumnMeta[] | null, url?: string): Record<string, string> => {
+const directoryUrlFieldsFor = (columns: AnnuaireColumnMeta[] | null, url?: string): Record<string, string> => {
   const value = (url || '').trim();
   return value && columns?.some((c) => c.id === 'annuaire_url') ? { 'annuaire_url': value } : {};
 };
 
 /** Secondary HAL identifiers (lib/halIds.ts), only when the Annuaire has the column and the record carries the field. */
-export const halIdNumSecondaryFieldsFor = (columns: AnnuaireColumnMeta[] | null, primary?: string, secondary?: string | null): Record<string, string | null> => {
+const halIdNumSecondaryFieldsFor = (columns: AnnuaireColumnMeta[] | null, primary?: string, secondary?: string | null): Record<string, string | null> => {
   if (secondary === undefined || secondary === null || !columns?.some((c) => c.id === HAL_ID_NUM_SECONDARY_COLUMN)) return {};
   return { [HAL_ID_NUM_SECONDARY_COLUMN]: joinHalIdNums(secondaryHalIdNums(primary, secondary)) || null };
 };
 
 /** HR staff number cell, only when the Annuaire has the column (instances without HR data do not). */
-export const hrIdFieldsFor = (columns: AnnuaireColumnMeta[] | null, hrId?: string): Record<string, number> => {
+const hrIdFieldsFor = (columns: AnnuaireColumnMeta[] | null, hrId?: string): Record<string, number> => {
   const cell = hrIdCell(hrId || '');
   if (cell === null || !columns) return {};
   return columns.some((c) => c.id === HR_ID_COLUMN) ? { [HR_ID_COLUMN]: cell } : {};

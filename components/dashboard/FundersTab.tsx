@@ -24,8 +24,8 @@ import {
 } from './EChartCard';
 import { numberLocale } from '../../lib/i18n';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
-import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
+import { csvCell, saveCsv } from '../../lib/download';
 
 const PAGE_SIZE = 25;
 const nf = (v: number) => v.toLocaleString(numberLocale());
@@ -245,28 +245,19 @@ export const FundersTab: React.FC<{ dataset: DashboardDataset; range: YearRange 
   const currentPage = Math.min(page, pageCount - 1);
   const pageRows = projects.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
-  const csvEscape = (v: string | number | null) => {
-    const s = (v ?? '').toString();
-    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-  };
   const downloadProjectsCsv = () => {
     const header = 'project_id,project_name,funder,category,source,n_publications';
     const lines = projects.map((p) =>
       [
-        csvEscape(p.projectId),
-        csvEscape(p.projectName),
-        csvEscape(p.funderName),
-        csvEscape(p.category),
-        csvEscape(p.source),
+        csvCell(p.projectId),
+        csvCell(p.projectName),
+        csvCell(p.funderName),
+        csvCell(p.category),
+        csvCell(p.source),
         p.count,
       ].join(','),
     );
-    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `financements_${dataset.slug}_${range.start}-${range.end}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`financements_${dataset.slug}_${range.start}-${range.end}.csv`, header, lines);
   };
 
   if (agg.fundedPubs === 0) {

@@ -10,7 +10,7 @@
 
 import type { DashboardDataset, DashboardPublication } from './types';
 
-export const isEditorialEntry = (p: Pick<DashboardPublication, 'isEditorialEntry'>): boolean =>
+const isEditorialEntry = (p: Pick<DashboardPublication, 'isEditorialEntry'>): boolean =>
   p.isEditorialEntry === true;
 
 /** False for the editor-signed entries: left out of the per-researcher counts. */
@@ -24,7 +24,7 @@ const NO_COLLABORATION = 'Pas de collaboration';
  * country, typology « Pas de collaboration ». Done once when the dataset is loaded, so that
  * every tab, filter, report and embed sees the same thing.
  */
-export function withoutCollaboration(p: DashboardPublication): DashboardPublication {
+function withoutCollaboration(p: DashboardPublication): DashboardPublication {
   const { nantesPartnersSource: _source, ...rest } = p;
   return {
     ...rest,

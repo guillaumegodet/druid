@@ -49,7 +49,7 @@ export const EmploymentSchema = z.object({
   ldapFields: z.array(z.string()).optional().default([]),
 });
 
-export const NURelatedSchema = z.object({
+const NURelatedSchema = z.object({
   pole: z.string().optional().nullable(),
   composante: z.string().optional().nullable(),
   location: z.string().optional().nullable(),
@@ -58,7 +58,7 @@ export const NURelatedSchema = z.object({
   hdrYear: z.string().optional().nullable(),
 });
 
-export const ResearcherIdentifiersSchema = z.object({
+const ResearcherIdentifiersSchema = z.object({
   orcid: z.string().optional().nullable(),
   idref: z.string().optional().nullable(),
   halId: z.string().optional().nullable(),
@@ -70,7 +70,7 @@ export const ResearcherIdentifiersSchema = z.object({
   openalexIds: z.string().optional().nullable(),
 });
 
-export const ValidationInfoSchema = z.object({
+const ValidationInfoSchema = z.object({
   validated: z.boolean().default(false),
   validatedStatus: z.nativeEnum(Presence).optional(),
   validationDate: z.string().optional(),
@@ -148,14 +148,14 @@ export const ResearcherSchema = z.object({
 
 // --- Structure Schemas ---
 
-export const LineageLinkSchema = z.object({
+const LineageLinkSchema = z.object({
   relatedStructureId: z.string(),
   relatedStructureName: z.string(),
   type: z.nativeEnum(LineageType),
   date: z.string(),
 });
 
-export const StructureIdentifiersSchema = z.object({
+const StructureIdentifiersSchema = z.object({
   halStructIds: z.array(z.string()).default([]),
   openalexIds: z.array(z.string()).default([]),
   idrefId: z.string().optional().nullable(),
@@ -173,7 +173,7 @@ const MembershipSchema = z.object({
   endDate: z.string().optional().nullable(),
 });
 
-export const StructureSchema = z.object({
+const StructureSchema = z.object({
   id: z.string(),
   localId: z.string().optional().nullable(),
   level: z.nativeEnum(StructureLevel).default(StructureLevel.ENTITE),

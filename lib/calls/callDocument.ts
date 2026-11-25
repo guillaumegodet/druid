@@ -18,7 +18,7 @@ import { EXTRACTION_SYSTEM, extractionPrompt, pageText, pageTitle, parseExtracti
 import { pdfToText } from './pdfText';
 import type { TranslatorSettings } from './translate';
 
-export const MAX_DOCUMENT_BYTES = 15 * 1024 * 1024;
+const MAX_DOCUMENT_BYTES = 15 * 1024 * 1024;
 const TIMEOUT_MS = 20000;
 const MAX_REDIRECTS = 5;
 

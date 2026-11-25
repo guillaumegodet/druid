@@ -22,25 +22,25 @@ import { FTE_COLUMNS } from './fte';
 
 /** LABO values that do not designate a lab: `zzz` = parking of LDAP people outside the
  *  lab scope (LDAP update of 2026-06-02, never validated), empty = record without affiliation. */
-export const PARKING_LABOS: ReadonlySet<string> = new Set(['zzz', '']);
+const PARKING_LABOS: ReadonlySet<string> = new Set(['zzz', '']);
 
 /** Columns merged by union (separator `|`, or line break for Commentaires). */
-export const MERGE_CONCAT_FIELDS: ReadonlySet<string> = new Set([
+const MERGE_CONCAT_FIELDS: ReadonlySet<string> = new Set([
   'Data_source', 'Commentaires', 'LDAP_champs_modifies', 'IdRef_champs_modifies',
   // Secondary HAL identifiers of the two records (the writer drops the one that is primary, lib/halIds.ts).
   'IdHAL_i_secondaires',
 ]);
 
 /** Columns of the validation block, arbitrated together. */
-export const VALIDATION_BLOCK: readonly string[] = [
+const VALIDATION_BLOCK: readonly string[] = [
   'validated', 'validated_status', 'validation_date', 'validation_source', 'validation_scope', 'validated_by',
 ];
 
 /** "Last update" columns (ISO dates): the most recent one is kept, no arbitration. */
-export const LATEST_WINS_FIELDS: ReadonlySet<string> = new Set(['LDAP_derniere_maj', 'IdRef_derniere_maj']);
+const LATEST_WINS_FIELDS: ReadonlySet<string> = new Set(['LDAP_derniere_maj', 'IdRef_derniere_maj']);
 
 /** Columns never copied (technical or derived). */
-export const MERGE_SKIP_FIELDS: ReadonlySet<string> = new Set(['id', 'manualSort']);
+const MERGE_SKIP_FIELDS: ReadonlySet<string> = new Set(['id', 'manualSort']);
 
 /** Class of a group of rows sharing a uid_dyna (see docs/archive/plan-fusion-doublons.md). */
 export type LdapDuplicateKind = 'same_labo' | 'parking' | 'multi_labo';
@@ -128,7 +128,7 @@ const hasLdapSource = (f: Record<string, any>): boolean =>
   String(f['Data_source'] || '').split(/[|,]/).map((s) => s.trim().toUpperCase()).includes('LDAP');
 
 /** Number of filled fields (excluding technical ones) — rough measure of "richness". */
-export const filledCount = (f: Record<string, any>): number =>
+const filledCount = (f: Record<string, any>): number =>
   Object.entries(f).filter(([k, v]) => !MERGE_SKIP_FIELDS.has(k) && !isEmpty(v)).length;
 
 /**
@@ -218,7 +218,7 @@ export function buildMergeProposal(keep: MergeRow, drop: MergeRow, columns: Merg
 }
 
 /** Union of two trace values (separator `|`, except Commentaires = lines). */
-export function concatValues(col: string, a: any, b: any): string {
+function concatValues(col: string, a: any, b: any): string {
   const sep = col === 'Commentaires' ? '\n' : '|';
   const parts = [...String(a ?? '').split(sep), ...String(b ?? '').split(sep)].map((s) => s.trim()).filter(Boolean);
   return Array.from(new Set(parts)).join(sep);
@@ -258,7 +258,7 @@ export function resolveMergeFields(p: MergeProposal, today: string): Record<stri
 }
 
 /** Conflicts tolerated by the automatic merge: spellings and formats, not data. */
-export const AUTO_MERGE_OK_CONFLICTS: ReadonlySet<string> = new Set(['Nom', 'Prenom', 'Civilite', 'LABO']);
+const AUTO_MERGE_OK_CONFLICTS: ReadonlySet<string> = new Set(['Nom', 'Prenom', 'Civilite', 'LABO']);
 
 /**
  * Can a merge be done without human review? Yes if:

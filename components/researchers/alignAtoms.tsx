@@ -11,7 +11,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
  * when those were removed on 2026-09-23 (docs/archive/plan-alignement-unifie.md, lot 7).
  */
 
-export type Decision = 'confirm' | 'detach' | 'ignore';
+type Decision = 'confirm' | 'detach' | 'ignore';
 
 export const StatCard: React.FC<{ label: string; value: number; tone?: string }> = ({ label, value, tone = 'bg-white/60 dark:bg-white/5' }) => (
   <div className={`rounded-card border border-white/70 dark:border-white/10 backdrop-blur-xl p-3 shadow-soft ${tone}`}>
@@ -20,7 +20,7 @@ export const StatCard: React.FC<{ label: string; value: number; tone?: string }>
   </div>
 );
 
-export const SectionTitle: React.FC<{ icon: React.ReactNode; children: React.ReactNode }> = ({ icon, children }) => (
+const SectionTitle: React.FC<{ icon: React.ReactNode; children: React.ReactNode }> = ({ icon, children }) => (
   <div className="flex items-center gap-2 pb-2 mb-3 border-b border-ink/5 dark:border-white/5 text-muted-lighter dark:text-[#8f897c]">
     {icon}
     <h3 className="font-disp text-base font-bold tracking-tight text-ink dark:text-[#f5f2ea]">{children}</h3>
@@ -184,7 +184,7 @@ export const ArbitrageCard: React.FC<{ a: IdrefDiff['aArbitrer'][number]; dec?: 
 };
 
 /** Score badge (strong / medium / weak) — exported for UnifiedAlignPage (lot 2). */
-export const ScoreBadge: React.FC<{ score?: AlignCandidate['score'] }> = ({ score }) => {
+const ScoreBadge: React.FC<{ score?: AlignCandidate['score'] }> = ({ score }) => {
   const { t } = useLingui();
   if (!score) return null;
   const cls = score === 'fort'

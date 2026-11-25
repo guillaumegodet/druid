@@ -8,7 +8,7 @@
 import { htmlToText } from './ftPortal';
 import type { CallStatus } from './programmes';
 
-export const ANR_SITE = 'https://anr.fr';
+const ANR_SITE = 'https://anr.fr';
 export const ANR_LISTING_URL = `${ANR_SITE}/fr/appels/`;
 /** Page of an edition of the generic call; anr.fr redirects it to the page of the call. */
 export const aapgPageUrl = (year: number): string => `${ANR_SITE}/fr/aapg-${year}/`;
@@ -30,7 +30,7 @@ const text = (html: string): string => htmlToText(html).replace(/\s+/g, ' ').tri
 const absolute = (href: string): string => (/^https?:/i.test(href) ? href : `${ANR_SITE}${href.startsWith('/') ? '' : '/'}${href}`);
 
 /** Type of a call from the tag of its card (2 = specific, 5 = France 2030), the label as a fallback. */
-export const anrCallType = (tag: string, label: string): AnrCallType => {
+const anrCallType = (tag: string, label: string): AnrCallType => {
   if (tag === '5' || /france\s*2030/i.test(label)) return 'france-2030';
   if (/g[ée]n[ée]rique/i.test(label)) return 'generic';
   if (tag === '2' || /sp[ée]cifique/i.test(label)) return 'specific';

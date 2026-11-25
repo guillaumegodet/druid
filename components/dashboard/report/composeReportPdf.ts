@@ -21,14 +21,14 @@ import { aiFrameLabel } from './reportAi';
 import type { CapturedChart } from './ReportRenderer';
 import type { BlockScope, ResolvedReport } from './resolveReport';
 
-export const periodLabel = (s: BlockScope): string =>
+const periodLabel = (s: BlockScope): string =>
   s.range.start === s.range.end ? String(s.range.start) : `${s.range.start} – ${s.range.end}`;
 
-export const perimetreLabel = (p: BlockScope['perimetre']): string =>
+const perimetreLabel = (p: BlockScope['perimetre']): string =>
   p === 'effectifs' ? i18n._(msg`Headcount`) : i18n._(msg`Affiliation`);
 
 /** Human-readable filters of a scope (free-text search included). */
-export function filtersLabel(scope: BlockScope, dataset: DashboardDataset | null | undefined): string {
+function filtersLabel(scope: BlockScope, dataset: DashboardDataset | null | undefined): string {
   const chips = dataset ? describeFilters(scope.filters, buildFilterContext(dataset)).map((c) => c.label) : [];
   if (scope.filters.q?.trim()) chips.unshift(`“${scope.filters.q.trim()}”`);
   return chips.join(' · ');
@@ -37,7 +37,7 @@ export function filtersLabel(scope: BlockScope, dataset: DashboardDataset | null
 const slugify = (s: string) =>
   s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60) || 'rapport';
 
-export interface ComposeInput {
+interface ComposeInput {
   definition: ReportDefinition;
   resolved: ResolvedReport;
   /** Unfiltered dataset of each structure (labels of the structure and of the filters). */

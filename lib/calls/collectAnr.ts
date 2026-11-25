@@ -11,7 +11,7 @@ import { aapgPageUrl, aapgTextUrl, ANR_LISTING_URL, parseAapgAxes, parseAnrCallP
 import { contentHashOf, type CollectedCall, type CollectorStore, type CollectStats, type StoredCallSummary } from './collect';
 import { statusFromDeadlines, type Programme } from './programmes';
 
-export interface AnrCollectOptions {
+interface AnrCollectOptions {
   /** Programmes to collect (anr-aapg, anr-specific, france-2030; the active ones of the source). */
   programmes: Programme[];
   /** HTML of a page; null when the page does not exist (404). Throws on another failure. */
@@ -35,7 +35,7 @@ const programmeOfCard = (card: AnrListedCall): string | null => {
 };
 
 /** Stored row of a specific or France 2030 call. */
-export const anrCollectedCall = (card: AnrListedCall, programmeId: string, page: AnrCallPage): CollectedCall => {
+const anrCollectedCall = (card: AnrListedCall, programmeId: string, page: AnrCallPage): CollectedCall => {
   const scope = page.text || card.abstract;
   const taxonomy: Record<string, string> = {};
   if (card.typeLabel) taxonomy.typeOfAction = card.typeLabel;
@@ -47,7 +47,7 @@ export const anrCollectedCall = (card: AnrListedCall, programmeId: string, page:
 };
 
 /** Stored row of an axis of the generic call; the axis has no page of its own, its url is the page of the call. */
-export const aapgCollectedCall = (year: number, axis: AapgAxis, page: AnrCallPage, url: string): CollectedCall => {
+const aapgCollectedCall = (year: number, axis: AapgAxis, page: AnrCallPage, url: string): CollectedCall => {
   const taxonomy: Record<string, string> = { call: `AAPG-${year}`, callTitle: page.title, axis: axis.code, domain: axis.domain };
   if (axis.keywords.length) taxonomy.keywords = axis.keywords.join('; ');
   if (axis.ercPanels.length) taxonomy.ercPanels = axis.ercPanels.join(', ');
@@ -64,7 +64,7 @@ export const aapgCollectedCall = (year: number, axis: AapgAxis, page: AnrCallPag
 
 const sameDates = (a: readonly string[], b: readonly string[]): boolean => a.length === b.length && a.every((d, i) => d === b[i]);
 /** Whether the stored call already says all that the collected one says. */
-export const unchanged = (stored: StoredCallSummary | undefined, call: CollectedCall): boolean =>
+const unchanged = (stored: StoredCallSummary | undefined, call: CollectedCall): boolean =>
   !!stored && stored.hasText && stored.title === call.title && stored.status === call.status
   && (stored.openingDate ?? null) === (call.openingDate ?? null) && sameDates(stored.deadlines, call.deadlines)
   && stored.contentHash === call.contentHash;

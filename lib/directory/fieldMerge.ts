@@ -175,7 +175,7 @@ export const resolveField = (field: string, rows: readonly FieldValue[], ranks: 
 
 // ── Writes (what to store, decided here so that every importer behaves the same) ───────────────────────────────────
 
-export interface ObservationInput {
+interface ObservationInput {
   field: string;
   source: string;
   /** Raw value from the source; empty = the source has no value. */

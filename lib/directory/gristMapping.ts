@@ -26,7 +26,7 @@ export interface GristRecord {
 export const RATTACHEMENT_COL = 'rattachement';
 
 // Business rules of the people (storage-independent since lot 6): re-exported for the existing importers.
-export { RATTACHEMENT_CHOICES, assignPublicIds, groupQualifiedRows, slugForExtId } from './people';
+export { RATTACHEMENT_CHOICES, groupQualifiedRows } from './people';
 export type { RattachementRole } from './people';
 
 export const DUPLICATE_DECISION_COL = 'doublon_decision';
@@ -74,7 +74,7 @@ export const BIRTH_DATE_COL = 'DATE_DE_NAISSANCE_JJ_MM_AAAA';
 /** Membership type (Grist Choice: stat_mmb / assoc_mmb / second_mmb / visit_mmb, created on 2026-09-14). */
 export const MEMBERSHIP_TYPE_COL = 'membership_type';
 
-export const toMembershipType = (v: any): MembershipType | undefined =>
+const toMembershipType = (v: any): MembershipType | undefined =>
   (MEMBERSHIP_TYPES as string[]).includes(String(v || '').trim()) ? (String(v).trim() as MembershipType) : undefined;
 
 /** Reads a fuzzy-date cell (epoch seconds, canonical text, or legacy DD-MM-YYYY text) → canonical
@@ -103,7 +103,7 @@ export const parseMultiLabel = (raw: any, preferLang = 'fr'): string => {
  * Keeps ONLY the institution refs (`uai-`/`ror-`), not the participations in
  * other research structures (`local-`, see parseStructureParticipations).
  */
-export const parseParticipations = (raw: any): { codes: string[]; pipe: string } => {
+const parseParticipations = (raw: any): { codes: string[]; pipe: string } => {
   if (!raw || typeof raw !== 'string') return { codes: [], pipe: '' };
   const codes = raw.split('|')
     .map(p => p.trim())
@@ -119,7 +119,7 @@ export const parseParticipations = (raw: any): { codes: string[]; pipe: string }
  * of the V2 `participations` field — e.g. the weak membership of a lab in a pole.
  * Returns the bare local_ids (without the `local-` prefix) and their `|` join.
  */
-export const parseStructureParticipations = (raw: any): { localIds: string[]; pipe: string } => {
+const parseStructureParticipations = (raw: any): { localIds: string[]; pipe: string } => {
   if (!raw || typeof raw !== 'string') return { localIds: [], pipe: '' };
   const localIds = raw.split('|')
     .map(p => p.trim())
@@ -141,7 +141,7 @@ export const parseStructureParticipations = (raw: any): { localIds: string[]; pi
  * or type ER (RNSR research team)
  * unit (2)         : UMR, UR, … (default)
  */
-export const deriveStructureLevel = (genericType: any, type?: any): string => {
+const deriveStructureLevel = (genericType: any, type?: any): string => {
   const gt = String(genericType || '').toLowerCase();
   const t = String(type || '').toUpperCase();
   if (gt === 'institution' || t === 'EPE' || t === 'GE') return '4';
@@ -151,7 +151,7 @@ export const deriveStructureLevel = (genericType: any, type?: any): string => {
 };
 
 /** V2 `main_mission`/`secondary_missions` (texte) -> StructureMission Druid. */
-export const missionFromV2 = (raw: any): string | null => {
+const missionFromV2 = (raw: any): string | null => {
   const v = String(raw || '').toLowerCase();
   if (!v) return null;
   if (v.includes('research') || v.includes('recherche')) return 'RECHERCHE';
@@ -161,12 +161,12 @@ export const missionFromV2 = (raw: any): string | null => {
 };
 
 /** `YYYYMMDD` (compact V2 format) -> `YYYY-MM-DD` (empty if invalid). */
-export const compactToIso = (d: any): string => {
+const compactToIso = (d: any): string => {
   const s = String(d || '');
   return /^\d{8}$/.test(s) ? `${s.slice(0, 4)}-${s.slice(4, 6)}-${s.slice(6, 8)}` : '';
 };
 
-export const SUPERVISION_CODES = new Set(['main_supervision', 'associated_supervision', 'participating_supervision']);
+const SUPERVISION_CODES = new Set(['main_supervision', 'associated_supervision', 'participating_supervision']);
 
 /**
  * Decodes a V2 membership column (`inclusions` or `participations`) into Membership[].
@@ -174,7 +174,7 @@ export const SUPERVISION_CODES = new Set(['main_supervision', 'associated_superv
  * refType ∈ local|uai|ror; a bare local_id (no prefix) is treated as `local`.
  * The brackets hold either a supervision code or a date range.
  */
-export const parseMembershipList = (raw: any): Membership[] => {
+const parseMembershipList = (raw: any): Membership[] => {
   if (!raw || typeof raw !== 'string') return [];
   return raw.split('|').map(p => p.trim()).filter(Boolean).map((entry): Membership => {
     const refPart = entry.split('[')[0].trim();
@@ -199,7 +199,7 @@ export const parseMembershipList = (raw: any): Membership[] => {
 };
 
 /** Annuaire record → directory row (lib/directory/people.ts): Grist cells decoded, column ids resolved here. Pure. */
-export function gristDirectoryRow(record: GristRecord): DirectoryRow {
+function gristDirectoryRow(record: GristRecord): DirectoryRow {
   const fields = record.fields || {};
   return {
     rowId: record.id,
@@ -257,7 +257,7 @@ export function gristDirectoryRow(record: GristRecord): DirectoryRow {
 }
 
 /** Etablissements records → employer index (name, UAI) by Grist row id. Pure. */
-export const gristEmployerIndex = (institutions: GristRecord[]): EmployerIndex =>
+const gristEmployerIndex = (institutions: GristRecord[]): EmployerIndex =>
   new Map((institutions || []).map((r: any) => [r.id, { name: r.fields['Employeur'] || `Etab ${r.id}`, uai: r.fields['UAI'] || '' }]));
 
 /**

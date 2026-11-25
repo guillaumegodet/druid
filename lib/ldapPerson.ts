@@ -12,7 +12,6 @@ import { translateApiError } from './apiErrors';
 import { normalizeHrId } from './hrId';
 import { hostingToolsOf, inferLdapEmployer, LdapEmployer } from './ldapEmployer';
 import { normalizeCivility } from './civility';
-import { STATUT_DYNA_MAP } from './ldapCodes';
 
 /** Entry returned by /api/ldap/person/:uid. */
 export interface LdapPerson {
@@ -45,7 +44,6 @@ export interface LdapPerson {
   affectationPrincipaleLabel: string;
 }
 
-export { STATUT_DYNA_MAP };
 
 /** Druid status derived from an LDAP dynaEtat code (N → `Interne`, D → `Départ`, other → `Externe`). */
 export const statusFromEtat = (etat: any): ResearcherStatus => {
@@ -64,7 +62,7 @@ const isoBirthDate = (b: string): string => {
   return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s : '';
 };
 
-export interface LdapPrefill {
+interface LdapPrefill {
   researcher: Researcher;
   /** Lab (acronym, as in the membership menu) found among the LDAP affectations — the principal
    * affectation first; '' when none of the codes is a known lab. */

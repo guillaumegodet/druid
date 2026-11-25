@@ -72,7 +72,7 @@ import { ApiError } from './errors';
 import { applySiteImport, planSiteImport, SiteImportDocumentSchema, SiteImportSelectionSchema } from './siteImport';
 import { applyPeopleImport, PeopleImportInputSchema, PeopleImportSelectionSchema, planPeopleImport } from './peopleImport';
 
-export interface DirectoryApiBindings {
+interface DirectoryApiBindings {
   repository: DirectoryRepository;
   /** Publications side (D10): tables that stay in Grist. */
   publications: PublicationsStore;

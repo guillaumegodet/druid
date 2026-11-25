@@ -32,7 +32,7 @@ export interface InterLabNetworkResponse extends NetworkData {
   truncated: number;
 }
 
-export interface InterLabParams {
+interface InterLabParams {
   labs: string[];
   range: YearRange;
   minPubs: number;

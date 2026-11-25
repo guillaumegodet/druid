@@ -8,7 +8,7 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { CountryName } from './types';
 
-export const LANGUAGE_LABELS: Record<string, MessageDescriptor> = {
+const LANGUAGE_LABELS: Record<string, MessageDescriptor> = {
   fr: msg`French`,
   en: msg`English`,
   es: msg`Spanish`,
@@ -29,7 +29,7 @@ export function languageLabel(code: string): string {
   return m ? i18n._(m) : code.toUpperCase();
 }
 
-export const OA_LABELS: Record<string, MessageDescriptor> = {
+const OA_LABELS: Record<string, MessageDescriptor> = {
   diamond: msg`Diamond`,
   gold: msg`Gold`,
   green: msg`Green`,

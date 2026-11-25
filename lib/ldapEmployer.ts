@@ -35,7 +35,7 @@ export const hostingToolsOf = (refIds: string[]): string[] => refIds
   .map((v) => String(v).match(/^\{TOOL\}([A-Z]+)\d*$/i)?.[1]?.toUpperCase() || '')
   .filter(Boolean);
 
-export interface LdapEmployerSignals {
+interface LdapEmployerSignals {
   /** dynaCategorie. */
   categorie: string;
   /** supannEmpCorps, prefix stripped (« 301 »). */

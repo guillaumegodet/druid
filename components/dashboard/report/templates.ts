@@ -16,7 +16,7 @@ import { newBlockId, type ReportBlock, type ReportDefinition, type ReportPeriod 
 import { REPORT_SECTIONS } from './reportCatalog';
 
 /** Parameters a template asks for, in form order. */
-export type TemplateParam = 'structure' | 'period' | 'perimetre' | 'country' | 'partners' | 'funderCategory' | 'publisher';
+type TemplateParam = 'structure' | 'period' | 'perimetre' | 'country' | 'partners' | 'funderCategory' | 'publisher';
 
 export interface TemplateInput {
   name: string;
@@ -35,14 +35,14 @@ export interface TemplateInput {
 }
 
 /** What a template may read about the chosen structure. */
-export interface TemplateEnv {
+interface TemplateEnv {
   /** Unfiltered dataset of the structure (null: unknown → every chart is kept). */
   dataset: DashboardDataset | null;
   /** Tabs the admin hid for this structure (druid_tabs_hidden). */
   hiddenTabs: string[];
 }
 
-export interface ReportTemplate {
+interface ReportTemplate {
   id: string;
   label: MessageDescriptor;
   description: MessageDescriptor;

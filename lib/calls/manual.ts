@@ -9,10 +9,9 @@ import { FUNDER_CATEGORIES, statusFromDeadlines, type CallStatus, type FunderCat
 
 export const MANUAL_SOURCE = 'manual';
 /** Prefix of the funders, programmes and calls created by hand: they never collide with those of the collectors. */
-export const MANUAL_PREFIX = 'm-';
+const MANUAL_PREFIX = 'm-';
 
 export type ReviewStatus = 'to_validate' | 'validated' | 'rejected';
-export const REVIEW_STATUSES: readonly ReviewStatus[] = ['to_validate', 'validated', 'rejected'];
 
 export const LIMITS = {
   title: 400,

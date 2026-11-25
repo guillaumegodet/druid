@@ -10,10 +10,10 @@ import { FieldValueError } from '../fieldMerge';
 import { ldapGradeTarget } from '../ldap';
 import { observeFieldValue, readSourceRanks, reprojectField } from './fieldValues';
 
-export const LDAP_SOURCE = 'ldap';
-export const LDAP_OBSERVE_ACTOR = 'job:ldap_observe';
+const LDAP_SOURCE = 'ldap';
+const LDAP_OBSERVE_ACTOR = 'job:ldap_observe';
 
-export interface LdapObserveSummary {
+interface LdapObserveSummary {
   /** Records with an LDAP entry in the cache. */
   persons: number;
   /** Values stored for the first time or changed since the last sync. */

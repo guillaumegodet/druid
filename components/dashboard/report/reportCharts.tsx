@@ -15,7 +15,7 @@ import type { PairsResponse } from '../pairsApi';
 import type { PubFilters } from '../publicationFilters';
 import type { DashboardDataset } from '../types';
 
-export interface RemoteChartProps {
+interface RemoteChartProps {
   /** Payload of the chart's remote source (status 'ok': loaded). */
   remote: unknown;
   range: YearRange;

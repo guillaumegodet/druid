@@ -4,6 +4,6 @@
 import pg from 'pg';
 import { createDbWith, type Db, type DbOptions } from './core';
 
-export { withActor, type DB, type Db, type DbOptions } from './core';
+export { withActor, type DB, type Db } from './core';
 
 export const createDb = (options: DbOptions): Db => createDbWith(pg, options);

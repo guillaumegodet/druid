@@ -30,7 +30,7 @@ type RGB = [number, number, number];
 /** Line height (mm) for a given font size (pt). */
 const lh = (pt: number, ratio = 1.4) => (pt * 25.4 / 72) * ratio;
 
-export interface CoverMeta {
+interface CoverMeta {
   /** Acronym of the structure (dataset.lab). */
   lab: string;
   /** Full name (dataset.name). */
@@ -43,7 +43,7 @@ export interface CoverMeta {
 }
 
 /** Cover of a saved report (« Mes rapports »): its own name and description, free rows. */
-export interface ReportCoverMeta {
+interface ReportCoverMeta {
   title: string;
   description?: string;
   rows: [string, string][];
@@ -51,7 +51,7 @@ export interface ReportCoverMeta {
   sourceLine: string;
 }
 
-export interface KpiCell {
+interface KpiCell {
   label: string;
   value: string;
   hint?: string;

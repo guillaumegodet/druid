@@ -3,7 +3,7 @@
 // instance template. Readers see the report computed with their own access to the data
 // (decision R1): a block on a structure they cannot open shows as unavailable.
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Check, Copy, RefreshCw, Trash2, UserPlus, X } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../../lib/apiErrors';
@@ -13,6 +13,7 @@ import { CHART_META } from '../dashboard/chartMeta';
 import type { ReportDefinition } from '../dashboard/report/definition';
 import type { ReportsBackend, ShareRole, StoredReport } from '../dashboard/report/reportsApi';
 import { selectCls } from './ReportControls';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 /** A person the report can be shared with (suggestion list). */
 export interface ShareCandidate {
@@ -40,11 +41,7 @@ export const ShareDialog: React.FC<{
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   const me = getUserInfo().preferred_username.toLowerCase();
   const labelOf = useMemo(() => new Map(candidates.map((c) => [c.id.toLowerCase(), c.label])), [candidates]);

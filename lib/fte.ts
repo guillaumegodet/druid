@@ -18,7 +18,7 @@ import type { AnnuaireColumnMeta } from './gristService';
 /** Grist columns of the Annuaire table, absent from the documents created before 2026-10-06. */
 export const FTE_COLUMNS = { fte: 'etp_quotite', researchFte: 'etp_recherche' } as const;
 
-export type FteField = keyof typeof FTE_COLUMNS;
+type FteField = keyof typeof FTE_COLUMNS;
 
 /**
  * Reads a Grist cell: a number in [0, 1], or null when the cell is empty or unreadable.

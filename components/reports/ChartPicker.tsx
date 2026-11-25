@@ -2,7 +2,7 @@
 // whose route the instance has), grouped by dashboard tab (REPORT_SECTIONS order), searchable;
 // charts the structure cannot show (no teams, not composite…) are listed greyed out with the reason.
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Search, X } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { MessageDescriptor } from '@lingui/core';
@@ -11,6 +11,7 @@ import { hasCapability } from '../../lib/auth';
 import { CHART_META, missingFeatures, type DatasetFeature } from '../dashboard/chartMeta';
 import { REPORT_SECTIONS } from '../dashboard/report/reportCatalog';
 import { hasReportChart, reportChartLabel } from '../dashboard/report/reportCharts';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 export const FEATURE_LABELS: Record<DatasetFeature, MessageDescriptor> = {
   composite: msg`needs a structure with member labs`,
@@ -34,11 +35,7 @@ export const ChartPicker: React.FC<{
   const { t } = useLingui();
   const [query, setQuery] = useState('');
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   const groups = useMemo(() => {
     const q = query.trim().toLowerCase();

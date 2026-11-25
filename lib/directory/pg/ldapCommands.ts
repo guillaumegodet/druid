@@ -22,7 +22,7 @@ import { MERGED_RECORD_FIELDS } from './fieldValues';
 import { insertStructure, patchStructure, readStructureRecords } from './structures';
 import { pgWriting, writeRecordPatches } from './alignCommands';
 
-export interface PgLdapCommandsOptions {
+interface PgLdapCommandsOptions {
   db: Db;
   repository: DirectoryRepository;
   ldap: LdapSource;

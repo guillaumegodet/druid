@@ -10,7 +10,7 @@
 
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-export interface ReportSection {
+interface ReportSection {
   /** DashboardPage tab key (Tab). */
   tab: string;
   /** Section title in the PDF (= tab label), translatable. */

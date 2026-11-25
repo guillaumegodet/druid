@@ -22,7 +22,7 @@ import { countsForResearchers } from './editorialEntries';
 
 // ── Population filter ─────────────────────────────────────────────────────────
 
-export const NONE = 'none';
+const NONE = 'none';
 export const MEMBERSHIP_KEYS = ['stat_mmb', 'assoc_mmb', 'second_mmb', 'visit_mmb', NONE] as const;
 export type MembershipKey = (typeof MEMBERSHIP_KEYS)[number];
 export const CATEGORY_KEYS = ['permanent', 'non_permanent', 'doctorant', 'emeritus', NONE] as const;
@@ -105,13 +105,13 @@ export function presenceByYear(
   return out;
 }
 
-export const isUndatedFormer = (m: StaffMember): boolean => m.former && !fuzzyDateUpperBound(m.endDate ?? '');
+const isUndatedFormer = (m: StaffMember): boolean => m.former && !fuzzyDateUpperBound(m.endDate ?? '');
 
 // ── Age brackets (D1, D6) ────────────────────────────────────────────────────
 
-export interface AgeBracket { key: string; min: number | null; max: number | null }
+interface AgeBracket { key: string; min: number | null; max: number | null }
 
-export const AGE_BRACKETS: AgeBracket[] = [
+const AGE_BRACKETS: AgeBracket[] = [
   { key: '<35', min: null, max: 34 },
   { key: '35-44', min: 35, max: 44 },
   { key: '45-54', min: 45, max: 54 },
@@ -296,7 +296,7 @@ export function publicationRateByAge(
 
 // ── Age pyramid (current age) ────────────────────────────────────────────────
 
-export interface AgePyramid {
+interface AgePyramid {
   /** Bracket labels in age order (merged as in D6), `unknown` last when shown. */
   brackets: string[];
   categories: CategoryKey[];
@@ -333,7 +333,7 @@ export function agePyramid(staff: StaffMember[], year: number, minCell = 3): Age
 
 // ── Indicators and publications per member ───────────────────────────────────
 
-export interface MemberPublications {
+interface MemberPublications {
   key: string;
   label: string;
   category: CategoryKey;
@@ -379,7 +379,7 @@ export function publicationsPerMember(
 }
 
 /** Publication-count steps of the distribution chart (lower bounds; the last one is open). */
-export const PUBLICATION_STEPS = [0, 1, 3, 6, 11, 21] as const;
+const PUBLICATION_STEPS = [0, 1, 3, 6, 11, 21] as const;
 
 export const publicationStepLabel = (i: number): string => {
   const lo = PUBLICATION_STEPS[i];
@@ -388,7 +388,7 @@ export const publicationStepLabel = (i: number): string => {
   return next - 1 === lo ? String(lo) : `${lo}-${next - 1}`;
 };
 
-export interface PublicationsDistribution {
+interface PublicationsDistribution {
   steps: string[];
   categories: CategoryKey[];
   /** members[step][category] — matched members only. */
@@ -412,7 +412,7 @@ export function publicationsDistribution(perMember: MemberPublications[]): Publi
   };
 }
 
-export interface StaffKpis {
+interface StaffKpis {
   headcount: number;
   /** Sum of the research FTEs of the population (current value), PhD students and emeriti excluded as in the rate. */
   researchFte: number;

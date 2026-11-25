@@ -75,7 +75,7 @@ export interface GristClient extends GristReader {
   sql(query: string, args: unknown[]): Promise<Record<string, any>[]>;
 }
 
-export interface GristReaderOptions {
+interface GristReaderOptions {
   apiBase: string;
   docId: string;
   /** Absent on a read-only instance reading a public document. */
@@ -130,7 +130,7 @@ export interface LdapCacheSnapshot {
   version: string;
 }
 
-export interface GristDirectoryRepositoryOptions {
+interface GristDirectoryRepositoryOptions {
   grist: GristReader;
   /** Instance without LDAP (Cloudflare): omitted → empty cache. */
   loadLdapCache?: () => Promise<LdapCacheSnapshot>;

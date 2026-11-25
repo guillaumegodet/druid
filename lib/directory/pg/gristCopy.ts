@@ -11,9 +11,8 @@
 import type { GristRecord } from '../gristMapping';
 
 export const COPIED_TABLES = ['Etablissements', 'Structures', 'Annuaire'] as const;
-export type CopiedTable = (typeof COPIED_TABLES)[number];
 
-export interface GristColumn { id: string; fields: Record<string, any> }
+interface GristColumn { id: string; fields: Record<string, any> }
 
 export interface TableCopyPlan {
   table: string;

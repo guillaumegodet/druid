@@ -10,8 +10,8 @@ import type { AlignCacheSource } from '../directory/alignCommands';
 import type { PeopleAlignSource } from './jobs';
 
 /** Names served at the site root (functions/_lib/instanceAssets.js ALIGN_CACHES) plus the Qualinka cache of IdRef. */
-export const ALIGN_CACHE_NAMES = ['idref_align_cache', 'idref_align_qualinka_cache', 'orcid_align_cache', 'hal_align_cache', 'openalex_align_cache', 'scopus_align_cache'] as const;
-export type AlignCacheName = typeof ALIGN_CACHE_NAMES[number];
+const ALIGN_CACHE_NAMES = ['idref_align_cache', 'idref_align_qualinka_cache', 'orcid_align_cache', 'hal_align_cache', 'openalex_align_cache', 'scopus_align_cache'] as const;
+type AlignCacheName = typeof ALIGN_CACHE_NAMES[number];
 export const isAlignCacheName = (v: unknown): v is AlignCacheName => ALIGN_CACHE_NAMES.includes(v as AlignCacheName);
 
 /** Files a run of `source` writes (scripts/sync_*.cjs makeStore): the unified view reads the Qualinka cache for IdRef. */

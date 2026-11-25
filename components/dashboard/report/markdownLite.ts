@@ -4,7 +4,7 @@
 // no rich text; the preview renders the same runs).
 
 export type MdInline = { text: string; bold?: boolean; italic?: boolean; url?: string };
-export type MdNode =
+type MdNode =
   | { kind: 'heading'; level: 1 | 2; inline: MdInline[] }
   | { kind: 'bullets'; items: MdInline[][] }
   | { kind: 'paragraph'; inline: MdInline[] };

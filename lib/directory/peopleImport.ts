@@ -24,7 +24,7 @@ export const PEOPLE_IMPORT_FIELDS = ['lastName', 'firstName', 'lab', 'email', 't
 export type PeopleImportField = typeof PEOPLE_IMPORT_FIELDS[number];
 
 /** Header spellings recognized for each field (compared without case, accents, spaces or punctuation). */
-export const HEADER_ALIASES: Record<PeopleImportField, string[]> = {
+const HEADER_ALIASES: Record<PeopleImportField, string[]> = {
   lastName: ['nom', 'nomdefamille', 'nomdusage', 'lastname', 'surname', 'familyname'],
   firstName: ['prenom', 'prenoms', 'firstname', 'givenname'],
   lab: ['laboratoire', 'labo', 'unite', 'unitederecherche', 'structure', 'siglelabo', 'siglelaboratoire', 'sigle', 'lab', 'laboratory', 'unit', 'researchunit'],
@@ -132,7 +132,7 @@ const emailOf = (s: string): string => {
 };
 
 /** A row with its identifiers and email normalized; what could not be read is reported. */
-export const cleanRow = (row: PeopleImportRow): { row: PeopleImportRow; warnings: string[] } => {
+const cleanRow = (row: PeopleImportRow): { row: PeopleImportRow; warnings: string[] } => {
   const out = { ...row };
   const warnings: string[] = [];
   const check = (field: 'orcid' | 'idref' | 'halId' | 'email', parse: (s: string) => string) => {
@@ -146,10 +146,10 @@ export const cleanRow = (row: PeopleImportRow): { row: PeopleImportRow; warnings
 
 // ── Plan ──────────────────────────────────────────────────────────────────────────────────────────────────────────────
 export type PeopleImportUpdateField = 'email' | 'grade' | 'employer' | 'team' | 'orcid' | 'idref' | 'halId';
-export const PEOPLE_IMPORT_UPDATE_FIELDS: PeopleImportUpdateField[] = ['email', 'grade', 'employer', 'team', 'orcid', 'idref', 'halId'];
+const PEOPLE_IMPORT_UPDATE_FIELDS: PeopleImportUpdateField[] = ['email', 'grade', 'employer', 'team', 'orcid', 'idref', 'halId'];
 /** Identifiers are only added, never replaced: a different one is a question for the alignment pages. */
 const COMPLEMENT_ONLY: PeopleImportUpdateField[] = ['orcid', 'idref', 'halId'];
-export type PeopleMatchedBy = 'uid' | 'email' | 'orcid' | 'idref' | 'halId' | 'name' | 'firstName' | 'lastName';
+type PeopleMatchedBy = 'uid' | 'email' | 'orcid' | 'idref' | 'halId' | 'name' | 'firstName' | 'lastName';
 
 export interface PeopleImportCreation {
   /** First row of the person (stable key of the review). */
@@ -421,7 +421,7 @@ export interface PeopleImportResult {
 }
 
 /** New record of a creation: its main lab first; the other labs are added by an update (one row per membership). */
-export const newPersonOf = (c: PeopleImportCreation, source: string, validation: ReturnType<typeof validationOf> | null): Researcher => ({
+const newPersonOf = (c: PeopleImportCreation, source: string, validation: ReturnType<typeof validationOf> | null): Researcher => ({
   id: '', uid: c.uid, lastName: c.lastName, firstName: c.firstName, displayName: `${c.lastName.toUpperCase()} ${c.firstName}`.trim(),
   civility: '', email: c.email, status: '' as any,
   employment: { employer: c.employer, grade: c.grade, contractType: c.employmentType },
@@ -436,7 +436,7 @@ export const newPersonOf = (c: PeopleImportCreation, source: string, validation:
  * Command context of a write that also reports the grade of the file (source `lab_file` of the fields merged by source,
  * druid-internal `docs/plan-maj-chercheurs.md`; the nature of the file — HR, lab, partner directory — is decision D3).
  */
-export const PEOPLE_IMPORT_SOURCE = 'lab_file';
+const PEOPLE_IMPORT_SOURCE = 'lab_file';
 const fileObservation = (ctx: any, grade: string | undefined, importBatchId: string | null = null) =>
   (grade ? { ...ctx, fieldObservation: { source: PEOPLE_IMPORT_SOURCE, values: { corps_grade: grade }, importBatchId } } : ctx);
 

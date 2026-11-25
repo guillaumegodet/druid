@@ -52,7 +52,6 @@ import { HelpButton } from './HelpButton';
 import { visibleTabKeys } from './dashboard/tabAvailability';
 import { DASHBOARD_TAB_HELP } from '../lib/helpLinks';
 
-export type { DashboardTab } from './dashboard/dashboardNav';
 
 interface DashboardPageProps {
   /** druid-biblio slug to preselect (e.g. from a Structure record); null = default. */

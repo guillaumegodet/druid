@@ -1,22 +1,15 @@
 import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
-import { ResearcherStatus, type MembershipType } from '../types';
+import { type MembershipType } from '../types';
 import type { ValidationScope } from './validation';
 import { Presence, type LdapAccountState } from './presence';
 
 /**
  * @file researcherLabels.ts
  * @description Translatable labels shared by the Staff section
- * (statuses, validation scopes, membership types). Declared with `msg` outside components,
+ * (presence, validation scopes, membership types). Declared with `msg` outside components,
  * to be displayed via `i18n._(label)` or `t(label)`.
  */
-
-export const STATUS_LABELS: Record<ResearcherStatus, MessageDescriptor> = {
-  [ResearcherStatus.INTERNE]: msg`Internal`,
-  [ResearcherStatus.DEPART]: msg`Leaving`,
-  [ResearcherStatus.PARTI]: msg`Left`,
-  [ResearcherStatus.EXTERNE]: msg`External`,
-};
 
 /** Presence in the unit (lib/presence.ts) — replaces the status. */
 export const PRESENCE_LABELS: Record<Presence, MessageDescriptor> = {

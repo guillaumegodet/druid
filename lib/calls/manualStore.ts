@@ -13,7 +13,7 @@ import type { CallStatus, FunderCategory } from './programmes';
 
 type Queryable = Kysely<DB> | Transaction<DB>;
 
-export class ManualCallError extends Error {
+class ManualCallError extends Error {
   constructor(message: string, readonly status = 400) { super(message); }
 }
 
@@ -60,7 +60,7 @@ export interface CatalogueReport {
   truncated: number;
 }
 
-export interface SaveOptions {
+interface SaveOptions {
   /** Edit of this call (a call added by hand); a new call otherwise. */
   callId?: string;
   /** Reference of the row in a catalogue: the same reference updates the same call. */
@@ -248,4 +248,3 @@ export const createManualCallsStore = (db: Kysely<DB>) => {
   return { funders, programmes, list, duplicatesOf, save, setReview, remove, existingIds, programmeIdOf, importCatalogue };
 };
 
-export type ManualCallsStore = ReturnType<typeof createManualCallsStore>;

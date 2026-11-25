@@ -10,9 +10,9 @@ import { YearRange } from './overviewAggregates';
 import { StackedByYear, ResearcherItem } from './structureAggregates';
 
 /** Fixed display order of the sources (= color slot, merge priority). */
-export const SOURCE_ORDER = ['crisalid', 'bso', 'openalex', 'hal'];
+const SOURCE_ORDER = ['crisalid', 'bso', 'openalex', 'hal'];
 
-export const SOURCE_LABELS: Record<string, string> = {
+const SOURCE_LABELS: Record<string, string> = {
   crisalid: 'Harvester CRISalid',
   bso: 'BSO',
   openalex: 'OpenAlex',
@@ -20,7 +20,7 @@ export const SOURCE_LABELS: Record<string, string> = {
 };
 
 /** Sub-sources harvested by the CRISalid harvester (IKG graph). */
-export const HARVESTER_LABELS: Record<string, string> = {
+const HARVESTER_LABELS: Record<string, string> = {
   hal: 'HAL',
   scanr: 'ScanR',
   idref: 'IdRef / Sudoc',
@@ -31,7 +31,7 @@ export const HARVESTER_LABELS: Record<string, string> = {
 /** Result of the OpenAlex re-enrichment of the harvester records.
  *  found_by_id / found_by_doi: the work exists in OpenAlex but the
  *  structure is not credited there → pool of affiliation corrections. */
-export const LOOKUP_LABELS: Record<string, string> = {
+const LOOKUP_LABELS: Record<string, string> = {
   matched_corpus: 'Dans le corpus OpenAlex de la structure',
   found_by_id: 'Dans OpenAlex, structure non créditée',
   found_by_doi: 'Dans OpenAlex, structure non créditée',
@@ -39,12 +39,12 @@ export const LOOKUP_LABELS: Record<string, string> = {
   no_doi: 'Hors OpenAlex (ni DOI ni identifiant)',
 };
 
-export const COVERAGE_BOTH = 'Harvester + sources classiques';
-export const COVERAGE_CRISALID_ONLY = 'Harvester seul';
-export const COVERAGE_CLASSIC_ONLY = 'Sources classiques seules';
+const COVERAGE_BOTH = 'Harvester + sources classiques';
+const COVERAGE_CRISALID_ONLY = 'Harvester seul';
+const COVERAGE_CLASSIC_ONLY = 'Sources classiques seules';
 const COVERAGE_ORDER = [COVERAGE_BOTH, COVERAGE_CRISALID_ONLY, COVERAGE_CLASSIC_ONLY];
 
-export interface SourcesAggregates {
+interface SourcesAggregates {
   /** Publications of the period carrying a provenance (non-empty sources). */
   total: number;
   /** Publications of the period without provenance (export predating the field). */

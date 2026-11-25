@@ -7,7 +7,7 @@ import { ApiError } from '../errors';
 import { FieldValueError, MANUAL_SOURCE, MERGED_FIELDS, type DivergenceKind } from '../fieldMerge';
 import { correctFieldValue, dropFieldCorrection, keepFieldCorrection, listFieldConflicts, reprojectField } from './fieldValues';
 
-export interface FieldConflictItem {
+interface FieldConflictItem {
   personId: string;
   /** A directory row of the person, to open the record. */
   recordId: number | null;
@@ -22,7 +22,7 @@ export interface FieldConflictItem {
   conflicts: { source: string; value: string; observedAt: string; kind: DivergenceKind }[];
 }
 
-export type FieldConflictAction = 'keep' | 'drop' | 'correct';
+type FieldConflictAction = 'keep' | 'drop' | 'correct';
 
 /** A file or site import (import_batch of kind `import`) and the values it still brings (case 19 of the plan). */
 export interface FieldImportItem {
@@ -137,4 +137,3 @@ export const createFieldConflictsStore = (db: Db) => ({
     }
   },
 });
-export type FieldConflictsStore = ReturnType<typeof createFieldConflictsStore>;

@@ -10,7 +10,7 @@ import type { EtlStatus } from '../etl/etlConsoleApi';
 export type { EtlStatus } from '../etl/etlConsoleApi';
 
 /** Member in the format expected by the group ETL (config.yaml members[]). */
-export interface GroupMemberPayload {
+interface GroupMemberPayload {
   nom: string;
   prenom: string;
   orcid?: string;

@@ -7,14 +7,14 @@
  */
 import { StructureLevel, type Structure } from '../../types';
 
-export const BSO_DUMP_URL = 'https://storage.gra.cloud.ovh.net/v1/AUTH_32c5d10cb0fe4519b957064a111717e3/bso_dump/bso-publications-latest_{id}_enriched.jsonl.gz';
+const BSO_DUMP_URL = 'https://storage.gra.cloud.ovh.net/v1/AUTH_32c5d10cb0fe4519b957064a111717e3/bso_dump/bso-publications-latest_{id}_enriched.jsonl.gz';
 
 /** Slug of a lab in the data folder of druid-biblio: `LS2N` → `ls2n`, `CRCI²NA` → `crci2na`. */
 export const labSlugOf = (acronym: string): string =>
   String(acronym || '').toLowerCase().split('²').join('2').normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 64);
 
-export interface EtlLab { slug: string; acronym: string; config: Record<string, unknown> }
-export interface EtlConfigOptions {
+interface EtlLab { slug: string; acronym: string; config: Record<string, unknown> }
+interface EtlConfigOptions {
   /** Years of history the plan allows (null = everything since 2016, the first BSO year). */
   historyYears: number | null;
   mailto: string | null;
@@ -23,7 +23,7 @@ export interface EtlConfigOptions {
   home?: { name: string; openalexIds: string[] } | null;
   now?: Date;
 }
-export interface EtlLabsReport { labs: EtlLab[]; skipped: { acronym: string; reason: string }[] }
+interface EtlLabsReport { labs: EtlLab[]; skipped: { acronym: string; reason: string }[] }
 
 /** The labs of the directory (level 2) with at least one harvesting key, as druid-biblio configurations. */
 /** OpenAlex institution ids of a structure, normalized (`https://openalex.org/i123` → `I123`). */

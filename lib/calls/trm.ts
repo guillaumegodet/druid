@@ -7,7 +7,7 @@ import { HORIZON_EUROPE } from './programmes';
 
 export type MatchOverall = 'strong' | 'plausible' | 'weak' | 'none';
 
-export interface TrmPublication {
+interface TrmPublication {
   uid: string;
   title: string;
   year: number | null;

@@ -11,7 +11,7 @@ export interface Embedder {
 type Fetch = (url: string, init: { method: string; headers: Record<string, string>; body: string; signal?: AbortSignal }) =>
   Promise<{ ok: boolean; status: number; json: () => Promise<unknown> }>;
 
-export const EMBEDDING_BATCH = 32;
+const EMBEDDING_BATCH = 32;
 
 /** The embedder of the environment; null when no service is set (the « My project » assistant is then off). */
 export const embedderFromEnv = (env: Record<string, string | undefined>, fetchImpl: Fetch = fetch as unknown as Fetch, timeoutMs = 30000): Embedder | null => {

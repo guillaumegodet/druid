@@ -19,7 +19,7 @@ export interface InstitutionInput {
 }
 
 /** The same fields once checked and normalized (blank identifiers → ''). */
-export interface InstitutionFields {
+interface InstitutionFields {
   name: string;
   label: string;
   uai: string;

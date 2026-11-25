@@ -119,7 +119,7 @@ export interface JobContext {
 }
 
 /** Thrown by a handler whose child process was stopped on request: the job ends `cancelled`, not `failed`. */
-export class JobCancelled extends Error {
+class JobCancelled extends Error {
   constructor(message = 'cancelled') { super(message); this.name = 'JobCancelled'; }
 }
 
@@ -127,7 +127,7 @@ const tenantDbOf = (env: RunnerEnv, tenant: Tenant): Db =>
   createDbWith(pg, { connectionString: env.appUrl || env.ownerUrl, max: 2, allowExitOnIdle: true, schema: tenant.schema_name });
 
 /** Route `<host>/*` → the Worker, through the Cloudflare API (idempotent: an existing route is kept). */
-export const ensureWorkerRoute = async (cf: CloudflareRouteEnv, host: string, fetchImpl: typeof fetch = fetch): Promise<'created' | 'exists'> => {
+const ensureWorkerRoute = async (cf: CloudflareRouteEnv, host: string, fetchImpl: typeof fetch = fetch): Promise<'created' | 'exists'> => {
   const base = `https://api.cloudflare.com/client/v4/zones/${cf.zoneId}/workers/routes`;
   const headers = { Authorization: `Bearer ${cf.apiToken}`, 'Content-Type': 'application/json' };
   const pattern = `${host}/*`;
@@ -157,7 +157,7 @@ export const removeWorkerRoute = async (cf: CloudflareRouteEnv, host: string, fe
 };
 
 /** `tenant.provision`: the schema, the directory, the route, the status, the e-mail. */
-export const provisionTenant: JobHandler = async (job, { saas, env, tenant, progress, log }) => {
+const provisionTenant: JobHandler = async (job, { saas, env, tenant, progress, log }) => {
   const opts: TenantDbOptions = { ownerUrl: env.ownerUrl, dbmateBin: env.dbmateBin, migrationsDir: env.migrationsDir, log };
   await progress('schema', 10);
   await migrateTenantSchema(tenant.schema_name, opts);
@@ -201,7 +201,7 @@ export const provisionTenant: JobHandler = async (job, { saas, env, tenant, prog
  * `structures.align` (druid-internal docs/plan-druid-saas.md, lot 4 e): the structure alignment of a tenant,
  * `params` = lib/saas/jobs.ts StructuresAlignParams.
  */
-export const alignStructures: JobHandler = async (job, { saas, env, tenant, progress, log }) => {
+const alignStructures: JobHandler = async (job, { saas, env, tenant, progress, log }) => {
   const params = StructuresAlignParams.parse(job.params || {});
   const types = params.types ? (params.types as unknown[]).filter(isStructureIdType) as StructureIdType[] : ALIGNED_STRUCTURE_ID_TYPES;
   const db = tenantDbOf(env, tenant);
@@ -231,7 +231,7 @@ export const childEnvOf = (overrides: Record<string, string | undefined>, base: 
   return out;
 };
 
-export interface ChildRun {
+interface ChildRun {
   command: string;
   args: string[];
   cwd: string;
@@ -246,7 +246,7 @@ export interface ChildRun {
   /** Delay between SIGTERM and SIGKILL once a stop was asked (default 60 s). */
   killAfterMs?: number;
 }
-export interface ChildResult { code: number | null; signal: NodeJS.Signals | null; cancelled: boolean; timedOut: boolean; progress: Record<string, unknown> | null }
+interface ChildResult { code: number | null; signal: NodeJS.Signals | null; cancelled: boolean; timedOut: boolean; progress: Record<string, unknown> | null }
 
 const readJson = (file: string): Record<string, unknown> | null => {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')); } catch { return null; }
@@ -258,7 +258,7 @@ const tailOf = (file: string, lines = 30): string[] => {
 };
 
 /** Runs a child process, relays its progress file, stops it when asked (SIGTERM then SIGKILL) or after `timeoutMs`. */
-export const runChild = async (run: ChildRun, ctx: { log: (l: string) => void; isCancelRequested: () => Promise<boolean>; spawnImpl?: typeof nodeSpawn }): Promise<ChildResult> => {
+const runChild = async (run: ChildRun, ctx: { log: (l: string) => void; isCancelRequested: () => Promise<boolean>; spawnImpl?: typeof nodeSpawn }): Promise<ChildResult> => {
   const spawn = ctx.spawnImpl || nodeSpawn;
   // Truncated at each run: appended, the tail of a successful run still showed the errors of the previous one.
   const out = fs.openSync(run.outputFile, 'w');
@@ -319,7 +319,7 @@ const workDirOf = (env: RunnerEnv, tenant: Tenant): string => {
  * tenant's `align_cache` table at the end (the Functions serve and read them). The keys of the establishment (Scopus,
  * its own OpenAlex key) come from its secrets.
  */
-export const alignPeople: JobHandler = async (job, ctx) => {
+const alignPeople: JobHandler = async (job, ctx) => {
   const { env, tenant, log, saas } = ctx;
   const params = PeopleAlignParams.parse(job.params || {});
   const root = env.druidRoot || process.cwd();
@@ -372,7 +372,7 @@ export const alignPeople: JobHandler = async (job, ctx) => {
  * structure alignment confirmed), the ETL of each lab as a child process (BIBLIO_DATA_DIR = the tenant's folder), the
  * dashboards uploaded to the asset store under `<slug>/dashboard-data/`. A lab that fails does not stop the others.
  */
-export const buildEtl: JobHandler = async (job, ctx) => {
+const buildEtl: JobHandler = async (job, ctx) => {
   const { env, tenant, plan, log, saas } = ctx;
   const params = EtlBuildParams.parse(job.params || {});
   if (!env.etl) throw new Error('ETL not configured on this runner (SAAS_ETL_DATA_DIR / SAAS_ETL_COMMAND)');
@@ -477,7 +477,7 @@ ${base} · ${labs.length} dashboard(s)
  * accounts, archived as `<base>.tar.gz` and uploaded under `<slug>/exports/`; the result stays in `job.progress`
  * (lib/saas/lifecycle.ts ExportResult) for `EXPORT_TTL_DAYS` days, the requester is told by e-mail.
  */
-export const exportTenant: JobHandler = async (job, ctx) => {
+const exportTenant: JobHandler = async (job, ctx) => {
   const { env, tenant, log, saas } = ctx;
   if (!env.assets) throw new Error('No asset store on this runner (SAAS_R2_*): the export has nowhere to go');
   const at = new Date();
@@ -550,7 +550,7 @@ export const exportTenant: JobHandler = async (job, ctx) => {
  * schema, and last the rows (lib/saas/lifecycle.ts tombstoneTenant). Each step is idempotent: a failed run is retried
  * the next day from the start.
  */
-export const deleteTenant: JobHandler = async (job, ctx) => {
+const deleteTenant: JobHandler = async (job, ctx) => {
   const { env, tenant, log, saas } = ctx;
   if (!isDeletionDue(tenant)) { log(`deletion of ${tenant.slug} not due (status ${tenant.status}, delete_after ${tenant.delete_after ?? '—'}): nothing done`); return; }
   const owners = (await saas.selectFrom('member').select('email').where('tenant_id', '=', tenant.id).where('role', '=', 'owner').execute()).map((m) => m.email);
@@ -581,7 +581,7 @@ export const deleteTenant: JobHandler = async (job, ctx) => {
   }
 };
 
-export const HANDLERS: Record<string, JobHandler> = {
+const HANDLERS: Record<string, JobHandler> = {
   'tenant.provision': provisionTenant, 'structures.align': alignStructures, 'people.align': alignPeople, 'etl.build': buildEtl,
   'tenant.export': exportTenant, 'tenant.delete': deleteTenant,
 };
@@ -615,7 +615,7 @@ const appendLog = async (saas: SaasDb, id: string, line: string) => {
 const PLATFORM_JOB_TYPES = ['tenant.provision', 'tenant.delete'];
 
 /** Two failures in a row of the same key (this one included), or one of a platform job → the ops address is told (lot 3 e). */
-export const alertOnRepeatedFailure = async (saas: SaasDb, env: RunnerEnv, job: Job, tenant: Tenant | null, message: string): Promise<boolean> => {
+const alertOnRepeatedFailure = async (saas: SaasDb, env: RunnerEnv, job: Job, tenant: Tenant | null, message: string): Promise<boolean> => {
   if (!env.alertEmail || !env.email?.RESEND_API_KEY) return false;
   const once = PLATFORM_JOB_TYPES.includes(job.type);
   if (!once && (await previousRunOf(saas, job))?.status !== 'failed') return false;
@@ -627,7 +627,7 @@ export const alertOnRepeatedFailure = async (saas: SaasDb, env: RunnerEnv, job: 
 };
 
 /** A failed job of the establishment → the member who started it, or the owners for a scheduled one (lot 6 d). */
-export const notifyJobFailure = async (saas: SaasDb, env: RunnerEnv, job: Job, tenant: Tenant | null, message: string): Promise<string[]> => {
+const notifyJobFailure = async (saas: SaasDb, env: RunnerEnv, job: Job, tenant: Tenant | null, message: string): Promise<string[]> => {
   if (!tenant || !env.email?.RESEND_API_KEY) return [];
   const recipients = await failureRecipients(saas, job, tenant);
   if (!recipients.length) return [];
@@ -642,7 +642,7 @@ export const notifyJobFailure = async (saas: SaasDb, env: RunnerEnv, job: Job, t
 };
 
 /** Runs one claimed job: progress and log on the row, `done`, `cancelled` or `failed` at the end. */
-export const runJob = async (saas: SaasDb, env: RunnerEnv, job: Job, handlers = HANDLERS): Promise<'done' | 'failed' | 'cancelled'> => {
+const runJob = async (saas: SaasDb, env: RunnerEnv, job: Job, handlers = HANDLERS): Promise<'done' | 'failed' | 'cancelled'> => {
   // The log lines are written in order and all flushed before the final status.
   let pending: Promise<void> = Promise.resolve();
   const log = (line: string) => {
@@ -693,7 +693,7 @@ export const runJobsOnce = async (saas: SaasDb, env: RunnerEnv, handlers = HANDL
 };
 
 // ── Scheduled refreshes (lot 3 d) ─────────────────────────────────────────────────────────────────────────────────────
-export const REFRESH_DAYS: Record<string, number> = { monthly: 30, weekly: 7, daily: 1 };
+const REFRESH_DAYS: Record<string, number> = { monthly: 30, weekly: 7, daily: 1 };
 /** `now` falls in the window `[start, end)` of UTC hours (the window may cross midnight). */
 export const inNightWindow = (now: Date, [start, end]: [number, number]): boolean => {
   const h = now.getUTCHours();
@@ -764,7 +764,7 @@ export const scheduleLifecycle = async (saas: SaasDb, env: RunnerEnv, now = new 
 };
 
 /** MemAvailable of /proc/meminfo in MiB (null elsewhere than Linux). */
-export const memAvailableMb = (): number | null => {
+const memAvailableMb = (): number | null => {
   try {
     const m = fs.readFileSync('/proc/meminfo', 'utf8').match(/MemAvailable:\s+(\d+) kB/);
     return m ? Math.round(Number(m[1]) / 1024) : null;

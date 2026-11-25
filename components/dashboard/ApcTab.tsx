@@ -18,13 +18,12 @@ import {
 import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
+import { csvCell, saveCsv } from '../../lib/download';
 
 const PAGE_SIZE = 25;
 
 const eur = (v: number) => `${Math.round(v).toLocaleString(numberLocale())} €`;
 
-/** Elsevier transformative agreement (confirmed Nantes U payer) attached to the publication, else null. */
-const dealOf = (p: DashboardPublication) => p.publisherDeal ?? null;
 /** Is the article OA under the agreement (APC covered)? subscription = OA waived. */
 const isDealOa = (d: DashboardPublication['publisherDeal']) =>
   !!d && (d.model === 'gold' || d.model === 'hybrid');
@@ -51,7 +50,7 @@ interface DealAggregates {
 }
 
 /** Aggregate of the Elsevier transformative agreement over the period (Nantes U). */
-export function aggregateDeal(pubs: DashboardPublication[], range: YearRange): DealAggregates {
+function aggregateDeal(pubs: DashboardPublication[], range: YearRange): DealAggregates {
   const inRange = pubs.filter(
     (p) =>
       p.publisherDeal &&
@@ -232,7 +231,7 @@ export const ApcByJournalChart: React.FC<{
 };
 
 // ── Breakdown of the Elsevier agreement per lab (composite institution) ──────
-export interface LaboAmount {
+interface LaboAmount {
   labo: string;
   total: number; // cumulative list value in € (OA articles under the agreement)
   n: number;
@@ -413,19 +412,10 @@ const OpenApcSubTab: React.FC<{ data: OpenApcData }> = ({ data }) => {
 
   const downloadCsv = () => {
     const header = 'year,publisher,journal,euro,type,doi';
-    const esc = (v: string | number | null) => {
-      const s = (v ?? '').toString();
-      return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
-    };
     const lines = rows.map((r) =>
-      [r.year ?? '', esc(r.publisher), esc(r.journal), r.euro, r.hybrid ? 'hybride' : 'gold', r.doi ?? ''].join(','),
+      [r.year ?? '', csvCell(r.publisher), csvCell(r.journal), r.euro, r.hybrid ? 'hybride' : 'gold', r.doi ?? ''].join(','),
     );
-    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `openapc_${data.institution}_${data.yearMin ?? ''}-${data.yearMax ?? ''}.csv`.replace(/\s+/g, '_');
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`openapc_${data.institution}_${data.yearMin ?? ''}-${data.yearMax ?? ''}.csv`.replace(/\s+/g, '_'), header, lines);
   };
 
   return (
@@ -570,12 +560,6 @@ export const ApcTab: React.FC<{ dataset: DashboardDataset; range: YearRange }> =
   const authorsOf = (p: DashboardPublication) =>
     p.authorIds.map((id) => byId.get(id)).filter(Boolean).join(', ');
 
-  const csvEscape = (v: string | number | null) => {
-    const s = (v ?? '').toString();
-    return s.includes(',') || s.includes('"') || s.includes('\n')
-      ? `"${s.replace(/"/g, '""')}"`
-      : s;
-  };
   const downloadCsv = () => {
     const header =
       'year,title,authors,journal,issn,apc_list_amount,apc_list_currency,apc_list_usd,apc_paid_amount,apc_paid_currency,apc_paid_usd,corresponding_authors,corresponding_institutions,corresponding_countries,oa_status,doi,' +
@@ -585,12 +569,12 @@ export const ApcTab: React.FC<{ dataset: DashboardDataset; range: YearRange }> =
       const dl = p.publisherDeal;
       const best = bestEurOf(p);
       return [
-        p.year, csvEscape(p.title), csvEscape(authorsOf(p)), csvEscape(p.journal), p.issn ?? '',
+        p.year, csvCell(p.title), csvCell(authorsOf(p)), csvCell(p.journal), p.issn ?? '',
         d?.listAmount ?? '', d?.listCurrency ?? '', d?.listUsd ?? '',
         d?.paidAmount ?? '', d?.paidCurrency ?? '', d?.paidUsd ?? '',
-        csvEscape(d?.correspondingAuthors?.join(' | ') ?? ''),
-        csvEscape(d?.correspondingInstitutions?.join(' | ') ?? ''),
-        csvEscape(d?.correspondingCountries?.join(' | ') ?? ''),
+        csvCell(d?.correspondingAuthors?.join(' | ') ?? ''),
+        csvCell(d?.correspondingInstitutions?.join(' | ') ?? ''),
+        csvCell(d?.correspondingCountries?.join(' | ') ?? ''),
         p.oaStatus ?? '', p.doi ?? '',
         dl?.source ?? '', dl?.agreement ?? '', dl?.model ?? '',
         dl ? (dl.confirmedPayer ? 'oui' : 'non') : '',
@@ -598,12 +582,7 @@ export const ApcTab: React.FC<{ dataset: DashboardDataset; range: YearRange }> =
         best != null ? Math.round(best) : '',
       ].join(',');
     });
-    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `apc_${dataset.slug}_${range.start}-${range.end}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`apc_${dataset.slug}_${range.start}-${range.end}.csv`, header, lines);
   };
 
   const pctPaid = agg.pubs.length ? Math.round((agg.paidKnown / agg.pubs.length) * 100) : 0;

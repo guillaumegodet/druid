@@ -37,7 +37,7 @@ const defaultDbmate = (): string => {
 };
 
 /** `ownerUrl` with `search_path=<schema>` (dbmate reads it: schema of the migrations and of schema_migrations). */
-export const urlWithSearchPath = (ownerUrl: string, schema: string): string => {
+const urlWithSearchPath = (ownerUrl: string, schema: string): string => {
   const u = new URL(ownerUrl);
   u.searchParams.set('search_path', schema);
   return u.toString();
@@ -116,7 +116,7 @@ export const dropTenantSchema = async (schema: string, opts: Pick<TenantDbOption
 export const openSaasDb = (connectionString: string, max = 2): SaasDb =>
   createDbWith(pg, { connectionString, max, allowExitOnIdle: true, schema: SAAS_SCHEMA });
 
-export interface CreateTenantInput {
+interface CreateTenantInput {
   slug: string;
   label: string;
   hosts: string[];

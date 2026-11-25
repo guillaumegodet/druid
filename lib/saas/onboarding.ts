@@ -11,10 +11,10 @@ import type { Db } from '../db/core';
 import type { CommandContext } from '../directory/commands';
 import { ApiError } from '../directory/errors';
 import { createPgStorage } from '../directory/pg/storage';
-import { RESERVED_SLUGS, SLUG_RE, normalizeEmail } from './controlPlane';
+import { RESERVED_SLUGS, SLUG_RE } from './controlPlane';
 
 // ── ROR (api.ror.org/v2) ──────────────────────────────────────────────────────────────────────────────────────────────
-export interface OrganizationCandidate {
+interface OrganizationCandidate {
   /** ROR id without the URL prefix (`03gnr7b55`). */
   ror: string;
   name: string;
@@ -58,7 +58,7 @@ export const rorOrganizationFromRecord = (raw: any): OrganizationCandidate | nul
 };
 
 // ── Establishments of the ministry (fr-esr-principaux-etablissements-enseignement-superieur) ──────────────────────────
-export interface EsrEstablishment {
+interface EsrEstablishment {
   uai: string | null;
   siret: string | null;
   idref: string | null;
@@ -83,7 +83,7 @@ export const esrEstablishmentFromRecord = (raw: any): EsrEstablishment | null =>
 };
 
 // ── Research structures of the ministry (fr-esr-structures-recherche-publiques-actives, RNSR) ─────────────────────────
-export interface RnsrStructure {
+interface RnsrStructure {
   rnsr: string;
   acronym: string | null;
   name: string;
@@ -147,7 +147,7 @@ export const mailDomainOf = (website: string | null | undefined): string | null 
 // ── Payload confirmed by the creator ──────────────────────────────────────────────────────────────────────────────────
 const optionalText = (max = 200) => z.string().trim().max(max).nullable().optional().transform((v) => (v ? v : null));
 
-export const OnboardingLab = z.object({
+const OnboardingLab = z.object({
   rnsr: optionalText(20),
   acronym: z.string().trim().min(1).max(60),
   name: z.string().trim().min(1).max(300),
@@ -182,7 +182,7 @@ export const OnboardingPayload = z.object({
   labs: z.array(OnboardingLab).max(500).default([]),
 });
 export type OnboardingPayload = z.infer<typeof OnboardingPayload>;
-export type OnboardingLab = z.infer<typeof OnboardingLab>;
+type OnboardingLab = z.infer<typeof OnboardingLab>;
 
 /** Host of a tenant on the base domain of the deployment. */
 export const tenantHostOf = (slug: string, baseDomain: string): string => `${slug}.${String(baseDomain).toLowerCase().replace(/^\.+|\.+$/g, '')}`;
@@ -198,7 +198,7 @@ export const structureOfLab = (lab: OnboardingLab): Structure => ({
   identifiers: { wikidata: lab.wikidata || undefined },
 } as unknown as Structure);
 
-export interface SeedReport { institution: number; structures: number; skipped: { acronym: string; reason: string }[] }
+interface SeedReport { institution: number; structures: number; skipped: { acronym: string; reason: string }[] }
 
 /** Writes the establishment and the labs of the payload into the (empty) directory of the tenant. */
 export const seedTenantDirectory = async (db: Db, payload: OnboardingPayload, actor: string): Promise<SeedReport> => {
@@ -229,9 +229,3 @@ export const seedTenantDirectory = async (db: Db, payload: OnboardingPayload, ac
   return report;
 };
 
-/** Owner e-mail and mail domains of a payload, normalized. */
-export const ownerAndDomains = (ownerEmail: string, payload: OnboardingPayload): { ownerEmail: string; mailDomains: string[] } => {
-  const owner = normalizeEmail(ownerEmail);
-  const domains = new Set(payload.mailDomains.map((d) => d.toLowerCase()));
-  return { ownerEmail: owner, mailDomains: [...domains] };
-};
