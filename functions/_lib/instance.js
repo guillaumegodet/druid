@@ -8,20 +8,23 @@
 //    instance (pages.dev, branch previews, custom domain); Pages variables still override the
 //    registry field by field when present and non-empty (transition of lot 5):
 //      DRUID_INSTANCE, INSTANCE_LABEL, READ_ONLY, SHOW_STATUS_VALIDATION, ADMIN_EMAILS,
-//      OPENALEX_MAILTO, GRIST_DOC_ID / VITE_GRIST_DOC_ID, GRIST_API_BASE, VITE_GRIST_PUBLIC_BASE_URL,
-//      DRUID_STORAGE (grist | postgres, druid-internal docs/plan-migration-postgresql.md, lot 10);
+//      OPENALEX_MAILTO, DRUID_STORAGE;
 //  - mode "multi" (one deployment for several instances, DRUID_DEPLOYMENT or DRUID_INSTANCES): the instance is the one
 //    declaring the request host in its `domains`; an unknown host gets no instance (404). No
 //    variable overrides an instance, and secrets are only read per instance (see secretOf).
 // Without registry nor variable, the defaults are the historical ones (Centrale).
 //
+// Storage: PostgreSQL only since lot 12 a of druid-internal docs/plan-migration-postgresql.md (2026-11-25). An instance
+// still declaring `storage: grist` resolves, and its directory routes answer 500 (functions/_lib/storage.js).
+//
 // No route: this module exports no onRequest handler, so Pages does not serve it.
 import registry from '../_generated/registry.js';
 
 export const DEFAULT_SLUG = 'centrale';
-export const DEFAULT_GRIST_API_BASE = 'https://grist.numerique.gouv.fr/api';
+// Grist UI sent to the browser (lib/instanceRuntime.ts): no document on Cloudflare, so no « open in Grist » link.
+const DEFAULT_GRIST_UI_URL = 'https://grist.numerique.gouv.fr';
 // Secrets an instance can hold. In "multi" mode they are named <NAME>__<SLUG> (see secretOf).
-export const INSTANCE_SECRETS = ['GRIST_API_KEY', 'ILAAS_API_KEY', 'OPENALEX_API_KEY'];
+export const INSTANCE_SECRETS = ['ILAAS_API_KEY', 'OPENALEX_API_KEY'];
 // Hyperdrive binding of an instance on PostgreSQL (storage "postgres"): HYPERDRIVE, or HYPERDRIVE__<SLUG> on a shared
 // deployment — resolved like a secret (secretOf), never borrowed from another instance.
 export const HYPERDRIVE_BINDING = 'HYPERDRIVE';
@@ -44,14 +47,8 @@ export const resolveInstance = (env = {}, reg = null, { shared = false } = {}) =
   const e = shared ? {} : env;
   const slug = (isSet(e.DRUID_INSTANCE) ? String(e.DRUID_INSTANCE).trim() : reg?.slug) || DEFAULT_SLUG;
   const envBool = (name, fallback) => (isSet(e[name]) ? isTrue(e[name]) : fallback);
-  const storageRaw = String(isSet(e.DRUID_STORAGE) ? e.DRUID_STORAGE : (reg?.storage || 'grist')).trim().toLowerCase();
-  const storage = STORAGE_KINDS.includes(storageRaw) ? storageRaw : 'grist';
-  const docId = [e.GRIST_DOC_ID, e.VITE_GRIST_DOC_ID, reg?.grist?.docId].find(isSet) || '';
-  const apiBase = String([e.GRIST_API_BASE, reg?.grist?.apiBase].find(isSet) || DEFAULT_GRIST_API_BASE).trim().replace(/\/$/, '');
-  // Public doc read directly by the browser (read-only instance): its API base, else null (proxy).
-  const publicBaseUrl = isSet(e.VITE_GRIST_PUBLIC_BASE_URL)
-    ? String(e.VITE_GRIST_PUBLIC_BASE_URL).trim().replace(/\/$/, '')
-    : (reg?.grist?.publicRead ? apiBase : null);
+  const storageRaw = String(isSet(e.DRUID_STORAGE) ? e.DRUID_STORAGE : (reg?.storage || 'postgres')).trim().toLowerCase();
+  const storage = STORAGE_KINDS.includes(storageRaw) ? storageRaw : 'postgres';
   return {
     slug,
     label: String([e.INSTANCE_LABEL, reg?.label].find(isSet) || 'Centrale Nantes'),
@@ -60,8 +57,6 @@ export const resolveInstance = (env = {}, reg = null, { shared = false } = {}) =
     storage,
     // Schema of the shared database of a multi-tenant deployment (instance.json `postgres.schema`), null otherwise.
     postgres: { schema: storage === 'postgres' && reg?.postgres?.schema ? String(reg.postgres.schema) : null },
-    // Document of a Grist instance; on PostgreSQL the ids stay empty (no « open in Grist » link, no key).
-    grist: { docId: String(docId).trim(), apiBase, publicBaseUrl },
     // Without registry, news and newsletter keep their historical rule: Centrale only.
     features: {
       news: reg ? !!reg.features?.news : slug === DEFAULT_SLUG,
@@ -133,8 +128,9 @@ export const instanceEnv = (env, instance) => {
 export const publicInstanceInfo = (instance) => ({
   slug: instance.slug,
   label: instance.label,
-  gristDocId: instance.grist.docId,
-  gristPublicBaseUrl: instance.grist.publicBaseUrl,
-  gristUiUrl: instance.grist.apiBase.replace(/\/api$/, ''),
+  // Sent empty rather than left out: the browser would fall back on build variables (lib/instanceRuntime.ts).
+  gristDocId: '',
+  gristPublicBaseUrl: null,
+  gristUiUrl: DEFAULT_GRIST_UI_URL,
   storage: instance.storage,
 });

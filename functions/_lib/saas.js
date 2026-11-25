@@ -15,7 +15,7 @@ import {
 import { sendMagicLink } from '../../lib/saas/email.ts';
 import { llmEnvOf } from '../../lib/saas/clientKeys.ts';
 import { readTenantSecrets } from '../../lib/saas/secrets.ts';
-import { DEFAULT_GRIST_API_BASE, instanceEnv, instanceForRequest, instanceOf, resolveForHost } from './instance.js';
+import { instanceEnv, instanceForRequest, instanceOf, resolveForHost } from './instance.js';
 
 export const SAAS_BINDING = 'SAAS_HYPERDRIVE';
 /** Optional KV namespace caching host → tenant (5 min); without it, the isolate memo below (60 s) is the only cache. */
@@ -87,7 +87,6 @@ export const tenantInstance = ({ tenant, plan }) => {
     readOnly: tenant.status !== 'active',
     statusValidation: !!settings.capabilities?.HAS_STATUS_VALIDATION,
     storage: 'postgres',
-    grist: { docId: '', apiBase: DEFAULT_GRIST_API_BASE, publicBaseUrl: null },
     features: { news: false, newsletter: false },
     // Rights come from the members (functions/api/me.js), never from a list of admins.
     admins: [],

@@ -1,7 +1,6 @@
 // Seed of a fictitious instance (druid-internal docs/plan-migration-postgresql.md, lot 10 b): the rows of
-// instances/<slug>/demo-data.mjs shaped as the Grist records that instances/demo/build_demo_grist.mjs writes into the
-// demo document, so that the Grist → PostgreSQL import (gristToPg, loadPg) loads the same directory from the data
-// files alone — no document, no key. Pure: the script scripts/seed_demo_pg.ts does the database part.
+// instances/<slug>/demo-data.mjs shaped as Grist records (the former demo documents, removed in lot 12 a), so that the
+// Grist → PostgreSQL import (gristToPg, loadPg) loads the directory from the data files alone — no document, no key. Pure: the script scripts/seed_demo_pg.ts does the database part.
 import type { GristRecord } from '../directory/gristMapping';
 import type { GristDirectoryInput } from './gristToPg';
 import { WORK_TABLES, type GristWorkInput } from './gristToPgWork';

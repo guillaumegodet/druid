@@ -16701,12 +16701,12 @@ msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY not configured"
 
 #: lib/apiErrors.ts:134
-msgid "GRIST_API_KEY not configured on Cloudflare"
-msgstr "GRIST_API_KEY not configured on Cloudflare"
-
-#: lib/apiErrors.ts:135
 msgid "HYPERDRIVE binding not configured on Cloudflare"
 msgstr "HYPERDRIVE binding not configured on Cloudflare"
+
+#: lib/apiErrors.ts:135
+msgid "Grist storage is no longer served on Cloudflare: storage postgres required"
+msgstr "Grist storage is no longer served on Cloudflare: storage postgres required"
 
 #: lib/apiErrors.ts:137
 msgid "Unknown API route"

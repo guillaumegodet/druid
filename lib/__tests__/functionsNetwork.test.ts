@@ -43,7 +43,7 @@ const call = (handler: any, path: string, { instance = demo, method = 'GET', bod
 describe('capabilities of the demo', () => {
   it('declares the network and the calls for proposals', async () => {
     expect([capabilitiesFor(demo).HAS_NETWORK_API, capabilitiesFor(demo).HAS_CALLS, capabilitiesFor(demo).HAS_CALLS_CHAT]).toEqual([true, true, false]);
-    expect([capabilitiesFor(withoutNetwork).HAS_NETWORK_API, capabilitiesFor(resolveInstance({})).HAS_NETWORK_API, capabilitiesFor(resolveInstance({})).HAS_CALLS]).toEqual([false, false, false]);
+    expect([capabilitiesFor(withoutNetwork).HAS_NETWORK_API, capabilitiesFor(resolveInstance({})).HAS_NETWORK_API, capabilitiesFor(resolveInstance({})).HAS_CALLS]).toEqual([false, false, true]);
     const r = await call(me, '/api/me');
     const body = await r.json();
     expect([body.capabilities.HAS_NETWORK_API, body.capabilities.HAS_CALLS, body.capabilities.READ_ONLY]).toEqual([true, true, true]);
