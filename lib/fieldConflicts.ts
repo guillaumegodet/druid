@@ -22,6 +22,19 @@ export interface FieldConflict {
 
 export type FieldConflictAction = 'keep' | 'drop' | 'correct';
 
+/** A file or site import and the values it still brings (case 19 of the plan). */
+export interface FieldImport {
+  id: string;
+  source: string;
+  label: string | null;
+  createdAt: string;
+  createdBy: string | null;
+  values: number;
+  persons: number;
+  undoneAt: string | null;
+  undoneBy: string | null;
+}
+
 /** Readable name of a source (fallback: its code). */
 export const SOURCE_LABELS: Record<string, MessageDescriptor> = {
   manual: msg`Corrected`,
@@ -50,4 +63,6 @@ export const FieldConflictsApi = {
   list: () => request<{ available: boolean; items: FieldConflict[] }>('/api/field-conflicts'),
   resolve: (personId: string, field: string, action: FieldConflictAction, value?: string) =>
     request<{ ok: true }>('/api/field-conflicts/resolve', { method: 'POST', body: JSON.stringify({ personId, field, action, value }) }),
+  imports: () => request<{ available: boolean; items: FieldImport[] }>('/api/field-imports'),
+  undoImport: (id: string) => request<{ values: number; persons: number }>(`/api/field-imports/${encodeURIComponent(id)}/undo`, { method: 'POST' }),
 };

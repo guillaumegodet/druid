@@ -12,6 +12,16 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Annuler un import** (PostgreSQL ; À traiter › Conflits de sources › Imports récents, administrateurs) : chaque
+  import de fichier ou de site enregistre son lot, et les valeurs qu'il apporte à la date de naissance et au grade le
+  référencent. « Annuler les valeurs de cet import » les retire et recalcule les fiches ; les fiches, appartenances et
+  identifiants créés par l'import restent.
+- Tâches : la tâche **« Passer à l'uid LDAP »** repère aussi les fiches restées sur un **compte étudiant** (uid
+  `E…U`) dont le n° agent est celui d'un compte personnel qu'aucune fiche ne porte : étudiant ou doctorant devenu
+  personnel, que Druid affichait parti à la fermeture du compte étudiant. Après la bascule, la tâche de suivi SoVisu+
+  est ouverte pour tout ancien uid, plus seulement pour les `ext_`.
+
 ### Corrigé
 - **Fusion de doublons et fusion par source** (PostgreSQL) : quand la fiche absorbée était une autre personne, ses
   valeurs par source (date de naissance, grade), corrections manuelles comprises, disparaissaient avec elle. Elles
@@ -19,11 +29,10 @@ données à exécuter au déploiement).
   et un conflit de sources quand elle contredit une correction de la fiche gardée. Une fusion annulée recrée la personne
   avec des valeurs `legacy` (plus de correction manuelle implicite).
 
-### Ajouté
-- Tâches : la tâche **« Passer à l'uid LDAP »** repère aussi les fiches restées sur un **compte étudiant** (uid
-  `E…U`) dont le n° agent est celui d'un compte personnel qu'aucune fiche ne porte : étudiant ou doctorant devenu
-  personnel, que Druid affichait parti à la fermeture du compte étudiant. Après la bascule, la tâche de suivi SoVisu+
-  est ouverte pour tout ancien uid, plus seulement pour les `ext_`.
+### Migration
+- `20261125150000_import_batch_kind` (dbmate) : `import_batch.kind` (`arbitration` par défaut pour les lots existants,
+  `import` pour les imports), `created_by`, `undone_at`, `undone_by` ; index sur `person_field_value.import_batch_id`.
+  Les écrans d'arbitrage ne listent que les lots `arbitration`.
 
 ## [2.20.0] — 2026-11-25
 
