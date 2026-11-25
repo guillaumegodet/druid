@@ -10,6 +10,7 @@ import { joinHalIdNums, sortHalIdNums } from '../../halIds';
 import { parseFteCell } from '../../fte';
 import { validationInfo } from '../../validation';
 import type { DirectoryRow, EmployerIndex, RattachementRole } from '../people';
+import type { FieldProvenance } from '../../../types';
 
 /** Columns of the PostgreSQL rows the adapter reads (selected by the repository). */
 export interface PgPerson {
@@ -36,6 +37,8 @@ export interface PersonExtras {
   identifiers: PgIdentifier[];
   scopusAbsent: boolean;
   links: PgLink[];
+  /** Provenance of the fields merged by source (lib/directory/pg/fieldValues.ts readFieldProvenance), {} when none. */
+  provenance?: Record<string, FieldProvenance>;
 }
 
 const LINK_FIELDS = {
@@ -73,6 +76,7 @@ export const pgDirectoryRow = (p: PgPerson, m: PgMembership, x: PersonExtras): D
     annuaireUrl: p.directory_url ?? '',
     birthDate: p.birth_date ?? fromGristFuzzyDate(e.DATE_DE_NAISSANCE_JJ_MM_AAAA),
     corpsGrade: p.corps_grade,
+    provenance: x.provenance ?? {},
     employmentType: p.employment_type,
     employmentTypeLabel: p.employment_type_label,
     // A label typed in place of a reference is what the record shows (kept by the import even when resolved).

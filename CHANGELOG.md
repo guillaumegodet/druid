@@ -12,6 +12,27 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Provenance par champ et fusion par priorité de sources** (base technique, sans effet visible pour l'instant) :
+  chaque source (LDAP, fichier RH, fichier labo, site annuaire, saisie manuelle) garde sa propre valeur dans
+  `person_field_value` ; la colonne de `person` devient une projection recalculée (`lib/directory/fieldMerge.ts`).
+  Une correction manuelle l'emporte toujours et n'est plus écrasée par un réimport ; une source qui change ensuite
+  lève un conflit. Premiers champs : date de naissance et corps-grade ; ordre des sources dans
+  `field_source_priority`.
+- **Date de naissance et grade fusionnés par source** (PostgreSQL) : la fiche affiche la valeur de la source la plus
+  fiable avec une étiquette (LDAP, Fichier RH, Site du labo, Corrigée…) et ces champs restent modifiables. Une valeur
+  saisie devient une correction qui l'emporte sur le LDAP et les imports ; réenregistrer sans changement n'en crée pas.
+  Les valeurs LDAP sont enregistrées comme source après chaque synchronisation LDAP (grade non repris pour un employeur
+  externe) ; les imports de fichier et de site enregistrent le grade lu, et une ligne cochée contre une source plus
+  fiable devient une correction.
+- **À traiter › Conflits de sources** : les corrections qu'une source contredit depuis leur saisie, avec trois choix
+  (garder la correction, revenir aux sources, autre valeur). Aide « Lire une fiche » et « Tâches à traiter » à jour.
+
+### Modifié
+- Sur PostgreSQL, la revue LDAP ne propose plus la date de naissance ni le grade (la synchronisation les enregistre
+  comme source), et ces champs ne sont plus verrouillés par le LDAP dans la fiche. Une date de naissance illisible est
+  refusée (400) au lieu d'effacer le champ. Grist inchangé.
+
 ### Corrigé
 - **Identifiants OpenAlex incomplets sur quelques fiches (PostgreSQL)** : pour une personne qui avait plusieurs lignes
   dans Grist, la migration gardait dans `person.extra.OpenAlex_ids` la cellule de sa ligne principale, et la liste
@@ -23,6 +44,17 @@ données à exécuter au déploiement).
 ### Migration
 - `20261120150000_person_extra_openalex_list.sql` : retire `OpenAlex_ids` de `person.extra` (3 fiches à Nantes).
   Rien à restaurer au retour arrière : les A-ids sont dans `person_identifier`.
+- `20261121150000_person_field_value` (dbmate) : crée les deux tables (rang unique par champ, colonne `customized`
+  pour les réglages d'une instance) et reprend les valeurs actuelles par la fonction `seed_person_field_value`. La
+  dernière écriture de chaque valeur dans le journal d'audit décide de sa source : la ligne datée qu'elle a ajoutée
+  aux commentaires de la fiche (`MAJ LDAP` → `ldap`, `Arbitrage DRPI` → `hr_file`, autre arbitrage →
+  `partner_directory`, `Fusion` → `legacy`) ; une écriture en lot (autre fiche du même auteur à moins de 2 s) ou
+  technique → `legacy` ; sinon une saisie dans la fiche → correction manuelle. Les valeurs reprises de Grist passent
+  en `legacy`, au dernier rang. La fonction reste en base : le lot qui branchera les imports la relancera.
+- `20261124150000_field_value_wiring` (dbmate) : remplace les lignes reprises par une reprise des valeurs actuelles
+  (`seed_person_field_value`) et retire `observed_at` du journal d'audit (une confirmation de source n'est pas un
+  changement). **Après le déploiement : relancer la synchronisation LDAP** (Synchroniser › LDAP) pour enregistrer les
+  valeurs LDAP ; jusque-là, la fiche montre les valeurs stockées sans la surcouche LDAP.
 
 ## [2.18.0] — 2026-11-20
 

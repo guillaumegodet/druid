@@ -13,39 +13,39 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:148
+#: App.tsx:149
 msgid "Error computing the LDAP diff"
 msgstr "Error computing the LDAP diff"
 
-#: App.tsx:158
+#: App.tsx:159
 msgid "Error searching for duplicates"
 msgstr "Error searching for duplicates"
 
-#: App.tsx:182
-#: App.tsx:188
+#: App.tsx:184
+#: App.tsx:190
 msgid "Researcher not found in the loaded scope"
 msgstr "Researcher not found in the loaded scope"
 
-#: App.tsx:201
+#: App.tsx:203
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:362
+#: App.tsx:364
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:399
+#: App.tsx:401
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:413
+#: App.tsx:415
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:427
+#: App.tsx:429
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -53,106 +53,106 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:427
+#: App.tsx:431
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to the directory).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to the directory).{skippedMsg}"
 
-#: App.tsx:431
+#: App.tsx:433
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:438
+#: App.tsx:440
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:516
-#: App.tsx:523
+#: App.tsx:518
+#: App.tsx:525
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:524
+#: App.tsx:526
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:524
+#: App.tsx:526
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:526
+#: App.tsx:528
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#: App.tsx:536
+#: App.tsx:538
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:546
+#: App.tsx:548
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:560
+#: App.tsx:562
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:570
+#: App.tsx:574
 msgid "LDAP update applied: {updated} record(s) written to the directory."
 msgstr "LDAP update applied: {updated} record(s) written to the directory."
 
-#: App.tsx:574
+#: App.tsx:576
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:581
+#: App.tsx:583
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:613
+#: App.tsx:617
 msgid "Validation applied: {0} record(s) written to the directory."
 msgstr "Validation applied: {0} record(s) written to the directory."
 
-#: App.tsx:617
+#: App.tsx:619
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:628
+#: App.tsx:632
 msgid "This record has no directory row: validation impossible."
 msgstr "This record has no directory row: validation impossible."
 
-#: App.tsx:642
+#: App.tsx:644
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:661
+#: App.tsx:663
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:692
+#: App.tsx:694
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:704
+#: App.tsx:708
 msgid "LDAP structures: {updated} updated, {created} created in the directory."
 msgstr "LDAP structures: {updated} updated, {created} created in the directory."
 
-#: App.tsx:708
+#: App.tsx:710
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:730
+#: App.tsx:732
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:739
+#: App.tsx:741
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -160,45 +160,45 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:748
+#: App.tsx:750
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:756
+#: App.tsx:758
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:770
+#: App.tsx:772
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:787
-#: App.tsx:803
+#: App.tsx:789
+#: App.tsx:805
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:836
+#: App.tsx:838
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:983
+#: App.tsx:986
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:987
+#: App.tsx:990
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:990
+#: App.tsx:996
 msgid "Directory row {gristRowId} not found in the loaded scope"
 msgstr "Directory row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:1013
+#: App.tsx:1016
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:1034
-#: App.tsx:1047
+#: App.tsx:1037
+#: App.tsx:1050
 #: components/admin/EstablishmentAdmin.tsx:86
 #: components/dashboard/CallCandidates.tsx:127
 #: components/dashboard/CallCandidates.tsx:165
@@ -217,20 +217,20 @@ msgstr "Loading dashboard…"
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1057
+#: App.tsx:1060
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1081
+#: App.tsx:1084
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1085
+#: App.tsx:1088
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1134
+#: App.tsx:1137
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -620,6 +620,7 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:194
 #: components/researchers/AlignLaunchModal.tsx:188
+#: components/researchers/FieldConflictsPage.tsx:112
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
@@ -818,6 +819,7 @@ msgstr "Export PDF"
 #: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
 #: components/reports/ShareDialog.tsx:197
+#: components/researchers/FieldConflictsPage.tsx:110
 msgid "Save"
 msgstr "Save"
 
@@ -1066,7 +1068,7 @@ msgid "Synchronise"
 msgstr "Synchronise"
 
 #: components/StructureList.tsx:278
-#: components/researchers/ListHeader.tsx:108
+#: components/researchers/ListHeader.tsx:109
 msgid "Force directory refresh"
 msgstr "Force directory refresh"
 
@@ -1320,6 +1322,7 @@ msgstr "Funding programmes known to this instance. An active programme has its c
 #: components/researchers/AffiliationHistorySection.tsx:204
 #: components/researchers/DuplicatesPage.tsx:118
 #: components/researchers/DuplicatesPage.tsx:131
+#: components/researchers/FieldConflictsPage.tsx:58
 #: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/LdapMovesPanel.tsx:124
 #: components/researchers/TasksPage.tsx:132
@@ -2934,13 +2937,15 @@ msgid "Confidence of the automatic classification"
 msgstr "Confidence of the automatic classification"
 
 #: components/dashboard/AxisReviewTable.tsx:130
+#: components/researchers/GeneralTab.tsx:22
+#: lib/fieldConflicts.ts:27
+msgid "Corrected"
+msgstr "Corrected"
+
+#: components/dashboard/AxisReviewTable.tsx:130
 #: components/structures/StructureAlignPanel.tsx:165
 msgid "Confirmed"
 msgstr "Confirmed"
-
-#: components/dashboard/AxisReviewTable.tsx:130
-msgid "Corrected"
-msgstr "Corrected"
 
 #: components/dashboard/AxisReviewTable.tsx:130
 #: components/dashboard/AxisReviewTable.tsx:279
@@ -3735,6 +3740,7 @@ msgstr "To check"
 #: components/dashboard/CallCandidates.tsx:147
 #: components/dashboard/CallCandidates.tsx:177
 #: components/researchers/FilterPanel.tsx:272
+#: lib/fieldConflicts.ts:38
 #: lib/importConflicts.ts:63
 msgid "Grade"
 msgstr "Grade"
@@ -6722,7 +6728,7 @@ msgstr "Lab"
 #: components/dashboard/PublicationsListTab.tsx:351
 #: components/researchers/FilterPanel.tsx:183
 #: components/researchers/FilterPanel.tsx:335
-#: components/researchers/GeneralTab.tsx:319
+#: components/researchers/GeneralTab.tsx:400
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Employment type"
@@ -7286,7 +7292,7 @@ msgstr "Population"
 
 #: components/dashboard/StaffSection.tsx:295
 #: components/dashboard/StaffSection.tsx:311
-#: components/researchers/GeneralTab.tsx:366
+#: components/researchers/GeneralTab.tsx:447
 msgid "Research FTE"
 msgstr "Research FTE"
 
@@ -12060,7 +12066,7 @@ msgstr "All records of the scope (full rerun)"
 #: components/researchers/AlignLaunchModal.tsx:129
 #: components/researchers/DuplicatesPage.tsx:146
 #: components/researchers/ListHeader.tsx:140
-#: components/researchers/TodoPage.tsx:61
+#: components/researchers/TodoPage.tsx:66
 msgid "To process"
 msgstr "To process"
 
@@ -12326,6 +12332,7 @@ msgid "Undetermined case: remembered so it stops coming back at every review, no
 msgstr "Undetermined case: remembered so it stops coming back at every review, no role set."
 
 #: components/researchers/DuplicateQualifyPanel.tsx:60
+#: components/researchers/GeneralTab.tsx:40
 msgctxt "needs rework"
 msgid "To review"
 msgstr "To review"
@@ -12367,12 +12374,12 @@ msgid "Recomputes the groups from the Directory (no LDAP run)"
 msgstr "Recomputes the groups from the Directory (no LDAP run)"
 
 #: components/researchers/DuplicatesPage.tsx:126
-#: components/researchers/TodoPage.tsx:75
+#: components/researchers/TodoPage.tsx:82
 msgid "Duplicates"
 msgstr "Duplicates"
 
 #: components/researchers/DuplicatesPage.tsx:127
-#: components/researchers/TodoPage.tsx:64
+#: components/researchers/TodoPage.tsx:69
 msgid "Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation"
 msgstr "Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation"
 
@@ -12448,6 +12455,55 @@ msgstr "Qualified multiple affiliations ({0})"
 msgid "Requalify"
 msgstr "Requalify"
 
+#: components/researchers/FieldConflictsPage.tsx:54
+msgid "A manual correction wins over the imports and the LDAP. A source that changed its value since is listed here: nothing changes until you choose."
+msgstr "A manual correction wins over the imports and the LDAP. A source that changed its value since is listed here: nothing changes until you choose."
+
+#: components/researchers/FieldConflictsPage.tsx:64
+msgid "No source conflict."
+msgstr "No source conflict."
+
+#: components/researchers/FieldConflictsPage.tsx:82
+msgid "Correction: <0>{shown}</0> (by {by} on {on})"
+msgstr "Correction: <0>{shown}</0> (by {by} on {on})"
+
+#: components/researchers/FieldConflictsPage.tsx:90
+msgid "{source} now gives <0>{value}</0> (since {since}, after the correction)"
+msgstr "{source} now gives <0>{value}</0> (since {since}, after the correction)"
+
+#: components/researchers/FieldConflictsPage.tsx:91
+msgid "{source} changed to <0>{value}</0> (since {since})"
+msgstr "{source} changed to <0>{value}</0> (since {since})"
+
+#: components/researchers/FieldConflictsPage.tsx:98
+msgid "The correction stays; the sources as they are now are acknowledged."
+msgstr "The correction stays; the sources as they are now are acknowledged."
+
+#: components/researchers/FieldConflictsPage.tsx:99
+msgid "Keep the correction"
+msgstr "Keep the correction"
+
+#: components/researchers/FieldConflictsPage.tsx:102
+msgid "The correction is removed: the most trusted source gives the value."
+msgstr "The correction is removed: the most trusted source gives the value."
+
+#: components/researchers/FieldConflictsPage.tsx:103
+msgid "Back to the sources"
+msgstr "Back to the sources"
+
+#: components/researchers/FieldConflictsPage.tsx:108
+#: components/researchers/FuzzyDateInput.tsx:74
+msgid "YYYY-MM-DD, YYYY-MM or YYYY"
+msgstr "YYYY-MM-DD, YYYY-MM or YYYY"
+
+#: components/researchers/FieldConflictsPage.tsx:108
+msgid "Grade code"
+msgstr "Grade code"
+
+#: components/researchers/FieldConflictsPage.tsx:116
+msgid "Another value"
+msgstr "Another value"
+
 #: components/researchers/FilterPanel.tsx:144
 #: components/researchers/FilterPanel.tsx:147
 #: components/researchers/FilterPanel.tsx:160
@@ -12499,7 +12555,7 @@ msgstr "Validation"
 
 #: components/researchers/FilterPanel.tsx:184
 #: components/researchers/FilterPanel.tsx:325
-#: components/researchers/GeneralTab.tsx:402
+#: components/researchers/GeneralTab.tsx:484
 msgid "Cluster"
 msgstr "Cluster"
 
@@ -12588,169 +12644,215 @@ msgstr "Enter a value between 0 and 1 (e.g. 0.5), or leave empty"
 msgid "Unrecognized date: enter YYYY-MM-DD, YYYY-MM or YYYY"
 msgstr "Unrecognized date: enter YYYY-MM-DD, YYYY-MM or YYYY"
 
-#: components/researchers/FuzzyDateInput.tsx:74
-msgid "YYYY-MM-DD, YYYY-MM or YYYY"
-msgstr "YYYY-MM-DD, YYYY-MM or YYYY"
-
 #: components/researchers/FuzzyDateInput.tsx:88
 msgid "Pick a full date from the calendar"
 msgstr "Pick a full date from the calendar"
 
-#: components/researchers/GeneralTab.tsx:92
+#: components/researchers/GeneralTab.tsx:22
+#: lib/fieldConflicts.ts:29
+msgid "HR file"
+msgstr "HR file"
+
+#: components/researchers/GeneralTab.tsx:22
+#: lib/fieldConflicts.ts:30
+msgid "Lab file"
+msgstr "Lab file"
+
+#: components/researchers/GeneralTab.tsx:22
+#: lib/fieldConflicts.ts:31
+msgid "Lab website"
+msgstr "Lab website"
+
+#: components/researchers/GeneralTab.tsx:23
+#: lib/fieldConflicts.ts:32
+msgid "Partner directory"
+msgstr "Partner directory"
+
+#: components/researchers/GeneralTab.tsx:23
+#: lib/fieldConflicts.ts:33
+msgid "Before tracking"
+msgstr "Before tracking"
+
+#: components/researchers/GeneralTab.tsx:30
+msgid "Manual correction by {by} on {on}: it wins over the imports and the LDAP."
+msgstr "Manual correction by {by} on {on}: it wins over the imports and the LDAP."
+
+#: components/researchers/GeneralTab.tsx:31
+msgid "Value given by this source. Typing another value makes it a manual correction."
+msgstr "Value given by this source. Typing another value makes it a manual correction."
+
+#: components/researchers/GeneralTab.tsx:38
+msgid "A source changed its value since the correction: to review in To do › Source conflicts."
+msgstr "A source changed its value since the correction: to review in To do › Source conflicts."
+
+#: components/researchers/GeneralTab.tsx:137
 msgid "Researcher identifiers"
 msgstr "Researcher identifiers"
 
-#: components/researchers/GeneralTab.tsx:144
+#: components/researchers/GeneralTab.tsx:189
 msgid "HAL numeric identifier (idHal_i)"
 msgstr "HAL numeric identifier (idHal_i)"
 
-#: components/researchers/GeneralTab.tsx:155
+#: components/researchers/GeneralTab.tsx:200
 msgid "Digits only, e.g. 123456"
 msgstr "Digits only, e.g. 123456"
 
-#: components/researchers/GeneralTab.tsx:162
+#: components/researchers/GeneralTab.tsx:207
 msgid "Only the primary IdHAL_i is sent to CRISalid and harvested"
 msgstr "Only the primary IdHAL_i is sent to CRISalid and harvested"
 
-#: components/researchers/GeneralTab.tsx:163
+#: components/researchers/GeneralTab.tsx:208
 msgid "Other IdHAL_i (not harvested)"
 msgstr "Other IdHAL_i (not harvested)"
 
-#: components/researchers/GeneralTab.tsx:167
+#: components/researchers/GeneralTab.tsx:212
 msgid "e.g. 123456|654321"
 msgstr "e.g. 123456|654321"
 
-#: components/researchers/GeneralTab.tsx:183
+#: components/researchers/GeneralTab.tsx:228
 msgid "Make it the primary IdHAL_i (the one harvested by CRISalid)"
 msgstr "Make it the primary IdHAL_i (the one harvested by CRISalid)"
 
-#: components/researchers/GeneralTab.tsx:185
+#: components/researchers/GeneralTab.tsx:230
 #: components/structures/IdentifiersTab.tsx:76
 #: components/structures/StructureAlignPanel.tsx:178
 msgid "make primary"
 msgstr "make primary"
 
-#: components/researchers/GeneralTab.tsx:230
+#: components/researchers/GeneralTab.tsx:260
+msgid "Read-only: maintained by the OpenAlex alignment"
+msgstr "Read-only: maintained by the OpenAlex alignment"
+
+#: components/researchers/GeneralTab.tsx:275
+msgid "Author ID confirmed by hand (group dashboards)"
+msgstr "Author ID confirmed by hand (group dashboards)"
+
+#: components/researchers/GeneralTab.tsx:283
+msgid "No OpenAlex author ID"
+msgstr "No OpenAlex author ID"
+
+#: components/researchers/GeneralTab.tsx:311
 msgid "Personal details"
 msgstr "Personal details"
 
-#: components/researchers/GeneralTab.tsx:236
+#: components/researchers/GeneralTab.tsx:317
 msgctxt "honorific"
 msgid "Title"
 msgstr "Title"
 
-#: components/researchers/GeneralTab.tsx:244
+#: components/researchers/GeneralTab.tsx:325
 #: components/researchers/PeopleFileImport.tsx:14
 msgid "Last name"
 msgstr "Last name"
 
-#: components/researchers/GeneralTab.tsx:248
+#: components/researchers/GeneralTab.tsx:329
 #: components/researchers/PeopleFileImport.tsx:14
 msgid "First name"
 msgstr "First name"
 
-#: components/researchers/GeneralTab.tsx:252
+#: components/researchers/GeneralTab.tsx:333
 #: lib/importConflicts.ts:66
 msgid "Nationality"
 msgstr "Nationality"
 
-#: components/researchers/GeneralTab.tsx:256
+#: components/researchers/GeneralTab.tsx:337
+#: lib/fieldConflicts.ts:37
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date of birth"
 
-#: components/researchers/GeneralTab.tsx:262
+#: components/researchers/GeneralTab.tsx:343
 msgid "Date of birth: YYYY-MM-DD, or YYYY-MM / YYYY when only the month or the year is known."
 msgstr "Date of birth: YYYY-MM-DD, or YYYY-MM / YYYY when only the month or the year is known."
 
-#: components/researchers/GeneralTab.tsx:269
+#: components/researchers/GeneralTab.tsx:350
 #: components/researchers/LdapUidLookup.tsx:49
 msgid "UID (Dyna)"
 msgstr "UID (Dyna)"
 
-#: components/researchers/GeneralTab.tsx:282
+#: components/researchers/GeneralTab.tsx:363
 msgid "HR staff number (Mangue), from LDAP or the HR lists — read-only"
 msgstr "HR staff number (Mangue), from LDAP or the HR lists — read-only"
 
-#: components/researchers/GeneralTab.tsx:282
+#: components/researchers/GeneralTab.tsx:363
 msgid "Staff number"
 msgstr "Staff number"
 
-#: components/researchers/GeneralTab.tsx:291
+#: components/researchers/GeneralTab.tsx:372
 msgid "Employment & contract"
 msgstr "Employment & contract"
 
-#: components/researchers/GeneralTab.tsx:294
+#: components/researchers/GeneralTab.tsx:375
 msgid "Employing institution"
 msgstr "Employing institution"
 
-#: components/researchers/GeneralTab.tsx:300
+#: components/researchers/GeneralTab.tsx:381
 msgid "— None —"
 msgstr "— None —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:302
+#: components/researchers/GeneralTab.tsx:383
 msgid "{0} (not in list)"
 msgstr "{0} (not in list)"
 
-#: components/researchers/GeneralTab.tsx:310
+#: components/researchers/GeneralTab.tsx:391
 msgid "Grade / Rank"
 msgstr "Grade / Rank"
 
-#: components/researchers/GeneralTab.tsx:326
+#: components/researchers/GeneralTab.tsx:407
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Undefined —"
 
-#: components/researchers/GeneralTab.tsx:351
+#: components/researchers/GeneralTab.tsx:432
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Employment start"
 
-#: components/researchers/GeneralTab.tsx:351
+#: components/researchers/GeneralTab.tsx:432
 msgid "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 
-#: components/researchers/GeneralTab.tsx:355
+#: components/researchers/GeneralTab.tsx:436
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Employment end"
 
-#: components/researchers/GeneralTab.tsx:355
+#: components/researchers/GeneralTab.tsx:436
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 
-#: components/researchers/GeneralTab.tsx:362
+#: components/researchers/GeneralTab.tsx:443
 msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 msgstr "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 
-#: components/researchers/GeneralTab.tsx:362
+#: components/researchers/GeneralTab.tsx:443
 msgid "FTE (working time)"
 msgstr "FTE (working time)"
 
-#: components/researchers/GeneralTab.tsx:366
+#: components/researchers/GeneralTab.tsx:447
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 
-#: components/researchers/GeneralTab.tsx:380
+#: components/researchers/GeneralTab.tsx:461
 msgid "Accredited to supervise research (HDR)"
 msgstr "Accredited to supervise research (HDR)"
 
-#: components/researchers/GeneralTab.tsx:385
+#: components/researchers/GeneralTab.tsx:466
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "HDR year"
 
-#: components/researchers/GeneralTab.tsx:406
+#: components/researchers/GeneralTab.tsx:488
 msgid "Faculty"
 msgstr "Faculty"
 
-#: components/researchers/GeneralTab.tsx:410
+#: components/researchers/GeneralTab.tsx:492
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "Doctoral school"
 
-#: components/researchers/GeneralTab.tsx:414
+#: components/researchers/GeneralTab.tsx:496
 msgid "Location (site)"
 msgstr "Location (site)"
 
@@ -14578,37 +14680,49 @@ msgstr "theses.fr could not be read at the last check."
 msgid "No thesis found on theses.fr for the IdRef of the record."
 msgstr "No thesis found on theses.fr for the IdRef of the record."
 
-#: components/researchers/TodoPage.tsx:66
+#: components/researchers/TodoPage.tsx:71
 msgid "Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands"
 msgstr "Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands"
 
-#: components/researchers/TodoPage.tsx:67
+#: components/researchers/TodoPage.tsx:73
+msgid "Manual corrections that a source contradicts since they were made — keep them or go back to the sources"
+msgstr "Manual corrections that a source contradicts since they were made — keep them or go back to the sources"
+
+#: components/researchers/TodoPage.tsx:74
 msgid "Values of an imported directory that differ from Druid — choose which one to keep"
 msgstr "Values of an imported directory that differ from Druid — choose which one to keep"
 
-#: components/researchers/TodoPage.tsx:74
+#: components/researchers/TodoPage.tsx:81
 msgid "Records sharing the same uid_dyna"
 msgstr "Records sharing the same uid_dyna"
 
-#: components/researchers/TodoPage.tsx:79
+#: components/researchers/TodoPage.tsx:86
 msgid "Tasks to carry out outside Druid"
 msgstr "Tasks to carry out outside Druid"
 
-#: components/researchers/TodoPage.tsx:80
+#: components/researchers/TodoPage.tsx:87
 msgid "Tasks"
 msgstr "Tasks"
 
-#: components/researchers/TodoPage.tsx:83
+#: components/researchers/TodoPage.tsx:90
 msgid "Conflicts left by a directory import"
 msgstr "Conflicts left by a directory import"
 
-#: components/researchers/TodoPage.tsx:84
+#: components/researchers/TodoPage.tsx:91
 msgid "Directory conflicts {conflictSource}"
 msgstr "Directory conflicts {conflictSource}"
 
-#: components/researchers/TodoPage.tsx:84
+#: components/researchers/TodoPage.tsx:91
 msgid "Directory conflicts"
 msgstr "Directory conflicts"
+
+#: components/researchers/TodoPage.tsx:95
+msgid "Manual corrections contradicted by a source since"
+msgstr "Manual corrections contradicted by a source since"
+
+#: components/researchers/TodoPage.tsx:96
+msgid "Source conflicts"
+msgstr "Source conflicts"
 
 #: components/researchers/UnifiedAlignPage.tsx:76
 #: components/structures/IdentifiersTab.tsx:71
@@ -15643,18 +15757,13 @@ msgid "Cluster (derived — read only)"
 msgstr "Cluster (derived — read only)"
 
 #: components/structures/IdentifiersTab.tsx:72
-msgid "Source of the value"
-msgstr "Source of the value"
-
-#: components/structures/IdentifiersTab.tsx:72
 #: components/structures/StructureAlignPanel.tsx:170
 msgid "checked on"
 msgstr "checked on"
 
-#: components/structures/IdentifiersTab.tsx:73
-#: components/structures/StructureAlignPanel.tsx:173
-msgid "record not found"
-msgstr "record not found"
+#: components/structures/IdentifiersTab.tsx:72
+msgid "Source of the value"
+msgstr "Source of the value"
 
 #: components/structures/IdentifiersTab.tsx:73
 #: components/structures/StructureAlignPanel.tsx:37
@@ -15663,18 +15772,23 @@ msgid "closed record"
 msgstr "closed record"
 
 #: components/structures/IdentifiersTab.tsx:73
+#: components/structures/StructureAlignPanel.tsx:173
+msgid "record not found"
+msgstr "record not found"
+
+#: components/structures/IdentifiersTab.tsx:73
 msgid "record names something else"
 msgstr "record names something else"
-
-#. placeholder {0}: i.value
-#: components/structures/IdentifiersTab.tsx:77
-msgid "Remove {0}? It will not be suggested again by the alignment."
-msgstr "Remove {0}? It will not be suggested again by the alignment."
 
 #: components/structures/IdentifiersTab.tsx:77
 #: components/structures/StructureAlignPanel.tsx:179
 msgid "remove"
 msgstr "remove"
+
+#. placeholder {0}: i.value
+#: components/structures/IdentifiersTab.tsx:77
+msgid "Remove {0}? It will not be suggested again by the alignment."
+msgstr "Remove {0}? It will not be suggested again by the alignment."
 
 #: components/structures/IdentifiersTab.tsx:85
 msgid "Identifier or URL"
@@ -16423,884 +16537,892 @@ msgstr "Unknown pair"
 msgid "The opinions need the PostgreSQL storage"
 msgstr "The opinions need the PostgreSQL storage"
 
-#: lib/apiErrors.ts:66
+#: lib/apiErrors.ts:67
+msgid "Invalid source conflict decision"
+msgstr "Invalid source conflict decision"
+
+#: lib/apiErrors.ts:68
+msgid "Source conflicts need the PostgreSQL storage"
+msgstr "Source conflicts need the PostgreSQL storage"
+
+#: lib/apiErrors.ts:69
 msgid "Invalid pair"
 msgstr "Invalid pair"
 
-#: lib/apiErrors.ts:67
+#: lib/apiErrors.ts:70
 msgid "Unknown researcher"
 msgstr "Unknown researcher"
 
-#: lib/apiErrors.ts:70
+#: lib/apiErrors.ts:73
 msgid "Give the URL of the call or its PDF"
 msgstr "Give the URL of the call or its PDF"
 
-#: lib/apiErrors.ts:71
+#: lib/apiErrors.ts:74
 msgid "A call with this URL is already known"
 msgstr "A call with this URL is already known"
 
-#: lib/apiErrors.ts:72
+#: lib/apiErrors.ts:75
 msgid "Invalid review status"
 msgstr "Invalid review status"
 
-#: lib/apiErrors.ts:73
+#: lib/apiErrors.ts:76
 msgid "Researchers were matched to this call: reject it instead"
 msgstr "Researchers were matched to this call: reject it instead"
 
-#: lib/apiErrors.ts:74
+#: lib/apiErrors.ts:77
 msgid "Invalid catalogue"
 msgstr "Invalid catalogue"
 
-#: lib/apiErrors.ts:75
+#: lib/apiErrors.ts:78
 msgid "This programme is collected automatically: add the call to a programme of its own"
 msgstr "This programme is collected automatically: add the call to a programme of its own"
 
-#: lib/apiErrors.ts:76
+#: lib/apiErrors.ts:79
 msgid "Unknown funder"
 msgstr "Unknown funder"
 
-#: lib/apiErrors.ts:77
+#: lib/apiErrors.ts:80
 msgid "A collected programme already has this identifier"
 msgstr "A collected programme already has this identifier"
 
-#: lib/apiErrors.ts:78
+#: lib/apiErrors.ts:81
 msgid "A collected call already has this identifier"
 msgstr "A collected call already has this identifier"
 
-#: lib/apiErrors.ts:79
+#: lib/apiErrors.ts:82
 msgid "No column of the file is a title (« Titre », « Title », « Intitulé »)"
 msgstr "No column of the file is a title (« Titre », « Title », « Intitulé »)"
 
-#: lib/apiErrors.ts:80
+#: lib/apiErrors.ts:83
 msgid "Invalid URL"
 msgstr "Invalid URL"
 
-#: lib/apiErrors.ts:81
+#: lib/apiErrors.ts:84
 msgid "Only http and https addresses are read"
 msgstr "Only http and https addresses are read"
 
-#: lib/apiErrors.ts:82
+#: lib/apiErrors.ts:85
 msgid "Unknown host"
 msgstr "Unknown host"
 
-#: lib/apiErrors.ts:83
+#: lib/apiErrors.ts:86
 msgid "This address is not a public website"
 msgstr "This address is not a public website"
 
-#: lib/apiErrors.ts:84
+#: lib/apiErrors.ts:87
 msgid "The document is larger than 15 MB"
 msgstr "The document is larger than 15 MB"
 
-#: lib/apiErrors.ts:85
+#: lib/apiErrors.ts:88
 msgid "The website did not answer in time"
 msgstr "The website did not answer in time"
 
-#: lib/apiErrors.ts:86
+#: lib/apiErrors.ts:89
 msgid "The website could not be read"
 msgstr "The website could not be read"
 
-#: lib/apiErrors.ts:87
+#: lib/apiErrors.ts:90
 msgid "The PDF could not be read"
 msgstr "The PDF could not be read"
 
-#: lib/apiErrors.ts:88
+#: lib/apiErrors.ts:91
 msgid "The text is too short to describe a call"
 msgstr "The text is too short to describe a call"
 
-#: lib/apiErrors.ts:89
+#: lib/apiErrors.ts:92
 msgid "The PDF has no text layer (scanned document?)"
 msgstr "The PDF has no text layer (scanned document?)"
 
-#: lib/apiErrors.ts:90
+#: lib/apiErrors.ts:93
 msgid "Too many redirects"
 msgstr "Too many redirects"
 
-#: lib/apiErrors.ts:91
+#: lib/apiErrors.ts:94
 msgid "The page does not exist (404)"
 msgstr "The page does not exist (404)"
 
-#: lib/apiErrors.ts:92
+#: lib/apiErrors.ts:95
 msgid "The website answered with an error"
 msgstr "The website answered with an error"
 
-#: lib/apiErrors.ts:93
+#: lib/apiErrors.ts:96
 msgid "Unsupported document"
 msgstr "Unsupported document"
 
-#: lib/apiErrors.ts:94
+#: lib/apiErrors.ts:97
 msgid "The page has almost no text (built by JavaScript?): upload the PDF of the call instead"
 msgstr "The page has almost no text (built by JavaScript?): upload the PDF of the call instead"
 
-#: lib/apiErrors.ts:95
+#: lib/apiErrors.ts:98
 msgid "The title is missing"
 msgstr "The title is missing"
 
-#: lib/apiErrors.ts:96
+#: lib/apiErrors.ts:99
 msgid "The URL must start with http:// or https://"
 msgstr "The URL must start with http:// or https://"
 
-#: lib/apiErrors.ts:97
+#: lib/apiErrors.ts:100
 msgid "The opening date is not a valid day (YYYY-MM-DD)"
 msgstr "The opening date is not a valid day (YYYY-MM-DD)"
 
-#: lib/apiErrors.ts:98
+#: lib/apiErrors.ts:101
 msgid "A deadline is not a valid day (YYYY-MM-DD)"
 msgstr "A deadline is not a valid day (YYYY-MM-DD)"
 
-#: lib/apiErrors.ts:99
+#: lib/apiErrors.ts:102
 msgid "At most 4 deadlines"
 msgstr "At most 4 deadlines"
 
-#: lib/apiErrors.ts:100
+#: lib/apiErrors.ts:103
 msgid "The deadline is before the opening date"
 msgstr "The deadline is before the opening date"
 
-#: lib/apiErrors.ts:101
+#: lib/apiErrors.ts:104
 msgid "The programme is missing"
 msgstr "The programme is missing"
 
-#: lib/apiErrors.ts:102
+#: lib/apiErrors.ts:105
 msgid "The name of the programme is missing"
 msgstr "The name of the programme is missing"
 
-#: lib/apiErrors.ts:103
+#: lib/apiErrors.ts:106
 msgid "The funder is missing"
 msgstr "The funder is missing"
 
-#: lib/apiErrors.ts:105
+#: lib/apiErrors.ts:108
 msgid "ILAAS_API_KEY not configured (druid service env)"
 msgstr "ILAAS_API_KEY not configured (druid service env)"
 
-#: lib/apiErrors.ts:106
+#: lib/apiErrors.ts:109
 msgid "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 msgstr "ILAAS_API_KEY not configured on Cloudflare (secret + redeploy)"
 
-#: lib/apiErrors.ts:108
+#: lib/apiErrors.ts:111
 msgid "An export is already running"
 msgstr "An export is already running"
 
-#: lib/apiErrors.ts:109
+#: lib/apiErrors.ts:112
 msgid "Export not found"
 msgstr "Export not found"
 
-#: lib/apiErrors.ts:110
+#: lib/apiErrors.ts:113
 msgid "This export has expired: ask for a new one"
 msgstr "This export has expired: ask for a new one"
 
-#: lib/apiErrors.ts:111
+#: lib/apiErrors.ts:114
 msgid "No file store on this deployment"
 msgstr "No file store on this deployment"
 
-#: lib/apiErrors.ts:112
+#: lib/apiErrors.ts:115
 msgid "Type the name of the Druid to confirm"
 msgstr "Type the name of the Druid to confirm"
 
-#: lib/apiErrors.ts:113
+#: lib/apiErrors.ts:116
 msgid "A deletion is already planned"
 msgstr "A deletion is already planned"
 
-#: lib/apiErrors.ts:114
+#: lib/apiErrors.ts:117
 msgid "No deletion is planned"
 msgstr "No deletion is planned"
 
-#: lib/apiErrors.ts:116
+#: lib/apiErrors.ts:119
 msgid "No language model is configured for this Druid (My institution › API keys)"
 msgstr "No language model is configured for this Druid (My institution › API keys)"
 
-#: lib/apiErrors.ts:117
+#: lib/apiErrors.ts:120
 msgid "SAAS_SECRETS_KEY not configured"
 msgstr "SAAS_SECRETS_KEY not configured"
 
-#: lib/apiErrors.ts:118
+#: lib/apiErrors.ts:121
 msgid "The key test failed"
 msgstr "The key test failed"
 
-#: lib/apiErrors.ts:119
+#: lib/apiErrors.ts:122
 msgid "Invalid address of the language model"
 msgstr "Invalid address of the language model"
 
-#: lib/apiErrors.ts:120
+#: lib/apiErrors.ts:123
 msgid "Invalid model name"
 msgstr "Invalid model name"
 
-#: lib/apiErrors.ts:121
+#: lib/apiErrors.ts:124
 msgid "Invalid API key"
 msgstr "Invalid API key"
 
-#: lib/apiErrors.ts:122
+#: lib/apiErrors.ts:125
 msgid "Invalid institution token"
 msgstr "Invalid institution token"
 
-#: lib/apiErrors.ts:123
+#: lib/apiErrors.ts:126
 msgid "The API key is required"
 msgstr "The API key is required"
 
-#: lib/apiErrors.ts:124
+#: lib/apiErrors.ts:127
 msgid "No key is stored"
 msgstr "No key is stored"
 
-#: lib/apiErrors.ts:125
+#: lib/apiErrors.ts:128
 msgid "VITE_GRIST_DOC_ID not configured"
 msgstr "VITE_GRIST_DOC_ID not configured"
 
-#: lib/apiErrors.ts:126
+#: lib/apiErrors.ts:129
 msgid "GRIST_API_KEY not configured"
 msgstr "GRIST_API_KEY not configured"
 
-#: lib/apiErrors.ts:127
+#: lib/apiErrors.ts:130
 msgid "GRIST_API_KEY not configured on Cloudflare"
 msgstr "GRIST_API_KEY not configured on Cloudflare"
 
-#: lib/apiErrors.ts:128
+#: lib/apiErrors.ts:131
 msgid "HYPERDRIVE binding not configured on Cloudflare"
 msgstr "HYPERDRIVE binding not configured on Cloudflare"
 
-#: lib/apiErrors.ts:130
+#: lib/apiErrors.ts:133
 msgid "Unknown API route"
 msgstr "Unknown API route"
 
-#: lib/apiErrors.ts:131
+#: lib/apiErrors.ts:134
 msgid "Directory storage unavailable"
 msgstr "Directory storage unavailable"
 
-#: lib/apiErrors.ts:132
+#: lib/apiErrors.ts:135
 msgid "Another record already holds this value"
 msgstr "Another record already holds this value"
 
-#: lib/apiErrors.ts:133
+#: lib/apiErrors.ts:136
 msgid "API v1 unavailable"
 msgstr "API v1 unavailable"
 
-#: lib/apiErrors.ts:134
+#: lib/apiErrors.ts:137
 msgid "Grist proxy removed: use /api/v1"
 msgstr "Grist proxy removed: use /api/v1"
 
-#: lib/apiErrors.ts:135
+#: lib/apiErrors.ts:138
 msgid "Not available on the PostgreSQL storage yet"
 msgstr "Not available on the PostgreSQL storage yet"
 
-#: lib/apiErrors.ts:136
+#: lib/apiErrors.ts:139
 msgid "Invalid record"
 msgstr "Invalid record"
 
-#: lib/apiErrors.ts:137
+#: lib/apiErrors.ts:140
 msgid "Invalid lab"
 msgstr "Invalid lab"
 
-#: lib/apiErrors.ts:138
+#: lib/apiErrors.ts:141
 msgid "Invalid import file"
 msgstr "Invalid import file"
 
-#: lib/apiErrors.ts:139
+#: lib/apiErrors.ts:142
 msgid "Replaced IdRef record not found"
 msgstr "Replaced IdRef record not found"
 
-#: lib/apiErrors.ts:140
+#: lib/apiErrors.ts:143
 msgid "Review table missing, run the alignment script first"
 msgstr "Review table missing, run the alignment script first"
 
-#: lib/apiErrors.ts:141
+#: lib/apiErrors.ts:144
 msgid "Directory error (partial write)"
 msgstr "Directory error (partial write)"
 
-#: lib/apiErrors.ts:142
+#: lib/apiErrors.ts:145
 msgid "Qualification: primary row required"
 msgstr "Qualification: primary row required"
 
-#: lib/apiErrors.ts:143
+#: lib/apiErrors.ts:146
 msgid "Invalid LDAP uid"
 msgstr "Invalid LDAP uid"
 
-#: lib/apiErrors.ts:144
+#: lib/apiErrors.ts:147
 msgid "This uid already has a directory record, merge the two records instead"
 msgstr "This uid already has a directory record, merge the two records instead"
 
-#: lib/apiErrors.ts:145
+#: lib/apiErrors.ts:148
 msgid "Record not found in the directory"
 msgstr "Record not found in the directory"
 
-#: lib/apiErrors.ts:146
+#: lib/apiErrors.ts:149
 msgid "Merge: both rows are identical"
 msgstr "Merge: both rows are identical"
 
-#: lib/apiErrors.ts:147
+#: lib/apiErrors.ts:150
 msgid "Merge: one of the records no longer exists in the directory"
 msgstr "Merge: one of the records no longer exists in the directory"
 
-#: lib/apiErrors.ts:148
+#: lib/apiErrors.ts:151
 msgid "Directory error (writing the kept row)"
 msgstr "Directory error (writing the kept row)"
 
-#: lib/apiErrors.ts:149
+#: lib/apiErrors.ts:152
 msgid "Directory error (deleting the absorbed row)"
 msgstr "Directory error (deleting the absorbed row)"
 
-#: lib/apiErrors.ts:150
+#: lib/apiErrors.ts:153
 msgid "Merge not found"
 msgstr "Merge not found"
 
-#: lib/apiErrors.ts:151
+#: lib/apiErrors.ts:154
 msgid "Merge already restored"
 msgstr "Merge already restored"
 
-#: lib/apiErrors.ts:152
+#: lib/apiErrors.ts:155
 msgid "Row re-created but merge log not updated, do not restart the restoration"
 msgstr "Row re-created but merge log not updated, do not restart the restoration"
 
-#: lib/apiErrors.ts:153
+#: lib/apiErrors.ts:156
 msgid "Row re-created but kept row not restored"
 msgstr "Row re-created but kept row not restored"
 
-#: lib/apiErrors.ts:154
+#: lib/apiErrors.ts:157
 msgid "The acronym / short name is required"
 msgstr "The acronym / short name is required"
 
-#: lib/apiErrors.ts:155
+#: lib/apiErrors.ts:158
 msgid "A team must be included in a lab (Memberships tab)"
 msgstr "A team must be included in a lab (Memberships tab)"
 
-#: lib/apiErrors.ts:156
+#: lib/apiErrors.ts:159
 msgid "A structure with this acronym already exists"
 msgstr "A structure with this acronym already exists"
 
-#: lib/apiErrors.ts:157
+#: lib/apiErrors.ts:160
 msgid "local_id already used"
 msgstr "local_id already used"
 
-#: lib/apiErrors.ts:158
+#: lib/apiErrors.ts:161
 msgid "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 msgstr "Invalid entity code (letters, digits, “-”, “_” or “.” only)"
 
-#: lib/apiErrors.ts:160
+#: lib/apiErrors.ts:163
 msgid "The institution name is required"
 msgstr "The institution name is required"
 
-#: lib/apiErrors.ts:161
+#: lib/apiErrors.ts:164
 msgid "The institution name is too long"
 msgstr "The institution name is too long"
 
-#: lib/apiErrors.ts:162
+#: lib/apiErrors.ts:165
 msgid "Invalid UAI code"
 msgstr "Invalid UAI code"
 
-#: lib/apiErrors.ts:163
+#: lib/apiErrors.ts:166
 msgid "Invalid ROR identifier"
 msgstr "Invalid ROR identifier"
 
-#: lib/apiErrors.ts:164
+#: lib/apiErrors.ts:167
 msgid "Invalid IdRef PPN"
 msgstr "Invalid IdRef PPN"
 
-#: lib/apiErrors.ts:165
+#: lib/apiErrors.ts:168
 msgid "An institution with this name already exists"
 msgstr "An institution with this name already exists"
 
-#: lib/apiErrors.ts:166
+#: lib/apiErrors.ts:169
 msgid "An institution with this UAI already exists"
 msgstr "An institution with this UAI already exists"
 
-#: lib/apiErrors.ts:167
+#: lib/apiErrors.ts:170
 msgid "Institutions require the institution right"
 msgstr "Institutions require the institution right"
 
-#: lib/apiErrors.ts:168
+#: lib/apiErrors.ts:171
 msgid "Institution not found"
 msgstr "Institution not found"
 
-#: lib/apiErrors.ts:169
+#: lib/apiErrors.ts:172
 #: lib/gristService.ts:139
 msgid "Invalid record identifier (row id missing)"
 msgstr "Invalid record identifier (row id missing)"
 
-#: lib/apiErrors.ts:170
+#: lib/apiErrors.ts:173
 msgid "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 msgstr "Several affiliations can only be saved for a person with a directory identifier (uid_dyna)."
 
-#: lib/apiErrors.ts:171
+#: lib/apiErrors.ts:174
 msgid "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 msgstr "This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation."
 
-#: lib/apiErrors.ts:172
+#: lib/apiErrors.ts:175
 msgid "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:173
+#: lib/apiErrors.ts:176
 msgid "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 msgstr "Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)"
 
-#: lib/apiErrors.ts:174
+#: lib/apiErrors.ts:177
 msgid "No OpenAlex identifier configured for this structure"
 msgstr "No OpenAlex identifier configured for this structure"
 
-#: lib/apiErrors.ts:175
+#: lib/apiErrors.ts:178
 msgid "No dashboard data for this structure"
 msgstr "No dashboard data for this structure"
 
-#: lib/apiErrors.ts:177
+#: lib/apiErrors.ts:180
 msgid "messages[] required"
 msgstr "messages[] required"
 
-#: lib/apiErrors.ts:178
+#: lib/apiErrors.ts:181
 msgid "Assistant unavailable"
 msgstr "Assistant unavailable"
 
-#: lib/apiErrors.ts:179
+#: lib/apiErrors.ts:182
 msgid "Help assistant not configured"
 msgstr "Help assistant not configured"
 
-#: lib/apiErrors.ts:180
+#: lib/apiErrors.ts:183
 msgid "Project assistant not configured"
 msgstr "Project assistant not configured"
 
-#: lib/apiErrors.ts:181
+#: lib/apiErrors.ts:184
 msgid "Assistant not configured"
 msgstr "Assistant not configured"
 
-#: lib/apiErrors.ts:181
+#: lib/apiErrors.ts:185
 msgid "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 msgstr "The newsletter is only available for structures with an OpenAlex identifier (not groups)"
 
-#: lib/apiErrors.ts:182
+#: lib/apiErrors.ts:186
 msgid "Generation interrupted"
 msgstr "Generation interrupted"
 
-#: lib/apiErrors.ts:183
+#: lib/apiErrors.ts:187
 msgid "Generation failed"
 msgstr "Generation failed"
 
-#: lib/apiErrors.ts:184
+#: lib/apiErrors.ts:188
 msgid "Analysis failed"
 msgstr "Analysis failed"
 
-#: lib/apiErrors.ts:185
+#: lib/apiErrors.ts:189
 msgid "Missing theme"
 msgstr "Missing theme"
 
-#: lib/apiErrors.ts:186
+#: lib/apiErrors.ts:190
 msgid "No publication to analyze"
 msgstr "No publication to analyze"
 
-#: lib/apiErrors.ts:187
+#: lib/apiErrors.ts:191
 msgid "OpenAlex unreachable"
 msgstr "OpenAlex unreachable"
 
-#: lib/apiErrors.ts:189
+#: lib/apiErrors.ts:193
 msgid "Report not found"
 msgstr "Report not found"
 
-#: lib/apiErrors.ts:190
+#: lib/apiErrors.ts:194
 msgid "Not allowed on this report"
 msgstr "Not allowed on this report"
 
-#: lib/apiErrors.ts:191
+#: lib/apiErrors.ts:195
 msgid "Invalid report definition"
 msgstr "Invalid report definition"
 
-#: lib/apiErrors.ts:192
+#: lib/apiErrors.ts:196
 msgid "Report changed since it was loaded"
 msgstr "Report changed since it was loaded"
 
-#: lib/apiErrors.ts:193
+#: lib/apiErrors.ts:197
 msgid "Invalid report share"
 msgstr "Invalid report share"
 
-#: lib/apiErrors.ts:194
+#: lib/apiErrors.ts:198
 msgid "Invalid report generation"
 msgstr "Invalid report generation"
 
-#: lib/apiErrors.ts:195
+#: lib/apiErrors.ts:199
 msgid "Read-only instance: reports are kept in the browser"
 msgstr "Read-only instance: reports are kept in the browser"
 
-#: lib/apiErrors.ts:196
+#: lib/apiErrors.ts:200
 msgid "Invalid AI task"
 msgstr "Invalid AI task"
 
-#: lib/apiErrors.ts:197
+#: lib/apiErrors.ts:201
 msgid "PDF archiving is not configured on this instance"
 msgstr "PDF archiving is not configured on this instance"
 
-#: lib/apiErrors.ts:198
+#: lib/apiErrors.ts:202
 msgid "Invalid PDF"
 msgstr "Invalid PDF"
 
-#: lib/apiErrors.ts:199
+#: lib/apiErrors.ts:203
 msgid "Generation not found"
 msgstr "Generation not found"
 
-#: lib/apiErrors.ts:200
+#: lib/apiErrors.ts:204
 msgid "PDF not archived"
 msgstr "PDF not archived"
 
-#: lib/apiErrors.ts:202
+#: lib/apiErrors.ts:206
 msgid "Invalid record key"
 msgstr "Invalid record key"
 
-#: lib/apiErrors.ts:203
+#: lib/apiErrors.ts:207
 msgid "Career path not computed yet for this record"
 msgstr "Career path not computed yet for this record"
 
-#: lib/apiErrors.ts:204
+#: lib/apiErrors.ts:208
 msgid "Directory unreachable"
 msgstr "Directory unreachable"
 
-#: lib/apiErrors.ts:205
+#: lib/apiErrors.ts:209
 msgid "No Annuaire record for this key"
 msgstr "No Annuaire record for this key"
 
-#: lib/apiErrors.ts:206
+#: lib/apiErrors.ts:210
 msgid "Refresh outside your scope"
 msgstr "Refresh outside your scope"
 
-#: lib/apiErrors.ts:207
+#: lib/apiErrors.ts:211
 msgid "Too many refreshes in progress, retry in a minute"
 msgstr "Too many refreshes in progress, retry in a minute"
 
-#: lib/apiErrors.ts:208
+#: lib/apiErrors.ts:212
 msgid "Career-path computation failed"
 msgstr "Career-path computation failed"
 
-#: lib/apiErrors.ts:209
+#: lib/apiErrors.ts:213
 msgid "No usable identifier for this record"
 msgstr "No usable identifier for this record"
 
-#: lib/apiErrors.ts:210
+#: lib/apiErrors.ts:214
 msgid "Unknown suggestion"
 msgstr "Unknown suggestion"
 
-#: lib/apiErrors.ts:212
+#: lib/apiErrors.ts:216
 msgid "Task not found"
 msgstr "Task not found"
 
-#: lib/apiErrors.ts:213
+#: lib/apiErrors.ts:217
 msgid "Unknown event action"
 msgstr "Unknown event action"
 
-#: lib/apiErrors.ts:214
+#: lib/apiErrors.ts:218
 msgid "Empty comment"
 msgstr "Empty comment"
 
-#: lib/apiErrors.ts:215
+#: lib/apiErrors.ts:219
 msgid "Nothing to update"
 msgstr "Nothing to update"
 
-#: lib/apiErrors.ts:216
+#: lib/apiErrors.ts:220
 msgid "Unknown task type"
 msgstr "Unknown task type"
 
-#: lib/apiErrors.ts:217
+#: lib/apiErrors.ts:221
 msgid "Unknown status"
 msgstr "Unknown status"
 
-#: lib/apiErrors.ts:218
+#: lib/apiErrors.ts:222
 msgid "Transition not allowed"
 msgstr "Transition not allowed"
 
-#: lib/apiErrors.ts:219
+#: lib/apiErrors.ts:223
 msgid "Task detection already running"
 msgstr "Task detection already running"
 
-#: lib/apiErrors.ts:221
+#: lib/apiErrors.ts:225
 msgid "Name required"
 msgstr "Name required"
 
-#: lib/apiErrors.ts:222
+#: lib/apiErrors.ts:226
 msgid "Empty list"
 msgstr "Empty list"
 
-#: lib/apiErrors.ts:223
+#: lib/apiErrors.ts:227
 msgid "List of identifiers expected"
 msgstr "List of identifiers expected"
 
-#: lib/apiErrors.ts:224
+#: lib/apiErrors.ts:228
 msgid "Invalid mention identifier"
 msgstr "Invalid mention identifier"
 
-#: lib/apiErrors.ts:225
+#: lib/apiErrors.ts:229
 msgid "Invalid source identifier"
 msgstr "Invalid source identifier"
 
-#: lib/apiErrors.ts:226
+#: lib/apiErrors.ts:230
 msgid "researchers and structures arrays required"
 msgstr "researchers and structures arrays required"
 
-#: lib/apiErrors.ts:227
+#: lib/apiErrors.ts:231
 msgid "Identifier removals could not be sent to the CRISalid graph, try again later"
 msgstr "Identifier removals could not be sent to the CRISalid graph, try again later"
 
-#: lib/apiErrors.ts:228
+#: lib/apiErrors.ts:232
 msgid "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 msgstr "Too many identifier removals to send to the CRISalid graph at once, an administrator must check them"
 
-#: lib/apiErrors.ts:229
+#: lib/apiErrors.ts:233
 msgid "Cannot send the identifier removals to the CRISalid graph"
 msgstr "Cannot send the identifier removals to the CRISalid graph"
 
-#: lib/apiErrors.ts:230
+#: lib/apiErrors.ts:234
 msgid "Cannot read the removals sent to the CRISalid graph"
 msgstr "Cannot read the removals sent to the CRISalid graph"
 
-#: lib/apiErrors.ts:231
+#: lib/apiErrors.ts:235
 msgid "Keycloak admin API unreachable"
 msgstr "Keycloak admin API unreachable"
 
-#: lib/apiErrors.ts:232
+#: lib/apiErrors.ts:236
 msgid "ETL API (druid-etl-api) unreachable"
 msgstr "ETL API (druid-etl-api) unreachable"
 
-#: lib/apiErrors.ts:234
+#: lib/apiErrors.ts:238
 msgid "Grist path not allowed by the proxy"
 msgstr "Grist path not allowed by the proxy"
 
-#: lib/apiErrors.ts:235
+#: lib/apiErrors.ts:239
 msgid "Writing to the document root is refused"
 msgstr "Writing to the document root is refused"
 
-#: lib/apiErrors.ts:236
+#: lib/apiErrors.ts:240
 msgid "Writing to the table definition is refused"
 msgstr "Writing to the table definition is refused"
 
-#: lib/apiErrors.ts:237
+#: lib/apiErrors.ts:241
 msgid "Method not relayed"
 msgstr "Method not relayed"
 
-#: lib/apiErrors.ts:238
+#: lib/apiErrors.ts:242
 msgid "Method not relayed on /tables"
 msgstr "Method not relayed on /tables"
 
-#: lib/apiErrors.ts:239
+#: lib/apiErrors.ts:243
 msgid "Table creation not allowed"
 msgstr "Table creation not allowed"
 
-#: lib/apiErrors.ts:240
+#: lib/apiErrors.ts:244
 msgid "Table not writable through the proxy"
 msgstr "Table not writable through the proxy"
 
-#: lib/apiErrors.ts:241
+#: lib/apiErrors.ts:245
 msgid "Write outside scope"
 msgstr "Write outside scope"
 
-#: lib/apiErrors.ts:242
+#: lib/apiErrors.ts:246
 msgid "Creation outside scope"
 msgstr "Creation outside scope"
 
-#: lib/apiErrors.ts:243
+#: lib/apiErrors.ts:247
 msgid "Rows outside scope or unknown"
 msgstr "Rows outside scope or unknown"
 
-#: lib/apiErrors.ts:244
+#: lib/apiErrors.ts:248
 msgid "Scope check failed"
 msgstr "Scope check failed"
 
-#: lib/apiErrors.ts:245
+#: lib/apiErrors.ts:249
 msgid "Directory writes require the institution right"
 msgstr "Directory writes require the institution right"
 
-#: lib/apiErrors.ts:246
+#: lib/apiErrors.ts:250
 msgid "Writes require an authenticated user (Cloudflare Access)"
 msgstr "Writes require an authenticated user (Cloudflare Access)"
 
-#: lib/apiErrors.ts:247
+#: lib/apiErrors.ts:251
 msgid "Read-only instance: writes are disabled"
 msgstr "Read-only instance: writes are disabled"
 
-#: lib/apiErrors.ts:248
+#: lib/apiErrors.ts:252
 msgid "Newsletter not available on this instance"
 msgstr "Newsletter not available on this instance"
 
-#: lib/apiErrors.ts:249
+#: lib/apiErrors.ts:253
 msgid "Missing id for PATCH"
 msgstr "Missing id for PATCH"
 
-#: lib/apiErrors.ts:250
+#: lib/apiErrors.ts:254
 msgid "Invalid record identifiers"
 msgstr "Invalid record identifiers"
 
-#: lib/apiErrors.ts:251
+#: lib/apiErrors.ts:255
 msgid "Body with a records array expected"
 msgstr "Body with a records array expected"
 
-#: lib/apiErrors.ts:253
+#: lib/apiErrors.ts:257
 msgid "An LDAP synchronization is already running"
 msgstr "An LDAP synchronization is already running"
 
-#: lib/apiErrors.ts:254
+#: lib/apiErrors.ts:258
 msgid "An LDAP structures synchronization is already running"
 msgstr "An LDAP structures synchronization is already running"
 
-#: lib/apiErrors.ts:255
+#: lib/apiErrors.ts:259
 msgid "An LDAP search is already running"
 msgstr "An LDAP search is already running"
 
-#: lib/apiErrors.ts:256
+#: lib/apiErrors.ts:260
 msgid "An IdRef alignment is already running"
 msgstr "An IdRef alignment is already running"
 
-#: lib/apiErrors.ts:257
+#: lib/apiErrors.ts:261
 msgid "Alignment already running"
 msgstr "Alignment already running"
 
-#: lib/apiErrors.ts:258
+#: lib/apiErrors.ts:262
 msgid "Unknown alignment source"
 msgstr "Unknown alignment source"
 
-#: lib/apiErrors.ts:259
+#: lib/apiErrors.ts:263
 msgid "No alignment running"
 msgstr "No alignment running"
 
-#: lib/apiErrors.ts:261
+#: lib/apiErrors.ts:265
 msgid "Owner right required"
 msgstr "Owner right required"
 
-#: lib/apiErrors.ts:262
+#: lib/apiErrors.ts:266
 msgid "Unknown role"
 msgstr "Unknown role"
 
-#: lib/apiErrors.ts:263
+#: lib/apiErrors.ts:267
 msgid "A lab account needs at least one lab"
 msgstr "A lab account needs at least one lab"
 
-#: lib/apiErrors.ts:264
+#: lib/apiErrors.ts:268
 msgid "This address is already a member"
 msgstr "This address is already a member"
 
-#: lib/apiErrors.ts:265
+#: lib/apiErrors.ts:269
 msgid "Account limit of the plan reached"
 msgstr "Account limit of the plan reached"
 
-#: lib/apiErrors.ts:266
+#: lib/apiErrors.ts:270
 msgid "Member not found"
 msgstr "Member not found"
 
-#: lib/apiErrors.ts:267
+#: lib/apiErrors.ts:271
 msgid "The last owner of a Druid keeps the role"
 msgstr "The last owner of a Druid keeps the role"
 
-#: lib/apiErrors.ts:268
+#: lib/apiErrors.ts:272
 msgid "The last owner of a Druid cannot be removed"
 msgstr "The last owner of a Druid cannot be removed"
 
-#: lib/apiErrors.ts:269
+#: lib/apiErrors.ts:273
 msgid "Access request not found"
 msgstr "Access request not found"
 
-#: lib/apiErrors.ts:270
+#: lib/apiErrors.ts:274
 msgid "Too many mail domains"
 msgstr "Too many mail domains"
 
-#: lib/apiErrors.ts:271
+#: lib/apiErrors.ts:275
 msgid "Invalid mail domain"
 msgstr "Invalid mail domain"
 
-#: lib/apiErrors.ts:273
+#: lib/apiErrors.ts:277
 msgid "Not included in the plan of this Druid"
 msgstr "Not included in the plan of this Druid"
 
-#: lib/apiErrors.ts:274
+#: lib/apiErrors.ts:278
 msgid "Too many quote requests today"
 msgstr "Too many quote requests today"
 
-#: lib/apiErrors.ts:276
+#: lib/apiErrors.ts:280
 msgid "Structure alignment already running"
 msgstr "Structure alignment already running"
 
-#: lib/apiErrors.ts:278
+#: lib/apiErrors.ts:282
 msgid "Institution right required"
 msgstr "Institution right required"
 
-#: lib/apiErrors.ts:279
+#: lib/apiErrors.ts:283
 msgid "Job already finished"
 msgstr "Job already finished"
 
-#: lib/apiErrors.ts:280
+#: lib/apiErrors.ts:284
 msgid "Job already running"
 msgstr "Job already running"
 
-#: lib/apiErrors.ts:281
+#: lib/apiErrors.ts:285
 msgid "Dashboard build already running"
 msgstr "Dashboard build already running"
 
-#: lib/apiErrors.ts:282
+#: lib/apiErrors.ts:286
 msgid "Unknown job type"
 msgstr "Unknown job type"
 
-#: lib/apiErrors.ts:283
+#: lib/apiErrors.ts:287
 msgid "Method not allowed"
 msgstr "Method not allowed"
 
-#: lib/apiErrors.ts:284
+#: lib/apiErrors.ts:288
 msgid "Structure alignment needs the PostgreSQL storage"
 msgstr "Structure alignment needs the PostgreSQL storage"
 
-#: lib/apiErrors.ts:285
+#: lib/apiErrors.ts:289
 msgid "Unknown identifier type"
 msgstr "Unknown identifier type"
 
-#: lib/apiErrors.ts:286
+#: lib/apiErrors.ts:290
 msgid "Invalid identifier"
 msgstr "Invalid identifier"
 
-#: lib/apiErrors.ts:287
+#: lib/apiErrors.ts:291
 msgid "Candidate not found"
 msgstr "Candidate not found"
 
-#: lib/apiErrors.ts:288
+#: lib/apiErrors.ts:292
 msgid "Identifier not found"
 msgstr "Identifier not found"
 
-#: lib/apiErrors.ts:289
+#: lib/apiErrors.ts:293
 msgid "Structure not found"
 msgstr "Structure not found"
 
-#: lib/apiErrors.ts:290
+#: lib/apiErrors.ts:294
 msgid "No run yet"
 msgstr "No run yet"
 
-#: lib/apiErrors.ts:292
+#: lib/apiErrors.ts:296
 msgid "LDAP not configured on this instance"
 msgstr "LDAP not configured on this instance"
 
-#: lib/apiErrors.ts:293
+#: lib/apiErrors.ts:297
 msgid "Invalid uid"
 msgstr "Invalid uid"
 
-#: lib/apiErrors.ts:294
+#: lib/apiErrors.ts:298
 msgid "No LDAP entry for this uid"
 msgstr "No LDAP entry for this uid"
 
-#: lib/apiErrors.ts:295
+#: lib/apiErrors.ts:299
 msgid "LDAP directory unreachable"
 msgstr "LDAP directory unreachable"
 
-#: lib/apiErrors.ts:297
+#: lib/apiErrors.ts:301
 msgid "Invalid date"
 msgstr "Invalid date"
 
-#: lib/apiErrors.ts:299
+#: lib/apiErrors.ts:303
 msgid "No network data"
 msgstr "No network data"
 
-#: lib/apiErrors.ts:300
+#: lib/apiErrors.ts:304
 msgid "Unreadable network data"
 msgstr "Unreadable network data"
 
-#: lib/apiErrors.ts:301
+#: lib/apiErrors.ts:305
 msgid "Structure not in the university network"
 msgstr "Structure not in the university network"
 
-#: lib/apiErrors.ts:302
+#: lib/apiErrors.ts:306
 msgid "Invalid node ids"
 msgstr "Invalid node ids"
 
-#: lib/apiErrors.ts:304
+#: lib/apiErrors.ts:308
 msgid "Failed to fetch"
 msgstr "Failed to fetch"
 
-#: lib/apiErrors.ts:305
+#: lib/apiErrors.ts:309
 msgid "NetworkError when attempting to fetch resource."
 msgstr "NetworkError when attempting to fetch resource."
 
-#: lib/apiErrors.ts:306
+#: lib/apiErrors.ts:310
 msgid "Load failed"
 msgstr "Load failed"
 
@@ -17369,6 +17491,10 @@ msgstr "Indicator"
 #: lib/directoryApi.ts:73
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Directory unavailable ({resource}, HTTP {0})."
+
+#: lib/fieldConflicts.ts:28
+msgid "LDAP"
+msgstr "LDAP"
 
 #: lib/gristService.ts:241
 msgid "Invalid ID"
@@ -17770,15 +17896,3 @@ msgstr "Error during the {lbl} alignment"
 #: lib/unifiedAlignRuns.ts:153
 msgid "Estimate failed: {0}"
 msgstr "Estimate failed: {0}"
-
-#: components/researchers/GeneralTab.tsx:226
-msgid "Read-only: maintained by the OpenAlex alignment"
-msgstr "Read-only: maintained by the OpenAlex alignment"
-
-#: components/researchers/GeneralTab.tsx:241
-msgid "Author ID confirmed by hand (group dashboards)"
-msgstr "Author ID confirmed by hand (group dashboards)"
-
-#: components/researchers/GeneralTab.tsx:249
-msgid "No OpenAlex author ID"
-msgstr "No OpenAlex author ID"

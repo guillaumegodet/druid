@@ -138,7 +138,26 @@ export interface RecordPatch { id: number; fields: Record<string, any> }
  * the Etablissements table (employer external to Nantes Université ⇒ hosted LDAP account). Formerly
  * GristService.computeLdapDiff.
  */
-export function computeLdapDiffFrom(records: GristRecord[], etablissementsRows: GristRecord[], ldapCache: Record<string, any>): LdapDiff {
+/**
+ * Grade the LDAP gives a record: its corps (supannEmpCorps), transposed to an emeritus code when a trace of emeritus
+ * status exists in the LDAP or in the record — otherwise the sync proposed PR/MCF again for an emeritus (LDAP keeps the
+ * original corps). '' when the LDAP gives no usable corps. Not meaningful for an external employer (hosted account).
+ * Shared by the LDAP review and the observation of the LDAP values on PostgreSQL (lib/directory/pg/ldapObserve.ts).
+ */
+export const ldapGradeTarget = (e: any, f: Record<string, any>): string => {
+  const ldapBase = ldapGradeFor(e.categorie, e.empCorps, f['Corps_grade']);
+  const gradeSignals: EmeritusSignals = { grade: f['Corps_grade'], typeEmploi: f['TYPE_EMPLOI'], libTypeEmploi: f['LIB_TYPE_EMPLOI'], ldapCategory: e.categorie };
+  return hasEmeritusTrace(gradeSignals) ? resolveGrade(ldapBase ?? f['Corps_grade'] ?? '', gradeSignals) : (ldapBase || '');
+};
+
+/** LDAP review options. `mergedFields`: record fields merged by source (PostgreSQL, lib/directory/pg/fieldValues.ts),
+ * never proposed — the LDAP values go to person_field_value (ldapObserve.ts), their divergences to « Source conflicts ». */
+export interface LdapDiffOptions {
+  mergedFields?: readonly string[];
+}
+
+export function computeLdapDiffFrom(records: GristRecord[], etablissementsRows: GristRecord[], ldapCache: Record<string, any>, options: LdapDiffOptions = {}): LdapDiff {
+  const skipped = new Set(options.mergedFields || []);
   const etabs: Record<number, { name: string; uai: string }> = {};
   for (const r of etablissementsRows) etabs[r.id] = { name: String(r.fields['Employeur'] || ''), uai: String(r.fields['UAI'] || '') };
 
@@ -179,6 +198,7 @@ export function computeLdapDiffFrom(records: GristRecord[], etablissementsRows: 
       const f = rec.fields;
       const changes: LdapFieldChange[] = [];
       const push = (field: string, label: string, before: any, after: any) => {
+        if (skipped.has(field)) return;
         const b = (before ?? '').toString().trim();
         const a = (after ?? '').toString().trim();
         if (a && a !== b) changes.push({ field, label, before: b, after: a }); // never clear when LDAP is empty
@@ -191,10 +211,7 @@ export function computeLdapDiffFrom(records: GristRecord[], etablissementsRows: 
       if (!externalEmployer) {
         // Grade: LDAP corps, transposed to an emeritus code when a trace of emeritus status exists (LDAP or Grist) —
         // otherwise the sync proposed PR/MCF again for an emeritus (LDAP keeps the original corps).
-        const ldapBase = ldapGradeFor(e.categorie, e.empCorps, f['Corps_grade']);
-        const gradeSignals: EmeritusSignals = { grade: f['Corps_grade'], typeEmploi: f['TYPE_EMPLOI'], libTypeEmploi: f['LIB_TYPE_EMPLOI'], ldapCategory: e.categorie };
-        const gradeTarget = hasEmeritusTrace(gradeSignals) ? resolveGrade(ldapBase ?? f['Corps_grade'] ?? '', gradeSignals) : (ldapBase || '');
-        push('Corps_grade', 'Grade', f['Corps_grade'] || '', gradeTarget);
+        push('Corps_grade', 'Grade', f['Corps_grade'] || '', ldapGradeTarget(e, f));
         push('TYPE_EMPLOI', 'Type emploi', f['TYPE_EMPLOI'] || '', e.categorie || '');
       }
       push('DATE_DE_NAISSANCE_JJ_MM_AAAA', 'Date naissance', fromGristFuzzyDate(f['DATE_DE_NAISSANCE_JJ_MM_AAAA']), fmtBirth(e.birthDate || ''));

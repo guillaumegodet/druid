@@ -38,6 +38,12 @@ export interface CommandContext {
   actor?: string;
   /** Reported write (called once per Grist write). */
   audit: (entry: WriteAudit) => void;
+  /**
+   * PostgreSQL: values a source reported for the fields merged by source (birth date, corps-grade) during this write —
+   * a file or site import. They are stored under that source; the record's own value counts as a human choice only
+   * where it changes what the record showed (lib/directory/pg/fieldValues.ts, writeMergedField).
+   */
+  fieldObservation?: { source: string; values: Partial<Record<'birth_date' | 'corps_grade', unknown>>; importBatchId?: string | null };
 }
 
 export interface DirectoryCommands {

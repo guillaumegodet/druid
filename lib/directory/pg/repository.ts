@@ -15,6 +15,7 @@ import { normalizeAcronym } from '../../normalize';
 import { mapDirectoryRows } from '../people';
 import { mapStructureRecords, type AbesExportMark, type Institution, type MergeLogEntry } from '../gristMapping';
 import type { DirectoryRepository, DirectoryScope, LdapCacheSnapshot, Versioned } from '../repository';
+import { readFieldProvenance } from './fieldValues';
 import { pgDirectoryRow, pgEmployerIndex, type PgIdentifier, type PgLink, type PgMembership, type PgPerson } from './directoryRows';
 
 export interface PgDirectoryRepositoryOptions {
@@ -42,13 +43,14 @@ export const createPgDirectoryRepository = ({ db, loadLdapCache }: PgDirectoryRe
 
   /** Every directory row (one per membership, Grist order = row id), with the employer index. */
   const loadRows = async () => {
-    const [persons, memberships, identifiers, checks, links, establishments] = await Promise.all([
+    const [persons, memberships, identifiers, checks, links, establishments, provenance] = await Promise.all([
       db.selectFrom('person').selectAll().execute(),
       db.selectFrom('membership').select(['id', 'person_id', 'lab_label', 'type', 'role', 'start_date', 'end_date', 'team_labels']).orderBy('id').execute(),
       db.selectFrom('person_identifier').select(['person_id', 'scheme', 'value', 'is_primary', 'source']).orderBy('id').execute(),
       db.selectFrom('person_identifier_check').select(['person_id', 'scheme', 'result']).execute(),
       db.selectFrom('person_link').select(['person_id', 'kind', 'url']).orderBy('id').execute(),
       db.selectFrom('establishment').select(['id', 'name', 'uai', 'extra']).execute(),
+      readFieldProvenance(db),
     ]);
     const byPerson = <T extends { person_id: string }>(rows: T[]) => {
       const m = new Map<string, T[]>();
@@ -66,6 +68,7 @@ export const createPgDirectoryRepository = ({ db, loadLdapCache }: PgDirectoryRe
         person: personOf.get(m.person_id)!,
         row: pgDirectoryRow(personOf.get(m.person_id)!, m, {
           identifiers: idsOf.get(m.person_id) || [], scopusAbsent: absent.has(m.person_id), links: linksOf.get(m.person_id) || [],
+          provenance: provenance.get(m.person_id) ?? {},
         }),
       })),
     };

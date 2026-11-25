@@ -23,6 +23,7 @@ import { loadDirectory, loadWork } from '../migration/loadPg';
 import { gristDirectoryFixture, row } from './fixtures/gristDirectory';
 import { gristWorkFixture } from './fixtures/gristWork';
 import { memoryGrist } from './fixtures/memoryGrist';
+import { observeLdapFields } from '../directory/pg/ldapObserve';
 
 const url = process.env.DATABASE_URL;
 const db = url ? createDb({ connectionString: url, max: 1 }) : null;
@@ -39,6 +40,33 @@ const differences = (a: unknown, b: unknown, path = ''): string[] => {
   }
   return [`${path}: ${JSON.stringify(a)} ≠ ${JSON.stringify(b)}`];
 };
+
+/**
+ * Fields merged by source (PostgreSQL, druid-internal `docs/plan-maj-chercheurs.md`): once the LDAP values are observed
+ * (ldapObserve.ts), both stores show the same values, but Grist locks them as LDAP fields while PostgreSQL shows their
+ * provenance and lets them be corrected — documented difference, left out of the comparison.
+ */
+const withoutMergedMarks = (x: unknown) => JSON.parse(JSON.stringify(x ?? null), (_k, v) => {
+  if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
+  const { fieldProvenance: _p, ...rest } = v;
+  if (Array.isArray(rest.ldapFields)) rest.ldapFields = rest.ldapFields.filter((f: string) => f !== 'birthDate' && f !== 'grade');
+  return rest;
+});
+/** PostgreSQL as in production: the stored values seeded as sources, then the LDAP values observed. */
+const mergeBySource = async (trx: any, ldapCache: Record<string, any>) => {
+  await sql`SELECT seed_person_field_value('contract')`.execute(trx);
+  await observeLdapFields(trx, ldapCache);
+};
+
+/** LDAP review on PostgreSQL: the merged fields are never proposed (their LDAP values are a source of the merge). */
+const MERGED_COLUMNS = ['Corps_grade', 'DATE_DE_NAISSANCE_JJ_MM_AAAA'];
+const withoutMergedProposals = (x: unknown) => JSON.parse(JSON.stringify(x ?? null), (k, v) => {
+  if (k === 'aMettreAJour' && Array.isArray(v)) {
+    return v.map((e: any) => ({ ...e, changes: (e.changes || []).filter((c: any) => !MERGED_COLUMNS.includes(c.field)) }))
+      .filter((e: any) => e.changes.length > 0);
+  }
+  return v;
+});
 
 const ALL: DirectoryScope = { all: true, labAnchors: [] };
 const ctxOf = (scope: DirectoryScope = ALL): CommandContext => ({ scope, actor: 'contract', audit: () => {} });
@@ -210,7 +238,7 @@ describe.skipIf(!url)('LdapCommands and AlignCommands contract: Grist = PostgreS
     };
     // The 101 / 102 group of the fixture has personal fields that diverge on purpose (one person in PostgreSQL).
     const read = async (s: Store) => ({
-      people: (await s.repo.people(ALL)).items.filter((p) => p.uid !== 'dupont-a').map((p) => ({ ...p, lastSync: '' })),
+      people: withoutMergedMarks((await s.repo.people(ALL)).items.filter((p) => p.uid !== 'dupont-a').map((p) => ({ ...p, lastSync: '' }))),
       structures: (await s.repo.structures()).items,
       reviews: await reviews(s),
     });
@@ -237,6 +265,7 @@ describe.skipIf(!url)('LdapCommands and AlignCommands contract: Grist = PostgreS
       await sql`SELECT pg_advisory_xact_lock(726104)`.execute(trx);
       await loadDirectory(trx, directory.rows, directory.report);
       await loadWork(trx, transformWork(work, directory.rows).rows);
+      await mergeBySource(trx, LDAP_STATUS);
       const pgRepo = createPgDirectoryRepository({ db: trx, loadLdapCache });
       // Given the test transaction, each command runs in a savepoint of it.
       const pg: Store = {
@@ -247,7 +276,7 @@ describe.skipIf(!url)('LdapCommands and AlignCommands contract: Grist = PostgreS
       };
       for (const [name, step] of STEPS) {
         const run = (s: Store) => step(s).catch((e) => `${e.status ?? ''} ${e.message}`);
-        const [g, p] = [outsideGroup(await run(grist)), outsideGroup(await run(pg))];
+        const [g, p] = [withoutMergedProposals(outsideGroup(await run(grist))), outsideGroup(await run(pg))];
         results.push({ step: name, grist: g, pg: p, differences: differences(await read(grist), await read(pg)) });
       }
       throw new Rollback();

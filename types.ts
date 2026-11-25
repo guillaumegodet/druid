@@ -88,6 +88,16 @@ export interface Employment {
   ldapFields?: string[];   // Fields whose value comes from LDAP (not editable in the app)
 }
 
+/** Provenance of a field merged by source: the source of the shown value (`manual`, `ldap`, `hr_file`, `site`,
+ *  `lab_file`, `partner_directory`, `legacy`), and the sources that changed since a manual correction (to review). */
+export interface FieldProvenance {
+  source: string | null;
+  refinedBy: string | null;
+  conflicts: number;
+  correctedBy?: string | null;
+  correctedAt?: string | null;
+}
+
 /** Nantes Université-specific information from Grist */
 export interface NURelated {
   pole?: string | null;    // Affiliated pole
@@ -176,6 +186,9 @@ export interface Researcher {
   };
   nuFields?: NURelated;    // Nantes Université-specific fields
   ldapFields?: string[];   // Root fields whose value comes from LDAP (not editable)
+  /** PostgreSQL: where the value of each field merged by source comes from (druid-internal `docs/plan-maj-chercheurs.md`).
+   *  Such a field stays editable: a typed value is a manual correction that wins over the sources. */
+  fieldProvenance?: { birthDate?: FieldProvenance; grade?: FieldProvenance };
   lastSync?: string;       // Date of the last update from an external source
   validation?: ValidationInfo; // Manual reliability layer (takes precedence over the derived status)
   /** Set by « Fill from LDAP » on a record being created (lib/ldapPerson.ts): createResearcher then

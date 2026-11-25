@@ -63,6 +63,9 @@ export const API_ERRORS = [
   msg`Unknown pair`,
   // Opinions on the suggested connections between researchers (`docs/archive/plan-binomes-chercheurs.md`, lot 4)
   msg`The opinions need the PostgreSQL storage`,
+  // Source conflicts (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 d).
+  msg`Invalid source conflict decision`,
+  msg`Source conflicts need the PostgreSQL storage`,
   msg`Invalid pair`,
   msg`Unknown researcher`,
   // Calls added by hand (lot 6): routes, store (lib/calls/manualStore.ts), reading (lib/calls/callDocument.ts), checks
