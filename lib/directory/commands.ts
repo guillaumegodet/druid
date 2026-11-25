@@ -43,7 +43,7 @@ export interface CommandContext {
    * a file or site import. They are stored under that source; the record's own value counts as a human choice only
    * where it changes what the record showed (lib/directory/pg/fieldValues.ts, writeMergedField).
    */
-  fieldObservation?: { source: string; values: Partial<Record<'birth_date' | 'corps_grade', unknown>>; importBatchId?: string | null };
+  fieldObservation?: { source: string; values: Partial<Record<'birth_date' | 'corps_grade' | 'civility' | 'employment_type', unknown>>; importBatchId?: string | null };
 }
 
 export interface DirectoryCommands {

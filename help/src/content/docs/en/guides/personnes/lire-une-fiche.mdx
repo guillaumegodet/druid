@@ -56,9 +56,9 @@ page.
    [Enter imprecise employment dates](/en/guides/personnes/dates-imprecises/)).
 3. Click **Save** at the top of the record.
 
-### Where the date of birth and the grade come from
+### Where the date of birth, the grade, the title and the employment type come from
 
-On instances on PostgreSQL, these two fields keep the value of **each source**: LDAP directory,
+On instances on PostgreSQL, these four fields keep the value of **each source**: LDAP directory,
 HR file, partner directory, lab website, lab file. The record shows the value of the most trusted
 source, and a label next to the field name says which one (**LDAP**, **HR file**, **Lab website**…).
 
@@ -87,9 +87,9 @@ regeneration.
 
 ## Known limitations
 
-- **LDAP directory data take precedence on display** for the title (and, on an instance on
-  Grist, for the date of birth and the grade): a correction made in Druid on these fields can be
-  hidden by the directory's value. For an
+- **On an instance on Grist, LDAP directory data take precedence on display** for the title, the
+  date of birth, the grade and the employment type: a correction made in Druid on these fields can
+  be hidden by the directory's value. For an
   error of this kind, see [Where to fix what](/en/guides/corriger/ou-corriger-quoi/).
 - **A person can have several records** (one per laboratory). The record shows all their
   memberships, but validation and saving apply to the record that is open.

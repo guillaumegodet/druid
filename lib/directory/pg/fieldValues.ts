@@ -12,7 +12,11 @@ import {
 } from '../fieldMerge';
 
 /** Column of `person` written by the projection, per merged field. */
-const PERSON_COLUMN: Record<string, 'birth_date' | 'corps_grade'> = { birth_date: 'birth_date', corps_grade: 'corps_grade' };
+/** Fields merged by source, and the `person` column each is projected on (same name). */
+export type MergedField = 'birth_date' | 'corps_grade' | 'civility' | 'employment_type';
+const PERSON_COLUMN: Record<string, MergedField> = {
+  birth_date: 'birth_date', corps_grade: 'corps_grade', civility: 'civility', employment_type: 'employment_type',
+};
 
 const assertMerged = (field: string): void => {
   if (!MERGED_FIELDS.includes(field) || !PERSON_COLUMN[field]) throw new Error(`Field not merged by source: ${field}`);
@@ -177,9 +181,11 @@ export const moveFieldValues = async (trx: Transaction<DB>, fromPersonId: string
 // ── Writes of the application (record form, imports, LDAP, arbitrations, merges) ──────────────────────────────────────
 
 /** Record field (Grist column name used by the commands) → merged field. */
-export const MERGED_RECORD_FIELDS: Record<string, 'birth_date' | 'corps_grade'> = {
+export const MERGED_RECORD_FIELDS: Record<string, MergedField> = {
   DATE_DE_NAISSANCE_JJ_MM_AAAA: 'birth_date',
   Corps_grade: 'corps_grade',
+  Civilite: 'civility',
+  TYPE_EMPLOI: 'employment_type',
 };
 
 /** A value reported by a source in the same operation (an import line, the LDAP entry of an attached record). */

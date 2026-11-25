@@ -57,9 +57,9 @@ page d'aide.
    date complète (voir [Saisir des dates imprécises](/guides/personnes/dates-imprecises/)).
 3. Cliquez sur **Enregistrer** en haut de la fiche.
 
-### D'où viennent la date de naissance et le grade
+### D'où viennent la date de naissance, le grade, la civilité et le type d'emploi
 
-Sur les instances sur PostgreSQL, ces deux champs gardent la valeur de **chaque source** : annuaire
+Sur les instances sur PostgreSQL, ces quatre champs gardent la valeur de **chaque source** : annuaire
 LDAP, fichier RH, annuaire partenaire, site du labo, fichier d'un labo. La fiche affiche la valeur
 de la source la plus fiable, et une étiquette à côté du nom du champ indique laquelle (**LDAP**,
 **Fichier RH**, **Site du labo**…).
@@ -91,8 +91,8 @@ les tableaux de bord à leur prochaine régénération.
 
 ## Limites connues
 
-- **Les données de l'annuaire LDAP priment à l'affichage** pour la civilité (et, sur une
-  instance sur Grist, pour la date de naissance et le grade) : une correction faite dans Druid
+- **Sur une instance sur Grist, les données de l'annuaire LDAP priment à l'affichage** pour la
+  civilité, la date de naissance, le grade et le type d'emploi : une correction faite dans Druid
   sur ces champs peut être masquée par la valeur de l'annuaire. Pour une erreur de ce type, voir
   [Où corriger quoi](/guides/corriger/ou-corriger-quoi/).
 - **Une personne peut avoir plusieurs fiches** (une par laboratoire). La fiche affiche

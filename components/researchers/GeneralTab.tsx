@@ -19,8 +19,11 @@ import { Trans, useLingui } from '@lingui/react/macro';
  * makes it a manual correction that wins over the sources. A click opens the sources of the field (read on demand)
  * and, for a correction on a writable record, « Back to the sources ».
  */
+/** Fields merged by source (lib/directory/pg/fieldValues.ts MergedField). */
+type MergedFieldCode = 'birth_date' | 'corps_grade' | 'civility' | 'employment_type';
+
 const ProvenanceBadge: React.FC<{
-  provenance: FieldProvenance; field: 'birth_date' | 'corps_grade'; recordId?: number; canCorrect?: boolean;
+  provenance: FieldProvenance; field: MergedFieldCode; recordId?: number; canCorrect?: boolean;
   onDropped?: (value: string | null, provenance: FieldProvenance) => void;
 }> = ({ provenance, field, recordId, canCorrect, onDropped }) => {
   const { t, i18n } = useLingui();
@@ -107,7 +110,7 @@ const ProvenanceBadge: React.FC<{
 };
 
 const LdapFieldLabel: React.FC<{
-  label: string; fromLdap?: boolean; provenance?: FieldProvenance; field?: 'birth_date' | 'corps_grade'; recordId?: number;
+  label: string; fromLdap?: boolean; provenance?: FieldProvenance; field?: MergedFieldCode; recordId?: number;
   canCorrect?: boolean; onDropped?: (value: string | null, provenance: FieldProvenance) => void;
 }> = ({ label, fromLdap, provenance, field, recordId, canCorrect, onDropped }) => (
   <div className="flex items-center gap-2 mb-1">
@@ -384,7 +387,12 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               <LdapUidLookup uid={researcher.uid || ''} onUidChange={(v) => onUpdateField('uid', v)} onLookup={onLdapLookup} autoRun={ldapAutoRun} />
             )}
             <div>
-              <label className={fieldLabel}><Trans context="honorific">Title</Trans></label>
+              <LdapFieldLabel label={t({ message: 'Title', context: 'honorific' })} provenance={researcher.fieldProvenance?.civility}
+                field="civility" recordId={researcher.gristRowId} canCorrect={canCorrect}
+                onDropped={(value, provenance) => {
+                  onUpdateField('civility', value ?? '');
+                  onUpdateField('fieldProvenance', { ...researcher.fieldProvenance, civility: provenance });
+                }} />
               <select value={researcher.civility} onChange={(e) => onUpdateField('civility', e.target.value)} className="input-soft">
                 <option value="">-</option>
                 <option value="F">F</option>
@@ -477,7 +485,12 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                />
              </div>
              <div>
-               <LdapFieldLabel label={t`Employment type`} fromLdap={researcher.employment.ldapFields?.includes('contractType')} />
+               <LdapFieldLabel label={t`Employment type`} fromLdap={researcher.employment.ldapFields?.includes('contractType')}
+                 provenance={researcher.fieldProvenance?.contractType} field="employment_type" recordId={researcher.gristRowId} canCorrect={canCorrect}
+                 onDropped={(value, provenance) => {
+                   onUpdateField('contractType', value ?? '', 'employment');
+                   onUpdateField('fieldProvenance', { ...researcher.fieldProvenance, contractType: provenance });
+                 }} />
                <select
                  value={researcher.employment.contractType || ''}
                  onChange={(e) => onUpdateField('contractType', e.target.value, 'employment')}

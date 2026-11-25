@@ -153,9 +153,11 @@ msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
 #: App.tsx:741
-msgid "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
+msgid ""
+"Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
-msgstr "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
+msgstr ""
+"Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
 #: App.tsx:750
@@ -209,7 +211,7 @@ msgstr "Loading dashboard…"
 #: components/reports/ReportEditor.tsx:275
 #: components/reports/ReportsPage.tsx:134
 #: components/researchers/AffiliationHistorySection.tsx:211
-#: components/researchers/GeneralTab.tsx:83
+#: components/researchers/GeneralTab.tsx:86
 #: components/researchers/MergeLogPanel.tsx:64
 #: components/researchers/TasksPage.tsx:388
 #: components/structures/IdentifiersTab.tsx:52
@@ -467,16 +469,16 @@ msgstr "international"
 msgid "members"
 msgstr "members"
 
-#. placeholder {0}: data.lab
-#: components/DashboardPage.tsx:401
-msgid "Dashboard — {0}"
-msgstr "Dashboard — {0}"
-
 #: components/DashboardPage.tsx:401
 #: components/Sidebar.tsx:161
 #: components/StructureDetail.tsx:118
 msgid "Dashboard"
 msgstr "Dashboard"
+
+#. placeholder {0}: data.lab
+#: components/DashboardPage.tsx:401
+msgid "Dashboard — {0}"
+msgstr "Dashboard — {0}"
 
 #: components/DashboardPage.tsx:415
 #: components/reports/ReportControls.tsx:44
@@ -806,10 +808,6 @@ msgid "Export PDF"
 msgstr "Export PDF"
 
 #: components/ResearcherDetail.tsx:321
-msgid "Create the record"
-msgstr "Create the record"
-
-#: components/ResearcherDetail.tsx:321
 #: components/StructureDetail.tsx:139
 #: components/admin/EstablishmentAdmin.tsx:275
 #: components/admin/InstitutionsAdmin.tsx:219
@@ -819,6 +817,10 @@ msgstr "Create the record"
 #: components/researchers/FieldConflictsPage.tsx:136
 msgid "Save"
 msgstr "Save"
+
+#: components/ResearcherDetail.tsx:321
+msgid "Create the record"
+msgstr "Create the record"
 
 #: components/ResearcherDetail.tsx:353
 #: components/ResearcherDetail.tsx:354
@@ -2058,7 +2060,7 @@ msgstr "Add a call"
 #: components/reports/ShareDialog.tsx:91
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
-#: components/researchers/GeneralTab.tsx:80
+#: components/researchers/GeneralTab.tsx:83
 #: components/researchers/PeopleFileImport.tsx:160
 #: components/researchers/PeopleFileImport.tsx:299
 #: components/researchers/SiteImportReview.tsx:117
@@ -2255,14 +2257,14 @@ msgid "The file could not be read"
 msgstr "The file could not be read"
 
 #: components/admin/ManualCallsAdmin.tsx:402
-#: components/researchers/DuplicatesPage.tsx:181
-msgid "new"
-msgstr "new"
-
-#: components/admin/ManualCallsAdmin.tsx:402
 #: components/researchers/UnifiedAlignPage.tsx:651
 msgid "error"
 msgstr "error"
+
+#: components/admin/ManualCallsAdmin.tsx:402
+#: components/researchers/DuplicatesPage.tsx:181
+msgid "new"
+msgstr "new"
 
 #: components/admin/ManualCallsAdmin.tsx:402
 msgid "update"
@@ -2315,6 +2317,7 @@ msgstr "Row"
 #: components/dashboard/NewsTab.tsx:681
 #: components/dashboard/PublicationsListTab.tsx:438
 #: components/dashboard/report/reportTables.ts:57
+#: lib/fieldConflicts.ts:53
 #: lib/importConflicts.ts:62
 msgid "Title"
 msgstr "Title"
@@ -2883,14 +2886,14 @@ msgid "Share (%)"
 msgstr "Share (%)"
 
 #: components/dashboard/AxesTab.tsx:412
-msgid "Strategic axes by team (share of each team's publications)"
-msgstr "Strategic axes by team (share of each team's publications)"
-
-#: components/dashboard/AxesTab.tsx:412
 #: components/dashboard/embedRegistry.tsx:682
 #: components/dashboard/embedRegistry.tsx:687
 msgid "Strategic axes by team"
 msgstr "Strategic axes by team"
+
+#: components/dashboard/AxesTab.tsx:412
+msgid "Strategic axes by team (share of each team's publications)"
+msgstr "Strategic axes by team (share of each team's publications)"
 
 #: components/dashboard/AxesTab.tsx:425
 msgid "Keywords by strategic axis"
@@ -4386,17 +4389,17 @@ msgstr "Most co-signing institutions"
 
 #: components/dashboard/CountryCharts.tsx:41
 #: components/dashboard/countryKpis.ts:62
-#: components/dashboard/partnerKpis.ts:175
-msgid "Teams involved"
-msgstr "Teams involved"
-
-#: components/dashboard/CountryCharts.tsx:41
-#: components/dashboard/countryKpis.ts:62
 #: components/dashboard/embedRegistry.tsx:1043
 #: components/dashboard/embedRegistry.tsx:1048
 #: components/dashboard/partnerKpis.ts:175
 msgid "Labs involved"
 msgstr "Labs involved"
+
+#: components/dashboard/CountryCharts.tsx:41
+#: components/dashboard/countryKpis.ts:62
+#: components/dashboard/partnerKpis.ts:175
+msgid "Teams involved"
+msgstr "Teams involved"
 
 #. placeholder {0}: focus.label
 #: components/dashboard/CountryCharts.tsx:52
@@ -6715,7 +6718,8 @@ msgstr "Lab"
 #: components/dashboard/PublicationsListTab.tsx:339
 #: components/researchers/FilterPanel.tsx:183
 #: components/researchers/FilterPanel.tsx:335
-#: components/researchers/GeneralTab.tsx:480
+#: components/researchers/GeneralTab.tsx:488
+#: lib/fieldConflicts.ts:54
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Employment type"
@@ -6998,22 +7002,22 @@ msgid "Yearly evolution by goal"
 msgstr "Yearly evolution by goal"
 
 #: components/dashboard/SdgTab.tsx:425
-msgid "Goals by lab (share of each lab's tagged publications)"
-msgstr "Goals by lab (share of each lab's tagged publications)"
-
-#: components/dashboard/SdgTab.tsx:425
 #: components/dashboard/embedRegistry.tsx:725
 msgid "Goals by lab"
 msgstr "Goals by lab"
 
-#: components/dashboard/SdgTab.tsx:426
-msgid "Goals by team (share of each team's tagged publications)"
-msgstr "Goals by team (share of each team's tagged publications)"
+#: components/dashboard/SdgTab.tsx:425
+msgid "Goals by lab (share of each lab's tagged publications)"
+msgstr "Goals by lab (share of each lab's tagged publications)"
 
 #: components/dashboard/SdgTab.tsx:426
 #: components/dashboard/embedRegistry.tsx:725
 msgid "Goals by team"
 msgstr "Goals by team"
+
+#: components/dashboard/SdgTab.tsx:426
+msgid "Goals by team (share of each team's tagged publications)"
+msgstr "Goals by team (share of each team's tagged publications)"
 
 #: components/dashboard/SdgTab.tsx:445
 msgid "Official titles and colours of the United Nations. The figures are not comparable with rankings built on other classifiers (THE Impact Rankings, SciVal)."
@@ -7279,7 +7283,7 @@ msgstr "Population"
 
 #: components/dashboard/StaffSection.tsx:295
 #: components/dashboard/StaffSection.tsx:311
-#: components/researchers/GeneralTab.tsx:527
+#: components/researchers/GeneralTab.tsx:540
 msgid "Research FTE"
 msgstr "Research FTE"
 
@@ -11793,13 +11797,13 @@ msgid "Concurrent affiliation (directory row qualified SECONDAIRE)"
 msgstr "Concurrent affiliation (directory row qualified SECONDAIRE)"
 
 #: components/researchers/AffiliationsTable.tsx:124
-msgid "former"
-msgstr "former"
-
-#: components/researchers/AffiliationsTable.tsx:124
 #: components/researchers/UnifiedAlignPage.tsx:77
 msgid "secondary"
 msgstr "secondary"
+
+#: components/researchers/AffiliationsTable.tsx:124
+msgid "former"
+msgstr "former"
 
 #: components/researchers/AffiliationsTable.tsx:132
 msgid "— Structure —"
@@ -12206,7 +12210,7 @@ msgid "Undetermined case: remembered so it stops coming back at every review, no
 msgstr "Undetermined case: remembered so it stops coming back at every review, no role set."
 
 #: components/researchers/DuplicateQualifyPanel.tsx:60
-#: components/researchers/GeneralTab.tsx:72
+#: components/researchers/GeneralTab.tsx:75
 msgctxt "needs rework"
 msgid "To review"
 msgstr "To review"
@@ -12301,6 +12305,11 @@ msgstr "Declare a multiple affiliation (concurrent or successive) or mark “to 
 msgid "Qualify"
 msgstr "Qualify"
 
+#: components/researchers/DuplicatesPage.tsx:212
+#: components/researchers/TasksPage.tsx:330
+msgid "Open the merge assistant"
+msgstr "Open the merge assistant"
+
 #. placeholder {0}: a.name
 #. placeholder {1}: a.labo || '∅'
 #. placeholder {2}: b.name
@@ -12308,11 +12317,6 @@ msgstr "Qualify"
 #: components/researchers/DuplicatesPage.tsx:212
 msgid "Merge {0} ({1}) and {2} ({3})"
 msgstr "Merge {0} ({1}) and {2} ({3})"
-
-#: components/researchers/DuplicatesPage.tsx:212
-#: components/researchers/TasksPage.tsx:330
-msgid "Open the merge assistant"
-msgstr "Open the merge assistant"
 
 #: components/researchers/DuplicatesPage.tsx:216
 #: components/researchers/LdapCandidatesPage.tsx:223
@@ -12362,12 +12366,12 @@ msgid "Keep the correction"
 msgstr "Keep the correction"
 
 #: components/researchers/FieldConflictsPage.tsx:128
-#: components/researchers/GeneralTab.tsx:99
+#: components/researchers/GeneralTab.tsx:102
 msgid "The correction is removed: the most trusted source gives the value."
 msgstr "The correction is removed: the most trusted source gives the value."
 
 #: components/researchers/FieldConflictsPage.tsx:129
-#: components/researchers/GeneralTab.tsx:100
+#: components/researchers/GeneralTab.tsx:103
 msgid "Back to the sources"
 msgstr "Back to the sources"
 
@@ -12463,7 +12467,7 @@ msgstr "Validation"
 
 #: components/researchers/FilterPanel.tsx:184
 #: components/researchers/FilterPanel.tsx:325
-#: components/researchers/GeneralTab.tsx:564
+#: components/researchers/GeneralTab.tsx:577
 msgid "Cluster"
 msgstr "Cluster"
 
@@ -12556,211 +12560,211 @@ msgstr "Unrecognized date: enter YYYY-MM-DD, YYYY-MM or YYYY"
 msgid "Pick a full date from the calendar"
 msgstr "Pick a full date from the calendar"
 
-#: components/researchers/GeneralTab.tsx:37
+#: components/researchers/GeneralTab.tsx:40
 msgid "Manual correction by {by} on {on}: it wins over the imports and the LDAP."
 msgstr "Manual correction by {by} on {on}: it wins over the imports and the LDAP."
 
-#: components/researchers/GeneralTab.tsx:38
+#: components/researchers/GeneralTab.tsx:41
 msgid "Value given by this source. Typing another value makes it a manual correction."
 msgstr "Value given by this source. Typing another value makes it a manual correction."
 
-#: components/researchers/GeneralTab.tsx:60
+#: components/researchers/GeneralTab.tsx:63
 msgid "changed since the correction"
 msgstr "changed since the correction"
 
-#: components/researchers/GeneralTab.tsx:61
+#: components/researchers/GeneralTab.tsx:64
 msgid "new since the correction"
 msgstr "new since the correction"
 
-#: components/researchers/GeneralTab.tsx:61
+#: components/researchers/GeneralTab.tsx:64
 msgid "seen when correcting"
 msgstr "seen when correcting"
 
-#: components/researchers/GeneralTab.tsx:62
+#: components/researchers/GeneralTab.tsx:65
 msgid "less trusted"
 msgstr "less trusted"
 
-#: components/researchers/GeneralTab.tsx:70
+#: components/researchers/GeneralTab.tsx:73
 msgid "A source changed its value since the correction: to review in To do › Source conflicts."
 msgstr "A source changed its value since the correction: to review in To do › Source conflicts."
 
-#: components/researchers/GeneralTab.tsx:76
 #: components/researchers/GeneralTab.tsx:79
+#: components/researchers/GeneralTab.tsx:82
 msgid "Sources of the value"
 msgstr "Sources of the value"
 
-#: components/researchers/GeneralTab.tsx:84
+#: components/researchers/GeneralTab.tsx:87
 msgid "No source recorded yet."
 msgstr "No source recorded yet."
 
-#: components/researchers/GeneralTab.tsx:207
+#: components/researchers/GeneralTab.tsx:210
 msgid "Researcher identifiers"
 msgstr "Researcher identifiers"
 
-#: components/researchers/GeneralTab.tsx:259
+#: components/researchers/GeneralTab.tsx:262
 msgid "HAL numeric identifier (idHal_i)"
 msgstr "HAL numeric identifier (idHal_i)"
 
-#: components/researchers/GeneralTab.tsx:270
+#: components/researchers/GeneralTab.tsx:273
 msgid "Digits only, e.g. 123456"
 msgstr "Digits only, e.g. 123456"
 
-#: components/researchers/GeneralTab.tsx:277
+#: components/researchers/GeneralTab.tsx:280
 msgid "Only the primary IdHAL_i is sent to CRISalid and harvested"
 msgstr "Only the primary IdHAL_i is sent to CRISalid and harvested"
 
-#: components/researchers/GeneralTab.tsx:278
+#: components/researchers/GeneralTab.tsx:281
 msgid "Other IdHAL_i (not harvested)"
 msgstr "Other IdHAL_i (not harvested)"
 
-#: components/researchers/GeneralTab.tsx:282
+#: components/researchers/GeneralTab.tsx:285
 msgid "e.g. 123456|654321"
 msgstr "e.g. 123456|654321"
 
-#: components/researchers/GeneralTab.tsx:298
+#: components/researchers/GeneralTab.tsx:301
 msgid "Make it the primary IdHAL_i (the one harvested by CRISalid)"
 msgstr "Make it the primary IdHAL_i (the one harvested by CRISalid)"
 
-#: components/researchers/GeneralTab.tsx:300
+#: components/researchers/GeneralTab.tsx:303
 #: components/structures/IdentifiersTab.tsx:76
 #: components/structures/StructureAlignPanel.tsx:178
 msgid "make primary"
 msgstr "make primary"
 
-#: components/researchers/GeneralTab.tsx:330
+#: components/researchers/GeneralTab.tsx:333
 msgid "Read-only: maintained by the OpenAlex alignment"
 msgstr "Read-only: maintained by the OpenAlex alignment"
 
-#: components/researchers/GeneralTab.tsx:345
+#: components/researchers/GeneralTab.tsx:348
 msgid "Author ID confirmed by hand (group dashboards)"
 msgstr "Author ID confirmed by hand (group dashboards)"
 
-#: components/researchers/GeneralTab.tsx:353
+#: components/researchers/GeneralTab.tsx:356
 msgid "No OpenAlex author ID"
 msgstr "No OpenAlex author ID"
 
-#: components/researchers/GeneralTab.tsx:381
+#: components/researchers/GeneralTab.tsx:384
 msgid "Personal details"
 msgstr "Personal details"
 
-#: components/researchers/GeneralTab.tsx:387
+#: components/researchers/GeneralTab.tsx:390
 msgctxt "honorific"
 msgid "Title"
 msgstr "Title"
 
-#: components/researchers/GeneralTab.tsx:395
+#: components/researchers/GeneralTab.tsx:403
 #: components/researchers/PeopleFileImport.tsx:14
 msgid "Last name"
 msgstr "Last name"
 
-#: components/researchers/GeneralTab.tsx:399
+#: components/researchers/GeneralTab.tsx:407
 #: components/researchers/PeopleFileImport.tsx:14
 msgid "First name"
 msgstr "First name"
 
-#: components/researchers/GeneralTab.tsx:403
+#: components/researchers/GeneralTab.tsx:411
 #: lib/importConflicts.ts:66
 msgid "Nationality"
 msgstr "Nationality"
 
-#: components/researchers/GeneralTab.tsx:407
+#: components/researchers/GeneralTab.tsx:415
 #: lib/fieldConflicts.ts:51
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date of birth"
 
-#: components/researchers/GeneralTab.tsx:418
+#: components/researchers/GeneralTab.tsx:426
 msgid "Date of birth: YYYY-MM-DD, or YYYY-MM / YYYY when only the month or the year is known."
 msgstr "Date of birth: YYYY-MM-DD, or YYYY-MM / YYYY when only the month or the year is known."
 
-#: components/researchers/GeneralTab.tsx:425
+#: components/researchers/GeneralTab.tsx:433
 #: components/researchers/LdapUidLookup.tsx:49
 msgid "UID (Dyna)"
 msgstr "UID (Dyna)"
 
-#: components/researchers/GeneralTab.tsx:438
+#: components/researchers/GeneralTab.tsx:446
 msgid "HR staff number (Mangue), from LDAP or the HR lists — read-only"
 msgstr "HR staff number (Mangue), from LDAP or the HR lists — read-only"
 
-#: components/researchers/GeneralTab.tsx:438
+#: components/researchers/GeneralTab.tsx:446
 msgid "Staff number"
 msgstr "Staff number"
 
-#: components/researchers/GeneralTab.tsx:447
+#: components/researchers/GeneralTab.tsx:455
 msgid "Employment & contract"
 msgstr "Employment & contract"
 
-#: components/researchers/GeneralTab.tsx:450
+#: components/researchers/GeneralTab.tsx:458
 msgid "Employing institution"
 msgstr "Employing institution"
 
-#: components/researchers/GeneralTab.tsx:456
+#: components/researchers/GeneralTab.tsx:464
 msgid "— None —"
 msgstr "— None —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:458
+#: components/researchers/GeneralTab.tsx:466
 msgid "{0} (not in list)"
 msgstr "{0} (not in list)"
 
-#: components/researchers/GeneralTab.tsx:466
+#: components/researchers/GeneralTab.tsx:474
 msgid "Grade / Rank"
 msgstr "Grade / Rank"
 
-#: components/researchers/GeneralTab.tsx:487
+#: components/researchers/GeneralTab.tsx:500
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Undefined —"
 
-#: components/researchers/GeneralTab.tsx:512
+#: components/researchers/GeneralTab.tsx:525
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Employment start"
 
-#: components/researchers/GeneralTab.tsx:512
+#: components/researchers/GeneralTab.tsx:525
 msgid "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 
-#: components/researchers/GeneralTab.tsx:516
+#: components/researchers/GeneralTab.tsx:529
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Employment end"
 
-#: components/researchers/GeneralTab.tsx:516
+#: components/researchers/GeneralTab.tsx:529
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 
-#: components/researchers/GeneralTab.tsx:523
+#: components/researchers/GeneralTab.tsx:536
 msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 msgstr "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 
-#: components/researchers/GeneralTab.tsx:523
+#: components/researchers/GeneralTab.tsx:536
 msgid "FTE (working time)"
 msgstr "FTE (working time)"
 
-#: components/researchers/GeneralTab.tsx:527
+#: components/researchers/GeneralTab.tsx:540
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 
-#: components/researchers/GeneralTab.tsx:541
+#: components/researchers/GeneralTab.tsx:554
 msgid "Accredited to supervise research (HDR)"
 msgstr "Accredited to supervise research (HDR)"
 
-#: components/researchers/GeneralTab.tsx:546
+#: components/researchers/GeneralTab.tsx:559
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "HDR year"
 
-#: components/researchers/GeneralTab.tsx:568
+#: components/researchers/GeneralTab.tsx:581
 msgid "Faculty"
 msgstr "Faculty"
 
-#: components/researchers/GeneralTab.tsx:572
+#: components/researchers/GeneralTab.tsx:585
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "Doctoral school"
 
-#: components/researchers/GeneralTab.tsx:576
+#: components/researchers/GeneralTab.tsx:589
 msgid "Location (site)"
 msgstr "Location (site)"
 
@@ -13537,13 +13541,13 @@ msgid "IdHAL"
 msgstr "IdHAL"
 
 #: components/researchers/PeopleFileImport.tsx:15
-msgid "Position"
-msgstr "Position"
-
-#: components/researchers/PeopleFileImport.tsx:15
 #: components/researchers/SiteImportReview.tsx:14
 msgid "Corps / grade"
 msgstr "Corps / grade"
+
+#: components/researchers/PeopleFileImport.tsx:15
+msgid "Position"
+msgstr "Position"
 
 #: components/researchers/PeopleFileImport.tsx:15
 msgid "Local identifier"
@@ -15012,10 +15016,12 @@ msgid "List (paste: name, email, uid, status)"
 msgstr "List (paste: name, email, uid, status)"
 
 #: components/researchers/ValidationImportReview.tsx:92
-msgid "name,email,uid\n"
+msgid ""
+"name,email,uid\n"
 "DUPONT Jean,jean.dupont@x.fr,jdupont\n"
 "…"
-msgstr "name,email,uid\n"
+msgstr ""
+"name,email,uid\n"
 "DUPONT Jean,jean.dupont@x.fr,jdupont\n"
 "…"
 
@@ -16260,7 +16266,7 @@ msgstr "{0}: no profile — fix it in the Annuaire"
 msgid "Invalid ID_SCOPUS"
 msgstr "Invalid ID_SCOPUS"
 
-#. placeholder {0}: entry.scopus
+#. placeholder {0}: entry.scopus!
 #: lib/alignTextsI18n.ts:29
 msgid "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
 msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted to mark a verified absence)"
@@ -16269,7 +16275,7 @@ msgstr "{0}: not a numeric Scopus identifier (the text « absent » is accepted 
 msgid "Invalid ORCID"
 msgstr "Invalid ORCID"
 
-#. placeholder {0}: entry.orcid
+#. placeholder {0}: entry.orcid!
 #: lib/alignTextsI18n.ts:31
 msgid "{0}: wrong format or check digit"
 msgstr "{0}: wrong format or check digit"
@@ -16278,8 +16284,8 @@ msgstr "{0}: wrong format or check digit"
 msgid "Profile merged by Scopus"
 msgstr "Profile merged by Scopus"
 
-#. placeholder {0}: entry.scopus
-#. placeholder {1}: entry.merged
+#. placeholder {0}: entry.scopus!
+#. placeholder {1}: entry.merged!
 #: lib/alignTextsI18n.ts:33
 msgid "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
 msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_SCOPUS"
@@ -16289,7 +16295,7 @@ msgstr "{0} → {1}: Scopus merged this profile into another one — update ID_S
 msgid "{0} — check the profile, flag it “Mixed identity” if needed"
 msgstr "{0} — check the profile, flag it “Mixed identity” if needed"
 
-#. placeholder {0}: cand.fullName
+#. placeholder {0}: cand.fullName!
 #. placeholder {1}: (cand.forms || []).length > 1 ? ` (${cand.forms!.join(' | ')})` : ''
 #: lib/alignTextsI18n.ts:35
 msgid "Annuaire “{displayName}” ≠ profile “{0}”{1}"
@@ -16464,8 +16470,8 @@ msgid "This import was already cancelled"
 msgstr "This import was already cancelled"
 
 #: lib/apiErrors.ts:72
-msgid "The date of birth or the grade was changed meanwhile: reload the record before correcting it"
-msgstr "The date of birth or the grade was changed meanwhile: reload the record before correcting it"
+msgid "A value of this record was changed meanwhile: reload the record before correcting it"
+msgstr "A value of this record was changed meanwhile: reload the record before correcting it"
 
 #: lib/apiErrors.ts:73
 msgid "Invalid pair"

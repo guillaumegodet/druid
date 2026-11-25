@@ -53,7 +53,7 @@ const differences = (a: unknown, b: unknown, path = ''): string[] => {
 const withoutMergedMarks = (x: unknown) => JSON.parse(JSON.stringify(x ?? null), (_k, v) => {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
   const { fieldProvenance: _p, ...rest } = v;
-  if (Array.isArray(rest.ldapFields)) rest.ldapFields = rest.ldapFields.filter((f: string) => f !== 'birthDate' && f !== 'grade');
+  if (Array.isArray(rest.ldapFields)) rest.ldapFields = rest.ldapFields.filter((f: string) => !['birthDate', 'grade', 'contractType'].includes(f));
   return rest;
 });
 /** PostgreSQL as in production: the stored values seeded as sources, then the LDAP values observed. */

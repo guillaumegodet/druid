@@ -50,6 +50,8 @@ export const SOURCE_LABELS: Record<string, MessageDescriptor> = {
 export const MERGED_FIELD_LABELS: Record<string, MessageDescriptor> = {
   birth_date: msg`Date of birth`,
   corps_grade: msg`Grade`,
+  civility: msg`Title`,
+  employment_type: msg`Employment type`,
 };
 
 async function request<T>(url: string, init?: RequestInit): Promise<T> {
