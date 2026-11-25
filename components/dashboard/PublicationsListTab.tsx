@@ -15,14 +15,10 @@ import {
 import { doiUrl } from '../../lib/doi';
 import { sdgLabel } from './sdg';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
+import { csvCell, saveCsv } from '../../lib/download';
 
 const PAGE_SIZE = 50;
 const JOURNAL_DATALIST_MAX = 400;
-
-function csvEscape(v: string | number | null | undefined): string {
-  const s = (v ?? '').toString();
-  return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
-}
 
 /** Compact select of the filter panel (hidden if no option). */
 const FilterSelect: React.FC<{
@@ -195,16 +191,9 @@ export const PublicationsListTab: React.FC<{
       ['openalex_lookup', (p) => p.openalexLookup],
     ];
     const header = cols.map(([name]) => name).join(',');
-    const lines = rows.map((p) => cols.map(([, get]) => csvEscape(get(p))).join(','));
+    const lines = rows.map((p) => cols.map(([, get]) => csvCell(get(p))).join(','));
     // UTF-8 BOM: Excel (fr) does not interpret accents without it.
-    const blob = new Blob(['\ufeff', [header, ...lines].join('\n')], {
-      type: 'text/csv;charset=utf-8',
-    });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `publications_${range.start}-${range.end}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`publications_${range.start}-${range.end}.csv`, header, lines, { bom: true });
   };
 
   return (

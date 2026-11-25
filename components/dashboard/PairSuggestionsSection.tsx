@@ -19,7 +19,7 @@ import { getUserInfo } from '../../lib/auth';
 import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
 import { toCsv } from '../../lib/chartExport';
-import { downloadBlob } from './chartFileExport';
+import { downloadBlob } from '../../lib/download';
 import { helpUrl } from '../../lib/helpLinks';
 import { WorkTitle, fetchWorkTitle, openAlexWorkUrl } from '../../lib/pairs/openalexTitles';
 

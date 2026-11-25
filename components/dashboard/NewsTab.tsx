@@ -27,6 +27,7 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { apiErrorText } from '../../lib/apiErrors';
 import { fetchStaticNews } from '../../lib/dashboardSource';
+import { csvCell, saveCsv } from '../../lib/download';
 
 // « Publications » / « Médias » toggle of the « Veille » tab (live OpenAlex monitoring
 // on one side, media_watch media mentions on the other).
@@ -124,11 +125,6 @@ function docTypeLabel(item: NewsItem): string {
   if (item.workType === 'article') return i18n._(msg`Journal article`);
   const m = WORK_TYPE_LABELS[item.workType ?? ''];
   return m ? i18n._(m) : item.workType ?? i18n._(msg`Other`);
-}
-
-function csvEscape(v: string | number | null | undefined): string {
-  const s = (v ?? '').toString();
-  return s.includes(',') || s.includes('"') || s.includes('\n') ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
 function formatDate(iso: string | null): string {
@@ -393,25 +389,20 @@ export const NewsTab: React.FC<{ dataset: DashboardDataset; slug: string }> = ({
     const header = 'titre,auteurs,labos,journal_ou_conference,type,quartile,thematique,date,citations,open_access,lien';
     const lines = rows.map((it) =>
       [
-        csvEscape(it.title),
-        csvEscape(authorsLabel(it)),
-        csvEscape(it.labs.join(' | ')),
-        csvEscape(it.sourceName),
-        csvEscape(docTypeLabel(it)),
+        csvCell(it.title),
+        csvCell(authorsLabel(it)),
+        csvCell(it.labs.join(' | ')),
+        csvCell(it.sourceName),
+        csvCell(docTypeLabel(it)),
         quartileLookup(it) ?? '',
-        csvEscape(it.topics.slice(0, 3).join(' | ')),
+        csvCell(it.topics.slice(0, 3).join(' | ')),
         it.date ?? '',
         it.citedByCount,
         it.isOa ? 'oui' : 'non',
-        csvEscape(it.link),
+        csvCell(it.link),
       ].join(','),
     );
-    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `veille_${slug}_${days}j.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`veille_${slug}_${days}j.csv`, header, lines);
   };
 
   const openPost = (item: NewsItem) => {

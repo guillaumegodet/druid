@@ -18,6 +18,7 @@ import {
 import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
+import { csvCell, saveCsv } from '../../lib/download';
 
 const PAGE_SIZE = 25;
 
@@ -307,12 +308,6 @@ const SignaturesTable: React.FC<{
   const authorsOf = (p: DashboardPublication) =>
     p.authorIds.map((id) => byId.get(id)).filter(Boolean).join(', ');
 
-  const csvEscape = (v: string | number | null) => {
-    const s = (v ?? '').toString();
-    return s.includes(',') || s.includes('"') || s.includes('\n')
-      ? `"${s.replace(/"/g, '""')}"`
-      : s;
-  };
   const downloadCsv = () => {
     const header = 'year,score_pct,conforme,mention_nu,modele,signature,auteurs,title,doi';
     const lines = rows.map((p) =>
@@ -321,19 +316,14 @@ const SignaturesTable: React.FC<{
         Math.round((p.charte!.score as number) * 100),
         charterCompliant(p, seuil) ? 'oui' : '',
         p.charte!.nuSeul ? 'oui' : '',
-        csvEscape(p.charte!.modele),
-        csvEscape(p.charte!.signature),
-        csvEscape(authorsOf(p)),
-        csvEscape(p.title),
+        csvCell(p.charte!.modele),
+        csvCell(p.charte!.signature),
+        csvCell(authorsOf(p)),
+        csvCell(p.title),
         p.doi ?? '',
       ].join(','),
     );
-    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `conformite_charte_${dataset.slug}_${range.start}-${range.end}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`conformite_charte_${dataset.slug}_${range.start}-${range.end}.csv`, header, lines);
   };
 
   const filters: { key: StatusFilter; label: string }[] = [

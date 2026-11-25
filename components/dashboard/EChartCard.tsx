@@ -34,7 +34,8 @@ import { Download, Maximize2, ChevronDown, Minimize2, Share2, Copy, Check, Exter
 import { chartDoc } from './report/chartDocs';
 import { VIZ_DARK, VIZ_LIGHT, VizTheme } from './palette';
 import { EMBEDDABLE_IDS, REPORT_ONLY_IDS } from './embedIds';
-import { downloadBlob, renderChartSvg, svgToPdf, toStaticOption } from './chartFileExport';
+import { renderChartSvg, svgToPdf, toStaticOption } from './chartFileExport';
+import { downloadBlob } from '../../lib/download';
 import { chartTables, toCsv, type DataTable } from '../../lib/chartExport';
 import { Trans, useLingui } from '@lingui/react/macro';
 

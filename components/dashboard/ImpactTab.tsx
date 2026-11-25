@@ -19,6 +19,7 @@ import { FwciMeanByGroupChart, TopByGroupChart } from './charts/ImpactGroupChart
 import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
+import { csvCell, saveCsv } from '../../lib/download';
 
 const TEAM_UNKNOWN = 'Non identifié';
 // Local name kept: it is the placeholder of a translated message.
@@ -144,23 +145,12 @@ const TopPublicationsTable: React.FC<{ dataset: DashboardDataset; range: YearRan
     { key: 'fwci', label: t`FWCI ranking` },
   ];
 
-  const csvEscape = (v: string | number | null) => {
-    const s = (v ?? '').toString();
-    return s.includes(',') || s.includes('"') || s.includes('\n')
-      ? `"${s.replace(/"/g, '""')}"`
-      : s;
-  };
   const downloadCsv = () => {
     const header = 'year,title,authors,journal,fwci,citations,teams,doi';
     const lines = rows.map((r) =>
-      [r.year, csvEscape(r.title), csvEscape(r.authors), csvEscape(r.journal), r.fwci ?? '', r.citedByCount, csvEscape(r.teams), r.doi ?? ''].join(','),
+      [r.year, csvCell(r.title), csvCell(r.authors), csvCell(r.journal), r.fwci ?? '', r.citedByCount, csvCell(r.teams), r.doi ?? ''].join(','),
     );
-    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `impact_${kind}_${range.start}-${range.end}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`impact_${kind}_${range.start}-${range.end}.csv`, header, lines);
   };
 
   return (

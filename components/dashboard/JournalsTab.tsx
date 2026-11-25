@@ -24,6 +24,7 @@ import {
 } from './EChartCard';
 import { numberLocale } from '../../lib/i18n';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
+import { csvCell, saveCsv } from '../../lib/download';
 
 const PAGE_SIZE = 25;
 
@@ -144,27 +145,16 @@ const AllJournalsTable: React.FC<{
   const hasQuartile = agg.rows.some((r) => r.quartile);
   const hasLn = agg.rows.some((r) => r.licenceNationale);
 
-  const csvEscape = (v: string | number | null) => {
-    const s = (v ?? '').toString();
-    return s.includes(',') || s.includes('"') || s.includes('\n')
-      ? `"${s.replace(/"/g, '""')}"`
-      : s;
-  };
   const downloadCsv = () => {
     const header = 'revue,editeur,issn,publications,quartile,pct_acces_ouvert,citations,acces_nu,licence_nationale';
     const lines = rows.map((r) =>
       [
-        csvEscape(r.journal), csvEscape(r.publisher), r.issn ?? '', r.publications,
-        r.quartile ?? '', r.pctOpen, r.citations, csvEscape(accessLabel(r.accessCat)),
+        csvCell(r.journal), csvCell(r.publisher), r.issn ?? '', r.publications,
+        r.quartile ?? '', r.pctOpen, r.citations, csvCell(accessLabel(r.accessCat)),
         r.licenceNationale ? 'oui' : '',
       ].join(','),
     );
-    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv;charset=utf-8' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `revues_${range.start}-${range.end}.csv`;
-    a.click();
-    URL.revokeObjectURL(a.href);
+    saveCsv(`revues_${range.start}-${range.end}.csv`, header, lines);
   };
 
   return (
