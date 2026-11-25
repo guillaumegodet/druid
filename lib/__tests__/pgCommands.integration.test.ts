@@ -197,7 +197,9 @@ describe.skipIf(!url)('DirectoryCommands contract: Grist = PostgreSQL', () => {
     const gristRepo = createGristDirectoryRepository({ grist: gristClient });
     const grist: Store = { repo: gristRepo, commands: createGristDirectoryCommands({ grist: gristClient, repository: gristRepo, today: TODAY }) };
     const read = async (s: Store) => ({
-      people: (await s.repo.people(ALL)).items.map((p) => ({ ...p, lastSync: '' })),
+      // fieldProvenance: PostgreSQL only (fields merged by source, druid-internal `docs/plan-maj-chercheurs.md`) —
+      // documented difference, as in the repository and LDAP contracts.
+      people: (await s.repo.people(ALL)).items.map(({ fieldProvenance: _p, ...p }) => ({ ...p, lastSync: '' })),
       structures: (await s.repo.structures()).items.filter((x) => !['S-13', 'S-14'].includes(x.id)), // rows the import leaves out
       merges: (await s.repo.merges(50)).items.map((m) => ({ ...m, date: m.date ? 'set' : '' })),
       abes: (await s.repo.abesExports(ALL)).items,
