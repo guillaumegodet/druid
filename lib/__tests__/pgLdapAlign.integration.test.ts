@@ -59,7 +59,7 @@ const mergeBySource = async (trx: any, ldapCache: Record<string, any>) => {
 };
 
 /** LDAP review on PostgreSQL: the merged fields are never proposed (their LDAP values are a source of the merge). */
-const MERGED_COLUMNS = ['Corps_grade', 'DATE_DE_NAISSANCE_JJ_MM_AAAA', 'Civilite', 'TYPE_EMPLOI'];
+const MERGED_COLUMNS = ['Corps_grade', 'DATE_DE_NAISSANCE_JJ_MM_AAAA', 'Civilite', 'TYPE_EMPLOI', 'employment_end_date'];
 const withoutMergedProposals = (x: unknown) => JSON.parse(JSON.stringify(x ?? null), (k, v) => {
   if (k === 'aMettreAJour' && Array.isArray(v)) {
     return v.map((e: any) => ({ ...e, changes: (e.changes || []).filter((c: any) => !MERGED_COLUMNS.includes(c.field)) }))

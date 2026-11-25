@@ -6718,7 +6718,7 @@ msgstr "Lab"
 #: components/dashboard/PublicationsListTab.tsx:339
 #: components/researchers/FilterPanel.tsx:183
 #: components/researchers/FilterPanel.tsx:335
-#: components/researchers/GeneralTab.tsx:488
+#: components/researchers/GeneralTab.tsx:497
 #: lib/fieldConflicts.ts:54
 #: lib/importConflicts.ts:64
 msgid "Employment type"
@@ -6823,6 +6823,7 @@ msgstr "None"
 #: components/researchers/FilterPanel.tsx:266
 #: components/researchers/PeopleFileImport.tsx:14
 #: components/researchers/ResearcherTable.tsx:88
+#: lib/fieldConflicts.ts:55
 #: lib/importConflicts.ts:73
 msgid "Employer"
 msgstr "Employer"
@@ -7283,7 +7284,7 @@ msgstr "Population"
 
 #: components/dashboard/StaffSection.tsx:295
 #: components/dashboard/StaffSection.tsx:311
-#: components/researchers/GeneralTab.tsx:540
+#: components/researchers/GeneralTab.tsx:567
 msgid "Research FTE"
 msgstr "Research FTE"
 
@@ -12467,7 +12468,7 @@ msgstr "Validation"
 
 #: components/researchers/FilterPanel.tsx:184
 #: components/researchers/FilterPanel.tsx:325
-#: components/researchers/GeneralTab.tsx:577
+#: components/researchers/GeneralTab.tsx:604
 msgid "Cluster"
 msgstr "Cluster"
 
@@ -12694,77 +12695,79 @@ msgstr "Staff number"
 msgid "Employment & contract"
 msgstr "Employment & contract"
 
-#: components/researchers/GeneralTab.tsx:458
+#: components/researchers/GeneralTab.tsx:459
 msgid "Employing institution"
 msgstr "Employing institution"
 
-#: components/researchers/GeneralTab.tsx:464
+#: components/researchers/GeneralTab.tsx:473
 msgid "— None —"
 msgstr "— None —"
 
 #. placeholder {0}: researcher.employment.employer
-#: components/researchers/GeneralTab.tsx:466
+#: components/researchers/GeneralTab.tsx:475
 msgid "{0} (not in list)"
 msgstr "{0} (not in list)"
 
-#: components/researchers/GeneralTab.tsx:474
+#: components/researchers/GeneralTab.tsx:483
 msgid "Grade / Rank"
 msgstr "Grade / Rank"
 
-#: components/researchers/GeneralTab.tsx:500
+#: components/researchers/GeneralTab.tsx:509
 #: components/researchers/GradeSelect.tsx:23
 msgid "— Undefined —"
 msgstr "— Undefined —"
 
-#: components/researchers/GeneralTab.tsx:525
+#: components/researchers/GeneralTab.tsx:535
+#: lib/fieldConflicts.ts:56
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Employment start"
 
-#: components/researchers/GeneralTab.tsx:525
+#: components/researchers/GeneralTab.tsx:535
 msgid "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 msgstr "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 
-#: components/researchers/GeneralTab.tsx:529
+#: components/researchers/GeneralTab.tsx:548
+#: lib/fieldConflicts.ts:57
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Employment end"
 
-#: components/researchers/GeneralTab.tsx:529
+#: components/researchers/GeneralTab.tsx:548
 msgid "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 msgstr "Contract / employment end (YYYY, YYYY-MM or YYYY-MM-DD). For an external record (no LDAP state), a past date switches the status to « Left »; with a past membership end as well, « Left » applies even to a validated record."
 
-#: components/researchers/GeneralTab.tsx:536
+#: components/researchers/GeneralTab.tsx:563
 msgid "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 msgstr "Share of a full-time position (0 to 1, e.g. 0.5). Empty = not provided."
 
-#: components/researchers/GeneralTab.tsx:536
+#: components/researchers/GeneralTab.tsx:563
 msgid "FTE (working time)"
 msgstr "FTE (working time)"
 
-#: components/researchers/GeneralTab.tsx:540
+#: components/researchers/GeneralTab.tsx:567
 msgid "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 msgstr "Research full-time equivalent (0 to 1): usually 0.5 for a teacher-researcher, 1 for a full-time researcher. Empty = not provided (a default from the grade will be used in the dashboard); 0 = no research time."
 
-#: components/researchers/GeneralTab.tsx:554
+#: components/researchers/GeneralTab.tsx:581
 msgid "Accredited to supervise research (HDR)"
 msgstr "Accredited to supervise research (HDR)"
 
-#: components/researchers/GeneralTab.tsx:559
+#: components/researchers/GeneralTab.tsx:586
 #: lib/importConflicts.ts:68
 msgid "HDR year"
 msgstr "HDR year"
 
-#: components/researchers/GeneralTab.tsx:581
+#: components/researchers/GeneralTab.tsx:608
 msgid "Faculty"
 msgstr "Faculty"
 
-#: components/researchers/GeneralTab.tsx:585
+#: components/researchers/GeneralTab.tsx:612
 #: lib/importConflicts.ts:70
 msgid "Doctoral school"
 msgstr "Doctoral school"
 
-#: components/researchers/GeneralTab.tsx:589
+#: components/researchers/GeneralTab.tsx:616
 msgid "Location (site)"
 msgstr "Location (site)"
 

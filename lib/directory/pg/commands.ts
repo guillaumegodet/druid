@@ -218,25 +218,23 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       // birth_date, corps_grade, civility, employment_type: merged by source, written by writeMerged below (never the
       // column directly).
       email: orNull(r.email), nationality: orNull(r.nationality),
-      employment_start: fuzzy(r.employment?.startDate), employment_end: fuzzy(r.employment?.endDate),
       fte_ratio: parseFteCell(r.employment?.fte), fte_research: parseFteCell(r.employment?.researchFte),
       photo_url: orNull(String(r.photoUrl ?? '').trim()),
       // Lab website directory page: written by the site imports only (the record form does not edit it).
       ...(String(r.annuaireUrl ?? '').trim() ? { directory_url: String(r.annuaireUrl).trim() } : {}),
       ...validationColumns(r.validation),
-      ...(employer ? { employer_id: employer.id } : {}),
     };
     const replaced = ['Civilite', 'DATE_DE_NAISSANCE_JJ_MM_AAAA', 'employment_start_date', 'employment_end_date', 'validated_status',
       'validation_date', ...(employer ? ['Employeur'] : []), ...LINKS.map((l) => l.column)];
     // A civility outside F / M is kept as typed (the record shows it normalized, like a Grist cell).
     const extra: Record<string, any> = civility && !['F', 'M'].includes(civility.toUpperCase()) ? { Civilite: civility } : {};
-    return { values, replaced, extra };
+    return { values, replaced, extra, employer };
   };
   /**
    * Fields merged by source (druid-internal `docs/plan-maj-chercheurs.md`): the record's values are a human choice
    * (form, import line kept); the values of an import are first stored under its source (ctx.fieldObservation).
    */
-  const writeMerged = async (trx: Transaction<DB>, personId: string, r: Researcher, ctx: CommandContext) => {
+  const writeMerged = async (trx: Transaction<DB>, personId: string, r: Researcher, ctx: CommandContext, employer: { id: string | null } | undefined) => {
     // An unreadable date is refused (400), not taken as a cleared field. A civility outside F / M stays in `extra`
     // (personColumns) and counts as none here.
     const civility = String(r.civility || '').trim().toUpperCase();
@@ -245,14 +243,34 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       corps_grade: orNull(r.employment?.grade),
       civility: civility === 'F' || civility === 'M' ? civility : null,
       employment_type: orNull(r.employment?.contractType),
+      // A label outside the list of institutions leaves the employer as it is (skipped below), as before.
+      employer_id: employer?.id === undefined || employer?.id === null ? null : String(employer.id),
+      employment_start: blank(r.employment?.startDate) ? null : fuzzy(r.employment?.startDate) ?? r.employment?.startDate,
+      employment_end: blank(r.employment?.endDate) ? null : fuzzy(r.employment?.endDate) ?? r.employment?.endDate,
     };
     // Key of each field in the record's fieldProvenance.
-    const provenanceKey = { birth_date: 'birthDate', corps_grade: 'grade', civility: 'civility', employment_type: 'contractType' } as const;
+    const provenanceKey = {
+      birth_date: 'birthDate', corps_grade: 'grade', civility: 'civility', employment_type: 'contractType',
+      employer_id: 'employer', employment_start: 'employmentStart', employment_end: 'employmentEnd',
+    } as const;
+    // An import reports its employer by label: resolved to the institution (unknown label = no observation).
+    const employerIdOf = async (raw: unknown): Promise<string | null | undefined> => {
+      const s = String(raw ?? '').trim();
+      if (!s) return null;
+      if (/^\d+$/.test(s)) return s;
+      const e = await trx.selectFrom('establishment').select('id').where(sql`lower(name)`, '=', s.toLowerCase()).executeTakeFirst();
+      return e ? String(e.id) : undefined;
+    };
     const obs = ctx.fieldObservation;
     const sameText = (a: unknown, b: unknown) => String(a ?? '').trim().toLowerCase() === String(b ?? '').trim().toLowerCase();
-    for (const field of ['birth_date', 'corps_grade', 'civility', 'employment_type'] as const) {
-      const observed = obs && Object.prototype.hasOwnProperty.call(obs.values, field)
+    for (const field of ['birth_date', 'corps_grade', 'civility', 'employment_type', 'employer_id', 'employment_start', 'employment_end'] as const) {
+      if (field === 'employer_id' && employer === undefined) continue;
+      let observed = obs && Object.prototype.hasOwnProperty.call(obs.values, field)
         ? { source: obs.source, value: obs.values[field], importBatchId: obs.importBatchId } : undefined;
+      if (observed && field === 'employer_id') {
+        const id = await employerIdOf(observed.value);
+        observed = id === undefined ? undefined : { ...observed, value: id };
+      }
       // D7 (druid-internal `docs/plan-maj-chercheurs.md`): the record sends back the stored value it was read with. If
       // it changed since (another user, the LDAP sync), a field left as it was keeps the new value instead of
       // reverting it as a « correction », and a field typed over is refused: two corrections never silently collide.
@@ -273,6 +291,12 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
         throw new ApiError(400, e.message);
       }
     }
+  };
+  /** Name of an institution by id (the employer merged by source is stored as an id). */
+  const employerNames = async (trx: Transaction<DB>) => {
+    const rows = await trx.selectFrom('establishment').select(['id', 'name']).execute();
+    const byId = new Map(rows.map((e) => [String(e.id), e.name ?? '']));
+    return (id: string | null) => (id === null ? null : byId.get(String(id)) ?? id);
   };
   const writeIdentifiers = async (trx: Transaction<DB>, personId: string, r: Researcher, extra: Record<string, any>) => {
     for (const [scheme, raw] of Object.entries(identifiersOf(r))) {
@@ -322,7 +346,10 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
       const person = await personOfRecord(db as any, ctx.scope, recordId);
       const all = await readFieldSources(db, person.id);
-      return Object.fromEntries(Object.entries(all).map(([field, f]) => [field, { value: f.value, source: f.source, sources: f.sources }]));
+      const name = await employerNames(db as any);
+      return Object.fromEntries(Object.entries(all).map(([field, f]) => [field, field === 'employer_id'
+        ? { value: name(f.value), source: f.source, sources: f.sources.map((x) => ({ ...x, value: name(x.value) })) }
+        : { value: f.value, source: f.source, sources: f.sources }]));
     },
     dropFieldCorrection: (recordId, field, ctx) => writing(ctx, async (trx) => {
       if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
@@ -331,7 +358,8 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       await dropCorrection(trx, person.id, field);
       ctx.audit({ table: 'Annuaire', kind: 'update', rows: [recordId], fields: [field], count: 1 });
       const f = (await readFieldSources(trx, person.id))[field];
-      return { value: f.value, provenance: f.provenance };
+      // The employer as the record shows it: the institution's name.
+      return { value: field === 'employer_id' ? (await employerNames(trx))(f.value) : f.value, provenance: f.provenance };
     }),
 
     createPerson: (researcher, ctx) => writing(ctx, async (trx) => {
@@ -343,7 +371,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       const existing = uid ? await trx.selectFrom('person').select(['id']).where(sql`lower(uid)`, '=', uid.toLowerCase()).executeTakeFirst() : undefined;
       let personId = existing?.id;
       if (!personId) {
-        const { values, extra } = await personColumns(trx, researcher);
+        const { values, extra, employer } = await personColumns(trx, researcher);
         const prefill = researcher.ldapPrefill;
         const inserted = await trx.insertInto('person').values({
           ...values, uid: uid || null, extra: JSON.stringify(extra) as any,
@@ -353,7 +381,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
           } : researcher.importSource ? { sources: [researcher.importSource] } : {}),
         } as any).returning('id').executeTakeFirstOrThrow();
         personId = inserted.id;
-        await writeMerged(trx, personId, researcher, ctx);
+        await writeMerged(trx, personId, researcher, ctx, employer);
         const personExtra: Record<string, any> = { ...extra };
         await writeIdentifiers(trx, personId, researcher, personExtra);
         await writeLinks(trx, personId, researcher, personExtra);
@@ -392,12 +420,12 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       const parts = droppedRows.length ? (await loadPersonParts(trx, [person.id])).get(person.id)! : null;
       const droppedFields = droppedRows.map((m) => ({ rowId: Number(m.id), fields: readRecordFields(person, m, parts!) }));
 
-      const { values, replaced, extra } = await personColumns(trx, researcher);
+      const { values, replaced, extra, employer } = await personColumns(trx, researcher);
       const personExtra: Record<string, any> = { ...(person.extra as object) };
       for (const k of replaced) delete personExtra[k];
       Object.assign(personExtra, extra);
       await trx.updateTable('person').set(values as any).where('id', '=', person.id).execute();
-      await writeMerged(trx, person.id, researcher, ctx);
+      await writeMerged(trx, person.id, researcher, ctx, employer);
       await writeIdentifiers(trx, person.id, researcher, personExtra);
       await writeLinks(trx, person.id, researcher, personExtra);
 

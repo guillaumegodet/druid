@@ -13,9 +13,10 @@ import {
 
 /** Column of `person` written by the projection, per merged field. */
 /** Fields merged by source, and the `person` column each is projected on (same name). */
-export type MergedField = 'birth_date' | 'corps_grade' | 'civility' | 'employment_type';
+export type MergedField = 'birth_date' | 'corps_grade' | 'civility' | 'employment_type' | 'employer_id' | 'employment_start' | 'employment_end';
 const PERSON_COLUMN: Record<string, MergedField> = {
   birth_date: 'birth_date', corps_grade: 'corps_grade', civility: 'civility', employment_type: 'employment_type',
+  employer_id: 'employer_id', employment_start: 'employment_start', employment_end: 'employment_end',
 };
 
 const assertMerged = (field: string): void => {
@@ -186,6 +187,9 @@ export const MERGED_RECORD_FIELDS: Record<string, MergedField> = {
   Corps_grade: 'corps_grade',
   Civilite: 'civility',
   TYPE_EMPLOI: 'employment_type',
+  Employeur: 'employer_id',
+  employment_start_date: 'employment_start',
+  employment_end_date: 'employment_end',
 };
 
 /** A value reported by a source in the same operation (an import line, the LDAP entry of an attached record). */
