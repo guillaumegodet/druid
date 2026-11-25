@@ -72,6 +72,9 @@ source, and a label next to the field name says which one (**LDAP**, **HR file**
   the correction: the most trusted source takes over again.
 - If the date of birth or the grade changed while you had the record open (LDAP sync, another manager), the updated
   value is kept; if you changed it too, saving is refused: reload the record, then correct it again.
+- After **merging two records**, the values of the absorbed record stay among the sources of the kept one; a
+  correction it carried shows as the **Merged record** source, and among the source conflicts when it contradicts a
+  correction of the kept record.
 
 The photo is changed with the pencil on the photo (**Edit photo (URL)**): enter the address
 of a public image (lab page, directory, HAL). Without a photo, Druid shows the initials.

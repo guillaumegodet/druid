@@ -25,7 +25,7 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
-import { dropFieldCorrection as dropCorrection, readFieldSources, writeMergedField } from './fieldValues';
+import { dropFieldCorrection as dropCorrection, moveFieldValues, readFieldSources, writeMergedField } from './fieldValues';
 import { FieldValueError, MERGED_FIELDS } from '../fieldMerge';
 import { resolveGrade } from '../../emeritus';
 import { OPENALEX_AUTHOR_SOURCE, linkTeamLabels, loadPersonParts, readRecordFields, resolveStructures, writeHalIdNumSecondaries, writeRecordFields } from './recordFields';
@@ -603,7 +603,11 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       await trx.deleteFrom('membership').where('id', '=', dropM.id).execute();
       if (dropM.person_id !== keepM.person_id) {
         const left = await trx.selectFrom('membership').select('id').where('person_id', '=', dropM.person_id).executeTakeFirst();
-        if (!left) await trx.deleteFrom('person').where('id', '=', dropM.person_id).execute();
+        if (!left) {
+          // Its values by source (corrections included) move to the kept person before the cascade deletes them.
+          await moveFieldValues(trx, dropM.person_id, keepM.person_id);
+          await trx.deleteFrom('person').where('id', '=', dropM.person_id).execute();
+        }
       }
       if (Object.keys(patch).length > 0) await writeRecordFields(trx, keepM.person_id, String(keepM.id), patch);
       ctx.audit({ table: 'Annuaire', kind: 'delete', rows: [dropRowId], count: 1 });
@@ -639,7 +643,9 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       const { id: membershipId } = await trx.insertInto('membership').values({ person_id: personId }).returning('id').executeTakeFirstOrThrow();
       // An existing person keeps its own fields: only the membership comes back.
       const written = existing ? Object.fromEntries(Object.entries(fields).filter(([k]) => MEMBERSHIP_FIELDS.includes(k))) : fields;
-      await writeRecordFields(trx, personId, membershipId, written);
+      // A re-created person gets the snapshot's birth date and grade as `legacy` values, not as manual corrections (the
+      // values moved to the kept person at the merge stay there: druid-internal `docs/plan-maj-chercheurs.md`, case 20).
+      await writeRecordFields(trx, personId, membershipId, written, existing ? undefined : { source: 'legacy', explicit: false });
       const restoredRowId = Number(membershipId);
       await trx.updateTable('merge_log').set({ restored: true, restored_person_id: personId, legacy_restored_rowid: restoredRowId }).where('id', '=', String(logId)).execute();
       if (kept) await writeRecordFields(trx, kept.person_id, String(kept.id), before);

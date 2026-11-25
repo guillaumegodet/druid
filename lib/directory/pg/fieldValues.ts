@@ -141,6 +141,39 @@ export const listFieldConflicts = async (trx: Transaction<DB>, field: string): P
   return out;
 };
 
+// ── Merge of two persons (duplicates) ──────────────────────────────────────────────────────────────────────────────────
+
+/** Source of the values a merged-away record carried as manual corrections (case 20 of the plan). */
+export const MERGED_RECORD_SOURCE = 'merged_record';
+
+/**
+ * Before a person is merged into another and deleted (duplicates), its values by source move to the kept person
+ * instead of disappearing with it: a source the kept person lacks is taken over, a source both have keeps its most
+ * recent observation. A manual correction of the absorbed person becomes the `merged_record` source — never the kept
+ * person's correction: shown in the record's sources, and a conflict to review when it contradicts a correction of the
+ * kept person. The values chosen in the merge assistant are written afterwards, as human choices.
+ */
+export const moveFieldValues = async (trx: Transaction<DB>, fromPersonId: string, toPersonId: string): Promise<number> => {
+  const rows = await trx.selectFrom('person_field_value').selectAll().where('person_id', '=', fromPersonId).execute();
+  let moved = 0;
+  for (const r of rows) {
+    if (!MERGED_FIELDS.includes(r.field)) continue;
+    const source = r.source === MANUAL_SOURCE ? MERGED_RECORD_SOURCE : r.source;
+    const existing = await trx.selectFrom('person_field_value').select(['id', 'observed_at'])
+      .where('person_id', '=', toPersonId).where('field', '=', r.field).where('source', '=', source).executeTakeFirst();
+    if (existing && new Date(existing.observed_at as any) >= new Date(r.observed_at as any)) continue;
+    const values = {
+      value: r.value, asserted_at: r.asserted_at, observed_at: r.observed_at, asserted_by: r.asserted_by,
+      import_batch_id: r.import_batch_id, note: `merged from person ${fromPersonId}`,
+    } as any;
+    if (existing) await trx.updateTable('person_field_value').set(values).where('id', '=', existing.id).execute();
+    else await trx.insertInto('person_field_value').values({ ...values, person_id: toPersonId, field: r.field, source }).execute();
+    moved++;
+  }
+  for (const field of new Set(rows.map((r) => r.field).filter((f) => MERGED_FIELDS.includes(f)))) await reprojectField(trx, toPersonId, field);
+  return moved;
+};
+
 // ── Writes of the application (record form, imports, LDAP, arbitrations, merges) ──────────────────────────────────────
 
 /** Record field (Grist column name used by the commands) → merged field. */

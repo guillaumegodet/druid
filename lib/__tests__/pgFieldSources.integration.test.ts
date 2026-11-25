@@ -8,7 +8,8 @@ import { createDb, withActor, type DB } from '../db/client';
 import type { CommandContext } from '../directory/commands';
 import { createPgDirectoryCommands } from '../directory/pg/commands';
 import { createPgDirectoryRepository } from '../directory/pg/repository';
-import { observeFieldValue } from '../directory/pg/fieldValues';
+import { correctFieldValue, observeFieldValue } from '../directory/pg/fieldValues';
+import { createFieldConflictsStore } from '../directory/pg/fieldConflicts';
 
 const url = process.env.DATABASE_URL_APP;
 const db = url ? createDb({ connectionString: url, max: 2 }) : null;
@@ -72,6 +73,44 @@ describe.skipIf(!url)('record and fields merged by source', () => {
       expect(back).toMatchObject({ value: '1914-11-10', provenance: { source: 'ldap', value: '1914-11-10' } });
       expect(await column()).toBe('1914-11-10');
       await expect(commands.dropFieldCorrection!(recordId, 'email', ctx)).rejects.toMatchObject({ status: 400 });
+    });
+  });
+
+  it('merging duplicates moves the values by source of the absorbed person; two corrections that differ are a conflict', async () => {
+    await inRollback(async (trx) => {
+      const person = async (uid: string, last: string) => {
+        const id = (await trx.insertInto('person').values({ last_name: last, first_name: 'Test', uid } as any).returning('id').executeTakeFirstOrThrow()).id;
+        const row = Number((await trx.insertInto('membership').values({ person_id: id, lab_label: 'LABX' } as any).returning('id').executeTakeFirstOrThrow()).id);
+        return { id, row };
+      };
+      const kept = await person('test-kept-k', 'Keep');
+      const dropped = await person('test-dropped-d', 'Drop');
+      await observeFieldValue(trx, { personId: kept.id, field: 'birth_date', source: 'ldap', value: '19800512' });
+      await correctFieldValue(trx, kept.id, 'corps_grade', 'PR', 'alice');
+      await correctFieldValue(trx, dropped.id, 'birth_date', '1981-02-03', 'bob');
+      await observeFieldValue(trx, { personId: dropped.id, field: 'corps_grade', source: 'lab_file', value: 'MCF' });
+      await correctFieldValue(trx, dropped.id, 'corps_grade', 'DR', 'bob');
+
+      const repository = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository, today: () => '2026-11-25' });
+      await commands.mergeRows({ keepRowId: kept.row, dropRowId: dropped.row, fields: {}, author: 'test.user' }, ctx);
+
+      expect(await trx.selectFrom('person').select('id').where('id', '=', dropped.id).executeTakeFirst()).toBeUndefined();
+      const rows = await trx.selectFrom('person_field_value').select(['field', 'source', 'value']).where('person_id', '=', kept.id)
+        .orderBy('field').orderBy('source').execute();
+      expect(rows).toEqual([
+        { field: 'birth_date', source: 'ldap', value: '1980-05-12' },
+        { field: 'birth_date', source: 'merged_record', value: '1981-02-03' },
+        { field: 'corps_grade', source: 'lab_file', value: 'MCF' },
+        { field: 'corps_grade', source: 'manual', value: 'PR' },
+        { field: 'corps_grade', source: 'merged_record', value: 'DR' },
+      ]);
+      const shown = await trx.selectFrom('person').select(['birth_date', 'corps_grade']).where('id', '=', kept.id).executeTakeFirstOrThrow();
+      expect(shown).toEqual({ birth_date: '1980-05-12', corps_grade: 'PR' });
+      const conflicts = (await createFieldConflictsStore(trx as any).list()).filter((c) => c.personId === kept.id);
+      expect(conflicts.map((c) => [c.field, c.conflicts.map((k) => `${k.source}:${k.kind}`)])).toEqual([
+        ['corps_grade', ['lab_file:new_since_manual', 'merged_record:new_since_manual']],
+      ]);
     });
   });
 });

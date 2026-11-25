@@ -31,6 +31,7 @@ export const SOURCE_LABELS: Record<string, MessageDescriptor> = {
   site: msg`Lab website`,
   partner_directory: msg`Partner directory`,
   legacy: msg`Before tracking`,
+  merged_record: msg`Merged record`,
 };
 
 export const MERGED_FIELD_LABELS: Record<string, MessageDescriptor> = {

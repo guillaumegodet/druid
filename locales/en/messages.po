@@ -3741,7 +3741,7 @@ msgstr "To check"
 #: components/dashboard/CallCandidates.tsx:147
 #: components/dashboard/CallCandidates.tsx:177
 #: components/researchers/FilterPanel.tsx:272
-#: lib/fieldConflicts.ts:38
+#: lib/fieldConflicts.ts:39
 #: lib/importConflicts.ts:63
 msgid "Grade"
 msgstr "Grade"
@@ -12759,7 +12759,7 @@ msgid "Nationality"
 msgstr "Nationality"
 
 #: components/researchers/GeneralTab.tsx:407
-#: lib/fieldConflicts.ts:37
+#: lib/fieldConflicts.ts:38
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date of birth"
@@ -17522,6 +17522,10 @@ msgstr "Partner directory"
 #: lib/fieldConflicts.ts:33
 msgid "Before tracking"
 msgstr "Before tracking"
+
+#: lib/fieldConflicts.ts:34
+msgid "Merged record"
+msgstr "Merged record"
 
 #: lib/gristService.ts:241
 msgid "Invalid ID"
