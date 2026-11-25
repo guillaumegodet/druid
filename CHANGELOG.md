@@ -12,19 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.19.0] — 2026-11-25
+
 ### Ajouté
-- **Provenance par champ et fusion par priorité de sources** (base technique, sans effet visible pour l'instant) :
-  chaque source (LDAP, fichier RH, fichier labo, site annuaire, saisie manuelle) garde sa propre valeur dans
-  `person_field_value` ; la colonne de `person` devient une projection recalculée (`lib/directory/fieldMerge.ts`).
-  Une correction manuelle l'emporte toujours et n'est plus écrasée par un réimport ; une source qui change ensuite
-  lève un conflit. Premiers champs : date de naissance et corps-grade ; ordre des sources dans
-  `field_source_priority`.
-- **Date de naissance et grade fusionnés par source** (PostgreSQL) : la fiche affiche la valeur de la source la plus
-  fiable avec une étiquette (LDAP, Fichier RH, Site du labo, Corrigée…) et ces champs restent modifiables. Une valeur
-  saisie devient une correction qui l'emporte sur le LDAP et les imports ; réenregistrer sans changement n'en crée pas.
-  Les valeurs LDAP sont enregistrées comme source après chaque synchronisation LDAP (grade non repris pour un employeur
-  externe) ; les imports de fichier et de site enregistrent le grade lu, et une ligne cochée contre une source plus
-  fiable devient une correction.
+- **Date de naissance et grade fusionnés par source** (PostgreSQL), sur le principe du module de fusion CRISalid-labo :
+  chaque source (LDAP, fichier RH, annuaire partenaire, site du labo, fichier d'un labo) garde sa propre valeur
+  (`person_field_value`), et la fiche affiche celle de la source la plus fiable (`field_source_priority`), avec une
+  étiquette (LDAP, Fichier RH, Site du labo, Corrigée…). Ces champs restent modifiables : une valeur saisie devient une
+  correction qui l'emporte sur le LDAP et les imports, et un réimport ne l'écrase plus ; réenregistrer sans changement
+  n'en crée pas. Les valeurs LDAP sont enregistrées comme source après chaque synchronisation LDAP (grade non repris
+  pour un employeur externe) ; les imports de fichier et de site enregistrent le grade lu, et une ligne cochée contre
+  une source plus fiable devient une correction.
 - **À traiter › Conflits de sources** : les corrections qu'une source contredit depuis leur saisie, avec trois choix
   (garder la correction, revenir aux sources, autre valeur). Aide « Lire une fiche » et « Tâches à traiter » à jour.
 
@@ -44,17 +42,17 @@ données à exécuter au déploiement).
 ### Migration
 - `20261120150000_person_extra_openalex_list.sql` : retire `OpenAlex_ids` de `person.extra` (3 fiches à Nantes).
   Rien à restaurer au retour arrière : les A-ids sont dans `person_identifier`.
-- `20261121150000_person_field_value` (dbmate) : crée les deux tables (rang unique par champ, colonne `customized`
-  pour les réglages d'une instance) et reprend les valeurs actuelles par la fonction `seed_person_field_value`. La
-  dernière écriture de chaque valeur dans le journal d'audit décide de sa source : la ligne datée qu'elle a ajoutée
-  aux commentaires de la fiche (`MAJ LDAP` → `ldap`, `Arbitrage DRPI` → `hr_file`, autre arbitrage →
-  `partner_directory`, `Fusion` → `legacy`) ; une écriture en lot (autre fiche du même auteur à moins de 2 s) ou
-  technique → `legacy` ; sinon une saisie dans la fiche → correction manuelle. Les valeurs reprises de Grist passent
-  en `legacy`, au dernier rang. La fonction reste en base : le lot qui branchera les imports la relancera.
-- `20261124150000_field_value_wiring` (dbmate) : remplace les lignes reprises par une reprise des valeurs actuelles
-  (`seed_person_field_value`) et retire `observed_at` du journal d'audit (une confirmation de source n'est pas un
-  changement). **Après le déploiement : relancer la synchronisation LDAP** (Synchroniser › LDAP) pour enregistrer les
-  valeurs LDAP ; jusque-là, la fiche montre les valeurs stockées sans la surcouche LDAP.
+- `20261121150000_person_field_value` puis `20261124150000_field_value_wiring` (dbmate, `druid-migrate`) : créent
+  `person_field_value` et `field_source_priority` (rang unique par champ, colonne `customized` pour les réglages d'une
+  instance), reprennent les valeurs actuelles (`seed_person_field_value`) et retirent `observed_at` du journal d'audit
+  (une confirmation de source n'est pas un changement). Reprise : la dernière écriture de chaque valeur dans le journal
+  d'audit décide de sa source, d'après la ligne datée qu'elle a ajoutée aux commentaires de la fiche (`MAJ LDAP` →
+  `ldap`, `Arbitrage DRPI` → `hr_file`, autre arbitrage → `partner_directory`, `Fusion` → `legacy`) ; une écriture en
+  lot (autre fiche du même auteur à moins de 2 s) ou technique → `legacy` ; sinon une saisie dans la fiche →
+  correction manuelle (34 à Nantes). Les valeurs reprises de Grist passent en `legacy`, au dernier rang.
+- **Après le déploiement en prod : relancer la synchronisation LDAP** (Synchroniser › LDAP) pour enregistrer les
+  valeurs LDAP ; jusque-là, la fiche montre les valeurs stockées sans la surcouche LDAP. Puis vérifier
+  « À traiter › Conflits de sources » (au plus 34 corrections reprises peuvent y apparaître).
 
 ## [2.18.0] — 2026-11-20
 
