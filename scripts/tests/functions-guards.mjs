@@ -53,7 +53,7 @@ check('anonymous, default instance label', w.name, 'Centrale Nantes');
 // Instance settings: registry absent = Pages variables and historical defaults
 const pick = (i) => ({ slug: i.slug, label: i.label, readOnly: i.readOnly });
 check('no registry: defaults', resolveInstance({}), {
-  slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false, storage: 'grist',
+  slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false, storage: 'grist', postgres: { schema: null },
   grist: { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null },
   features: { news: true, newsletter: true, network: false }, admins: [], openalexMailto: null, fromRegistry: false, shared: false,
 });
@@ -69,7 +69,8 @@ check('capabilities from variables', [capabilitiesFor(resolveInstance({ READ_ONL
 // Registry only (the demo instance.json of this repository, as validated by the build)
 // The demo of this repository is on PostgreSQL (lot 10 c); the Grist cases keep a copy of it on a public document.
 const demoFile = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
-const demoRaw = { ...demoFile, storage: 'grist', grist: { docId: 'docDemoPublic01', publicRead: true } };
+const { postgres: _demoSchema, ...demoBase } = demoFile;
+const demoRaw = { ...demoBase, storage: 'grist', grist: { docId: 'docDemoPublic01', publicRead: true } };
 const demoReg = parseInstanceConfig(demoRaw).config;
 const demo = resolveInstance({}, demoReg);
 check('registry only: demo', [pick(demo), demo.grist, demo.features, demo.admins, demo.fromRegistry],

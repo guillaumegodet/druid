@@ -9,6 +9,9 @@
   "access": "public",
   "readOnly": true,
   "storage": "postgres",
+  "postgres": {
+    "schema": "i_demo"
+  },
   "capabilities": {
     "HAS_STATUS_VALIDATION": false
   },

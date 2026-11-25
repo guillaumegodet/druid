@@ -58,6 +58,8 @@ export const resolveInstance = (env = {}, reg = null, { shared = false } = {}) =
     readOnly: envBool('READ_ONLY', !!reg?.readOnly),
     statusValidation: envBool('SHOW_STATUS_VALIDATION', !!reg?.capabilities?.HAS_STATUS_VALIDATION),
     storage,
+    // Schema of the shared database of a multi-tenant deployment (instance.json `postgres.schema`), null otherwise.
+    postgres: { schema: storage === 'postgres' && reg?.postgres?.schema ? String(reg.postgres.schema) : null },
     // Document of a Grist instance; on PostgreSQL the ids stay empty (no « open in Grist » link, no key).
     grist: { docId: String(docId).trim(), apiBase, publicBaseUrl },
     // Without registry, news and newsletter keep their historical rule: Centrale only.
