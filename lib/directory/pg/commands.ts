@@ -25,8 +25,9 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
-import { writeMergedField } from './fieldValues';
-import { FieldValueError } from '../fieldMerge';
+import { dropFieldCorrection as dropCorrection, readFieldSources, writeMergedField } from './fieldValues';
+import { FieldValueError, MERGED_FIELDS } from '../fieldMerge';
+import { resolveGrade } from '../../emeritus';
 import { OPENALEX_AUTHOR_SOURCE, linkTeamLabels, loadPersonParts, readRecordFields, resolveStructures, writeHalIdNumSecondaries, writeRecordFields } from './recordFields';
 import { HAL_ID_NUM_SECONDARY_COLUMN, secondaryHalIdNums } from '../../halIds';
 import { insertStructure, writeStructure } from './structures';
@@ -241,9 +242,23 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     // An unreadable date is refused (400), not taken as a cleared field.
     const chosen = { birth_date: blank(r.birthDate) ? null : fuzzy(r.birthDate) ?? r.birthDate, corps_grade: orNull(r.employment?.grade) };
     const obs = ctx.fieldObservation;
+    const sameText = (a: unknown, b: unknown) => String(a ?? '').trim().toLowerCase() === String(b ?? '').trim().toLowerCase();
     for (const field of ['birth_date', 'corps_grade'] as const) {
       const observed = obs && Object.prototype.hasOwnProperty.call(obs.values, field)
         ? { source: obs.source, value: obs.values[field], importBatchId: obs.importBatchId } : undefined;
+      // D7 (druid-internal `docs/plan-maj-chercheurs.md`): the record sends back the stored value it was read with. If
+      // it changed since (another user, the LDAP sync), a field left as it was keeps the new value instead of
+      // reverting it as a « correction », and a field typed over is refused: two corrections never silently collide.
+      const read = field === 'birth_date' ? r.fieldProvenance?.birthDate : r.fieldProvenance?.grade;
+      if (!observed && read && read.value !== undefined) {
+        const current = ((await trx.selectFrom('person').select(field).where('id', '=', personId).executeTakeFirst()) as any)?.[field] ?? null;
+        if (!sameText(current, read.value)) {
+          const untouched = sameText(chosen[field], read.value) || (field === 'corps_grade' && read.value
+            && sameText(chosen[field], resolveGrade(read.value, { grade: read.value, typeEmploi: r.employment?.contractType, libTypeEmploi: r.employment?.internalTypology })));
+          if (untouched) continue;
+          throw new ApiError(409, 'The date of birth or the grade was changed meanwhile: reload the record before correcting it');
+        }
+      }
       try {
         await writeMergedField(trx, personId, field, { value: chosen[field], explicit: true, ...(observed ? { observed } : {}) });
       } catch (e) {
@@ -289,6 +304,23 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
 
   return {
     annuaireColumns: async () => RECORD_FIELDS,
+
+    // Fields merged by source (druid-internal `docs/plan-maj-chercheurs.md`): the record's « sources » panel.
+    fieldSources: async (recordId, ctx) => {
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
+      const person = await personOfRecord(db as any, ctx.scope, recordId);
+      const all = await readFieldSources(db, person.id);
+      return Object.fromEntries(Object.entries(all).map(([field, f]) => [field, { value: f.value, source: f.source, sources: f.sources }]));
+    },
+    dropFieldCorrection: (recordId, field, ctx) => writing(ctx, async (trx) => {
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
+      if (!MERGED_FIELDS.includes(field)) throw new ApiError(400, 'Invalid source conflict decision');
+      const person = await personOfRecord(trx, ctx.scope, recordId);
+      await dropCorrection(trx, person.id, field);
+      ctx.audit({ table: 'Annuaire', kind: 'update', rows: [recordId], fields: [field], count: 1 });
+      const f = (await readFieldSources(trx, person.id))[field];
+      return { value: f.value, provenance: f.provenance };
+    }),
 
     createPerson: (researcher, ctx) => writing(ctx, async (trx) => {
       const affiliation = researcher.affiliations?.[0];

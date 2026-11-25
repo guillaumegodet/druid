@@ -271,6 +271,13 @@ export const createDirectoryApi = (): Hono<Env> => {
     return c.json(await c.env.align.unifiedDiff(sources, mode.data, { scope: c.env.scope!, audit: () => {} }), 200, NO_STORE);
   });
   app.get('/duplicates', async (c) => c.json(await c.env.repository.duplicates(c.env.scope!), 200, NO_STORE));
+  // Sources of the fields merged by source of a record (PostgreSQL; druid-internal `docs/plan-maj-chercheurs.md`).
+  app.get('/people/:recordId/field-sources', async (c) => {
+    const recordId = recordIdOf(c.req.param('recordId'));
+    if (!recordId) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    if (!c.env.commands?.fieldSources) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    return c.json({ fields: await c.env.commands.fieldSources(recordId, ctxOf(c)) }, 200, NO_STORE);
+  });
   app.get('/people/rows', async (c) => {
     const ids = String(c.req.query('ids') || '').split(',').filter(Boolean).map(Number);
     if (ids.length === 0 || ids.length > 500 || !ids.every((n) => Number.isInteger(n) && n > 0)) return c.json({ error: 'Invalid record identifiers' }, 400, NO_STORE);
@@ -321,6 +328,13 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!recordId || !body) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     await c.env.commands!.updatePerson(recordId, body as any, ctxOf(c));
     return c.json({ ok: true }, 200, NO_STORE);
+  });
+  // « Back to the sources »: removes the manual correction of a merged field of the record.
+  writes.post('/people/:recordId/field-sources/:field/drop', async (c) => {
+    const recordId = recordIdOf(c.req.param('recordId'));
+    if (!recordId) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    if (!c.env.commands!.dropFieldCorrection) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    return c.json(await c.env.commands!.dropFieldCorrection(recordId, c.req.param('field'), ctxOf(c)), 200, NO_STORE);
   });
   writes.patch('/people/:recordId/openalex-id', async (c) => {
     const recordId = recordIdOf(c.req.param('recordId'));

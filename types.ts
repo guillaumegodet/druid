@@ -94,8 +94,22 @@ export interface FieldProvenance {
   source: string | null;
   refinedBy: string | null;
   conflicts: number;
+  /** Stored (projected) value when the record was read: sent back on save, it detects a concurrent change (D7). */
+  value?: string | null;
   correctedBy?: string | null;
   correctedAt?: string | null;
+}
+
+/** One source of a field merged by source, as the record's « sources » panel shows it. */
+export interface FieldSourceDetail {
+  source: string;
+  value: string | null;
+  observedAt: string;
+  assertedBy: string | null;
+  /** Rank of the source (lower = more trusted), null for a manual correction. */
+  rank: number | null;
+  /** Divergence from the shown value: '' when it agrees (or gives it). */
+  kind: '' | 'overridden' | 'acknowledged' | 'changed_since_manual' | 'new_since_manual';
 }
 
 /** Nantes Université-specific information from Grist */

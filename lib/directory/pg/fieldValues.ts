@@ -5,7 +5,7 @@
 import { sql, type Transaction } from 'kysely';
 import type { DB } from '../../db/schema.gen';
 import { resolveGrade } from '../../emeritus';
-import type { FieldProvenance } from '../../../types';
+import type { FieldProvenance, FieldSourceDetail } from '../../../types';
 import {
   MANUAL_SOURCE, MERGED_FIELDS, correct, keepCorrection, normalizeFieldValue, observe, resolveField,
   type FieldResolution, type FieldValue, type SourceRanks,
@@ -199,6 +199,42 @@ export const writeMergedField = async (trx: Transaction<DB>, personId: string, f
 };
 
 
+const provenanceOf = (rows: FieldValue[], res: FieldResolution): FieldProvenance => {
+  const manual = rows.find((r) => r.source === MANUAL_SOURCE);
+  return {
+    source: res.source, refinedBy: res.refinedBy, conflicts: res.conflicts.length, value: res.value,
+    ...(manual ? { correctedBy: manual.assertedBy ?? null, correctedAt: manual.assertedAt } : {}),
+  };
+};
+
+/**
+ * Sources of the merged fields of one person (the record's « sources » panel): each source with its value, rank and
+ * how it diverges from the shown value, the shown value and its source.
+ */
+export const readFieldSources = async (db: Transaction<DB> | any, personId: string): Promise<Record<string, { value: string | null; source: string | null; provenance: FieldProvenance; sources: FieldSourceDetail[] }>> => {
+  const ranks = await readSourceRanks(db);
+  const out: Record<string, { value: string | null; source: string | null; provenance: FieldProvenance; sources: FieldSourceDetail[] }> = {};
+  for (const field of MERGED_FIELDS) {
+    const fieldRanks = ranks.get(field) ?? new Map<string, number>();
+    const rows = await readFieldValues(db, personId, field);
+    const res = resolveField(field, rows, fieldRanks);
+    const kindOf = new Map(res.divergences.map((d) => [d.source, d.kind]));
+    out[field] = {
+      value: res.value,
+      source: res.source,
+      provenance: provenanceOf(rows, res),
+      sources: rows
+        .map((r) => ({
+          source: r.source, value: r.value, observedAt: r.observedAt, assertedBy: r.assertedBy ?? null,
+          rank: r.source === MANUAL_SOURCE ? null : (fieldRanks.get(r.source) ?? null),
+          kind: (kindOf.get(r.source) ?? '') as FieldSourceDetail['kind'],
+        }))
+        .sort((a, b) => (a.rank ?? -1) - (b.rank ?? -1) || a.source.localeCompare(b.source)),
+    };
+  }
+  return out;
+};
+
 /** Provenance of every merged field of every person (one read of person_field_value; resolved in memory). */
 export const readFieldProvenance = async (db: Transaction<DB> | any): Promise<Map<string, Record<string, FieldProvenance>>> => {
   const ranks = await readSourceRanks(db);
@@ -213,12 +249,8 @@ export const readFieldProvenance = async (db: Transaction<DB> | any): Promise<Ma
     const [personId, field] = key.split('\u0000');
     if (!MERGED_FIELDS.includes(field)) continue;
     const res = resolveField(field, rows, ranks.get(field) ?? new Map());
-    const manual = rows.find((r) => r.source === MANUAL_SOURCE);
     if (!out.has(personId)) out.set(personId, {});
-    out.get(personId)![field] = {
-      source: res.source, refinedBy: res.refinedBy, conflicts: res.conflicts.length,
-      ...(manual ? { correctedBy: manual.assertedBy ?? null, correctedAt: manual.assertedAt } : {}),
-    };
+    out.get(personId)![field] = provenanceOf(rows, res);
   }
   return out;
 };

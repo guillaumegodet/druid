@@ -66,6 +66,7 @@ export const API_ERRORS = [
   // Source conflicts (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 d).
   msg`Invalid source conflict decision`,
   msg`Source conflicts need the PostgreSQL storage`,
+  msg`The date of birth or the grade was changed meanwhile: reload the record before correcting it`,
   msg`Invalid pair`,
   msg`Unknown researcher`,
   // Calls added by hand (lot 6): routes, store (lib/calls/manualStore.ts), reading (lib/calls/callDocument.ts), checks

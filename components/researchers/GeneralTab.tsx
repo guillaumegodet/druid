@@ -1,6 +1,8 @@
 import React from 'react';
-import { Lock, ExternalLink, AlertTriangle } from 'lucide-react';
-import { Researcher, Affiliation, type FieldProvenance } from '../../types';
+import { Lock, ExternalLink, AlertTriangle, Undo2, X } from 'lucide-react';
+import { Researcher, Affiliation, type FieldProvenance, type FieldSourceDetail } from '../../types';
+import { DirectoryApi } from '../../lib/directoryApi';
+import { SOURCE_LABELS } from '../../lib/fieldConflicts';
 import { AffiliationsTable, TeamOption } from './AffiliationsTable';
 import { GradeSelect } from './GradeSelect';
 import { FuzzyDateInput } from './FuzzyDateInput';
@@ -14,37 +16,100 @@ import { Trans, useLingui } from '@lingui/react/macro';
 /**
  * Source of a field merged by source (druid-internal `docs/plan-maj-chercheurs.md`): where the shown value comes from,
  * and the sources that changed since a manual correction (« Source conflicts » in « To do »). No lock: typing a value
- * makes it a manual correction that wins over the sources.
+ * makes it a manual correction that wins over the sources. A click opens the sources of the field (read on demand)
+ * and, for a correction on a writable record, « Back to the sources ».
  */
-const ProvenanceBadge: React.FC<{ provenance: FieldProvenance }> = ({ provenance }) => {
-  const { t } = useLingui();
-  const labels: Record<string, string> = {
-    manual: t`Corrected`, ldap: 'LDAP', hr_file: t`HR file`, lab_file: t`Lab file`, site: t`Lab website`,
-    partner_directory: t`Partner directory`, legacy: t`Before tracking`,
-  };
+const ProvenanceBadge: React.FC<{
+  provenance: FieldProvenance; field: 'birth_date' | 'corps_grade'; recordId?: number; canCorrect?: boolean;
+  onDropped?: (value: string | null, provenance: FieldProvenance) => void;
+}> = ({ provenance, field, recordId, canCorrect, onDropped }) => {
+  const { t, i18n } = useLingui();
+  const [open, setOpen] = React.useState(false);
+  const [sources, setSources] = React.useState<FieldSourceDetail[] | null>(null);
+  const [error, setError] = React.useState('');
+  const [busy, setBusy] = React.useState(false);
   if (!provenance.source) return null;
-  const label = labels[provenance.source] ?? provenance.source;
+  const nameOf = (code: string) => (SOURCE_LABELS[code] ? i18n._(SOURCE_LABELS[code]) : code);
+  const label = nameOf(provenance.source);
   const by = provenance.correctedBy ?? '';
   const on = provenance.correctedAt ? provenance.correctedAt.slice(0, 10) : '';
   const title = provenance.source === 'manual'
     ? t`Manual correction by ${by} on ${on}: it wins over the imports and the LDAP.`
     : t`Value given by this source. Typing another value makes it a manual correction.`;
+  const toggle = async () => {
+    const next = !open;
+    setOpen(next);
+    if (!next || !recordId) return;
+    setError('');
+    try {
+      setSources((await DirectoryApi.fieldSources(recordId)).fields[field]?.sources ?? []);
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+  };
+  const drop = async () => {
+    if (!recordId) return;
+    setBusy(true);
+    setError('');
+    try {
+      const r = await DirectoryApi.dropFieldCorrection(recordId, field);
+      onDropped?.(r.value, r.provenance);
+      setOpen(false);
+      setSources(null);
+    } catch (e) { setError(e instanceof Error ? e.message : String(e)); }
+    finally { setBusy(false); }
+  };
+  const kindText = (k: FieldSourceDetail['kind']) => (k === 'changed_since_manual' ? t`changed since the correction`
+    : k === 'new_since_manual' ? t`new since the correction` : k === 'acknowledged' ? t`seen when correcting`
+      : k === 'overridden' ? t`less trusted` : '');
   return (
-    <>
-      <span title={title} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-primary/10 text-primary dark:bg-primary-light/15 dark:text-primary-light">
+    <span className="relative inline-flex items-center gap-1">
+      <button type="button" onClick={toggle} title={title} aria-expanded={open}
+        className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-primary/10 text-primary dark:bg-primary-light/15 dark:text-primary-light hover:bg-primary/20">
         {label}
-      </span>
+      </button>
       {provenance.conflicts > 0 && (
         <span title={t`A source changed its value since the correction: to review in To do › Source conflicts.`}
           className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300">
           <AlertTriangle className="w-2.5 h-2.5" />{t({ message: 'To review', context: 'needs rework' })}
         </span>
       )}
-    </>
+      {open && (
+        <div role="dialog" aria-label={t`Sources of the value`}
+          className="absolute left-0 top-full mt-1 z-20 w-72 rounded-xl border border-ink/10 dark:border-white/15 bg-white dark:bg-[#24221f] shadow-lg p-3 text-[12px] normal-case font-normal">
+          <div className="flex items-center justify-between mb-2">
+            <span className="font-semibold text-ink dark:text-[#f5f2ea]"><Trans>Sources of the value</Trans></span>
+            <button type="button" onClick={() => setOpen(false)} aria-label={t`Close`} className="text-muted hover:text-ink"><X className="w-3.5 h-3.5" /></button>
+          </div>
+          {error && <p className="text-[#b23b3b] dark:text-[#f08c8c] mb-2">{error}</p>}
+          {!sources && !error && <p className="text-muted"><Trans>Loading…</Trans></p>}
+          {sources && sources.length === 0 && <p className="text-muted"><Trans>No source recorded yet.</Trans></p>}
+          {sources && sources.length > 0 && (
+            <ul className="space-y-1">
+              {sources.map((s) => (
+                <li key={s.source} className="flex flex-wrap items-baseline gap-x-2">
+                  <span className={`font-semibold ${s.source === provenance.source ? 'text-primary dark:text-primary-light' : 'text-ink dark:text-[#f5f2ea]'}`}>{nameOf(s.source)}</span>
+                  <span className="text-ink dark:text-[#f5f2ea]">{s.value ?? '∅'}</span>
+                  <span className="text-muted">{s.observedAt.slice(0, 10)}{s.source === 'manual' && s.assertedBy ? ` · ${s.assertedBy}` : ''}</span>
+                  {kindText(s.kind) && <span className="text-muted italic">{kindText(s.kind)}</span>}
+                </li>
+              ))}
+            </ul>
+          )}
+          {provenance.source === 'manual' && canCorrect && recordId && (
+            <button type="button" disabled={busy} onClick={drop} className="btn-pill h-7 text-[11px] mt-3"
+              title={t`The correction is removed: the most trusted source gives the value.`}>
+              <Undo2 className="w-3 h-3" /> <Trans>Back to the sources</Trans>
+            </button>
+          )}
+        </div>
+      )}
+    </span>
   );
 };
 
-const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean; provenance?: FieldProvenance }> = ({ label, fromLdap, provenance }) => (
+const LdapFieldLabel: React.FC<{
+  label: string; fromLdap?: boolean; provenance?: FieldProvenance; field?: 'birth_date' | 'corps_grade'; recordId?: number;
+  canCorrect?: boolean; onDropped?: (value: string | null, provenance: FieldProvenance) => void;
+}> = ({ label, fromLdap, provenance, field, recordId, canCorrect, onDropped }) => (
   <div className="flex items-center gap-2 mb-1">
     <label className="block text-xs text-muted-lighter dark:text-[#8f897c]">{label}</label>
     {fromLdap && (
@@ -52,7 +117,9 @@ const LdapFieldLabel: React.FC<{ label: string; fromLdap?: boolean; provenance?:
         <Lock className="w-2.5 h-2.5" />LDAP
       </span>
     )}
-    {!fromLdap && provenance && <ProvenanceBadge provenance={provenance} />}
+    {!fromLdap && provenance && field && (
+      <ProvenanceBadge provenance={provenance} field={field} recordId={recordId} canCorrect={canCorrect} onDropped={onDropped} />
+    )}
   </div>
 );
 
@@ -100,6 +167,8 @@ interface GeneralTabProps {
   onLdapLookup?: (uid: string) => Promise<LdapLookupOutcome>;
   /** Runs « Fill from LDAP » on mount (record opened from the LDAP arrivals). */
   ldapAutoRun?: boolean;
+  /** The record can be edited: offers « Back to the sources » on a corrected field (fields merged by source). */
+  canCorrect?: boolean;
 }
 
 export const GeneralTab: React.FC<GeneralTabProps> = ({
@@ -116,6 +185,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
   onCreateTeam,
   onLdapLookup,
   ldapAutoRun = false,
+  canCorrect = false,
 }) => {
   const { t } = useLingui();
   const showFte = useFteColumns();
@@ -334,7 +404,12 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
               <input type="text" value={researcher.nationality || ''} onChange={(e) => onUpdateField('nationality', e.target.value)} className="input-soft" />
             </div>
             <div>
-              <LdapFieldLabel label={t`Date of birth`} fromLdap={researcher.ldapFields?.includes('birthDate')} provenance={researcher.fieldProvenance?.birthDate} />
+              <LdapFieldLabel label={t`Date of birth`} fromLdap={researcher.ldapFields?.includes('birthDate')} provenance={researcher.fieldProvenance?.birthDate}
+                field="birth_date" recordId={researcher.gristRowId} canCorrect={canCorrect}
+                onDropped={(value, provenance) => {
+                  onUpdateField('birthDate', value ?? '');
+                  onUpdateField('fieldProvenance', { ...researcher.fieldProvenance, birthDate: provenance });
+                }} />
               {/* Reduced-precision date (lib/dates.ts): the year or the month alone when the day is not known. */}
               <FuzzyDateInput
                 value={researcher.birthDate || ''}
@@ -388,7 +463,12 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                </select>
              </div>
              <div>
-               <LdapFieldLabel label={t`Grade / Rank`} fromLdap={researcher.employment.ldapFields?.includes('grade')} provenance={researcher.fieldProvenance?.grade} />
+               <LdapFieldLabel label={t`Grade / Rank`} fromLdap={researcher.employment.ldapFields?.includes('grade')} provenance={researcher.fieldProvenance?.grade}
+                 field="corps_grade" recordId={researcher.gristRowId} canCorrect={canCorrect}
+                 onDropped={(value, provenance) => {
+                   onUpdateField('grade', value ?? '', 'employment');
+                   onUpdateField('fieldProvenance', { ...researcher.fieldProvenance, grade: provenance });
+                 }} />
                <GradeSelect
                  value={researcher.employment.grade || ''}
                  onChange={(code) => onUpdateField('grade', code, 'employment')}

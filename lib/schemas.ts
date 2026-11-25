@@ -84,6 +84,7 @@ const FieldProvenanceSchema = z.object({
   source: z.string().nullable(),
   refinedBy: z.string().nullable(),
   conflicts: z.number(),
+  value: z.string().nullable().optional(),
   correctedBy: z.string().nullable().optional(),
   correctedAt: z.string().nullable().optional(),
 });
