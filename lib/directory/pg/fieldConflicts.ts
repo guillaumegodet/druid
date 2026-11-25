@@ -1,10 +1,11 @@
 // « To process › Source conflicts » (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 d): the fields merged by source
 // whose manual correction a source contradicts since it was made, and the three ways to settle one — keep the
 // correction, go back to the sources, type another value. PostgreSQL only; admin routes of server.cjs.
-import { withActor, type Db } from '../../db/client';
+import { sql, type Transaction } from 'kysely';
+import { withActor, type DB, type Db } from '../../db/client';
 import { ApiError } from '../errors';
 import { FieldValueError, MANUAL_SOURCE, MERGED_FIELDS, type DivergenceKind } from '../fieldMerge';
-import { correctFieldValue, dropFieldCorrection, keepFieldCorrection, listFieldConflicts } from './fieldValues';
+import { correctFieldValue, dropFieldCorrection, keepFieldCorrection, listFieldConflicts, reprojectField } from './fieldValues';
 
 interface FieldConflictItem {
   personId: string;
@@ -22,6 +23,28 @@ interface FieldConflictItem {
 }
 
 type FieldConflictAction = 'keep' | 'drop' | 'correct';
+
+/** A file or site import (import_batch of kind `import`) and the values it still brings (case 19 of the plan). */
+export interface FieldImportItem {
+  id: string;
+  /** Source of its values: `site`, `lab_file`… */
+  source: string;
+  label: string | null;
+  createdAt: string;
+  createdBy: string | null;
+  /** Values of the import still recorded, and the persons they concern (0 once cancelled). */
+  values: number;
+  persons: number;
+  undoneAt: string | null;
+  undoneBy: string | null;
+}
+
+/** A transaction audited under `actor`; given a transaction (tests, a job chaining steps), runs in it. */
+const asActor = async <T>(db: Db, actor: string, fn: (trx: Transaction<DB>) => Promise<T>): Promise<T> => {
+  if (!(db as any).isTransaction) return withActor(db, actor, fn);
+  await sql`SELECT set_config('druid.actor', ${actor}, true)`.execute(db);
+  return fn(db as unknown as Transaction<DB>);
+};
 
 export const createFieldConflictsStore = (db: Db) => ({
   async list(): Promise<FieldConflictItem[]> {
@@ -58,6 +81,42 @@ export const createFieldConflictsStore = (db: Db) => ({
     }).sort((a, b) => a.name.localeCompare(b.name, 'fr') || a.field.localeCompare(b.field));
   },
 
+  /** The latest file and site imports, with the values each still brings. */
+  async imports(limit = 30): Promise<FieldImportItem[]> {
+    const rows = await db.selectFrom('import_batch as b')
+      .leftJoin('person_field_value as v', 'v.import_batch_id', 'b.id')
+      .select((eb) => ['b.id', 'b.source', 'b.label', 'b.created_at', 'b.created_by', 'b.undone_at', 'b.undone_by',
+        eb.fn.count('v.id').as('values'), eb.fn.count('v.person_id').distinct().as('persons')])
+      .where('b.kind', '=', 'import')
+      .groupBy(['b.id', 'b.source', 'b.label', 'b.created_at', 'b.created_by', 'b.undone_at', 'b.undone_by'])
+      .orderBy('b.id', 'desc').limit(limit).execute();
+    const iso = (d: unknown) => (d ? new Date(d as any).toISOString() : null);
+    return rows.map((r: any) => ({
+      id: String(r.id), source: r.source, label: r.label ?? null, createdAt: iso(r.created_at)!, createdBy: r.created_by ?? null,
+      values: Number(r.values), persons: Number(r.persons), undoneAt: iso(r.undone_at), undoneBy: r.undone_by ?? null,
+    }));
+  },
+
+  /**
+   * « Cancel an import »: removes the values the import still brings to the fields merged by source and recomputes the
+   * records (the other sources, or a manual correction, give the value again). Its records, memberships and
+   * identifiers stay: they are not values by source. Audited under `actor`.
+   */
+  async undoImport(batchId: unknown, actor: string): Promise<{ values: number; persons: number }> {
+    const id = typeof batchId === 'string' && /^\d+$/.test(batchId) ? batchId : '';
+    if (!id) throw new ApiError(400, 'Invalid import');
+    return asActor(db, actor, async (trx) => {
+      const batch = await trx.selectFrom('import_batch').select(['id', 'undone_at']).where('id', '=', id).where('kind', '=', 'import').executeTakeFirst();
+      if (!batch) throw new ApiError(404, 'Unknown import');
+      if (batch.undone_at) throw new ApiError(409, 'This import was already cancelled');
+      const removed = await trx.deleteFrom('person_field_value').where('import_batch_id', '=', id).returning(['person_id', 'field']).execute();
+      const pairs = new Map(removed.map((r) => [`${r.person_id}|${r.field}`, r]));
+      for (const r of pairs.values()) await reprojectField(trx, r.person_id, r.field);
+      await trx.updateTable('import_batch').set({ undone_at: new Date().toISOString(), undone_by: actor } as any).where('id', '=', id).execute();
+      return { values: removed.length, persons: new Set(removed.map((r) => r.person_id)).size };
+    });
+  },
+
   /** Settles one conflict, audited under `actor`. */
   async resolve(input: { personId?: unknown; field?: unknown; action?: unknown; value?: unknown }, actor: string): Promise<void> {
     const personId = typeof input.personId === 'string' ? input.personId : '';
@@ -67,7 +126,7 @@ export const createFieldConflictsStore = (db: Db) => ({
       throw new ApiError(400, 'Invalid source conflict decision');
     }
     try {
-      await withActor(db, actor, async (trx) => {
+      await asActor(db, actor, async (trx) => {
         if (action === 'keep') await keepFieldCorrection(trx, personId, field, actor);
         else if (action === 'drop') await dropFieldCorrection(trx, personId, field);
         else await correctFieldValue(trx, personId, field, input.value, actor);

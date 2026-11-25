@@ -2454,6 +2454,28 @@ app.post('/api/field-conflicts/resolve', requireSuperAdmin, async (req, res) => 
   }
 });
 
+// File and site imports and « cancel an import » (case 19 of druid-internal `docs/plan-maj-chercheurs.md`).
+app.get('/api/field-imports', requireSuperAdmin, async (req, res) => {
+  const store = storage().fieldConflicts;
+  if (!store) return res.json({ available: false, items: [] });
+  try {
+    res.json({ available: true, items: await store.imports() });
+  } catch (e) {
+    console.error('[field-imports] list failed:', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+app.post('/api/field-imports/:id/undo', requireSuperAdmin, async (req, res) => {
+  const store = storage().fieldConflicts;
+  if (!store) return res.status(501).json({ error: 'Source conflicts need the PostgreSQL storage' });
+  try {
+    res.json(await store.undoImport(req.params.id, req.session.user.preferred_username));
+  } catch (e) {
+    if (!e.status) console.error('[field-imports] undo failed:', e.message);
+    res.status(e.status || 500).json({ error: e.message });
+  }
+});
+
 // Tables with their number of actionable conflicts (tab + counter; a settled table stays listed with 0).
 app.get('/api/import-conflicts', requireSuperAdmin, withConflicts(async (req, res, conflicts) => {
   res.json({ tables: await conflicts.tables() });

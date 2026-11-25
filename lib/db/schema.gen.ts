@@ -303,10 +303,14 @@ export interface IdentifierConflict {
 
 export interface ImportBatch {
   created_at: Generated<Timestamp>;
+  created_by: string | null;
   id: ColumnType<string, never, never>;
+  kind: Generated<string>;
   label: string | null;
   legacy_table: string | null;
   source: string;
+  undone_at: Timestamp | null;
+  undone_by: string | null;
 }
 
 export interface ImportRow {

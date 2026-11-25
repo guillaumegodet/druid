@@ -352,6 +352,8 @@ export interface SiteImportResult {
 
 /** Commands the application needs (lib/directory/commands.ts, Grist or PostgreSQL). */
 export interface SiteImportCommands {
+  /** PostgreSQL: batch of the import (lib/directory/commands.ts), absent on Grist. */
+  openImportBatch?(source: string, label: string, ctx: any): Promise<string>;
   createStructure(structure: Structure, ctx: any): Promise<{ id: string }>;
   createPerson(researcher: Researcher, ctx: any): Promise<{ recordId: number }>;
   updatePerson(recordId: number, researcher: Researcher, ctx: any): Promise<void>;
@@ -368,8 +370,17 @@ const presenceOfSite = (status: string): 'PRESENT' | 'DEPART' | 'PARTI' => {
  * Command context of a write that also reports the grade read on the site (source `site` of the fields merged by source,
  * druid-internal `docs/plan-maj-chercheurs.md`): stored as the site's value even when the reviewer did not keep it.
  */
-const siteObservation = (ctx: any, grade: string | undefined) =>
-  (grade ? { ...ctx, fieldObservation: { source: 'site', values: { corps_grade: grade } } } : ctx);
+const siteObservation = (ctx: any, grade: string | undefined, importBatchId: string | null = null) =>
+  (grade ? { ...ctx, fieldObservation: { source: 'site', values: { corps_grade: grade }, importBatchId } } : ctx);
+
+/**
+ * Batch of an import, opened at the first value it observes (no empty batch): `openImportBatch` on PostgreSQL, none on
+ * Grist (null). Shared by the site and file imports.
+ */
+export const lazyImportBatch = (commands: { openImportBatch?(source: string, label: string, ctx: any): Promise<string> }, source: string, label: string, ctx: any) => {
+  let batch: Promise<string | null> | null = null;
+  return (): Promise<string | null> => (batch ??= commands.openImportBatch ? commands.openImportBatch(source, label, ctx) : Promise.resolve(null));
+};
 
 export const validationOf = (status: string, source: string, today: string, actor: string) => ({
   validated: true, validatedStatus: presenceOfSite(status), validationDate: today, validationSource: source,
@@ -429,6 +440,8 @@ export async function applySiteImport(args: {
   const { doc, selection, people, institutions, structures = [], commands, ctx, today, actor } = args;
   const plan = planSiteImport(doc, people, institutions, structures);
   const source = doc.source || `Site ${doc.lab}`;
+  const batchOf = lazyImportBatch(commands, 'site', source, ctx);
+  const observing = async (grade: string | undefined) => siteObservation(ctx, grade, grade ? await batchOf() : null);
   // Lab label as the directory writes it (the file may differ in case or accents).
   const lab = people.flatMap((r) => r.affiliations || []).find((a) => normLab(a.structureName) === normLab(doc.lab))?.structureName || doc.lab;
   const result: SiteImportResult = { teamsCreated: 0, created: 0, updated: 0, validated: 0, stale: 0, errors: [] };
@@ -453,7 +466,7 @@ export async function applySiteImport(args: {
     if (!c) { result.stale++; continue; }
     try {
       const created = newResearcherOf(c, lab, source, selection.validateNew ? validationOf(c.person.status, source, today, actor) : null);
-      await commands.createPerson(created, siteObservation(ctx, created.employment?.grade));
+      await commands.createPerson(created, await observing(created.employment?.grade));
       result.created++;
     } catch (e) { fail(index, `${c.person.firstName} ${c.person.lastName}`.trim(), e); }
   }
@@ -471,7 +484,7 @@ export async function applySiteImport(args: {
     const r = byId.get(m.researcherId);
     try {
       if (!r?.gristRowId) throw new Error('record without row id');
-      await commands.updatePerson(r.gristRowId, withSiteFields(r, lab, m.person, kept), siteObservation(ctx, m.person.grade));
+      await commands.updatePerson(r.gristRowId, withSiteFields(r, lab, m.person, kept), await observing(m.person.grade));
       result.updated++;
     } catch (e) { fail(index, m.name, e); }
   }

@@ -194,9 +194,9 @@ export const createPgWorkPorts = ({ db, actor = '', now = () => new Date() }: Pg
 
   const conflicts = {
     tables: async (): Promise<string[]> =>
-      (await db.selectFrom('import_batch').select(['legacy_table', 'source', 'label']).orderBy('id').execute()).map(batchTable),
+      (await db.selectFrom('import_batch').select(['legacy_table', 'source', 'label']).where('kind', '=', 'arbitration').orderBy('id').execute()).map(batchTable),
     async rows(table: string): Promise<Row[]> {
-      const batch = (await db.selectFrom('import_batch').selectAll().orderBy('id').execute()).find((b) => batchTable(b) === table);
+      const batch = (await db.selectFrom('import_batch').selectAll().where('kind', '=', 'arbitration').orderBy('id').execute()).find((b) => batchTable(b) === table);
       if (!batch) return [];
       const rows = await db.selectFrom('import_row').selectAll().where('batch_id', '=', batch.id).orderBy('id').execute();
       const record = await recordOf(db, rows);
@@ -219,7 +219,7 @@ export const createPgWorkPorts = ({ db, actor = '', now = () => new Date() }: Pg
     /** The record cells and the rows marked resolved, in one transaction. */
     resolve: (table: string, annuairePatches: Row[], rowPatches: Row[]) => writing(async (trx) => {
       await writeRecordPatches(trx, annuairePatches);
-      const batch = (await trx.selectFrom('import_batch').selectAll().execute()).find((b) => batchTable(b) === table);
+      const batch = (await trx.selectFrom('import_batch').selectAll().where('kind', '=', 'arbitration').execute()).find((b) => batchTable(b) === table);
       for (const { id, fields } of rowPatches) {
         const { values, extra, written } = columnsOf(fields, ARBITRATION);
         await trx.updateTable('import_row').set({ ...values, extra: extraUpdate(extra, written) } as any)
