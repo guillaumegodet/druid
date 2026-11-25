@@ -7,7 +7,7 @@
 // Authorization, as the proxy (server.cjs gristProxyDecision): institution right = everything; lab right =
 // every touched row and every new `LABO` value within its labs, the merge log open to it. Schema changes
 // (affiliation columns, merge log table) are made by the server for every right.
-import type { Researcher, Structure } from '../../types';
+import type { FieldProvenance, FieldSourceDetail, Researcher, Structure } from '../../types';
 import { normalizeAcronym } from '../normalize';
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from '../mergeLog';
 import { validationToGristFields, ValidationInfo } from '../validation';
@@ -47,6 +47,13 @@ export interface CommandContext {
 }
 
 export interface DirectoryCommands {
+  /**
+   * PostgreSQL: the sources of the fields merged by source of a record's person (druid-internal
+   * `docs/plan-maj-chercheurs.md`), each with its value; absent on Grist.
+   */
+  fieldSources?(recordId: number, ctx: CommandContext): Promise<Record<string, { value: string | null; source: string | null; sources: FieldSourceDetail[] }>>;
+  /** PostgreSQL: « back to the sources » — removes the manual correction of a merged field; returns the new provenance. */
+  dropFieldCorrection?(recordId: number, field: string, ctx: CommandContext): Promise<{ value: string | null; provenance: FieldProvenance }>;
   createPerson(researcher: Researcher, ctx: CommandContext): Promise<{ recordId: number }>;
   updatePerson(recordId: number, researcher: Researcher, ctx: CommandContext): Promise<void>;
   setGroups(entries: { recordId: number; groups: string[] }[], ctx: CommandContext): Promise<void>;

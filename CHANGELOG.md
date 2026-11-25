@@ -12,6 +12,16 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Sources d'une valeur dans la fiche** (date de naissance, grade ; PostgreSQL) : un clic sur l'étiquette de provenance
+  montre ce que dit chaque source (valeur, date, écart) ; sur une valeur corrigée, **Revenir aux sources** retire la
+  correction depuis la fiche (droit d'écriture sur la fiche).
+
+### Modifié
+- **Changements simultanés de la date de naissance ou du grade** (D7) : la fiche renvoie la valeur qu'elle a lue. Si
+  la valeur a changé entre-temps (synchronisation LDAP, autre gestionnaire), un champ laissé tel quel garde la valeur à
+  jour au lieu de la remettre comme « correction », et une saisie par-dessus est refusée (409, fiche à recharger).
+
 ## [2.19.1] — 2026-11-25
 
 ### Corrigé

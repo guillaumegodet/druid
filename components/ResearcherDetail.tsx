@@ -395,6 +395,7 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
             employerOptions={employerOptions}
             onLdapLookup={onSave && localResearcher.id.startsWith('NEW-') && hasCapability('HAS_LDAP') && canUseEstablishmentTools() ? handleLdapLookup : undefined}
             ldapAutoRun={autoLookup}
+            canCorrect={!!onSave && !localResearcher.id.startsWith('NEW-')}
           />
           {/* Career path (docs/archive/plan-parcours-affiliations.md, lot 3): affiliations of the publications,
               ORCID positions, Scopus profile — full width. Needs the server job (Docker instances). */}
