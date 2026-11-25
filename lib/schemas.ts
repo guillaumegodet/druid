@@ -79,6 +79,15 @@ export const ValidationInfoSchema = z.object({
   validatedBy: z.string().optional(),
 });
 
+/** Provenance of a field merged by source (lib/directory/pg/fieldValues.ts readFieldProvenance). */
+const FieldProvenanceSchema = z.object({
+  source: z.string().nullable(),
+  refinedBy: z.string().nullable(),
+  conflicts: z.number(),
+  correctedBy: z.string().nullable().optional(),
+  correctedAt: z.string().nullable().optional(),
+});
+
 export const ResearcherSchema = z.object({
   id: z.string(),
   uid: z.string().optional().nullable(),
@@ -129,6 +138,9 @@ export const ResearcherSchema = z.object({
   }).optional(),
   nuFields: NURelatedSchema.optional(),
   ldapFields: z.array(z.string()).optional().default([]),
+  // Fields merged by source (PostgreSQL, types.ts FieldProvenance): declared here, otherwise the parse of
+  // mapDirectoryRows drops them and the record never shows where its values come from.
+  fieldProvenance: z.object({ birthDate: FieldProvenanceSchema.optional(), grade: FieldProvenanceSchema.optional() }).optional(),
   lastSync: z.string().optional().nullable(),
   validation: ValidationInfoSchema.optional(),
 });
