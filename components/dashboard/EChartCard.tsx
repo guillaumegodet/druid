@@ -38,6 +38,7 @@ import { renderChartSvg, svgToPdf, toStaticOption } from './chartFileExport';
 import { downloadBlob } from '../../lib/download';
 import { chartTables, toCsv, type DataTable } from '../../lib/chartExport';
 import { Trans, useLingui } from '@lingui/react/macro';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 echarts.use([
   BarChart, PieChart, LineChart, MapChart, LinesChart, ScatterChart, EffectScatterChart,
@@ -464,14 +465,7 @@ export const EChartCard: React.FC<EChartCardProps> = ({
     return () => window.clearTimeout(id);
   }, [fullscreen]);
 
-  useEffect(() => {
-    if (!fullscreen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setFullscreen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [fullscreen]);
+  useEscapeKey(() => setFullscreen(false), fullscreen);
 
   const [exportOpen, setExportOpen] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
@@ -481,14 +475,7 @@ export const EChartCard: React.FC<EChartCardProps> = ({
     [exportOpen, exportTables, option],
   );
 
-  useEffect(() => {
-    if (!exportOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setExportOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [exportOpen]);
+  useEscapeKey(() => setExportOpen(false), exportOpen);
 
   const runExport = async (format: 'png' | 'svg' | 'pdf' | 'csv') => {
     setExportOpen(false);

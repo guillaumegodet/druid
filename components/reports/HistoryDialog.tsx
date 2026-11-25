@@ -10,6 +10,7 @@ import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
 import { parseReportDefinition, type ReportDefinition } from '../dashboard/report/definition';
 import type { GenerationHistory, ReportGeneration, ReportsBackend } from '../dashboard/report/reportsApi';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 const periodOf = (g: ReportGeneration): string => {
   const p = (g.definitionSnapshot as { context?: { period?: { start?: number; end?: number } } } | null)?.context?.period;
@@ -33,11 +34,7 @@ export const HistoryDialog: React.FC<{
   useEffect(() => {
     backend.listGenerations(reportId).then(setHistory).catch((e) => setError(apiErrorText(e)));
   }, [backend, reportId]);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   const toggleShared = async (g: ReportGeneration) => {
     try {

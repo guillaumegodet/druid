@@ -28,6 +28,7 @@ import { affiliatedPartners } from '../dashboard/report/rorAffiliates';
 import { FUNDER_CATEGORIES, FUNDER_CATEGORY_LABELS } from '../dashboard/fundersAggregates';
 import { loadDashboardDataset } from '../dashboard/useDashboardData';
 import { PerimetreSelect, PeriodInput, selectCls, StructureSelect, useStructureSlugs } from './ReportControls';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 const ALL_YEARS = { start: -Infinity, end: Infinity };
 
@@ -71,11 +72,7 @@ export const NewReportDialog: React.FC<{
   useEffect(() => {
     if (!slug && slugs.length) setSlug(slugs.includes('univ-nantes') ? 'univ-nantes' : slugs[0]);
   }, [slug, slugs]);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
 
   // The structure's data: a template picks the charts it can show (and the partner countries).
   useEffect(() => {

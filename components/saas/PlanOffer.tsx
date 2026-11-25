@@ -7,6 +7,7 @@ import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
 import { getTenantInfo, getUserInfo } from '../../lib/auth';
 import { planUnlocking, type PlanFeature } from '../../lib/saas/planFeatures';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 /**
  * Plans of a hosted Druid in the interface (druid-internal docs/plan-druid-saas.md, lot 6 b): a feature the plan locks
@@ -57,11 +58,7 @@ export const QuoteDialog: React.FC<{ onClose: () => void; feature?: PlanFeature 
   const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   useEffect(() => { loadPlans().then(setPlans); }, []);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  useEscapeKey(onClose);
   const choices = [...plans.filter((p) => p.code !== 'trial').map((p) => ({ code: p.code, label: p.label })), { code: 'onsite', label: t`On site (installed at the institution)` }];
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
