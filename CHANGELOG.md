@@ -12,10 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.19.1] — 2026-11-25
+
 ### Corrigé
 - **Étiquette de provenance absente de la fiche (2.19.0)** : la date de naissance et le grade n'affichaient ni leur
   source (LDAP, Fichier RH, Corrigée…) ni « À revoir », le schéma de la fiche ne déclarant pas ce champ. La fusion, les
   corrections et « À traiter › Conflits de sources » n'étaient pas touchés.
+
+### Migration
+- Aucune nouvelle migration. Une instance encore en 2.18.x (la 2.19.0 n'a pas été mise en production à Nantes) reçoit
+  celles de la 2.19.0 : les appliquer (`druid-migrate`) **avant** de démarrer la nouvelle image, puis relancer la
+  synchronisation LDAP et vérifier « À traiter › Conflits de sources » (voir 2.19.0).
 
 ## [2.19.0] — 2026-11-25
 
