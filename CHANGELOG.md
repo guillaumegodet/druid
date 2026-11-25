@@ -12,6 +12,11 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Étiquette de provenance absente de la fiche (2.19.0)** : la date de naissance et le grade n'affichaient ni leur
+  source (LDAP, Fichier RH, Corrigée…) ni « À revoir », le schéma de la fiche ne déclarant pas ce champ. La fusion, les
+  corrections et « À traiter › Conflits de sources » n'étaient pas touchés.
+
 ## [2.19.0] — 2026-11-25
 
 ### Ajouté

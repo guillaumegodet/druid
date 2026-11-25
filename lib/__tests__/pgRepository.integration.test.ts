@@ -109,6 +109,9 @@ describe.skipIf(!url)('DirectoryRepository contract: Grist = PostgreSQL', () => 
     expect(people.map((p) => [p.id, p.gristRowId, p.affiliations.length])).toEqual([
       ['dupont-a', 101, 2], [expect.stringMatching(/^ext_martin-b/), 103, 1], ['ext_durand-c', 104, 1], ['Petit-D', 105, 1],
     ]);
+    // The record says where its merged values come from: the parse of mapDirectoryRows must keep the field
+    // (v2.19.0 shipped without it: no provenance label in the record).
+    expect(people.find((p) => p.id === 'dupont-a')?.fieldProvenance?.birthDate).toMatchObject({ source: 'ldap', conflicts: 0 });
     // Structures: the Grist rows the import leaves out (duplicated local_id, no local_id) are the only difference.
     const gristStructures = (got.structures[0] as any[]).filter((s) => !['S-13', 'S-14'].includes(s.id));
     expect(differences(gristStructures, got.structures[1], 'structures')).toEqual([]);
