@@ -276,8 +276,8 @@ const TaskDetail: React.FC<{
   };
   const needsText = (s: TaskStatus) => s === 'en_attente' || s === 'fait' || s === 'abandonnee';
   // « Switch to the LDAP uid » (annuaire_uid_ldap, docs/archive/plan-statut-employeur-ldap.md, lot 2): rewrites
-  // uid_dyna on every row of the record, opens the SoVisu+ follow-up when the former uid was exported
-  // (ext_…), then closes the task.
+  // uid_dyna on every row of the record, opens the SoVisu+ follow-up when the record had a former uid (ext_…
+  // or student account E…U, both exported to SoVisu+), then closes the task.
   const uidSwitch = isOpenStatus(task.statut) ? uidSwitchOf(task) : null;
   const switchFrom = task.uid_dyna || '—';
   const switchTo = uidSwitch?.to ?? '';
@@ -285,7 +285,7 @@ const TaskDetail: React.FC<{
   const switchUid = (to: string) => run(async () => {
     const from = task.uid_dyna;
     await GristService.switchAnnuaireUid({ fromUid: from, rowId: task.chercheur || undefined, toUid: to, author: me });
-    if (from.startsWith('ext_')) {
+    if (from) {
       await onCreate({
         type: 'sovisu_ancienne_personne', chercheurRowId: task.chercheur || undefined, uid_dyna: to, nom: task.nom, labo: task.labo,
         description: `La fiche est passée de ${from} à ${to} (tâche #${task.id}). SoVisu+ connaît encore la personne ${from} avec ses identifiants (ORCID, IdRef, IdHAL, Scopus) : `
@@ -336,7 +336,7 @@ const TaskDetail: React.FC<{
           <div className="flex flex-col gap-2 rounded-2xl border border-ink/10 dark:border-white/10 p-3 bg-white/60 dark:bg-white/5">
             <p className="text-[12px] text-ink dark:text-[#f5f2ea]">
               <Trans>Every row of the record moves from <b className="font-mono">{switchFrom}</b> to <b className="font-mono">{switchTo}</b>. Check the warnings above first.</Trans>
-              {task.uid_dyna.startsWith('ext_') && <> <Trans>A follow-up task is created to remove the identifiers of the former person in SoVisu+.</Trans></>}
+              {task.uid_dyna && <> <Trans>A follow-up task is created to remove the identifiers of the former person in SoVisu+.</Trans></>}
             </p>
             <div className="flex gap-2 justify-end">
               <button className="btn-pill h-8 text-[12px]" onClick={() => setConfirmSwitch(false)} disabled={busy}><Trans>Cancel</Trans></button>

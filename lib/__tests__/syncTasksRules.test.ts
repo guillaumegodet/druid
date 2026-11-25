@@ -72,11 +72,11 @@ describe('scripts/sync_tasks.cjs rules (docs/archive/plan-chantiers-taches.md, l
     const notice = (ppn: string, dates: string) => ({ mode: 'verify', candidates: [{ ppn, affiliations: [{ ppn: 'x', label: 'Nantes Université', qualifier: '2022-....', dates }] }] });
     const out = RULES.rh_depart.detect(ctx({
       annuaire: [gone, phd, closed],
-      ldap: { a: { etat: 'D', dateFin: '2026-08-31' }, b: { etat: 'D', dateFin: '2026-08-31' }, c: { etat: 'D', dateFin: '2026-06-30' } },
+      ldap: { a: { etat: 'D', dateFin: '2030-08-31' }, b: { etat: 'D', dateFin: '2030-08-31' }, c: { etat: 'D', dateFin: '2026-06-30' } },
       idref: { a: notice('1', '2022-....'), b: notice('2', '2022-....'), c: { mode: 'verify', candidates: [{ ppn: '3', affiliations: [{ label: 'Nantes Université', qualifier: '2019-2024', dates: '2019-2024' }] }] } },
     }));
     expect(out.map((x: { key: string }) => x.key)).toEqual(['a']);
-    expect(out[0].description).toContain('2026-08-31');
+    expect(out[0].description).toContain('2030-08-31');
     expect(out[0].lien).toBe('https://www.idref.fr/1');
   });
 
@@ -222,6 +222,24 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       expect(out[0].description).toContain('SoVisu+ connaît cette personne sous ext_leroux-c');
       expect(out[0].description).not.toContain('Attention');
       expect(out[1].description).not.toContain('SoVisu+');
+    });
+
+    it('proposes the staff uid for a record left on a student account (E…U)', () => {
+      const ldap3 = {
+        E900001U: { etat: 'D', categorie: 'DOCTORANT', empId: '', dateFin: '2030-08-31' },
+        'durand-p-2': { etat: 'N', categorie: 'CDD UNIVERSITE', empId: '777001' },
+        'roy-l': { etat: 'N', categorie: 'TITULAIRE', empId: '555' },
+      };
+      const out = RULES.uid_ldap_disponible.detect(ctx({ ldap: ldap3, annuaire: [
+        rec(1, { uid_dyna: 'E900001U', Nom: 'Durand', Prenom: 'Pierre', [HR]: 777001 }),
+        rec(2, { uid_dyna: 'E200001U', Nom: 'Martin', Prenom: 'Lou' }),          // no staff number: still a student
+        rec(3, { uid_dyna: 'leroy-l', Nom: 'Leroy', Prenom: 'Lucie', [HR]: 555 }),   // staff uid: out of scope
+      ] }));
+      expect(out.map((d: { key: string }) => d.key)).toEqual(['E900001U>durand-p-2']);
+      expect(out[0].description).toContain('Le n° agent 777001 de cette fiche (E900001U) est celui du compte LDAP durand-p-2 (état N, CDD UNIVERSITE)');
+      expect(out[0].description).toContain('E900001U est un compte étudiant (état D, fin 2030-08-31)');
+      expect(out[0].description).toContain('SoVisu+ connaît cette personne sous E900001U');
+      expect(out[0].description).not.toContain('Attention');
     });
 
     it('accepts compound and usage-prefixed names', () => {

@@ -150,7 +150,7 @@ export const sharedIdTaskUids = (task: Pick<Task, 'type' | 'cle'>): string[] => 
 /** Separator of the key of an `annuaire_uid_ldap` task: `annuaire_uid_ldap:<current key>><LDAP uid>`. */
 export const UID_SWITCH_SEPARATOR = '>';
 
-/** Current key (ext_ uid, or g<row> for a record without uid) and LDAP uid of an `annuaire_uid_ldap`
+/** Current key (ext_ or student uid, or g<row> for a record without uid) and LDAP uid of an `annuaire_uid_ldap`
  * task, read from its key (scripts/sync_tasks.cjs); null for any other task. */
 export const uidSwitchOf = (task: Pick<Task, 'type' | 'cle'>): { from: string; to: string } | null => {
   const prefix = 'annuaire_uid_ldap:';

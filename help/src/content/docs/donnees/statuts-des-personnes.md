@@ -65,7 +65,9 @@ fictif `ext_…`) et que l'annuaire le connaît :
 | **Aucun** | Pas d'uid, uid fictif `ext_…`, ou compte inconnu de l'annuaire. |
 
 Une fiche `ext_…` dont la personne a en fait un compte (repérée par son n° agent) reçoit une
-tâche **Passer à l'uid LDAP**. Voir
+tâche **Passer à l'uid LDAP**. De même pour une fiche restée sur un compte étudiant `E…U` alors
+que la personne a depuis un compte personnel : sans bascule, la fiche passe « parti » à la
+fermeture du compte étudiant. Voir
 [Les tâches à traiter](/guides/personnes/taches-a-traiter/).
 
 ## Comment la présence est calculée
