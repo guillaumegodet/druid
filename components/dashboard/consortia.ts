@@ -15,7 +15,7 @@ export interface ConsortiumMember {
   name: string;
 }
 
-export interface ConsortiumDefinition {
+interface ConsortiumDefinition {
   key: string;
   label: string;
   /** Members, potential reference institution included. */
@@ -62,7 +62,7 @@ export interface PartnerGroup {
 }
 
 /** `https://ror.org/03gnr7b55` or `03gnr7b55` → `03gnr7b55`. */
-export function shortRor(ror: string | null | undefined): string | null {
+function shortRor(ror: string | null | undefined): string | null {
   if (!ror) return null;
   return ror.replace(/^https?:\/\/ror\.org\//, '') || null;
 }

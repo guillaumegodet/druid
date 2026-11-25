@@ -35,7 +35,7 @@ const IDENTIFIER_FIELDS: Record<string, string> = {
   Bluesky: 'bluesky', Mastodon: 'mastodon',
 };
 /** Web profiles, by record field. */
-export const LINK_FIELDS: Record<string, string> = {
+const LINK_FIELDS: Record<string, string> = {
   CV_institutionnel: 'cv_institutionnel', CV_site_labo: 'cv_site_labo', CV_pdf_docx_: 'cv_pdf_docx', CV_HAL: 'cv_hal', Academia: 'academia',
   Researchgate: 'researchgate', Profil_GS: 'profil_gs', LinkedIn: 'linkedin', Site_web: 'site_web', YouTube: 'youtube', Blog: 'blog',
   Podcast_flux: 'podcast_flux',
@@ -48,7 +48,7 @@ const has = (o: Record<string, any>, k: string) => Object.prototype.hasOwnProper
 const epochOf = (iso: string | null) => (iso ? toGristEpoch(iso) : null);
 
 /** What a person carries besides its own columns (loaded once for a set of people). */
-export interface PersonParts {
+interface PersonParts {
   identifiers: PgIdentifier[];
   scopusAbsent: boolean;
   links: PgLink[];

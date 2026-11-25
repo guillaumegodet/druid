@@ -58,7 +58,7 @@ export function hasTeams(pubs: DashboardPublication[]): boolean {
   return pubs.some((p) => p.teams.some((tm) => tm && tm !== TEAM_UNKNOWN));
 }
 
-export interface TeamsAggregates {
+interface TeamsAggregates {
   byTeam: CountItem[];
   byYear: StackedByYear;
   byType: StackedByCategory;
@@ -123,7 +123,7 @@ export interface RadarAggregates {
 
 export type TeamRadarLevel = 'subfield' | 'topic';
 
-export interface TeamRadarOptions {
+interface TeamRadarOptions {
   topSubfields?: number;
   maxSeries?: number;
   /** OpenAlex level of the axes in automatic mode (default: subfield). */
@@ -230,7 +230,7 @@ export function aggregateResearchers(
     .slice(0, top);
 }
 
-export interface PhdAggregates {
+interface PhdAggregates {
   byTeam: CountItem[];
   byYear: StackedByYear;
   byDoctorant: ResearcherItem[];

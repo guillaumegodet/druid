@@ -14,11 +14,11 @@ import type { Researcher, Structure } from '../../../types';
 import { normalizeAcronym } from '../../normalize';
 import { mapDirectoryRows } from '../people';
 import { mapStructureRecords, type AbesExportMark, type Institution, type MergeLogEntry } from '../gristMapping';
-import type { DirectoryRepository, DirectoryScope, LdapCacheSnapshot, Versioned } from '../repository';
+import type { DirectoryRepository, DirectoryScope, LdapCacheSnapshot } from '../repository';
 import { readFieldProvenance } from './fieldValues';
 import { pgDirectoryRow, pgEmployerIndex, type PgIdentifier, type PgLink, type PgMembership, type PgPerson } from './directoryRows';
 
-export interface PgDirectoryRepositoryOptions {
+interface PgDirectoryRepositoryOptions {
   db: Db;
   /** Instance without LDAP: omitted → empty cache. */
   loadLdapCache?: () => Promise<LdapCacheSnapshot>;

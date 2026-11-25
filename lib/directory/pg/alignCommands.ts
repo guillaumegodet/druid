@@ -20,7 +20,7 @@ import { RECORD_FIELDS } from './commands';
 import { readRecords, writeRecordFields, type MergedFieldsMode } from './recordFields';
 import { readReviewRecords, writeReview } from './review';
 
-export interface PgAlignCommandsOptions {
+interface PgAlignCommandsOptions {
   db: Db;
   repository: DirectoryRepository;
   caches: AlignCacheSource;

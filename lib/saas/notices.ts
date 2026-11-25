@@ -10,11 +10,11 @@
 import { normalizeEmail, type Job, type SaasDb, type Tenant } from './controlPlane';
 import { redactSecrets } from './redact';
 
-export const INACTIVITY_DAYS = 90;
+const INACTIVITY_DAYS = 90;
 const DAY_MS = 86_400_000;
 
 /** Jobs started by the establishment (or the scheduler on its behalf): their failures concern it. */
-export const OWNER_NOTIFIED_TYPES: readonly string[] = ['etl.build', 'people.align', 'structures.align', 'tenant.export'];
+const OWNER_NOTIFIED_TYPES: readonly string[] = ['etl.build', 'people.align', 'structures.align', 'tenant.export'];
 
 const SOURCE_NAMES: Record<string, string> = { idref: 'IdRef', orcid: 'ORCID', hal: 'HAL', openalex: 'OpenAlex', scopus: 'Scopus' };
 
@@ -62,7 +62,7 @@ export const failureRecipients = async (saas: SaasDb, job: Job, tenant: Pick<Ten
 };
 
 // ── Inactivity ────────────────────────────────────────────────────────────────────────────────────────────────────────
-export interface InactiveTenant { id: string; slug: string; label: string; lastActivity: string }
+interface InactiveTenant { id: string; slug: string; label: string; lastActivity: string }
 
 /** Last sign-in of a member, or the creation of the tenant when nobody ever signed in (impersonations do not count). */
 export const lastActivityOf = (t: { created_at: string | Date; last_login: string | Date | null }): Date => {
@@ -94,5 +94,5 @@ export const markInactivityNotified = async (saas: SaasDb, tenantId: string, now
 };
 
 /** Hours (UTC) in which the inactivity e-mails leave: office hours in Europe, not the middle of the night. */
-export const NOTICE_HOURS: [number, number] = [7, 17];
+const NOTICE_HOURS: [number, number] = [7, 17];
 export const inNoticeHours = (now: Date): boolean => now.getUTCHours() >= NOTICE_HOURS[0] && now.getUTCHours() < NOTICE_HOURS[1];

@@ -13,7 +13,7 @@ export const TENANT_SECRET_NAMES = [
   'ILAAS_API_KEY', 'ILAAS_API_BASE', 'ILAAS_MODEL',
 ] as const;
 export type TenantSecretName = typeof TENANT_SECRET_NAMES[number];
-export const isTenantSecretName = (v: unknown): v is TenantSecretName => TENANT_SECRET_NAMES.includes(v as TenantSecretName);
+const isTenantSecretName = (v: unknown): v is TenantSecretName => TENANT_SECRET_NAMES.includes(v as TenantSecretName);
 
 const b64encode = (bytes: Uint8Array): string => {
   let s = '';

@@ -48,7 +48,7 @@ export interface AlignCommands {
   reject(rejection: AlignRejection, ctx: CommandContext): Promise<{ rejected: number; tableCreated: boolean }>;
 }
 
-export interface GristAlignCommandsOptions {
+interface GristAlignCommandsOptions {
   grist: GristClient;
   repository: DirectoryRepository;
   caches: AlignCacheSource;

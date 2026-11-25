@@ -7,7 +7,7 @@ import { GRAPH_TYPE_OF_SCHEME, comparableValue, type GraphIdentifier, type Graph
 const GRAPH_TYPES = new Set<string>(Object.values(GRAPH_TYPE_OF_SCHEME));
 const LOCAL_PREFIX = 'local-';
 
-export interface ParsedSnapshot {
+interface ParsedSnapshot {
   identifiers: GraphIdentifier[];
   /** Lines that are not three quoted fields (header aside). */
   unreadableLines: number;
@@ -48,7 +48,7 @@ export const parseGraphSnapshot = (text: string): ParsedSnapshot => {
   return out;
 };
 
-export interface StateDifference {
+interface StateDifference {
   added: number;
   removed: number;
   changed: number;

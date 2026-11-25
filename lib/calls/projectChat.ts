@@ -49,7 +49,7 @@ export async function writeQueries(project: string, llm: TranslatorSettings, fet
   return [];
 }
 
-export interface EmbedReport {
+interface EmbedReport {
   calls: number;
   embedded: number;
   kept: number;
@@ -95,9 +95,9 @@ export async function embedOpenCalls(store: CallPassageStore, embedder: Embedder
  * Calls handed to the model, which keeps five at most: the relevant ones ranked 5th to 13th on druid-test (2026-10-17)
  * when generic calls (AI, youth…) matched one aspect of the project better.
  */
-export const PROJECT_HITS = 12;
+const PROJECT_HITS = 12;
 
-export interface ProjectSearchResult {
+interface ProjectSearchResult {
   /** System prompt of the answer (rules + calls found). */
   system: string;
   hits: ProjectHit[];
@@ -125,4 +125,3 @@ export const createProjectChat = (deps: { store: CallPassageStore; embedder: Emb
   return { search, model: deps.llm.model };
 };
 
-export type ProjectChat = ReturnType<typeof createProjectChat>;

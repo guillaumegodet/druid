@@ -65,7 +65,7 @@ export interface SearchablePassage {
   vector: ArrayLike<number>;
 }
 
-export interface RankedCall {
+interface RankedCall {
   callId: string;
   /** Reciprocal-rank fusion over the queries: a call found by several queries, or ranked first, comes first. */
   score: number;

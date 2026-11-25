@@ -12,7 +12,6 @@ import {
   describeFilters,
   matchesFilters,
 } from './publicationFilters';
-import { numberLocale } from '../../lib/i18n';
 import { doiUrl } from '../../lib/doi';
 import { sdgLabel } from './sdg';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';

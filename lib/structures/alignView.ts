@@ -49,7 +49,7 @@ export interface StructureAlignOverview {
   stats: { structures: number; actionable: number; strong: number; ambiguous: number; arbitrate: number; conflicts: number };
 }
 
-export const ACTIONABLE_STATUSES: StructureCellStatus[] = ['strong', 'ambiguous', 'arbitrate', 'conflict'];
+const ACTIONABLE_STATUSES: StructureCellStatus[] = ['strong', 'ambiguous', 'arbitrate', 'conflict'];
 
 /** State of one cell from its identifiers, pending candidates and search bookkeeping. */
 export const cellStatus = (existing: StructureIdentifier[], candidates: StructureCandidateView[], searched: boolean, multi: boolean): StructureCellStatus => {

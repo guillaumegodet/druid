@@ -27,7 +27,7 @@ interface JobView {
 
 /** A lab the ETL can harvest: a confirmed OpenAlex institution or HAL collection (the RNSR alone only reaches a BSO
  *  dump, rarely published for a lab). */
-export const isLabReadyForEtl = (row: StructureAlignRow): boolean =>
+const isLabReadyForEtl = (row: StructureAlignRow): boolean =>
   !!(row.cells.openalex?.existing.length || row.cells.hal_collection?.existing.length);
 
 const live = (j: JobView | null) => !!j && (j.status === 'queued' || j.status === 'running');

@@ -21,7 +21,7 @@ export class ConsoleError extends Error {
   constructor(public status: number, message: string) { super(message); }
 }
 
-export interface TenantOverview {
+interface TenantOverview {
   slug: string; label: string; status: Tenant['status']; plan: string; host: string | null; createdAt: string;
   members: number; lastLoginAt: string | null;
   lastJob: { type: string; status: string; createdAt: string } | null;

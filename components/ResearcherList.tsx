@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Trans, useLingui } from '@lingui/react/macro';
+import { useLingui } from '@lingui/react/macro';
 import { KeyFiguresStrip } from './researchers/KeyFiguresStrip';
-import { Researcher, ResearcherStatus } from '../types';
+import { Researcher } from '../types';
 import { GristService } from '../lib/gristService';
 import { AbesExportModal } from './researchers/AbesExportModal';
 import { useResearcherFilters } from '../hooks/useResearcherFilters';

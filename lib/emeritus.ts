@@ -20,20 +20,20 @@
 import { getGradeFromNcorps } from './gradeTypology';
 
 export const EMERITUS_GRADES = ['PREM', 'MCFEM', 'DREM', 'CREM'] as const;
-export type EmeritusGrade = (typeof EMERITUS_GRADES)[number];
+type EmeritusGrade = (typeof EMERITUS_GRADES)[number];
 
 const norm = (s: any): string =>
   String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toUpperCase().trim();
 
 /** The grade is already an emeritus code of the typology. */
-export const isEmeritusGrade = (grade: any): grade is EmeritusGrade =>
+const isEmeritusGrade = (grade: any): grade is EmeritusGrade =>
   (EMERITUS_GRADES as readonly string[]).includes(norm(grade));
 
 /** Category / employment type label expressing emeritus status (« PROFESSEUR EMERITE », « EMERITE »…). */
-export const isEmeritusLabel = (label: any): boolean => /EMERIT/.test(norm(label));
+const isEmeritusLabel = (label: any): boolean => /EMERIT/.test(norm(label));
 
 /** HR category « RETRAITE » (LDAP dynaCategorie or TYPE_EMPLOI). */
-export const isRetireeLabel = (label: any): boolean => /^RETRAITE/.test(norm(label));
+const isRetireeLabel = (label: any): boolean => /^RETRAITE/.test(norm(label));
 
 /** Everything on a record that may carry a trace of emeritus status or retirement. */
 export interface EmeritusSignals {

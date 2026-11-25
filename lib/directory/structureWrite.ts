@@ -8,13 +8,13 @@ import { ApiError } from './errors';
 /**
  * Re-encodes a simple value in the V2 multi-label format for writing (`Valeur[fr]`).
  */
-export const encodeMultiLabel = (value: any, lang = 'fr'): string => {
+const encodeMultiLabel = (value: any, lang = 'fr'): string => {
   const v = (value === null || value === undefined) ? '' : String(value).trim();
   return v ? `${v}[${lang}]` : '';
 };
 
 /** Druid StructureMission -> V2 text value for writing. */
-export const missionToV2 = (mission: any): string => {
+const missionToV2 = (mission: any): string => {
   switch (mission) {
     case 'RECHERCHE': return 'research';
     case 'SERVICES_SCIENTIFIQUES': return 'scientific_services';
@@ -24,7 +24,7 @@ export const missionToV2 = (mission: any): string => {
 };
 
 /** `YYYY-MM-DD` -> `YYYYMMDD` (empty if invalid). */
-export const isoToCompact = (d: any): string => {
+const isoToCompact = (d: any): string => {
   const s = String(d || '');
   return /^\d{4}-\d{2}-\d{2}$/.test(s) ? s.replace(/-/g, '') : '';
 };
@@ -35,7 +35,7 @@ export const isoToCompact = (d: any): string => {
  * (default start `20000101`, end possibly empty = open), as expected by
  * the CRISalid directory bridge.
  */
-export const serializeMembershipList = (list: any): string => {
+const serializeMembershipList = (list: any): string => {
   if (!Array.isArray(list)) return '';
   return list
     .filter((m: any) => m && m.ref)

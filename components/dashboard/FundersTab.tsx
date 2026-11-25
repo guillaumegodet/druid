@@ -24,7 +24,6 @@ import {
 } from './EChartCard';
 import { numberLocale } from '../../lib/i18n';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
-import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 
 const PAGE_SIZE = 25;

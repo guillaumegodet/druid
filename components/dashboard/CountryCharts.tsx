@@ -32,7 +32,7 @@ const asCountryItems = (rows: { cc: string; label: string; count: number }[], na
   rows.map((c) => ({ iso2: c.cc, fr: c.label, echarts: names[c.cc]?.echarts ?? '', eu: names[c.cc]?.eu ?? false, count: c.count }));
 
 /** Filter of a lab / team in the publication list, when the export carries them on the publications. */
-export const unitFilter = (focus: CountryFocus, unit: string): PubFilters | null =>
+const unitFilter = (focus: CountryFocus, unit: string): PubFilters | null =>
   focus.units.filterKey === 'team' ? { team: unit }
     : focus.units.filterKey === 'sousStructure' ? { sousStructure: unit }
       : null;

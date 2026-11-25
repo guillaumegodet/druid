@@ -12,7 +12,7 @@ import { sql } from 'kysely';
 import { normalizeEmail, type Job, type SaasDb, type Tenant, type TenantStatus } from './controlPlane.ts';
 
 export const EXPORT_TTL_DAYS = 7;
-export const DELETION_DELAY_DAYS = 30;
+const DELETION_DELAY_DAYS = 30;
 const DAY_MS = 86_400_000;
 
 export class LifecycleError extends Error {
@@ -36,9 +36,9 @@ export const exportObjectKey = (slug: string, jobId: string, at: Date): string =
   `${slug}/exports/${exportBaseName(slug, jobId, at)}.tar.gz`;
 
 /** What the runner leaves in `job.progress` once the archive is uploaded (and `purgedAt` once it is removed). */
-export interface ExportResult { objectKey: string; fileName: string; size: number; expiresAt: string; purgedAt?: string }
+interface ExportResult { objectKey: string; fileName: string; size: number; expiresAt: string; purgedAt?: string }
 
-export interface ExportView {
+interface ExportView {
   id: string;
   status: Job['status'];
   createdAt: string;
@@ -109,7 +109,7 @@ export const markExportPurged = async (db: SaasDb, jobId: string, now = new Date
 };
 
 // ── Deletion ──────────────────────────────────────────────────────────────────────────────────────────────────────────
-export interface DeletionView { requestedAt: string; requestedBy: string | null; deleteAfter: string }
+interface DeletionView { requestedAt: string; requestedBy: string | null; deleteAfter: string }
 
 export const deletionOf = (t: Pick<Tenant, 'delete_requested_at' | 'delete_requested_by' | 'delete_after'>): DeletionView | null =>
   t.delete_after && t.delete_requested_at

@@ -1,7 +1,7 @@
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
-import { Researcher, Structure } from '../types';
+import { Researcher } from '../types';
 
 /**
  * Reports an export made in the browser to the server audit log (POST /api/audit/export,

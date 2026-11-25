@@ -13,7 +13,7 @@ import { createGristLdapCommands } from '../lib/directory/ldapCommands';
 import { createGristAlignCommands } from '../lib/directory/alignCommands';
 import { tokenAlignTexts } from '../lib/directory/alignTexts';
 import {
-  createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient, LdapCacheSnapshot,
+  createGristDirectoryRepository, createGristReader, DirectoryScope, GristClient,
 } from '../lib/directory/repository';
 import { createGristPublicationsStore } from '../lib/publications/store';
 import { createDb } from '../lib/db/client';

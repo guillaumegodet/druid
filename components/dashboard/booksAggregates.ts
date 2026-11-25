@@ -6,14 +6,14 @@ import { DashboardPublication } from './types';
 import { CountItem, YearRange } from './overviewAggregates';
 
 /** Publication types considered as « ouvrages » (books), fixed order (= color slot). */
-export const BOOK_TYPES = [
+const BOOK_TYPES = [
   'Chapitre de livre',
   'Monographie',
   "Direction/coordination d'ouvrage",
   'Coordination',
 ];
 
-export interface BooksAggregates {
+interface BooksAggregates {
   byType: CountItem[];
   years: number[];
   series: { name: string; slot: number; data: number[] }[];

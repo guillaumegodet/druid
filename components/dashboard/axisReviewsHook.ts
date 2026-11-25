@@ -6,7 +6,7 @@ import { apiErrorText } from '../../lib/apiErrors';
 import { workKeyOf, type AxisReview, type AxisReviewDecision } from '../../lib/publications/axisReviews';
 import { indexReviews, reviewOf as reviewOfIndex, type ReviewablePublication, type ReviewIndex } from '../../lib/publications/axisReviewStats';
 
-export interface AxisReviewsState {
+interface AxisReviewsState {
   /** null until the first answer; false on an instance without PostgreSQL (404). */
   supported: boolean | null;
   loaded: boolean;
@@ -14,7 +14,7 @@ export interface AxisReviewsState {
   index: ReviewIndex;
 }
 
-export interface ReviewDraft {
+interface ReviewDraft {
   decision: AxisReviewDecision;
   axes?: string[];
   note?: string;

@@ -15,7 +15,7 @@ import { doiUrl } from '../../lib/doi';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 
 /** « grande collaboration » threshold (ALICE/CMS hyper-authorship…) — cf. plan §4, to be tuned with use. */
-export const HYPER_AUTHORED_THRESHOLD = 50;
+const HYPER_AUTHORED_THRESHOLD = 50;
 const RECENT_PUBLICATIONS_N = 10;
 
 /**

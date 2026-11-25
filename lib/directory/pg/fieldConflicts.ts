@@ -6,7 +6,7 @@ import { ApiError } from '../errors';
 import { FieldValueError, MANUAL_SOURCE, MERGED_FIELDS, type DivergenceKind } from '../fieldMerge';
 import { correctFieldValue, dropFieldCorrection, keepFieldCorrection, listFieldConflicts } from './fieldValues';
 
-export interface FieldConflictItem {
+interface FieldConflictItem {
   personId: string;
   /** A directory row of the person, to open the record. */
   recordId: number | null;
@@ -21,7 +21,7 @@ export interface FieldConflictItem {
   conflicts: { source: string; value: string; observedAt: string; kind: DivergenceKind }[];
 }
 
-export type FieldConflictAction = 'keep' | 'drop' | 'correct';
+type FieldConflictAction = 'keep' | 'drop' | 'correct';
 
 export const createFieldConflictsStore = (db: Db) => ({
   async list(): Promise<FieldConflictItem[]> {
@@ -78,4 +78,3 @@ export const createFieldConflictsStore = (db: Db) => ({
     }
   },
 });
-export type FieldConflictsStore = ReturnType<typeof createFieldConflictsStore>;

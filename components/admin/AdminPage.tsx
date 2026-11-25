@@ -15,7 +15,6 @@ import { EstablishmentAdmin } from './EstablishmentAdmin';
 import { CallsProgrammesAdmin } from './CallsProgrammesAdmin';
 import { ManualCallsAdmin } from './ManualCallsAdmin';
 
-export type { AdminTab };
 
 /** Last generation of a cdb file (GET /api/sovisu-export-status); null = file absent. */
 type CdbFileStatus = { updatedAt: string; count: number } | null;

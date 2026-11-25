@@ -34,7 +34,7 @@ import { insertStructure, writeStructure } from './structures';
 import type { CommandContext, DirectoryCommands } from '../commands';
 import type { DirectoryRepository, DirectoryScope } from '../repository';
 
-export interface PgDirectoryCommandsOptions {
+interface PgDirectoryCommandsOptions {
   db: Db;
   /** Its cached reads are dropped after every write. */
   repository: DirectoryRepository;
@@ -42,7 +42,6 @@ export interface PgDirectoryCommandsOptions {
   today?: () => string;
 }
 
-export { OPENALEX_AUTHOR_SOURCE };
 /** Record fields of a membership (as opposed to the person): what a restoration writes on a person that already exists. */
 const MEMBERSHIP_FIELDS = ['LABO', 'team', 'affiliation_start_date', 'affiliation_end_date', 'membership_type', 'rattachement', 'doublon_decision'];
 

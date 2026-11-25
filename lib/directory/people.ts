@@ -109,7 +109,7 @@ export function groupQualifiedRows(researchers: any[], rowRole: Record<number, R
 }
 
 /** Lowercase ASCII slug used to build an ext_ identifier (accents removed, non-alphanumerics -> '-'). */
-export const slugForExtId = (s: string): string =>
+const slugForExtId = (s: string): string =>
   (s || '')
     .normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().trim()
@@ -125,7 +125,7 @@ export const slugForExtId = (s: string): string =>
  * is now PERSISTED in uid_dyna (+ people.csv) → they go through the « real uid » branch
  * above; the synthetic computation is only a fallback for externals without uid_dyna.
  */
-export function assignPublicIds(researchers: any[]): void {
+function assignPublicIds(researchers: any[]): void {
   const used = new Set<string>();
   const uidSeen = new Set<string>();
   const dupUids = new Set<string>();

@@ -12,7 +12,7 @@ import { msg } from '@lingui/core/macro';
 import { i18n, type MessageDescriptor } from '@lingui/core';
 
 /** Doc entry resolved in the active language (what EChartCard and the PDF consume). */
-export interface ChartDoc {
+interface ChartDoc {
   /** What the chart shows (1-2 sentences, reading). */
   description: string;
   /** How it is computed (effective aggregation rules). */
@@ -29,7 +29,7 @@ interface ChartDocSource {
 }
 
 /** Global methodological note (« Note méthodologique » page of the report). */
-export const METHODOLOGY_NOTE: MessageDescriptor[] = [
+const METHODOLOGY_NOTE: MessageDescriptor[] = [
   msg`Corpus. The publications come from the druid-biblio bibliometric warehouse of Nantes Université, which merges up to four sources depending on each structure's configuration: the CRISalid graph (publications of the structure's current members, harvested from their researcher identifiers in HAL, ScanR, IdRef/Sudoc, OpenAlex and Scopus), the French Open Science Monitor (BSO), OpenAlex (publications affiliated with the structure's OpenAlex institution) and HAL (the structure's collection). Duplicates are merged by DOI, HAL or OpenAlex identifier, then by normalised title; each record is then enriched (OpenAlex indicators retrieved by DOI, Scimago and Nantilus reference data, signature charter, staff lists) and the whole is frozen in a snapshot. The figures in the report reflect the state of the data at the date of the last export, not real time.`,
   msg`Scopes. “Affiliation” keeps the whole merged corpus: publications signed by the structure (OpenAlex, HAL, BSO) and publications of its current members brought in by CRISalid — the latter may include work published before the researcher joined the structure. “Staff” restricts to publications where at least one author is matched (by name) to the structure's validated member list: this scope is closer to the actual staff but may leave out publications whose authors are not yet matched. The period filters on publication year; publications without a year are excluded from all charts.`,
   msg`Citation indicators. Citations, FWCI and percentiles are OpenAlex data at the export date; records unknown to OpenAlex (often without a DOI: theses, books, French-language publications) have none and are left out of these indicators. The FWCI (Field-Weighted Citation Impact) compares a publication's citations with the world average of comparable publications (same field, same year, same type): 1 = world average. The “Top 1% / Top 10%” indicators flag publications whose citation count places them in the upper percentiles of their field and year. These indicators are of little significance for recent publications (short citation window) and for small samples.`,
@@ -37,7 +37,7 @@ export const METHODOLOGY_NOTE: MessageDescriptor[] = [
   msg`General limitations. Adding CRISalid, HAL and the BSO to OpenAlex improves the coverage of the humanities and social sciences, French-language publications and books, but these remain less well covered than indexed international journals, and the indicators that depend on OpenAlex (citations, topics, collaborations) are missing for part of them. Comparisons between structures from different disciplines should therefore be avoided; trends over time within the same structure are more robust. The CRISalid contribution depends on the researcher identifiers recorded (ORCID, idHAL, IdRef…) and on the date of the last harvest. The most recent year is usually incomplete (indexing delays).`,
 ];
 
-export const CHART_DOCS: Record<string, ChartDocSource> = {
+const CHART_DOCS: Record<string, ChartDocSource> = {
   // ── Overview ───────────────────────────────────────────────────────────────
   'publications-par-annee': {
     description:

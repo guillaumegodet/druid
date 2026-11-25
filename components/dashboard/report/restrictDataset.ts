@@ -30,7 +30,7 @@ export function resolvePeriod(period: ReportPeriod, now: Date = new Date()): Yea
  * authorIds of the staff: `members` in the private corpus, the minimal
  * `effectifsAuthorIds` field in the public variant (/embed).
  */
-export function headcountAuthorIds(dataset: DashboardDataset): Set<number> {
+function headcountAuthorIds(dataset: DashboardDataset): Set<number> {
   const fromMembers = (dataset.members ?? [])
     .map((m) => m.authorId)
     .filter((id): id is number => id != null);
@@ -48,7 +48,7 @@ export function hasActiveFilter(f: PubFilters): boolean {
     !(typeof v === 'string' && v.trim() === '') && !(Array.isArray(v) && v.length === 0));
 }
 
-export interface RestrictOptions {
+interface RestrictOptions {
   perimetre?: 'affiliation' | 'effectifs';
   filters?: PubFilters;
   /** Reused when several restrictions run on the same dataset (built otherwise). */

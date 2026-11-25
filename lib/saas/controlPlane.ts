@@ -14,7 +14,7 @@ import { sql } from 'kysely';
 // ── Tables of the saas schema ─────────────────────────────────────────────────────────────────────────────────────────
 export type TenantStatus = 'provisioning' | 'active' | 'suspended' | 'deleted';
 export type MemberRole = 'owner' | 'admin' | 'viewer' | 'lab';
-export type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
+type JobStatus = 'queued' | 'running' | 'done' | 'failed' | 'cancelled';
 
 export interface PlanTable {
   code: string;
@@ -52,7 +52,7 @@ export interface TenantTable {
   /** Owners last told that nobody signed in for 90 days (lot 6 d, lib/saas/notices.ts). */
   inactivity_notified_at: string | null;
 }
-export interface TenantHostTable {
+interface TenantHostTable {
   host: string;
   tenant_id: string;
   is_primary: Generated<boolean>;
@@ -68,7 +68,7 @@ export interface MemberTable {
   created_at: Generated<string>;
   last_login_at: string | null;
 }
-export interface MagicLinkTable {
+interface MagicLinkTable {
   id: Generated<string>;
   email: string;
   tenant_id: string | null;
@@ -82,8 +82,8 @@ export interface MagicLinkTable {
   /** Console user opening a tenant session as a member (impersonation, lot 6 c). */
   impersonated_by: string | null;
 }
-export type SessionKind = 'user' | 'console';
-export interface SessionTable {
+type SessionKind = 'user' | 'console';
+interface SessionTable {
   id: Generated<string>;
   email: string;
   tenant_id: string | null;
@@ -94,7 +94,7 @@ export interface SessionTable {
   kind: Generated<SessionKind>;
   impersonated_by: string | null;
 }
-export interface ConsoleEventTable {
+interface ConsoleEventTable {
   id: Generated<string>;
   at: Generated<string>;
   actor: string;
@@ -121,14 +121,14 @@ export interface JobTable {
   cancel_requested_at: string | null;
   runner: string | null;
 }
-export interface TenantSecretTable {
+interface TenantSecretTable {
   tenant_id: string;
   name: string;
   ciphertext: string;
   iv: string;
   updated_at: Generated<string>;
 }
-export interface TenantKeyCheckTable {
+interface TenantKeyCheckTable {
   tenant_id: string;
   key_group: string;
   checked_at: Generated<string>;
@@ -137,7 +137,7 @@ export interface TenantKeyCheckTable {
   message: string | null;
   checked_by: string | null;
 }
-export interface AccessRequestTable {
+interface AccessRequestTable {
   id: Generated<string>;
   tenant_id: string;
   email: string;
@@ -145,7 +145,7 @@ export interface AccessRequestTable {
   created_at: Generated<string>;
   handled_at: string | null;
 }
-export interface QuoteRequestTable {
+interface QuoteRequestTable {
   id: Generated<string>;
   tenant_id: string;
   email: string;
@@ -207,7 +207,7 @@ export const normalizeAcronym = (s: string): string =>
   String(s).toLowerCase().split('²').join('2').normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z0-9]/g, '');
 
 /** Rights of the front (lib/auth.ts DruidAccess) and roles, from a member row. */
-export interface MemberAccess {
+interface MemberAccess {
   roles: string[];
   access: { isSuperAdmin: boolean; isMediaAdmin: boolean; isLabViewer: boolean; annuaireLabs: string[]; allowedSlugs: 'all' | string[] };
   /** Scope of the domain API (lib/directory/api.ts): everything, or the labs of the member. */
@@ -260,7 +260,7 @@ export const publicTenantInfo = (tenant: Pick<Tenant, 'slug' | 'status' | 'mail_
 });
 
 // ── Queries ───────────────────────────────────────────────────────────────────────────────────────────────────────────
-export interface TenantByHost { tenant: Tenant; plan: Plan | null }
+interface TenantByHost { tenant: Tenant; plan: Plan | null }
 
 /** Tenant serving `host`, with its plan; null when no active or suspended tenant declares it. */
 export const findTenantByHost = async (db: SaasDb, host: string): Promise<TenantByHost | null> => {
@@ -288,7 +288,7 @@ export const countMembers = async (db: SaasDb, tenantId: string): Promise<number
 export const mayRequestLink = (tenant: Pick<Tenant, 'mail_domains'>, member: Member | null, email: string): boolean =>
   !!member || tenant.mail_domains.includes(emailDomain(email));
 
-export interface MagicLinkInput { email: string; tenantId: string | null; tokenHash: string; nextPath?: string | null; ttlMinutes?: number; kind?: SessionKind; impersonatedBy?: string | null }
+interface MagicLinkInput { email: string; tenantId: string | null; tokenHash: string; nextPath?: string | null; ttlMinutes?: number; kind?: SessionKind; impersonatedBy?: string | null }
 export const createMagicLink = async (db: SaasDb, { email, tenantId, tokenHash, nextPath = null, ttlMinutes = 15, kind = 'user', impersonatedBy = null }: MagicLinkInput): Promise<void> => {
   await db.insertInto('magic_link').values({
     email: normalizeEmail(email), tenant_id: tenantId, token_hash: tokenHash, next_path: nextPath,
@@ -302,7 +302,7 @@ export const consumeMagicLink = async (db: SaasDb, tokenHash: string): Promise<S
     .where('token_hash', '=', tokenHash).where('consumed_at', 'is', null).where('expires_at', '>', sql<string>`now()`)
     .returningAll().executeTakeFirst()) || null;
 
-export interface SessionInput { email: string; tenantId: string | null; userAgent?: string | null; ttlDays?: number; ttlHours?: number; kind?: SessionKind; impersonatedBy?: string | null }
+interface SessionInput { email: string; tenantId: string | null; userAgent?: string | null; ttlDays?: number; ttlHours?: number; kind?: SessionKind; impersonatedBy?: string | null }
 export const createSession = async (db: SaasDb, { email, tenantId, userAgent = null, ttlDays = 30, ttlHours, kind = 'user', impersonatedBy = null }: SessionInput): Promise<string> => {
   const row = await db.insertInto('session').values({
     email: normalizeEmail(email), tenant_id: tenantId, user_agent: userAgent ? String(userAgent).slice(0, 300) : null,

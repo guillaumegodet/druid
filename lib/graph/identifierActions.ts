@@ -69,7 +69,7 @@ export const isReadableValue = (type: GraphIdentifierType, value: string) => VAL
 
 const key = (uid: string, type: string) => `${uid}\u0000${type}`;
 
-export interface PlanInput {
+interface PlanInput {
   /** Primary identifiers of the directory, already typed for the graph (persons with a uid). */
   directory: GraphIdentifier[];
   /** Every uid of the directory, with or without identifiers. */
@@ -122,9 +122,9 @@ export const planGraphActions = ({ directory, uids, state, open, accepted = IKG_
 };
 
 /** Graph uid of a directory person (people.csv: `local_identifier` = uid, the IKG prefixes it). */
-export const graphPersonUid = (uid: string) => `local-${uid}`;
+const graphPersonUid = (uid: string) => `local-${uid}`;
 
-export interface UserActionMessage {
+interface UserActionMessage {
   id: string;
   actionType: 'REMOVE';
   targetType: 'PERSON';

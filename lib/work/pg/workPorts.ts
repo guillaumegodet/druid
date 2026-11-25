@@ -19,7 +19,7 @@ import { readRecords } from '../../directory/pg/recordFields';
 type Row = { id: number; fields: Record<string, any> };
 type Conn = Db | Transaction<DB>;
 
-export interface PgWorkPortsOptions {
+interface PgWorkPortsOptions {
   db: Db;
   /** Author of the writes in the audit log (Keycloak / Access user, or the name of a job). */
   actor?: string;
@@ -293,4 +293,3 @@ export const createPgWorkPorts = ({ db, actor = '', now = () => new Date() }: Pg
 
   return { tasks, conflicts, peerGroups, reports };
 };
-export type PgWorkPorts = ReturnType<typeof createPgWorkPorts>;

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useCompactHeader } from '../hooks/useCompactHeader';
-import { Search, FileDown, ArrowRight, Filter, Merge, Trash2, ArrowUp, ArrowDown, Users, CheckCircle, Network, RefreshCw, Building, Plus, CornerDownRight } from 'lucide-react';
+import { Search, FileDown, ArrowRight, Filter, Merge, Trash2, ArrowUp, ArrowDown, CheckCircle, Network, RefreshCw, Building, Plus, CornerDownRight } from 'lucide-react';
 import { Structure, StructureStatus, StructureLevel, ViewState } from '../types';
 import { POLE_LAB_MAPPING } from '../lib/mappings';
 import { ExportService } from '../lib/exportService';

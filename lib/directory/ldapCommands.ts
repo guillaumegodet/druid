@@ -36,7 +36,7 @@ export interface LdapCommands {
   applyStructures(updateIds: string[], createKeys: string[], ctx: CommandContext): Promise<{ updated: number; created: number }>;
 }
 
-export interface GristLdapCommandsOptions {
+interface GristLdapCommandsOptions {
   grist: GristClient;
   repository: DirectoryRepository;
   ldap: LdapSource;

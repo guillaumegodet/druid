@@ -24,7 +24,7 @@ export function presenceBreakdown(researchers: Researcher[]): Record<PresenceSli
   return out;
 }
 
-export type Gender = 'f' | 'm' | 'other' | null;
+type Gender = 'f' | 'm' | 'other' | null;
 
 /** Gender read from the civility (« Mme », « M. », « Madame »…); null when empty. */
 export function genderOf(civility: string | undefined | null): Gender {
@@ -103,7 +103,7 @@ export function identifierCoverage(researchers: Researcher[]): Record<Identifier
   return out;
 }
 
-export interface DirectoryKpis {
+interface DirectoryKpis {
   total: number;
   present: number;
   leaving: number;
@@ -144,7 +144,7 @@ export function directoryKpis(researchers: Researcher[]): DirectoryKpis {
 }
 
 /** Affiliation still running today (no end date, or an end date not yet past). */
-export const isActiveAffiliation = (a: Affiliation, today: string = todayIso()): boolean =>
+const isActiveAffiliation = (a: Affiliation, today: string = todayIso()): boolean =>
   !a.endDate || !isFuzzyDatePast(a.endDate, today);
 
 /**

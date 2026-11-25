@@ -9,7 +9,7 @@
  */
 import type { PeopleAlignSource } from './jobs';
 
-export interface AlignTarget {
+interface AlignTarget {
   recId: number;
   key: string;
   first: string;
@@ -48,7 +48,7 @@ const scopusIdOf = (p: AlignTarget): string => (/^\d{6,12}$/.test(digits(p.scopu
 const scopusMarkedAbsent = (p: AlignTarget): boolean => !scopusIdOf(p) && p.scopus.trim() !== '' && p.scopus.trim() !== '0';
 const doneInMode = (entry: any, mode: string): boolean => !!entry && entry.mode === mode && entry.status !== 'error';
 
-export type AlignRunMode = 'search' | 'verify';
+type AlignRunMode = 'search' | 'verify';
 interface SourceSpec { cache: string; modes: AlignRunMode[]; eligible: (p: AlignTarget, mode: AlignRunMode) => boolean; done: (entry: any, mode: AlignRunMode) => boolean }
 /** Same rules as scripts/lib/align_targets.cjs TARGET_SOURCES. */
 export const TARGET_SOURCES: Record<PeopleAlignSource, SourceSpec> = {
@@ -72,7 +72,7 @@ export const TARGET_SOURCES: Record<PeopleAlignSource, SourceSpec> = {
 };
 
 /** API calls per record (scripts/lib/align_estimate.cjs ALIGN_COST). */
-export const ALIGN_COST: Record<PeopleAlignSource, Partial<Record<AlignRunMode, Record<string, number>>>> = {
+const ALIGN_COST: Record<PeopleAlignSource, Partial<Record<AlignRunMode, Record<string, number>>>> = {
   idref: { search: { requests: 10 } },
   orcid: { search: { requests: 3 }, verify: { requests: 1 } },
   hal: { search: { requests: 3 }, verify: { requests: 1 } },
@@ -84,8 +84,8 @@ const isDoctorant = (p: AlignTarget) => p.typeEmploi.trim().toUpperCase() === 'D
 const isHorsRecherche = (p: AlignTarget) => /n'ayant pas d'obligation statutaire de recherche/i.test(p.libTypeEmploi.replace(/[’‘]/g, "'"));
 export const alignGroupOf = (p: AlignTarget): 'personnel' | 'doctorants' | 'hors_recherche' => (isDoctorant(p) ? 'doctorants' : isHorsRecherche(p) ? 'hors_recherche' : 'personnel');
 
-export interface EstimateScope { mode: AlignRunMode; labo?: string; group?: string }
-export interface SourceEstimate { eligible: number; pending: number; unit: Record<string, number> }
+interface EstimateScope { mode: AlignRunMode; labo?: string; group?: string }
+interface SourceEstimate { eligible: number; pending: number; unit: Record<string, number> }
 
 /** Per source supporting `mode`: the records of the scope to process, those never processed, the cost per record. */
 export const estimateAlignment = (

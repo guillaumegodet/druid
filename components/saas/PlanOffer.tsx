@@ -5,7 +5,7 @@ import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
 import { apiErrorText } from '../../lib/apiErrors';
 import { numberLocale } from '../../lib/i18n';
-import { getTenantInfo, getUserInfo, isLockedByPlan } from '../../lib/auth';
+import { getTenantInfo, getUserInfo } from '../../lib/auth';
 import { planUnlocking, type PlanFeature } from '../../lib/saas/planFeatures';
 
 /**
@@ -150,9 +150,6 @@ export const LockedFeature: React.FC<{ feature: PlanFeature }> = ({ feature }) =
   );
 };
 
-/** Small lock next to the label of an entry the plan locks. */
-export const LockMark: React.FC<{ feature: PlanFeature }> = ({ feature }) =>
-  isLockedByPlan(feature) ? <Lock className="w-3 h-3 opacity-70 shrink-0" aria-hidden /> : null;
 
 /** Thin banner of a trial: « Trial — powered by Druid », and the quote; of a planned deletion (lot 6 a-3), its date. */
 export const TrialBanner: React.FC = () => {

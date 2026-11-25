@@ -179,7 +179,7 @@ export type ReportContext = z.infer<typeof reportContextSchema>;
 export type ReportBlock = z.infer<typeof reportBlockSchema>;
 export type ReportDefinition = z.infer<typeof reportDefinitionSchema>;
 
-export type ParseResult<T> = { ok: true; value: T } | { ok: false; error: string };
+type ParseResult<T> = { ok: true; value: T } | { ok: false; error: string };
 
 /** Validates an untrusted definition (storage, import): size first, then shape. */
 export function parseReportDefinition(input: unknown): ParseResult<ReportDefinition> {

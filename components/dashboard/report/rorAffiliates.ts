@@ -15,7 +15,7 @@ export const rorOf = (key: string): string | null =>
   /^0[a-z0-9]{8}$/.test(key) ? key : null;
 
 /** ROR ids linked to `ror` as child or related organization (empty when unreachable). */
-export function relatedRors(ror: string, fetchImpl: typeof fetch = fetch): Promise<string[]> {
+function relatedRors(ror: string, fetchImpl: typeof fetch = fetch): Promise<string[]> {
   let p = cache.get(ror);
   if (!p) {
     p = fetchImpl(`${ROR_API}/${encodeURIComponent(ror)}`)

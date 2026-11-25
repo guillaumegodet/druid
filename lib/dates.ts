@@ -10,7 +10,7 @@
  * bound: a START date to the first day of the period, an END date to its last day.
  */
 
-export type FuzzyDatePrecision = 'year' | 'month' | 'day';
+type FuzzyDatePrecision = 'year' | 'month' | 'day';
 
 /** `YYYY`, `YYYY-MM` or `YYYY-MM-DD` (calendar validity checked separately). */
 const FUZZY_RE = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/;

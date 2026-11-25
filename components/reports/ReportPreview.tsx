@@ -26,7 +26,7 @@ const Inline: React.FC<{ runs: MdInline[] }> = ({ runs }) => (
   </>
 );
 
-export const MarkdownView: React.FC<{ md: string }> = ({ md }) => (
+const MarkdownView: React.FC<{ md: string }> = ({ md }) => (
   <div className="flex flex-col gap-2 text-[15px] leading-relaxed text-ink dark:text-[#e8e4d8]">
     {parseMarkdownLite(md).map((n, i) =>
       n.kind === 'heading' ? (

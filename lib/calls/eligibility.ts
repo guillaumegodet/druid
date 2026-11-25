@@ -66,7 +66,7 @@ export const rulesFromCallText = (call: { callId: string; scheme: string; object
 
 const minusYears = (iso: string, years: number): string => `${Number(iso.slice(0, 4)) - years}${iso.slice(4)}`;
 
-export interface EligibilityResult {
+interface EligibilityResult {
   verdict: EligibilityVerdict;
   reasons: EligibilityReason[];
 }

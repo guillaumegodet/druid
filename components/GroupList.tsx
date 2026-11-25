@@ -6,7 +6,6 @@ import { Group, Researcher, ViewState } from '../types';
 import { GristService } from '../lib/gristService';
 import { GroupDashboardSection } from './groups/GroupDashboardSection';
 import { AuthorResolveModal } from './groups/AuthorResolveModal';
-import { isHarvestable } from './groups/groupDashboardApi';
 import { Trans, Plural, useLingui } from '@lingui/react/macro';
 import { apiErrorText } from '../lib/apiErrors';
 import { HelpButton } from './HelpButton';

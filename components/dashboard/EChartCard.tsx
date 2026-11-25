@@ -76,7 +76,7 @@ export const ReportCaptureContext = React.createContext<ReportCapture | null>(nu
  * range): when present, each chart of the registry exposes
  * a « Partager » button that builds the matching public /embed URL.
  */
-export interface ShareScope {
+interface ShareScope {
   slug: string;
   range: { start: number; end: number };
   /** Current corpus scope — carried over into shared links. */
@@ -152,7 +152,7 @@ export function useWorldMap(): boolean {
 }
 
 /** Follows the `dark` class set on <html> by App.tsx (same mechanism as Tailwind). */
-export function useIsDark(): boolean {
+function useIsDark(): boolean {
   const [dark, setDark] = useState(() => document.documentElement.classList.contains('dark'));
   useEffect(() => {
     const obs = new MutationObserver(() =>

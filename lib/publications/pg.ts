@@ -39,7 +39,7 @@ const recordOf = (r: Selectable<NewsletterItemRow>) => ({
   fields: { ...r, id: undefined, genere_le: isoOf(r.genere_le), valide_le: isoOf(r.valide_le) } as Record<string, unknown>,
 });
 
-export interface PgPublicationsStoreOptions {
+interface PgPublicationsStoreOptions {
   db: Queryable;
   /** Grist store of the instance: axis corrections. Absent (Cloudflare, lot 10 a): no structure has axes. */
   grist?: PublicationsStore;

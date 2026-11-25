@@ -25,7 +25,7 @@ export function publicationCountries(p: DashboardPublication): string[] {
 }
 
 /** Foreign (non-FR) countries of a publication. */
-export const foreignCountriesOf = (p: DashboardPublication): string[] =>
+const foreignCountriesOf = (p: DashboardPublication): string[] =>
   publicationCountries(p).filter((c) => c !== 'FR');
 
 /** Is `cc` a country of the publication (the « Pays » filter)? */
@@ -183,7 +183,7 @@ export interface CountryFocus {
   large: number;
 }
 
-export interface CountryFocusOptions {
+interface CountryFocusOptions {
   /** Excludes the publications with more than `maxAuthors` authors everywhere (D2 checkbox). */
   maxAuthors?: number;
   /** Folds hospitals and institutes under their parent university (D3, off by default). */

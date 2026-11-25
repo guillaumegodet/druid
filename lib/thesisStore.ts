@@ -11,12 +11,12 @@ export interface ThesisCheckTarget {
   idref: string;
 }
 
-export interface StoredThesis extends Thesis {
+interface StoredThesis extends Thesis {
   source: 'theses.fr' | 'manual';
   updatedAt: string;
 }
 
-export interface ThesisCheckInfo {
+interface ThesisCheckInfo {
   checkedAt: string;
   found: number;
   error: string;
@@ -108,4 +108,3 @@ export const createThesisStore = (db: Kysely<DB>) => {
   return { due, saveCheck, thesesOfUid, thesesOfRow, coverage };
 };
 
-export type ThesisStore = ReturnType<typeof createThesisStore>;

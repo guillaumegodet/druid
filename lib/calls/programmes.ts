@@ -13,7 +13,6 @@ export type ProgrammeKind = 'thematic' | 'open' | 'eligibility' | 'mixed';
 export type ProgrammeRefresh = 'daily' | 'weekly' | 'manual';
 export type CallStatus = 'forthcoming' | 'open' | 'closed' | 'unknown';
 export type MatchEngine = 'trm' | 'profile' | 'eligibility';
-export const MATCH_ENGINES: readonly MatchEngine[] = ['trm', 'profile', 'eligibility'];
 
 export interface Funder {
   funderId: string;
@@ -105,7 +104,7 @@ export const BUILT_IN_FUNDERS: readonly Funder[] = [EU_FUNDER, ANR_FUNDER];
 export const BUILT_IN_PROGRAMMES: readonly Programme[] = [...PORTAL_PROGRAMMES_BUILT_IN, ...ANR_PROGRAMMES_BUILT_IN];
 
 /** Page of a topic on the Funding & Tenders portal. */
-export const PORTAL_TOPIC_PAGE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
+const PORTAL_TOPIC_PAGE = 'https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/';
 export const portalTopicUrl = (topicId: string): string => `${PORTAL_TOPIC_PAGE}${topicId.toLowerCase()}`;
 
 /** Status of a call at `today` ('YYYY-MM-DD') from its dates: unknown without deadline, forthcoming before its opening,

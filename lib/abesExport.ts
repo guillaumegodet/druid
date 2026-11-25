@@ -17,9 +17,9 @@ import { isFuzzyDatePast } from './dates';
 
 // ── Business constants ────────────────────────────────────────────────────────
 /** Nantes Université (2022-....) and its predecessor Université de Nantes (1962-2021). */
-export const PPN_NANTES_UNIVERSITE = '258086599';
-export const PPN_UNIVERSITE_DE_NANTES = '026403447';
-export const NANTES_U_SPLIT_YEAR = 2022;
+const PPN_NANTES_UNIVERSITE = '258086599';
+const PPN_UNIVERSITE_DE_NANTES = '026403447';
+const NANTES_U_SPLIT_YEAR = 2022;
 
 export type AbesAction = 'AJOUT' | 'MAJ_DATES' | 'CONFLIT' | 'OK' | '';
 
@@ -104,16 +104,16 @@ export interface AbesDiff {
 }
 
 // ── Normalizations ────────────────────────────────────────────────────────────
-export const normText = (s: any): string =>
+const normText = (s: any): string =>
   String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-export const normOrcid = (s: any): string => {
+const normOrcid = (s: any): string => {
   const m = String(s ?? '').toUpperCase().match(/\d{4}-\d{4}-\d{4}-\d{3}[\dX]/);
   return m ? m[0] : '';
 };
-export const normScopus = (s: any): string => String(s ?? '').replace(/\D/g, '');
-export const normIdhal = (s: any): string => String(s ?? '').trim().toLowerCase().replace(/^https?:\/\/[^/]+\/(?:cv\/)?/, '').replace(/\/$/, '');
-export const ppnDigits = (s: any): string => String(s ?? '').trim().split('/').pop()!.toUpperCase();
+const normScopus = (s: any): string => String(s ?? '').replace(/\D/g, '');
+const normIdhal = (s: any): string => String(s ?? '').trim().toLowerCase().replace(/^https?:\/\/[^/]+\/(?:cv\/)?/, '').replace(/\/$/, '');
+const ppnDigits = (s: any): string => String(s ?? '').trim().split('/').pop()!.toUpperCase();
 
 const yearOf = (iso?: string): string => (iso && /^\d{4}/.test(iso) ? iso.slice(0, 4) : '');
 /** Whole period elapsed — fuzzy dates (`2023`, `2023-06`) count as past once their last day is (lib/dates.ts). */
@@ -126,16 +126,16 @@ const shareToken = (a: string, b: string): boolean => {
 };
 
 /** Start / end years read from a 510 `$0` (« 2022-.... », « 1996-2021 », « 2024 », « 2025 -.... »). */
-export const parseDates510 = (s: string): { start: string; end: string; open: boolean } => {
+const parseDates510 = (s: string): { start: string; end: string; open: boolean } => {
   const years = String(s || '').match(/\d{4}/g) || [];
   const open = /\.{3,}/.test(s || '') || (years.length === 1 && !/-\s*\d{4}/.test(s || ''));
   return { start: years[0] || '', end: years[1] || '', open: open || years.length < 2 };
 };
-export const formatDates510 = (startYear: string, endYear: string): string =>
+const formatDates510 = (startYear: string, endYear: string): string =>
   `${startYear || '....'}-${endYear || '....'}`;
 
 // ── Note 340 ──────────────────────────────────────────────────────────────────
-export const gradeLabel = (code?: string): string => {
+const gradeLabel = (code?: string): string => {
   const c = String(code || '').trim();
   if (!c) return '';
   return findGradeByCode(c)?.libelle || c;
@@ -145,7 +145,7 @@ export const gradeLabel = (code?: string): string => {
  * « <Grade> au <Labo> (<Employeur>), depuis <AAAA> (en <année d'extraction>) ».
  * The lab is mandatory (a note without a structure brings nothing to the ABES).
  */
-export const buildNote340 = (p: {
+const buildNote340 = (p: {
   grade?: string; laboName: string; employerLabel?: string; startYear?: string; extractionYear: string;
 }): string => {
   if (!p.laboName) return '';
@@ -157,7 +157,7 @@ export const buildNote340 = (p: {
 };
 
 /** Does an existing 340 already cite the lab (acronym or full name, accents stripped)? */
-export const noteMentionsLab = (notes: string[], acronym: string, laboName: string): boolean => {
+const noteMentionsLab = (notes: string[], acronym: string, laboName: string): boolean => {
   const acr = normText(acronym), name = normText(laboName);
   return notes.some((n) => {
     const t = ` ${normText(n)} `;
@@ -166,7 +166,7 @@ export const noteMentionsLab = (notes: string[], acronym: string, laboName: stri
 };
 
 // ── Expected affiliations ─────────────────────────────────────────────────────
-export interface ExpectedAffiliation {
+interface ExpectedAffiliation {
   kind: 'etab' | 'etab2' | 'labo' | 'labo2';
   ppn: string;            // empty when the structure has no known PPN
   name: string;
@@ -185,7 +185,7 @@ export interface ExpectedAffiliation {
  * Université covering the start of the employment (missing, or starting in 2022 while the
  * employment is earlier) — never when the 510 Nantes Université already covers the period.
  */
-export const expectedEmployers = (
+const expectedEmployers = (
   r: Researcher, etab: Institution | undefined, today: string,
   noticeAffs: NonNullable<IdrefCandidate['affiliations']> = [],
 ): ExpectedAffiliation[] => {
@@ -217,7 +217,7 @@ export const expectedEmployers = (
 };
 
 /** Labs: PRINCIPAL + at most one SECONDAIRE; HISTORIQUE ignored unless dated (closed). */
-export const expectedLabs = (
+const expectedLabs = (
   r: Researcher, structureByAcronym: Map<string, Structure>, today: string,
 ): ExpectedAffiliation[] => {
   const affs = (r.affiliations || []).filter((a: Affiliation) => a && a.structureName);
@@ -241,7 +241,7 @@ export const expectedLabs = (
 };
 
 /** Compares an expected affiliation with the 510s of the authority record. */
-export const compareAffiliation = (
+const compareAffiliation = (
   exp: ExpectedAffiliation, notice: NonNullable<IdrefCandidate['affiliations']>,
 ): { action: AbesAction; dates: string; comment: string } => {
   const dates = formatDates510(exp.startYear, exp.endYear);
@@ -264,7 +264,7 @@ export const compareAffiliation = (
 };
 
 // ── Fingerprint ───────────────────────────────────────────────────────────────
-export const rowHash = (row: AbesRow): string => {
+const rowHash = (row: AbesRow): string => {
   // `nom_idref` always included: an update of the name form (soft conflict, see `entry.nameMismatch`)
   // changes no `_action` but changes the comment — without this, it would never be resent.
   const parts: string[] = [`nom_idref=${row.nom_idref || ''}`];
@@ -289,7 +289,7 @@ export const rowHash = (row: AbesRow): string => {
 const inList = (v: string, list?: string[]): boolean =>
   !list || list.length === 0 || list.map((x) => x.trim().toUpperCase()).includes(String(v || '').trim().toUpperCase());
 
-export const inScope = (r: Researcher, o: AbesExportOptions): boolean => {
+const inScope = (r: Researcher, o: AbesExportOptions): boolean => {
   if (!inList(r.employment?.employer || '', o.employers)) return false;
   if (o.labos && o.labos.length && !(r.affiliations || []).some((a) => inList(a.structureName, o.labos))) return false;
   if (!inList(r.status, o.statuses)) return false;
@@ -464,13 +464,3 @@ export const abesTaskTypes = (row: AbesRow): string[] => {
   return out;
 };
 
-export const ABES_DEFAULT_OPTIONS = (extractionDate: string): AbesExportOptions => ({
-  extractionDate,
-  employers: ['NANTES UNIVERSITE'],
-  statuses: ['INTERNE'],
-  validatedOnly: true,
-  excludeEmploymentTypes: ['DOCTORANT', 'VACATAIRE'],
-  includeSansNotice: false,
-  proposeNotes: true,
-  includeAlreadySent: false,
-});

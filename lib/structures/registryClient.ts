@@ -6,15 +6,15 @@
  * key or mailto of the deployment goes on its calls (OPENALEX_API_KEY / OPENALEX_MAILTO).
  */
 import {
-  HAL_SEARCH_API, IDREF_SOLR, OPENALEX_API, OPENALEX_FIELDS, RNSR_API, ROR_API, WIKIDATA_API, halCollectionFacet, halDocCount, halStructureQuery,
+  HAL_SEARCH_API, OPENALEX_API, OPENALEX_FIELDS, RNSR_API, ROR_API, WIKIDATA_API, halCollectionFacet, halDocCount, halStructureQuery,
   halStructureRecord, idrefPpnQuery, idrefRecord, idrefSearchQuery, odsLiteral, openalexRecord, rnsrRecord, rorRecord, solrPhrase, wikidataRecord,
   type RegistryRecord,
 } from './registries';
 import type { StructureIdType } from './identifiers';
 
-export type FetchLike = (url: string, init?: { headers?: Record<string, string>; signal?: AbortSignal }) => Promise<{ ok: boolean; status: number; json(): Promise<any>; text(): Promise<string> }>;
+type FetchLike = (url: string, init?: { headers?: Record<string, string>; signal?: AbortSignal }) => Promise<{ ok: boolean; status: number; json(): Promise<any>; text(): Promise<string> }>;
 
-export interface RegistrySearch {
+interface RegistrySearch {
   /** Official name. */
   name: string;
   acronym?: string | null;
@@ -46,7 +46,7 @@ export interface Registry {
   wikidata: RegistryLookup & { byLink(type: StructureIdType, value: string): Promise<RegistryRecord[]> };
 }
 
-export interface RegistryClientOptions {
+interface RegistryClientOptions {
   fetch?: FetchLike;
   openalexApiKey?: string | null;
   openalexMailto?: string | null;

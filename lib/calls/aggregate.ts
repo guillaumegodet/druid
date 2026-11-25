@@ -65,7 +65,7 @@ export interface CallWithMatches extends Call {
   nextDeadline: string | null;
 }
 
-export interface ResearcherMatches {
+interface ResearcherMatches {
   uid: string;
   personName: string;
   matches: (CallMatch & { call: Call })[];
@@ -74,7 +74,7 @@ export interface ResearcherMatches {
 const OVERALL_RANK: Record<MatchOverall, number> = { strong: 0, plausible: 1, weak: 2, none: 3 };
 
 /** Strongest first, then by score. */
-export const compareMatches = (a: CallMatch, b: CallMatch): number =>
+const compareMatches = (a: CallMatch, b: CallMatch): number =>
   OVERALL_RANK[a.overall] - OVERALL_RANK[b.overall] || b.score - a.score || a.personName.localeCompare(b.personName);
 
 /** The match once `verdict` is the opinion of the current user (their previous opinion, if any, withdrawn). */
@@ -92,7 +92,7 @@ export const nextDeadlineOf = (deadlines: string[], today: string): string | nul
 export const isOpenAt = (call: { deadlines: string[] }, today: string): boolean =>
   call.deadlines.length === 0 || call.deadlines.some((d) => d >= today);
 
-export interface CallFilters {
+interface CallFilters {
   /** Directory uids of the researchers shown; null or undefined = every match. */
   uids?: Set<string> | null;
   today: string;

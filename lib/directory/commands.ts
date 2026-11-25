@@ -83,7 +83,7 @@ const STRUCTURES = 'Structures';
 const INSTITUTIONS = 'Etablissements';
 const isRowId = (id: unknown): id is number => Number.isInteger(id) && (id as number) > 0;
 
-export interface GristDirectoryCommandsOptions {
+interface GristDirectoryCommandsOptions {
   grist: GristClient;
   /** Its cached reads are dropped after every write. */
   repository: DirectoryRepository;

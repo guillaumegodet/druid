@@ -115,7 +115,6 @@ export const GRADE_TYPOLOGY = [
   },
 ] as const;
 
-export type GradeCode = typeof GRADE_TYPOLOGY[number]['sous_categories'][number]['items'][number]['code'];
 
 export const findGradeByCode = (code: string) => {
   for (const cat of GRADE_TYPOLOGY) {
@@ -128,18 +127,10 @@ export const findGradeByCode = (code: string) => {
   return null;
 };
 
-export const getCategoryByCode = (code: string): string | null => {
-  for (const cat of GRADE_TYPOLOGY) {
-    for (const scat of cat.sous_categories) {
-      if (scat.items.some(item => item.code === code)) return cat.categorie;
-    }
-  }
-  return null;
-};
 
 // Mapping BCN N_CORPS code (value after stripping the {NCORPS} prefix) → Druid grade code.
 // null = known code that cannot be mapped in the typology (e.g. VN, VF, CDI).
-export const NCORPS_TO_GRADE: Record<string, string | null> = {
+const NCORPS_TO_GRADE: Record<string, string | null> = {
   // University professors (PU)
   '300': 'PR',
   '311': 'PAST',  // associate PU, full time

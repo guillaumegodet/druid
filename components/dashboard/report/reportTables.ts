@@ -11,13 +11,13 @@ import type { PairsResponse } from '../pairsApi';
 import { pairAuthorLabel, pairTrendLabel } from '../pairsKpis';
 import type { DashboardDataset } from '../types';
 
-export interface TableColumn {
+interface TableColumn {
   label: MessageDescriptor;
   /** Relative width in the PDF (sum per table normalized). */
   width: number;
 }
 
-export interface TableRows {
+interface TableRows {
   columns: TableColumn[];
   rows: string[][];
   /** Rows left out by the limit. */
@@ -26,7 +26,7 @@ export interface TableRows {
   links?: (string | null)[];
 }
 
-export interface ReportTable {
+interface ReportTable {
   label: MessageDescriptor;
   /**
    * `dataset` = restricted corpus of the block (null for a table fed by a remote source);

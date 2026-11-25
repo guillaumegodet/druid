@@ -101,7 +101,7 @@ export async function* portalListingObjects(chunks: AsyncIterable<string | Uint8
   }
 }
 
-export interface ProgrammeMatch {
+interface ProgrammeMatch {
   programmeId: string;
   /** Partition of the programme (cluster, scheme, mission…), '' when the programme has none. */
   subset: string;

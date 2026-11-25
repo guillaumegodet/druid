@@ -13,7 +13,7 @@ import { DashboardPublication } from './types';
 /** Goals kept as their own series in the yearly evolution; the rest is folded into « Other SDGs ». */
 export const SDG_TOP_SERIES = 6;
 
-export interface SdgOptions {
+interface SdgOptions {
   /** Goals left out of every count (decision D5: « excluding SDG 3 » toggle). */
   exclude?: number[];
 }
@@ -65,7 +65,7 @@ const OA_OPEN = new Set(['gold', 'diamond', 'hybrid', 'green', 'bronze']);
 const pct1 = (n: number, d: number): number => (d ? Math.round((1000 * n) / d) / 10 : 0);
 const pct0 = (n: number, d: number): number | null => (d ? Math.round((100 * n) / d) : null);
 
-export const otherSdgsLabel = (): string => i18n._(msg`Other SDGs`);
+const otherSdgsLabel = (): string => i18n._(msg`Other SDGs`);
 
 export function aggregateSdgs(
   pubs: DashboardPublication[],

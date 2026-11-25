@@ -1,17 +1,15 @@
 import { t } from '@lingui/core/macro';
-import { Researcher, ResearcherStatus, Structure, StructureLevel } from '../types';
+import { Researcher, Structure, StructureLevel } from '../types';
 import { purgeStoredDirectory } from './directoryStorage';
-import { getGradeFromNcorps } from './gradeTypology';
 
 import { ValidationInfo } from './validation';
 
 // --- LDAP sync: diff structures (Phase 1, read only) ---
 
-import { PARKING_LABOS, LdapDuplicateKind } from './mergeProposal';
-import { statusFromEtat } from './ldapPerson';
+import { LdapDuplicateKind } from './mergeProposal';
 
 import { DirectoryApi } from './directoryApi';
-import { computeDuplicateGroups, DuplicateGroup, DuplicatesDiff } from './directory/duplicates';
+import { DuplicatesDiff } from './directory/duplicates';
 import type { LdapDiff, LdapCandidatesDiff, LdapResolved, StructuresLdapDiff } from './directory/ldap';
 // Alignments (types, pure computations, unified view) moved to lib/directory/alignments.ts (migration plan, lot 2 e),
 // re-exported for the existing importers.
@@ -22,30 +20,27 @@ import { localizeAlignTokens } from './directory/alignTexts';
 import { i18nAlignTexts } from './alignTextsI18n';
 // LDAP types moved to lib/directory/ldap.ts (migration plan, lot 2 d), re-exported for the existing importers.
 export type {
-  LdapFieldChange, LdapDiff, StructuresLdapDiff, LdapCandidateMatch, LdapCandidate, LdapAmbiguous, LdapResolved, LdapCandidatesDiff,
+  LdapDiff, StructuresLdapDiff, LdapResolved, LdapCandidatesDiff,
 } from './directory/ldap';
 // Moved to lib/directory/duplicates.ts (migration plan, lot 2 c), re-exported for the existing importers.
-export { computeDuplicateGroups };
-export type { DuplicateGroup, DuplicatesDiff };
-import { RATTACHEMENT_COL, RattachementRole, DUPLICATE_DECISION_COL, Institution, MergeLogEntry, fromGristDate } from './directory/gristMapping';
+export type { DuplicatesDiff };
+import { Institution, MergeLogEntry, fromGristDate } from './directory/gristMapping';
 // Moved to lib/directory/gristMapping.ts (migration plan, lot 1), re-exported for the existing importers.
-export { RATTACHEMENT_COL, groupQualifiedRows } from './directory/gristMapping';
-export type { RattachementRole, Institution, MergeLogEntry } from './directory/gristMapping';
+export { groupQualifiedRows } from './directory/gristMapping';
+export type { Institution, MergeLogEntry } from './directory/gristMapping';
 import { AnnuaireColumnMeta, planAffiliationRows } from './directory/annuaireWrite';
 import { makeLocalId } from './directory/structureWrite';
 // Moved to lib/directory/annuaireWrite.ts / structureWrite.ts (migration plan, lots 2 a-b), re-exported for the
 // existing importers.
 export { resolveNewStructureLocalId } from './directory/structureWrite';
 export { planAffiliationRows };
-export type { AnnuaireColumnMeta, AffiliationRowPlan } from './directory/annuaireWrite';
-export { PARKING_LABOS };
+export type { AnnuaireColumnMeta } from './directory/annuaireWrite';
 export type { LdapDuplicateKind };
 
 // Every read and write of the directory goes through the domain API (lib/directoryApi.ts → /api/v1, druid-internal
 // docs/plan-migration-postgresql.md, lot 2): this module no longer talks to Grist.
 
 /** Qualification columns for multi-affiliations (duplicate merge plan, lot 1): lib/directory/gristMapping.ts. */
-export { DUPLICATE_DECISION_COL };
 
 /** Cache of the Annuaire columns (rarely changes). */
 let _annuaireColumnsCache: AnnuaireColumnMeta[] | null = null;

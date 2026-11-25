@@ -9,13 +9,13 @@ export interface YearRange {
 }
 
 export const CONFERENCE_LABEL = 'Communication de conférence';
-export const JOURNAL_ARTICLE_LABEL = 'Article de revue';
+const JOURNAL_ARTICLE_LABEL = 'Article de revue';
 
 // OpenAlex only provides the USD-normalized value (value_usd), sometimes the journal's
 // native currency. Everything is brought back to euros: exact native amount if already in EUR,
 // otherwise conversion of the normalized USD at the average rate below. No real-time exchange
 // rate (order-of-magnitude dashboard) — adjust this constant if the rate drifts.
-export const USD_TO_EUR = 0.92;
+const USD_TO_EUR = 0.92;
 
 /**
  * OpenAlex estimate brought back to €: paid if known, else list price; native EUR
@@ -65,7 +65,7 @@ export interface CountItem {
   count: number;
 }
 
-export interface OverviewAggregates {
+interface OverviewAggregates {
   kpis: OverviewKpis;
   byYear: { year: number; count: number }[];
   byLanguage: CountItem[];
@@ -74,7 +74,7 @@ export interface OverviewAggregates {
 }
 
 /** Stable display order of OA statuses (from most open to closed). */
-export const OA_ORDER = ['diamond', 'gold', 'green', 'hybrid', 'bronze', 'closed', 'unknown'];
+const OA_ORDER = ['diamond', 'gold', 'green', 'hybrid', 'bronze', 'closed', 'unknown'];
 
 export function getYearBounds(pubs: DashboardPublication[]): { min: number; max: number } {
   const years = pubs.map((p) => p.year).filter((y): y is number => typeof y === 'number');

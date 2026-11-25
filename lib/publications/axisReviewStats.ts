@@ -25,7 +25,7 @@ export const reviewOf = (index: ReviewIndex, p: ReviewablePublication): AxisRevi
 export const autoAxisOf = (p: ReviewablePublication, unclassified: string): string =>
   (p.chosenAxe ?? '').split('|')[0].trim() || unclassified;
 
-export interface ReviewProgress {
+interface ReviewProgress {
   total: number;
   reviewed: number;
   byDecision: Record<AxisReviewDecision, number>;

@@ -22,7 +22,7 @@ import { oaLabel } from './labels';
 import { NewsletterPanel } from './NewsletterPanel';
 import { MediaMentionsPanel } from './MediaMentionsPanel';
 import { numberLocale } from '../../lib/i18n';
-import { Trans, Plural, useLingui } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { apiErrorText } from '../../lib/apiErrors';

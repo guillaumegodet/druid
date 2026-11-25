@@ -40,7 +40,7 @@ export type NewsletterEditableField = typeof NEWSLETTER_EDITABLE_FIELDS[number];
 /** Thrown when the instance may not read the document holding the requested data. */
 export class DocumentNotAllowedError extends Error {}
 
-export interface GristPublicationsStoreOptions {
+interface GristPublicationsStoreOptions {
   /** Main document of the instance (Newsletter table). */
   main: GristClient;
   /** Client of another document, null when the instance may not use it (Nantes: GRIST_EXTRA_DOC_IDS). */

@@ -18,7 +18,6 @@ import { normTitle } from '../../lib/normalize';
 export { AXES_GRIST };
 
 // Title normalization for matching (same rule as the study), shared with the API since the axis reviews.
-export { normTitle };
 
 export interface AxisCorrection {
   gristId: number;
@@ -35,7 +34,7 @@ export interface AxisCorrectionIndex {
 export const EMPTY_AXIS_INDEX: AxisCorrectionIndex = { byDoi: new Map(), byTitle: new Map() };
 
 /** Builds the index from the corrections (DOI in lowercase, normalized title). */
-export function indexAxisCorrections(rows: AxisCorrectionRow[]): AxisCorrectionIndex {
+function indexAxisCorrections(rows: AxisCorrectionRow[]): AxisCorrectionIndex {
   const byDoi = new Map<string, AxisCorrection>();
   const byTitle = new Map<string, AxisCorrection>();
   for (const row of rows) {

@@ -37,7 +37,7 @@ export interface AlignTexts {
   nameMismatchProfile(displayName: string, cand: { fullName?: string; forms?: string[] }): string;
 }
 
-export type AlignTextKey = keyof AlignTexts;
+type AlignTextKey = keyof AlignTexts;
 
 // Invisible delimiters (Unicode « function application » / « invisible times »), never found in directory data.
 const OPEN = '⁡';

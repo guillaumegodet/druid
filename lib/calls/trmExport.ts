@@ -22,7 +22,7 @@ export interface CallForMatching {
 }
 
 /** A topic of the file, field names of crisalid-agents. */
-export interface TopicsFileTopic {
+interface TopicsFileTopic {
   topic_id: string;
   title: string;
   /** Subset of the call (cluster, scheme, mission…); the subset of the file when the call has none. */
@@ -37,7 +37,7 @@ export interface TopicsFileTopic {
   scope: string;
 }
 
-export interface TopicsFile {
+interface TopicsFile {
   format: typeof TOPICS_FILE_FORMAT;
   programme: string;
   /** Name of the programme, put in the prompts of the batch instead of « Horizon Europe work programme ». */
@@ -49,7 +49,7 @@ export interface TopicsFile {
   topics: TopicsFileTopic[];
 }
 
-export interface TopicsFileOptions {
+interface TopicsFileOptions {
   /** Subset exported (one file per subset, a run per subset); undefined = every call of the programme. */
   subset?: string;
   exportedAt?: string;

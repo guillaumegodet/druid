@@ -40,7 +40,7 @@ export const readSourceRanks = async (db: Transaction<DB> | any): Promise<Map<st
 };
 
 /** Values of one field of one person, all sources. */
-export const readFieldValues = async (trx: Transaction<DB>, personId: string, field: string): Promise<FieldValue[]> =>
+const readFieldValues = async (trx: Transaction<DB>, personId: string, field: string): Promise<FieldValue[]> =>
   (await trx.selectFrom('person_field_value').selectAll().where('person_id', '=', personId).where('field', '=', field).execute())
     .map(toFieldValue);
 
@@ -77,7 +77,7 @@ export const reprojectField = async (trx: Transaction<DB>, personId: string, fie
   return resolution;
 };
 
-export interface ObserveArgs {
+interface ObserveArgs {
   personId: string;
   field: string;
   source: string;
@@ -144,7 +144,7 @@ export const listFieldConflicts = async (trx: Transaction<DB>, field: string): P
 // ── Merge of two persons (duplicates) ──────────────────────────────────────────────────────────────────────────────────
 
 /** Source of the values a merged-away record carried as manual corrections (case 20 of the plan). */
-export const MERGED_RECORD_SOURCE = 'merged_record';
+const MERGED_RECORD_SOURCE = 'merged_record';
 
 /**
  * Before a person is merged into another and deleted (duplicates), its values by source move to the kept person
@@ -183,13 +183,13 @@ export const MERGED_RECORD_FIELDS: Record<string, 'birth_date' | 'corps_grade'> 
 };
 
 /** A value reported by a source in the same operation (an import line, the LDAP entry of an attached record). */
-export interface FieldObservation {
+interface FieldObservation {
   source: string;
   value: unknown;
   importBatchId?: string | null;
 }
 
-export interface MergedWrite {
+interface MergedWrite {
   /** Value the record must end with: typed in the form, kept in an import review, chosen in an arbitration. */
   value: unknown;
   /** The source that reported a value during the same operation, recorded as its own whatever the outcome. */

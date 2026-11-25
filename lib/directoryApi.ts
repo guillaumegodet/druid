@@ -19,7 +19,7 @@ import type { PeopleImportInput, PeopleImportPlan, PeopleImportResult, PeopleImp
 import type { StructureIdType, StructureIdentifier } from './structures/identifiers';
 import type { StructureAlignOverview } from './structures/alignView';
 
-export const DIRECTORY_API_BASE = '/api/v1';
+const DIRECTORY_API_BASE = '/api/v1';
 
 /** `GET /api/v1/<path>` → its `items` (envelope `{ items, updatedAt? }`). Throws on an HTTP error. */
 async function fetchItems<T>(path: string): Promise<T[]> {

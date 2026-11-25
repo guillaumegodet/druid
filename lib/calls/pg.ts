@@ -11,9 +11,8 @@ import type { CallForMatching } from './trmExport';
 
 type Queryable = Kysely<DB> | Transaction<DB>;
 
-export const FEEDBACK_VERDICTS: readonly FeedbackVerdict[] = ['relevant', 'not_relevant', 'already_applying'];
 
-export interface CallsRunSummary {
+interface CallsRunSummary {
   runId: string;
   programmeId: string;
   subset: string;
@@ -28,13 +27,13 @@ export interface CallsRunSummary {
   importedAt: string;
 }
 
-export interface CallsOverview {
+interface CallsOverview {
   runs: CallsRunSummary[];
   calls: number;
   matches: number;
 }
 
-export interface ImportReport {
+interface ImportReport {
   runId: string;
   programmeId: string;
   subset: string;
@@ -46,7 +45,7 @@ export interface ImportReport {
   mergedIntoRunId: string | null;
 }
 
-export interface ImportOptions {
+interface ImportOptions {
   /** The report completes the run already imported for its programme and subset (topics replayed after a failure of
    * the batch): its topics and their matches replace the same topics of that run, the other topics stay. Without a
    * previous run the report is imported as a run of its own. */
@@ -55,7 +54,7 @@ export interface ImportOptions {
   perimeter?: string;
 }
 
-export interface MatchesQuery {
+interface MatchesQuery {
   /** Directory uids the caller may see (lab scope); undefined = every match. */
   uids?: string[];
   callId?: string;
@@ -431,4 +430,3 @@ export const createCallsStore = (db: Kysely<DB>) => {
   };
 };
 
-export type CallsStore = ReturnType<typeof createCallsStore>;

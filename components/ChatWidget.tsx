@@ -23,7 +23,7 @@ interface ChatMessage {
   content: string;
 }
 
-export type ChatMode = 'data' | 'help' | 'calls';
+type ChatMode = 'data' | 'help' | 'calls';
 
 const STORAGE_KEY = 'druid-chat-messages';
 /** The data mode keeps the historical key, so ongoing conversations survive the update. */

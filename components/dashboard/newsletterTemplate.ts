@@ -4,7 +4,7 @@
 // The HTML is self-contained (inline styles): ready to paste into a mail client
 // or to send as is.
 
-export interface NewsletterArticle {
+interface NewsletterArticle {
   accroche: string;
   resume: string;
   titre: string;

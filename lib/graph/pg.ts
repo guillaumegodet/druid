@@ -72,7 +72,7 @@ const correctionActor = async (trx: Transaction<DB>, id: GraphIdentifier): Promi
   return row?.actor ?? null;
 };
 
-export interface RecordedPlan {
+interface RecordedPlan {
   queued: number;
   blocked: number;
   /** The removals queued (pending) and blocked by the pass: person and type, for the logs. */
@@ -85,7 +85,7 @@ export interface RecordedPlan {
 }
 
 /** Records a plan in the outbox (inside the caller's transaction). Refuses a pass with too many removals to send. */
-export const recordGraphPlan = async (
+const recordGraphPlan = async (
   trx: Transaction<DB>, plan: GraphActionPlan, { force = false, limit = MAX_REMOVALS_PER_PASS } = {},
 ): Promise<RecordedPlan> => {
   const toSend = plan.removals.filter((r) => r.status === 'pending').length + plan.unblocked.length;
@@ -219,7 +219,7 @@ export const recordPeopleCsvExport = (db: Queryable, uids: string[], identifiers
 /** How many sent removals the overview lists, most recent first. */
 const RECENT_SENT = 30;
 
-export interface GraphActionsOverview {
+interface GraphActionsOverview {
   /** Actions of the outbox by status (all time). */
   counts: Record<'pending' | 'sent' | 'blocked' | 'failed' | 'cancelled', number>;
   /** Removals the next pass would queue (directory corrected since the last pass). */

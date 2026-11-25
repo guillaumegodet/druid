@@ -1,4 +1,4 @@
-export const UAI_MAPPING: Record<string, string> = {
+const UAI_MAPPING: Record<string, string> = {
   "n° UAI": "Institution ou site",
   "0752744A": "Académie des sciences d'outre-mer",
   "MANQUANT": "Académie des technologies",

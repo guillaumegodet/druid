@@ -33,7 +33,7 @@ export interface PgLink { person_id: string; kind: string; url: string }
 const has = (o: Record<string, any>, k: string) => Object.prototype.hasOwnProperty.call(o, k);
 
 /** Identifiers and links of one person, as the record shows them. */
-export interface PersonExtras {
+interface PersonExtras {
   identifiers: PgIdentifier[];
   scopusAbsent: boolean;
   links: PgLink[];

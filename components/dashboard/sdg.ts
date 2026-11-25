@@ -7,7 +7,7 @@ import { i18n, type MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { DashboardPublication } from './types';
 
-export interface SdgDef {
+interface SdgDef {
   id: number;
   /** UN title of the goal. */
   title: MessageDescriptor;
@@ -40,7 +40,6 @@ const BY_ID = new Map(SDGS.map((g) => [g.id, g]));
 /** Colour of the series that gathers the goals beyond the top N (same gray as « Autre » elsewhere). */
 export const SDG_OTHER_COLOR = '#8c8677';
 
-export const sdgDef = (id: number): SdgDef | undefined => BY_ID.get(id);
 export const sdgColor = (id: number): string => BY_ID.get(id)?.color ?? SDG_OTHER_COLOR;
 export const sdgTitle = (id: number): string => {
   const g = BY_ID.get(id);

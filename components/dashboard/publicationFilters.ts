@@ -273,7 +273,7 @@ const FLAG_LABELS: Partial<Record<keyof PubFilters, MessageDescriptor>> = {
   funded: msg`Acknowledges a funder`,
 };
 
-export interface FilterChip {
+interface FilterChip {
   key: keyof PubFilters;
   label: string;
 }
@@ -354,7 +354,7 @@ export function countActiveFilters(f: PubFilters): number {
 }
 
 /** Distinct values available for each select of the filter panel. */
-export interface FilterOptions {
+interface FilterOptions {
   years: number[];
   pubTypes: string[];
   oaStatuses: string[];

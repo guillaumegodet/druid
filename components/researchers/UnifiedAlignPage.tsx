@@ -10,7 +10,7 @@ import {
 } from '../../lib/gristService';
 import type {
   AlignCandidate, AlignGroup, AlignMode, IdrefCandidate, PersonAlignCell, PersonAlignRow,
-  PersonAlignUpdate, ReviewMixedItem, UnifiedAlignDiff, UnifiedAlignSource, UnifiedArbitrateDecision,
+  ReviewMixedItem, UnifiedAlignDiff, UnifiedAlignSource, UnifiedArbitrateDecision,
 } from '../../lib/gristService';
 import type { UnifiedRunProgress } from '../../lib/unifiedAlignRuns';
 import { AlignLaunchModal, type AlignLaunchChoice } from './AlignLaunchModal';

@@ -120,8 +120,8 @@ export interface DemoExtras {
 /** Programmes the demo calls belong to (the built-in ones of lib/calls/programmes.ts, plus a regional one added by hand). */
 const ERC = PORTAL_PROGRAMMES_BUILT_IN.find((p) => p.programmeId === 'erc')!;
 const MSCA = PORTAL_PROGRAMMES_BUILT_IN.find((p) => p.programmeId === 'msca')!;
-export const REGION_FUNDER: Funder = { funderId: 'manual-region-udemo', name: 'Région de Démonstration', country: 'FR', category: 'Régional', url: 'https://example.org/region-demo' };
-export const REGION_PROGRAMME: Programme = {
+const REGION_FUNDER: Funder = { funderId: 'manual-region-udemo', name: 'Région de Démonstration', country: 'FR', category: 'Régional', url: 'https://example.org/region-demo' };
+const REGION_PROGRAMME: Programme = {
   programmeId: 'manual-region-udemo-emergence', funderId: REGION_FUNDER.funderId, name: 'Appel Émergence (Région de Démonstration)',
   kind: 'thematic', url: 'https://example.org/region-demo/emergence', source: 'manual', refresh: 'manual', subsetLabel: '', active: true,
 };
@@ -160,7 +160,7 @@ const THESIS_TITLES = [
 ];
 
 /** Doctoral theses: one defended thesis per permanent researcher or post-doc, one in progress per PhD student. */
-export const demoTheses = (rows: DemoResearcherRow[]): DemoThesis[] => {
+const demoTheses = (rows: DemoResearcherRow[]): DemoThesis[] => {
   const out: DemoThesis[] = [];
   for (const r of rows) {
     const uid = r.uid_dyna;
@@ -311,7 +311,7 @@ const statusOf = (opening: string, deadlines: string[], today: string): CallStat
   opening > today ? 'forthcoming' : deadlines.some((d) => d >= today) ? 'open' : 'closed';
 
 /** The calls, dated relative to `today` ('YYYY-MM-DD'). */
-export const demoCalls = (today: string): DemoCall[] => CALL_SPECS.map((c) => {
+const demoCalls = (today: string): DemoCall[] => CALL_SPECS.map((c) => {
   const openingDate = addDays(today, c.opening);
   const deadlines = c.deadlines.map((d) => addDays(today, d));
   return {
@@ -351,7 +351,7 @@ const publicationsOf = (network: DemoNetwork | null, uid: string) => {
  * the researchers of the targeted labs retained for each call: permanent researchers and post-docs present at `today`,
  * the most senior first, strength decreasing with the rank. MSCA retains post-docs and PhD students only.
  */
-export const demoMatches = (calls: DemoCall[], rows: DemoResearcherRow[], network: DemoNetwork | null, today: string): { runs: DemoRun[]; matches: DemoMatch[] } => {
+const demoMatches = (calls: DemoCall[], rows: DemoResearcherRow[], network: DemoNetwork | null, today: string): { runs: DemoRun[]; matches: DemoMatch[] } => {
   const present = rows.filter((r) => !r.employment_end_date || r.employment_end_date >= today);
   const runs = new Map<string, DemoRun>();
   const matches: DemoMatch[] = [];
@@ -399,7 +399,7 @@ export const demoMatches = (calls: DemoCall[], rows: DemoResearcherRow[], networ
 // ── Eligibility ────────────────────────────────────────────────────────────────────────────────────────────────────
 
 /** Rules read from the text of the calls (lib/calls/eligibility.ts), and the researchers they make eligible or to check. */
-export const demoEligibility = (calls: DemoCall[], rows: DemoResearcherRow[], theses: DemoThesis[], today: string): DemoEligibility[] => {
+const demoEligibility = (calls: DemoCall[], rows: DemoResearcherRow[], theses: DemoThesis[], today: string): DemoEligibility[] => {
   const phdOf = new Map(theses.filter((t) => t.status === 'defended').map((t) => [t.uid, t.defendedOn]));
   const present = rows.filter((r) => !r.employment_end_date || r.employment_end_date >= today);
   return calls

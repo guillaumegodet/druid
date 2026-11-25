@@ -19,7 +19,7 @@ export type TaskEventAction =
   | 'creation' | 'prise_en_charge' | 'email_prepare' | 'en_attente' | 'fait' | 'abandon'
   | 'reouverture' | 'reassignation' | 'modification' | 'commentaire' | 'resolution_auto';
 
-export interface TaskTypeMeta {
+interface TaskTypeMeta {
   base: TaskBase;
   /** Default channel, editable at creation. */
   canal: TaskCanal;
@@ -116,7 +116,7 @@ export const EVENT_ACTION_LABELS: Record<TaskEventAction, MessageDescriptor> = {
 };
 
 export const TASK_STATUSES: TaskStatus[] = ['a_faire', 'en_cours', 'en_attente', 'fait', 'abandonnee', 'resolue_auto'];
-export const OPEN_STATUSES: TaskStatus[] = ['a_faire', 'en_cours', 'en_attente'];
+const OPEN_STATUSES: TaskStatus[] = ['a_faire', 'en_cours', 'en_attente'];
 export const isOpenStatus = (s: TaskStatus): boolean => OPEN_STATUSES.includes(s);
 
 /** Same table as tasks_schema.cjs TRANSITIONS. */
@@ -135,7 +135,7 @@ export const taskKey = (type: TaskType, uid: string): string => `${type}:${uid}`
 
 /** Task types of the `annuaire_ids_partages` rule whose records may be one person: the detail
  * offers the merge assistant. */
-export const MERGEABLE_TASK_TYPES: ReadonlySet<string> = new Set(['annuaire_doublon', 'annuaire_doublon_a_verifier']);
+const MERGEABLE_TASK_TYPES: ReadonlySet<string> = new Set(['annuaire_doublon', 'annuaire_doublon_a_verifier']);
 
 /** uid_dyna of the records of a « shared identifiers » task, read from its key
  * (`<type>:<uid>+<uid>[+<uid>…]`, scripts/sync_tasks.cjs); [] for any other task. */
@@ -148,7 +148,7 @@ export const sharedIdTaskUids = (task: Pick<Task, 'type' | 'cle'>): string[] => 
 };
 
 /** Separator of the key of an `annuaire_uid_ldap` task: `annuaire_uid_ldap:<current key>><LDAP uid>`. */
-export const UID_SWITCH_SEPARATOR = '>';
+const UID_SWITCH_SEPARATOR = '>';
 
 /** Current key (ext_ or student uid, or g<row> for a record without uid) and LDAP uid of an `annuaire_uid_ldap`
  * task, read from its key (scripts/sync_tasks.cjs); null for any other task. */
@@ -232,7 +232,7 @@ export type TaskPatchInput = Partial<Pick<Task, 'assignee' | 'priorite' | 'canal
 export const countOpenTasks = (tasks: Task[]): number => tasks.filter((x) => isOpenStatus(x.statut)).length;
 
 /** One exported ABES row, as sent to /api/tasks/abes-sent (lib/abesExport.ts abesTaskTypes). */
-export interface AbesSentItem { rowId: number; uid: string; types: string[] }
+interface AbesSentItem { rowId: number; uid: string; types: string[] }
 
 // ── API client ─────────────────────────────────────────────────────────────
 async function request<T>(url: string, init?: RequestInit): Promise<T> {

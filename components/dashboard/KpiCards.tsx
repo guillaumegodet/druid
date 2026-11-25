@@ -35,7 +35,7 @@ import { useLingui } from '@lingui/react';
 import { KPI_SETS, KpiItem, impactKpiItems, overviewKpiItems } from './kpiItems';
 import { DashboardDataset } from './types';
 
-export interface KpiCardData {
+interface KpiCardData {
   label: string;
   value: string;
   hint?: string;

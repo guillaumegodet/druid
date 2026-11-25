@@ -9,7 +9,7 @@
  */
 import { TASK_TYPES, isTaskType, type TaskType } from './tasks';
 
-export interface TaskEmailContext {
+interface TaskEmailContext {
   civility?: string;
   firstName: string;
   lastName: string;
@@ -23,7 +23,7 @@ export interface TaskEmailContext {
   senderName?: string;
 }
 
-export interface TaskEmail {
+interface TaskEmail {
   subject: string;
   body: string;
 }

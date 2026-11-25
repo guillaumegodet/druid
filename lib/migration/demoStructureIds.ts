@@ -46,7 +46,7 @@ export const ppnCheck = (digits8: string): string => {
   return r === 10 ? 'X' : String(r);
 };
 /** Fictitious PPN of a structure: 9 characters, WRONG check character (the people use the 99… range, structures 98…). */
-export const fakeStructurePpn = (n: number): string => {
+const fakeStructurePpn = (n: number): string => {
   const d8 = `98${String(n).padStart(6, '0')}`;
   const good = ppnCheck(d8);
   const bad = good === 'X' ? '0' : String((Number(good) + 1) % 10);

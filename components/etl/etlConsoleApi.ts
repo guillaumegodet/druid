@@ -46,7 +46,7 @@ export type StructureConfigPayload = Partial<
   affiliation_controle?: { mots_cles_positifs: string | string[]; mots_cles_negatifs: string | string[] };
 };
 
-export interface FileInfo {
+interface FileInfo {
   exists: boolean;
   updatedAt: string | null;
   rows?: number;
@@ -133,7 +133,7 @@ export interface EffectifsSyncStats {
   departs_ignores?: number;
 }
 
-export interface EffectifsSyncResponse extends Partial<EffectifsResponse> {
+interface EffectifsSyncResponse extends Partial<EffectifsResponse> {
   written: boolean;
   count: number;
   labo: string;

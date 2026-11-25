@@ -5,7 +5,7 @@
  * `define`), shown in the top bar so that anyone can say which release they are using.
  */
 
-export interface BuildInfo {
+interface BuildInfo {
   version: string;
   /** Full commit hash, `-dirty` suffix for a build from uncommitted changes; '' when unknown. */
   sha: string;
@@ -15,7 +15,7 @@ export interface BuildInfo {
 
 declare const __DRUID_BUILD__: BuildInfo | undefined;
 
-export const BUILD: BuildInfo =
+const BUILD: BuildInfo =
   typeof __DRUID_BUILD__ !== 'undefined' && __DRUID_BUILD__
     ? __DRUID_BUILD__
     : { version: '0.0.0', sha: '', builtAt: '' };

@@ -43,7 +43,7 @@ export interface ValidationInfo {
 }
 
 /** Beyond this age, a validation is considered "stale" (to be reviewed). */
-export const VALIDATION_STALE_MONTHS = 18;
+const VALIDATION_STALE_MONTHS = 18;
 
 /**
  * Grist column names of the validation layer — **identical** in both Druids
@@ -51,7 +51,7 @@ export const VALIDATION_STALE_MONTHS = 18;
  * (see scripts/add_validation_columns.cjs). `validated` = Bool, `validation_date`
  * = Date, the others = Text.
  */
-export const GRIST_VALIDATION_COLUMNS = {
+const GRIST_VALIDATION_COLUMNS = {
   validated: 'validated',
   validatedStatus: 'validated_status',
   validationDate: 'validation_date',
@@ -83,7 +83,7 @@ export const isExternalEmployer = (employerName: any, employerUai?: any): boolea
 };
 
 /** Default presence set by a reliable list ("these people are present"). */
-export const DEFAULT_VALIDATED_STATUS = Presence.PRESENT;
+const DEFAULT_VALIDATED_STATUS = Presence.PRESENT;
 
 /**
  * Single definition of a "validated cell", shared by `validation.ts` and

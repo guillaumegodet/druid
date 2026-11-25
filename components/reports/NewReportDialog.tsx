@@ -31,7 +31,7 @@ import { PerimetreSelect, PeriodInput, selectCls, StructureSelect, useStructureS
 
 const ALL_YEARS = { start: -Infinity, end: Infinity };
 
-export interface NewReportInitial {
+interface NewReportInitial {
   templateId?: string;
   slug?: string;
   period?: ReportPeriod;

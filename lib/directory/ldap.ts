@@ -152,7 +152,7 @@ export const ldapGradeTarget = (e: any, f: Record<string, any>): string => {
 
 /** LDAP review options. `mergedFields`: record fields merged by source (PostgreSQL, lib/directory/pg/fieldValues.ts),
  * never proposed — the LDAP values go to person_field_value (ldapObserve.ts), their divergences to « Source conflicts ». */
-export interface LdapDiffOptions {
+interface LdapDiffOptions {
   mergedFields?: readonly string[];
 }
 

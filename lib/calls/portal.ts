@@ -5,7 +5,7 @@
 import { dateOfMs, datesOfMs, htmlToText, portalStatus, splitDescription } from './ftPortal';
 import type { CallStatus } from './programmes';
 
-export const PORTAL_TOPIC_JSON = 'https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/';
+const PORTAL_TOPIC_JSON = 'https://ec.europa.eu/info/funding-tenders/opportunities/data/topicDetails/';
 
 export interface PortalBudget {
   minContribution?: number;

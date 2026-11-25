@@ -54,7 +54,7 @@ export const CountrySection: React.FC<{
   range: YearRange;
   onOpenList?: (filters: PubFilters) => void;
 }> = ({ dataset, range, onOpenList }) => {
-  const { t, i18n } = useLingui();
+  const { i18n } = useLingui();
   const initial = useMemo(readUrlState, []);
   const options = useMemo(
     () => countryOptions(dataset.publications, range, dataset.countryNames),

@@ -18,7 +18,7 @@ function inRangePubs(pubs: DashboardPublication[], range: YearRange): DashboardP
 // ── Exclusive typology (same priority order as the Streamlit) ─────────────────
 
 /** [raw collab_type value, displayed label] — from broadest to most local. */
-export const COLLAB_EXCLUSIVE: [string, string][] = [
+const COLLAB_EXCLUSIVE: [string, string][] = [
   ['Internationales', 'Internationales'],
   ['Nationales (hors Nantes Université)', 'Nationales (hors NU)'],
   ["Avec d'autres labos de Nantes Université", 'Autre labo Nantes Université'],
@@ -27,7 +27,7 @@ export const COLLAB_EXCLUSIVE: [string, string][] = [
 ];
 
 /** Exclusive (broadest) category of a multi-labeled publication. */
-export function collabExclusiveCat(collabTypes: string[]): string {
+function collabExclusiveCat(collabTypes: string[]): string {
   const joined = collabTypes.join('|');
   for (const [raw, label] of COLLAB_EXCLUSIVE) {
     if (joined.includes(raw)) return label;
@@ -35,7 +35,7 @@ export function collabExclusiveCat(collabTypes: string[]): string {
   return COLLAB_EXCLUSIVE[COLLAB_EXCLUSIVE.length - 1][1];
 }
 
-export interface CollabTypologyAggregates {
+interface CollabTypologyAggregates {
   byCategory: CountItem[]; // COLLAB_EXCLUSIVE order
   byYear: StackedByYear;
   total: number;
@@ -225,7 +225,7 @@ export function unitsOfDataset(dataset: { publications: DashboardPublication[]; 
 
 // ── National collaborations (French institutions outside NU) ──────────────────
 
-export interface NationalCollabAggregates {
+interface NationalCollabAggregates {
   total: number;
   topInstitutions: CountItem[];
   byYear: { year: number; count: number }[];
@@ -331,7 +331,7 @@ export function buildPartnerCatalog(pubs: DashboardPublication[]): PartnerCatalo
 // buildPartnerMatcher; this function remains usable on its own (tests,
 // future uses) with any predicate.
 
-export interface PartnerBilanAggregates {
+interface PartnerBilanAggregates {
   total: number;
   byYear: { year: number; count: number }[];
   domains: CountItem[];
@@ -489,7 +489,7 @@ export interface PartnerBreakdownEntry {
   publications: PartnerBreakdownPublication[];
 }
 
-export interface PartnerBreakdownAggregates {
+interface PartnerBreakdownAggregates {
   /** One entry per selected key present in the catalog, sorted by total desc. */
   entries: PartnerBreakdownEntry[];
   /** Publications concerned by at least one institution (exclusive counting, = global breakdown). */
@@ -502,7 +502,7 @@ export interface PartnerBreakdownAggregates {
   missingKeys: string[];
 }
 
-export interface PartnerBreakdownOptions {
+interface PartnerBreakdownOptions {
   /** Exclude publications with more than `maxAuthors` authors (undefined = no exclusion). */
   maxAuthors?: number;
   topResearchersN?: number;
@@ -511,7 +511,7 @@ export interface PartnerBreakdownOptions {
 }
 
 /** True if the publication is a "large collaboration" per the threshold (authorCount known and > threshold). */
-export function isHyperAuthored(p: DashboardPublication, maxAuthors: number | undefined): boolean {
+function isHyperAuthored(p: DashboardPublication, maxAuthors: number | undefined): boolean {
   return maxAuthors != null && typeof p.authorCount === 'number' && p.authorCount > maxAuthors;
 }
 
@@ -646,7 +646,7 @@ export function aggregatePartnerBreakdown(
 // aggregatePartnerBilan already accepts an arbitrary predicate). Same mixed
 // subfields+topics vocabulary as PubFilters.themeKeys (publicationFilters.ts).
 
-export interface ThemeCandidates {
+interface ThemeCandidates {
   domains: string[];
   subfields: string[];
   topics: string[];

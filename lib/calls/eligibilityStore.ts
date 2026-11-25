@@ -5,7 +5,7 @@ import type { DB } from '../db/schema.gen';
 import { phdOf } from '../thesis';
 import type { EligibilityReason, EligibilityRule, EligibilityVerdict } from './eligibility';
 
-export interface CallForEligibility {
+interface CallForEligibility {
   callId: string;
   programmeId: string;
   scheme: string;
@@ -15,7 +15,7 @@ export interface CallForEligibility {
   deadlines: string[];
 }
 
-export interface EligibilityPerson {
+interface EligibilityPerson {
   personId: string;
   uid: string;
   name: string;
@@ -28,7 +28,7 @@ export interface EligibilityPerson {
   phdOn: string;
 }
 
-export interface Candidate {
+interface Candidate {
   callId: string;
   uid: string;
   personName: string;
@@ -40,7 +40,7 @@ export interface Candidate {
   phdOn: string | null;
 }
 
-export interface EligibilityRuleView extends EligibilityRule {
+interface EligibilityRuleView extends EligibilityRule {
   title: string;
   programmeId: string;
   deadlines: string[];
@@ -50,7 +50,7 @@ export interface EligibilityRuleView extends EligibilityRule {
 }
 
 /** A call a given person may apply to, with the rule that makes them eligible (block of the record). */
-export interface PersonEligibility {
+interface PersonEligibility {
   callId: string;
   programmeId: string;
   scheme: string;
@@ -188,4 +188,3 @@ export const createEligibilityStore = (db: Kysely<DB>) => {
   return { openCalls, people, saveCall, dropRulesExcept, rules, candidates, ofPerson };
 };
 
-export type EligibilityStore = ReturnType<typeof createEligibilityStore>;

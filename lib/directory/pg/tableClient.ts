@@ -37,7 +37,7 @@ const filtered = (rows: GristRecord[], filter?: Record<string, unknown[]>) => (!
   : rows.filter((r) => Object.entries(filter).every(([col, values]) => values.includes(col === 'id' ? r.id : r.fields[col]))));
 
 /** Establishments as the Etablissements table (a value the import kept aside is shown again). */
-export const establishmentRecords = async (db: any): Promise<GristRecord[]> =>
+const establishmentRecords = async (db: any): Promise<GristRecord[]> =>
   (await db.selectFrom('establishment').select(['id', 'name', 'uai', 'ror', 'label', 'idref', 'extra']).orderBy('id').execute())
     .map((e: any) => ({ id: Number(e.id), fields: { Employeur: e.name, UAI: e.uai ?? '', ROR: e.ror ?? '', Libelle: e.label ?? '', idref: e.idref ?? '', commentaire: '', ...(e.extra || {}) } }));
 
@@ -58,7 +58,7 @@ export const parseGristSql = (query: string) => {
   return { columns, table: m[2], where: m[3] ? { col: m[3], op: m[4].toUpperCase() as '=' | 'IN' } : null };
 };
 
-export interface PgTableClientOptions {
+interface PgTableClientOptions {
   db: Db;
   /** Author of the writes in the audit log (a job's name, or the user). */
   actor?: string;

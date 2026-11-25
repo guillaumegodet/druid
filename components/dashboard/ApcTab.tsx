@@ -23,8 +23,6 @@ const PAGE_SIZE = 25;
 
 const eur = (v: number) => `${Math.round(v).toLocaleString(numberLocale())} €`;
 
-/** Elsevier transformative agreement (confirmed Nantes U payer) attached to the publication, else null. */
-const dealOf = (p: DashboardPublication) => p.publisherDeal ?? null;
 /** Is the article OA under the agreement (APC covered)? subscription = OA waived. */
 const isDealOa = (d: DashboardPublication['publisherDeal']) =>
   !!d && (d.model === 'gold' || d.model === 'hybrid');
@@ -51,7 +49,7 @@ interface DealAggregates {
 }
 
 /** Aggregate of the Elsevier transformative agreement over the period (Nantes U). */
-export function aggregateDeal(pubs: DashboardPublication[], range: YearRange): DealAggregates {
+function aggregateDeal(pubs: DashboardPublication[], range: YearRange): DealAggregates {
   const inRange = pubs.filter(
     (p) =>
       p.publisherDeal &&
@@ -232,7 +230,7 @@ export const ApcByJournalChart: React.FC<{
 };
 
 // ── Breakdown of the Elsevier agreement per lab (composite institution) ──────
-export interface LaboAmount {
+interface LaboAmount {
   labo: string;
   total: number; // cumulative list value in € (OA articles under the agreement)
   n: number;
