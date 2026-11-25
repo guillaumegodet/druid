@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.21.0] — 2026-11-25
+
 ### Ajouté
 - **Civilité et type d'emploi fusionnés par source** (PostgreSQL), comme la date de naissance et le grade : le LDAP
   devient une source (plus de surcouche à l'affichage ni de verrou du type d'emploi), une valeur saisie dans la fiche
