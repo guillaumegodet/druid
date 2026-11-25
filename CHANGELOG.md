@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.22.0] — 2026-11-25
+
 ### Ajouté
 - **Employeur et dates d'emploi fusionnés par source** (PostgreSQL), comme l'état civil : une correction dans la fiche
   l'emporte sur les imports, une source qui change ensuite lève un conflit, étiquette de provenance et panneau des
