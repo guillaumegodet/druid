@@ -6,7 +6,7 @@
 //  - Cloudflare Access in front of the site → header `Cf-Access-Authenticated-User-Email`
 //    = real identity (usable for `validated_by`).
 //  - Otherwise (Access not configured, or local `wrangler pages dev`) → generic
-//    anonymous user so that the app can start. ⚠️ In this mode the Grist proxy
+//    anonymous user so that the app can start. ⚠️ In this mode the directory API
 //    refuses writes unless ALLOW_ANONYMOUS_WRITES=true (local dev).
 //
 // Rights: Centrale has no lab scope — every Access account sees everything
@@ -16,9 +16,9 @@
 // Instance (docs/plan-architecture-multi-instances.md, lot 5 c): the same Functions serve every
 // Cloudflare instance (Centrale, public demo), told apart by their instance.json
 // (functions/_lib/instance.js), Pages variables overriding it during the transition:
-//   slug     — DRUID_INSTANCE (default `centrale`), also used by the build and the Grist proxy
+//   slug     — DRUID_INSTANCE (default `centrale`), also used by the build
 //   label    — INSTANCE_LABEL: display name of the anonymous user (default « Centrale Nantes »)
-//   readOnly — READ_ONLY: public read-only instance (no admin, the proxy refuses writes)
+//   readOnly — READ_ONLY: public read-only instance (no admin, the directory API refuses writes)
 //
 // auth.ts (frontend) redirects to /auth/login when /api/me is not OK:
 // so we always answer 200 here; access control happens at the edge (Access).
@@ -61,7 +61,7 @@ export const CAPABILITIES = {
   HAS_CALLS: false,
   HAS_CALLS_CHAT: false,
   // Public read-only instance (demo): readOnly in instance.json. Not a HAS_* flag — it removes features
-  // rather than adding an integration; the Grist proxy enforces it server-side.
+  // rather than adding an integration; the directory API enforces it server-side.
   READ_ONLY: false,
 };
 

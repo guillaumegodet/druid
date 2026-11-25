@@ -22,8 +22,8 @@ hosts of `demo-2` (`functions/_lib/instanceAssets.js`, see `../README.md`).
 Since lot 10 e of druid-internal docs/plan-migration-postgresql.md (2026-11-25), schema `i_demo_2` of the
 control-plane database of the druid-saas Worker (`postgres.schema` of `instance.json`, read through
 `SAAS_HYPERDRIVE`). The Worker deployment (dirladata-instances) migrates it and reloads `demo-data.mjs` into it at
-every deployment (`scripts/seed_demo_pg.ts --instance demo-2 --schema i_demo_2 --apply`). The former public Grist doc
-`7LPh1eN5pL8UqSx7osVrwD` is no longer read; to be deleted once the Worker serves the schema.
+every deployment (`scripts/seed_demo_pg.ts --instance demo-2 --schema i_demo_2 --apply`). Its former public Grist doc is
+no longer read (Grist is not served on Cloudflare since lot 12 a).
 
 Dashboards and alignment caches stay static files, regenerated after editing `demo-data.mjs`:
 

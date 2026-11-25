@@ -1,7 +1,7 @@
 // Run: docker run --rm -v "$PWD":/app -w /app node:20-slim node scripts/tests/functions-guards.mjs
 // Harness for the Pages Functions: shape of /api/me (functions/api/me.js), instance registry and resolution, per-instance
 // files. The Functions that reach the directory import TypeScript (functions/_lib/storage.js): tested by vitest —
-// lib/__tests__/functionsApiV1.test.ts (security cases of the former Grist proxy) and functionsCentrale.test.ts (news,
+// lib/__tests__/functionsApiV1.test.ts (security cases of the directory API) and functionsCentrale.test.ts (news,
 // newsletter, reports). No network: the guards are called directly.
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
@@ -36,7 +36,6 @@ const check = (label, got, want) => {
   if (!ok) ko++;
   console.log(`${ok ? 'OK ' : 'KO '} ${label}${ok ? '' : ` → ${JSON.stringify(got)} (attendu ${JSON.stringify(want)})`}`);
 };
-const DOC = 'docA';
 // /api/me
 const admins = parseAdminEmails(' A@example.org, b@example.org ,, ');
 check('parseAdminEmails', admins, ['a@example.org', 'b@example.org']);
@@ -53,84 +52,72 @@ check('anonymous, default instance label', w.name, 'Centrale Nantes');
 // Instance settings: registry absent = Pages variables and historical defaults
 const pick = (i) => ({ slug: i.slug, label: i.label, readOnly: i.readOnly });
 check('no registry: defaults', resolveInstance({}), {
-  slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false, storage: 'grist', postgres: { schema: null },
-  grist: { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null },
+  slug: 'centrale', label: 'Centrale Nantes', readOnly: false, statusValidation: false, storage: 'postgres', postgres: { schema: null },
   features: { news: true, newsletter: true, network: false }, admins: [], openalexMailto: null, fromRegistry: false, shared: false,
 });
 check('no registry: demo variables', pick(resolveInstance({ DRUID_INSTANCE: 'demo', INSTANCE_LABEL: 'Université de Démonstration', READ_ONLY: 'TRUE' })),
   { slug: 'demo', label: 'Université de Démonstration', readOnly: true });
 check('no registry: news/newsletter only on centrale', resolveInstance({ DRUID_INSTANCE: 'demo' }).features, { news: false, newsletter: false, network: false });
-check('no registry: Grist doc from VITE_GRIST_DOC_ID, GRIST_DOC_ID first',
-  [resolveInstance({ VITE_GRIST_DOC_ID: 'docV' }).grist.docId, resolveInstance({ VITE_GRIST_DOC_ID: 'docV', GRIST_DOC_ID: 'docG' }).grist.docId], ['docV', 'docG']);
 check('no registry: ADMIN_EMAILS', resolveInstance({ ADMIN_EMAILS: ' A@example.org,b@example.org ' }).admins, ['a@example.org', 'b@example.org']);
 check('capabilities default', [capabilitiesFor(resolveInstance({})).READ_ONLY, capabilitiesFor(resolveInstance({})).HAS_STATUS_VALIDATION], [false, false]);
 check('capabilities from variables', [capabilitiesFor(resolveInstance({ READ_ONLY: 'true' })).READ_ONLY, capabilitiesFor(resolveInstance({ SHOW_STATUS_VALIDATION: 'true' })).HAS_STATUS_VALIDATION], [true, true]);
 
-// Registry only (the demo instance.json of this repository, as validated by the build)
-// The demo of this repository is on PostgreSQL (lot 10 c); the Grist cases keep a copy of it on a public document.
+// Registry only (the demo instance.json of this repository, as validated by the build). Cloudflare instances are on
+// PostgreSQL only (druid-internal docs/plan-migration-postgresql.md, lot 12 a).
 const demoFile = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
-const { postgres: _demoSchema, ...demoBase } = demoFile;
-const demoRaw = { ...demoBase, storage: 'grist', grist: { docId: 'docDemoPublic01', publicRead: true } };
-const demoReg = parseInstanceConfig(demoRaw).config;
+const demoReg = parseInstanceConfig(demoFile).config;
 const demo = resolveInstance({}, demoReg);
-check('registry only: demo', [pick(demo), demo.grist, demo.features, demo.admins, demo.fromRegistry],
-  [{ slug: 'demo', label: demoReg.label, readOnly: true },
-    { docId: demoReg.grist.docId, apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: 'https://grist.numerique.gouv.fr/api' },
-    { news: false, newsletter: false, network: true }, [], true]);
+check('registry only: demo', [pick(demo), demo.storage, demo.postgres, demo.features, demo.admins, demo.fromRegistry],
+  [{ slug: 'demo', label: demoReg.label, readOnly: true }, 'postgres', { schema: 'i_demo' }, { news: false, newsletter: false, network: true }, [], true]);
 const ecoleRaw = {
   slug: 'ecole', label: 'École fictive', target: 'cloudflare', domains: ['ecole.example.org'], access: 'cloudflare-access',
-  readOnly: false, grist: { docId: 'docEcole0001', apiBase: 'https://grist.example.org/api/' },
+  readOnly: false, storage: 'postgres',
   capabilities: { HAS_STATUS_VALIDATION: true }, features: { news: true, newsletter: false, network: false },
-  admins: ['Admin@Example.org'], openalexMailto: 'veille@example.org', secrets: ['GRIST_API_KEY'],
+  admins: ['Admin@Example.org'], openalexMailto: 'veille@example.org', secrets: ['ILAAS_API_KEY'],
 };
 const privReg = parseInstanceConfig(ecoleRaw).config;
 const ecole = resolveInstance({}, privReg);
-check('registry only: private instance', [ecole.slug, ecole.readOnly, ecole.statusValidation, ecole.grist, ecole.features, ecole.admins, ecole.openalexMailto],
-  ['ecole', false, true, { docId: 'docEcole0001', apiBase: 'https://grist.example.org/api', publicBaseUrl: null }, { news: true, newsletter: false, network: false }, ['admin@example.org'], 'veille@example.org']);
+check('registry only: private instance', [ecole.slug, ecole.readOnly, ecole.statusValidation, ecole.storage, ecole.postgres, ecole.features, ecole.admins, ecole.openalexMailto],
+  ['ecole', false, true, 'postgres', { schema: null }, { news: true, newsletter: false, network: false }, ['admin@example.org'], 'veille@example.org']);
 check('registry only: capabilities', [capabilitiesFor(ecole).HAS_STATUS_VALIDATION, capabilitiesFor(ecole).READ_ONLY, capabilitiesFor(ecole).HAS_LDAP], [true, false, false]);
-// Calls for proposals and theses need the PostgreSQL storage; the network, a network.json shipped with the dashboards
-// (`features.network`); the « My project » assistant stays on the Node server.
-check('registry only: network and calls off on a Grist instance', [ecole.features.network, capabilitiesFor(ecole).HAS_NETWORK_API, capabilitiesFor(ecole).HAS_CALLS, capabilitiesFor(ecole).HAS_CALLS_CHAT], [false, false, false, false]);
-const pgNetwork = resolveInstance({}, parseInstanceConfig({ ...ecoleRaw, grist: undefined, storage: 'postgres', secrets: [], features: { news: false, newsletter: false, network: true } }).config);
-check('registry only: network and calls on a PostgreSQL instance with the feature', [pgNetwork.features.network, capabilitiesFor(pgNetwork).HAS_NETWORK_API, capabilitiesFor(pgNetwork).HAS_CALLS, capabilitiesFor(pgNetwork).HAS_CALLS_CHAT], [true, true, true, false]);
+// Calls for proposals and theses come with the PostgreSQL storage; the network, with a network.json shipped with the
+// dashboards (`features.network`); the « My project » assistant stays on the Node server.
+check('registry only: calls without the network', [ecole.features.network, capabilitiesFor(ecole).HAS_NETWORK_API, capabilitiesFor(ecole).HAS_CALLS, capabilitiesFor(ecole).HAS_CALLS_CHAT], [false, false, true, false]);
+const pgNetwork = resolveInstance({}, parseInstanceConfig({ ...ecoleRaw, features: { news: false, newsletter: false, network: true } }).config);
+check('registry only: network and calls with the feature', [pgNetwork.features.network, capabilitiesFor(pgNetwork).HAS_NETWORK_API, capabilitiesFor(pgNetwork).HAS_CALLS, capabilitiesFor(pgNetwork).HAS_CALLS_CHAT], [true, true, true, false]);
+// A leftover `storage: grist` (no longer valid on Cloudflare) resolves, and its directory routes answer 500
+// (lib/__tests__/functionsApiV1.test.ts).
+check('a Grist instance still resolves', resolveInstance({ DRUID_STORAGE: 'grist' }).storage, 'grist');
 
-// Registry + Pages variables: a present, non-empty variable overrides its field
+// Registry + Pages variables: a present, non-empty variable overrides its field; the Grist variables of the former
+// Pages projects are no longer read.
 const over = resolveInstance({
   INSTANCE_LABEL: 'Autre nom', READ_ONLY: 'true', SHOW_STATUS_VALIDATION: 'false', ADMIN_EMAILS: 'c@example.org',
   OPENALEX_MAILTO: 'autre@example.org', VITE_GRIST_DOC_ID: 'docOverride1', GRIST_API_BASE: 'https://g.example.org/api',
 }, privReg);
-check('registry + variables: overrides', [over.label, over.readOnly, over.statusValidation, over.admins, over.openalexMailto, over.grist],
-  ['Autre nom', true, false, ['c@example.org'], 'autre@example.org', { docId: 'docOverride1', apiBase: 'https://g.example.org/api', publicBaseUrl: null }]);
-check('registry + VITE_GRIST_PUBLIC_BASE_URL: public base overridden',
-  resolveInstance({ VITE_GRIST_PUBLIC_BASE_URL: 'https://p.example.org/api/' }, privReg).grist.publicBaseUrl, 'https://p.example.org/api');
+check('registry + variables: overrides', [over.label, over.readOnly, over.statusValidation, over.admins, over.openalexMailto, 'grist' in over],
+  ['Autre nom', true, false, ['c@example.org'], 'autre@example.org', false]);
 
-// Instance block of /api/me (front runtime settings, lot 6 a): nothing private, same for anonymous
-check('publicInstanceInfo demo', publicInstanceInfo(demo), {
-  slug: 'demo', label: demoReg.label, gristDocId: demoReg.grist.docId,
-  gristPublicBaseUrl: 'https://grist.numerique.gouv.fr/api', gristUiUrl: 'https://grist.numerique.gouv.fr', storage: 'grist',
-});
-check('publicInstanceInfo private instance: proxy, UI of its Grist', publicInstanceInfo(ecole),
-  { slug: 'ecole', label: 'École fictive', gristDocId: 'docEcole0001', gristPublicBaseUrl: null, gristUiUrl: 'https://grist.example.org', storage: 'grist' });
+// Instance block of /api/me (front runtime settings, lot 6 a): nothing private, same for anonymous; no Grist document
+// on Cloudflare (sent empty, so that the browser does not fall back on build variables).
+const INFO_GRIST = { gristDocId: '', gristPublicBaseUrl: null, gristUiUrl: 'https://grist.numerique.gouv.fr' };
+check('publicInstanceInfo demo', publicInstanceInfo(demo), { slug: 'demo', label: demoReg.label, ...INFO_GRIST, storage: 'postgres' });
+check('publicInstanceInfo private instance', publicInstanceInfo(ecole), { slug: 'ecole', label: 'École fictive', ...INFO_GRIST, storage: 'postgres' });
 check('buildUser carries the instance block (user and anonymous)',
-  [buildUser('a@example.org', [], undefined, ecole).instance?.gristDocId, buildUser(null, [], undefined, ecole).instance?.gristDocId, Object.keys(buildUser(null, []).instance)],
-  ['docEcole0001', 'docEcole0001', ['slug', 'label', 'gristDocId', 'gristPublicBaseUrl', 'gristUiUrl', 'storage']]);
+  [buildUser('a@example.org', [], undefined, ecole).instance?.slug, buildUser(null, [], undefined, ecole).instance?.slug, Object.keys(buildUser(null, []).instance)],
+  ['ecole', 'ecole', ['slug', 'label', 'gristDocId', 'gristPublicBaseUrl', 'gristUiUrl', 'storage']]);
 
-// Storage of the instance (druid-internal docs/plan-migration-postgresql.md, lot 10 a): registry, DRUID_STORAGE override
-const pgReg = parseInstanceConfig(demoFile).config;
-const pgDemo = resolveInstance({}, pgReg);
-check('registry: PostgreSQL instance has no document', [pgDemo.storage, pgDemo.grist, publicInstanceInfo(pgDemo).gristDocId, publicInstanceInfo(pgDemo).storage],
-  ['postgres', { docId: '', apiBase: 'https://grist.numerique.gouv.fr/api', publicBaseUrl: null }, '', 'postgres']);
+// Storage of the instance: registry, DRUID_STORAGE override on a single deployment only
 check('no registry: DRUID_STORAGE variable, unknown value ignored',
-  [resolveInstance({}).storage, resolveInstance({ DRUID_STORAGE: 'postgres' }).storage, resolveInstance({ DRUID_STORAGE: 'sqlite' }).storage], ['grist', 'postgres', 'grist']);
-check('shared: DRUID_STORAGE overrides nothing', resolveInstance({ DRUID_STORAGE: 'postgres' }, demoReg, { shared: true }).storage, 'grist');
+  [resolveInstance({}).storage, resolveInstance({ DRUID_STORAGE: 'grist' }).storage, resolveInstance({ DRUID_STORAGE: 'sqlite' }).storage], ['postgres', 'grist', 'postgres']);
+check('shared: DRUID_STORAGE overrides nothing', resolveInstance({ DRUID_STORAGE: 'grist' }, demoReg, { shared: true }).storage, 'postgres');
 check('registry + variables: READ_ONLY=false overrides readOnly true', resolveInstance({ READ_ONLY: 'false' }, demoReg).readOnly, false);
-const blank = resolveInstance({ INSTANCE_LABEL: '', READ_ONLY: ' ', ADMIN_EMAILS: '', VITE_GRIST_DOC_ID: '' }, privReg);
-check('registry + empty variables: registry kept', [blank.label, blank.readOnly, blank.admins, blank.grist.docId], ['École fictive', false, ['admin@example.org'], 'docEcole0001']);
+const blank = resolveInstance({ INSTANCE_LABEL: '', READ_ONLY: ' ', ADMIN_EMAILS: '' }, privReg);
+check('registry + empty variables: registry kept', [blank.label, blank.readOnly, blank.admins], ['École fictive', false, ['admin@example.org']]);
 check('registry: features not overridable by the slug', resolveInstance({ DRUID_INSTANCE: 'centrale' }, demoReg).features, { news: false, newsletter: false, network: true });
 
 // Host resolution: single and shared deployments (lot 6 b)
-const demo2Reg = parseInstanceConfig({ ...demoRaw, slug: 'demo-2', label: 'Démo 2', domains: ['demo-2.example.org'],
-  grist: { docId: 'docDemo20002', publicRead: true } }).config;
+const demo2Reg = parseInstanceConfig({ ...demoFile, slug: 'demo-2', label: 'Démo 2', domains: ['demo-2.example.org'], postgres: { schema: 'i_demo_2' } }).config;
 const multiReg = buildRegistry([demoReg, demo2Reg], { mode: 'multi' }).registry;
 const singleReg = buildRegistry([privReg], { mode: 'single' }).registry;
 check('shared: each host gets its instance',
@@ -138,10 +125,10 @@ check('shared: each host gets its instance',
 check('shared: unknown host gets no instance', resolveForHost('other.example.org', {}, multiReg), null);
 check('shared: object keys are not hosts', [resolveForHost('__proto__', {}, multiReg), resolveForHost('constructor', {}, multiReg)], [null, null]);
 const d2 = resolveForHost('demo-2.example.org', {
-  INSTANCE_LABEL: 'X', READ_ONLY: 'false', VITE_GRIST_DOC_ID: 'docOther0001', ADMIN_EMAILS: 'a@example.org', DRUID_INSTANCE: 'centrale',
+  INSTANCE_LABEL: 'X', READ_ONLY: 'false', ADMIN_EMAILS: 'a@example.org', DRUID_INSTANCE: 'centrale', DRUID_STORAGE: 'grist',
 }, multiReg);
-check('shared: variables override nothing', [d2.slug, d2.label, d2.readOnly, d2.grist.docId, d2.admins, d2.shared],
-  ['demo-2', 'Démo 2', true, 'docDemo20002', [], true]);
+check('shared: variables override nothing', [d2.slug, d2.label, d2.readOnly, d2.storage, d2.postgres, d2.admins, d2.shared],
+  ['demo-2', 'Démo 2', true, 'postgres', { schema: 'i_demo_2' }, [], true]);
 check('single: every host serves the instance, variables still override',
   [resolveForHost('branch.druid-school.pages.dev', {}, singleReg).slug, resolveForHost('any.host', { INSTANCE_LABEL: 'Y' }, singleReg).label, resolveForHost('x', {}, singleReg).shared],
   ['ecole', 'Y', false]);
@@ -150,23 +137,23 @@ check('no registry: any host, from the variables', resolveForHost('x', { DRUID_I
 // Secrets per instance
 check('secretSuffix', secretSuffix('demo-2'), 'DEMO_2');
 check('shared: own secret only, never the common one',
-  [secretOf({ GRIST_API_KEY: 'common', GRIST_API_KEY__DEMO_2: 'k2' }, d2, 'GRIST_API_KEY'), secretOf({ GRIST_API_KEY: 'common' }, d2, 'GRIST_API_KEY')], ['k2', undefined]);
+  [secretOf({ ILAAS_API_KEY: 'common', ILAAS_API_KEY__DEMO_2: 'k2' }, d2, 'ILAAS_API_KEY'), secretOf({ ILAAS_API_KEY: 'common' }, d2, 'ILAAS_API_KEY')], ['k2', undefined]);
 check('single: own secret, then the plain one',
-  [secretOf({ GRIST_API_KEY: 'common', GRIST_API_KEY__ECOLE: 'ke' }, ecole, 'GRIST_API_KEY'), secretOf({ GRIST_API_KEY: 'common' }, ecole, 'GRIST_API_KEY')], ['ke', 'common']);
-const d2env = instanceEnv({ GRIST_API_KEY: 'common', ILAAS_API_KEY__DEMO_2: 'i2', ILAAS_MODEL: 'm' }, d2);
-check('instanceEnv on a shared deployment', [d2env.GRIST_API_KEY, d2env.ILAAS_API_KEY, d2env.ILAAS_MODEL], [undefined, 'i2', 'm']);
+  [secretOf({ ILAAS_API_KEY: 'common', ILAAS_API_KEY__ECOLE: 'ke' }, ecole, 'ILAAS_API_KEY'), secretOf({ ILAAS_API_KEY: 'common' }, ecole, 'ILAAS_API_KEY')], ['ke', 'common']);
+const d2env = instanceEnv({ OPENALEX_API_KEY: 'common', ILAAS_API_KEY__DEMO_2: 'i2', ILAAS_MODEL: 'm', GRIST_API_KEY: 'g' }, d2);
+check('instanceEnv on a shared deployment', [d2env.OPENALEX_API_KEY, d2env.ILAAS_API_KEY, d2env.ILAAS_MODEL], [undefined, 'i2', 'm']);
 
 // Handlers (no network: fetch is stubbed)
 globalThis.fetch = async () => new Response('{"records":[]}', { status: 200 });
 const req = (url, init = {}) => new Request(`https://demo.example${url}`, init);
 const asJson = async (res) => ({ status: res.status, body: await res.json() });
 
-const DEMO_ENV = { DRUID_INSTANCE: 'demo', INSTANCE_LABEL: 'Université de Démonstration', READ_ONLY: 'true', ADMIN_EMAILS: 'a@x.fr', VITE_GRIST_DOC_ID: DOC };
+const DEMO_ENV = { DRUID_INSTANCE: 'demo', INSTANCE_LABEL: 'Université de Démonstration', READ_ONLY: 'true', ADMIN_EMAILS: 'a@x.fr' };
 const meDemo = await asJson(await me({ request: req('/api/me', { headers: { 'Cf-Access-Authenticated-User-Email': 'a@x.fr' } }), env: DEMO_ENV }));
 check('/api/me demo: listed admin is not admin when read-only', [meDemo.body.roles, meDemo.body.access.isSuperAdmin, meDemo.body.capabilities.READ_ONLY], [['user'], false, true]);
 const meAnon = await asJson(await me({ request: req('/api/me'), env: DEMO_ENV }));
 check('/api/me demo anonymous', [meAnon.body.anonymous, meAnon.body.name, meAnon.body.preferred_username], [true, 'Université de Démonstration', 'demo']);
-check('/api/me demo: instance block from the variables', [meAnon.body.instance.gristDocId, meAnon.body.instance.gristPublicBaseUrl], [DOC, null]);
+check('/api/me demo: instance block without a Grist document', [meAnon.body.instance.slug, meAnon.body.instance.gristDocId, meAnon.body.instance.storage], ['demo', '', 'postgres']);
 const meCentrale = await asJson(await me({ request: req('/api/me', { headers: { 'Cf-Access-Authenticated-User-Email': 'a@x.fr' } }), env: { ADMIN_EMAILS: 'a@x.fr' } }));
 check('/api/me Centrale unchanged: admin', [meCentrale.body.roles, meCentrale.body.capabilities.READ_ONLY], [['user', 'admin'], false]);
 
@@ -179,9 +166,8 @@ check('/api/me Centrale unchanged: admin', [meCentrale.body.roles, meCentrale.bo
 }
 const sharedCall = (handler, host, path, instance, env, init = {}, params = {}) =>
   handler({ request: new Request(`https://${host}${path}`, init), env, params, data: { instance } });
-const ecoleShared = resolveInstance({}, privReg, { shared: true });
 const meD2 = await asJson(await sharedCall(me, 'demo-2.example.org', '/api/me', d2, { ADMIN_EMAILS: 'a@x.fr' }));
-check('shared /api/me: instance block of the host', [meD2.body.instance.slug, meD2.body.instance.gristDocId, meD2.body.capabilities.READ_ONLY], ['demo-2', 'docDemo20002', true]);
+check('shared /api/me: instance block of the host', [meD2.body.instance.slug, meD2.body.instance.storage, meD2.body.capabilities.READ_ONLY], ['demo-2', 'postgres', true]);
 // Centrale-only routes (news, newsletter) import the directory storage (TypeScript): tested by vitest
 // (lib/__tests__/functionsCentrale.test.ts).
 let r;

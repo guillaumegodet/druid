@@ -3,30 +3,23 @@
 // with the TypeScript modules), for the instance serving the request. Every Function reaches the directory through it,
 // never through the Grist API or the database itself.
 //
-// Two storages, chosen by the instance (functions/_lib/instance.js, `storage` of instance.json):
-//  - grist: the Grist document of the instance, key GRIST_API_KEY (GRIST_API_KEY__<SLUG> on a shared deployment); a
-//    read-only instance may read a public document without key. One set of stores per instance, document and key, for
-//    the lifetime of the isolate.
-//  - postgres: the PostgreSQL database of the instance through its Hyperdrive binding HYPERDRIVE (HYPERDRIVE__<SLUG>) —
-//    or, for a tenant or a registry instance with `postgres.schema`, its schema of the shared database (SAAS_HYPERDRIVE) —
-//    one database client per request (the connections of a Worker do not outlive the request; Hyperdrive holds the
-//    real pool), released by `release()` once the response is built. The driver comes from the bundle written by the
-//    build (functions/_generated/pg.js, scripts/functions_pg_bundle.cjs: node-postgres with its Node built-ins as
-//    `node:*`, which the Pages Functions build accepts without a flag), never from the `pg` package directly.
+// PostgreSQL only since lot 12 a (2026-11-25): an instance still declaring `storage: grist` gets a configuration error
+// (500) on every directory route. The Grist reader stays on the Node side (server.cjs, the nightly copy) until lot 12 b.
+//
+// The PostgreSQL database of the instance through its Hyperdrive binding HYPERDRIVE (HYPERDRIVE__<SLUG>) — or, for a
+// tenant or a registry instance with `postgres.schema`, its schema of the shared database (SAAS_HYPERDRIVE) — one
+// database client per request (the connections of a Worker do not outlive the request; Hyperdrive holds the real pool),
+// released by `release()` once the response is built. The driver comes from the bundle written by the build
+// (functions/_generated/pg.js, scripts/functions_pg_bundle.cjs: node-postgres with its Node built-ins as `node:*`, which
+// the Pages Functions build accepts without a flag), never from the `pg` package directly.
 import pg from '../_generated/pg.js';
 import { createDbWith } from '../../lib/db/core.ts';
 import { alignCacheSourceOf } from '../../lib/saas/alignCache.ts';
-import { createGristAlignCommands } from '../../lib/directory/alignCommands.ts';
 import { tokenAlignTexts } from '../../lib/directory/alignTexts.ts';
-import { createGristDirectoryCommands } from '../../lib/directory/commands.ts';
 import { createPgStorage } from '../../lib/directory/pg/storage.ts';
-import { createGristDirectoryRepository, createGristReader } from '../../lib/directory/repository.ts';
-import { createGristPublicationsStore } from '../../lib/publications/store.ts';
 import { instanceAssetPath } from './instanceAssets.js';
 import { HYPERDRIVE_BINDING, instanceOf, secretOf } from './instance.js';
 import { isControlPlane, tenantConnectionString } from './saas.js';
-
-const gristStores = new Map();
 
 /**
  * Alignment caches of the instance: static files (public/ on a single-instance deployment, its own copy under
@@ -42,40 +35,6 @@ const alignCachesOf = (context, instance) => ({
     return res.json().catch(() => null);
   },
 });
-
-const gristStorage = (context, instance) => {
-  const apiKey = secretOf(context.env, instance, 'GRIST_API_KEY');
-  // The key is part of the cache key: a rotated secret never reuses a client built with the former one.
-  const key = `${instance.slug}|${instance.grist.apiBase}|${instance.grist.docId}|${apiKey || ''}`;
-  let store = gristStores.get(key);
-  if (!store) {
-    const grist = createGristReader({
-      apiBase: instance.grist.apiBase,
-      docId: instance.grist.docId,
-      apiKey: apiKey || undefined,
-      userAgent: `Druid-CRISalid-${instance.slug}/1.0`,
-    });
-    const repository = createGristDirectoryRepository({ grist });
-    store = {
-      kind: 'grist',
-      grist,
-      /** The document as a table client (Annuaire reads of news/newsletter, reports tables). */
-      tables: grist,
-      repository,
-      commands: createGristDirectoryCommands({ grist, repository }),
-      // Only the instance document (no side document on Cloudflare).
-      publications: createGristPublicationsStore({ main: grist, readerFor: (docId) => (docId === instance.grist.docId ? grist : null) }),
-    };
-    gristStores.set(key, store);
-  }
-  // The alignment commands read the caches through the bindings of THIS request: built per request.
-  const align = createGristAlignCommands({
-    grist: store.grist, repository: store.repository, annuaireColumns: store.commands.annuaireColumns,
-    texts: tokenAlignTexts, hasQualinka: false, caches: alignCachesOf(context, instance),
-  });
-  const missing = !apiKey && !instance.readOnly ? 'GRIST_API_KEY not configured on Cloudflare' : null;
-  return { instance, apiKey, store: { ...store, align }, missing, release: async () => {} };
-};
 
 const pgStorage = (context, instance) => {
   // A tenant of the control plane (druid-internal docs/plan-druid-saas.md, lot 1 b): its schema of the shared database,
@@ -108,7 +67,10 @@ const pgStorage = (context, instance) => {
  */
 export const storageOf = (context) => {
   const instance = instanceOf(context);
-  return instance.storage === 'postgres' ? pgStorage(context, instance) : gristStorage(context, instance);
+  if (instance.storage !== 'postgres') {
+    return { instance, apiKey: undefined, store: null, missing: 'Grist storage is no longer served on Cloudflare: storage postgres required', release: async () => {} };
+  }
+  return pgStorage(context, instance);
 };
 
 /**

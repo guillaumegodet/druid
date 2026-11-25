@@ -2,9 +2,8 @@
 // docs/plan-migration-postgresql.md, lot 1. Same Hono application as server.cjs (lib/directory/api.ts),
 // bundled by Pages with the TypeScript modules it imports.
 //
-// Storage of the instance serving the request: functions/_lib/storage.js — its Grist document (a read-only instance may
-// read a public document without key, as the former /api/grist proxy did) or its PostgreSQL database through
-// Hyperdrive (lot 10 a).
+// Storage of the instance serving the request: functions/_lib/storage.js — its PostgreSQL database through Hyperdrive
+// (lots 10 a and 12 a).
 //
 // Rights: the Cloudflare instances have no lab scope (see functions/api/me.js): every account that gets
 // through Cloudflare Access reads the whole directory, as it did through the proxy. Writes, as through the

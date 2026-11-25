@@ -57,8 +57,8 @@ export async function onRequest(context) {
       }
     }
   }
-  // Tables of the reports: the Grist document, or the migrated tables of the database (lib/directory/pg/tableClient.ts).
-  const tablesKey = storage.kind === 'postgres' ? `postgres:${instance.slug}` : `${instance.grist.apiBase}/${instance.grist.docId}`;
+  // Tables of the reports: the migrated tables of the database (lib/directory/pg/tableClient.ts).
+  const tablesKey = `postgres:${instance.slug}`;
   const store = reportsStore.createReportsStore(
     reportsStore.storageClient(storage.tables, tablesKey),
     { blobs: env.REPORT_PDFS ? r2Blobs(env.REPORT_PDFS, instance.slug) : null },

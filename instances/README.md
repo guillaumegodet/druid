@@ -8,29 +8,30 @@ build (Nantes) never copies anything. Instances with personal data are NOT in th
 their folder lives in the private repository `guillaumegodet/druid-instances`, cloned at build
 time with the `INSTANCES_REPO_TOKEN` secret when `instances/<slug>/` is absent here.
 
-| Instance | Folder | Access | Grist writes |
+| Instance | Folder | Access | Writes |
 | --- | --- | --- | --- |
-| Centrale Nantes | `centrale/` of `guillaumegodet/druid-instances` (private: real PII) | Cloudflare Access | yes, with an Access identity |
-| Public demo | `demo/` (fictitious data, see its README) — PostgreSQL (Neon) through Hyperdrive since lot 10 c; calls for proposals, theses and co-authorship network seeded with it | public | no (`readOnly` in its `instance.json`) |
-| Second demo (shared deployment prototype) | `demo-2/` (fictitious data, see its README) | public | no |
+| Centrale Nantes | `centrale/` of `guillaumegodet/druid-instances` (private: real PII) — PostgreSQL (Clever Cloud) | Cloudflare Access | yes, with an Access identity |
+| Public demo | `demo/` (fictitious data, see its README) — PostgreSQL (Neon on `druid-demo.pages.dev`, schema `i_demo` on the druid-saas Worker); calls for proposals, theses and co-authorship network seeded with it | public | no (`readOnly` in its `instance.json`) |
+| Second demo | `demo-2/` (fictitious data, see its README) — schema `i_demo_2` on the druid-saas Worker | public | no |
 
 ## Instance registry: `instance.json`
 
 Every instance folder holds an `instance.json` describing the instance (docs/plan-architecture-multi-instances.md,
 lot 5): display name, target (`cloudflare` | `docker`), domains, access (`public` | `cloudflare-access` |
-`keycloak`), read-only flag, storage (`grist` with the Grist doc, or `postgres`, see below), settable
+`keycloak`), read-only flag, storage (`postgres`, see below), settable
 capabilities, `news`/`newsletter` features, admins, OpenAlex contact, the **names** of the secrets it needs — never
 a secret value — and, optionally, the shared deployment that serves it (`deployment`, see below). Schema and rules:
 `scripts/instances/instanceConfig.cjs`. The public repository only accepts read-only instances with
-public access, no admins and public data (a public doc, or a PostgreSQL database of fictitious rows) — also
+public access, no admins and public data (a PostgreSQL database of fictitious rows) — also
 enforced by `scripts/publication/check_public_tree.mjs`.
 
-### Storage: Grist document or PostgreSQL database
+### Storage: PostgreSQL database
 
-`storage` (default `grist`) says where the directory of the instance lives (druid-internal
-docs/plan-migration-postgresql.md, lot 10):
-- `grist`: the document of the `grist` block (`docId`, `apiBase`, `publicRead`), read with the `GRIST_API_KEY` secret
-  unless the doc is public;
+`storage` says where the directory of the instance lives (druid-internal docs/plan-migration-postgresql.md, lots 10
+and 12 a). Target `cloudflare` serves **`postgres` only** since lot 12 a (2026-11-25): an instance still declaring
+`grist` fails validation, and its directory routes would answer 500. The `grist` block (`docId`, `apiBase`,
+`extraDocIds`, with the `GRIST_API_KEY` secret) only remains on target `docker`, where it names the document of the
+nightly read-only copy of Nantes.
 - `postgres`: a PostgreSQL database (schema `db/migrations`, roles `db/roles.sql`) reached through a **Hyperdrive**
   binding of the Pages project named `HYPERDRIVE` (`HYPERDRIVE__<SLUG>` on a shared deployment, like the secrets),
   with the connection string of the `druid_app` role. No `grist` block, no `GRIST_API_KEY`; the news items of the
@@ -60,12 +61,12 @@ docker run --rm -v "$PWD":/app -w /app -v /opt/crisalid/work/druid-instances:/in
 
 On a Cloudflare build, `scripts/prepare-cloudflare-assets.cjs` validates it (an invalid file fails the
 build, the previous deployment stays online) and generates:
-- `.env.production.local`: `VITE_GRIST_DOC_ID`, plus `VITE_GRIST_PUBLIC_BASE_URL` for a public doc;
+- `.env.production.local`: no instance variable any more (a Grist doc only exists on target `docker`);
 - `functions/_generated/instance.js`: the validated config (`null` without `instance.json`), bundled with the
   Functions — Pages compiles `functions/` after the build command. Both files are ignored by git and Docker.
 
 The Functions read that generated config (`functions/_lib/instance.js`, lot 5 c): label, read-only mode,
-status/validation capability, Grist doc and API base, admins, OpenAlex contact and the `news`/`newsletter`
+status/validation capability, storage, admins, OpenAlex contact and the `news`/`newsletter`
 features all come from `instance.json`. **Any change of these settings goes through `instance.json`** (a commit
 here for the demo, in `druid-instances` for the others), then a new build.
 
@@ -78,7 +79,7 @@ Preview environments:
 | Variable | Used by | Centrale | Demo |
 | --- | --- | --- | --- |
 | `DRUID_INSTANCE` | build (instance folder), Functions | `centrale` (default when unset) | `demo` |
-| `GRIST_API_KEY` (secret) | Grist proxy, news/newsletter | required | **unset**: the public doc is read anonymously |
+| `HYPERDRIVE` (binding) | directory storage | Hyperdrive `druid-centrale` | Hyperdrive of its Neon database |
 | `INSTANCES_REPO_TOKEN` (secret) | build: clone of the private instances repository | fine-grained token, read-only Contents on `druid-instances` | unset (data in this repository) |
 | `ILAAS_API_KEY` (secret) | collab-theme, newsletter | set | **unset**: a public site without Access would expose the LLM quota |
 | `OPENALEX_API_KEY` (secret) | news, newsletter | set | unset |
@@ -88,8 +89,8 @@ Optional technical variables, not described by the registry: `INSTANCES_REPO` (d
 `wrangler pages dev` only.
 
 **Overrides (transition only).** These variables are still honoured, field by field, when present and non-empty,
-and win over `instance.json`: `INSTANCE_LABEL`, `READ_ONLY`, `SHOW_STATUS_VALIDATION`, `VITE_GRIST_DOC_ID`,
-`GRIST_DOC_ID`, `VITE_GRIST_PUBLIC_BASE_URL`, `GRIST_API_BASE`, `ADMIN_EMAILS`, `OPENALEX_MAILTO`. The build log
+and win over `instance.json`: `INSTANCE_LABEL`, `READ_ONLY`, `SHOW_STATUS_VALIDATION`, `ADMIN_EMAILS`,
+`OPENALEX_MAILTO` (the Grist variables are no longer read since lot 12 a). The build log
 names each one found (« repeats instance.json » or « overrides instance.json »): remove it from the dashboard, after
 moving its value into `instance.json` when it differs. Without `instance.json` (instance not migrated yet), they
 remain the only source, with the historical defaults (Centrale).
@@ -109,7 +110,7 @@ other host** — the front shows « No Druid instance is declared for this addre
 
 - no variable overrides an instance (settings come only from `instance.json`);
 - secrets are per instance, `<NAME>__<SLUG>` with the slug upper-cased and `-` → `_`
-  (`GRIST_API_KEY__DEMO_2`); the plain `GRIST_API_KEY` is never used, so an instance without its own key
+  (`ILAAS_API_KEY__DEMO_2`, Hyperdrive `HYPERDRIVE__DEMO_2`); the plain name is never used, so an instance without its own key
   cannot borrow another's;
 - nothing instance-specific is built into the bundle; the files of each instance (dashboard exports,
   alignment caches) are copied into `public/instance-assets/<slug>/` and the build writes route files

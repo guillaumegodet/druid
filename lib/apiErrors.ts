@@ -131,8 +131,8 @@ export const API_ERRORS = [
   msg`No key is stored`,
   msg`VITE_GRIST_DOC_ID not configured`,
   msg`GRIST_API_KEY not configured`,
-  msg`GRIST_API_KEY not configured on Cloudflare`,
   msg`HYPERDRIVE binding not configured on Cloudflare`,
+  msg`Grist storage is no longer served on Cloudflare: storage postgres required`,
   // directory domain API (/api/v1, lib/directory/api.ts)
   msg`Unknown API route`,
   msg`Directory storage unavailable`,
