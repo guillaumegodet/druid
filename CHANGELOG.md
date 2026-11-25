@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.19.0] — 2026-11-25
+
 ### Ajouté
 - **Provenance par champ et fusion par priorité de sources** (base technique, sans effet visible pour l'instant) :
   chaque source (LDAP, fichier RH, fichier labo, site annuaire, saisie manuelle) garde sa propre valeur dans
