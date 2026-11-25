@@ -22,7 +22,7 @@ import { FTE_COLUMNS } from './fte';
 
 /** LABO values that do not designate a lab: `zzz` = parking of LDAP people outside the
  *  lab scope (LDAP update of 2026-06-02, never validated), empty = record without affiliation. */
-export const PARKING_LABOS: ReadonlySet<string> = new Set(['zzz', '']);
+const PARKING_LABOS: ReadonlySet<string> = new Set(['zzz', '']);
 
 /** Columns merged by union (separator `|`, or line break for Commentaires). */
 const MERGE_CONCAT_FIELDS: ReadonlySet<string> = new Set([

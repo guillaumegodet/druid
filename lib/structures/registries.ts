@@ -197,7 +197,7 @@ export const openalexRecord = (raw: any): RegistryRecord | null => {
 };
 
 // ── IdRef corporate bodies (Solr) ────────────────────────────────────────────────────────────────────────────────────
-export const IDREF_SOLR = 'https://www.idref.fr/Sru/Solr';
+const IDREF_SOLR = 'https://www.idref.fr/Sru/Solr';
 
 export const idrefRecord = (doc: any): RegistryRecord | null => {
   const id = normalizeStructureId('idref', doc?.ppn_z);
