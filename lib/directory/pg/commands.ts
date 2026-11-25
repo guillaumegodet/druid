@@ -215,11 +215,10 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     const employer = await employerOf(trx, r.employment?.employer);
     const values: Record<string, any> = {
       last_name: String(r.lastName ?? ''), first_name: orNull(r.firstName),
-      civility: civility === 'F' || civility === 'M' ? civility : null,
-      // birth_date and corps_grade: merged by source, written by writeMerged below (never the column directly).
+      // birth_date, corps_grade, civility, employment_type: merged by source, written by writeMerged below (never the
+      // column directly).
       email: orNull(r.email), nationality: orNull(r.nationality),
       employment_start: fuzzy(r.employment?.startDate), employment_end: fuzzy(r.employment?.endDate),
-      employment_type: orNull(r.employment?.contractType),
       fte_ratio: parseFteCell(r.employment?.fte), fte_research: parseFteCell(r.employment?.researchFte),
       photo_url: orNull(String(r.photoUrl ?? '').trim()),
       // Lab website directory page: written by the site imports only (the record form does not edit it).
@@ -230,7 +229,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     const replaced = ['Civilite', 'DATE_DE_NAISSANCE_JJ_MM_AAAA', 'employment_start_date', 'employment_end_date', 'validated_status',
       'validation_date', ...(employer ? ['Employeur'] : []), ...LINKS.map((l) => l.column)];
     // A civility outside F / M is kept as typed (the record shows it normalized, like a Grist cell).
-    const extra: Record<string, any> = civility && !values.civility ? { Civilite: civility } : {};
+    const extra: Record<string, any> = civility && !['F', 'M'].includes(civility.toUpperCase()) ? { Civilite: civility } : {};
     return { values, replaced, extra };
   };
   /**
@@ -238,24 +237,33 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
    * (form, import line kept); the values of an import are first stored under its source (ctx.fieldObservation).
    */
   const writeMerged = async (trx: Transaction<DB>, personId: string, r: Researcher, ctx: CommandContext) => {
-    // An unreadable date is refused (400), not taken as a cleared field.
-    const chosen = { birth_date: blank(r.birthDate) ? null : fuzzy(r.birthDate) ?? r.birthDate, corps_grade: orNull(r.employment?.grade) };
+    // An unreadable date is refused (400), not taken as a cleared field. A civility outside F / M stays in `extra`
+    // (personColumns) and counts as none here.
+    const civility = String(r.civility || '').trim().toUpperCase();
+    const chosen = {
+      birth_date: blank(r.birthDate) ? null : fuzzy(r.birthDate) ?? r.birthDate,
+      corps_grade: orNull(r.employment?.grade),
+      civility: civility === 'F' || civility === 'M' ? civility : null,
+      employment_type: orNull(r.employment?.contractType),
+    };
+    // Key of each field in the record's fieldProvenance.
+    const provenanceKey = { birth_date: 'birthDate', corps_grade: 'grade', civility: 'civility', employment_type: 'contractType' } as const;
     const obs = ctx.fieldObservation;
     const sameText = (a: unknown, b: unknown) => String(a ?? '').trim().toLowerCase() === String(b ?? '').trim().toLowerCase();
-    for (const field of ['birth_date', 'corps_grade'] as const) {
+    for (const field of ['birth_date', 'corps_grade', 'civility', 'employment_type'] as const) {
       const observed = obs && Object.prototype.hasOwnProperty.call(obs.values, field)
         ? { source: obs.source, value: obs.values[field], importBatchId: obs.importBatchId } : undefined;
       // D7 (druid-internal `docs/plan-maj-chercheurs.md`): the record sends back the stored value it was read with. If
       // it changed since (another user, the LDAP sync), a field left as it was keeps the new value instead of
       // reverting it as a « correction », and a field typed over is refused: two corrections never silently collide.
-      const read = field === 'birth_date' ? r.fieldProvenance?.birthDate : r.fieldProvenance?.grade;
+      const read = r.fieldProvenance?.[provenanceKey[field]];
       if (!observed && read && read.value !== undefined) {
         const current = ((await trx.selectFrom('person').select(field).where('id', '=', personId).executeTakeFirst()) as any)?.[field] ?? null;
         if (!sameText(current, read.value)) {
           const untouched = sameText(chosen[field], read.value) || (field === 'corps_grade' && read.value
             && sameText(chosen[field], resolveGrade(read.value, { grade: read.value, typeEmploi: r.employment?.contractType, libTypeEmploi: r.employment?.internalTypology })));
           if (untouched) continue;
-          throw new ApiError(409, 'The date of birth or the grade was changed meanwhile: reload the record before correcting it');
+          throw new ApiError(409, 'A value of this record was changed meanwhile: reload the record before correcting it');
         }
       }
       try {

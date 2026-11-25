@@ -16,6 +16,7 @@
  *      when the source changed (or appeared) after the correction; a divergence the user already saw is not.
  */
 import { normalizeFuzzyDate } from '../dates';
+import { normalizeCivility } from '../civility';
 
 export const MANUAL_SOURCE = 'manual';
 
@@ -93,9 +94,24 @@ const fuzzyDateRule: FieldRule = {
   precision: (v) => v.length,
 };
 
+// Civility: F or M (LDAP « Madame », « M. »… read as such); anything else is not a storable value.
+const civilityRule: FieldRule = {
+  ...textRule,
+  normalize: (raw) => {
+    const s = raw === null || raw === undefined ? '' : String(raw).trim();
+    if (!s) return '';
+    const c = normalizeCivility(s);
+    return c === 'F' || c === 'M' ? c : null;
+  },
+};
+
 const FIELD_RULES: Record<string, FieldRule> = {
   birth_date: fuzzyDateRule,
   corps_grade: { ...textRule, normalize: (raw) => (raw === null || raw === undefined ? '' : String(raw).trim().toUpperCase()) },
+  civility: civilityRule,
+  // Employment type: the LDAP category (« TITULAIRE », « CDD UNIVERSITE ») or the type a site or file gives; compared
+  // without case.
+  employment_type: textRule,
 };
 
 const ruleOf = (field: string): FieldRule => FIELD_RULES[field] ?? textRule;

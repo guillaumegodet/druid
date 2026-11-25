@@ -141,7 +141,10 @@ export const ResearcherSchema = z.object({
   ldapFields: z.array(z.string()).optional().default([]),
   // Fields merged by source (PostgreSQL, types.ts FieldProvenance): declared here, otherwise the parse of
   // mapDirectoryRows drops them and the record never shows where its values come from.
-  fieldProvenance: z.object({ birthDate: FieldProvenanceSchema.optional(), grade: FieldProvenanceSchema.optional() }).optional(),
+  fieldProvenance: z.object({
+    birthDate: FieldProvenanceSchema.optional(), grade: FieldProvenanceSchema.optional(),
+    civility: FieldProvenanceSchema.optional(), contractType: FieldProvenanceSchema.optional(),
+  }).optional(),
   lastSync: z.string().optional().nullable(),
   validation: ValidationInfoSchema.optional(),
 });

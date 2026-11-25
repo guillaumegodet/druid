@@ -76,6 +76,30 @@ describe.skipIf(!url)('record and fields merged by source', () => {
     });
   });
 
+  it('civility and employment type: LDAP values, a correction typed in the record, the provenance shown', async () => {
+    await inRollback(async (trx) => {
+      const id = (await trx.insertInto('person').values({ last_name: 'Meitner', first_name: 'Lise', uid: 'test-meitner-l' } as any)
+        .returning('id').executeTakeFirstOrThrow()).id;
+      const recordId = Number((await trx.insertInto('membership').values({ person_id: id, lab_label: 'LABX' } as any)
+        .returning('id').executeTakeFirstOrThrow()).id);
+      await observeFieldValue(trx, { personId: id, field: 'civility', source: 'ldap', value: 'Madame' });
+      await observeFieldValue(trx, { personId: id, field: 'employment_type', source: 'ldap', value: 'CDD UNIVERSITE' });
+      const repository = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository, today: () => '2026-11-26' });
+      const loaded = (await repository.people(ALL)).items.find((p) => p.uid === 'test-meitner-l')!;
+      expect([loaded.civility, loaded.employment.contractType, loaded.employment.ldapFields]).toEqual(['F', 'CDD UNIVERSITE', []]);
+      expect(loaded.fieldProvenance).toMatchObject({ civility: { source: 'ldap' }, contractType: { source: 'ldap' } });
+      // Saved untouched: no correction. Type corrected: a manual correction that wins over the LDAP.
+      await commands.updatePerson(recordId, loaded, ctx);
+      expect(await trx.selectFrom('person_field_value').select('source').where('person_id', '=', id).where('source', '=', 'manual').execute()).toEqual([]);
+      await commands.updatePerson(recordId, { ...loaded, employment: { ...loaded.employment, contractType: 'TITULAIRE' } }, ctx);
+      repository.invalidate();
+      const after = (await repository.people(ALL)).items.find((p) => p.uid === 'test-meitner-l')!;
+      expect([after.employment.contractType, after.fieldProvenance?.contractType?.source, after.fieldProvenance?.civility?.source])
+        .toEqual(['TITULAIRE', 'manual', 'ldap']);
+    });
+  });
+
   it('merging duplicates moves the values by source of the absorbed person; two corrections that differ are a conflict', async () => {
     await inRollback(async (trx) => {
       const person = async (uid: string, last: string) => {

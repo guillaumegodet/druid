@@ -437,8 +437,10 @@ const newPersonOf = (c: PeopleImportCreation, source: string, validation: Return
  * druid-internal `docs/plan-maj-chercheurs.md`; the nature of the file — HR, lab, partner directory — is decision D3).
  */
 const PEOPLE_IMPORT_SOURCE = 'lab_file';
-const fileObservation = (ctx: any, grade: string | undefined, importBatchId: string | null = null) =>
-  (grade ? { ...ctx, fieldObservation: { source: PEOPLE_IMPORT_SOURCE, values: { corps_grade: grade }, importBatchId } } : ctx);
+const fileObservation = (ctx: any, values: { corps_grade?: string; employment_type?: string }, importBatchId: string | null = null) => {
+  const given = Object.fromEntries(Object.entries(values).filter(([, v]) => !!v));
+  return Object.keys(given).length ? { ...ctx, fieldObservation: { source: PEOPLE_IMPORT_SOURCE, values: given, importBatchId } } : ctx;
+};
 
 export const withImport = (r: Researcher, joins: PeopleImportJoin[], fields: { lab: string; field: PeopleImportUpdateField; value: string }[]): Researcher => {
   const out: Researcher = structuredClone(r);
@@ -469,7 +471,8 @@ export async function applyPeopleImport(args: {
   const plan = planPeopleImport(input, people, institutions, structures);
   const source = input.source || 'Import de fichier';
   const batchOf = lazyImportBatch(commands, PEOPLE_IMPORT_SOURCE, source, ctx);
-  const observing = async (grade: string | undefined) => fileObservation(ctx, grade, grade ? await batchOf() : null);
+  const observing = async (values: { corps_grade?: string; employment_type?: string }) =>
+    fileObservation(ctx, values, Object.values(values).some(Boolean) ? await batchOf() : null);
   const result: PeopleImportResult = { teamsCreated: 0, created: 0, joined: 0, updated: 0, stale: 0, errors: [] };
   const fail = (index: number, name: string, e: unknown) => result.errors.push({ index, name, error: e instanceof Error ? e.message : String(e) });
 
@@ -489,7 +492,7 @@ export async function applyPeopleImport(args: {
     if (!c) { result.stale++; continue; }
     const person = newPersonOf(c, source, selection.validateNew ? validationOf('PRESENT', source, today, actor) : null);
     try {
-      const withGrade = await observing(c.grade);
+      const withGrade = await observing({ corps_grade: c.grade, employment_type: c.employmentType });
       const { recordId } = await commands.createPerson({ ...person, affiliations: person.affiliations.slice(0, 1) }, withGrade);
       result.created++;
       if (person.affiliations.length > 1) {
@@ -531,7 +534,7 @@ export async function applyPeopleImport(args: {
       const fileGrade = plan.updates.filter((u) => u.researcherId === researcherId)
         .flatMap((u) => [...u.complements.map((c) => (c.field === 'grade' ? c.value : '')), ...u.differences.map((d) => (d.field === 'grade' ? d.file : ''))])
         .find(Boolean);
-      await commands.updatePerson(r.gristRowId, withImport(r, w.joins, w.fields), await observing(fileGrade));
+      await commands.updatePerson(r.gristRowId, withImport(r, w.joins, w.fields), await observing({ corps_grade: fileGrade }));
       result.joined += w.joins.length;
       if (w.fields.length) result.updated++;
     } catch (e) { fail(w.index, w.name, e); }

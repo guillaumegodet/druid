@@ -198,8 +198,10 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
       ldapCiv = (ldapCache[uid] as any).civilite;
     }
 
-    // LDAP first, otherwise the stored civility
-    const researcherCivility = normalizeCivility(ldapCiv || row.civility);
+    // Fields merged by source (PostgreSQL, druid-internal `docs/plan-maj-chercheurs.md`): the stored values are already
+    // the merge of the LDAP and the other sources, no overlay. Otherwise (Grist): LDAP first, then the stored value.
+    const merged = row.provenance;
+    const researcherCivility = normalizeCivility(merged ? row.civility : (ldapCiv || row.civility));
 
     // External employer: the LDAP category and corps describe the hosted account (« CDI
     // UNIVERSITE », generic corps → « IR ») and not the actual job → keep the stored values.
@@ -219,7 +221,6 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
 
     let researcherBirthDate = row.birthDate;
     let birthDateFromLdap = false;
-    const merged = row.provenance;
 
     if (!merged && uid && ldapCache[uid] && (ldapCache[uid] as any).birthDate) {
       const ldapBirth = (ldapCache[uid] as any).birthDate;
@@ -280,10 +281,10 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
       employment: {
         employer: employerName,
         institutionId: (typeof employerId === 'number') ? (employers.get(employerId)?.uai || '') : '',
-        contractType: ldapCategory || row.employmentType || '',
+        contractType: (merged ? row.employmentType : (ldapCategory || row.employmentType)) || '',
         grade: finalGrade,
         ldapFields: [
-          ...(ldapCategory ? ['contractType'] : []),
+          ...(ldapCategory && !merged ? ['contractType'] : []),
           ...(ldapGrade !== null && !merged ? ['grade'] : []),
         ],
         internalTypology: row.employmentTypeLabel || '',
@@ -306,6 +307,8 @@ export function mapDirectoryRows(rows: DirectoryRow[], employers: EmployerIndex,
       ...(merged ? { fieldProvenance: {
         ...(merged.birth_date ? { birthDate: merged.birth_date } : {}),
         ...(merged.corps_grade ? { grade: merged.corps_grade } : {}),
+        ...(merged.civility ? { civility: merged.civility } : {}),
+        ...(merged.employment_type ? { contractType: merged.employment_type } : {}),
       } } : {}),
       groups: row.groups,
       identifiers: { ...row.identifiers },

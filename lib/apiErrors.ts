@@ -69,7 +69,7 @@ export const API_ERRORS = [
   msg`Invalid import`,
   msg`Unknown import`,
   msg`This import was already cancelled`,
-  msg`The date of birth or the grade was changed meanwhile: reload the record before correcting it`,
+  msg`A value of this record was changed meanwhile: reload the record before correcting it`,
   msg`Invalid pair`,
   msg`Unknown researcher`,
   // Calls added by hand (lot 6): routes, store (lib/calls/manualStore.ts), reading (lib/calls/callDocument.ts), checks

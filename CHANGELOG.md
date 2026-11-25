@@ -13,6 +13,11 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Civilité et type d'emploi fusionnés par source** (PostgreSQL), comme la date de naissance et le grade : le LDAP
+  devient une source (plus de surcouche à l'affichage ni de verrou du type d'emploi), une valeur saisie dans la fiche
+  devient une correction qui l'emporte, avec l'étiquette de provenance, le panneau des sources, les conflits de sources
+  et le verrou des changements simultanés. Type d'emploi LDAP non repris pour un employeur externe ; les imports de
+  site et de fichier enregistrent le type d'emploi des fiches qu'ils créent.
 - **Annuler un import** (PostgreSQL ; À traiter › Conflits de sources › Imports récents, administrateurs) : chaque
   import de fichier ou de site enregistre son lot, et les valeurs qu'il apporte à la date de naissance et au grade le
   référencent. « Annuler les valeurs de cet import » les retire et recalcule les fiches ; les fiches, appartenances et
@@ -33,6 +38,9 @@ données à exécuter au déploiement).
 - `20261125150000_import_batch_kind` (dbmate) : `import_batch.kind` (`arbitration` par défaut pour les lots existants,
   `import` pour les imports), `created_by`, `undone_at`, `undone_by` ; index sur `person_field_value.import_batch_id`.
   Les écrans d'arbitrage ne listent que les lots `arbitration`.
+- `20261126090000_merge_civility_employment_type` (dbmate) : rangs des sources pour `civility` et `employment_type`,
+  reprise des valeurs actuelles (27 civilités et 1 type d'emploi en correction manuelle à Nantes). **Après le
+  déploiement : relancer la synchronisation LDAP** pour enregistrer les valeurs LDAP de ces deux champs.
 
 ## [2.20.0] — 2026-11-25
 

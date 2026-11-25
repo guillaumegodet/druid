@@ -1,13 +1,14 @@
-// LDAP values of the fields merged by source (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 a): after each LDAP
-// sync (server.cjs, end of scripts/sync_ldap.cjs), the birth date and the grade of every record with an LDAP account are
-// stored as the `ldap` source in person_field_value, and the `person` columns recomputed. This replaces the display
-// overlay of lib/directory/people.ts on PostgreSQL: a manual correction now wins over the LDAP, and an LDAP value that
-// changes after it is a conflict to review instead of a silent override.
+// LDAP values of the fields merged by source (druid-internal `docs/plan-maj-chercheurs.md`, lots 2 a and 3): after each
+// LDAP sync (server.cjs, end of scripts/sync_ldap.cjs), the birth date, grade, civility and employment type of every
+// record with an LDAP account are stored as the `ldap` source in person_field_value, and the `person` columns
+// recomputed. This replaces the display overlay of lib/directory/people.ts on PostgreSQL: a manual correction now wins
+// over the LDAP, and an LDAP value that changes after it is a conflict to review instead of a silent override.
 import { sql, type Transaction } from 'kysely';
 import { withActor, type DB, type Db } from '../../db/client';
 import { isExternalEmployer } from '../../validation';
 import { FieldValueError } from '../fieldMerge';
 import { ldapGradeTarget } from '../ldap';
+import { normalizeCivility } from '../../civility';
 import { observeFieldValue, readSourceRanks, reprojectField } from './fieldValues';
 
 const LDAP_SOURCE = 'ldap';
@@ -60,17 +61,24 @@ export const observeLdapFields = async (db: Db, cache: Record<string, any>, chun
           }
         };
         await observeOne('birth_date', entry.birthDate ?? '');
+        // Civility: F / M from « Madame », « M. »…; another LDAP value counts as none.
+        const civility = normalizeCivility(String(entry.civilite ?? ''));
+        await observeOne('civility', civility === 'F' || civility === 'M' ? civility : '');
         if (external) {
-          const dropped = await trx.deleteFrom('person_field_value')
-            .where('person_id', '=', p.id).where('field', '=', 'corps_grade').where('source', '=', LDAP_SOURCE).executeTakeFirst();
-          if (Number(dropped.numDeletedRows) > 0) {
-            summary.removed++;
-            await reprojectField(trx, p.id, 'corps_grade', ranks.get('corps_grade'));
+          // Hosted account: its corps and category describe the account, not the job.
+          for (const field of ['corps_grade', 'employment_type']) {
+            const dropped = await trx.deleteFrom('person_field_value')
+              .where('person_id', '=', p.id).where('field', '=', field).where('source', '=', LDAP_SOURCE).executeTakeFirst();
+            if (Number(dropped.numDeletedRows) > 0) {
+              summary.removed++;
+              await reprojectField(trx, p.id, field, ranks.get(field));
+            }
           }
         } else {
           await observeOne('corps_grade', ldapGradeTarget(entry, {
             Corps_grade: p.corps_grade ?? '', TYPE_EMPLOI: p.employment_type ?? '', LIB_TYPE_EMPLOI: p.employment_type_label ?? '',
           }));
+          await observeOne('employment_type', entry.categorie ?? '');
         }
       }
     });

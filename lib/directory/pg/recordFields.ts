@@ -181,6 +181,10 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
         // Reduced-precision date (YYYY, YYYY-MM or YYYY-MM-DD); 0 is the empty sentinel of the former Grist Date column.
         const d = blank(value) || value === 0 ? null : normalizeFuzzyDate(fromGristFuzzyDate(value)) || null;
         if (d || blank(value) || value === 0) { done(field); merged.push([MERGED_RECORD_FIELDS[field], d]); } else keep(field, value);
+      } else if (field === 'Civilite') {
+        // F / M; another civility is kept as typed (the record shows it normalized, like a Grist cell).
+        const c = String(value ?? '').trim().toUpperCase();
+        if (c === 'F' || c === 'M' || c === '') { done(field); merged.push(['civility', c || null]); } else keep(field, value);
       } else {
         merged.push([MERGED_RECORD_FIELDS[field], blank(value) ? null : String(value)]);
       }
@@ -189,11 +193,6 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
     if (PERSON_TEXT[field]) { set[PERSON_TEXT[field]] = field === 'Nom' ? String(value ?? '') : (blank(value) ? null : String(value)); continue; }
     switch (field) {
       case 'uid_dyna': set.uid = blank(value) ? null : String(value).trim(); continue;
-      case 'Civilite': {
-        const c = String(value ?? '').trim().toUpperCase();
-        if (c === 'F' || c === 'M' || c === '') { set.civility = c || null; done(field); } else { set.civility = null; keep(field, value); }
-        continue;
-      }
       case 'validation_date': {
         const d = blank(value) || value === 0 ? '' : fromGristDate(value);
         if (!d || (/^\d{4}-\d{2}-\d{2}$/.test(d) && normalizeFuzzyDate(d) === d)) { set.presence_validated_on = d || null; done(field); } else { set.presence_validated_on = null; keep(field, value); }

@@ -152,7 +152,7 @@ describe.skipIf(!url)('person_field_value', () => {
     });
   });
 
-  it('LDAP observation: birth date and grade stored as `ldap`; none for an external employer; a second run changes nothing', async () => {
+  it('LDAP observation: birth date, grade, civility, employment type stored as `ldap`; no grade nor type for an external employer; a second run changes nothing', async () => {
     await inRollback(async (trx) => {
       const external = (await trx.insertInto('establishment').values({ name: 'CNRS', uai: '0000000X' } as any).returning('id').executeTakeFirstOrThrow()).id;
       const inside = (await trx.insertInto('person').values({ last_name: 'Noether', first_name: 'Emmy', uid: 'test-noether-e' } as any).returning('id').executeTakeFirstOrThrow()).id;
@@ -160,16 +160,20 @@ describe.skipIf(!url)('person_field_value', () => {
         .returning('id').executeTakeFirstOrThrow()).id;
       await observeFieldValue(trx, { personId: hosted, field: 'corps_grade', source: 'ldap', value: 'IR' });
       const cache = {
-        'test-noether-e': { etat: 'N', birthDate: '19820309', empCorps: '', categorie: '' },
-        'test-germain-s': { etat: 'N', birthDate: '19760401', empCorps: '', categorie: 'CDI UNIVERSITE' },
+        'test-noether-e': { etat: 'N', birthDate: '19820309', empCorps: '', categorie: 'TITULAIRE', civilite: 'Madame' },
+        'test-germain-s': { etat: 'N', birthDate: '19760401', empCorps: '', categorie: 'CDI UNIVERSITE', civilite: 'Mme' },
       };
+      await observeFieldValue(trx, { personId: hosted, field: 'employment_type', source: 'ldap', value: 'CDI UNIVERSITE' });
       // The observer opens its own transactions: run it on this one.
       const first = await observeLdapFields(trx as any, cache);
-      expect(first).toMatchObject({ persons: 2, removed: 1, invalid: 0 });
+      expect(first).toMatchObject({ persons: 2, removed: 2, invalid: 0 });
       expect((await column(trx, inside)).birth_date).toBe('1982-03-09');
+      const insideRow = await trx.selectFrom('person').select(['civility', 'employment_type']).where('id', '=', inside).executeTakeFirstOrThrow();
+      expect(insideRow).toEqual({ civility: 'F', employment_type: 'TITULAIRE' });
       expect((await column(trx, hosted)).corps_grade).toBeNull();
-      expect(await trx.selectFrom('person_field_value').select(['field', 'source']).where('person_id', '=', hosted).orderBy('field').execute())
-        .toEqual([{ field: 'birth_date', source: 'ldap' }]);
+      // Hosted account: birth date and civility kept, no grade nor employment type from the LDAP.
+      expect(await trx.selectFrom('person_field_value').select(['field', 'source', 'value']).where('person_id', '=', hosted).orderBy('field').execute())
+        .toEqual([{ field: 'birth_date', source: 'ldap', value: '1976-04-01' }, { field: 'civility', source: 'ldap', value: 'F' }]);
       const second = await observeLdapFields(trx as any, cache);
       expect(second).toMatchObject({ changed: 0, removed: 0 });
     });
