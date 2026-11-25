@@ -42,6 +42,12 @@ docs/plan-migration-postgresql.md, lot 10):
   Settings › Runtime, default for a compatibility date from 2026-08-04); the driver is bundled by the build with its
   Node built-ins as `node:*` (`functions/_generated/pg.js`), since the Pages build system compiles the Functions without
   that flag. On target `docker` the server reads `DRUID_STORAGE` instead; the field only documents it.
+- `postgres.schema` (`i_<name>`, optional, with `storage: postgres`): the instance lives in that schema of the
+  control-plane database of the druid-saas Worker (binding `SAAS_HYPERDRIVE`, the database of the tenants, whose
+  schemas are `t_<slug>`). Used when the deployment has no `HYPERDRIVE`/`HYPERDRIVE__<SLUG>` binding for the instance:
+  the public demos are served by the Worker from their schemas (`i_demo`, `i_demo_2`) and by `druid-demo.pages.dev`
+  from its own Neon database. The Worker deployment (dirladata-instances) creates, migrates and reloads these schemas
+  with `scripts/seed_demo_pg.ts --instance <slug> --schema <schema> --apply`.
 The private repository also describes the Docker instance of Nantes (not read by `server.cjs`: inventory
 and drift check only).
 

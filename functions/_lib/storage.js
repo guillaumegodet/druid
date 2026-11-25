@@ -7,7 +7,8 @@
 //  - grist: the Grist document of the instance, key GRIST_API_KEY (GRIST_API_KEY__<SLUG> on a shared deployment); a
 //    read-only instance may read a public document without key. One set of stores per instance, document and key, for
 //    the lifetime of the isolate.
-//  - postgres: the PostgreSQL database of the instance through its Hyperdrive binding HYPERDRIVE (HYPERDRIVE__<SLUG>),
+//  - postgres: the PostgreSQL database of the instance through its Hyperdrive binding HYPERDRIVE (HYPERDRIVE__<SLUG>) —
+//    or, for a tenant or a registry instance with `postgres.schema`, its schema of the shared database (SAAS_HYPERDRIVE) —
 //    one database client per request (the connections of a Worker do not outlive the request; Hyperdrive holds the
 //    real pool), released by `release()` once the response is built. The driver comes from the bundle written by the
 //    build (functions/_generated/pg.js, scripts/functions_pg_bundle.cjs: node-postgres with its Node built-ins as
@@ -23,7 +24,7 @@ import { createGristDirectoryRepository, createGristReader } from '../../lib/dir
 import { createGristPublicationsStore } from '../../lib/publications/store.ts';
 import { instanceAssetPath } from './instanceAssets.js';
 import { HYPERDRIVE_BINDING, instanceOf, secretOf } from './instance.js';
-import { tenantConnectionString } from './saas.js';
+import { isControlPlane, tenantConnectionString } from './saas.js';
 
 const gristStores = new Map();
 
@@ -79,12 +80,16 @@ const gristStorage = (context, instance) => {
 const pgStorage = (context, instance) => {
   // A tenant of the control plane (druid-internal docs/plan-druid-saas.md, lot 1 b): its schema of the shared database,
   // every query qualified by the schema (lib/db/core.ts) — the binding of the control plane, no per-instance binding.
-  const binding = instance.tenant ? tenantConnectionString(context.env) : secretOf(context.env, instance, HYPERDRIVE_BINDING);
+  // A registry instance with `postgres.schema` (the public demos on the druid-saas Worker) lives in a schema of that same
+  // database when the deployment has no HYPERDRIVE binding of its own for it (druid-demo.pages.dev keeps its Neon).
+  const own = instance.tenant ? null : secretOf(context.env, instance, HYPERDRIVE_BINDING);
+  const sharedSchema = !instance.tenant && !own && instance.postgres?.schema && isControlPlane(context.env) ? instance.postgres.schema : null;
+  const binding = instance.tenant || sharedSchema ? tenantConnectionString(context.env) : own;
   const connectionString = binding && typeof binding === 'object' ? binding.connectionString : (typeof binding === 'string' ? binding : '');
   if (!connectionString) {
     return { instance, apiKey: undefined, store: null, missing: `${instance.tenant ? 'SAAS_HYPERDRIVE' : 'HYPERDRIVE'} binding not configured on Cloudflare`, release: async () => {} };
   }
-  const db = createDbWith(pg, { connectionString, max: 1, schema: instance.tenant ? instance.tenant.schema : undefined });
+  const db = createDbWith(pg, { connectionString, max: 1, schema: instance.tenant ? instance.tenant.schema : sharedSchema || undefined });
   // A tenant's caches are rows of its schema, written by the runner after each run (lib/saas/alignCache.ts); its IdRef
   // search is the Qualinka engine of the runner (lot 3 b). The other instances read their static files.
   const caches = instance.tenant ? alignCacheSourceOf(db) : alignCachesOf(context, instance);

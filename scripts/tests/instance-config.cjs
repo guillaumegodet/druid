@@ -67,6 +67,10 @@ check('storage postgres excludes the grist block', rejects({ ...publicDemo(), st
 check('storage postgres has no Grist key', rejects({ ...postgresDemo(), secrets: ['GRIST_API_KEY'] }, 'does not use the GRIST_API_KEY secret'), true);
 check('storage postgres: private writable instance with news and newsletter is valid (lot 10 d)', parseInstanceConfig({ ...privateCloudflare(), grist: undefined, storage: 'postgres', secrets: ['ILAAS_API_KEY'], features: { news: true, newsletter: true } }).ok, true);
 check('unknown storage is rejected', rejects({ ...publicDemo(), storage: 'sqlite' }, 'storage'), true);
+check('postgres.schema in the shared database (lot 10 e)', parseInstanceConfig({ ...postgresDemo(), postgres: { schema: 'i_demo_2' } }).config.postgres, { schema: 'i_demo_2' });
+check('postgres block absent by default', parseInstanceConfig(postgresDemo()).config.postgres, null);
+check('postgres.schema needs the i_ prefix', rejects({ ...postgresDemo(), postgres: { schema: 't_demo' } }, 'postgres.schema'), true);
+check('postgres block requires storage postgres', rejects({ ...publicDemo(), postgres: { schema: 'i_demo' } }, 'requires storage "postgres"'), true);
 check('public repository: a Grist instance still needs a public doc', publicRepoErrors({ ...publicDemo(), grist: { docId: 'AAAAAAAAAAAAAAAAAAAAAA' } }).length, 1);
 
 {

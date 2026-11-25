@@ -4,6 +4,12 @@
 import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import { describe, it, expect, beforeEach } from 'vitest';
+import { sql } from 'kysely';
+import { createDb } from '../db/client';
+import { demoDirectoryInput, type DemoData } from '../migration/demoSeed';
+import { transformDirectory } from '../migration/gristToPg';
+import { loadDirectory } from '../migration/loadPg';
+import { migrateTenantSchema } from '../saas/tenantDb';
 
 // The Functions import the registry written by a Cloudflare build (ignored by git): created empty when absent, as
 // scripts/tests/functions-guards.mjs does.
@@ -22,7 +28,8 @@ const { parseInstanceConfig, buildRegistry } = createRequire(import.meta.url)('.
 const DOC = 'docA';
 // The demo of this repository is on PostgreSQL (lot 10 c); the Grist cases keep a copy of it on a public document.
 const demoFile = JSON.parse(fs.readFileSync(new URL('../../instances/demo/instance.json', import.meta.url), 'utf8'));
-const demoRaw = { ...demoFile, storage: 'grist', grist: { docId: 'docDemoPublic01', publicRead: true } };
+const { postgres: _demoSchema, ...demoBase } = demoFile;
+const demoRaw = { ...demoBase, storage: 'grist', grist: { docId: 'docDemoPublic01', publicRead: true } };
 const demoReg = parseInstanceConfig(demoRaw).config;
 const demo2Reg = parseInstanceConfig({ ...demoRaw, slug: 'demo-2', label: 'Démo 2', domains: ['demo-2.example.org'], grist: { docId: 'docDemo20002', publicRead: true } }).config;
 const privReg = parseInstanceConfig({
@@ -133,4 +140,34 @@ describe.skipIf(!pgUrl)('functions/api/v1 on PostgreSQL through Hyperdrive (lot 
     const r = await call('GET', '/api/v1/structures', { instance: shared, env: { HYPERDRIVE__DEMO: binding } });
     expect(r.status).toBe(200);
   });
+
+  // Public demos on the druid-saas Worker (lot 10 e): a schema of the control-plane database, loaded like
+  // scripts/seed_demo_pg.ts --schema does (search_path of the transaction), read through SAAS_HYPERDRIVE.
+  const ownerUrl = process.env.DATABASE_URL;
+  it.skipIf(!ownerUrl)('instance with postgres.schema: its schema of the shared database, never without SAAS_HYPERDRIVE', async () => {
+    const schema = 'i_zz_fn_demo';
+    const owner = createDb({ connectionString: ownerUrl!, max: 1 });
+    try {
+      await sql`DROP SCHEMA IF EXISTS ${sql.id(schema)} CASCADE`.execute(owner);
+      await migrateTenantSchema(schema, { ownerUrl: ownerUrl! });
+      const data = await import('../../instances/demo-2/demo-data.mjs') as DemoData;
+      const directory = transformDirectory(demoDirectoryInput(data));
+      await owner.transaction().execute(async (trx) => {
+        await sql`SELECT set_config('search_path', ${schema}, true)`.execute(trx);
+        await loadDirectory(trx, directory.rows, directory.report);
+      });
+      const inSchema = resolveInstance({}, parseInstanceConfig({ ...demoFile, slug: 'demo-2', postgres: { schema } }, { folder: 'demo-2' }).config, { shared: true });
+      expect(inSchema.postgres.schema).toBe(schema);
+      const p = await call('GET', '/api/v1/people', { instance: inSchema, env: { SAAS_HYPERDRIVE: binding } });
+      expect(p.status).toBe(200);
+      expect((await p.json()).items.length).toBe(data.buildResearchers().length);
+      // Not a control-plane deployment: the schema alone opens nothing.
+      const none = await call('GET', '/api/v1/people', { instance: inSchema, env: {} });
+      expect([none.status, (await none.json()).error]).toEqual([500, 'HYPERDRIVE binding not configured on Cloudflare']);
+      expect(calls).toEqual([]);
+    } finally {
+      await sql`DROP SCHEMA IF EXISTS ${sql.id(schema)} CASCADE`.execute(owner);
+      await owner.destroy();
+    }
+  }, 120_000);
 });

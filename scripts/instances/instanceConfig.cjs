@@ -56,6 +56,12 @@ const instanceSchema = z.strictObject({
   // PostgreSQL database reached through the Hyperdrive binding HYPERDRIVE (HYPERDRIVE__<SLUG> on a shared deployment).
   // On target "docker" the server reads DRUID_STORAGE instead; the field only documents the instance.
   storage: z.enum(['grist', 'postgres']).default('grist'),
+  // PostgreSQL instance hosted in a schema of the control-plane database of a multi-tenant deployment (the public
+  // demos on the druid-saas Worker): reached through SAAS_HYPERDRIVE when the deployment has no HYPERDRIVE binding of
+  // its own for the instance, every query qualified by this schema. `i_` prefix: never a tenant schema (`t_<slug>`).
+  postgres: z.strictObject({
+    schema: z.string().regex(/^i_[a-z0-9_]{1,40}$/, 'expected i_<name> (lowercase, digits, underscores)'),
+  }).nullable().default(null),
   grist: z.strictObject({
     docId: z.string().regex(GRIST_DOC_RE, 'expected a Grist doc id'),
     apiBase: z.url().default(DEFAULT_GRIST_API_BASE),
@@ -96,6 +102,8 @@ const crossFieldErrors = (c) => {
     if (c.grist) errors.push('storage "postgres" excludes the grist block (no document is read any more)');
     if (c.secrets.includes('GRIST_API_KEY')) errors.push('storage "postgres" does not use the GRIST_API_KEY secret');
   }
+  if (c.postgres && c.storage !== 'postgres') errors.push('the postgres block requires storage "postgres"');
+  if (c.postgres && c.target !== 'cloudflare') errors.push('postgres.schema only exists on target "cloudflare" (shared database of the Worker)');
   if (c.grist?.publicRead && !c.readOnly) errors.push('grist.publicRead requires readOnly: true (the browser reads the doc without the proxy)');
   if (c.readOnly && c.admins.length) errors.push('a readOnly instance has no administrator: admins must be empty');
   if (c.admins.length && c.access !== 'cloudflare-access') errors.push('admins only apply to access "cloudflare-access" (Keycloak holds its own roles)');

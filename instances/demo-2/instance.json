@@ -7,9 +7,9 @@
   ],
   "access": "public",
   "readOnly": true,
-  "grist": {
-    "docId": "7LPh1eN5pL8UqSx7osVrwD",
-    "publicRead": true
+  "storage": "postgres",
+  "postgres": {
+    "schema": "i_demo_2"
   },
   "capabilities": {
     "HAS_STATUS_VALIDATION": false

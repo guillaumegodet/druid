@@ -11,9 +11,15 @@
  *
  * Usage (DATABASE_URL = druid_owner of the target, migrated with dbmate):
  *   npm run seed:demo -- [--instance demo|demo-2] [--apply]
+ *
+ * `--schema i_<name>`: the instance lives in that schema of a shared database (instance.json `postgres.schema`, the
+ * public demos on the druid-saas Worker, druid-internal docs/plan-migration-postgresql.md, lot 10 e). With `--apply`
+ * the schema is created and migrated first (lib/saas/tenantDb.ts, dbmate of node_modules); the load then runs with
+ * `search_path` set to it for the transaction, so the loaders keep their unqualified names.
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { sql } from 'kysely';
 import { createDb } from '../lib/db/client';
 import { demoExtras, type DemoNetwork, type DemoResearcherRow } from '../lib/migration/demoExtras';
 import { demoDirectoryInput, emptyWorkInput, type DemoData } from '../lib/migration/demoSeed';
@@ -21,6 +27,7 @@ import { loadDemoExtras } from '../lib/migration/loadDemoExtras';
 import { mergeReport, transformDirectory } from '../lib/migration/gristToPg';
 import { transformWork } from '../lib/migration/gristToPgWork';
 import { loadDirectory, loadWork } from '../lib/migration/loadPg';
+import { migrateTenantSchema } from '../lib/saas/tenantDb';
 
 // Static paths: the bundler (esbuild) ships both data files; the fictitious instances are the ones of this repository.
 const DATA: Record<string, () => Promise<DemoData>> = {
@@ -43,6 +50,8 @@ const args = process.argv.slice(2);
 const APPLY = args.includes('--apply');
 const at = args.indexOf('--instance');
 const INSTANCE = at >= 0 ? String(args[at + 1] || '') : 'demo';
+const atSchema = args.indexOf('--schema');
+const SCHEMA = atSchema >= 0 ? String(args[atSchema + 1] || '') : null;
 
 class DryRun extends Error {}
 
@@ -50,6 +59,7 @@ async function main() {
   const load = DATA[INSTANCE];
   if (!load) throw new Error(`--instance must be one of: ${Object.keys(DATA).join(', ')}`);
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL (role druid_owner) not configured');
+  if (SCHEMA !== null && !/^i_[a-z0-9_]{1,40}$/.test(SCHEMA)) throw new Error('--schema must be i_<name> (instance.json postgres.schema)');
 
   const data = await load();
   const directory = transformDirectory(demoDirectoryInput(data));
@@ -69,15 +79,23 @@ async function main() {
     process.exit(1);
   }
 
+  if (SCHEMA && APPLY) {
+    await migrateTenantSchema(SCHEMA, { ownerUrl: process.env.DATABASE_URL, log: (l) => console.log(`[seed_demo] ${l}`) });
+  }
   const db = createDb({ connectionString: process.env.DATABASE_URL, max: 1 });
   try {
     const counts = await db.transaction().execute(async (trx) => {
+      if (SCHEMA) {
+        const found = await sql<{ n: number }>`SELECT count(*)::int AS n FROM information_schema.tables WHERE table_schema = ${SCHEMA} AND table_name = 'person'`.execute(trx);
+        if (!found.rows[0]?.n) throw new Error(`schema ${SCHEMA} is not migrated (run with --apply to create it)`);
+        await sql`SELECT set_config('search_path', ${SCHEMA}, true)`.execute(trx);
+      }
       const loaded = {
         ...await loadDirectory(trx, directory.rows, report),
         ...await loadWork(trx, work.rows),
         ...(extras ? await loadDemoExtras(trx, extras) : {}),
       };
-      console.log(`[seed_demo] loaded ${JSON.stringify(loaded)}`);
+      console.log(`[seed_demo] loaded${SCHEMA ? ` in schema ${SCHEMA}` : ''} ${JSON.stringify(loaded)}`);
       if (!APPLY) throw new DryRun();
       return loaded;
     });

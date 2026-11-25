@@ -10,23 +10,24 @@ for the homonyms of its alignment caches).
 | File | Role |
 | --- | --- |
 | `demo-data.mjs` | Fictitious researchers (26), structures (7), institutions (3). Deterministic. |
-| `instance.json` | Registry entry: read-only, public access, public Grist doc, host `demo-2.dirladata.fr`. |
+| `instance.json` | Registry entry: read-only, public access, PostgreSQL schema `i_demo_2` of the druid-saas database, host `demo-2.dirladata.fr`. |
 | `dashboard-data/` | Fictitious dashboards (eidemo = the school, mecademo, syndemo), written by `../demo/gen_demo_dashboards.py --instance demo-2`. |
 | `demo-2-*_cache.json` | Fictitious alignment candidates, written by `../demo/gen_demo_align_caches.mjs --instance demo-2`. |
 
 On the shared deployment these files are copied into `public/instance-assets/demo-2/` and served only on the
 hosts of `demo-2` (`functions/_lib/instanceAssets.js`, see `../README.md`).
 
-## Grist doc
+## Database
 
-`7LPh1eN5pL8UqSx7osVrwD` (« Druid — démo 2 », personal Grist space of the maintainer), created on 2026-09-26
-with the demo schema (`../demo/schema.json`). It must be shared **publicly as viewer** (Grist UI → Share →
-Public access, on the doc only — never on the workspace). Refresh after editing `demo-data.mjs`:
+Since lot 10 e of druid-internal docs/plan-migration-postgresql.md (2026-11-25), schema `i_demo_2` of the
+control-plane database of the druid-saas Worker (`postgres.schema` of `instance.json`, read through
+`SAAS_HYPERDRIVE`). The Worker deployment (dirladata-instances) migrates it and reloads `demo-data.mjs` into it at
+every deployment (`scripts/seed_demo_pg.ts --instance demo-2 --schema i_demo_2 --apply`). The former public Grist doc
+`7LPh1eN5pL8UqSx7osVrwD` is no longer read; to be deleted once the Worker serves the schema.
+
+Dashboards and alignment caches stay static files, regenerated after editing `demo-data.mjs`:
 
 ```bash
-docker run --rm --network host -v "$PWD":/app -w /app \
-  -e GRIST_API_KEY=<key> -e DEMO_GRIST_DOC_ID=7LPh1eN5pL8UqSx7osVrwD \
-  node:20-slim node instances/demo/build_demo_grist.mjs --instance demo-2 --apply
 docker run --rm -v "$PWD":/app -w /app node:20-slim node instances/demo-2/demo-data.mjs > /tmp/demo-2-people.json
 python3 instances/demo/gen_demo_dashboards.py --instance demo-2 /tmp/demo-2-people.json
 docker run --rm -v "$PWD":/app -w /app node:20-slim node instances/demo/gen_demo_align_caches.mjs --instance demo-2
