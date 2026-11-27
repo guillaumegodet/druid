@@ -40,14 +40,17 @@
  *                    (affiliation_history/_index.json of scripts/sync_affiliation_history.cjs): one task per
  *                    record, typed by the strongest signal — parcours_depart_confirme (several sources),
  *                    parcours_depart_declare (ORCID), parcours_depart_observe (publications); closed as soon
- *                    as an end date is entered (docs/archive/plan-parcours-affiliations.md, lot 4)
+ *                    as an end date is entered or Druid's presence already says gone / leaving (LDAP account gone or
+ *                    closing, end dates), and a publications-only signal once the home LDAP account is active
+ *                    (docs/archive/plan-parcours-affiliations.md, lot 4)
  *   parcours_statut_incoherent  ended record still publishing locally / with an open ORCID position there
  *   parcours_identifiant_suspect  identifiers whose publications / Scopus profile never mention the
  *                    institution (alignment control)
  *   doctorant_these  record still a PhD student (TYPE_EMPLOI or Corps_grade DOCTORANT, not gone) whose IdRef has a
  *                    defended thesis on theses.fr (table Theses, PostgreSQL instances, scripts/sync_theses.ts):
  *                    annuaire_doctorant_docteur when the thesis is recent (status, employment or end to update;
- *                    closed once the record no longer says PhD student), annuaire_doctorant_these_ancienne when it
+ *                    closed once the record no longer says PhD student, or Druid counts the person gone or leaving),
+ *                    annuaire_doctorant_these_ancienne when it
  *                    is older than a PhD lasts (IdRef of a namesake, or a second doctorate: to check)
  *   employeur_a_renseigner  closing-only rule (`review`, creates nothing) over the « employer to enter » tasks
  *                    of migration 002 (records validated EXTERNE without employer, release 1.6.0): such a task
@@ -369,6 +372,58 @@ function employerTaskSettled(rec, ctx) {
   return 'Fiche sans uid LDAP (ext_ ou vide) : Druid la compte déjà hors de l’établissement (externe), l’employeur n’est pas nécessaire.';
 }
 
+// ── Presence as Druid shows it (lib/presence.ts derivePresence, ported: this script cannot import TypeScript) ──
+/** An employment end this close is an announced departure (lib/presence.ts DEPARTURE_NOTICE_MONTHS). */
+const DEPARTURE_NOTICE_MONTHS = 3;
+/** Fuzzy date of a cell (YYYY, YYYY-MM, YYYY-MM-DD; Grist epoch seconds read as a day). */
+const fuzzyOf = (v) => (typeof v === 'number' && v ? new Date(v * 1000).toISOString().slice(0, 10) : String(v || '').trim());
+/** Last day a fuzzy date may mean (« 2027 » → 2027-12-31), '' when not a date — lib/dates.ts fuzzyDateUpperBound. */
+const fuzzyUpper = (v) => {
+  const m = /^(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?$/.exec(fuzzyOf(v));
+  if (!m) return '';
+  const month = m[2] ? Number(m[2]) : 12;
+  const day = m[3] ? Number(m[3]) : new Date(Date.UTC(Number(m[1]), month, 0)).getUTCDate();
+  return `${m[1]}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+};
+const isPastFuzzy = (v) => { const u = fuzzyUpper(v); return !!u && u < today; };
+const monthsFromToday = (n) => { const d = new Date(`${today}T00:00:00Z`); d.setUTCMonth(d.getUTCMonth() + n); return d.toISOString().slice(0, 10); };
+const isTrueCell = (v) => v === true || v === 1 || v === 'true' || v === 'OUI' || v === 'oui' || v === 'yes';
+/** Presence set by a reliable list covering the status (lib/validation.ts normStatus), '' otherwise. */
+const validatedPresenceOf = (f) => {
+  if (!isTrueCell(f.validated) || !String(f.validation_scope || '').includes('statut')) return '';
+  const s = normEmployer(f.validated_status);
+  if (s === 'PRESENT' || s === 'INTERNE' || s === 'EXTERNE') return 'PRESENT';
+  return s === 'DEPART' || s === 'PARTI' ? s : '';
+};
+/** LDAP state of a record: 'none' (ext_ or no uid), 'gone' (uid absent from the cache), 'closing' (D) or 'active'. */
+const ldapStateOf = (f, ctx) => {
+  const uid = String(f.uid_dyna || '').trim();
+  if (!uid || uid.startsWith('ext_')) return 'none';
+  const l = ctx.ldap[uid];
+  const etat = l === undefined ? undefined : (typeof l === 'string' ? l : l && l.etat);
+  if (etat === undefined || etat === null) return 'gone';
+  return String(etat).trim().toUpperCase().startsWith('D') ? 'closing' : 'active';
+};
+/**
+ * Presence of an Annuaire row as Druid computes it (same order as lib/presence.ts derivePresence, without the
+ * « retired without emeritus » signal, which only makes this one see fewer departures): { presence, why }.
+ */
+function presenceOf(f, ctx) {
+  const uid = String(f.uid_dyna || '').trim();
+  if (isPastFuzzy(f.employment_end_date) && isPastFuzzy(f.affiliation_end_date)) return { presence: 'PARTI', why: 'fins d’emploi et d’appartenance passées' };
+  const validated = validatedPresenceOf(f);
+  if (validated) return { presence: validated, why: `présence validée${f.validation_source ? ` « ${f.validation_source} »` : ''}` };
+  if (!isExternalEmployerRef(f.Employeur, ctx.etablissements)) {
+    const l = ldapStateOf(f, ctx);
+    if (l === 'gone') return { presence: 'PARTI', why: `compte LDAP ${uid} disparu` };
+    if (l === 'closing') return { presence: 'DEPART', why: `compte LDAP ${uid} en fermeture` };
+  }
+  if (isPastFuzzy(f.employment_end_date)) return { presence: 'PARTI', why: 'fin d’emploi passée' };
+  const end = fuzzyUpper(f.employment_end_date);
+  if (end && end <= monthsFromToday(DEPARTURE_NOTICE_MONTHS)) return { presence: 'DEPART', why: 'fin d’emploi dans moins de 3 mois' };
+  return { presence: 'PRESENT', why: '' };
+}
+
 // ── Rules: detect(ctx) → [{ key, rec, description, lien, type? }] ─────────────────
 
 // ── Career path (docs/archive/plan-parcours-affiliations.md, lot 4) ────────────────────────
@@ -398,6 +453,35 @@ function endsByKey(annuaire) {
 /** A thesis defended more than this many years ago does not belong to a current PhD student (a PhD lasts 3 to 6). */
 const PHD_RECENT_YEARS = 6;
 const isPhdStudent = (f) => [f.TYPE_EMPLOI, f.Corps_grade].some((v) => String(v || '').trim().toUpperCase() === 'DOCTORANT');
+
+/**
+ * `settled(rec, ctx, type)` of a rule: why a situation it would flag needs nobody, or ''. The rule skips such
+ * records, and the closing of its open tasks gives this reason instead of « situation gone ».
+ */
+/** Departure task: Druid already counts the person gone / leaving, or an active home LDAP account outweighs
+ * a departure seen in the publications only (the weakest signal). */
+function parcoursSettled(rec, ctx) {
+  if (!rec) return '';
+  const f = rec.fields;
+  const p = presenceOf(f, ctx);
+  if (p.presence === 'PARTI') return `Druid compte déjà la personne partie (${p.why}).`;
+  if (p.presence === 'DEPART') return `Druid compte déjà la personne sur le départ (${p.why}).`;
+  const line = ctx.parcours[rec.key];
+  const strongest = line && PARCOURS_DEPART.map(([sig, type]) => ((line.signals || []).some((x) => x.type === sig) ? type : '')).find(Boolean);
+  if (strongest === 'parcours_depart_observe' && ldapStateOf(f, ctx) === 'active' && !isExternalEmployerRef(f.Employeur, ctx.etablissements)) {
+    return `Compte LDAP ${f.uid_dyna} actif dans l’établissement : les publications seules ne suffisent pas à conclure au départ.`;
+  }
+  return '';
+}
+/** PhD student turned doctor: nothing to update once Druid counts the person gone (or leaving, for the recent
+ * thesis — an old one still points to an IdRef to check). */
+function doctorantSettled(rec, ctx, type) {
+  if (!rec) return '';
+  const p = presenceOf(rec.fields, ctx);
+  if (p.presence === 'PARTI') return `Druid compte déjà la personne partie (${p.why}) : rien à mettre à jour.`;
+  if (p.presence === 'DEPART' && type !== 'annuaire_doctorant_these_ancienne') return `Druid compte déjà la personne sur le départ (${p.why}) : rien à mettre à jour.`;
+  return '';
+}
 /** Thesis of each directory row, from the table Theses (one row per person, `annuaire_rows` = its rows). */
 const thesesByRow = (rows) => {
   const out = {};
@@ -609,12 +693,15 @@ const RULES = {
   parcours_depart: {
     type: 'parcours_depart_observe',
     types: ['parcours_depart_confirme', 'parcours_depart_declare', 'parcours_depart_observe'],
-    sources: ['parcours'],
+    // ldap + etablissements: the presence (parcoursSettled) reads them; empty ⇒ skipped, not every uid « gone ».
+    sources: ['parcours', 'ldap', 'etablissements'],
+    settled: parcoursSettled,
     detect(ctx) {
       const out = [];
       for (const [key, e] of endsByKey(ctx.annuaire)) {
         const line = ctx.parcours[key];
         if (!line || e.ended) continue;   // an end date entered since the computation closes the task
+        if (parcoursSettled(e.rec, ctx)) continue;
         const found = PARCOURS_DEPART.map(([sig, type]) => ({ sig: (line.signals || []).find((x) => x.type === sig), type })).find((x) => x.sig);
         if (!found) continue;
         const others = (line.signals || []).filter((x) => x !== found.sig && PARCOURS_DEPART.some(([t]) => t === x.type));
@@ -668,7 +755,8 @@ const RULES = {
   doctorant_these: {
     type: 'annuaire_doctorant_docteur',
     types: ['annuaire_doctorant_docteur', 'annuaire_doctorant_these_ancienne'],
-    sources: ['theses'],
+    sources: ['theses', 'ldap', 'etablissements'],
+    settled: doctorantSettled,
     detect(ctx) {
       const out = [];
       const recentFrom = `${Number(today.slice(0, 4)) - PHD_RECENT_YEARS}${today.slice(4)}`;
@@ -679,11 +767,12 @@ const RULES = {
         if (/^PARTI$/i.test(String(f.validated_status || '').trim())) continue;   // gone: nothing to update
         const when = `${frDate(String(t.defended_on))}${t.institution ? ` (${t.institution})` : ''}`;
         const recent = String(t.defended_on) >= recentFrom.slice(0, String(t.defended_on).length);
+        if (doctorantSettled(rec, ctx, recent ? 'annuaire_doctorant_docteur' : 'annuaire_doctorant_these_ancienne')) continue;
         out.push(recent ? {
           key: rec.key, rec, type: 'annuaire_doctorant_docteur',
           description: [
             `Thèse soutenue le ${when}, NNT ${t.nnt} (theses.fr, par l’IdRef de la fiche) ; la fiche indique toujours « doctorant ».`,
-            'À faire : mettre à jour le type d’emploi et le grade (post-doctorant, ATER, MCF…), ou, si la personne est partie, saisir la fin d’emploi et valider la présence « parti ». La tâche se ferme seule quand la fiche ne dit plus « doctorant » ou que la personne est validée partie.',
+            'À faire : mettre à jour le type d’emploi et le grade (post-doctorant, ATER, MCF…), ou, si la personne est partie, saisir la fin d’emploi et valider la présence « parti ». La tâche se ferme seule quand la fiche ne dit plus « doctorant » ou que Druid compte la personne partie ou sur le départ.',
           ].join('\n'),
           lien: druidRecordUrl(rec.key),
         } : {
@@ -762,6 +851,7 @@ async function main() {
   catch (e) { if (APPLY) throw e; console.log(`[tasks] table ${schema.TASKS_TABLE} unreadable (${e.message}) — dry-run continues with no existing task`); }
   ctx.tasks = existing;   // closing-only rules (review) read the tasks they settle
   const byKey = new Map(existing.filter((r) => r.fields.cle).map((r) => [r.fields.cle, r]));
+  const rowById = new Map(annuaire.map((r) => [r.id, r]));   // settled(): reason of a closing
   // Open tasks typed by hand (import, form) for the same type + person: the rule does not
   // duplicate them — the human one already tracks the situation.
   const manualOpen = new Set(existing
@@ -831,8 +921,9 @@ async function main() {
       if (cur.fields.origine !== `regle:${name}` || seen.has(cur.fields.cle)) continue;
       const statut = schema.statusOf(cur.fields);
       if (!['a_faire', 'en_cours', 'en_attente'].includes(statut)) continue;
-      patches.push({ id: cur.id, fields: { statut: 'resolue_auto', fait_par: AUTHOR, fait_le: nowIso, verifie_le: nowIso, resolution: `Situation disparue au contrôle du ${today}` },
-        event: { date: nowIso, auteur: AUTHOR, action: 'resolution_auto', detail: `La règle ${name} ne détecte plus la situation` } });
+      const reason = rule.settled ? rule.settled(rowById.get(Number(cur.fields.chercheur)), ctx, cur.fields.type) : '';
+      patches.push({ id: cur.id, fields: { statut: 'resolue_auto', fait_par: AUTHOR, fait_le: nowIso, verifie_le: nowIso, resolution: reason || `Situation disparue au contrôle du ${today}` },
+        event: { date: nowIso, auteur: AUTHOR, action: 'resolution_auto', detail: reason ? `Règle ${name} : ${reason}` : `La règle ${name} ne détecte plus la situation` } });
       stats.resolved++;
     }
     console.log(`[tasks] ${name}: ${detected.length} detected`);
@@ -867,7 +958,7 @@ async function main() {
   writeProgress({ running: false, total: rules.length, done, ...stats, startedAt: nowIso, finishedAt: new Date().toISOString() });
 }
 
-module.exports = { RULES, DEFAULT_RULES, employerTaskSettled, thesesByRow, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
+module.exports = { RULES, DEFAULT_RULES, employerTaskSettled, presenceOf, thesesByRow, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
 
 if (require.main === module) {
   main().catch((e) => {
