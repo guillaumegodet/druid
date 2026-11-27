@@ -25,7 +25,7 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
-import { actorOf, readIdentifierSources, recordIdentifierValues, rememberRemovedIdentifiers } from './identifierProvenance';
+import { actorOf, liftRejection, readIdentifierSources, recordIdentifierValues, rememberRemovedIdentifiers } from './identifierProvenance';
 import { dropFieldCorrection as dropCorrection, moveFieldValues, readFieldSources, writeMergedField } from './fieldValues';
 import { FieldValueError, MERGED_FIELDS } from '../fieldMerge';
 import { resolveGrade } from '../../emeritus';
@@ -315,8 +315,11 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     // Values the record already held: re-saving the record does not make them `manual` (nor an import's).
     const held = new Set((await trx.selectFrom('person_identifier').select(['scheme', 'value']).where('person_id', '=', personId).execute())
       .map((x) => `${x.scheme}|${x.value}`));
-    const record = (scheme: string, values: string[]) => recordIdentifierValues(trx, personId, scheme,
-      values.filter((v) => !held.has(`${scheme}|${v}`)), source, actor);
+    const record = async (scheme: string, values: string[]) => {
+      const fresh = values.filter((v) => !held.has(`${scheme}|${v}`));
+      await recordIdentifierValues(trx, personId, scheme, fresh, source, actor);
+      if (typedInRecord) await liftRejection(trx, personId, scheme, fresh);
+    };
     const removed = async (scheme: string, values: string[]) => {
       const really = scheme === 'idhal_i' && keptSecondaries ? values.filter((v) => !keptSecondaries.includes(v)) : values;
       if (typedInRecord && really.length) await rememberRemovedIdentifiers(trx, personId, scheme, really, actor!);

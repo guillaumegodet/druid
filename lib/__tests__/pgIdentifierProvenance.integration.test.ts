@@ -76,6 +76,11 @@ describe.skipIf(!url)('identifier provenance', () => {
         ['0000-0002-0000-0001', false, false, ['manual'], 'Rejeté'],
       ]);
       expect(panel.idref.map((v) => [v.value, v.shown])).toEqual([['000000019', false]]);
+
+      // Typed again in the record: the person changed their mind, the rejection is lifted.
+      const r4 = await read();
+      await commands.updatePerson(recordId, { ...r4, identifiers: { ...r4.identifiers, orcid: '0000-0002-0000-0001' } }, ctx);
+      expect((await rejected()).map((r) => r.candidate_id)).toEqual(['0000-0002-0000-0002']);
     });
   });
 

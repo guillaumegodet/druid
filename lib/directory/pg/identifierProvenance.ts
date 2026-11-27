@@ -71,6 +71,14 @@ export const rememberRemovedIdentifiers = async (trx: Transaction<DB>, personId:
   return n;
 };
 
+/** A value typed again in the record by a person: its « Rejeté » is lifted (the person changed their mind). */
+export const liftRejection = async (trx: Transaction<DB>, personId: string, scheme: string, values: string[]): Promise<void> => {
+  const source = ALIGN_SOURCE_OF_SCHEME[scheme];
+  if (!source || !values.length) return;
+  await trx.deleteFrom('alignment_candidate').where('person_id', '=', personId).where('source', '=', source)
+    .where('candidate_id', 'in', values).where('decision', '=', 'Rejeté').execute();
+};
+
 /** Identifiers of a person with their sources, and the values set aside (« Rejeté », « Identité mêlée »). */
 export const readIdentifierSources = async (db: Transaction<DB> | any, personId: string): Promise<Record<string, IdentifierSourceDetail[]>> => {
   const [current, provenance, decisions] = await Promise.all([
