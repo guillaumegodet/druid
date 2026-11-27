@@ -22,6 +22,11 @@ données à exécuter au déploiement).
   désactivé par défaut. Le publieur des retraits ne propose plus de retirer du graphe une valeur posée par SoVisu+.
 
 ### Modifié
+- **Fiche : enregistrer ne réécrit plus un identifiant changé entre-temps** (PostgreSQL) : le formulaire envoie aussi
+  les identifiants qu'il a chargés ; un ORCID, IdRef, IdHAL, IdHAL_i ou Scopus que la personne n'a pas touché mais qui a
+  changé depuis l'ouverture de la fiche (chercheur dans SoVisu+, job d'alignement, autre gestionnaire) garde sa
+  nouvelle valeur au lieu de revenir à l'ancienne (et n'est plus marqué « Rejeté » par erreur). Une valeur modifiée dans
+  le formulaire l'emporte comme avant.
 - **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
   les ferme d'elle-même (« résolue auto », motif au fil de la tâche) quand la fiche n'a pas d'uid LDAP (`ext_` ou
   vide) — Druid la compte déjà externe sans employeur —, quand un employeur est saisi, quand la personne est validée
@@ -31,6 +36,12 @@ données à exécuter au déploiement).
   personne que Druid compte déjà partie ou sur le départ (compte LDAP disparu ou en fermeture, dates de fin, présence
   validée) ; un départ vu dans les seules publications cède devant un compte LDAP actif de l'établissement. Les deux
   règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
+
+### Corrigé
+- **Fiche — identifiants changés pendant l'édition** (PostgreSQL) : enregistrer une fiche ouverte avant qu'un
+  identifiant ne change ailleurs (retrait ou ajout dans SoVisu+, job d'alignement, autre gestionnaire) ne remet plus
+  l'ancienne valeur ni ne l'écarte comme un retrait manuel : un identifiant que la personne n'a pas touché dans le
+  formulaire garde sa valeur du moment ; celui qu'elle a modifié s'applique comme avant.
 
 ### Migration
 - `20261128150000_inbound_graph_action` (dbmate) : journal des messages reçus ; origine `sovisuplus` dans
