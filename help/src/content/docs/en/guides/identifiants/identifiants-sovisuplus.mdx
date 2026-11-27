@@ -1,0 +1,63 @@
+---
+title: "Identifiers changed in SoVisu+"
+description: "What Druid does when a researcher or a librarian adds, removes or authenticates an identifier in SoVisu+."
+sidebar:
+  order: 6
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Record managers; administrators (follow-up)"
+	menu="Record › Researcher identifiers; Administration; To process"
+	disponibilite="instances linked to the CRISalid graph (SoVisu+)"
+/>
+
+In SoVisu+, researchers manage their identifiers: remove an IdRef or an IdHAL that is not theirs, authenticate their
+ORCID (sign-in to orcid.org) or their IdHAL (sign-in to HAL). Librarians can also type an identifier there. Druid
+**takes these choices over in the record**. Otherwise, the next export to SoVisu+ would bring the old value back.
+
+## What Druid does
+
+| In SoVisu+ | In the Druid record |
+|---|---|
+| The researcher **removes** an identifier | It is removed from the record and **set aside**: the alignments no longer propose it, the imports no longer write it back. If it came from the LDAP directory or was typed in Druid, a task **Identifier removed in SoVisu+: check** is created. |
+| The researcher **authenticates** an ORCID or an IdHAL | It becomes the **primary** identifier, even if it had been set aside. The old one stays as secondary, and a task **Identifier replaced by the researcher** reports it. |
+| A librarian **types** an identifier | It fills the record if the record had none. If the record holds another value, nothing is written and a task **Identifier different in SoVisu+: choose** is created. |
+| The identifier is already held by **another record** | Nothing is written; task **Identifier carried by two people**. |
+
+A value chosen this way carries a pill next to the identifier, in the record: **authenticated in SoVisu+**, **from
+SoVisu+** or **removed in SoVisu+** (date on hover). The **Sources** button gives the history.
+
+:::caution[Decide quickly]
+For a task **Identifier different in SoVisu+**, the CRISalid graph keeps the SoVisu+ value until the next export to
+SoVisu+, which puts the record's value back. Decide before: keep the record's value, or type the SoVisu+ value in the
+record.
+:::
+
+## Saving a record opened in the meantime
+
+If you edit a record opened **before** a researcher changed an identifier in SoVisu+, saving does not bring the old
+value back: an identifier you did not touch keeps its current value. Only an identifier you changed in the form is
+applied.
+
+## Follow-up (administrators)
+
+The **Identifiers changed in SoVisu+** block of the **Administration** page shows:
+
+- how many actions were applied, how many wait for a decision (tasks **To process**), how many failed;
+- the date of the last action received and the latest actions, with their result;
+- how many actions were **replayed at night**: every night, Druid reads again the SoVisu+ actions the CRISalid bus did
+  not deliver. A growing number means messages are lost on the bus;
+- during a trial period, the actions **read without being applied**, which will be applied when it goes live.
+
+## Limits
+
+- Only the ORCID, the IdRef and the IdHAL (both forms) can be changed in SoVisu+. Scopus and OpenAlex stay managed in
+  Druid.
+- SoVisu+ does not say who made the change: the Druid log shows « SoVisu+ » and the person concerned.
+
+## See also
+
+- [Tasks to process](/en/guides/personnes/taches-a-traiter/)
+- [Align the identifiers](/en/guides/identifiants/aligner-les-identifiants/)

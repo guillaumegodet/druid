@@ -1,0 +1,65 @@
+---
+title: "Identifiants modifiés dans SoVisu+"
+description: "Ce que Druid fait quand un chercheur ou une bibliothécaire ajoute, retire ou authentifie un identifiant dans SoVisu+."
+sidebar:
+  order: 6
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Gestionnaires de fiches ; administrateurs (suivi)"
+	menu="Fiche › Identifiants du chercheur ; Administration ; À traiter"
+	disponibilite="instances reliées au graphe CRISalid (SoVisu+)"
+/>
+
+Dans SoVisu+, les chercheurs gèrent leurs identifiants : retirer un IdRef ou un IdHAL qui n'est pas le leur,
+authentifier leur ORCID (connexion à orcid.org) ou leur IdHAL (connexion à HAL). Les bibliothécaires peuvent aussi y
+saisir un identifiant. Druid **reprend ces choix dans la fiche**. Sans cela, le prochain export vers SoVisu+ remettrait
+l'ancienne valeur.
+
+## Ce que fait Druid
+
+| Dans SoVisu+ | Dans la fiche Druid |
+|---|---|
+| Le chercheur **retire** un identifiant | Il est retiré de la fiche et **écarté** : les alignements ne le proposent plus, les imports ne le réécrivent plus. S'il venait de l'annuaire LDAP ou d'une saisie dans Druid, une tâche **Identifiant retiré dans SoVisu+ : vérifier** est créée. |
+| Le chercheur **authentifie** un ORCID ou un IdHAL | Il devient l'identifiant **principal**, même s'il avait été écarté. L'ancien reste en secondaire, et une tâche **Identifiant remplacé par le chercheur** le signale. |
+| Une bibliothécaire **saisit** un identifiant | Il remplit la fiche si elle n'en avait pas. Si la fiche porte une autre valeur, rien n'est écrit et une tâche **Identifiant différent dans SoVisu+ : choisir** est créée. |
+| L'identifiant est déjà porté par **une autre fiche** | Rien n'est écrit ; tâche **Identifiant porté par deux personnes**. |
+
+Une valeur ainsi choisie porte une pastille à côté de l'identifiant, dans la fiche : **authentifié dans SoVisu+**,
+**de SoVisu+** ou **retiré dans SoVisu+** (date au survol). Le bouton **Sources** détaille l'historique.
+
+:::caution[Choisir vite]
+Pour une tâche **Identifiant différent dans SoVisu+**, le graphe CRISalid garde la valeur de SoVisu+ jusqu'au
+prochain export vers SoVisu+, qui remettra celle de la fiche. Tranchez avant : gardez la valeur de la fiche, ou saisissez
+celle de SoVisu+ dans la fiche.
+:::
+
+## Corriger une fiche ouverte pendant ce temps
+
+Si vous modifiez une fiche ouverte **avant** qu'un chercheur ne change un identifiant dans SoVisu+, l'enregistrement
+ne remet pas l'ancienne valeur : un identifiant que vous n'avez pas touché garde la valeur du moment. Seul un
+identifiant que vous avez modifié dans le formulaire s'applique.
+
+## Suivre la reprise (administrateurs)
+
+Le bloc **Identifiants modifiés dans SoVisu+** de la page **Administration** indique :
+
+- combien d'actions ont été appliquées, combien attendent une décision (tâches **À traiter**), combien ont échoué ;
+- la date de la dernière action reçue et les dernières actions, avec leur résultat ;
+- combien d'actions ont été **rejouées la nuit** : Druid relit chaque nuit les actions de SoVisu+ que le bus CRISalid
+  n'a pas livrées. Un nombre qui grandit signale des messages perdus sur le bus ;
+- en période d'essai, les actions **lues sans être appliquées**, qui le seront à la mise en service.
+
+## Limites
+
+- Seuls l'ORCID, l'IdRef et l'IdHAL (deux formes) se modifient dans SoVisu+. Scopus et OpenAlex restent gérés dans
+  Druid.
+- SoVisu+ ne transmet pas qui a fait la modification : le journal de Druid indique « SoVisu+ » et la personne concernée.
+
+## Voir aussi
+
+- [Tâches à traiter](/guides/personnes/taches-a-traiter/)
+- [Aligner les identifiants](/guides/identifiants/aligner-les-identifiants/)
+- [Identifiants des chercheurs](/donnees/identifiants-chercheurs/)

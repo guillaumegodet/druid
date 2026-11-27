@@ -3119,6 +3119,20 @@ app.get('/api/graph-actions-status', requireEstablishmentScope, async (req, res)
   }
 });
 
+// Identifier actions received from SoVisu+ (consumer and nightly reconciliation, druid-internal
+// docs/plan-retour-identifiants-sovisuplus.md lot 6): `available: false` on Grist or before any message.
+app.get('/api/graph-inbound-status', requireEstablishmentScope, async (req, res) => {
+  const overview = serverStorage?.inboundOverview || null;
+  if (!overview) return res.json({ available: false });
+  try {
+    const data = await overview();
+    res.json(data ? { available: true, ...data } : { available: false });
+  } catch (err) {
+    console.error('[graph] inbound status error:', err);
+    res.status(500).json({ error: 'Cannot read the identifier actions received from SoVisu+' });
+  }
+});
+
 // ── Structures hierarchy dataviz (vendored crisalid-directory-bridge tool) ───
 // Runs scripts/structures-viz/visualize_structures.py on the current structures.csv
 // (/cdb-data/structures.csv) and returns the standalone HTML (Cytoscape.js). Shown in
