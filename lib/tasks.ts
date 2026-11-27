@@ -174,6 +174,31 @@ export const mergePairsOf = (task: Pick<Task, 'type' | 'cle'>, rowIdOfUid: (uid:
   return pairs;
 };
 
+/**
+ * Merge queue of the « Merge in series » action: one pair per open `annuaire_doublon` task (same names and
+ * identifiers: one person on two records). The « to check » duplicates (usage names, relatives) stay one by one.
+ * Pairs are distinct, and a record taken by one pair is not offered again (its row disappears in the merge).
+ */
+export const mergeSeriesOf = (
+  tasks: readonly Pick<Task, 'type' | 'cle' | 'statut'>[],
+  rowIdOfUid: (uid: string) => number | undefined,
+): [number, number][] => {
+  const out: [number, number][] = [];
+  const taken = new Set<number>();
+  for (const task of tasks) {
+    if (task.type !== 'annuaire_doublon' || !isOpenStatus(task.statut)) continue;
+    const pair = mergePairsOf(task, rowIdOfUid).find((p) => !taken.has(p.rowIds[0]) && !taken.has(p.rowIds[1]));
+    if (!pair) continue;
+    pair.rowIds.forEach((id) => taken.add(id));
+    out.push(pair.rowIds);
+  }
+  return out;
+};
+
+/** Departure tasks whose proposed end date can be reported in batch: confirmed by several sources, or declared
+ * in ORCID. A departure seen in the publications only stays one by one (the weakest signal). */
+export const BATCH_DEPARTURE_TYPES: ReadonlySet<string> = new Set(['parcours_depart_confirme', 'parcours_depart_declare']);
+
 export interface Task {
   id: number;
   cle: string;
