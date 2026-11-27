@@ -19,6 +19,7 @@ données à exécuter au déploiement).
   pour l'alignement de sa source : `sync_openalex` (vérification et passe ORCID) et `sync_hal` ne le réécrivent plus.
   Une application en lot de propositions d'alignement n'écarte rien (elle doit pouvoir être corrigée par un passage
   suivant).
+  Ressaisir dans la fiche une valeur écartée lève le rejet.
 
 ### Migration
 - `20261127090000_person_identifier_source` (dbmate) : table `person_identifier_source`, reprise des identifiants
