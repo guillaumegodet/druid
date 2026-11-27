@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.25.0] — 2026-11-28
+
 ### Ajouté
 - **Identifiants modifiés dans SoVisu+ : écrans et aide.** Dans la fiche, une pastille signale un identifiant
   authentifié par le chercheur, saisi ou retiré dans SoVisu+ (date au survol) ; le panneau **Sources** nomme SoVisu+.
