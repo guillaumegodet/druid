@@ -236,6 +236,7 @@ export const API_ERRORS = [
   msg`Too many identifier removals to send to the CRISalid graph at once, an administrator must check them`,
   msg`Cannot send the identifier removals to the CRISalid graph`,
   msg`Cannot read the removals sent to the CRISalid graph`,
+  msg`Cannot read the identifier actions received from SoVisu+`,
   msg`Keycloak admin API unreachable`,
   msg`ETL API (druid-etl-api) unreachable`,
   // Grist proxy

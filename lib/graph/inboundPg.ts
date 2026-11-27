@@ -280,3 +280,51 @@ export const replayPlannedMessages = async (db: Kysely<DB>, log: (line: string) 
   }
   return rows.length;
 };
+
+// ── Follow-up (Administration) ──────────────────────────────────────────────────────────────────────────────────────
+
+/** How many recent messages the overview lists. */
+const RECENT_INBOUND = 30;
+
+export interface InboundOverview {
+  /** Messages by status and by channel (all time). */
+  counts: Record<'planned' | 'applied' | 'task' | 'ignored' | 'failed', number>;
+  channels: Record<'bus' | 'reconcile', number>;
+  lastReceivedAt: string | null;
+  /** Tasks opened by SoVisu+ actions still to do. */
+  openTasks: number;
+  recent: { id: string; uid: string | null; type: string | null; value: string | null; action: string | null; status: string;
+    reason: string | null; channel: string; receivedAt: string }[];
+  failed: { id: string; uid: string | null; type: string | null; attempts: number; lastError: string | null; updatedAt: string }[];
+}
+
+/** What the consumer and the reconciliation received and did (Administration, lot 6); null before any message. */
+export const inboundOverview = async (db: Kysely<DB>): Promise<InboundOverview | null> => {
+  const iso = (d: unknown) => (d ? new Date(d as any).toISOString() : null);
+  const [byStatus, byChannel, recent, failed, tasks] = await Promise.all([
+    db.selectFrom('inbound_graph_action').select(['status', sql<number>`count(*)::int`.as('n'), sql<Date>`max(received_at)`.as('last')])
+      .groupBy('status').execute(),
+    db.selectFrom('inbound_graph_action').select(['channel', sql<number>`count(*)::int`.as('n')]).groupBy('channel').execute(),
+    db.selectFrom('inbound_graph_action')
+      .select(['id', 'uid', 'identifier_type', 'value', 'action_type', 'status', 'reason', 'channel', 'received_at'])
+      .orderBy('received_at', 'desc').orderBy('id').limit(RECENT_INBOUND).execute(),
+    db.selectFrom('inbound_graph_action').select(['id', 'uid', 'identifier_type', 'attempts', 'last_error', 'updated_at'])
+      .where('status', '=', 'failed').orderBy('updated_at', 'desc').execute(),
+    db.selectFrom('task').select(sql<number>`count(*)::int`.as('n')).where('origin', '=', 'sovisuplus')
+      .where('status', 'in', ['a_faire', 'en_cours', 'en_attente']).executeTakeFirst(),
+  ]);
+  if (!byStatus.length) return null;
+  const counts = { planned: 0, applied: 0, task: 0, ignored: 0, failed: 0 };
+  for (const r of byStatus) if (r.status in counts) counts[r.status as keyof typeof counts] = r.n;
+  const channels = { bus: 0, reconcile: 0 };
+  for (const r of byChannel) if (r.channel in channels) channels[r.channel as keyof typeof channels] = r.n;
+  const last = byStatus.map((r) => iso(r.last)).filter((d): d is string => !!d).sort().pop() ?? null;
+  return {
+    counts, channels, lastReceivedAt: last, openTasks: tasks?.n ?? 0,
+    recent: recent.map((r) => ({
+      id: r.id, uid: r.uid, type: r.identifier_type, value: r.value, action: r.action_type, status: r.status, reason: r.reason,
+      channel: r.channel, receivedAt: iso(r.received_at)!,
+    })),
+    failed: failed.map((r) => ({ id: r.id, uid: r.uid, type: r.identifier_type, attempts: r.attempts, lastError: r.last_error, updatedAt: iso(r.updated_at)! })),
+  };
+};

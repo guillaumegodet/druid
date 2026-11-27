@@ -10,6 +10,7 @@ import { HelpButton } from '../HelpButton';
 import { ADMIN_TAB_HELP } from '../../lib/helpLinks';
 import { numberLocale } from '../../lib/i18n';
 import { GraphActionsPanel } from './GraphActionsPanel';
+import { InboundActionsPanel } from './InboundActionsPanel';
 import { InstitutionsAdmin } from './InstitutionsAdmin';
 import { EstablishmentAdmin } from './EstablishmentAdmin';
 import { CallsProgrammesAdmin } from './CallsProgrammesAdmin';
@@ -142,6 +143,7 @@ export const AdminPage: React.FC<{
         </p>
       )}
       {onSyncToSovisu && !syncingSovisu && <GraphActionsPanel onOpenResearcher={onOpenResearcherUid} />}
+      {onSyncToSovisu && !syncingSovisu && <InboundActionsPanel onOpenResearcher={onOpenResearcherUid} />}
 
       {tab === 'establishment' && <EstablishmentAdmin />}
       {tab === 'console' && (

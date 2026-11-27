@@ -3,7 +3,7 @@ import { Lock, ExternalLink, AlertTriangle, Undo2, X } from 'lucide-react';
 import { Researcher, Affiliation, type FieldProvenance, type FieldSourceDetail } from '../../types';
 import { DirectoryApi } from '../../lib/directoryApi';
 import { SOURCE_LABELS } from '../../lib/fieldConflicts';
-import { IdentifierSourcesButton } from './IdentifierSourcesPanel';
+import { IdentifierSourcesButton, SovisuplusPill, useSovisuplusMarks } from './IdentifierSourcesPanel';
 import { AffiliationsTable, TeamOption } from './AffiliationsTable';
 import { GradeSelect } from './GradeSelect';
 import { FuzzyDateInput } from './FuzzyDateInput';
@@ -201,6 +201,8 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
     onUpdateField('halIdNum', next.primary, 'identifiers');
     onUpdateField('halIdNumSecondary', next.secondaries, 'identifiers');
   };
+  // Identifiers chosen in SoVisu+ (lot 6 of druid-internal docs/plan-retour-identifiants-sovisuplus.md), PostgreSQL only.
+  const svpMarks = useSovisuplusMarks(researcher.fieldProvenance ? researcher.gristRowId : undefined);
   return (
     // `contents`: the cards become items of the 2-column grid defined
     // in ResearcherDetail (left col. 300px: photo + identifiers; right col.:
@@ -218,7 +220,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 <span className="w-9 h-9 rounded-xl bg-orcid text-ink flex items-center justify-center text-[12px] font-extrabold flex-shrink-0">iD</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]">ORCID</span>
+                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]">ORCID<SovisuplusPill mark={svpMarks.orcid} /></span>
                     {researcher.identifiers.orcid && (
                       <a href={`https://orcid.org/${researcher.identifiers.orcid}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-[#7a9a24] dark:text-orcid hover:underline">
                         <ExternalLink className="w-3 h-3" /> orcid.org
@@ -233,7 +235,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 <span className="w-9 h-9 rounded-xl bg-cream-300 text-ink dark:bg-white/10 dark:text-[#e7e2d6] flex items-center justify-center text-[11px] font-extrabold flex-shrink-0">IdR</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]">IdRef</span>
+                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]">IdRef<SovisuplusPill mark={svpMarks.idref} /></span>
                     {researcher.identifiers.idref && (
                       <a href={`https://www.idref.fr/${researcher.identifiers.idref}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-primary dark:text-primary-light hover:underline">
                         <ExternalLink className="w-3 h-3" /> idref.fr
@@ -248,7 +250,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 <span className="w-9 h-9 rounded-xl bg-ink text-white dark:bg-[#f5f2ea] dark:text-ink flex items-center justify-center text-[10px] font-extrabold flex-shrink-0">HAL</span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]">IdHAL</span>
+                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]">IdHAL<SovisuplusPill mark={svpMarks.idhal} /></span>
                     {researcher.identifiers.halId && (
                       <a href={`https://hal.science/search/index/q/*/authIdHal_s/${researcher.identifiers.halId}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-muted dark:text-[#8f897c] hover:underline">
                         <ExternalLink className="w-3 h-3" /> hal.science
@@ -263,7 +265,7 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
                 <span className="w-9 h-9 rounded-xl bg-ink/80 text-white dark:bg-[#f5f2ea]/80 dark:text-ink flex items-center justify-center text-[9px] font-extrabold flex-shrink-0">HAL<sub className="text-[8px]">i</sub></span>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-0.5">
-                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]" title={t`HAL numeric identifier (idHal_i)`}>IdHAL_i</span>
+                    <span className="text-[11px] text-muted-lighter dark:text-[#8f897c]" title={t`HAL numeric identifier (idHal_i)`}>IdHAL_i<SovisuplusPill mark={svpMarks.idhal_i} /></span>
                     {researcher.identifiers.halIdNum && (
                       <a href={halIdNumSearchUrl(researcher.identifiers.halIdNum)} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-muted dark:text-[#8f897c] hover:underline">
                         <ExternalLink className="w-3 h-3" /> hal.science

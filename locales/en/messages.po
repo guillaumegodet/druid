@@ -17997,3 +17997,114 @@ msgstr "Error during the {lbl} alignment"
 #: lib/unifiedAlignRuns.ts:153
 msgid "Estimate failed: {0}"
 msgstr "Estimate failed: {0}"
+
+#: components/admin/InboundActionsPanel.tsx:52
+msgid "dry run"
+msgstr "dry run"
+
+#: components/admin/InboundActionsPanel.tsx:52
+msgid "applied"
+msgstr "applied"
+
+#: components/admin/InboundActionsPanel.tsx:52
+msgid "to decide"
+msgstr "to decide"
+
+#: components/admin/InboundActionsPanel.tsx:52
+msgid "ignored"
+msgstr "ignored"
+
+#: components/admin/InboundActionsPanel.tsx:72
+msgid "Identifiers changed in SoVisu+"
+msgstr "Identifiers changed in SoVisu+"
+
+#. placeholder {0}: status.counts.planned
+#: components/admin/InboundActionsPanel.tsx:75
+msgid "dry run: {0} read, nothing applied"
+msgstr "dry run: {0} read, nothing applied"
+
+#. placeholder {0}: status.counts.applied
+#: components/admin/InboundActionsPanel.tsx:77
+msgid "{0} applied"
+msgstr "{0} applied"
+
+#. placeholder {0}: status.openTasks
+#: components/admin/InboundActionsPanel.tsx:78
+msgid "{0} tasks to do"
+msgstr "{0} tasks to do"
+
+#. placeholder {0}: formatDate(status.lastReceivedAt)
+#: components/admin/InboundActionsPanel.tsx:80
+msgid "last received {0}"
+msgstr "last received {0}"
+
+#: components/admin/InboundActionsPanel.tsx:86
+msgid "Researchers and library staff add and remove identifiers in SoVisu+. Druid receives these actions from the CRISalid bus and takes them over in the record: a removal is applied and set aside, an authenticated identifier becomes the primary one, an addition never replaces another value. The cases to settle become tasks « To process ». Every night, the actions the bus did not deliver are read again from SoVisu+."
+msgstr "Researchers and library staff add and remove identifiers in SoVisu+. Druid receives these actions from the CRISalid bus and takes them over in the record: a removal is applied and set aside, an authenticated identifier becomes the primary one, an addition never replaces another value. The cases to settle become tasks « To process ». Every night, the actions the bus did not deliver are read again from SoVisu+."
+
+#. placeholder {0}: status.channels.bus
+#. placeholder {1}: status.channels.reconcile
+#: components/admin/InboundActionsPanel.tsx:94
+msgid "Received from the bus: {0}; replayed from SoVisu+ at night: {1}. Many replays mean that messages are lost on the bus."
+msgstr "Received from the bus: {0}; replayed from SoVisu+ at night: {1}. Many replays mean that messages are lost on the bus."
+
+#: components/admin/InboundActionsPanel.tsx:105
+msgid "Tried again by the night reconciliation."
+msgstr "Tried again by the night reconciliation."
+
+#. placeholder {0}: status.recent.length
+#: components/admin/InboundActionsPanel.tsx:106
+msgid "Recently received ({0})"
+msgstr "Recently received ({0})"
+
+#: components/admin/InboundActionsPanel.tsx:110
+msgid "added"
+msgstr "added"
+
+#: components/admin/InboundActionsPanel.tsx:110
+msgid "removed"
+msgstr "removed"
+
+#: components/admin/InboundActionsPanel.tsx:115
+msgid "replayed at night"
+msgstr "replayed at night"
+
+#: components/researchers/IdentifierSourcesPanel.tsx:29
+msgid "SoVisu+, authenticated by the researcher"
+msgstr "SoVisu+, authenticated by the researcher"
+
+#: components/researchers/IdentifierSourcesPanel.tsx:30
+msgid "SoVisu+, typed by library staff"
+msgstr "SoVisu+, typed by library staff"
+
+#: components/researchers/IdentifierSourcesPanel.tsx:60
+msgid "the researcher in SoVisu+"
+msgstr "the researcher in SoVisu+"
+
+#: components/researchers/IdentifierSourcesPanel.tsx:114
+msgid "Authenticated by the researcher in SoVisu+ on {on}: the researcher proved this identifier is theirs."
+msgstr "Authenticated by the researcher in SoVisu+ on {on}: the researcher proved this identifier is theirs."
+
+#: components/researchers/IdentifierSourcesPanel.tsx:116
+msgid "Typed in SoVisu+ by library staff on {on}."
+msgstr "Typed in SoVisu+ by library staff on {on}."
+
+#: components/researchers/IdentifierSourcesPanel.tsx:117
+msgid "{value} removed by the researcher in SoVisu+ on {on}: set aside, no longer proposed by the alignments."
+msgstr "{value} removed by the researcher in SoVisu+ on {on}: set aside, no longer proposed by the alignments."
+
+#: components/researchers/IdentifierSourcesPanel.tsx:118
+msgid "authenticated in SoVisu+"
+msgstr "authenticated in SoVisu+"
+
+#: components/researchers/IdentifierSourcesPanel.tsx:118
+msgid "from SoVisu+"
+msgstr "from SoVisu+"
+
+#: components/researchers/IdentifierSourcesPanel.tsx:118
+msgid "removed in SoVisu+"
+msgstr "removed in SoVisu+"
+
+#: lib/apiErrors.ts:239
+msgid "Cannot read the identifier actions received from SoVisu+"
+msgstr "Cannot read the identifier actions received from SoVisu+"

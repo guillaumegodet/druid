@@ -23,6 +23,7 @@ import { createPgWorkPorts } from '../lib/work/pg/workPorts';
 import type { StorageKind } from '../lib/directory/jobStorage';
 import { graphActionsOverview, recordPeopleCsvExport } from '../lib/graph/pg';
 import { prepareGraphForPeopleCsv, type GraphActionsMode } from '../lib/graph/publisher';
+import { inboundOverview } from '../lib/graph/inboundPg';
 import { connectGraphBus } from '../lib/graph/bus';
 import { createCallsStore } from '../lib/calls/pg';
 import { createPairFeedbackStore } from '../lib/pairs/feedback';
@@ -240,6 +241,9 @@ export const createServerStorage = (options: ApiV1Options) => {
       graphOverview: options.graphActions && options.graphActions !== 'off'
         ? () => graphActionsOverview(db, options.graphAcceptedTypes) : null,
       graphMode: options.graphActions || 'off',
+      /** Identifier actions received from SoVisu+ (Administration, lot 6 of druid-internal
+       * docs/plan-retour-identifiants-sovisuplus.md): null until the consumer received a message. */
+      inboundOverview: () => inboundOverview(db),
       /** « Calls for proposals » tab: calls of the funding programmes matched to the researchers (druid-internal
        * docs/plan-funding-calls.md, lot 1), PostgreSQL only. */
       calls: createCallsStore(db),
@@ -267,6 +271,7 @@ export const createServerStorage = (options: ApiV1Options) => {
     graph: null,
     graphOverview: null,
     graphMode: 'off' as GraphActionsMode,
+    inboundOverview: null,
     calls: null,
     pairFeedback: null,
     theses: null,

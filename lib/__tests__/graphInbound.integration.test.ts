@@ -10,7 +10,7 @@ import type { CommandContext } from '../directory/commands';
 import { createPgDirectoryCommands } from '../directory/pg/commands';
 import { createPgDirectoryRepository } from '../directory/pg/repository';
 import { planAndRecordGraphActions } from '../graph/pg';
-import { MAX_INBOUND_ATTEMPTS, processInboundMessage, recordInboundFailure, replayPlannedMessages } from '../graph/inboundPg';
+import { MAX_INBOUND_ATTEMPTS, inboundOverview, processInboundMessage, recordInboundFailure, replayPlannedMessages } from '../graph/inboundPg';
 
 const url = process.env.DATABASE_URL_APP;
 const db = url ? createDb({ connectionString: url, max: 1 }) : null;
@@ -169,6 +169,23 @@ describe.skipIf(!url)('identifier actions from SoVisu+ (PostgreSQL)', () => {
       expect((await processInboundMessage(trx, raw, 'on')).status).toBe('ignored');
     });
   });
+  it('the overview of Administration counts what was received and lists the failures (lot 6)', async () => {
+    await inRollback(async (trx) => {
+      expect(await inboundOverview(trx)).toBeNull();
+      await person(trx, 'zz-ada-l', { orcid: ORCID });
+      await processInboundMessage(trx, message('o-1', 'REMOVE', 'zz-ada-l', 'orcid', ORCID), 'on');
+      await processInboundMessage(trx, message('o-2', 'ADD', 'zz-ada-l', 'idref', '12345678X'), 'dry-run', { channel: 'reconcile' });
+      await recordInboundFailure(trx, message('o-3', 'ADD', 'zz-ada-l', 'idhali', '100001'), new Error('database restarting'));
+      const o = (await inboundOverview(trx))!;
+      expect(o.counts).toEqual({ planned: 1, applied: 1, task: 0, ignored: 0, failed: 1 });
+      expect(o.channels).toEqual({ bus: 2, reconcile: 1 });
+      expect(o.failed).toMatchObject([{ id: 'o-3', attempts: 1, lastError: 'database restarting' }]);
+      expect(o.recent.map((r) => r.id).sort()).toEqual(['o-1', 'o-2', 'o-3']);
+      expect(o.recent.find((r) => r.id === 'o-1')).toMatchObject({ uid: 'zz-ada-l', type: 'orcid', action: 'REMOVE', status: 'applied', channel: 'bus' });
+      expect(o.lastReceivedAt).not.toBeNull();
+    });
+  });
+
   describe('lot 4 — a SoVisu+ value is never written back by Druid', () => {
     const record = async (trx: Transaction<DB>, uid: string) => {
       const id = (await trx.insertInto('person').values({ uid, last_name: 'Lovelace', first_name: 'Ada' }).returning('id').executeTakeFirstOrThrow()).id;

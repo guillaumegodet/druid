@@ -1,8 +1,9 @@
 import React from 'react';
-import { History, X } from 'lucide-react';
+import { BadgeCheck, History, X } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DirectoryApi } from '../../lib/directoryApi';
 import { SOURCE_LABELS } from '../../lib/fieldConflicts';
+import { isSovisuplusAuthor, sovisuplusMarks, type SovisuplusMark } from '../../lib/identifierMarks';
 import type { IdentifierSourceDetail } from '../../types';
 
 const SCHEME_LABELS: Record<string, string> = {
@@ -25,6 +26,8 @@ export const IdentifierSourcesButton: React.FC<{ recordId?: number }> = ({ recor
   const sourceName = (code: string) => {
     if (code.startsWith('align:')) { const name = ALIGN_LABELS[code.slice(6)] ?? code.slice(6); return t`Alignment ${name}`; }
     if (code === 'job') return t`Automatic job`;
+    if (code === 'sovisuplus:auth') return t`SoVisu+, authenticated by the researcher`;
+    if (code === 'sovisuplus') return t`SoVisu+, typed by library staff`;
     return SOURCE_LABELS[code] ? i18n._(SOURCE_LABELS[code]) : code;
   };
   const toggle = async () => {
@@ -54,7 +57,7 @@ export const IdentifierSourcesButton: React.FC<{ recordId?: number }> = ({ recor
               <div className="text-[11px] font-bold uppercase tracking-wide text-muted-faint mb-0.5">{SCHEME_LABELS[scheme] ?? scheme}</div>
               <ul className="space-y-1">
                 {values.map((v) => {
-                  const by = v.setAside?.by ?? '';
+                  const by = isSovisuplusAuthor(v.setAside?.by) ? t`the researcher in SoVisu+` : v.setAside?.by ?? '';
                   const on = v.setAside?.at ? v.setAside.at.slice(0, 10) : '';
                   return (
                     <li key={v.value}>
@@ -62,7 +65,7 @@ export const IdentifierSourcesButton: React.FC<{ recordId?: number }> = ({ recor
                       {v.shown && <span className="ml-1 text-muted">{v.primary ? t`primary` : t`secondary`}</span>}
                       {v.sources.length > 0 && (
                         <span className="ml-1 text-muted">
-                          · {v.sources.map((s) => `${sourceName(s.source)} ${s.at.slice(0, 10)}${s.by ? ` (${s.by})` : ''}`).join(', ')}
+                          · {v.sources.map((s) => `${sourceName(s.source)} ${s.at.slice(0, 10)}${s.by && !isSovisuplusAuthor(s.by) ? ` (${s.by})` : ''}`).join(', ')}
                         </span>
                       )}
                       {v.setAside && (
@@ -80,6 +83,43 @@ export const IdentifierSourcesButton: React.FC<{ recordId?: number }> = ({ recor
           ))}
         </div>
       )}
+    </span>
+  );
+};
+
+/**
+ * Marks of the identifiers changed in SoVisu+ (lot 6 of druid-internal docs/plan-retour-identifiants-sovisuplus.md),
+ * read once with the record (PostgreSQL only: `recordId` is undefined otherwise).
+ */
+export const useSovisuplusMarks = (recordId?: number): Record<string, SovisuplusMark> => {
+  const [marks, setMarks] = React.useState<Record<string, SovisuplusMark>>({});
+  React.useEffect(() => {
+    if (!recordId) { setMarks({}); return undefined; }
+    let cancelled = false;
+    DirectoryApi.identifierSources(recordId)
+      .then((r) => { if (!cancelled) setMarks(sovisuplusMarks(r.identifiers)); })
+      .catch(() => { if (!cancelled) setMarks({}); });
+    return () => { cancelled = true; };
+  }, [recordId]);
+  return marks;
+};
+
+/** Pill next to an identifier the researcher or library staff chose in SoVisu+: change it knowingly. */
+export const SovisuplusPill: React.FC<{ mark?: SovisuplusMark }> = ({ mark }) => {
+  const { t } = useLingui();
+  if (!mark) return null;
+  const on = mark.at.slice(0, 10);
+  const value = mark.value;
+  const title = mark.kind === 'authenticated'
+    ? t`Authenticated by the researcher in SoVisu+ on ${on}: the researcher proved this identifier is theirs.`
+    : mark.kind === 'added'
+      ? t`Typed in SoVisu+ by library staff on ${on}.`
+      : t`${value} removed by the researcher in SoVisu+ on ${on}: set aside, no longer proposed by the alignments.`;
+  const label = mark.kind === 'authenticated' ? t`authenticated in SoVisu+` : mark.kind === 'added' ? t`from SoVisu+` : t`removed in SoVisu+`;
+  return (
+    <span title={title} className={`ml-1.5 inline-flex items-center gap-0.5 rounded-full px-1.5 py-px text-[10px] font-semibold ${
+      mark.kind === 'removed' ? 'bg-amber-100 text-amber-800 dark:bg-amber-400/15 dark:text-amber-300' : 'bg-[rgba(122,154,36,.15)] text-[#5d761b] dark:text-[#b9d36a]'}`}>
+      {mark.kind === 'authenticated' && <BadgeCheck className="w-3 h-3" />}{label}
     </span>
   );
 };

@@ -13,6 +13,11 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Identifiants modifiés dans SoVisu+ : écrans et aide.** Dans la fiche, une pastille signale un identifiant
+  authentifié par le chercheur, saisi ou retiré dans SoVisu+ (date au survol) ; le panneau **Sources** nomme SoVisu+.
+  **Administration** : bloc « Identifiants modifiés dans SoVisu+ » (actions appliquées, tâches à trancher, échecs,
+  dernières actions reçues, part rejouée la nuit, actions lues en essai). Aide « Identifiants modifiés dans SoVisu+ »
+  (FR/EN).
 - **Appartenance principale choisie dans la fiche** : dans la carte « Appartenances & historique », un clic sur la pastille grise
   d'une appartenance en fait la principale ; les autres deviennent secondaires, ou historiques une fois leur date de
   fin passée, à l'enregistrement.
