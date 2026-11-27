@@ -19,8 +19,6 @@ données à exécuter au déploiement).
   plus réécrite par un import ni par un traitement automatique ; si une source la rapporte, elle est seulement notée et
   la fiche listée, comme une valeur écartée lors d'une revue d'alignement mais encore affichée (2 IdRef à Nantes).
   Choix : la garder écartée, ou l'accepter. Un réimport du même fichier ne relance pas un conflit tranché.
-
-### Ajouté
 - **Provenance des identifiants** (PostgreSQL) : chaque ORCID, IdRef, IdHAL, IdHAL_i, Scopus et A-id OpenAlex garde
   la source qui l'a apporté (alignement, import, fiche, traitement automatique), son auteur et sa date ; bouton
   **Sources** dans la carte des identifiants de la fiche. Un identifiant **retiré dans la fiche** devient un « Rejeté »
