@@ -403,6 +403,39 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       expect(p({ uid_dyna: 'ext_x', employment_end_date: soon })).toBe('DEPART');
       expect(p({ uid_dyna: 'ext_x', employment_end_date: '2020', affiliation_end_date: '2020-06', validated: true, validation_scope: 'statut', validated_status: 'PRESENT' })).toBe('PARTI');   // both ends past win
     });
+    it('parcours_statut_incoherent: an ORCID-only signal yields to a departure a reliable source confirms', () => {
+      const etablissements = { 1: { Employeur: 'NANTES UNIVERSITE', UAI: '0442953W' }, 2: { Employeur: 'CNRS', UAI: '0753639Y' } };
+      const ldap = { 'a-a': { etat: 'D' }, 'b-b': { etat: 'N' }, 'e-e': { etat: 'N' } };
+      const orcid = line([{ type: 'statut_incoherent', endYear: 2020, orcidOpenLocal: true }]);
+      const pubs = line([{ type: 'statut_incoherent', endYear: 2020, lastLocal: 2024 }]);
+      const end = { employment_end_date: '2020-12-31' };
+      const c = ctx({ ldap, etablissements,
+        parcours: { 'a-a': orcid, 'b-b': orcid, 'c-c': orcid, 'd-d': pubs, 'e-e': orcid, 'f-f': orcid, 'ext_g': orcid, 'h-h': orcid },
+        annuaire: [
+          rec(1, { uid_dyna: 'a-a', ...end }),                                                                     // LDAP closing ⇒ ORCID out of date
+          rec(2, { uid_dyna: 'b-b', ...end }),                                                                     // LDAP active: kept
+          rec(3, { uid_dyna: 'c-c', ...end }),                                                                     // LDAP account gone ⇒ ORCID out of date
+          rec(4, { uid_dyna: 'd-d', ...end }),                                                                     // local publications: kept (account gone)
+          rec(5, { uid_dyna: 'e-e', ...end, validated: true, validation_scope: 'statut', validated_status: 'DEPART', validation_source: 'Liste X' }),
+          rec(6, { uid_dyna: 'f-f', ...end, validated: true, validation_scope: 'statut', validated_status: 'PRESENT' }),   // validated present: kept
+          rec(7, { uid_dyna: 'ext_g', ...end }),                                                                   // end dates only: kept
+          rec(8, { uid_dyna: 'h-h', ...end, Employeur: 2 }),                                                       // hosted account says nothing: kept
+        ] });
+      expect(RULES.parcours_statut_incoherent.detect(c).map((x: { key: string }) => x.key)).toEqual(['b-b', 'd-d', 'f-f', 'ext_g', 'h-h']);
+      const why = (id: number) => RULES.parcours_statut_incoherent.settled((c.annuaire as { id: number }[]).find((r) => r.id === id), c);
+      expect(why(1)).toBe('Profil ORCID pas à jour : le compte LDAP a-a est en fermeture ; rien à corriger dans Druid.');
+      expect(why(3)).toContain('le compte LDAP c-c est fermé');
+      expect(why(5)).toBe('Profil ORCID pas à jour : la personne est validée sur le départ (« Liste X ») ; rien à corriger dans Druid.');
+    });
+    it('parcours_identifiant_suspect: not for a person employed by another institution', () => {
+      const etablissements = { 1: { Employeur: 'NANTES UNIVERSITE', UAI: '0442953W' }, 2: { Employeur: 'U RENNES 2', UAI: '0350937D' }, 3: { Employeur: 'non renseigné' } };
+      const sus = line([{ type: 'identifiant_suspect', sources: ['scopus'] }]);
+      const c = ctx({ etablissements, parcours: { 'a-a': sus, 'ext_b': sus, 'c-c': sus, 'd-d': sus }, annuaire: [
+        rec(1, { uid_dyna: 'a-a', Employeur: 1 }), rec(2, { uid_dyna: 'ext_b', Employeur: 2 }), rec(3, { uid_dyna: 'c-c', Employeur: 3 }), rec(4, { uid_dyna: 'd-d' }),
+      ] });
+      expect(RULES.parcours_identifiant_suspect.detect(c).map((x: { key: string }) => x.key)).toEqual(['a-a', 'c-c', 'd-d']);
+      expect(RULES.parcours_identifiant_suspect.settled((c.annuaire as unknown[])[1], c)).toContain('Employeur U RENNES 2 : ses publications et son profil Scopus citent son propre établissement');
+    });
     it('a membership ends the record only when every row is ended', () => {
       const ends = endsByKey([rec(1, { uid_dyna: 'a', affiliation_end_date: '2020' }), rec(2, { uid_dyna: 'a' }), rec(3, { uid_dyna: 'b', affiliation_end_date: '2020' })]);
       expect([ends.get('a').ended, ends.get('b').ended]).toEqual([false, true]);

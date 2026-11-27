@@ -52,7 +52,13 @@ before **Save** is clicked, and the status is never changed automatically.
 In the **People** list, the **Career path** filter finds probable or confirmed departures,
 inconsistent statuses and identifiers to check. An icon flags probable departures next to the name.
 The same situations become tasks in **To process**, which close by themselves once the end date is
-entered.
+entered. No task when Druid already knows the answer:
+- departure already known (LDAP account closed or closing, end dates, validated presence);
+- departure seen in the publications only while the institution's LDAP account is active;
+- inconsistent status reported by ORCID alone for a person whose departure is confirmed (reliable
+  list, LDAP account): the ORCID profile is out of date (suggestion “Close the position in ORCID”);
+- identifiers to check of a person employed by another institution: their publications give their
+  own institution.
 
 ## Suggestions of the institution
 
