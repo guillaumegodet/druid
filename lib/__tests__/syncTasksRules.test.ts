@@ -7,12 +7,12 @@ const { RULES, DEFAULT_RULES, thesesByRow, openNantesAffiliations, nameMatch, sh
 
 const rec = (id: number, fields: Record<string, unknown>) => ({ id, key: (fields.uid_dyna as string) || `g${id}`, fields });
 const cand = (extra: Record<string, unknown>) => ({ nameMatch: 'exact', score: 'moyen', evidence: ['site (Nantes Université)'], ...extra });
-const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours' | 'etablissements' | 'theses', unknown>>) =>
+const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idref' | 'ldap' | 'parcours' | 'etablissements' | 'theses' | 'tasks', unknown>>) =>
   ({ annuaire: [], orcid: {}, hal: {}, scopus: {}, idref: {}, ldap: {}, parcours: {}, etablissements: {}, theses: {}, ...over });
 
 describe('scripts/sync_tasks.cjs rules (docs/archive/plan-chantiers-taches.md, lot 5)', () => {
   it('default rules exclude the ABES ones (handled by the batch export)', () => {
-    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these']);
+    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these', 'employeur_a_renseigner']);
     expect(Object.keys(RULES)).toContain('abes_orcid');
   });
 
@@ -283,6 +283,33 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       ] }));
       expect(out.map((d: { key: string }) => d.key)).toEqual(['a-x']);
       expect(out[0].description).toContain('Employeur CNRS ; le compte LDAP hébergé a-x est en fermeture (état D, fin 2026-12-31)');
+    });
+  });
+
+  describe('employeur_a_renseigner — closing-only rule over the tasks of migration 002', () => {
+    const etablissements = { 1: { Employeur: 'NANTES UNIVERSITE', UAI: '0442953W' }, 2: { Employeur: 'CNRS', UAI: '0753639Y' }, 3: { Employeur: 'non renseigné' } };
+    const task = (id: number, chercheur: number, over: Record<string, unknown> = {}) =>
+      ({ id, fields: { type: 'annuaire_employeur_a_renseigner', origine: 'migration:002-validated-presence', statut: 'a_faire', chercheur, ...over } });
+    it('keeps the tasks of records carrying an LDAP uid without employer, closes the others with a reason', () => {
+      const out = RULES.employeur_a_renseigner.review(ctx({ etablissements, annuaire: [
+        rec(1, { uid_dyna: 'a-x' }),                                // LDAP uid, no employer: kept
+        rec(2, { uid_dyna: 'b-x', Employeur: 3 }),                  // LDAP uid, « non renseigné »: kept
+        rec(3, { uid_dyna: 'ext_c-x' }),                            // no LDAP uid: already external
+        rec(4, { Nom: 'D' }),                                       // no uid at all
+        rec(5, { uid_dyna: 'e-x', Employeur: 2 }),                  // employer entered
+        rec(6, { uid_dyna: 'e-x', validated_status: 'PARTI' }),     // validated gone
+      ], tasks: [
+        task(101, 1), task(102, 2), task(103, 3), task(104, 4), task(105, 5), task(106, 6),
+        task(107, 99),                                              // record deleted
+        task(108, 3, { statut: 'fait' }),                           // already closed: untouched
+        task(109, 3, { origine: 'manuel' }),                        // typed by hand: untouched
+      ] }));
+      expect(out.map((x: { task: { id: number }; reason: string }) => [x.task.id, x.reason.split(' ')[0]])).toEqual([
+        [103, 'Fiche'], [104, 'Fiche'], [105, 'Employeur'], [106, 'Personne'], [107, 'Fiche'],
+      ]);
+      expect(out[2].reason).toBe('Employeur renseigné (CNRS).');
+      expect(out[0].reason).toContain('sans uid LDAP');
+      expect(out[4].reason).toContain('supprimée');
     });
   });
 

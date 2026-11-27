@@ -49,6 +49,11 @@
  *                    annuaire_doctorant_docteur when the thesis is recent (status, employment or end to update;
  *                    closed once the record no longer says PhD student), annuaire_doctorant_these_ancienne when it
  *                    is older than a PhD lasts (IdRef of a namesake, or a second doctorate: to check)
+ *   employeur_a_renseigner  closing-only rule (`review`, creates nothing) over the « employer to enter » tasks
+ *                    of migration 002 (records validated EXTERNE without employer, release 1.6.0): such a task
+ *                    only matters while the record carries an LDAP uid — without one (`ext_` or empty),
+ *                    lib/presence.ts isHomeStaff already counts the person outside the institution. Closed as
+ *                    `resolue_auto` once the record has no LDAP uid, has an employer, is validated gone, or was deleted.
  *   abes_orcid       Annuaire ORCID missing from the IdRef record (lot ABES channel)
  *   abes_idhal       Annuaire IdHAL missing from the IdRef record (lot ABES channel)
  *
@@ -70,7 +75,7 @@ const schema = require('./lib/tasks_schema.cjs');
 const APPLY = common.hasFlag('apply');
 const AUTHOR = 'druid:regles';
 const PROGRESS_PATH = common.getArg('progress', 'tasks_detect_progress.json');
-const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these'];
+const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these', 'employeur_a_renseigner'];
 const RULES_ARG = String(common.getArg('rules', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
@@ -334,6 +339,35 @@ const isExternalEmployerRef = (ref, etablissements) => {
   if ((!name || name === 'NON RENSEIGNE') && !uai) return false;
   return uai ? uai !== HOME_UAI : name !== HOME_NAME;
 };
+/** Employer filled in, home institution included (« non renseigné » = not filled) — lib/presence.ts employerKindOf. */
+const employerLabelRef = (ref, etablissements) => {
+  const e = (etablissements || {})[ref];
+  if (!e) return '';
+  const name = String(e.Employeur || '').trim();
+  if (name && normEmployer(name) !== 'NON RENSEIGNE') return name;
+  return String(e.UAI || '').trim();
+};
+
+// ── « Employer to enter » tasks of migration 002 (release 1.6.0) ──────────────────────────
+const EMPLOYER_TASK_ORIGIN = 'migration:002-validated-presence';
+const OPEN_STATUSES = ['a_faire', 'en_cours', 'en_attente'];
+/**
+ * Why an « employer to enter » task no longer matters, or '' while it does. The task keeps the « not the
+ * institution » information of a record validated EXTERNE; lib/presence.ts isHomeStaff only counts a record
+ * with an unknown employer as home staff when it holds an LDAP account, so without one nothing is lost. Only
+ * the uid decides (`ext_` or empty = no account), not the LDAP cache: a real uid missing from the cache for a
+ * while must not close the task for good (closing-only rule, nothing reopens it).
+ */
+function employerTaskSettled(rec, ctx) {
+  if (!rec) return 'Fiche supprimée de l’Annuaire.';
+  const f = rec.fields;
+  const employer = f.Employeur ? employerLabelRef(f.Employeur, ctx.etablissements) : '';
+  if (employer) return `Employeur renseigné (${employer}).`;
+  if (/^PARTI$/i.test(String(f.validated_status || '').trim())) return 'Personne validée partie : l’employeur ne compte plus pour la présence.';
+  const uid = String(f.uid_dyna || '').trim();
+  if (uid && !uid.startsWith('ext_')) return '';
+  return 'Fiche sans uid LDAP (ext_ ou vide) : Druid la compte déjà hors de l’établissement (externe), l’employeur n’est pas nécessaire.';
+}
 
 // ── Rules: detect(ctx) → [{ key, rec, description, lien, type? }] ─────────────────
 
@@ -554,6 +588,24 @@ const RULES = {
       return out;
     },
   },
+  employeur_a_renseigner: {
+    type: 'annuaire_employeur_a_renseigner',
+    // Unreadable employer table ⇒ skipped (an entered employer would go unseen).
+    sources: ['etablissements'],
+    /** Closing-only: [{ task, reason }] for the open tasks of migration 002 that no longer matter. */
+    review(ctx) {
+      const byRow = new Map(ctx.annuaire.map((r) => [r.id, r]));
+      const out = [];
+      for (const task of ctx.tasks || []) {
+        const t = task.fields;
+        if (t.type !== 'annuaire_employeur_a_renseigner' || t.origine !== EMPLOYER_TASK_ORIGIN) continue;
+        if (!OPEN_STATUSES.includes(schema.statusOf(t))) continue;
+        const reason = employerTaskSettled(byRow.get(Number(t.chercheur)), ctx);
+        if (reason) out.push({ task, reason });
+      }
+      return out;
+    },
+  },
   parcours_depart: {
     type: 'parcours_depart_observe',
     types: ['parcours_depart_confirme', 'parcours_depart_declare', 'parcours_depart_observe'],
@@ -708,6 +760,7 @@ async function main() {
   let existing = [];
   try { existing = (await common.gristRecords(schema.TASKS_TABLE)) || []; }
   catch (e) { if (APPLY) throw e; console.log(`[tasks] table ${schema.TASKS_TABLE} unreadable (${e.message}) — dry-run continues with no existing task`); }
+  ctx.tasks = existing;   // closing-only rules (review) read the tasks they settle
   const byKey = new Map(existing.filter((r) => r.fields.cle).map((r) => [r.fields.cle, r]));
   // Open tasks typed by hand (import, form) for the same type + person: the rule does not
   // duplicate them — the human one already tracks the situation.
@@ -728,6 +781,19 @@ async function main() {
       console.warn(`[tasks] ${name}: skipped, empty cache(s) ${missing.join(', ')}`);
       stats.skipped = [...(stats.skipped || []), name];
       done++;
+      continue;
+    }
+    if (rule.review) {
+      // Closing-only rule: settles tasks created elsewhere (a migration), never creates nor reopens one.
+      const settled = rule.review(ctx);
+      for (const { task, reason } of settled) {
+        patches.push({ id: task.id, fields: { statut: 'resolue_auto', fait_par: AUTHOR, fait_le: nowIso, verifie_le: nowIso, resolution: reason },
+          event: { date: nowIso, auteur: AUTHOR, action: 'resolution_auto', detail: `Règle ${name} : ${reason}` } });
+      }
+      stats.resolved += settled.length;
+      console.log(`[tasks] ${name}: ${settled.length} settled`);
+      done++;
+      writeProgress({ running: true, total: rules.length, done, ...stats, startedAt: nowIso });
       continue;
     }
     const detected = rule.detect(ctx);
@@ -801,7 +867,7 @@ async function main() {
   writeProgress({ running: false, total: rules.length, done, ...stats, startedAt: nowIso, finishedAt: new Date().toISOString() });
 }
 
-module.exports = { RULES, DEFAULT_RULES, thesesByRow, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
+module.exports = { RULES, DEFAULT_RULES, employerTaskSettled, thesesByRow, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
 
 if (require.main === module) {
   main().catch((e) => {
