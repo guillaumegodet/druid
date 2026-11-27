@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.23.0] — 2026-11-27
+
 ### Ajouté
 - **Identifiants écartés** (PostgreSQL ; À traiter › Conflits de sources) : une valeur retirée dans la fiche n'est
   plus réécrite par un import ni par un traitement automatique ; si une source la rapporte, elle est seulement notée et
