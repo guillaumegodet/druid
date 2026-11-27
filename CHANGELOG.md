@@ -12,6 +12,15 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Identifiants modifiés dans SoVisu+ repris dans Druid** (CRISalid, PostgreSQL) : le consommateur
+  `scripts/graph_consume.ts` lit la file `druid-person-actions` du bus et applique à la fiche les retraits et ajouts
+  faits par les chercheurs et les bibliothécaires dans SoVisu+ : un identifiant retiré est écarté (plus reproposé par
+  les alignements), un ORCID ou un IdHAL authentifié devient principal, un ajout ne remplace jamais une autre valeur.
+  Les cas à trancher deviennent des tâches « À traiter » (identifiant retiré, remplacé, différent de la fiche, porté
+  par deux personnes). Chaque message est journalisé (`inbound_graph_action`) ; `DRUID_GRAPH_INBOUND=off|dry-run|on`,
+  désactivé par défaut. Le publieur des retraits ne propose plus de retirer du graphe une valeur posée par SoVisu+.
+
 ### Modifié
 - **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
   les ferme d'elle-même (« résolue auto », motif au fil de la tâche) quand la fiche n'a pas d'uid LDAP (`ext_` ou
@@ -22,6 +31,10 @@ données à exécuter au déploiement).
   personne que Druid compte déjà partie ou sur le départ (compte LDAP disparu ou en fermeture, dates de fin, présence
   validée) ; un départ vu dans les seules publications cède devant un compte LDAP actif de l'établissement. Les deux
   règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
+
+### Migration
+- `20261128150000_inbound_graph_action` (dbmate) : journal des messages reçus ; origine `sovisuplus` dans
+  `graph_identifier_state`.
 
 ## [2.24.0] — 2026-11-27
 

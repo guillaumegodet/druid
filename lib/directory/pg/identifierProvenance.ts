@@ -52,18 +52,19 @@ export const recordIdentifierValues = async (trx: Transaction<DB>, personId: str
 /**
  * A value removed from the record by a person is « Rejeté » for the alignment of its source: the alignments stop
  * proposing it and the automatic writers (sync_openalex, sync_hal) stop writing it back. Only for a removal typed in
- * the record (pg/commands.ts): a batch applying alignment proposals may remove values a later run must be able to
- * restore (case of 2026-11-13, plan § Lot 4).
+ * the record (pg/commands.ts) or by a researcher in SoVisu+ (lib/graph/inboundPg.ts, `note` « Retiré dans SoVisu+ »):
+ * a batch applying alignment proposals may remove values a later run must be able to restore (case of 2026-11-13).
  */
-export const rememberRemovedIdentifiers = async (trx: Transaction<DB>, personId: string, scheme: string, removed: string[], by: string): Promise<number> => {
+export const rememberRemovedIdentifiers = async (trx: Transaction<DB>, personId: string, scheme: string, removed: string[], by: string,
+  note = 'Retiré dans la fiche'): Promise<number> => {
   const source = ALIGN_SOURCE_OF_SCHEME[scheme];
   if (!source) return 0;
   let n = 0;
   for (const value of [...new Set(removed.map((v) => String(v).trim()).filter(Boolean))]) {
     await trx.insertInto('alignment_candidate')
-      .values({ person_id: personId, source, candidate_id: value, decision: 'Rejeté', note: 'Retiré dans la fiche', decided_by: by, decided_at: new Date().toISOString(), payload: JSON.stringify({}) } as any)
+      .values({ person_id: personId, source, candidate_id: value, decision: 'Rejeté', note, decided_by: by, decided_at: new Date().toISOString(), payload: JSON.stringify({}) } as any)
       .onConflict((oc) => oc.columns(['person_id', 'source', 'candidate_id']).doUpdateSet({
-        decision: 'Rejeté', note: 'Retiré dans la fiche', decided_by: by, decided_at: new Date().toISOString(),
+        decision: 'Rejeté', note, decided_by: by, decided_at: new Date().toISOString(),
       } as any))
       .execute();
     n++;

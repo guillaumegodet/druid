@@ -17836,6 +17836,18 @@ msgid "SoVisu+ — remove the identifiers of the former person (uid changed)"
 msgstr "SoVisu+ — retirer les identifiants de l’ancienne personne (uid changé)"
 
 #: lib/tasks.ts:68
+msgid "SoVisu+ — identifier removed by the researcher: check"
+msgstr "SoVisu+ — identifiant retiré par le chercheur : vérifier"
+
+#: lib/tasks.ts:69
+msgid "SoVisu+ — identifier replaced by the researcher: check"
+msgstr "SoVisu+ — identifiant remplacé par le chercheur : vérifier"
+
+#: lib/tasks.ts:70
+msgid "SoVisu+ — identifier different from the record: choose"
+msgstr "SoVisu+ — identifiant différent de la fiche : choisir"
+
+#: lib/tasks.ts:68
 msgid "Directory — employer to enter (record validated « external »)"
 msgstr "Annuaire — employeur à renseigner (fiche validée « externe »)"
 
