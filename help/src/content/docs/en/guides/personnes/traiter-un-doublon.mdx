@@ -1,6 +1,6 @@
 ---
 title: "Handle a duplicate"
-description: "Merge two records of the same person, or qualify them as multiple memberships."
+description: "Merge two records of the same person, qualify their multiple memberships, restore a merge."
 sidebar:
   order: 5
 ---
@@ -9,74 +9,103 @@ import QuiOu from '../../../../../components/QuiOu.astro';
 
 <QuiOu
 	profils="Druid administrators (the To process button appears if you are also a technical administrator)"
-	menu="People › To process › Duplicates"
+	menu="People › To process › Tasks (and Merges tab)"
 />
 
-A **duplicate** is several records with the same uid, i.e. the same person. It is not always
-a mistake: a person can belong to two laboratories. Druid asks you to decide, group by group.
+A person can only carry one uid in Druid. Two situations still need your attention:
 
-## The three cases
+- **two records for the same person**, under two different uids (for example an `ext_…`
+  record created from the lab website and the record coming from the LDAP directory): they
+  must be **merged**;
+- **a person with several memberships** (two laboratories, or a change of laboratory): you
+  must say which one is the **primary** one.
 
-The **Duplicates** page sorts the groups into three categories:
-
-| Category | Situation | What to do |
-|---|---|---|
-| **Same lab** | Two records for the same laboratory, usually one row from the LDAP directory and one row created from the lab's website. | **Merge** |
-| **Holding area** | One of the records has no laboratory (or a temporary one). | **Merge**: the record without a lab is absorbed by the lab's record. |
-| **Several labs** | One record per laboratory. | **Qualify**: it is not necessarily a mistake. |
-
-Groups that appeared since your last visit are labelled **new**. Groups already qualified are
-filed under **Qualified multiple affiliations**.
+Both cases arrive as **tasks** in **To process › Tasks**. Use the type filter to find them.
 
 ## Merge two records
 
-1. In the group, click **Merge**. The **Merge two records** wizard opens.
+The nightly detection creates a **Directory — two records for the same person: merge** task
+when two records share an identifier (ORCID, IdRef, IdHAL, Scopus, staff number) and carry the
+same name.
+
+1. Open the task, then click **Merge** (followed by both uids). The **Merge two records**
+   assistant opens.
 2. Check which record is **Kept**: Druid suggests the one with a laboratory, then the
    validated one, then the most complete. Click the other record to swap.
-3. Go through the **Fields to decide**: for each field that differs, Druid pre-selects a
-   value and says why (most recent validation, most recent LDAP update, union of both
-   values, fills an empty field…). Change it if needed.
+3. Go through the **Fields to decide**: for each field that differs, Druid pre-selects a value
+   and says why (most recent validation, most recent LDAP update, union of both values, fills
+   an empty field…). Change it if needed.
 4. Click **Merge**.
 
-The kept record is completed, the other one is deleted. The operation is **logged**: the
-**Merge log**, at the bottom of the Duplicates page, lets you **Restore** it.
+To chain several merges, click **Merge in series** at the top of the Tasks tab: the assistant
+opens on each pair in turn (“pair 3 of 37”). Every merge is still reviewed and confirmed;
+**Skip** leaves a pair as it is and opens the next one.
 
 :::caution
 If the two records do not have the same uid, Druid asks you to confirm that they really are
-the same person. If in doubt, do not merge: open both records and check.
+the same person. When in doubt, do not merge: open both records and check. The
+**Directory — shared identifiers: same person or namesakes?** tasks are handled one by one
+for this reason.
 :::
 
-## Qualify a multiple affiliation
+## Choose the primary membership
 
-1. In the group, click **Qualify**.
-2. Choose the **Main row**: the record of the person's main laboratory.
+When a person belongs to several structures, their record shows all their memberships in
+the **Affiliations & history** card. Only one is **primary** (purple dot): it is the one that counts in
+the lists, the dashboard and the export to SoVisu+.
+
+- To change the primary membership, click the grey dot of the membership you want, then save
+  the record.
+- The other memberships become **secondary** while ongoing, **former** once their end date
+  is past. Druid works it out when the record is saved.
+
+When you create a record for a uid that already exists in another laboratory, Druid adds a
+membership to the existing person: the existing membership stays primary, the new one becomes
+secondary (or former if it has already ended).
+
+## Qualify memberships left pending
+
+A few cases cannot be settled automatically: for example a membership restored after a merge,
+or a membership outside your scope. The person then shows as several records, and adding a
+membership is refused. The nightly detection creates a **Directory — affiliations to qualify**
+task.
+
+1. Open the task.
+2. Choose the **Main row**: the one of the person's main laboratory.
 3. Choose the type:
-   - **Concurrent**: the person belongs to both laboratories at the same time. The other
-     records become **secondary**;
-   - **Successive**: the person moved to another laboratory. The other records become
-     **former**; you can enter the end date of the former affiliation;
-   - **To review**: undetermined case, remembered so that it does not come back at every
-     review.
-4. Confirm.
+   - **Concurrent**: the person belongs to both laboratories at the same time. The other rows
+     become **secondary**;
+   - **Successive**: the person changed laboratory. The other rows become **former**; you can
+     give the end date of the former affiliation;
+   - **To review**: undetermined case, set aside.
+4. Confirm: the task is done and the person has a single record again.
 
-The group moves to **Qualified multiple affiliations**. You can **Requalify** it later.
+If both rows carry the same laboratory, it is usually the same membership entered twice:
+click **Open the merge assistant** instead.
+
+## Restore a merge
+
+Every merge is **logged**. The **To process › Merges** tab lists the merges carried out, most
+recent first; the **Restore** button recreates the absorbed record and puts the kept record
+back in its state before the merge.
 
 ## What happens next
 
 - A merge changes the directory immediately: the absorbed record disappears from the lists,
   and a trace of the merge is added to the kept record.
-- A qualification deletes nothing: it states, on each record, whether it is primary,
-  secondary or former. The researcher record then shows all the person's memberships.
-- Towards CRISalid, a person is exported only once, with their primary record.
+- A qualification deletes nothing: it states, for each membership, whether it is primary,
+  secondary or former.
+- Towards CRISalid, a person is exported only once, with their primary membership.
 
 ## Known limitations
 
-- **Only uid duplicates are detected**: two records of the same person with no shared uid
-  (for example an external person entered twice under two spellings) are not spotted.
-- **Restoring a merge puts the kept record back in its state before the merge**: changes
-  made to that record in the meantime are lost.
-- **The Refresh button recalculates the groups from the directory**, without a new
-  synchronisation with the LDAP directory.
+- **Only records sharing an identifier are matched**: two records of the same person with no
+  common identifier (for example an external person entered twice under two spellings) are
+  not spotted.
+- **Restoring a merge puts the kept record back in its state before the merge**: changes made
+  to that record in the meantime are lost.
+- **Tasks are created by the nightly detection**: a situation that appears during the day is
+  only reported the next day (or after **Run detection**).
 
 ## See also
 

@@ -36,8 +36,8 @@ Les autres appartenances apparaissent avec une mention :
 | **secondaire** | Appartenance concomitante à une autre structure, en cours. |
 | **historique** | Ancienne appartenance, terminée (la personne a changé de laboratoire). |
 
-Ces mentions viennent de la qualification des fiches multiples : voir
-[Traiter un doublon](/guides/personnes/traiter-un-doublon/).
+L'appartenance principale se choisit dans la fiche ; les autres deviennent secondaires ou
+historiques selon leur date de fin : voir [Traiter un doublon](/guides/personnes/traiter-un-doublon/#choisir-lappartenance-principale).
 
 ## Types d'appartenance
 

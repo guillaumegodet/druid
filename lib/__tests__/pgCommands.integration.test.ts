@@ -234,7 +234,7 @@ describe.skipIf(!url)('DirectoryCommands contract: Grist = PostgreSQL', () => {
 });
 
 describe.skipIf(!url)('PostgreSQL commands: what differs from Grist by design', () => {
-  it('a record created with a uid already in the directory is a new membership of that person', async () => {
+  it('a record created with a uid already in the directory is a new membership of that person, qualified at once', async () => {
     const dir = gristDirectoryFixture();
     const directory = transformDirectory(dir);
     const got: Record<string, unknown> = {};
@@ -249,13 +249,17 @@ describe.skipIf(!url)('PostgreSQL commands: what differs from Grist by design', 
       } as any, ctxOf());
       got.people = (await sql<{ uid: string; last_name: string; n: string }>`SELECT p.uid, p.last_name, count(m.id)::text AS n FROM person p
         JOIN membership m ON m.person_id = p.id WHERE lower(p.uid) = 'petit-d' GROUP BY p.uid, p.last_name`.execute(trx)).rows;
-      got.group = (await repo.duplicates(ALL)).doublonsUid.find((g) => g.uid === 'Petit-D')?.rows.map((r) => [r.gristRowId, r.labo]);
+      const group = (await repo.duplicates(ALL)).doublonsUid.find((g) => g.uid === 'Petit-D');
+      got.group = group?.rows.map((r) => [r.gristRowId, r.labo, r.role]);
+      got.qualified = group?.qualified;
       got.recordId = recordId;
       throw new Rollback();
     })).rejects.toBeInstanceOf(Rollback);
-    // One person (its fields unchanged), two memberships: a duplicate group to qualify or merge on the Doublons page.
+    // One person (its fields unchanged), two memberships qualified at once (annuaireWrite.ts qualifyAddedMembership):
+    // the existing one PRINCIPAL, the new one SECONDAIRE — one record with two affiliations, nothing left to qualify.
     expect(got.people).toEqual([{ uid: 'Petit-D', last_name: 'Petit', n: '2' }]);
-    expect(got.group).toEqual([[105, 'LAB2'], [got.recordId, 'zzz']]);
+    expect(got.group).toEqual([[105, 'LAB2', 'PRINCIPAL'], [got.recordId, 'zzz', 'SECONDAIRE']]);
+    expect(got.qualified).toBe(true);
   });
 
   it('a new team takes the members of its lab already labelled with it (plan-binomes-chercheurs D11)', async () => {

@@ -69,6 +69,7 @@ export const TASK_TYPES = {
   annuaire_hebergement_fin: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — hosted LDAP account closing: probable departure?` },
   annuaire_doctorant_docteur: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — PhD student who defended the thesis: update the status` },
   annuaire_doctorant_these_ancienne: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — PhD student with an old thesis on the IdRef: namesake?` },
+  annuaire_appartenance_a_qualifier: { base: 'Annuaire', canal: 'interne', email: false, label: msg`Directory — affiliations to qualify (main row, concurrent or successive)` },
   autre: { base: 'Autre', canal: 'interne', email: false, label: msg`Other` },
 } as const satisfies Record<string, TaskTypeMeta>;
 

@@ -175,7 +175,7 @@ export const API_ERRORS = [
   msg`Institution not found`,
   msg`Invalid record identifier (row id missing)`,
   msg`Several affiliations can only be saved for a person with a directory identifier (uid_dyna).`,
-  msg`This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation.`,
+  msg`This person has other directory rows not yet qualified: qualify them from the « Directory — affiliations to qualify » task (To do › Tasks) before adding an affiliation.`,
   msg`Error saving the groups — does the « groupes » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)`,
   msg`Error saving the author ID — does the « openalex_author_id » column exist in the Annuaire? (provisioning: node scripts/add_groups_column.cjs --apply)`,
   msg`No OpenAlex identifier configured for this structure`,

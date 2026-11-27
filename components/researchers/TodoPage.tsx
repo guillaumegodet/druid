@@ -1,8 +1,8 @@
 import React from 'react';
-import { ClipboardList, Copy, GitCompareArrows, GitMerge } from 'lucide-react';
+import { ClipboardList, GitCompareArrows, GitMerge, History } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useCompactHeader } from '../../hooks/useCompactHeader';
-import { DuplicatesPage } from './DuplicatesPage';
+import { MergeLogPanel } from './MergeLogPanel';
 import { TasksPage } from './TasksPage';
 import { ImportConflictsPage } from './ImportConflictsPage';
 import { FieldConflictsPage } from './FieldConflictsPage';
@@ -11,19 +11,18 @@ import type { ConflictTable } from '../../lib/importConflicts';
 import { HelpButton } from '../HelpButton';
 import { TODO_TAB_HELP } from '../../lib/helpLinks';
 
-export type TodoTab = 'doublons' | 'taches' | 'conflits' | 'sources';
-const TODO_TABS: readonly string[] = ['doublons', 'taches', 'conflits', 'sources'];
+export type TodoTab = 'taches' | 'conflits' | 'sources' | 'fusions';
+const TODO_TABS: readonly string[] = ['taches', 'conflits', 'sources', 'fusions'];
 
-type DuplicatesProps = React.ComponentProps<typeof DuplicatesPage>;
 type TasksProps = React.ComponentProps<typeof TasksPage>;
 
 interface Props {
   tab: TodoTab;
   onTabChange: (tab: TodoTab) => void;
-  duplicatesCount: number;
   tasksOpenCount: number;
-  duplicates: Omit<DuplicatesProps, 'embedded'>;
   tasks: TasksProps;
+  /** « Fusions » tab: the merge log, with restore (MergeLogPanel). */
+  merges: { onRestored: () => void; refreshKey: number };
   /** « Tâches » tab available (capability HAS_TASKS: server routes). */
   withTasks: boolean;
   /** Directory-import arbitration tables (`Arbitrage_*`); the tab shows when there is one. */
@@ -36,18 +35,19 @@ interface Props {
 
 /**
  * « À traiter » section of the Personnel tab (docs/archive/plan-chantiers-taches.md, lot 2): what is
- * left to do: the uid_dyna duplicates (DuplicatesPage, unchanged), the tasks to carry out
- * outside Druid (TasksPage) and the directory-import conflicts (ImportConflictsPage, when an
- * `Arbitrage_*` table exists). The read-only « OpenAlex affiliations » tab (lot 6) was dropped on
- * 2026-10-12 with the Grist corrections table (druid-internal plan-migration-postgresql.md, lot 14 b).
- * URL ?page=TASKS&tab=doublons|taches|conflits (any other value ⇒ doublons); the pill of the
- * Personnel header carries the sum of both counters. Admin-only (decision of 2026-09-23).
+ * left to do: the tasks to carry out (TasksPage), the directory-import conflicts (ImportConflictsPage, when an
+ * `Arbitrage_*` table exists), the source conflicts, and the merge log (« Fusions », with restore). The former
+ * « Doublons » tab (records sharing a uid_dyna) was dropped on 2026-11-28: a uid is unique on PostgreSQL, a
+ * membership added to a person is qualified at once, and what remains to qualify is a task of the rule
+ * `appartenance_a_qualifier`. URL ?page=TASKS&tab=taches|conflits|sources|fusions (the former `doublons` and any
+ * unknown value ⇒ the first tab available). Admin-only (decision of 2026-09-23).
  */
-export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, duplicatesCount, tasksOpenCount, duplicates, tasks, withTasks, conflictTables, onOpenConflictRecord, onConflictsResolved, fieldConflicts }) => {
+export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, tasksOpenCount, tasks, merges, withTasks, conflictTables, onOpenConflictRecord, onConflictsResolved, fieldConflicts }) => {
   const withConflicts = withTasks && conflictTables.length > 0;
   const withSources = withTasks && fieldConflicts.available;
-  const tab: TodoTab = !withTasks || !TODO_TABS.includes(requestedTab) || (requestedTab === 'conflits' && !withConflicts)
-    || (requestedTab === 'sources' && !withSources) ? 'doublons' : requestedTab;
+  const available = (x: string): boolean => TODO_TABS.includes(x)
+    && (x === 'fusions' || (withTasks && (x === 'taches' || (x === 'conflits' && withConflicts) || (x === 'sources' && withSources))));
+  const tab: TodoTab = available(requestedTab) ? requestedTab : withTasks ? 'taches' : 'fusions';
   // One import source ⇒ named in the tab (« Directory conflicts Centrale »); several ⇒ chosen in the tab.
   const conflictSource = conflictTables.length === 1 ? conflictTables[0].source : '';
   const conflictsOpen = conflictTables.reduce((n, x) => n + x.open, 0);
@@ -65,8 +65,8 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
             <div>
               <h1 className="font-disp text-3xl md:text-[38px] font-bold tracking-tight text-ink dark:text-[#f5f2ea] leading-none"><Trans>To process</Trans></h1>
               <p className="page-header-sub text-[15px] text-muted dark:text-[#8f897c] mt-1.5">
-                {tab === 'doublons'
-                  ? <Trans>Records sharing the same uid_dyna — merge, or qualify a legitimate multi-affiliation</Trans>
+                {tab === 'fusions'
+                  ? <Trans>Merges of records carried out in Druid — each one can be restored</Trans>
                   : tab === 'taches'
                     ? <Trans>Corrections to carry out outside Druid (IdRef, ORCID, HAL, OpenAlex, Scopus, HR) — who does what, and where it stands</Trans>
                     : tab === 'sources'
@@ -78,9 +78,6 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
           </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button onClick={() => onTabChange('doublons')} className={tabCls(tab === 'doublons')} title={t`Records sharing the same uid_dyna`}>
-            <Copy className="w-4 h-4" /> <Trans>Duplicates</Trans> {counter(duplicatesCount)}
-          </button>
           {withTasks && (
             <>
               <button onClick={() => onTabChange('taches')} className={tabCls(tab === 'taches')} title={t`Tasks to carry out outside Druid`}>
@@ -98,9 +95,13 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
               )}
             </>
           )}
+          <button onClick={() => onTabChange('fusions')} className={tabCls(tab === 'fusions')} title={t`Merge log: merges carried out, to restore if needed`}>
+            <History className="w-4 h-4" /> <Trans>Merges</Trans>
+          </button>
         </div>
       </header>
-      {tab === 'doublons' ? <DuplicatesPage embedded {...duplicates} />
+      {tab === 'fusions'
+        ? <div className="flex-1 overflow-auto px-4 md:px-7 pb-6" data-page-scroll><MergeLogPanel defaultOpen onRestored={merges.onRestored} refreshKey={merges.refreshKey} /></div>
         : tab === 'taches' ? <TasksPage {...tasks} />
           : tab === 'sources' ? <FieldConflictsPage items={fieldConflicts.items} identifiers={fieldConflicts.identifiers} onReload={fieldConflicts.reload} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />
           : <ImportConflictsPage tables={conflictTables} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />}

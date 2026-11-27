@@ -35,8 +35,8 @@ Terms are grouped by theme. Each definition links to the page that explains it i
   and for the export to CRISalid. → [Memberships and affiliation](/en/donnees/appartenances-rattachement/#primary-affiliation)
 - **Imprecise date**: a date entered to the year (`2022`), the month (`2022-09`) or the day
   (`2022-09-01`), depending on what is known. → [Memberships and affiliation](/en/donnees/appartenances-rattachement/#imprecise-dates)
-- **Duplicate**: two records with the same uid: either the same membership entered twice (to
-  merge), or a genuine double membership (to qualify). → [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/)
+- **Duplicate**: two records for the same person, under two uids (to merge); not to be confused
+  with a genuine double membership, which is qualified (primary, secondary, former). → [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/)
 - **Task**: a correction to make outside Druid (on IdRef, ORCID, HAL…), followed up in the
   *To process* section. → [Follow up “To process” tasks](/en/guides/personnes/taches-a-traiter/)
 

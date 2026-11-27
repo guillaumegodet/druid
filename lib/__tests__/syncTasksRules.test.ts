@@ -12,7 +12,7 @@ const ctx = (over: Partial<Record<'annuaire' | 'orcid' | 'hal' | 'scopus' | 'idr
 
 describe('scripts/sync_tasks.cjs rules (docs/archive/plan-chantiers-taches.md, lot 5)', () => {
   it('default rules exclude the ABES ones (handled by the batch export)', () => {
-    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these', 'employeur_a_renseigner']);
+    expect(DEFAULT_RULES).toEqual(['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these', 'employeur_a_renseigner', 'appartenance_a_qualifier']);
     expect(Object.keys(RULES)).toContain('abes_orcid');
   });
 
@@ -305,6 +305,23 @@ describe('annuaire_ids_partages — records with different uid sharing an export
       ] }));
       expect(out.map((d: { key: string }) => d.key)).toEqual(['a-x']);
       expect(out[0].description).toContain('Employeur CNRS ; le compte LDAP hébergé a-x est en fermeture (état D, fin 2026-12-31)');
+    });
+  });
+
+  describe('appartenance_a_qualifier — several directory rows of one uid not qualified', () => {
+    it('one task per unqualified uid group; qualified or « à revoir » groups and single rows left out', () => {
+      const out = RULES.appartenance_a_qualifier.detect(ctx({ annuaire: [
+        rec(1, { uid_dyna: 'a-a', Nom: 'Alpha', Prenom: 'Ann', LABO: 'LS2N' }), rec(2, { uid_dyna: 'a-a', LABO: 'IETR' }),          // to qualify
+        rec(3, { uid_dyna: 'b-b', LABO: 'LS2N', rattachement: 'PRINCIPAL' }), rec(4, { uid_dyna: 'b-b', LABO: 'IETR', rattachement: 'SECONDAIRE' }),
+        rec(5, { uid_dyna: 'c-c', LABO: 'LS2N', doublon_decision: 'A_REVOIR 2026-01-01 x' }), rec(6, { uid_dyna: 'c-c', LABO: 'LS2N' }),
+        rec(7, { uid_dyna: 'd-d', LABO: 'LS2N', rattachement: 'PRINCIPAL' }), rec(8, { uid_dyna: 'd-d', LABO: 'LS2N' }),             // one row without role
+        rec(9, { uid_dyna: 'e-e', LABO: 'LS2N' }), rec(10, { LABO: 'LS2N' }), rec(11, { LABO: 'LS2N' }),                              // single / no uid
+      ] }));
+      expect(out.map((x: { key: string }) => x.key)).toEqual(['a-a', 'd-d']);
+      expect(out[0].description).toContain('2 lignes de l’Annuaire pour ALPHA Ann (a-a), non qualifiées : LS2N, IETR.');
+      expect(out[0].description).toContain('choisir la ligne principale');
+      expect(out[1].description).toContain('doublon probable');
+      expect(out[0].lien).toBe('/?page=RESEARCHER_DETAIL&id=a-a');
     });
   });
 

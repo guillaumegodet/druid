@@ -23,7 +23,7 @@ import type { AdminTab } from './lib/auth';
 import { LockedFeature, TrialBanner } from './components/saas/PlanOffer';
 import { ImpersonationBanner } from './components/saas/ImpersonationBanner';
 import { ViewState, Researcher, Structure, ResearcherStatus, StructureLevel } from './types';
-import { GristService, NEW_STRUCTURE_ID, LdapDiff, StructuresLdapDiff, IdrefCandidate, AlignMode, AlignCandidate, DECISION_MIXED, ReviewDecision, AlignGroup, UnifiedAlignDiff, UnifiedAlignSource, UNIFIED_ALIGN_SOURCES, unifiedCandidateId, DuplicatesDiff } from './lib/gristService';
+import { GristService, NEW_STRUCTURE_ID, LdapDiff, StructuresLdapDiff, IdrefCandidate, AlignMode, AlignCandidate, DECISION_MIXED, ReviewDecision, AlignGroup, UnifiedAlignDiff, UnifiedAlignSource, UNIFIED_ALIGN_SOURCES, unifiedCandidateId } from './lib/gristService';
 import { runUnifiedAlign, stopUnifiedRun, UnifiedRunProgress } from './lib/unifiedAlignRuns';
 import { useDruidData } from './hooks/useDruidData';
 import { isSuperAdmin, hasFullAccess, canUseEstablishmentTools, isLabViewer, hasCapability, canWrite, isLockedByPlan } from './lib/auth';
@@ -118,9 +118,6 @@ function App() {
     if (ldapDiff) {
       try { setLdapDiff(await GristService.computeLdapDiff()); } catch (e) { console.warn('LDAP diff recompute after merge:', e); }
     }
-    if (dupDiff) {
-      try { setDupDiff(await GristService.computeDuplicatesDiff()); } catch (e) { console.warn('Duplicates recompute after merge:', e); }
-    }
   };
   const [structDiff, setStructDiff] = useState<StructuresLdapDiff | null>(null);
   // Unified alignment page (docs/archive/plan-alignement-unifie.md): aggregates IdRef/ORCID/HAL/OpenAlex
@@ -158,25 +155,7 @@ function App() {
     try { setLdapDiff(await GristService.computeLdapDiff()); }
     catch (err: any) { setError(apiErrorText(err) || t`Error computing the LDAP diff`); }
   };
-  // « Doublons » page (lot 3): uid_dyna groups computed on the Annuaire alone. The counter of the
-  // pill in the Personnel header comes from the already loaded `researchers` (a uid shared by ≥ 2
-  // ungrouped records = pending duplicate, qualified multi-affiliations being already merged
-  // into a single record by groupQualifiedRows) — no fetch, no run.
-  const [dupDiff, setDupDiff] = useState<DuplicatesDiff | null>(null);
-  const [dupLoading, setDupLoading] = useState(false);
-  const loadDupDiff = async () => {
-    try { setDupLoading(true); setDupDiff(await GristService.computeDuplicatesDiff()); }
-    catch (err: any) { setError(apiErrorText(err) || t`Error searching for duplicates`); }
-    finally { setDupLoading(false); }
-  };
-  const duplicatesCount = useMemo(() => {
-    const seen = new Map<string, number>();
-    for (const r of researchers) if (r.uid) seen.set(r.uid, (seen.get(r.uid) || 0) + 1);
-    let n = 0;
-    for (const c of seen.values()) if (c > 1) n++;
-    return n;
-  }, [researchers]);
-  // « À traiter » section (docs/archive/plan-chantiers-taches.md, lot 2): duplicates + tasks tabs, admin-only.
+  // « À traiter » section (docs/archive/plan-chantiers-taches.md, lot 2): tasks, conflicts and merges tabs, admin-only.
   // The task list is loaded once for admins (the pill counts the open ones); `?tab=` in the URL.
   const tasksEnabled = isSuperAdmin() && hasCapability('HAS_TASKS');
   const tasksState = useTasks(tasksEnabled);
@@ -200,7 +179,7 @@ function App() {
     if (!r) { setError(t`Researcher not found in the loaded scope`); return; }
     handleResearcherSelect(r, ViewState.ADMIN);
   };
-  const [todoTab, setTodoTab] = useState<TodoTab>('doublons');
+  const [todoTab, setTodoTab] = useState<TodoTab>('taches');
   const [taskForm, setTaskForm] = useState<{ researcher: Researcher | null } | null>(null);
   const openTodo = (tab?: TodoTab) => {
     setViewAndUrl(ViewState.TASKS);
@@ -289,9 +268,10 @@ function App() {
     { page: ViewState.RESEARCHERS_LIST, id: null, tab: null },
     (newState) => {
       setUrlVersion((v) => v + 1);
-      // Legacy « Doublons » page URL → « À traiter » section, Doublons tab.
-      if (String(newState.page) === 'DUPLICATES') { setCurrentView(ViewState.TASKS); setTodoTab('doublons'); return; }
-      if (newState.page === ViewState.TASKS && (newState.tab === 'doublons' || newState.tab === 'taches' || newState.tab === 'conflits' || newState.tab === 'sources')) setTodoTab(newState.tab);
+      // Legacy « Doublons » page and tab (dropped on 2026-11-28) → « À traiter », first tab available.
+      if (String(newState.page) === 'DUPLICATES') { setCurrentView(ViewState.TASKS); setTodoTab('taches'); return; }
+      if (newState.page === ViewState.TASKS && newState.tab === 'doublons') setTodoTab('taches');
+      else if (newState.page === ViewState.TASKS && (newState.tab === 'taches' || newState.tab === 'conflits' || newState.tab === 'sources' || newState.tab === 'fusions')) setTodoTab(newState.tab);
       if (newState.page === ViewState.REPORTS) {
         const n = Number(newState.id);
         setReportId(Number.isInteger(n) && n > 0 ? n : null);
@@ -376,11 +356,6 @@ function App() {
     if (!ldapProgress?.running && !ldapDiff) loadLdapDiff();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentView]);
-  // « À traiter › Doublons » tab: recomputes the groups on every entry (Annuaire read, no run).
-  useEffect(() => {
-    if (currentView === ViewState.TASKS && todoTab === 'doublons') loadDupDiff();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentView, todoTab]);
 
   // Rights management: Groups restricted to the super admin; the list of
   // Structures + alignment tools (LDAP, IdRef, ORCID, HAL, OpenAlex)
@@ -871,7 +846,7 @@ function App() {
             loading={loading}
             onManualSync={() => refreshData()}
             onOpenDuplicates={isSuperAdmin() ? () => openTodo() : undefined}
-            duplicatesCount={duplicatesCount + tasksState.openCount + conflictsState.openCount + fieldConflictsState.openCount}
+            duplicatesCount={tasksState.openCount + conflictsState.openCount + fieldConflictsState.openCount}
             onMergeResearchers={writable ? (rowIds) => setMergeRowIds(rowIds) : undefined}
             onImportValidation={writable && hasCapability('HAS_STATUS_VALIDATION') ? () => setValidationImportOpen(true) : undefined}
             onImportSite={writable && canUseEstablishmentTools() ? () => setSiteImportOpen(true) : undefined}
@@ -974,39 +949,13 @@ function App() {
           <TodoPage
             tab={todoTab}
             onTabChange={(tab) => { setTodoTab(tab); setUrlState({ tab }); }}
-            duplicatesCount={duplicatesCount}
             tasksOpenCount={tasksState.openCount}
             withTasks={tasksEnabled}
             conflictTables={conflictsState.tables}
             onOpenConflictRecord={openConflictRecord}
             onConflictsResolved={afterConflictResolved}
             fieldConflicts={fieldConflictsState}
-            duplicates={{
-              diff: dupDiff,
-              loading: dupLoading,
-              onRefresh: loadDupDiff,
-              onMerge: (rowIds) => setMergeRowIds(rowIds),
-              onRestored: () => { afterMergeChange(); },
-              mergesRefreshKey,
-              onQualify: async ({ rowIds, principalRowId, mode, endDate }) => {
-                try {
-                  const user = getUserInfo();
-                  await GristService.qualifyDoublon({ rowIds, principalRowId, mode, endDate, author: user.preferred_username || user.name || 'druid' });
-                  await afterMergeChange();
-                } catch (e: any) { setError(apiErrorText(e) || t`Qualification error`); }
-              },
-              onUnqualify: async (rowIds) => {
-                try { await GristService.unqualifyDoublon(rowIds); await afterMergeChange(); }
-                catch (e: any) { setError(apiErrorText(e) || t`Requalification error`); }
-              },
-              onOpenResearcher: (gristRowId) => {
-                // Opens the Druid record of the clicked Annuaire row (identified by its Grist row
-                // number, the only safe identifier when the uid is shared).
-                const r = researchers.find((res) => res.gristRowId === gristRowId);
-                if (!r) { setError(t`Directory row ${gristRowId} not found in the loaded scope`); return; }
-                handleResearcherSelect(r);
-              },
-            }}
+            merges={{ onRestored: () => { afterMergeChange(); }, refreshKey: mergesRefreshKey }}
             tasks={{
               state: tasksState,
               researchers,
@@ -1021,6 +970,11 @@ function App() {
                 setMergeRowIds(pairs[0]);
               } : undefined,
               onResearchersChanged: writable ? afterMergeChange : undefined,
+              onQualify: writable ? async ({ rowIds, principalRowId, mode, endDate }) => {
+                const user = getUserInfo();
+                await GristService.qualifyDoublon({ rowIds, principalRowId, mode, endDate, author: user.preferred_username || user.name || 'druid' });
+                await afterMergeChange();
+              } : undefined,
             }}
           />
         );

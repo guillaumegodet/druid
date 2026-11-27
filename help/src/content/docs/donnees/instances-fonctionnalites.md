@@ -42,7 +42,7 @@ Votre **profil** détermine les rubriques que vous voyez et le périmètre des d
 | **Membre d'un laboratoire** | Le ou les laboratoires de **votre propre fiche** dans l'annuaire | Consulter Personnel et le Tableau de bord, corriger les fiches de son labo. |
 | **Direction ou gestion de labo** | Les laboratoires attribués | Idem, sans dépendre de sa propre fiche. |
 | **Services centraux** | Tout l'établissement | Structures, Outils d'alignement. |
-| **Administrateur Druid** | Tout l'établissement | Groupes, À traiter (doublons et tâches), Signaler une correction, consultation des droits. |
+| **Administrateur Druid** | Tout l'établissement | Groupes, À traiter (tâches et journal des fusions), Signaler une correction, consultation des droits. |
 | **Administrateur technique** | Selon son autre profil | Console ETL, vues masquées du tableau de bord ; avec un accès à tout l'établissement : menu Synchroniser, création de fiches. |
 | **Chargé·e de communication** | — | Sources médias de la veille. |
 

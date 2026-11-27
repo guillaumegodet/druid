@@ -74,8 +74,8 @@ Par où commencer :
 Tout ce que voient les services centraux, plus :
 
 - **Groupes** : créer des sélections de chercheurs et leur tableau de bord ;
-- **À traiter** (dans Personnel) : les doublons à fusionner et les tâches de correction à
-  faire hors de Druid (le bouton n'apparaît que si vous êtes aussi administrateur
+- **À traiter** (dans Personnel) : les tâches de correction (fiches à fusionner, appartenances
+  à qualifier, corrections à faire hors de Druid) et le journal des fusions (le bouton n'apparaît que si vous êtes aussi administrateur
   technique) ;
 - **Signaler une correction** sur une fiche ;
 - **Administration › Gestion des droits** (consultation), si votre instance le permet.

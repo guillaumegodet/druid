@@ -10,16 +10,18 @@ interface MergeLogPanelProps {
   onRestored?: (restoredRowId: number) => void;
   /** Increment to force a reload (e.g. after a merge). */
   refreshKey?: number;
+  /** Open on mount (the « Fusions » tab of « À traiter » shows nothing else). */
+  defaultOpen?: boolean;
 }
 
 /**
  * Merge log (Grist `Fusions_log` table) with a « Restaurer » action:
  * recreates the absorbed row from its snapshot and restores the fields written on the
- * kept row (docs/archive/plan-fusion-doublons.md, lot 2). Collapsed by default.
+ * kept row (docs/archive/plan-fusion-doublons.md, lot 2). Collapsed unless `defaultOpen`.
  */
-export const MergeLogPanel: React.FC<MergeLogPanelProps> = ({ onRestored, refreshKey = 0 }) => {
+export const MergeLogPanel: React.FC<MergeLogPanelProps> = ({ onRestored, refreshKey = 0, defaultOpen = false }) => {
   const { t } = useLingui();
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const [entries, setEntries] = useState<MergeLogEntry[] | null>(null);
   const [busy, setBusy] = useState<number | null>(null);
   const [error, setError] = useState('');

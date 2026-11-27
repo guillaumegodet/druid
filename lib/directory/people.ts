@@ -156,7 +156,7 @@ function assignPublicIds(researchers: any[]): void {
   }
 
   // Count only: this now runs on the server, whose logs must not list people (the uids are listed by the
-  // Duplicates page).
+  // « affiliations to qualify » tasks).
   if (dupUids.size > 0) {
     console.warn(`[directory] ${dupUids.size} duplicated uid_dyna in the Annuaire: the URL opens the first record, the next ones get a suffixed id.`);
   }

@@ -64,7 +64,7 @@ export interface Issue { code: IssueCode; table: string; rows: number[]; columns
 /** Every report entry and what the import did about it: a code absent from here would be an unexplained case. */
 export const ISSUE_EXPLANATIONS = {
   multi_row_person: 'Personne sur plusieurs lignes de l’Annuaire : une appartenance par ligne, champs personnels pris sur la ligne retenue (PRINCIPAL, sinon validée la plus récente, sinon mise à jour LDAP la plus récente, sinon la plus ancienne).',
-  multi_row_divergence: 'Champs personnels différents entre les lignes d’une même personne : valeur de la ligne retenue gardée, à vérifier (page Doublons).',
+  multi_row_divergence: 'Champs personnels différents entre les lignes d’une même personne : valeur de la ligne retenue gardée, à vérifier (fiche de la personne).',
   notes_merged: 'Commentaires de plusieurs lignes d’une même personne réunis dans la note, chaque bloc précédé de sa ligne d’origine.',
   identifier_from_other_row: 'Identifiant présent seulement sur une autre ligne que la ligne retenue : importé comme identifiant secondaire.',
   identifier_shared: 'Même valeur d’identifiant portée par plusieurs personnes : importée pour chacune (vue identifier_conflict, règle annuaire_ids_partages).',

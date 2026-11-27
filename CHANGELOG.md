@@ -13,6 +13,12 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Appartenance principale choisie dans la fiche** : dans la carte « Appartenances & historique », un clic sur la pastille grise
+  d'une appartenance en fait la principale ; les autres deviennent secondaires, ou historiques une fois leur date de
+  fin passée, à l'enregistrement.
+- **Tâche « Annuaire — appartenances à qualifier »** (règle nocturne `appartenance_a_qualifier`) : une personne dont
+  les appartenances ne sont pas qualifiées (plusieurs lignes sans principale) ; la tâche porte le panneau de
+  qualification (ligne principale, simultanées, successives, à revoir) et, pour deux lignes, l'assistant de fusion.
 - **À traiter › Tâches — actions en lot** : filtre par type de tâche (avec le nombre de tâches ouvertes) ; bouton
   « Départs en lot » qui propose, pour chaque départ confirmé ou déclaré dans ORCID, la fin d'emploi suggérée par le
   parcours (même date que le bouton de la fiche), à cocher puis reporter : chaque fiche est enregistrée comme depuis le
@@ -29,6 +35,17 @@ données à exécuter au déploiement).
   personne que Druid compte déjà partie ou sur le départ (compte LDAP disparu ou en fermeture, dates de fin, présence
   validée) ; un départ vu dans les seules publications cède devant un compte LDAP actif de l'établissement. Les deux
   règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
+
+### Modifié
+- **Création d'une fiche pour un uid déjà présent** (PostgreSQL) : la nouvelle appartenance est qualifiée aussitôt —
+  l'appartenance existante devient principale, la nouvelle secondaire (historique si elle est close) — au lieu de
+  laisser deux fiches à qualifier. Hors du périmètre de l'auteur, ou si plusieurs appartenances sont déjà en suspens,
+  rien n'est fixé et la règle `appartenance_a_qualifier` en fait une tâche.
+
+### Retiré
+- **Onglet « À traiter › Doublons »** : sur PostgreSQL un uid est unique et il ne restait aucun groupe à traiter. Le
+  journal des fusions (avec « Restaurer ») passe dans un onglet **Fusions**, présent sur toutes les instances ; les
+  anciens liens `?tab=doublons` ouvrent l'onglet Tâches.
 
 ## [2.24.0] — 2026-11-27
 

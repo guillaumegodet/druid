@@ -114,10 +114,19 @@ export const AffiliationsTable: React.FC<AffiliationsTableProps> = ({
             }`}
           >
             <div className="flex items-center gap-2.5">
-              <span
-                title={aff.isPrimary ? t`Primary affiliation` : undefined}
-                className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${aff.isPrimary ? 'bg-[#9a7bff]' : 'bg-white/30'}`}
-              ></span>
+              {/* The primary membership is chosen here; the other ones become secondary, or former once their end
+                  date is past, when the record is saved (lib/directory/annuaireWrite.ts planAffiliationRows). */}
+              {aff.isPrimary || affiliations.length < 2 ? (
+                <span
+                  title={aff.isPrimary ? t`Primary affiliation` : undefined}
+                  className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${aff.isPrimary ? 'bg-[#9a7bff]' : 'bg-white/30'}`}
+                ></span>
+              ) : (
+                <button type="button" onClick={() => onChange(idx, 'isPrimary', true)}
+                  title={t`Make it the primary affiliation`} aria-label={t`Make it the primary affiliation`}
+                  className="w-2.5 h-2.5 rounded-full flex-shrink-0 bg-white/30 hover:bg-[#9a7bff] ring-2 ring-transparent hover:ring-[#9a7bff]/40 transition-colors"
+                ></button>
+              )}
               {aff.role && aff.role !== 'PRINCIPAL' && (
                 <span title={aff.role === 'HISTORIQUE' ? t`Former affiliation (directory row qualified HISTORIQUE)` : t`Concurrent affiliation (directory row qualified SECONDAIRE)`}
                   className={`text-[10px] font-bold uppercase tracking-[.06em] px-1.5 py-0.5 rounded-full ${aff.role === 'HISTORIQUE' ? 'bg-white/10 text-white/50' : 'bg-accent/25 text-accent'}`}>

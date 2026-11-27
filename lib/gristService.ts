@@ -241,9 +241,6 @@ export const GristService = {
    * Phase 1 (READ ONLY): computes the gap between the LDAP cache and the Annuaire table.
    * Writes NOTHING to Grist — serves as a review preview before a future application (Phase 2).
    */
-  /** « Doublons » page (docs/archive/plan-reorganisation-sync-ldap.md, lot 3): uid_dyna groups computed
-   * on the Annuaire alone — no LDAP run needed, unlike computeLdapDiff. */
-  computeDuplicatesDiff: (): Promise<DuplicatesDiff> => DirectoryApi.duplicates(),
 
   /** LDAP review: diff computed by the server from the LDAP cache and the Annuaire (domain API, lot 2 d). */
   computeLdapDiff: (): Promise<LdapDiff> => DirectoryApi.ldapDiff(),
@@ -267,9 +264,6 @@ export const GristService = {
   qualifyDoublon: (args: {
     rowIds: number[]; principalRowId?: number; mode: 'concomitant' | 'successif' | 'a_revoir'; endDate?: string; author: string;
   }): Promise<{ updated: number }> => DirectoryApi.qualifyDuplicates(args),
-
-  /** Removes the qualification of a group (roles and decision cleared) → it becomes a pending duplicate again. */
-  unqualifyDoublon: (rowIds: number[]): Promise<{ updated: number }> => DirectoryApi.unqualifyDuplicates(rowIds),
 
   /** Annuaire columns (label, type, formula) — for the merge assistant. */
   fetchAnnuaireColumns: (): Promise<AnnuaireColumnMeta[]> => fetchAnnuaireColumnsInternal(),

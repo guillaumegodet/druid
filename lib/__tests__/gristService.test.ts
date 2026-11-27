@@ -3,6 +3,7 @@ import {
   parseOpenalexIds, groupQualifiedRows, planAffiliationRows, alignGroupOf, gristDateToIso, pivotUnifiedAlignDiffs,
   buildUnifiedUpdates, unifiedFillKey, unifiedAmbigKey, resolveNewStructureLocalId, traceColumnsFor,
 } from '../gristService';
+import { qualifyAddedMembership } from '../directory/annuaireWrite';
 import type { AlignDiff, IdrefDiff, UnifiedAlignDiff, PersonAlignRow, AnnuaireColumnMeta } from '../gristService';
 
 // lib/gristService.ts (3337 lines) keeps most of its logic inside the GristService
@@ -435,5 +436,25 @@ describe('traceColumnsFor (traceability columns of an Annuaire write)', () => {
     expect(traceColumnsFor(cols, 'IdRef', '2026-01-15', ['IdRef'])).toEqual({
       IdRef_derniere_maj: 1768435200, IdRef_champs_modifies: 'IdRef',
     });
+  });
+});
+
+describe('qualifyAddedMembership (record created with a uid already in the directory)', () => {
+  const TODAY = '2026-09-25';
+  const m = (id: number, role: string | null, inScope = true) => ({ id, role, inScope });
+  it('first membership: nothing to qualify', () => {
+    expect(qualifyAddedMembership([], undefined, TODAY)).toEqual({ role: null, patches: [] });
+  });
+  it('one unqualified membership in scope: it becomes PRINCIPAL, the new one SECONDAIRE or HISTORIQUE', () => {
+    expect(qualifyAddedMembership([m(1, null)], undefined, TODAY)).toEqual({ role: 'SECONDAIRE', patches: [{ id: 1, role: 'PRINCIPAL' }] });
+    expect(qualifyAddedMembership([m(1, null)], '2020-06', TODAY)).toEqual({ role: 'HISTORIQUE', patches: [{ id: 1, role: 'PRINCIPAL' }] });
+  });
+  it('already qualified memberships: only the new one gets a role', () => {
+    expect(qualifyAddedMembership([m(1, 'PRINCIPAL'), m(2, 'HISTORIQUE')], '2030', TODAY)).toEqual({ role: 'SECONDAIRE', patches: [] });
+  });
+  it('outside the scope, several unqualified, or no single PRINCIPAL: left to the qualification task', () => {
+    expect(qualifyAddedMembership([m(1, null, false)], undefined, TODAY)).toEqual({ role: null, patches: [] });
+    expect(qualifyAddedMembership([m(1, null), m(2, null)], undefined, TODAY)).toEqual({ role: null, patches: [] });
+    expect(qualifyAddedMembership([m(1, 'SECONDAIRE'), m(2, 'SECONDAIRE')], undefined, TODAY)).toEqual({ role: null, patches: [] });
   });
 });

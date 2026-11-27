@@ -72,8 +72,8 @@ Where to start:
 Everything central services see, plus:
 
 - **Groups**: create selections of researchers and their dashboard;
-- **To process** (in People): duplicates to merge and correction tasks to carry out outside
-  Druid (the button only appears if you are also a technical administrator);
+- **To process** (in People): correction tasks (records to merge, memberships to qualify,
+  corrections to carry out outside Druid) and the merge log (the button only appears if you are also a technical administrator);
 - **Report a correction** on a record;
 - **Administration › Access rights** (read only), if your instance allows it.
 
