@@ -25,6 +25,7 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
+import { actorOf, readIdentifierSources, recordIdentifierValues, rememberRemovedIdentifiers } from './identifierProvenance';
 import { dropFieldCorrection as dropCorrection, moveFieldValues, readFieldSources, writeMergedField } from './fieldValues';
 import { FieldValueError, MERGED_FIELDS } from '../fieldMerge';
 import { resolveGrade } from '../../emeritus';
@@ -298,13 +299,35 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     const byId = new Map(rows.map((e) => [String(e.id), e.name ?? '']));
     return (id: string | null) => (id === null ? null : byId.get(String(id)) ?? id);
   };
-  const writeIdentifiers = async (trx: Transaction<DB>, personId: string, r: Researcher, extra: Record<string, any>) => {
+  /**
+   * Primary identifiers of the record (and secondary IdHAL_i). Lot 4 b of druid-internal `docs/plan-maj-chercheurs.md`:
+   * each value is recorded with its source (ctx.identifierSource for an import, else `manual` / `job` by author), and a
+   * value a person removes from the record is « Rejeté » for the alignment of its source, so that sync_openalex /
+   * sync_hal do not write it back. An import never removes (it only completes).
+   */
+  const writeIdentifiers = async (trx: Transaction<DB>, personId: string, r: Researcher, extra: Record<string, any>, ctx: CommandContext) => {
+    const { actor, human } = await actorOf(trx);
+    const source = ctx.identifierSource ?? (human ? 'manual' : 'job');
+    const typedInRecord = human && !ctx.identifierSource;
+    // Secondary IdHAL_i the record keeps: a former primary demoted there is not removed.
+    const secondary = r.identifiers?.halIdNumSecondary;
+    const keptSecondaries = secondary !== undefined && secondary !== null ? secondaryHalIdNums(identifiersOf(r).idhal_i, secondary) : null;
+    // Values the record already held: re-saving the record does not make them `manual` (nor an import's).
+    const held = new Set((await trx.selectFrom('person_identifier').select(['scheme', 'value']).where('person_id', '=', personId).execute())
+      .map((x) => `${x.scheme}|${x.value}`));
+    const record = (scheme: string, values: string[]) => recordIdentifierValues(trx, personId, scheme,
+      values.filter((v) => !held.has(`${scheme}|${v}`)), source, actor);
+    const removed = async (scheme: string, values: string[]) => {
+      const really = scheme === 'idhal_i' && keptSecondaries ? values.filter((v) => !keptSecondaries.includes(v)) : values;
+      if (typedInRecord && really.length) await rememberRemovedIdentifiers(trx, personId, scheme, really, actor!);
+    };
     for (const [scheme, raw] of Object.entries(identifiersOf(r))) {
       const value = blank(raw) ? '' : String(raw).trim();
       for (const k of EXTRA_OF_SCHEME[scheme] || []) delete extra[k];
       if (scheme === 'scopus') await trx.deleteFrom('person_identifier_check').where('person_id', '=', personId).where('scheme', '=', 'scopus').execute();
-      await trx.deleteFrom('person_identifier').where('person_id', '=', personId).where('scheme', '=', scheme).where('is_primary', '=', true)
-        .where('value', '<>', value).execute();
+      const gone = await trx.deleteFrom('person_identifier').where('person_id', '=', personId).where('scheme', '=', scheme).where('is_primary', '=', true)
+        .where('value', '<>', value).returning('value').execute();
+      await removed(scheme, gone.map((g) => g.value).filter((v) => !(scheme === 'scopus' && v.toLowerCase() === 'absent')));
       if (!value) continue;
       if (scheme === 'scopus' && value.toLowerCase() === 'absent') {
         await trx.insertInto('person_identifier_check').values({ person_id: personId, scheme: 'scopus', result: 'absent' }).execute();
@@ -312,12 +335,19 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       }
       await trx.insertInto('person_identifier').values({ person_id: personId, scheme, value, is_primary: true, source: 'record' })
         .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: true })).execute();
+      await record(scheme, [value]);
     }
     // Secondary HAL identifiers, after the primary one (a promoted secondary is already primary). A record that does
     // not carry the field (site import, creation from a list) leaves them as they are.
-    const secondary = r.identifiers?.halIdNumSecondary;
-    if (secondary !== undefined && secondary !== null) {
-      await writeHalIdNumSecondaries(trx, personId, secondaryHalIdNums(identifiersOf(r).idhal_i, secondary));
+    if (keptSecondaries) {
+      const ids = keptSecondaries;
+      const before = (await trx.selectFrom('person_identifier').select('value').where('person_id', '=', personId).where('scheme', '=', 'idhal_i')
+        .where('is_primary', '=', false).execute()).map((x) => x.value);
+      const primaryNow = String(identifiersOf(r).idhal_i || '');
+      await writeHalIdNumSecondaries(trx, personId, ids);
+      await record('idhal_i', ids);
+      // A secondary promoted to primary is not a removal.
+      await removed('idhal_i', before.filter((v) => !ids.includes(v) && v !== primaryNow));
       delete extra[HAL_ID_NUM_SECONDARY_COLUMN];
     }
   };
@@ -351,6 +381,12 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
         ? { value: name(f.value), source: f.source, sources: f.sources.map((x) => ({ ...x, value: name(x.value) })) }
         : { value: f.value, source: f.source, sources: f.sources }]));
     },
+    // Identifiers of the record with the sources that brought them and the values set aside (lot 4 b).
+    identifierSources: async (recordId, ctx) => {
+      if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
+      const person = await personOfRecord(db as any, ctx.scope, recordId);
+      return readIdentifierSources(db, person.id);
+    },
     dropFieldCorrection: (recordId, field, ctx) => writing(ctx, async (trx) => {
       if (!isRowId(recordId)) throw new ApiError(400, 'Invalid record identifier (row id missing)');
       if (!MERGED_FIELDS.includes(field)) throw new ApiError(400, 'Invalid source conflict decision');
@@ -383,7 +419,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
         personId = inserted.id;
         await writeMerged(trx, personId, researcher, ctx, employer);
         const personExtra: Record<string, any> = { ...extra };
-        await writeIdentifiers(trx, personId, researcher, personExtra);
+        await writeIdentifiers(trx, personId, researcher, personExtra, ctx);
         await writeLinks(trx, personId, researcher, personExtra);
         await trx.updateTable('person').set({ extra: JSON.stringify(personExtra) as any }).where('id', '=', personId).execute();
         if (prefill?.date) await trx.insertInto('sync_state').values({ person_id: personId, source: 'ldap', last_run: isoDate(prefill.date), changed_fields: [] }).execute();
@@ -426,7 +462,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       Object.assign(personExtra, extra);
       await trx.updateTable('person').set(values as any).where('id', '=', person.id).execute();
       await writeMerged(trx, person.id, researcher, ctx, employer);
-      await writeIdentifiers(trx, person.id, researcher, personExtra);
+      await writeIdentifiers(trx, person.id, researcher, personExtra, ctx);
       await writeLinks(trx, person.id, researcher, personExtra);
 
       await writeMembership(trx, String(recordId), plan.primary, plan.mainRole === undefined ? undefined : (plan.mainRole || null), personExtra);

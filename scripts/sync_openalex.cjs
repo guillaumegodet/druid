@@ -109,6 +109,10 @@ const AUTHOR_SELECT = 'id,display_name,display_name_alternatives,works_count,orc
 const store = makeStore({ cachePath: 'openalex_align_cache.json', progressPath: 'openalex_align_progress.json' });
 /** `key::A-id` pairs flagged « Identité mêlée » in the review table (loaded by main, read by verifyPerson). */
 const MIXED_KEYS = new Set();
+// `uid::A-id` set aside by a person: « Rejeté » in the review, or removed from the record (lot 4 b of druid-internal
+// `docs/plan-maj-chercheurs.md`, written as « Rejeté »). Never written back to OpenAlex_ids.
+const REJECTED_KEYS = new Set();
+const setAside = (key, id) => MIXED_KEYS.has(`${key}::${id}`) || REJECTED_KEYS.has(`${key}::${id}`);
 const { loadCache, writeCache, writeProgress } = store;
 
 // ── Helpers identifiants ─────────────────────────────────────────────────────
@@ -506,7 +510,8 @@ async function verifyPerson(p, labs) {
     else if (r.status === 'gone') removed.push(r.id);
   }
   // « Identité mêlée » decision in the review table → the A-id leaves the list (the decision drives the list, § 8.1).
-  const removedMixed = next.filter((id) => MIXED_KEYS.has(`${p.key}::${id}`));
+  // Same for a « Rejeté » one (a removal typed in the record, lot 4 b of the provenance plan).
+  const removedMixed = next.filter((id) => setAside(p.key, id));
   next = next.filter((id) => !removedMixed.includes(id));
   // The profile carrying the ORCID (matching name) must be in the list — same deterministic rule as in search.
   const added = [];
@@ -514,7 +519,7 @@ async function verifyPerson(p, labs) {
   if (orcid) {
     orcidAuthors = await authorByOrcid(orcid);
     if (orcidAuthors === null) netError = true;
-    else for (const a of orcidAuthors) if (!next.includes(a.id) && bestNameMatch(p, a)) { next.push(a.id); added.push(a.id); }
+    else for (const a of orcidAuthors) if (!next.includes(a.id) && !setAside(p.key, a.id) && bestNameMatch(p, a)) { next.push(a.id); added.push(a.id); }
   }
   // Fragments: same search as in search mode, excluding the resolved list. Reuses the ORCID call
   // above (otherwise alignPerson repeats the same authorByOrcid: review lot 4, finding 2).
@@ -664,7 +669,8 @@ async function applyDirectWrites(cache, all) {
     if (entry.mode !== 'search' || !(entry.direct || []).length || entry.written) continue;
     const p = byKey.get(key);
     if (!p || parseIds(p.openalexIds).length) continue;
-    updates.push({ key, recId: p.recId, ids: entry.direct });
+    const ids = entry.direct.filter((id) => !setAside(key, id));
+    if (ids.length) updates.push({ key, recId: p.recId, ids });
   }
   if (!updates.length) return { updated: 0, planned: 0 };
   if (!PUSH_GRIST) {
@@ -760,7 +766,10 @@ async function main() {
   const all = await common.fetchAnnuaire();
   const labs = MODE === 'push' ? new Map() : await loadLabs();
   const decisions = await loadReviewDecisions(REVIEW_TABLE, 'OpenAlex_candidat', extractAId);
-  for (const [k, d] of decisions) if (d.decision === DECISION_MIXED) MIXED_KEYS.add(k);
+  for (const [k, d] of decisions) {
+    if (d.decision === DECISION_MIXED) MIXED_KEYS.add(k);
+    else if (d.decision === 'Rejeté') REJECTED_KEYS.add(k);
+  }
   const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('openalex', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT, record: OPTS.record });
   let targets = sel.targets;
   const eligible = sel.eligible.length;

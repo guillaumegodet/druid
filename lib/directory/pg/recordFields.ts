@@ -17,6 +17,7 @@ import { HAL_ID_NUM_SECONDARY_COLUMN, joinHalIdNums, normalizeHalIdNum, secondar
 import { toGristEpoch } from '../annuaireWrite';
 import type { PgIdentifier, PgLink } from './directoryRows';
 import { MERGED_RECORD_FIELDS, writeMergedField } from './fieldValues';
+import { actorOf, identifierSourceOf, recordIdentifierValues } from './identifierProvenance';
 
 /** Source of an OpenAlex author id typed in the record (the import uses the same tag). */
 export const OPENALEX_AUTHOR_SOURCE = 'grist:openalex_author_id';
@@ -172,6 +173,20 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
   const done = (field: string) => { delete extra[field]; };
   const sync = new Map<string, { last_run?: string | null; changed_fields?: string[] }>();
   const merged: [string, string | null][] = [];
+  // Provenance of the identifiers this write brings (lot 4 b): the alignment whose trace it carries, the caller's
+  // source, else `manual` / `job` by author.
+  const { actor, human } = await actorOf(trx);
+  const idSource = identifierSourceOf(Object.keys(fields), mergedMode.source, human);
+  // Only the values this write brings: an alignment confirms every value it writes (its trace is in the write); any
+  // other write (record re-saved, import completing a field) only the values new for the person.
+  const confirms = idSource.startsWith('align:');
+  const before = new Map<string, Set<string>>();
+  for (const r of await trx.selectFrom('person_identifier').select(['scheme', 'value']).where('person_id', '=', personId).execute()) {
+    if (!before.has(r.scheme)) before.set(r.scheme, new Set());
+    before.get(r.scheme)!.add(r.value);
+  }
+  const provenance = (scheme: string, values: string[]) => recordIdentifierValues(trx, personId, scheme,
+    confirms ? values : values.filter((v) => !before.get(scheme)?.has(v)), idSource, actor);
 
   for (const [field, value] of Object.entries(fields)) {
     if (field === 'id' || field === 'manualSort') continue;
@@ -258,6 +273,7 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
           await trx.insertInto('person_identifier').values({ person_id: personId, scheme: 'openalex', value: v, is_primary: i === 0, source: OPENALEX_LIST_SOURCE })
             .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: i === 0, source: OPENALEX_LIST_SOURCE })).execute();
         }
+        await provenance('openalex', list);
         done(field); // the rows are the list: no verbatim copy in extra (it would hide later changes)
         continue;
       }
@@ -268,7 +284,9 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
         const primaryValue = has(fields, 'IdHAL_i') ? normalizeHalIdNum(fields.IdHAL_i)
           : (await trx.selectFrom('person_identifier').select('value').where('person_id', '=', personId).where('scheme', '=', 'idhal_i')
             .where('is_primary', '=', true).executeTakeFirst())?.value ?? '';
-        await writeHalIdNumSecondaries(trx, personId, secondaryHalIdNums(primaryValue, value));
+        const secondaries = secondaryHalIdNums(primaryValue, value);
+        await writeHalIdNumSecondaries(trx, personId, secondaries);
+        await provenance('idhal_i', secondaries);
         done(field);
         continue;
       }
@@ -277,6 +295,7 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
         if (!blank(value)) {
           await trx.insertInto('person_identifier').values({ person_id: personId, scheme: 'openalex', value: String(value).trim(), is_primary: false, source: OPENALEX_AUTHOR_SOURCE })
             .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ source: OPENALEX_AUTHOR_SOURCE })).execute();
+          await provenance('openalex', [String(value).trim()]);
         }
         continue;
       }
@@ -296,6 +315,7 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
       } else if (v) {
         await trx.insertInto('person_identifier').values({ person_id: personId, scheme, value: v, is_primary: true, source: 'record' })
           .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doUpdateSet({ is_primary: true })).execute();
+        await provenance(scheme, [v]);
       }
       continue;
     }

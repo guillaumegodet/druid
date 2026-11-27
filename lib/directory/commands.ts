@@ -7,7 +7,7 @@
 // Authorization, as the proxy (server.cjs gristProxyDecision): institution right = everything; lab right =
 // every touched row and every new `LABO` value within its labs, the merge log open to it. Schema changes
 // (affiliation columns, merge log table) are made by the server for every right.
-import type { FieldProvenance, FieldSourceDetail, Researcher, Structure } from '../../types';
+import type { FieldProvenance, FieldSourceDetail, IdentifierSourceDetail, Researcher, Structure } from '../../types';
 import { normalizeAcronym } from '../normalize';
 import { MERGE_LOG_TABLE, buildMergeLogColumns, buildMergeLogRow } from '../mergeLog';
 import { validationToGristFields, ValidationInfo } from '../validation';
@@ -43,6 +43,9 @@ export interface CommandContext {
    * a file or site import. They are stored under that source; the record's own value counts as a human choice only
    * where it changes what the record showed (lib/directory/pg/fieldValues.ts, writeMergedField).
    */
+  /** PostgreSQL: source of the identifiers this write brings (an import: `lab_file`, `site`…), lot 4 b. Absent = the
+   * record form (`manual`); a removal is then a « Rejeté » decision the alignments respect. */
+  identifierSource?: string;
   fieldObservation?: { source: string; values: Partial<Record<'birth_date' | 'corps_grade' | 'civility' | 'employment_type' | 'employer_id' | 'employment_start' | 'employment_end', unknown>>; importBatchId?: string | null };
 }
 
@@ -57,6 +60,8 @@ export interface DirectoryCommands {
    * `docs/plan-maj-chercheurs.md`), each with its value; absent on Grist.
    */
   fieldSources?(recordId: number, ctx: CommandContext): Promise<Record<string, { value: string | null; source: string | null; sources: FieldSourceDetail[] }>>;
+  /** PostgreSQL: identifiers of a record's person with the sources that brought them and the values set aside (lot 4 b). */
+  identifierSources?(recordId: number, ctx: CommandContext): Promise<Record<string, IdentifierSourceDetail[]>>;
   /** PostgreSQL: « back to the sources » — removes the manual correction of a merged field; returns the new provenance. */
   dropFieldCorrection?(recordId: number, field: string, ctx: CommandContext): Promise<{ value: string | null; provenance: FieldProvenance }>;
   createPerson(researcher: Researcher, ctx: CommandContext): Promise<{ recordId: number }>;

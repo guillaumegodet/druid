@@ -554,7 +554,7 @@ async function applySearchWrites(cache, all) {
   const updates = [];
   for (const [key, entry] of Object.entries(cache)) {
     const p = byKey.get(key);
-    const fields = p ? planSearchWrite(p, entry) : null;
+    const fields = p ? withoutRejected(key, planSearchWrite(p, entry)) : null;
     if (fields) updates.push({ key, recId: p.recId });
   }
   if (!updates.length) return { updated: 0, planned: 0 };
@@ -567,7 +567,7 @@ async function applySearchWrites(cache, all) {
   const written = new Map();
   const records = updates.map((u) => {
     const f = fresh.get(u.recId);
-    const fields = f ? planSearchWrite(f, cache[u.key]) : null;
+    const fields = f ? withoutRejected(u.key, planSearchWrite(f, cache[u.key])) : null;
     if (!fields) return null;
     written.set(u.recId, Object.keys(fields));
     return { id: u.recId, fields: withTrace(SOURCE, f, fields, 'ORCID / IdRef de la personne HAL') };
@@ -576,6 +576,13 @@ async function applySearchWrites(cache, all) {
   for (const u of updates) if (written.has(u.recId)) cache[u.key].written = written.get(u.recId);
   return { updated: n, planned: updates.length };
 }
+
+// `uid::IdHAL_i` set aside by a person: « Rejeté » in the review, or removed from the record (lot 4 b of druid-internal
+// `docs/plan-maj-chercheurs.md`). Loaded by main before any write; such an IdHAL_i is never written back.
+let REJECTED_IDHALI = new Set();
+const idhalIRejected = (key, value) => !!value && REJECTED_IDHALI.has(`${key}::${String(value).replace(/\D/g, '')}`);
+/** Fields of a write without an IdHAL_i a person set aside (nor the IdHAL derived from it). */
+const withoutRejected = (key, fields) => (fields && idhalIRejected(key, fields.IdHAL_i) ? null : fields);
 
 /** verify: writes IdHAL_i (and the IdHAL if the Annuaire held none) for the verified records. */
 async function applyVerifyWrites(cache, all) {
@@ -607,6 +614,7 @@ async function applyVerifyWrites(cache, all) {
     .map((u) => {
       const f = fresh.get(u.recId);
       if (!f) return null;
+      if (idhalIRejected(u.key, u.fields.IdHAL_i)) return null;
       const fields = {};
       if (u.fields.IdHAL_i && !String(f.idhalI || '').trim()) fields.IdHAL_i = u.fields.IdHAL_i;
       if (u.fields.IdHAL && noSlug(f.idhal)) fields.IdHAL = u.fields.IdHAL;
@@ -633,6 +641,7 @@ async function main() {
   console.log(`[hal] mode=${MODE} concurrency=${CONCURRENCY}${PUSH_GRIST ? '' : ' (dry run: no Grist write)'}`);
 
   const all = await common.fetchAnnuaire();
+  REJECTED_IDHALI = await loadRejected(REVIEW_TABLE, 'IdHAL_i_candidat', (v) => String(v || '').replace(/\D/g, ''));
   const sel = MODE === 'push' ? { eligible: [], targets: [] } : selectTargets('hal', all, cache, { mode: MODE, labo: LABO_FILTER, group: GROUP_FILTER, force: FORCE, limit: LIMIT, record: OPTS.record });
   let targets = sel.targets;
   const eligible = sel.eligible.length;

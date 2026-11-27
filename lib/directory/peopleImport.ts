@@ -439,7 +439,9 @@ const newPersonOf = (c: PeopleImportCreation, source: string, validation: Return
 const PEOPLE_IMPORT_SOURCE = 'lab_file';
 const fileObservation = (ctx: any, values: { corps_grade?: string; employment_type?: string; employer_id?: string }, importBatchId: string | null = null) => {
   const given = Object.fromEntries(Object.entries(values).filter(([, v]) => !!v));
-  return Object.keys(given).length ? { ...ctx, fieldObservation: { source: PEOPLE_IMPORT_SOURCE, values: given, importBatchId } } : ctx;
+  // Identifiers it completes carry the import's source too (lot 4 b), with or without merged values.
+  const withSource = { ...ctx, identifierSource: PEOPLE_IMPORT_SOURCE };
+  return Object.keys(given).length ? { ...withSource, fieldObservation: { source: PEOPLE_IMPORT_SOURCE, values: given, importBatchId } } : withSource;
 };
 
 export const withImport = (r: Researcher, joins: PeopleImportJoin[], fields: { lab: string; field: PeopleImportUpdateField; value: string }[]): Researcher => {

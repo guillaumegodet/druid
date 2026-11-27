@@ -278,6 +278,13 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!c.env.commands?.fieldSources) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
     return c.json({ fields: await c.env.commands.fieldSources(recordId, ctxOf(c)) }, 200, NO_STORE);
   });
+  // Identifiers of a record and the sources that brought them (PostgreSQL; lot 4 b of `docs/plan-maj-chercheurs.md`).
+  app.get('/people/:recordId/identifier-sources', async (c) => {
+    const recordId = recordIdOf(c.req.param('recordId'));
+    if (!recordId) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
+    if (!c.env.commands?.identifierSources) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    return c.json({ identifiers: await c.env.commands.identifierSources(recordId, ctxOf(c)) }, 200, NO_STORE);
+  });
   app.get('/people/rows', async (c) => {
     const ids = String(c.req.query('ids') || '').split(',').filter(Boolean).map(Number);
     if (ids.length === 0 || ids.length > 500 || !ids.every((n) => Number.isInteger(n) && n > 0)) return c.json({ error: 'Invalid record identifiers' }, 400, NO_STORE);
