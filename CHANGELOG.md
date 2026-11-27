@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Modifié
+- **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
+  les ferme d'elle-même (« résolue auto », motif au fil de la tâche) quand la fiche n'a pas d'uid LDAP (`ext_` ou
+  vide) — Druid la compte déjà externe sans employeur —, quand un employeur est saisi, quand la personne est validée
+  partie ou quand la fiche a disparu. Nouvelle règle `employeur_a_renseigner`, qui ne crée ni ne rouvre aucune tâche.
+
 ## [2.24.0] — 2026-11-27
 
 ### Ajouté
