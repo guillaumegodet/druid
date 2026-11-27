@@ -43,9 +43,11 @@
  *                    as an end date is entered or Druid's presence already says gone / leaving (LDAP account gone or
  *                    closing, end dates), and a publications-only signal once the home LDAP account is active
  *                    (docs/archive/plan-parcours-affiliations.md, lot 4)
- *   parcours_statut_incoherent  ended record still publishing locally / with an open ORCID position there
+ *   parcours_statut_incoherent  ended record still publishing locally / with an open ORCID position there; the ORCID
+ *                    signal alone yields to a departure a reliable source confirms (validated list, home LDAP account
+ *                    gone or closing): the ORCID profile is then out of date
  *   parcours_identifiant_suspect  identifiers whose publications / Scopus profile never mention the
- *                    institution (alignment control)
+ *                    institution (alignment control); not for a person employed by another institution
  *   doctorant_these  record still a PhD student (TYPE_EMPLOI or Corps_grade DOCTORANT, not gone) whose IdRef has a
  *                    defended thesis on theses.fr (table Theses, PostgreSQL instances, scripts/sync_theses.ts):
  *                    annuaire_doctorant_docteur when the thesis is recent (status, employment or end to update;
@@ -499,6 +501,34 @@ function parcoursSettled(rec, ctx) {
   }
   return '';
 }
+/**
+ * Ended record that ORCID still shows in a current position here (no local publication behind the signal): when a
+ * reliable source already says the person left — a reliable list validating the departure, or the home LDAP account
+ * gone or closing — the record is right and the ORCID profile is out of date: nothing to fix in Druid. The end dates
+ * alone do not count (they are what the task questions), nor a validated presence (the end date is then the problem).
+ */
+function incoherentSettled(rec, ctx) {
+  if (!rec) return '';
+  const sig = (ctx.parcours[rec.key]?.signals || []).find((x) => x.type === 'statut_incoherent');
+  if (!sig || sig.lastLocal) return '';   // local publications after the end: the end date is probably too early
+  const f = rec.fields;
+  const validated = validatedPresenceOf(f);
+  if (validated === 'PARTI' || validated === 'DEPART') {
+    return `Profil ORCID pas à jour : la personne est validée ${validated === 'PARTI' ? 'partie' : 'sur le départ'}${f.validation_source ? ` (« ${f.validation_source} »)` : ''} ; rien à corriger dans Druid.`;
+  }
+  if (validated) return '';
+  if (isExternalEmployerRef(f.Employeur, ctx.etablissements)) return '';   // a hosted account says nothing
+  const l = ldapStateOf(f, ctx);
+  if (l === 'gone' || l === 'closing') return `Profil ORCID pas à jour : le compte LDAP ${f.uid_dyna} est ${l === 'gone' ? 'fermé' : 'en fermeture'} ; rien à corriger dans Druid.`;
+  return '';
+}
+/** Identifiers never affiliated here: expected for a person employed by another institution (multi-site lab), whose
+ * publications and Scopus profile give their own institution. */
+function suspectSettled(rec, ctx) {
+  if (!rec || !isExternalEmployerRef(rec.fields.Employeur, ctx.etablissements)) return '';
+  const employer = String(ctx.etablissements[rec.fields.Employeur].Employeur || '').trim() || 'un autre établissement';
+  return `Employeur ${employer} : ses publications et son profil Scopus citent son propre établissement, il est normal qu’ils ne citent pas celui-ci.`;
+}
 /** PhD student turned doctor: nothing to update once Druid counts the person gone (or leaving, for the recent
  * thesis — an old one still points to an IdRef to check). */
 function doctorantSettled(rec, ctx, type) {
@@ -767,12 +797,15 @@ const RULES = {
   },
   parcours_statut_incoherent: {
     type: 'parcours_statut_incoherent',
-    sources: ['parcours'],
+    // ldap + etablissements: incoherentSettled reads them; empty ⇒ skipped, not every account « gone ».
+    sources: ['parcours', 'ldap', 'etablissements'],
+    settled: incoherentSettled,
     detect(ctx) {
       const out = [];
       for (const [key, e] of endsByKey(ctx.annuaire)) {
         const sig = (ctx.parcours[key]?.signals || []).find((x) => x.type === 'statut_incoherent');
         if (!sig || !e.ended) continue;   // end date removed since the computation: nothing left to check
+        if (incoherentSettled(e.rec, ctx)) continue;
         out.push({
           key, rec: e.rec,
           description: sig.lastLocal
@@ -786,12 +819,14 @@ const RULES = {
   },
   parcours_identifiant_suspect: {
     type: 'parcours_identifiant_suspect',
-    sources: ['parcours'],
+    sources: ['parcours', 'etablissements'],
+    settled: suspectSettled,
     detect(ctx) {
       const out = [];
       for (const [key, e] of endsByKey(ctx.annuaire)) {
         const sig = (ctx.parcours[key]?.signals || []).find((x) => x.type === 'identifiant_suspect');
         if (!sig || e.ended) continue;
+        if (suspectSettled(e.rec, ctx)) continue;
         const via = (sig.sources || []).map((x) => (x === 'scopus' ? 'le profil Scopus' : 'les publications')).join(' et ');
         out.push({
           key, rec: e.rec,

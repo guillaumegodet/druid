@@ -55,7 +55,14 @@ avant d’avoir cliqué sur **Enregistrer**, et le statut n’est jamais changé
 Dans la liste **Personnel**, le filtre **Parcours** retrouve les départs probables ou confirmés, les
 statuts incohérents et les identifiants à vérifier. Une icône signale les départs probables à côté
 du nom. Les mêmes situations deviennent des tâches dans **À traiter**, qui se ferment d’elles-mêmes
-dès que la date de fin est saisie.
+dès que la date de fin est saisie. Pas de tâche quand Druid connaît déjà la réponse :
+- départ déjà connu (compte LDAP fermé ou en fermeture, dates de fin, présence validée) ;
+- départ vu dans les seules publications alors que le compte LDAP de l’établissement est actif ;
+- statut incohérent signalé par ORCID seul pour une personne dont le départ est confirmé (liste
+  fiabilisée, compte LDAP) : c’est le profil ORCID qui n’est pas à jour (suggestion « Clore le poste
+  dans ORCID ») ;
+- identifiants à vérifier d’une personne employée par un autre établissement : ses publications
+  citent son propre établissement.
 
 ## Les suggestions de l’établissement
 
