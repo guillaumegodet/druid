@@ -12,6 +12,8 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.24.0] — 2026-11-27
+
 ### Ajouté
 - **Administration › Sources des fiches** (PostgreSQL, droit établissement) : l'ordre de confiance des sources (LDAP,
   fichier RH, annuaire partenaire, site, fichier d'un labo…) se règle champ par champ ; un aperçu indique combien de
