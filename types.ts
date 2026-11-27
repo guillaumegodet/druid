@@ -185,6 +185,10 @@ export interface Researcher {
     openalexId?: string;   // OpenAlex author ID (resolved via ORCID or confirmed by hand)
     openalexIds?: string;  // Reviewed list of OpenAlex A-ids, pipe-separated (Grist column OpenAlex_ids → `openalex` in people.csv)
   };
+  /** Identifiers as the record form loaded them, sent with a save (never stored): an identifier the person did not touch
+   *  while it changed in the meantime (SoVisu+, a job, another manager) keeps its new value instead of being written
+   *  back to the old one (lib/directory/pg/commands.ts, writeIdentifiers). */
+  baseIdentifiers?: Researcher['identifiers'];
   /** Declared public social media accounts (media monitoring) — editable
    *  here, persisted in the Grist Annuaire (columns Bluesky/Mastodon/YouTube/
    *  Podcast_flux/Blog/LinkedIn). Tracked by media_watch within the GDPR framework. */

@@ -24,6 +24,13 @@ données à exécuter au déploiement).
   parcours (même date que le bouton de la fiche), à cocher puis reporter : chaque fiche est enregistrée comme depuis le
   formulaire et sa tâche passe en « fait » ; bouton « Fusionner en série » qui ouvre l'assistant de fusion sur chaque
   doublon « même personne », l'un après l'autre (chaque fusion reste relue et confirmée, « Passer » ouvre la suivante).
+- **Identifiants modifiés dans SoVisu+ repris dans Druid** (CRISalid, PostgreSQL) : le consommateur
+  `scripts/graph_consume.ts` lit la file `druid-person-actions` du bus et applique à la fiche les retraits et ajouts
+  faits par les chercheurs et les bibliothécaires dans SoVisu+ : un identifiant retiré est écarté (plus reproposé par
+  les alignements), un ORCID ou un IdHAL authentifié devient principal, un ajout ne remplace jamais une autre valeur.
+  Les cas à trancher deviennent des tâches « À traiter » (identifiant retiré, remplacé, différent de la fiche, porté
+  par deux personnes). Chaque message est journalisé (`inbound_graph_action`) ; `DRUID_GRAPH_INBOUND=off|dry-run|on`,
+  désactivé par défaut. Le publieur des retraits ne propose plus de retirer du graphe une valeur posée par SoVisu+.
 
 ### Modifié
 - **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
@@ -46,6 +53,15 @@ données à exécuter au déploiement).
 - **Onglet « À traiter › Doublons »** : sur PostgreSQL un uid est unique et il ne restait aucun groupe à traiter. Le
   journal des fusions (avec « Restaurer ») passe dans un onglet **Fusions**, présent sur toutes les instances ; les
   anciens liens `?tab=doublons` ouvrent l'onglet Tâches.
+### Corrigé
+- **Fiche — identifiants changés pendant l'édition** (PostgreSQL) : enregistrer une fiche ouverte avant qu'un
+  identifiant ne change ailleurs (retrait ou ajout dans SoVisu+, job d'alignement, autre gestionnaire) ne remet plus
+  l'ancienne valeur ni ne l'écarte comme un retrait manuel : un identifiant que la personne n'a pas touché dans le
+  formulaire garde sa valeur du moment ; celui qu'elle a modifié s'applique comme avant.
+
+### Migration
+- `20261128150000_inbound_graph_action` (dbmate) : journal des messages reçus ; origine `sovisuplus` dans
+  `graph_identifier_state`.
 
 ## [2.24.0] — 2026-11-27
 

@@ -103,6 +103,8 @@ const identifiersOf = (r: Researcher): Record<string, unknown> => ({
   idhal_i: r.identifiers?.halIdNum ? String(r.identifiers.halIdNum).replace(/\D/g, '') : '',
   scopus: r.identifiers?.scopusId, bluesky: r.socials?.bluesky, mastodon: r.socials?.mastodon,
 });
+/** Schemes the three-way merge of a record save protects (identifiers others change too: SoVisu+, jobs). */
+const BASE_MERGED_SCHEMES = new Set(['orcid', 'idref', 'idhal', 'idhal_i', 'scopus']);
 /** extra keys (Grist column ids) that a written field replaces. */
 const EXTRA_OF_SCHEME: Record<string, string[]> = { scopus: ['ID_SCOPUS'] };
 
@@ -346,7 +348,18 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
     // A value a person set aside, brought by an import or a job: not written; recorded as that source's, it is a
     // conflict to review (« To process › Source conflicts »).
     const rejected = typedInRecord ? new Set<string>() : await rejectedValues(trx, personId);
+    // Three-way merge with the identifiers the form loaded (r.baseIdentifiers): a scheme the person left alone while
+    // its primary value changed in the meantime (a researcher in SoVisu+, a job, another manager) keeps the new value
+    // (lot 4 of druid-internal docs/plan-retour-identifiants-sovisuplus.md: never write back what was just changed).
+    const base = r.baseIdentifiers ? identifiersOf({ identifiers: r.baseIdentifiers } as Researcher) : null;
+    const primaries = base
+      ? new Map((await trx.selectFrom('person_identifier').select(['scheme', 'value']).where('person_id', '=', personId)
+        .where('is_primary', '=', true).execute()).map((x) => [x.scheme, x.value]))
+      : null;
+    const norm = (v: unknown) => (blank(v) ? '' : String(v).trim().toLowerCase());
     for (const [scheme, raw] of Object.entries(identifiersOf(r))) {
+      if (base && primaries && BASE_MERGED_SCHEMES.has(scheme) && norm(raw) === norm(base[scheme])
+        && norm(primaries.get(scheme)) !== norm(base[scheme])) continue;
       const value = blank(raw) ? '' : String(raw).trim();
       if (value && rejected.has(`${scheme}|${value}`) && !held.has(`${scheme}|${value}`)) {
         await recordIdentifierValues(trx, personId, scheme, [value], source, actor);
