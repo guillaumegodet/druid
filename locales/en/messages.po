@@ -13,39 +13,39 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
-#: App.tsx:149
+#: App.tsx:159
 msgid "Error computing the LDAP diff"
 msgstr "Error computing the LDAP diff"
 
-#: App.tsx:159
+#: App.tsx:169
 msgid "Error searching for duplicates"
 msgstr "Error searching for duplicates"
 
-#: App.tsx:184
-#: App.tsx:190
+#: App.tsx:194
+#: App.tsx:200
 msgid "Researcher not found in the loaded scope"
 msgstr "Researcher not found in the loaded scope"
 
-#: App.tsx:203
+#: App.tsx:213
 msgid "Researcher of the task not found in the loaded scope"
 msgstr "Researcher of the task not found in the loaded scope"
 
-#: App.tsx:364
+#: App.tsx:374
 msgid "Error reading LDAP candidates"
 msgstr "Error reading LDAP candidates"
 
 #. placeholder {0}: trig.status
-#: App.tsx:401
+#: App.tsx:411
 msgid "LDAP search trigger failed: {0}"
 msgstr "LDAP search trigger failed: {0}"
 
-#: App.tsx:415
+#: App.tsx:425
 msgid "Error during the LDAP search"
 msgstr "Error during the LDAP search"
 
 #. placeholder {0}: skippedDuplicates.length
 #. placeholder {1}: skippedDuplicates.map((s) => `${s.uid} → G-${s.existingRowId}`).join(', ')
-#: App.tsx:429
+#: App.tsx:439
 msgid ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
@@ -53,106 +53,107 @@ msgstr ""
 "\n"
 "{0} skipped: uid already carried by another row of the same lab ({1}) — use “Merge”."
 
-#: App.tsx:431
+#: App.tsx:441
 msgid "LDAP attachment: {updated} record(s) attached (uid_dyna written to the directory).{skippedMsg}"
 msgstr "LDAP attachment: {updated} record(s) attached (uid_dyna written to the directory).{skippedMsg}"
 
-#: App.tsx:433
+#: App.tsx:443
 msgid "Error attaching LDAP records"
 msgstr "Error attaching LDAP records"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:440
+#: App.tsx:450
 msgid "LDAP attachment interrupted after {0} record(s) written — {1}"
 msgstr "LDAP attachment interrupted after {0} record(s) written — {1}"
 
-#: App.tsx:518
-#: App.tsx:525
+#: App.tsx:528
+#: App.tsx:535
 msgid "Server error"
 msgstr "Server error"
 
 #. placeholder {0}: sData.count
 #. placeholder {1}: pData.count
 #. placeholder {2}: pData.skipped ? t`, ${pData.skipped} skipped (no uid)` : ''
-#: App.tsx:526
+#: App.tsx:536
 msgid "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 msgstr "SoVisu+ files updated: {0} structures (structures.csv), {1} people (people.csv){2}."
 
 #. placeholder {0}: pData.skipped
-#: App.tsx:526
+#: App.tsx:536
 msgid ", {0} skipped (no uid)"
 msgstr ", {0} skipped (no uid)"
 
-#: App.tsx:528
+#: App.tsx:538
 msgid "Error synchronizing with SoVisu+"
 msgstr "Error synchronizing with SoVisu+"
 
-#: App.tsx:538
+#: App.tsx:548
 msgid "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 msgstr "LDAP synchronization: unavailable on this instance (no server job) — the comparison on the existing cache can still be viewed."
 
 #. placeholder {0}: trig.status
-#: App.tsx:548
+#: App.tsx:558
 msgid "LDAP synchronization trigger failed: {0}"
 msgstr "LDAP synchronization trigger failed: {0}"
 
-#: App.tsx:562
+#: App.tsx:572
 msgid "Error during the LDAP synchronization"
 msgstr "Error during the LDAP synchronization"
 
-#: App.tsx:574
+#: App.tsx:584
 msgid "LDAP update applied: {updated} record(s) written to the directory."
 msgstr "LDAP update applied: {updated} record(s) written to the directory."
 
-#: App.tsx:576
+#: App.tsx:586
 msgid "Error writing the LDAP updates"
 msgstr "Error writing the LDAP updates"
 
 #. placeholder {0}: err.updated
 #. placeholder {1}: apiErrorText(err)
-#: App.tsx:583
+#: App.tsx:593
 msgid "LDAP write interrupted after {0} record(s) written — {1}"
 msgstr "LDAP write interrupted after {0} record(s) written — {1}"
 
 #. placeholder {0}: entries.length
-#: App.tsx:617
+#: App.tsx:627
 msgid "Validation applied: {0} record(s) written to the directory."
 msgstr "Validation applied: {0} record(s) written to the directory."
 
-#: App.tsx:619
+#: App.tsx:629
 msgid "Error applying the validations"
 msgstr "Error applying the validations"
 
-#: App.tsx:632
+#: App.tsx:642
 msgid "This record has no directory row: validation impossible."
 msgstr "This record has no directory row: validation impossible."
 
-#: App.tsx:644
+#: App.tsx:654
 msgid "Error validating the record"
 msgstr "Error validating the record"
 
-#: App.tsx:663
+#: App.tsx:673
+#: components/researchers/BulkDepartureModal.tsx:94
 msgid "Error while saving"
 msgstr "Error while saving"
 
-#: App.tsx:694
+#: App.tsx:704
 msgid "Error computing the LDAP structures diff"
 msgstr "Error computing the LDAP structures diff"
 
-#: App.tsx:708
+#: App.tsx:718
 msgid "LDAP structures: {updated} updated, {created} created in the directory."
 msgstr "LDAP structures: {updated} updated, {created} created in the directory."
 
-#: App.tsx:710
+#: App.tsx:720
 msgid "Error writing the LDAP structures"
 msgstr "Error writing the LDAP structures"
 
-#: App.tsx:732
+#: App.tsx:742
 msgid "Error saving the structure"
 msgstr "Error saving the structure"
 
-#: App.tsx:741
+#: App.tsx:751
 msgid ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
@@ -160,45 +161,45 @@ msgstr ""
 "Profile {candidateId} flagged “Mixed identity” for {displayName}.\n"
 "Note (optional): who owns what, what should be split…"
 
-#: App.tsx:750
+#: App.tsx:760
 msgid "Error loading the unified view"
 msgstr "Error loading the unified view"
 
-#: App.tsx:758
+#: App.tsx:768
 msgid "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 msgstr "Unified alignment: unavailable on this instance (no server job to launch a run) — the review of already computed candidates can still be viewed."
 
-#: App.tsx:772
+#: App.tsx:782
 msgid "Error during the unified alignment"
 msgstr "Error during the unified alignment"
 
-#: App.tsx:789
-#: App.tsx:805
+#: App.tsx:799
+#: App.tsx:815
 msgid "Error writing (unified view)"
 msgstr "Error writing (unified view)"
 
-#: App.tsx:838
+#: App.tsx:848
 msgid "Error rejecting the candidate"
 msgstr "Error rejecting the candidate"
 
-#: App.tsx:986
+#: App.tsx:996
 msgid "Qualification error"
 msgstr "Qualification error"
 
-#: App.tsx:990
+#: App.tsx:1000
 msgid "Requalification error"
 msgstr "Requalification error"
 
-#: App.tsx:996
+#: App.tsx:1006
 msgid "Directory row {gristRowId} not found in the loaded scope"
 msgstr "Directory row {gristRowId} not found in the loaded scope"
 
-#: App.tsx:1016
+#: App.tsx:1032
 msgid "Loading dashboard…"
 msgstr "Loading dashboard…"
 
-#: App.tsx:1037
-#: App.tsx:1050
+#: App.tsx:1053
+#: App.tsx:1066
 #: components/admin/EstablishmentAdmin.tsx:86
 #: components/admin/SourcePrioritiesAdmin.tsx:83
 #: components/dashboard/CallCandidates.tsx:127
@@ -215,25 +216,25 @@ msgstr "Loading dashboard…"
 #: components/researchers/GeneralTab.tsx:87
 #: components/researchers/IdentifierSourcesPanel.tsx:50
 #: components/researchers/MergeLogPanel.tsx:64
-#: components/researchers/TasksPage.tsx:388
+#: components/researchers/TasksPage.tsx:429
 #: components/structures/IdentifiersTab.tsx:52
 msgid "Loading…"
 msgstr "Loading…"
 
-#: App.tsx:1060
+#: App.tsx:1076
 msgid "View not found"
 msgstr "View not found"
 
-#: App.tsx:1084
+#: App.tsx:1100
 msgid "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 msgstr "Your account has a “lab” right, but no directory record carries your identifier with a current laboratory — contact an administrator to have your record updated."
 
-#: App.tsx:1088
+#: App.tsx:1104
 msgid "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 msgstr "No scope has been assigned to you in Druid yet — contact an administrator to attach you to a structure (Keycloak group <0>labo_viewer</0>, or <1>dashboard_viewer</1> under your lab)."
 
 #. placeholder {0}: UNIFIED_ALIGN_SOURCES.filter((s) => unifiedProgress?.[s]?.running).length
-#: App.tsx:1137
+#: App.tsx:1155
 msgid "Unified alignment: {0} source(s) running"
 msgstr "Unified alignment: {0} source(s) running"
 
@@ -448,7 +449,7 @@ msgid "Stop the answer"
 msgstr "Stop the answer"
 
 #: components/ChatWidget.tsx:542
-#: components/researchers/TasksPage.tsx:402
+#: components/researchers/TasksPage.tsx:443
 msgid "Send"
 msgstr "Send"
 
@@ -617,18 +618,19 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:191
 #: components/researchers/AlignLaunchModal.tsx:188
+#: components/researchers/BulkDepartureModal.tsx:165
 #: components/researchers/FieldConflictsPage.tsx:199
 #: components/researchers/FieldConflictsPage.tsx:240
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
-#: components/researchers/MergeResearchersModal.tsx:291
+#: components/researchers/MergeResearchersModal.tsx:301
 #: components/researchers/PeopleFileImport.tsx:299
 #: components/researchers/SiteImportReview.tsx:323
 #: components/researchers/SuggestionsSection.tsx:189
 #: components/researchers/TaskForm.tsx:163
-#: components/researchers/TasksPage.tsx:342
-#: components/researchers/TasksPage.tsx:363
+#: components/researchers/TasksPage.tsx:383
+#: components/researchers/TasksPage.tsx:404
 #: components/structures/StructuresLdapReview.tsx:131
 msgid "Cancel"
 msgstr "Cancel"
@@ -1039,7 +1041,7 @@ msgstr "Supervising bodies"
 #: components/StructureList.tsx:201
 #: components/StructureList.tsx:428
 #: components/researchers/ListHeader.tsx:54
-#: components/researchers/TasksPage.tsx:176
+#: components/researchers/TasksPage.tsx:213
 msgid "Status"
 msgstr "Status"
 
@@ -1116,7 +1118,7 @@ msgid "All levels"
 msgstr "All levels"
 
 #: components/StructureList.tsx:377
-#: components/researchers/TasksPage.tsx:115
+#: components/researchers/TasksPage.tsx:135
 msgid "All statuses"
 msgstr "All statuses"
 
@@ -1324,7 +1326,7 @@ msgstr "Funding programmes known to this instance. An active programme has its c
 #: components/researchers/FieldConflictsPage.tsx:106
 #: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/LdapMovesPanel.tsx:124
-#: components/researchers/TasksPage.tsx:132
+#: components/researchers/TasksPage.tsx:159
 msgid "Refresh"
 msgstr "Refresh"
 
@@ -2067,6 +2069,8 @@ msgstr "Add a call"
 #: components/reports/ShareDialog.tsx:91
 #: components/researchers/AffiliationHistorySection.tsx:100
 #: components/researchers/AlignLaunchModal.tsx:104
+#: components/researchers/BulkDepartureModal.tsx:113
+#: components/researchers/BulkDepartureModal.tsx:165
 #: components/researchers/GeneralTab.tsx:84
 #: components/researchers/IdentifierSourcesPanel.tsx:47
 #: components/researchers/PeopleFileImport.tsx:160
@@ -2341,7 +2345,7 @@ msgstr "{valid, plural, one {Import # call} other {Import # calls}}"
 
 #: components/admin/ManualCallsAdmin.tsx:548
 #: components/dashboard/MediaMentionsPanel.tsx:555
-#: components/researchers/MergeResearchersModal.tsx:186
+#: components/researchers/MergeResearchersModal.tsx:191
 #: components/researchers/SiteImportReview.tsx:312
 msgid "validated"
 msgstr "validated"
@@ -3843,8 +3847,9 @@ msgstr "{0, plural, one {# candidate} other {# candidates}}"
 #: components/dashboard/PairsSection.tsx:352
 #: components/dashboard/report/reportTables.ts:77
 #: components/dashboard/report/reportTables.ts:78
+#: components/researchers/BulkDepartureModal.tsx:124
 #: components/researchers/TaskForm.tsx:101
-#: components/researchers/TasksPage.tsx:173
+#: components/researchers/TasksPage.tsx:210
 msgid "Researcher"
 msgstr "Researcher"
 
@@ -3923,7 +3928,7 @@ msgstr "{0, plural, one {# more publication} other {# more publications}}"
 #: components/dashboard/CallsTab.tsx:47
 #: components/dashboard/NewsTab.tsx:726
 #: components/researchers/CallsSection.tsx:131
-#: components/researchers/TasksPage.tsx:161
+#: components/researchers/TasksPage.tsx:198
 msgid "Closed"
 msgstr "Closed"
 
@@ -5279,7 +5284,7 @@ msgstr "reject."
 #: components/dashboard/MediaMentionsPanel.tsx:258
 #: components/dashboard/MediaMentionsPanel.tsx:555
 #: components/reports/ReportEditor.tsx:770
-#: components/researchers/TasksPage.tsx:191
+#: components/researchers/TasksPage.tsx:228
 msgid "auto"
 msgstr "auto"
 
@@ -5847,7 +5852,7 @@ msgid "Link"
 msgstr "Link"
 
 #: components/dashboard/NewsTab.tsx:726
-#: components/researchers/TasksPage.tsx:114
+#: components/researchers/TasksPage.tsx:134
 msgid "Open"
 msgstr "Open"
 
@@ -6025,7 +6030,7 @@ msgid "Discard"
 msgstr "Discard"
 
 #: components/dashboard/NewsletterPanel.tsx:405
-#: components/researchers/TasksPage.tsx:274
+#: components/researchers/TasksPage.tsx:315
 msgid "Reopen"
 msgstr "Reopen"
 
@@ -11169,7 +11174,7 @@ msgid "PDFs generated from this report"
 msgstr "PDFs generated from this report"
 
 #: components/reports/ReportEditor.tsx:333
-#: components/researchers/TasksPage.tsx:386
+#: components/researchers/TasksPage.tsx:427
 msgid "History"
 msgstr "History"
 
@@ -12051,6 +12056,82 @@ msgstr "Figures of the last Scopus run ({0}); quotas reset on {1}."
 msgid "Start"
 msgstr "Start"
 
+#: components/researchers/BulkDepartureModal.tsx:50
+msgid "Record not found in the loaded directory"
+msgstr "Record not found in the loaded directory"
+
+#. placeholder {0}: researcher.employment.endDate
+#: components/researchers/BulkDepartureModal.tsx:51
+msgid "End of employment already entered ({0})"
+msgstr "End of employment already entered ({0})"
+
+#: components/researchers/BulkDepartureModal.tsx:52
+msgid "End of employment set by the LDAP"
+msgstr "End of employment set by the LDAP"
+
+#: components/researchers/BulkDepartureModal.tsx:54
+msgid "Record without key"
+msgstr "Record without key"
+
+#: components/researchers/BulkDepartureModal.tsx:58
+msgid "No end date proposed by the career path"
+msgstr "No end date proposed by the career path"
+
+#: components/researchers/BulkDepartureModal.tsx:60
+msgid "Career path unavailable"
+msgstr "Career path unavailable"
+
+#. placeholder {0}: row.date
+#: components/researchers/BulkDepartureModal.tsx:91
+msgid "End of employment {0} reported in batch from the career path"
+msgstr "End of employment {0} reported in batch from the career path"
+
+#: components/researchers/BulkDepartureModal.tsx:109
+msgid "Report the departures in batch"
+msgstr "Report the departures in batch"
+
+#: components/researchers/BulkDepartureModal.tsx:110
+msgid "End of employment proposed by the career path of each record (same date as the button of the record). Each ticked record is saved like the form does, and its task is closed as done."
+msgstr "End of employment proposed by the career path of each record (same date as the button of the record). Each ticked record is saved like the form does, and its task is closed as done."
+
+#: components/researchers/BulkDepartureModal.tsx:121
+msgid "Tick all"
+msgstr "Tick all"
+
+#: components/researchers/BulkDepartureModal.tsx:125
+msgid "Signal"
+msgstr "Signal"
+
+#: components/researchers/BulkDepartureModal.tsx:126
+msgid "Proposed end"
+msgstr "Proposed end"
+
+#: components/researchers/BulkDepartureModal.tsx:147
+msgid "reported"
+msgstr "reported"
+
+#: components/researchers/BulkDepartureModal.tsx:159
+msgid "Reading the career paths…"
+msgstr "Reading the career paths…"
+
+#: components/researchers/BulkDepartureModal.tsx:160
+msgid "{doneCount, plural, one {# record updated, its task closed.} other {# records updated, their tasks closed.}}"
+msgstr "{doneCount, plural, one {# record updated, its task closed.} other {# records updated, their tasks closed.}}"
+
+#. placeholder {0}: ready.length
+#: components/researchers/BulkDepartureModal.tsx:161
+msgid "{0, plural, one {# record with a proposed date.} other {# records with a proposed date.}}"
+msgstr "{0, plural, one {# record with a proposed date.} other {# records with a proposed date.}}"
+
+#: components/researchers/BulkDepartureModal.tsx:170
+msgid "Reporting…"
+msgstr "Reporting…"
+
+#. placeholder {0}: toApply.length
+#: components/researchers/BulkDepartureModal.tsx:170
+msgid "{0, plural, one {Report # end date} other {Report # end dates}}"
+msgstr "{0, plural, one {Report # end date} other {Report # end dates}}"
+
 #: components/researchers/CallsSection.tsx:99
 msgid "Calls for proposals for you"
 msgstr "Calls for proposals for you"
@@ -12356,7 +12437,7 @@ msgid "Qualify"
 msgstr "Qualify"
 
 #: components/researchers/DuplicatesPage.tsx:212
-#: components/researchers/TasksPage.tsx:330
+#: components/researchers/TasksPage.tsx:371
 msgid "Open the merge assistant"
 msgstr "Open the merge assistant"
 
@@ -12370,7 +12451,7 @@ msgstr "Merge {0} ({1}) and {2} ({3})"
 
 #: components/researchers/DuplicatesPage.tsx:216
 #: components/researchers/LdapCandidatesPage.tsx:223
-#: components/researchers/MergeResearchersModal.tsx:299
+#: components/researchers/MergeResearchersModal.tsx:309
 msgid "Merge"
 msgstr "Merge"
 
@@ -12978,7 +13059,7 @@ msgid "Take {source} for this record"
 msgstr "Take {source} for this record"
 
 #: components/researchers/ImportConflictsPage.tsx:187
-#: components/researchers/MergeResearchersModal.tsx:218
+#: components/researchers/MergeResearchersModal.tsx:223
 msgid "Field"
 msgstr "Field"
 
@@ -13509,132 +13590,146 @@ msgstr "G-{0} → G-{1}"
 msgid "restored (G-{0})"
 msgstr "restored (G-{0})"
 
-#: components/researchers/MergeResearchersModal.tsx:53
+#: components/researchers/MergeResearchersModal.tsx:55
 msgid "One of the two records cannot be found in the directory (already merged or deleted?)"
 msgstr "One of the two records cannot be found in the directory (already merged or deleted?)"
 
-#: components/researchers/MergeResearchersModal.tsx:87
+#: components/researchers/MergeResearchersModal.tsx:89
 msgid "yes"
 msgstr "yes"
 
-#: components/researchers/MergeResearchersModal.tsx:87
+#: components/researchers/MergeResearchersModal.tsx:89
 msgid "no"
 msgstr "no"
 
-#: components/researchers/MergeResearchersModal.tsx:93
+#: components/researchers/MergeResearchersModal.tsx:95
 msgid "the manually validated row wins"
 msgstr "the manually validated row wins"
 
-#: components/researchers/MergeResearchersModal.tsx:94
+#: components/researchers/MergeResearchersModal.tsx:96
 msgid "most recent validation"
 msgstr "most recent validation"
 
-#: components/researchers/MergeResearchersModal.tsx:95
+#: components/researchers/MergeResearchersModal.tsx:97
 msgid "most recent LDAP update"
 msgstr "most recent LDAP update"
 
-#: components/researchers/MergeResearchersModal.tsx:96
+#: components/researchers/MergeResearchersModal.tsx:98
 msgid "civil-status spelling (LDAP row)"
 msgstr "civil-status spelling (LDAP row)"
 
-#: components/researchers/MergeResearchersModal.tsx:97
+#: components/researchers/MergeResearchersModal.tsx:99
 msgid "fills an empty field"
 msgstr "fills an empty field"
 
-#: components/researchers/MergeResearchersModal.tsx:98
+#: components/researchers/MergeResearchersModal.tsx:100
 msgid "most recent date"
 msgstr "most recent date"
 
-#: components/researchers/MergeResearchersModal.tsx:99
+#: components/researchers/MergeResearchersModal.tsx:101
 msgid "union of both values"
 msgstr "union of both values"
 
-#: components/researchers/MergeResearchersModal.tsx:100
+#: components/researchers/MergeResearchersModal.tsx:102
 msgid "default: kept row"
 msgstr "default: kept row"
 
-#: components/researchers/MergeResearchersModal.tsx:145
+#: components/researchers/MergeResearchersModal.tsx:148
 msgid "Merge two records"
 msgstr "Merge two records"
 
-#: components/researchers/MergeResearchersModal.tsx:146
+#. placeholder {0}: series.position
+#. placeholder {1}: series.total
+#: components/researchers/MergeResearchersModal.tsx:149
+msgid "pair {0} of {1}"
+msgstr "pair {0} of {1}"
+
+#: components/researchers/MergeResearchersModal.tsx:151
 msgid "The kept row is completed, then the other one is deleted. The operation is logged in the merge log and can be restored."
 msgstr "The kept row is completed, then the other one is deleted. The operation is logged in the merge log and can be restored."
 
-#: components/researchers/MergeResearchersModal.tsx:158
+#: components/researchers/MergeResearchersModal.tsx:163
 msgid "Loading both rows…"
 msgstr "Loading both rows…"
 
-#: components/researchers/MergeResearchersModal.tsx:179
-#: components/researchers/MergeResearchersModal.tsx:219
+#: components/researchers/MergeResearchersModal.tsx:184
+#: components/researchers/MergeResearchersModal.tsx:224
 msgid "Kept"
 msgstr "Kept"
 
-#: components/researchers/MergeResearchersModal.tsx:179
-#: components/researchers/MergeResearchersModal.tsx:220
+#: components/researchers/MergeResearchersModal.tsx:184
+#: components/researchers/MergeResearchersModal.tsx:225
 msgid "Absorbed"
 msgstr "Absorbed"
 
-#: components/researchers/MergeResearchersModal.tsx:195
+#: components/researchers/MergeResearchersModal.tsx:200
 msgid "Click a record to make it the kept row (suggested: outside the holding area, then validated, then the most complete)."
 msgstr "Click a record to make it the kept row (suggested: outside the holding area, then validated, then the most complete)."
 
-#: components/researchers/MergeResearchersModal.tsx:201
+#: components/researchers/MergeResearchersModal.tsx:206
 msgid "The two rows do not share the same uid_dyna. I confirm they are the same person."
 msgstr "The two rows do not share the same uid_dyna. I confirm they are the same person."
 
 #. placeholder {0}: decisions.length
-#: components/researchers/MergeResearchersModal.tsx:208
+#: components/researchers/MergeResearchersModal.tsx:213
 msgid "Fields to decide ({0})"
 msgstr "Fields to decide ({0})"
 
-#: components/researchers/MergeResearchersModal.tsx:209
+#: components/researchers/MergeResearchersModal.tsx:214
 msgid "Suggested value pre-selected — change it if needed."
 msgstr "Suggested value pre-selected — change it if needed."
 
-#: components/researchers/MergeResearchersModal.tsx:212
+#: components/researchers/MergeResearchersModal.tsx:217
 msgid "No difference: the absorbed row adds nothing and will simply be deleted."
 msgstr "No difference: the absorbed row adds nothing and will simply be deleted."
 
 #. placeholder {0}: fmt('validation_source', (side === 'keep' ? effective.keep : effective.drop).fields['validation_source']) || '—'
 #. placeholder {1}: fmt('validation_date', (side === 'keep' ? effective.keep : effective.drop).fields['validation_date']) || '—'
-#: components/researchers/MergeResearchersModal.tsx:230
+#: components/researchers/MergeResearchersModal.tsx:235
 msgid "validated ({0}, {1})"
 msgstr "validated ({0}, {1})"
 
-#: components/researchers/MergeResearchersModal.tsx:231
+#: components/researchers/MergeResearchersModal.tsx:236
 msgid "not validated"
 msgstr "not validated"
 
-#: components/researchers/MergeResearchersModal.tsx:239
+#: components/researchers/MergeResearchersModal.tsx:244
 msgid "empty"
 msgstr "empty"
 
-#: components/researchers/MergeResearchersModal.tsx:249
+#: components/researchers/MergeResearchersModal.tsx:254
 msgid "fill-in"
 msgstr "fill-in"
 
-#: components/researchers/MergeResearchersModal.tsx:250
+#: components/researchers/MergeResearchersModal.tsx:255
 msgid "union"
 msgstr "union"
 
-#: components/researchers/MergeResearchersModal.tsx:251
+#: components/researchers/MergeResearchersModal.tsx:256
 #: components/structures/StructureAlignPanel.tsx:107
 msgid "conflict"
 msgstr "conflict"
 
 #. placeholder {0}: sameFields.length
-#: components/researchers/MergeResearchersModal.tsx:269
+#: components/researchers/MergeResearchersModal.tsx:274
 msgid "Fields without decision ({0}) — identical, or filled only on the kept row"
 msgstr "Fields without decision ({0}) — identical, or filled only on the kept row"
 
 #. placeholder {0}: effective.drop.rowId
 #. placeholder {1}: effective.keep.rowId
-#: components/researchers/MergeResearchersModal.tsx:287
+#: components/researchers/MergeResearchersModal.tsx:292
 msgid "Will be deleted: G-{0}. A trace is added to Data_source and Commentaires of G-{1}."
 msgstr "Will be deleted: G-{0}. A trace is added to Data_source and Commentaires of G-{1}."
 
-#: components/researchers/MergeResearchersModal.tsx:299
+#: components/researchers/MergeResearchersModal.tsx:296
+msgid "Leaves this pair as it is and opens the next one"
+msgstr "Leaves this pair as it is and opens the next one"
+
+#: components/researchers/MergeResearchersModal.tsx:297
+msgid "Skip"
+msgstr "Skip"
+
+#: components/researchers/MergeResearchersModal.tsx:309
 msgid "Merging…"
 msgstr "Merging…"
 
@@ -14399,27 +14494,27 @@ msgid "{hidden} more suggestions will show once these are done."
 msgstr "{hidden} more suggestions will show once these are done."
 
 #: components/researchers/SuggestionsSection.tsx:211
-#: components/researchers/TasksPage.tsx:448
+#: components/researchers/TasksPage.tsx:489
 msgid "Subject"
 msgstr "Subject"
 
 #: components/researchers/SuggestionsSection.tsx:214
-#: components/researchers/TasksPage.tsx:435
+#: components/researchers/TasksPage.tsx:476
 msgid "Subject:"
 msgstr "Subject:"
 
 #: components/researchers/SuggestionsSection.tsx:215
-#: components/researchers/TasksPage.tsx:452
+#: components/researchers/TasksPage.tsx:493
 msgid "Copy the email"
 msgstr "Copy the email"
 
 #: components/researchers/SuggestionsSection.tsx:218
-#: components/researchers/TasksPage.tsx:456
+#: components/researchers/TasksPage.tsx:497
 msgid "Open in the mail client"
 msgstr "Open in the mail client"
 
 #: components/researchers/SuggestionsSection.tsx:219
-#: components/researchers/TasksPage.tsx:442
+#: components/researchers/TasksPage.tsx:483
 msgid "no email in the Directory"
 msgstr "no email in the Directory"
 
@@ -14428,7 +14523,7 @@ msgid "Error creating the task"
 msgstr "Error creating the task"
 
 #: components/researchers/TaskForm.tsx:85
-#: components/researchers/TasksPage.tsx:139
+#: components/researchers/TasksPage.tsx:176
 msgid "New task"
 msgstr "New task"
 
@@ -14445,7 +14540,7 @@ msgid "No record selected — the task will be created without a researcher link
 msgstr "No record selected — the task will be created without a researcher link (badge « to complete »)."
 
 #: components/researchers/TaskForm.tsx:131
-#: components/researchers/TasksPage.tsx:175
+#: components/researchers/TasksPage.tsx:212
 msgid "Channel"
 msgstr "Channel"
 
@@ -14474,212 +14569,238 @@ msgid "Create the task"
 msgstr "Create the task"
 
 #. placeholder {0}: trig.status
-#: components/researchers/TasksPage.tsx:69
+#: components/researchers/TasksPage.tsx:76
 msgid "Detection trigger failed: {0}"
 msgstr "Detection trigger failed: {0}"
 
-#: components/researchers/TasksPage.tsx:82
+#: components/researchers/TasksPage.tsx:89
 msgid "Error during the detection"
 msgstr "Error during the detection"
 
-#: components/researchers/TasksPage.tsx:119
+#: components/researchers/TasksPage.tsx:139
 msgid "All bases"
 msgstr "All bases"
 
-#: components/researchers/TasksPage.tsx:123
+#: components/researchers/TasksPage.tsx:143
 msgid "All channels"
 msgstr "All channels"
 
-#: components/researchers/TasksPage.tsx:127
+#: components/researchers/TasksPage.tsx:146
+msgid "Task type"
+msgstr "Task type"
+
+#: components/researchers/TasksPage.tsx:147
+msgid "All types"
+msgstr "All types"
+
+#: components/researchers/TasksPage.tsx:154
 msgid "Mine"
 msgstr "Mine"
 
-#: components/researchers/TasksPage.tsx:129
+#: components/researchers/TasksPage.tsx:156
 msgid "Search (title, name, lab…)"
 msgstr "Search (title, name, lab…)"
 
-#: components/researchers/TasksPage.tsx:131
+#: components/researchers/TasksPage.tsx:158
 msgid "Re-reads the task list"
 msgstr "Re-reads the task list"
 
-#: components/researchers/TasksPage.tsx:134
+#: components/researchers/TasksPage.tsx:161
 msgid "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
 msgstr "Runs the detection rules (two ORCID / IdHAL / Scopus profiles, LDAP departures with an open IdRef affiliation) from the alignment caches; situations gone since the last run are closed automatically"
 
-#: components/researchers/TasksPage.tsx:136
+#: components/researchers/TasksPage.tsx:163
 msgid "Detecting…"
 msgstr "Detecting…"
 
-#: components/researchers/TasksPage.tsx:136
+#: components/researchers/TasksPage.tsx:163
 msgid "Run detection"
 msgstr "Run detection"
+
+#: components/researchers/TasksPage.tsx:166
+msgid "Reports the end of employment proposed by the career path on the confirmed or declared departures, after review"
+msgstr "Reports the end of employment proposed by the career path on the confirmed or declared departures, after review"
+
+#. placeholder {0}: batchDepartures.length
+#: components/researchers/TasksPage.tsx:167
+msgid "Departures in batch ({0})"
+msgstr "Departures in batch ({0})"
+
+#: components/researchers/TasksPage.tsx:171
+msgid "Opens the merge assistant on each « same person » duplicate in turn: every merge is still reviewed and confirmed"
+msgstr "Opens the merge assistant on each « same person » duplicate in turn: every merge is still reviewed and confirmed"
+
+#. placeholder {0}: mergeSeries.length
+#: components/researchers/TasksPage.tsx:172
+msgid "Merge in series ({0})"
+msgstr "Merge in series ({0})"
 
 #. placeholder {0}: detect?.created ?? 0
 #. placeholder {1}: detect?.verified ?? 0
 #. placeholder {2}: detect?.resolved ?? 0
 #. placeholder {3}: detect?.reopened ?? 0
-#: components/researchers/TasksPage.tsx:144
+#: components/researchers/TasksPage.tsx:181
 msgid "Detection done: {0} created, {1} verified, {2} resolved automatically, {3} reopened"
 msgstr "Detection done: {0} created, {1} verified, {2} resolved automatically, {3} reopened"
 
-#: components/researchers/TasksPage.tsx:153
+#: components/researchers/TasksPage.tsx:190
 msgid "Loading the tasks…"
 msgstr "Loading the tasks…"
 
-#: components/researchers/TasksPage.tsx:165
+#: components/researchers/TasksPage.tsx:202
 msgid "No task matches these filters."
 msgstr "No task matches these filters."
 
-#: components/researchers/TasksPage.tsx:172
+#: components/researchers/TasksPage.tsx:209
 msgid "Task"
 msgstr "Task"
 
-#: components/researchers/TasksPage.tsx:174
+#: components/researchers/TasksPage.tsx:211
 msgid "Base"
 msgstr "Base"
 
-#: components/researchers/TasksPage.tsx:177
+#: components/researchers/TasksPage.tsx:214
 msgid "Assigned"
 msgstr "Assigned"
 
-#: components/researchers/TasksPage.tsx:178
+#: components/researchers/TasksPage.tsx:215
 #: lib/tasks.ts:105
 msgid "Created"
 msgstr "Created"
 
-#: components/researchers/TasksPage.tsx:191
+#: components/researchers/TasksPage.tsx:228
 msgid "Generated by a detection rule — closed automatically when the situation disappears"
 msgstr "Generated by a detection rule — closed automatically when the situation disappears"
 
-#: components/researchers/TasksPage.tsx:200
+#: components/researchers/TasksPage.tsx:237
 msgid "No Directory record linked to this task"
 msgstr "No Directory record linked to this task"
 
-#: components/researchers/TasksPage.tsx:201
+#: components/researchers/TasksPage.tsx:238
 msgid "To complete"
 msgstr "To complete"
 
-#: components/researchers/TasksPage.tsx:227
+#: components/researchers/TasksPage.tsx:264
 msgid "Directory not loaded yet: researcher links open once the list is available."
 msgstr "Directory not loaded yet: researcher links open once the list is available."
 
-#: components/researchers/TasksPage.tsx:266
+#: components/researchers/TasksPage.tsx:307
 msgid "Action failed"
 msgstr "Action failed"
 
-#: components/researchers/TasksPage.tsx:270
+#: components/researchers/TasksPage.tsx:311
 msgid "Take over"
 msgstr "Take over"
 
-#: components/researchers/TasksPage.tsx:270
+#: components/researchers/TasksPage.tsx:311
 msgid "Resume"
 msgstr "Resume"
 
-#: components/researchers/TasksPage.tsx:271
+#: components/researchers/TasksPage.tsx:312
 #: lib/tasks.ts:108
 msgid "Put on hold"
 msgstr "Put on hold"
 
-#: components/researchers/TasksPage.tsx:272
+#: components/researchers/TasksPage.tsx:313
 msgid "Mark as done"
 msgstr "Mark as done"
 
-#: components/researchers/TasksPage.tsx:273
+#: components/researchers/TasksPage.tsx:314
 msgid "Drop"
 msgstr "Drop"
 
-#: components/researchers/TasksPage.tsx:274
+#: components/researchers/TasksPage.tsx:315
 msgid "Back to “to do”"
 msgstr "Back to “to do”"
 
-#: components/researchers/TasksPage.tsx:309
+#: components/researchers/TasksPage.tsx:350
 msgid "Created by"
 msgstr "Created by"
 
-#: components/researchers/TasksPage.tsx:310
+#: components/researchers/TasksPage.tsx:351
 msgid "Taken over by"
 msgstr "Taken over by"
 
-#: components/researchers/TasksPage.tsx:311
+#: components/researchers/TasksPage.tsx:352
 msgid "Closed by"
 msgstr "Closed by"
 
-#: components/researchers/TasksPage.tsx:313
+#: components/researchers/TasksPage.tsx:354
 msgid "Verified"
 msgstr "Verified"
 
-#: components/researchers/TasksPage.tsx:316
+#: components/researchers/TasksPage.tsx:357
 msgid "Waiting for:"
 msgstr "Waiting for:"
 
-#: components/researchers/TasksPage.tsx:317
+#: components/researchers/TasksPage.tsx:358
 msgid "Resolution:"
 msgstr "Resolution:"
 
-#: components/researchers/TasksPage.tsx:320
+#: components/researchers/TasksPage.tsx:361
 msgid "Open the link"
 msgstr "Open the link"
 
-#: components/researchers/TasksPage.tsx:324
+#: components/researchers/TasksPage.tsx:365
 msgid "Switch to the LDAP uid"
 msgstr "Switch to the LDAP uid"
 
-#: components/researchers/TasksPage.tsx:329
+#: components/researchers/TasksPage.tsx:370
 msgid "The task closes itself at the next detection, once the records are merged"
 msgstr "The task closes itself at the next detection, once the records are merged"
 
 #. placeholder {0}: p.uids[0]
 #. placeholder {1}: p.uids[1]
-#: components/researchers/TasksPage.tsx:330
+#: components/researchers/TasksPage.tsx:371
 msgid "Merge {0} + {1}"
 msgstr "Merge {0} + {1}"
 
-#: components/researchers/TasksPage.tsx:338
+#: components/researchers/TasksPage.tsx:379
 msgid "Every row of the record moves from <0>{switchFrom}</0> to <1>{switchTo}</1>. Check the warnings above first."
 msgstr "Every row of the record moves from <0>{switchFrom}</0> to <1>{switchTo}</1>. Check the warnings above first."
 
-#: components/researchers/TasksPage.tsx:339
+#: components/researchers/TasksPage.tsx:380
 msgid "A follow-up task is created to remove the identifiers of the former person in SoVisu+."
 msgstr "A follow-up task is created to remove the identifiers of the former person in SoVisu+."
 
-#: components/researchers/TasksPage.tsx:343
+#: components/researchers/TasksPage.tsx:384
 msgid "Switch to {switchTo}"
 msgstr "Switch to {switchTo}"
 
-#: components/researchers/TasksPage.tsx:359
+#: components/researchers/TasksPage.tsx:400
 msgid "Waiting for what? (researcher's answer, ABES batch, external support…)"
 msgstr "Waiting for what? (researcher's answer, ABES batch, external support…)"
 
-#: components/researchers/TasksPage.tsx:359
+#: components/researchers/TasksPage.tsx:400
 msgid "Resolution (optional)"
 msgstr "Resolution (optional)"
 
-#: components/researchers/TasksPage.tsx:369
+#: components/researchers/TasksPage.tsx:410
 msgid "Assign to (username)"
 msgstr "Assign to (username)"
 
-#: components/researchers/TasksPage.tsx:370
+#: components/researchers/TasksPage.tsx:411
 msgid "Reassign"
 msgstr "Reassign"
 
-#: components/researchers/TasksPage.tsx:371
+#: components/researchers/TasksPage.tsx:412
 msgid "Assign to me"
 msgstr "Assign to me"
 
-#: components/researchers/TasksPage.tsx:378
+#: components/researchers/TasksPage.tsx:419
 msgid "Email sent to the researcher"
 msgstr "Email sent to the researcher"
 
-#: components/researchers/TasksPage.tsx:400
+#: components/researchers/TasksPage.tsx:441
 msgid "Add a comment…"
 msgstr "Add a comment…"
 
-#: components/researchers/TasksPage.tsx:441
+#: components/researchers/TasksPage.tsx:482
 #: lib/tasks.ts:84
 msgid "Email to the researcher"
 msgstr "Email to the researcher"
 
-#: components/researchers/TasksPage.tsx:461
+#: components/researchers/TasksPage.tsx:502
 msgid "Mark as sent (task on hold)"
 msgstr "Mark as sent (task on hold)"
 
