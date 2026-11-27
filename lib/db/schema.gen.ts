@@ -339,6 +339,7 @@ export interface InboundGraphAction {
   application: string | null;
   attempts: Generated<number>;
   authenticated: Generated<boolean>;
+  channel: Generated<string>;
   effects: Generated<Json>;
   id: string;
   identifier_type: string | null;

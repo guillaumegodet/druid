@@ -21,6 +21,12 @@ données à exécuter au déploiement).
   par deux personnes). Chaque message est journalisé (`inbound_graph_action`) ; `DRUID_GRAPH_INBOUND=off|dry-run|on`,
   désactivé par défaut. Le publieur des retraits ne propose plus de retirer du graphe une valeur posée par SoVisu+.
 
+- **Rapprochement nocturne avec SoVisu+** : `scripts/graph_reconcile_sovisuplus.ts` relit la table des actions de
+  SoVisu+ (rôle en lecture seule, `SOVISUPLUS_DATABASE_URL`) et rejoue, par le même code que le consommateur, les
+  retraits et ajouts d'identifiants que le bus n'a pas livrés à Druid (messages perdus par SoVisu+, consommateur
+  arrêté) ; une action dépassée par une action plus récente déjà traitée sur le même identifiant n'est pas rejouée.
+  Refus net si la table de SoVisu+ change de forme. Premier passage = rattrapage depuis la montée en CRISalid 1.7.
+
 ### Modifié
 - **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
   les ferme d'elle-même (« résolue auto », motif au fil de la tâche) quand la fiche n'a pas d'uid LDAP (`ext_` ou
@@ -41,6 +47,7 @@ données à exécuter au déploiement).
 ### Migration
 - `20261128150000_inbound_graph_action` (dbmate) : journal des messages reçus ; origine `sovisuplus` dans
   `graph_identifier_state`.
+- `20261128170000_inbound_graph_action_channel` (dbmate) : canal de réception (`bus` ou `reconcile`) des messages.
 
 ## [2.24.0] — 2026-11-27
 
