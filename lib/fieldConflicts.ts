@@ -22,6 +22,21 @@ export interface FieldConflict {
 
 export type FieldConflictAction = 'keep' | 'drop' | 'correct';
 
+/** An identifier set aside by a person but brought again by a source, or still shown (lot 4 b). */
+export interface IdentifierConflict {
+  personId: string;
+  recordId: number | null;
+  uid: string;
+  name: string;
+  labs: string[];
+  scheme: string;
+  value: string;
+  kind: 'brought_again' | 'shown_but_rejected';
+  rejectedBy: string | null;
+  rejectedAt: string | null;
+  sources: { source: string; at: string }[];
+}
+
 /** A file or site import and the values it still brings (case 19 of the plan). */
 export interface FieldImport {
   id: string;
@@ -65,7 +80,9 @@ async function request<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export const FieldConflictsApi = {
-  list: () => request<{ available: boolean; items: FieldConflict[] }>('/api/field-conflicts'),
+  list: () => request<{ available: boolean; items: FieldConflict[]; identifiers?: IdentifierConflict[] }>('/api/field-conflicts'),
+  resolveIdentifier: (personId: string, scheme: string, value: string, action: 'keep' | 'accept') =>
+    request<{ ok: true }>('/api/field-conflicts/identifier', { method: 'POST', body: JSON.stringify({ personId, scheme, value, action }) }),
   resolve: (personId: string, field: string, action: FieldConflictAction, value?: string) =>
     request<{ ok: true }>('/api/field-conflicts/resolve', { method: 'POST', body: JSON.stringify({ personId, field, action, value }) }),
   imports: () => request<{ available: boolean; items: FieldImport[] }>('/api/field-imports'),

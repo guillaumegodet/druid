@@ -6,6 +6,7 @@ import { withActor, type DB, type Db } from '../../db/client';
 import { ApiError } from '../errors';
 import { FieldValueError, MANUAL_SOURCE, MERGED_FIELDS, type DivergenceKind } from '../fieldMerge';
 import { correctFieldValue, dropFieldCorrection, keepFieldCorrection, listFieldConflicts, reprojectField } from './fieldValues';
+import { PROVENANCE_SCHEMES, listIdentifierConflicts, resolveIdentifierConflict, type IdentifierConflictKind } from './identifierProvenance';
 
 interface FieldConflictItem {
   personId: string;
@@ -23,6 +24,21 @@ interface FieldConflictItem {
 }
 
 type FieldConflictAction = 'keep' | 'drop' | 'correct';
+
+/** An identifier to review (lot 4 b): set aside by a person but brought again by a source, or still shown. */
+export interface IdentifierConflictItem {
+  personId: string;
+  recordId: number | null;
+  uid: string;
+  name: string;
+  labs: string[];
+  scheme: string;
+  value: string;
+  kind: IdentifierConflictKind;
+  rejectedBy: string | null;
+  rejectedAt: string | null;
+  sources: { source: string; at: string }[];
+}
 
 /** A file or site import (import_batch of kind `import`) and the values it still brings (case 19 of the plan). */
 export interface FieldImportItem {
@@ -79,6 +95,41 @@ export const createFieldConflictsStore = (db: Db) => ({
         conflicts: resolution.conflicts.map((c) => ({ source: c.source, value: c.value, observedAt: c.observedAt, kind: c.kind })),
       };
     }).sort((a, b) => a.name.localeCompare(b.name, 'fr') || a.field.localeCompare(b.field));
+  },
+
+  /** Identifiers to review, with the record to open. */
+  async identifierConflicts(): Promise<IdentifierConflictItem[]> {
+    const found = await listIdentifierConflicts(db as any);
+    if (!found.length) return [];
+    const ids = [...new Set(found.map((f) => f.personId))];
+    const [persons, memberships] = await Promise.all([
+      db.selectFrom('person').select(['id', 'uid', 'last_name', 'first_name']).where('id', 'in', ids).execute(),
+      db.selectFrom('membership').select(['id', 'person_id', 'lab_label']).where('person_id', 'in', ids).orderBy('id').execute(),
+    ]);
+    const personOf = new Map(persons.map((p) => [p.id, p]));
+    return found.map((f) => {
+      const p = personOf.get(f.personId);
+      const rows = memberships.filter((m) => m.person_id === f.personId);
+      return {
+        ...f,
+        recordId: rows.length ? Number(rows[0].id) : null,
+        uid: p?.uid ?? '',
+        name: p ? `${String(p.last_name).toUpperCase()} ${p.first_name ?? ''}`.trim() : f.personId,
+        labs: [...new Set(rows.map((r) => r.lab_label).filter((l): l is string => !!l))],
+      };
+    }).sort((a, b) => a.name.localeCompare(b.name, 'fr') || a.scheme.localeCompare(b.scheme));
+  },
+
+  /** Keeps the rejection of an identifier, or accepts the value; audited under `actor`. */
+  async resolveIdentifier(input: { personId?: unknown; scheme?: unknown; value?: unknown; action?: unknown }, actor: string): Promise<void> {
+    const personId = typeof input.personId === 'string' ? input.personId : '';
+    const scheme = typeof input.scheme === 'string' ? input.scheme : '';
+    const value = typeof input.value === 'string' ? input.value.trim() : '';
+    const action = input.action as 'keep' | 'accept';
+    if (!/^[0-9a-f-]{36}$/i.test(personId) || !(PROVENANCE_SCHEMES as readonly string[]).includes(scheme) || !value || !['keep', 'accept'].includes(action)) {
+      throw new ApiError(400, 'Invalid source conflict decision');
+    }
+    await asActor(db, actor, (trx) => resolveIdentifierConflict(trx, personId, scheme, value, action, actor));
   },
 
   /** The latest file and site imports, with the values each still brings. */

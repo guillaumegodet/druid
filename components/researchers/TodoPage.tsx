@@ -6,7 +6,7 @@ import { DuplicatesPage } from './DuplicatesPage';
 import { TasksPage } from './TasksPage';
 import { ImportConflictsPage } from './ImportConflictsPage';
 import { FieldConflictsPage } from './FieldConflictsPage';
-import type { FieldConflict } from '../../lib/fieldConflicts';
+import type { FieldConflict, IdentifierConflict } from '../../lib/fieldConflicts';
 import type { ConflictTable } from '../../lib/importConflicts';
 import { HelpButton } from '../HelpButton';
 import { TODO_TAB_HELP } from '../../lib/helpLinks';
@@ -31,7 +31,7 @@ interface Props {
   onOpenConflictRecord: (record: number, uid: string) => void;
   onConflictsResolved: () => void;
   /** Source conflicts (fields merged by source, PostgreSQL): the tab shows when the storage has them. */
-  fieldConflicts: { available: boolean; items: FieldConflict[]; reload: () => Promise<void> };
+  fieldConflicts: { available: boolean; items: FieldConflict[]; identifiers: IdentifierConflict[]; reload: () => Promise<void> };
 }
 
 /**
@@ -93,7 +93,7 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
               )}
               {withSources && (
                 <button onClick={() => onTabChange('sources')} className={tabCls(tab === 'sources')} title={t`Manual corrections contradicted by a source since`}>
-                  <GitMerge className="w-4 h-4" /> <Trans>Source conflicts</Trans> {counter(fieldConflicts.items.length)}
+                  <GitMerge className="w-4 h-4" /> <Trans>Source conflicts</Trans> {counter(fieldConflicts.items.length + fieldConflicts.identifiers.length)}
                 </button>
               )}
             </>
@@ -102,7 +102,7 @@ export const TodoPage: React.FC<Props> = ({ tab: requestedTab, onTabChange, dupl
       </header>
       {tab === 'doublons' ? <DuplicatesPage embedded {...duplicates} />
         : tab === 'taches' ? <TasksPage {...tasks} />
-          : tab === 'sources' ? <FieldConflictsPage items={fieldConflicts.items} onReload={fieldConflicts.reload} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />
+          : tab === 'sources' ? <FieldConflictsPage items={fieldConflicts.items} identifiers={fieldConflicts.identifiers} onReload={fieldConflicts.reload} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />
           : <ImportConflictsPage tables={conflictTables} onOpenResearcher={onOpenConflictRecord} onResolved={onConflictsResolved} />}
     </div>
   );

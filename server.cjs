@@ -2434,9 +2434,10 @@ const withConflicts = (handler) => async (req, res) => {
 // source contradicts since they were made. PostgreSQL only: elsewhere the list is empty and the tab stays hidden.
 app.get('/api/field-conflicts', requireSuperAdmin, async (req, res) => {
   const store = storage().fieldConflicts;
-  if (!store) return res.json({ available: false, items: [] });
+  if (!store) return res.json({ available: false, items: [], identifiers: [] });
   try {
-    res.json({ available: true, items: await store.list() });
+    const [items, identifiers] = await Promise.all([store.list(), store.identifierConflicts()]);
+    res.json({ available: true, items, identifiers });
   } catch (e) {
     console.error('[field-conflicts] list failed:', e.message);
     res.status(500).json({ error: e.message });
@@ -2450,6 +2451,19 @@ app.post('/api/field-conflicts/resolve', requireSuperAdmin, async (req, res) => 
     res.json({ ok: true });
   } catch (e) {
     if (!e.status) console.error('[field-conflicts] resolve failed:', e.message);
+    res.status(e.status || 500).json({ error: e.message });
+  }
+});
+
+// Identifier set aside but brought again or still shown: keep the rejection or accept the value (lot 4 b).
+app.post('/api/field-conflicts/identifier', requireSuperAdmin, async (req, res) => {
+  const store = storage().fieldConflicts;
+  if (!store) return res.status(501).json({ error: 'Source conflicts need the PostgreSQL storage' });
+  try {
+    await store.resolveIdentifier(req.body || {}, req.session.user.preferred_username);
+    res.json({ ok: true });
+  } catch (e) {
+    if (!e.status) console.error('[field-conflicts] identifier failed:', e.message);
     res.status(e.status || 500).json({ error: e.message });
   }
 });

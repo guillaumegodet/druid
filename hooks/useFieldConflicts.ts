@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { FieldConflictsApi, type FieldConflict } from '../lib/fieldConflicts';
+import { FieldConflictsApi, type FieldConflict, type IdentifierConflict } from '../lib/fieldConflicts';
 
 /**
  * Source conflicts (druid-internal `docs/plan-maj-chercheurs.md`, lot 2 d) for the « To process › Source conflicts »
@@ -8,6 +8,7 @@ import { FieldConflictsApi, type FieldConflict } from '../lib/fieldConflicts';
  */
 export function useFieldConflicts(enabled: boolean) {
   const [items, setItems] = useState<FieldConflict[]>([]);
+  const [identifiers, setIdentifiers] = useState<IdentifierConflict[]>([]);
   const [available, setAvailable] = useState(false);
 
   const reload = useCallback(async () => {
@@ -16,10 +17,11 @@ export function useFieldConflicts(enabled: boolean) {
       const r = await FieldConflictsApi.list();
       setAvailable(r.available);
       setItems(r.items);
+      setIdentifiers(r.identifiers ?? []);
     } catch (e) { console.warn('Source conflicts:', e); }
   }, [enabled]);
 
   useEffect(() => { reload(); }, [reload]);
 
-  return { items, available, reload, openCount: items.length };
+  return { items, identifiers, available, reload, openCount: items.length + identifiers.length };
 }

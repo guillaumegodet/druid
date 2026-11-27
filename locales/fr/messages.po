@@ -615,8 +615,8 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:191
 #: components/researchers/AlignLaunchModal.tsx:188
-#: components/researchers/FieldConflictsPage.tsx:138
-#: components/researchers/FieldConflictsPage.tsx:179
+#: components/researchers/FieldConflictsPage.tsx:199
+#: components/researchers/FieldConflictsPage.tsx:240
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
@@ -815,7 +815,7 @@ msgstr "Export PDF"
 #: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
 #: components/reports/ShareDialog.tsx:194
-#: components/researchers/FieldConflictsPage.tsx:136
+#: components/researchers/FieldConflictsPage.tsx:197
 msgid "Save"
 msgstr "Enregistrer"
 
@@ -1315,7 +1315,7 @@ msgstr "Programmes de financement connus de cette instance. Un programme actif v
 #: components/researchers/AffiliationHistorySection.tsx:204
 #: components/researchers/DuplicatesPage.tsx:118
 #: components/researchers/DuplicatesPage.tsx:131
-#: components/researchers/FieldConflictsPage.tsx:84
+#: components/researchers/FieldConflictsPage.tsx:106
 #: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/LdapMovesPanel.tsx:124
 #: components/researchers/TasksPage.tsx:132
@@ -2319,7 +2319,7 @@ msgstr "Ligne"
 #: components/dashboard/NewsTab.tsx:681
 #: components/dashboard/PublicationsListTab.tsx:438
 #: components/dashboard/report/reportTables.ts:57
-#: lib/fieldConflicts.ts:53
+#: lib/fieldConflicts.ts:68
 #: lib/importConflicts.ts:62
 msgid "Title"
 msgstr "Titre"
@@ -2932,7 +2932,7 @@ msgid "Confidence of the automatic classification"
 msgstr "Confiance de la classification automatique"
 
 #: components/dashboard/AxisReviewTable.tsx:130
-#: lib/fieldConflicts.ts:40
+#: lib/fieldConflicts.ts:55
 msgid "Corrected"
 msgstr "Corrigée"
 
@@ -3060,7 +3060,7 @@ msgstr "L'axe automatique est juste"
 
 #: components/dashboard/AxisReviewTable.tsx:271
 #: components/dashboard/MediaSourcesAdmin.tsx:251
-#: components/researchers/FieldConflictsPage.tsx:177
+#: components/researchers/FieldConflictsPage.tsx:238
 #: components/researchers/ImportConflictsPage.tsx:149
 #: components/researchers/alignAtoms.tsx:178
 msgid "Confirm"
@@ -3735,7 +3735,7 @@ msgstr "À vérifier"
 #: components/dashboard/CallCandidates.tsx:147
 #: components/dashboard/CallCandidates.tsx:177
 #: components/researchers/FilterPanel.tsx:272
-#: lib/fieldConflicts.ts:52
+#: lib/fieldConflicts.ts:67
 #: lib/importConflicts.ts:63
 msgid "Grade"
 msgstr "Corps-grade"
@@ -6721,7 +6721,7 @@ msgstr "Laboratoire"
 #: components/researchers/FilterPanel.tsx:183
 #: components/researchers/FilterPanel.tsx:335
 #: components/researchers/GeneralTab.tsx:501
-#: lib/fieldConflicts.ts:54
+#: lib/fieldConflicts.ts:69
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Type d'emploi"
@@ -6825,7 +6825,7 @@ msgstr "Aucune"
 #: components/researchers/FilterPanel.tsx:266
 #: components/researchers/PeopleFileImport.tsx:14
 #: components/researchers/ResearcherTable.tsx:88
-#: lib/fieldConflicts.ts:55
+#: lib/fieldConflicts.ts:70
 #: lib/importConflicts.ts:73
 msgid "Employer"
 msgstr "Employeur"
@@ -12338,86 +12338,119 @@ msgstr "Multi-rattachements qualifiés ({0})"
 msgid "Requalify"
 msgstr "Requalifier"
 
-#: components/researchers/FieldConflictsPage.tsx:44
+#: components/researchers/FieldConflictsPage.tsx:43
+#: components/researchers/IdentifierSourcesPanel.tsx:26
+msgid "Alignment {name}"
+msgstr "Alignement {name}"
+
+#: components/researchers/FieldConflictsPage.tsx:66
 msgid "{n} values removed, {p} records recomputed."
 msgstr "{n} valeurs retirées, {p} fiches recalculées."
 
-#: components/researchers/FieldConflictsPage.tsx:80
+#: components/researchers/FieldConflictsPage.tsx:102
 msgid "A manual correction wins over the imports and the LDAP. A source that changed its value since is listed here: nothing changes until you choose."
 msgstr "Une correction manuelle l’emporte sur les imports et le LDAP. Une source qui a changé de valeur depuis est listée ici : rien ne change tant que vous n’avez pas choisi."
 
-#: components/researchers/FieldConflictsPage.tsx:90
+#: components/researchers/FieldConflictsPage.tsx:113
+msgid "Identifiers set aside"
+msgstr "Identifiants écartés"
+
+#: components/researchers/FieldConflictsPage.tsx:132
+msgid "<0>{value}</0> was set aside by {by} on {on}, and brought again by {sources}: not written."
+msgstr "<0>{value}</0> a été écarté par {by} le {on}, puis rapporté par {sources} : non écrit."
+
+#: components/researchers/FieldConflictsPage.tsx:133
+msgid "<0>{value}</0> was set aside by {by} on {on}, but the record still shows it."
+msgstr "<0>{value}</0> a été écarté par {by} le {on}, mais la fiche l’affiche encore."
+
+#: components/researchers/FieldConflictsPage.tsx:137
+msgid "The value stays set aside (and leaves the record if it still shows it)."
+msgstr "La valeur reste écartée (et quitte la fiche si elle l’affiche encore)."
+
+#: components/researchers/FieldConflictsPage.tsx:138
+msgid "Keep it set aside"
+msgstr "La garder écartée"
+
+#: components/researchers/FieldConflictsPage.tsx:141
+msgid "The rejection is lifted and the value kept in the record."
+msgstr "Le rejet est levé et la valeur gardée dans la fiche."
+
+#: components/researchers/FieldConflictsPage.tsx:142
+msgid "Accept the value"
+msgstr "Accepter la valeur"
+
+#: components/researchers/FieldConflictsPage.tsx:151
 msgid "No source conflict."
 msgstr "Aucun conflit de sources."
 
-#: components/researchers/FieldConflictsPage.tsx:108
+#: components/researchers/FieldConflictsPage.tsx:169
 msgid "Correction: <0>{shown}</0> (by {by} on {on})"
 msgstr "Correction : <0>{shown}</0> (par {by} le {on})"
 
-#: components/researchers/FieldConflictsPage.tsx:116
+#: components/researchers/FieldConflictsPage.tsx:177
 msgid "{source} now gives <0>{value}</0> (since {since}, after the correction)"
 msgstr "{source} donne désormais <0>{value}</0> (depuis le {since}, après la correction)"
 
-#: components/researchers/FieldConflictsPage.tsx:117
+#: components/researchers/FieldConflictsPage.tsx:178
 msgid "{source} changed to <0>{value}</0> (since {since})"
 msgstr "{source} est passé à <0>{value}</0> (depuis le {since})"
 
-#: components/researchers/FieldConflictsPage.tsx:124
+#: components/researchers/FieldConflictsPage.tsx:185
 msgid "The correction stays; the sources as they are now are acknowledged."
 msgstr "La correction reste ; les valeurs actuelles des sources sont prises en compte."
 
-#: components/researchers/FieldConflictsPage.tsx:125
+#: components/researchers/FieldConflictsPage.tsx:186
 msgid "Keep the correction"
 msgstr "Garder la correction"
 
-#: components/researchers/FieldConflictsPage.tsx:128
+#: components/researchers/FieldConflictsPage.tsx:189
 #: components/researchers/GeneralTab.tsx:103
 msgid "The correction is removed: the most trusted source gives the value."
 msgstr "La correction est retirée : la source la plus fiable donne la valeur."
 
-#: components/researchers/FieldConflictsPage.tsx:129
+#: components/researchers/FieldConflictsPage.tsx:190
 #: components/researchers/GeneralTab.tsx:104
 msgid "Back to the sources"
 msgstr "Revenir aux sources"
 
-#: components/researchers/FieldConflictsPage.tsx:134
+#: components/researchers/FieldConflictsPage.tsx:195
 #: components/researchers/FuzzyDateInput.tsx:74
 msgid "YYYY-MM-DD, YYYY-MM or YYYY"
 msgstr "AAAA-MM-JJ, AAAA-MM ou AAAA"
 
-#: components/researchers/FieldConflictsPage.tsx:134
+#: components/researchers/FieldConflictsPage.tsx:195
 msgid "Grade code"
 msgstr "Code du grade"
 
-#: components/researchers/FieldConflictsPage.tsx:142
+#: components/researchers/FieldConflictsPage.tsx:203
 msgid "Another value"
 msgstr "Autre valeur"
 
-#: components/researchers/FieldConflictsPage.tsx:151
+#: components/researchers/FieldConflictsPage.tsx:212
 msgid "Recent imports"
 msgstr "Imports récents"
 
-#: components/researchers/FieldConflictsPage.tsx:153
+#: components/researchers/FieldConflictsPage.tsx:214
 msgid "Cancelling an import removes the values it brought to the date of birth and the grade; the records take the value of the other sources again. The records, memberships and identifiers it created stay."
 msgstr "Annuler un import retire les valeurs qu’il a apportées à la date de naissance et au grade ; les fiches reprennent la valeur des autres sources. Les fiches, appartenances et identifiants qu’il a créés restent."
 
-#: components/researchers/FieldConflictsPage.tsx:168
+#: components/researchers/FieldConflictsPage.tsx:229
 msgid "{when} by {who}"
 msgstr "{when} par {who}"
 
-#: components/researchers/FieldConflictsPage.tsx:170
+#: components/researchers/FieldConflictsPage.tsx:231
 msgid "cancelled on {undoneOn} by {undoneBy}"
 msgstr "annulé le {undoneOn} par {undoneBy}"
 
-#: components/researchers/FieldConflictsPage.tsx:171
+#: components/researchers/FieldConflictsPage.tsx:232
 msgid "{n} values, {p} records"
 msgstr "{n} valeurs, {p} fiches"
 
-#: components/researchers/FieldConflictsPage.tsx:175
+#: components/researchers/FieldConflictsPage.tsx:236
 msgid "Remove these {n} values?"
 msgstr "Retirer ces {n} valeurs ?"
 
-#: components/researchers/FieldConflictsPage.tsx:183
+#: components/researchers/FieldConflictsPage.tsx:244
 msgid "Cancel this import's values"
 msgstr "Annuler les valeurs de cet import"
 
@@ -12673,7 +12706,7 @@ msgid "Nationality"
 msgstr "Nationalité"
 
 #: components/researchers/GeneralTab.tsx:419
-#: lib/fieldConflicts.ts:51
+#: lib/fieldConflicts.ts:66
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date de naissance"
@@ -12722,7 +12755,7 @@ msgid "— Undefined —"
 msgstr "— Non défini —"
 
 #: components/researchers/GeneralTab.tsx:539
-#: lib/fieldConflicts.ts:56
+#: lib/fieldConflicts.ts:71
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Début d'emploi"
@@ -12732,7 +12765,7 @@ msgid "Contract / employment dates (employment_* fields), distinct from the lab 
 msgstr "Dates du contrat / de l'emploi (champs employment_*), distinctes des dates d'appartenance au labo saisies dans la carte Appartenances. Date imprécise acceptée : AAAA ou AAAA-MM."
 
 #: components/researchers/GeneralTab.tsx:552
-#: lib/fieldConflicts.ts:57
+#: lib/fieldConflicts.ts:72
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Fin d'emploi"
@@ -12794,10 +12827,6 @@ msgstr "Sélectionnez ou créez…"
 #: components/researchers/GroupModal.tsx:60
 msgid "{selectedCount, plural, one {# researcher selected} other {# researchers selected}}"
 msgstr "{selectedCount, plural, one {# chercheur sélectionné} other {# chercheurs sélectionnés}}"
-
-#: components/researchers/IdentifierSourcesPanel.tsx:26
-msgid "Alignment {name}"
-msgstr "Alignement {name}"
 
 #: components/researchers/IdentifierSourcesPanel.tsx:27
 msgid "Automatic job"
@@ -17457,31 +17486,31 @@ msgstr "Indicateur"
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Annuaire indisponible ({resource}, HTTP {0})."
 
-#: lib/fieldConflicts.ts:41
+#: lib/fieldConflicts.ts:56
 msgid "LDAP"
 msgstr "LDAP"
 
-#: lib/fieldConflicts.ts:42
+#: lib/fieldConflicts.ts:57
 msgid "HR file"
 msgstr "Fichier RH"
 
-#: lib/fieldConflicts.ts:43
+#: lib/fieldConflicts.ts:58
 msgid "Lab file"
 msgstr "Fichier labo"
 
-#: lib/fieldConflicts.ts:44
+#: lib/fieldConflicts.ts:59
 msgid "Lab website"
 msgstr "Site du labo"
 
-#: lib/fieldConflicts.ts:45
+#: lib/fieldConflicts.ts:60
 msgid "Partner directory"
 msgstr "Annuaire partenaire"
 
-#: lib/fieldConflicts.ts:46
+#: lib/fieldConflicts.ts:61
 msgid "Before tracking"
 msgstr "Avant suivi"
 
-#: lib/fieldConflicts.ts:47
+#: lib/fieldConflicts.ts:62
 msgid "Merged record"
 msgstr "Fiche fusionnée"
 

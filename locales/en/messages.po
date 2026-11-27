@@ -615,8 +615,8 @@ msgstr "The group will be kept as soon as it has at least one member."
 #: components/reports/ReportsPage.tsx:188
 #: components/reports/ShareDialog.tsx:191
 #: components/researchers/AlignLaunchModal.tsx:188
-#: components/researchers/FieldConflictsPage.tsx:138
-#: components/researchers/FieldConflictsPage.tsx:179
+#: components/researchers/FieldConflictsPage.tsx:199
+#: components/researchers/FieldConflictsPage.tsx:240
 #: components/researchers/GroupModal.tsx:64
 #: components/researchers/ImportConflictsPage.tsx:151
 #: components/researchers/ImportConflictsPage.tsx:217
@@ -815,7 +815,7 @@ msgstr "Export PDF"
 #: components/dashboard/AxisReviewTable.tsx:262
 #: components/dashboard/NewsletterPanel.tsx:351
 #: components/reports/ShareDialog.tsx:194
-#: components/researchers/FieldConflictsPage.tsx:136
+#: components/researchers/FieldConflictsPage.tsx:197
 msgid "Save"
 msgstr "Save"
 
@@ -1315,7 +1315,7 @@ msgstr "Funding programmes known to this instance. An active programme has its c
 #: components/researchers/AffiliationHistorySection.tsx:204
 #: components/researchers/DuplicatesPage.tsx:118
 #: components/researchers/DuplicatesPage.tsx:131
-#: components/researchers/FieldConflictsPage.tsx:84
+#: components/researchers/FieldConflictsPage.tsx:106
 #: components/researchers/ImportConflictsPage.tsx:117
 #: components/researchers/LdapMovesPanel.tsx:124
 #: components/researchers/TasksPage.tsx:132
@@ -2319,7 +2319,7 @@ msgstr "Row"
 #: components/dashboard/NewsTab.tsx:681
 #: components/dashboard/PublicationsListTab.tsx:438
 #: components/dashboard/report/reportTables.ts:57
-#: lib/fieldConflicts.ts:53
+#: lib/fieldConflicts.ts:68
 #: lib/importConflicts.ts:62
 msgid "Title"
 msgstr "Title"
@@ -2932,7 +2932,7 @@ msgid "Confidence of the automatic classification"
 msgstr "Confidence of the automatic classification"
 
 #: components/dashboard/AxisReviewTable.tsx:130
-#: lib/fieldConflicts.ts:40
+#: lib/fieldConflicts.ts:55
 msgid "Corrected"
 msgstr "Corrected"
 
@@ -3060,7 +3060,7 @@ msgstr "The automatic axis is right"
 
 #: components/dashboard/AxisReviewTable.tsx:271
 #: components/dashboard/MediaSourcesAdmin.tsx:251
-#: components/researchers/FieldConflictsPage.tsx:177
+#: components/researchers/FieldConflictsPage.tsx:238
 #: components/researchers/ImportConflictsPage.tsx:149
 #: components/researchers/alignAtoms.tsx:178
 msgid "Confirm"
@@ -3735,7 +3735,7 @@ msgstr "To check"
 #: components/dashboard/CallCandidates.tsx:147
 #: components/dashboard/CallCandidates.tsx:177
 #: components/researchers/FilterPanel.tsx:272
-#: lib/fieldConflicts.ts:52
+#: lib/fieldConflicts.ts:67
 #: lib/importConflicts.ts:63
 msgid "Grade"
 msgstr "Grade"
@@ -6721,7 +6721,7 @@ msgstr "Lab"
 #: components/researchers/FilterPanel.tsx:183
 #: components/researchers/FilterPanel.tsx:335
 #: components/researchers/GeneralTab.tsx:501
-#: lib/fieldConflicts.ts:54
+#: lib/fieldConflicts.ts:69
 #: lib/importConflicts.ts:64
 msgid "Employment type"
 msgstr "Employment type"
@@ -6825,7 +6825,7 @@ msgstr "None"
 #: components/researchers/FilterPanel.tsx:266
 #: components/researchers/PeopleFileImport.tsx:14
 #: components/researchers/ResearcherTable.tsx:88
-#: lib/fieldConflicts.ts:55
+#: lib/fieldConflicts.ts:70
 #: lib/importConflicts.ts:73
 msgid "Employer"
 msgstr "Employer"
@@ -12338,86 +12338,119 @@ msgstr "Qualified multiple affiliations ({0})"
 msgid "Requalify"
 msgstr "Requalify"
 
-#: components/researchers/FieldConflictsPage.tsx:44
+#: components/researchers/FieldConflictsPage.tsx:43
+#: components/researchers/IdentifierSourcesPanel.tsx:26
+msgid "Alignment {name}"
+msgstr "Alignment {name}"
+
+#: components/researchers/FieldConflictsPage.tsx:66
 msgid "{n} values removed, {p} records recomputed."
 msgstr "{n} values removed, {p} records recomputed."
 
-#: components/researchers/FieldConflictsPage.tsx:80
+#: components/researchers/FieldConflictsPage.tsx:102
 msgid "A manual correction wins over the imports and the LDAP. A source that changed its value since is listed here: nothing changes until you choose."
 msgstr "A manual correction wins over the imports and the LDAP. A source that changed its value since is listed here: nothing changes until you choose."
 
-#: components/researchers/FieldConflictsPage.tsx:90
+#: components/researchers/FieldConflictsPage.tsx:113
+msgid "Identifiers set aside"
+msgstr "Identifiers set aside"
+
+#: components/researchers/FieldConflictsPage.tsx:132
+msgid "<0>{value}</0> was set aside by {by} on {on}, and brought again by {sources}: not written."
+msgstr "<0>{value}</0> was set aside by {by} on {on}, and brought again by {sources}: not written."
+
+#: components/researchers/FieldConflictsPage.tsx:133
+msgid "<0>{value}</0> was set aside by {by} on {on}, but the record still shows it."
+msgstr "<0>{value}</0> was set aside by {by} on {on}, but the record still shows it."
+
+#: components/researchers/FieldConflictsPage.tsx:137
+msgid "The value stays set aside (and leaves the record if it still shows it)."
+msgstr "The value stays set aside (and leaves the record if it still shows it)."
+
+#: components/researchers/FieldConflictsPage.tsx:138
+msgid "Keep it set aside"
+msgstr "Keep it set aside"
+
+#: components/researchers/FieldConflictsPage.tsx:141
+msgid "The rejection is lifted and the value kept in the record."
+msgstr "The rejection is lifted and the value kept in the record."
+
+#: components/researchers/FieldConflictsPage.tsx:142
+msgid "Accept the value"
+msgstr "Accept the value"
+
+#: components/researchers/FieldConflictsPage.tsx:151
 msgid "No source conflict."
 msgstr "No source conflict."
 
-#: components/researchers/FieldConflictsPage.tsx:108
+#: components/researchers/FieldConflictsPage.tsx:169
 msgid "Correction: <0>{shown}</0> (by {by} on {on})"
 msgstr "Correction: <0>{shown}</0> (by {by} on {on})"
 
-#: components/researchers/FieldConflictsPage.tsx:116
+#: components/researchers/FieldConflictsPage.tsx:177
 msgid "{source} now gives <0>{value}</0> (since {since}, after the correction)"
 msgstr "{source} now gives <0>{value}</0> (since {since}, after the correction)"
 
-#: components/researchers/FieldConflictsPage.tsx:117
+#: components/researchers/FieldConflictsPage.tsx:178
 msgid "{source} changed to <0>{value}</0> (since {since})"
 msgstr "{source} changed to <0>{value}</0> (since {since})"
 
-#: components/researchers/FieldConflictsPage.tsx:124
+#: components/researchers/FieldConflictsPage.tsx:185
 msgid "The correction stays; the sources as they are now are acknowledged."
 msgstr "The correction stays; the sources as they are now are acknowledged."
 
-#: components/researchers/FieldConflictsPage.tsx:125
+#: components/researchers/FieldConflictsPage.tsx:186
 msgid "Keep the correction"
 msgstr "Keep the correction"
 
-#: components/researchers/FieldConflictsPage.tsx:128
+#: components/researchers/FieldConflictsPage.tsx:189
 #: components/researchers/GeneralTab.tsx:103
 msgid "The correction is removed: the most trusted source gives the value."
 msgstr "The correction is removed: the most trusted source gives the value."
 
-#: components/researchers/FieldConflictsPage.tsx:129
+#: components/researchers/FieldConflictsPage.tsx:190
 #: components/researchers/GeneralTab.tsx:104
 msgid "Back to the sources"
 msgstr "Back to the sources"
 
-#: components/researchers/FieldConflictsPage.tsx:134
+#: components/researchers/FieldConflictsPage.tsx:195
 #: components/researchers/FuzzyDateInput.tsx:74
 msgid "YYYY-MM-DD, YYYY-MM or YYYY"
 msgstr "YYYY-MM-DD, YYYY-MM or YYYY"
 
-#: components/researchers/FieldConflictsPage.tsx:134
+#: components/researchers/FieldConflictsPage.tsx:195
 msgid "Grade code"
 msgstr "Grade code"
 
-#: components/researchers/FieldConflictsPage.tsx:142
+#: components/researchers/FieldConflictsPage.tsx:203
 msgid "Another value"
 msgstr "Another value"
 
-#: components/researchers/FieldConflictsPage.tsx:151
+#: components/researchers/FieldConflictsPage.tsx:212
 msgid "Recent imports"
 msgstr "Recent imports"
 
-#: components/researchers/FieldConflictsPage.tsx:153
+#: components/researchers/FieldConflictsPage.tsx:214
 msgid "Cancelling an import removes the values it brought to the date of birth and the grade; the records take the value of the other sources again. The records, memberships and identifiers it created stay."
 msgstr "Cancelling an import removes the values it brought to the date of birth and the grade; the records take the value of the other sources again. The records, memberships and identifiers it created stay."
 
-#: components/researchers/FieldConflictsPage.tsx:168
+#: components/researchers/FieldConflictsPage.tsx:229
 msgid "{when} by {who}"
 msgstr "{when} by {who}"
 
-#: components/researchers/FieldConflictsPage.tsx:170
+#: components/researchers/FieldConflictsPage.tsx:231
 msgid "cancelled on {undoneOn} by {undoneBy}"
 msgstr "cancelled on {undoneOn} by {undoneBy}"
 
-#: components/researchers/FieldConflictsPage.tsx:171
+#: components/researchers/FieldConflictsPage.tsx:232
 msgid "{n} values, {p} records"
 msgstr "{n} values, {p} records"
 
-#: components/researchers/FieldConflictsPage.tsx:175
+#: components/researchers/FieldConflictsPage.tsx:236
 msgid "Remove these {n} values?"
 msgstr "Remove these {n} values?"
 
-#: components/researchers/FieldConflictsPage.tsx:183
+#: components/researchers/FieldConflictsPage.tsx:244
 msgid "Cancel this import's values"
 msgstr "Cancel this import's values"
 
@@ -12673,7 +12706,7 @@ msgid "Nationality"
 msgstr "Nationality"
 
 #: components/researchers/GeneralTab.tsx:419
-#: lib/fieldConflicts.ts:51
+#: lib/fieldConflicts.ts:66
 #: lib/importConflicts.ts:65
 msgid "Date of birth"
 msgstr "Date of birth"
@@ -12722,7 +12755,7 @@ msgid "— Undefined —"
 msgstr "— Undefined —"
 
 #: components/researchers/GeneralTab.tsx:539
-#: lib/fieldConflicts.ts:56
+#: lib/fieldConflicts.ts:71
 #: lib/importConflicts.ts:71
 msgid "Employment start"
 msgstr "Employment start"
@@ -12732,7 +12765,7 @@ msgid "Contract / employment dates (employment_* fields), distinct from the lab 
 msgstr "Contract / employment dates (employment_* fields), distinct from the lab membership dates entered in the Memberships card. Imprecise dates accepted: YYYY or YYYY-MM."
 
 #: components/researchers/GeneralTab.tsx:552
-#: lib/fieldConflicts.ts:57
+#: lib/fieldConflicts.ts:72
 #: lib/importConflicts.ts:72
 msgid "Employment end"
 msgstr "Employment end"
@@ -12794,10 +12827,6 @@ msgstr "Select or create…"
 #: components/researchers/GroupModal.tsx:60
 msgid "{selectedCount, plural, one {# researcher selected} other {# researchers selected}}"
 msgstr "{selectedCount, plural, one {# researcher selected} other {# researchers selected}}"
-
-#: components/researchers/IdentifierSourcesPanel.tsx:26
-msgid "Alignment {name}"
-msgstr "Alignment {name}"
 
 #: components/researchers/IdentifierSourcesPanel.tsx:27
 msgid "Automatic job"
@@ -17457,31 +17486,31 @@ msgstr "Indicator"
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Directory unavailable ({resource}, HTTP {0})."
 
-#: lib/fieldConflicts.ts:41
+#: lib/fieldConflicts.ts:56
 msgid "LDAP"
 msgstr "LDAP"
 
-#: lib/fieldConflicts.ts:42
+#: lib/fieldConflicts.ts:57
 msgid "HR file"
 msgstr "HR file"
 
-#: lib/fieldConflicts.ts:43
+#: lib/fieldConflicts.ts:58
 msgid "Lab file"
 msgstr "Lab file"
 
-#: lib/fieldConflicts.ts:44
+#: lib/fieldConflicts.ts:59
 msgid "Lab website"
 msgstr "Lab website"
 
-#: lib/fieldConflicts.ts:45
+#: lib/fieldConflicts.ts:60
 msgid "Partner directory"
 msgstr "Partner directory"
 
-#: lib/fieldConflicts.ts:46
+#: lib/fieldConflicts.ts:61
 msgid "Before tracking"
 msgstr "Before tracking"
 
-#: lib/fieldConflicts.ts:47
+#: lib/fieldConflicts.ts:62
 msgid "Merged record"
 msgstr "Merged record"
 

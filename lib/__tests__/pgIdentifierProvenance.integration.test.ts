@@ -8,6 +8,7 @@ import type { CommandContext } from '../directory/commands';
 import { createPgDirectoryCommands } from '../directory/pg/commands';
 import { createPgDirectoryRepository } from '../directory/pg/repository';
 import { writeRecordFields } from '../directory/pg/recordFields';
+import { createFieldConflictsStore } from '../directory/pg/fieldConflicts';
 
 const url = process.env.DATABASE_URL_APP;
 const db = url ? createDb({ connectionString: url, max: 2 }) : null;
@@ -81,6 +82,50 @@ describe.skipIf(!url)('identifier provenance', () => {
       const r4 = await read();
       await commands.updatePerson(recordId, { ...r4, identifiers: { ...r4.identifiers, orcid: '0000-0002-0000-0001' } }, ctx);
       expect((await rejected()).map((r) => r.candidate_id)).toEqual(['0000-0002-0000-0002']);
+    });
+  });
+
+  it('an import never writes back a value set aside: a conflict to keep or accept', async () => {
+    await inRollback(async (trx) => {
+      const id = (await trx.insertInto('person').values({ last_name: 'Lovelace', first_name: 'Ada', uid: 'test-lovelace-a' } as any)
+        .returning('id').executeTakeFirstOrThrow()).id;
+      const recordId = Number((await trx.insertInto('membership').values({ person_id: id, lab_label: 'LABX' } as any)
+        .returning('id').executeTakeFirstOrThrow()).id);
+      const repository = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository, today: () => '2026-11-27' });
+      const store = createFieldConflictsStore(trx as any);
+      const read = async () => { repository.invalidate(); return (await repository.people(ALL)).items.find((p) => p.uid === 'test-lovelace-a')!; };
+      const orcid = async () => (await trx.selectFrom('person_identifier').select('value').where('person_id', '=', id).where('scheme', '=', 'orcid').execute())
+        .map((r) => r.value);
+      const mine = async () => (await store.identifierConflicts()).filter((c) => c.personId === id);
+
+      // Typed, then removed in the record: « Rejeté ».
+      const r0 = await read();
+      await commands.updatePerson(recordId, { ...r0, identifiers: { ...r0.identifiers, orcid: '0000-0003-0000-0001' } }, ctx);
+      const r1 = await read();
+      await commands.updatePerson(recordId, { ...r1, identifiers: { ...r1.identifiers, orcid: '' } }, ctx);
+      // The decision dates from before the import (a transaction has a single now()).
+      await trx.updateTable('alignment_candidate').set({ decided_at: '2026-01-01T00:00:00Z' } as any).where('person_id', '=', id).execute();
+      // A lab file brings it back: not written, a conflict.
+      const r2 = await read();
+      await commands.updatePerson(recordId, { ...r2, identifiers: { ...r2.identifiers, orcid: '0000-0003-0000-0001' } }, { ...ctx, identifierSource: 'lab_file' });
+      expect(await orcid()).toEqual([]);
+      expect((await mine()).map((c) => [c.scheme, c.value, c.kind, c.sources.map((s) => s.source)])).toEqual([['orcid', '0000-0003-0000-0001', 'brought_again', ['lab_file']]]);
+
+      // Kept set aside: no conflict, and the same file imported again raises none.
+      await store.resolveIdentifier({ personId: id, scheme: 'orcid', value: '0000-0003-0000-0001', action: 'keep' }, 'test.user');
+      expect(await mine()).toEqual([]);
+      const r3 = await read();
+      await commands.updatePerson(recordId, { ...r3, identifiers: { ...r3.identifiers, orcid: '0000-0003-0000-0001' } }, { ...ctx, identifierSource: 'lab_file' });
+      expect([await orcid(), await mine()]).toEqual([[], []]);
+
+      // Accepted after all: written as primary, rejection lifted.
+      await trx.updateTable('alignment_candidate').set({ decided_at: '2026-01-01T00:00:00Z' } as any).where('person_id', '=', id).execute();
+      await trx.updateTable('person_identifier_source').set({ asserted_at: '2026-02-01T00:00:00Z' } as any).where('person_id', '=', id).where('source', '=', 'lab_file').execute();
+      expect((await mine()).length).toBe(1);
+      await store.resolveIdentifier({ personId: id, scheme: 'orcid', value: '0000-0003-0000-0001', action: 'accept' }, 'test.user');
+      expect([await orcid(), await mine()]).toEqual([['0000-0003-0000-0001'], []]);
+      expect(await trx.selectFrom('alignment_candidate').select('id').where('person_id', '=', id).execute()).toEqual([]);
     });
   });
 
