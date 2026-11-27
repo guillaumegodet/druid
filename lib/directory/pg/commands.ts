@@ -26,6 +26,7 @@ import { structureCreateFields, structureUpdateFields } from '../structureWrite'
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
 import { actorOf, liftRejection, readIdentifierSources, recordIdentifierValues, rejectedValues, rememberRemovedIdentifiers } from './identifierProvenance';
+import { SOURCE_PROFILES, SourceOrderError, applySourceOrder, previewSourceOrder, readSourceOrders } from './sourcePriorities';
 import { dropFieldCorrection as dropCorrection, moveFieldValues, readFieldSources, writeMergedField } from './fieldValues';
 import { FieldValueError, MERGED_FIELDS } from '../fieldMerge';
 import { resolveGrade } from '../../emeritus';
@@ -293,6 +294,24 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       }
     }
   };
+  /** An invalid order of sources is a 400. */
+  const orderCall = async <T>(fn: () => Promise<T>): Promise<T> => {
+    try { return await fn(); } catch (e) {
+      if (e instanceof SourceOrderError) throw new ApiError(400, e.message);
+      throw e;
+    }
+  };
+  /** Effect of an order with the persons' names (and the institutions' names for the employer). */
+  const named = async (trx: Transaction<DB>, effect: { persons: number; changed: number; examples: { personId: string; before: string | null; after: string | null }[] }, field: string) => {
+    const ids = effect.examples.map((e) => e.personId);
+    const persons = ids.length ? await trx.selectFrom('person').select(['id', 'last_name', 'first_name']).where('id', 'in', ids).execute() : [];
+    const nameOf = new Map(persons.map((p) => [p.id, `${String(p.last_name).toUpperCase()} ${p.first_name ?? ''}`.trim()]));
+    const label = field === 'employer_id' ? await employerNames(trx) : (v: string | null) => v;
+    return {
+      persons: effect.persons, changed: effect.changed,
+      examples: effect.examples.map((e) => ({ name: nameOf.get(e.personId) ?? '', before: label(e.before), after: label(e.after) })),
+    };
+  };
   /** Name of an institution by id (the employer merged by source is stored as an id). */
   const employerNames = async (trx: Transaction<DB>) => {
     const rows = await trx.selectFrom('establishment').select(['id', 'name']).execute();
@@ -375,6 +394,22 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
 
   return {
     annuaireColumns: async () => RECORD_FIELDS,
+
+    // Order of the sources of the fields merged by source (lot 5 of druid-internal `docs/plan-maj-chercheurs.md`).
+    sourceOrders: async (ctx) => {
+      if (!ctx.scope.all) throw new ApiError(403, 'Forbidden');
+      return { fields: await readSourceOrders(db), profiles: SOURCE_PROFILES };
+    },
+    previewSourceOrder: async (field, order, ctx) => {
+      if (!ctx.scope.all) throw new ApiError(403, 'Forbidden');
+      return named(db as any, await orderCall(() => previewSourceOrder(db, field, order)), field);
+    },
+    setSourceOrder: (field, order, ctx) => writing(ctx, async (trx) => {
+      if (!ctx.scope.all) throw new ApiError(403, 'Forbidden');
+      const effect = await orderCall(() => applySourceOrder(trx, field, order));
+      ctx.audit({ table: 'field_source_priority', kind: 'update', rows: [], fields: [field], count: effect.changed });
+      return named(trx, effect, field);
+    }),
 
     // Batch of a file or site import (case 19 of druid-internal `docs/plan-maj-chercheurs.md`).
     openImportBatch: (source, label, ctx) => writing(ctx, async (trx) =>

@@ -75,6 +75,7 @@ export const ADMIN_TAB_HELP: Partial<Record<AdminTab, string>> = {
   media: '/guides/veille/sources-medias/',
   institutions: '/guides/administration/etablissements/',
   calls: '/guides/administration/appels-a-projets/',
+  sources: '/guides/administration/sources-des-fiches/',
 };
 
 /**

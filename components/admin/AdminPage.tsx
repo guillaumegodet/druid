@@ -14,6 +14,7 @@ import { InstitutionsAdmin } from './InstitutionsAdmin';
 import { EstablishmentAdmin } from './EstablishmentAdmin';
 import { CallsProgrammesAdmin } from './CallsProgrammesAdmin';
 import { ManualCallsAdmin } from './ManualCallsAdmin';
+import { SourcePrioritiesAdmin } from './SourcePrioritiesAdmin';
 
 
 /** Last generation of a cdb file (GET /api/sovisu-export-status); null = file absent. */
@@ -86,6 +87,7 @@ export const AdminPage: React.FC<{
     media: <Trans>Media sources</Trans>,
     institutions: <Trans>Institutions</Trans>,
     calls: <Trans>Calls for proposals</Trans>,
+    sources: <Trans>Record sources</Trans>,
   };
   const tabBtn = (active: boolean) =>
     `pill px-4 py-1.5 text-[13px] transition-colors cursor-pointer ${
@@ -154,6 +156,11 @@ export const AdminPage: React.FC<{
       {tab === 'institutions' && (
         <div className="max-w-5xl">
           <InstitutionsAdmin researchers={researchers} />
+        </div>
+      )}
+      {tab === 'sources' && (
+        <div className="max-w-6xl">
+          <SourcePrioritiesAdmin />
         </div>
       )}
       {tab === 'calls' && (

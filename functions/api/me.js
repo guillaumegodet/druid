@@ -56,6 +56,8 @@ export const CAPABILITIES = {
   HAS_TASKS: false,
   // Identifiers of the structures and their alignment: PostgreSQL storage (set per instance below).
   HAS_STRUCTURE_IDS: false,
+  // Order of the sources of the fields merged by source: PostgreSQL storage (set per instance below).
+  HAS_FIELD_SOURCES: false,
   // Calls for proposals, theses of the records (functions/api/calls, functions/api/researchers/*): PostgreSQL storage
   // (set per instance below). The « My project » assistant needs the LLM and embedding services of the Node server.
   HAS_CALLS: false,
@@ -71,6 +73,7 @@ export const capabilitiesFor = (instance) => ({
   ...CAPABILITIES,
   HAS_STATUS_VALIDATION: instance.statusValidation,
   HAS_STRUCTURE_IDS: instance.storage === 'postgres',
+  HAS_FIELD_SOURCES: instance.storage === 'postgres',
   HAS_CALLS: instance.storage === 'postgres',
   HAS_NETWORK_API: !!instance.features?.network,
   READ_ONLY: instance.readOnly,

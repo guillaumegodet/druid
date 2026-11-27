@@ -12,6 +12,16 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Administration › Sources des fiches** (PostgreSQL, droit établissement) : l'ordre de confiance des sources (LDAP,
+  fichier RH, annuaire partenaire, site, fichier d'un labo…) se règle champ par champ ; un aperçu indique combien de
+  fiches changeraient (avec des exemples), l'enregistrement les recalcule et entre au journal. Profils de départ « avec
+  LDAP » et « sans LDAP », export JSON. Un ordre réglé n'est plus modifié par les migrations (`customized`). Aide
+  « Régler l'ordre des sources des fiches ».
+
+### Migration
+- `20261128090000_field_source_priority_audit` (dbmate) : journal d'audit sur `field_source_priority`.
+
 ## [2.23.0] — 2026-11-27
 
 ### Ajouté

@@ -130,6 +130,8 @@ const CAPABILITIES = {
   HAS_CALLS_CHAT: STORAGE_KIND === 'postgres' && !!process.env.ILAAS_API_KEY && !!process.env.EMBEDDING_API_URL && !!process.env.EMBEDDING_API_MODEL,
   // Identifiers of the structures and their alignment (druid-internal docs/plan-druid-saas.md, lot 4): PostgreSQL tables.
   HAS_STRUCTURE_IDS: STORAGE_KIND === 'postgres',
+  // Order of the sources of the fields merged by source (Administration › Record sources): PostgreSQL storage.
+  HAS_FIELD_SOURCES: STORAGE_KIND === 'postgres',
   // Public read-only instance: Cloudflare only (functions/api/me.js, READ_ONLY=true) — the write
   // routes of this server are not guarded by it.
   READ_ONLY: false,

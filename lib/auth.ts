@@ -69,6 +69,9 @@ interface DruidCapabilities {
   /** Identifiers of the structures and their alignment (« Structures » tab of the alignment page, « Identifiers »
    * tab of the structure record; druid-internal docs/plan-druid-saas.md, lot 4): PostgreSQL storage, every runtime. */
   HAS_STRUCTURE_IDS: boolean;
+  /** Order of the sources of the fields merged by source (Administration › Record sources; druid-internal
+   * `docs/plan-maj-chercheurs.md`, lot 5): PostgreSQL storage, every runtime. */
+  HAS_FIELD_SOURCES: boolean;
   /** Public read-only instance (demo on Cloudflare, docs/archive/plan-instance-demo-cloudflare.md):
    * the Grist proxy refuses every write and the UI hides editing. Unlike the HAS_* flags it
    * removes features; false everywhere except where READ_ONLY=true is configured. */
@@ -124,6 +127,7 @@ const EMPTY_CAPABILITIES: DruidCapabilities = {
   HAS_CALLS: false,
   HAS_CALLS_CHAT: false,
   HAS_STRUCTURE_IDS: false,
+  HAS_FIELD_SOURCES: false,
   READ_ONLY: false,
 };
 
@@ -226,7 +230,7 @@ const isMediaAdmin = (): boolean => _userInfo?.access.isMediaAdmin ?? false;
 const canAdminMediaSources = (): boolean => isSuperAdmin() || isMediaAdmin();
 
 /** Tabs of the Administration section available to the user (display order). */
-export type AdminTab = 'establishment' | 'console' | 'rights' | 'media' | 'institutions' | 'calls';
+export type AdminTab = 'establishment' | 'console' | 'rights' | 'media' | 'institutions' | 'calls' | 'sources';
 export const adminTabsFor = (): AdminTab[] => {
   const tabs: AdminTab[] = [];
   // « My institution » of a tenant (druid-internal docs/plan-druid-saas.md, lot 6 a-1): the owners manage it, the
@@ -241,7 +245,9 @@ export const adminTabsFor = (): AdminTab[] => {
   if (isSuperAdmin() && hasCapability('HAS_KEYCLOAK_ADMIN')) tabs.push('rights');
   if (canAdminMediaSources()) tabs.push('media');           // media monitoring sources
   if (canUseEstablishmentTools() && canWrite()) tabs.push('institutions');   // employing institutions (dropdown of the record form)
-  if (canUseEstablishmentTools() && hasCapability('HAS_CALLS')) tabs.push('calls');   // programmes of the calls for proposals and their collections
+  if (canUseEstablishmentTools() && hasCapability('HAS_CALLS')) tabs.push('calls');
+  // Order of the sources of the record fields (druid-internal `docs/plan-maj-chercheurs.md`, lot 5, D6).
+  if (canUseEstablishmentTools() && canWrite() && hasCapability('HAS_FIELD_SOURCES')) tabs.push('sources');   // programmes of the calls for proposals and their collections
   return tabs;
 };
 /** The « Administration » entry of the bar is visible as soon as one tab is available. */
