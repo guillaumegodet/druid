@@ -49,6 +49,18 @@ export interface CommandContext {
   fieldObservation?: { source: string; values: Partial<Record<'birth_date' | 'corps_grade' | 'civility' | 'employment_type' | 'employer_id' | 'employment_start' | 'employment_end', unknown>>; importBatchId?: string | null };
 }
 
+/** Order of the sources of the fields merged by source, and the starting profiles (lot 5). */
+export interface SourceOrders {
+  fields: { field: string; sources: { source: string; rank: number; customized: boolean }[]; unranked: string[] }[];
+  profiles: Record<string, string[]>;
+}
+/** Effect of an order: persons with values, persons whose shown value changes (a few, with their name). */
+export interface SourceOrderEffectView {
+  persons: number;
+  changed: number;
+  examples: { name: string; before: string | null; after: string | null }[];
+}
+
 export interface DirectoryCommands {
   /**
    * PostgreSQL: opens the batch of a file or site import (`import_batch`, kind `import`); the values it observes for
@@ -60,6 +72,13 @@ export interface DirectoryCommands {
    * `docs/plan-maj-chercheurs.md`), each with its value; absent on Grist.
    */
   fieldSources?(recordId: number, ctx: CommandContext): Promise<Record<string, { value: string | null; source: string | null; sources: FieldSourceDetail[] }>>;
+  /**
+   * PostgreSQL, institution scope: order of the sources of each field merged by source (lot 5 of druid-internal
+   * `docs/plan-maj-chercheurs.md`), what a new order would change, and setting it (recomputes the records).
+   */
+  sourceOrders?(ctx: CommandContext): Promise<SourceOrders>;
+  previewSourceOrder?(field: string, order: unknown, ctx: CommandContext): Promise<SourceOrderEffectView>;
+  setSourceOrder?(field: string, order: unknown, ctx: CommandContext): Promise<SourceOrderEffectView>;
   /** PostgreSQL: identifiers of a record's person with the sources that brought them and the values set aside (lot 4 b). */
   identifierSources?(recordId: number, ctx: CommandContext): Promise<Record<string, IdentifierSourceDetail[]>>;
   /** PostgreSQL: « back to the sources » — removes the manual correction of a merged field; returns the new provenance. */

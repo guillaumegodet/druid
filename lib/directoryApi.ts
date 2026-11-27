@@ -3,6 +3,7 @@
 // Druid model and keeps only what the user's rights allow: the browser no longer reads the raw rows.
 import { t } from '@lingui/core/macro';
 import type { FieldProvenance, FieldSourceDetail, IdentifierSourceDetail, Researcher, Structure } from '../types';
+import type { SourceOrderEffectView, SourceOrders } from './directory/commands';
 import type { ValidationInfo } from './validation';
 import type { AnnuaireColumnMeta } from './directory/annuaireWrite';
 import type { InstitutionInput } from './directory/institutionWrite';
@@ -84,6 +85,10 @@ export const DirectoryApi = {
   /** Sources of the fields merged by source of a record (PostgreSQL, druid-internal `docs/plan-maj-chercheurs.md`). */
   fieldSources: (recordId: number) =>
     fetchJson<{ fields: Record<string, { value: string | null; source: string | null; sources: FieldSourceDetail[] }> }>(`people/${recordId}/field-sources`),
+  /** Order of the sources of the record fields (PostgreSQL, institution right; lot 5). */
+  sourceOrders: () => fetchJson<SourceOrders>('source-priorities'),
+  previewSourceOrder: (field: string, order: string[]) => send<SourceOrderEffectView>('POST', `source-priorities/${encodeURIComponent(field)}/preview`, { order }),
+  setSourceOrder: (field: string, order: string[]) => send<SourceOrderEffectView>('PUT', `source-priorities/${encodeURIComponent(field)}`, { order }),
   /** Identifiers of a record and the sources that brought them (PostgreSQL, lot 4 b). */
   identifierSources: (recordId: number) =>
     fetchJson<{ identifiers: Record<string, IdentifierSourceDetail[]> }>(`people/${recordId}/identifier-sources`),

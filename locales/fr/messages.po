@@ -200,6 +200,7 @@ msgstr "Chargement du tableau de bord…"
 #: App.tsx:1037
 #: App.tsx:1050
 #: components/admin/EstablishmentAdmin.tsx:86
+#: components/admin/SourcePrioritiesAdmin.tsx:83
 #: components/dashboard/CallCandidates.tsx:127
 #: components/dashboard/CallCandidates.tsx:165
 #: components/dashboard/EmbedPage.tsx:90
@@ -244,7 +245,7 @@ msgid "Unknown"
 msgstr "Inconnu"
 
 #: components/AccountMenu.tsx:100
-#: components/admin/AdminPage.tsx:110
+#: components/admin/AdminPage.tsx:112
 msgid "Administration"
 msgstr "Administration"
 
@@ -608,6 +609,7 @@ msgstr "Le groupe sera conservé dès qu'il comptera au moins un membre."
 #: components/ResearcherDetail.tsx:599
 #: components/admin/InstitutionsAdmin.tsx:223
 #: components/admin/ManualCallsAdmin.tsx:328
+#: components/admin/SourcePrioritiesAdmin.tsx:136
 #: components/dashboard/AxisReviewTable.tsx:263
 #: components/reports/AddToReportDialog.tsx:192
 #: components/reports/HistoryDialog.tsx:133
@@ -1205,66 +1207,70 @@ msgstr "Précédent"
 msgid "Next"
 msgstr "Suivant"
 
-#: components/admin/AdminPage.tsx:83
+#: components/admin/AdminPage.tsx:84
 msgid "My institution"
 msgstr "Mon établissement"
 
-#: components/admin/AdminPage.tsx:84
+#: components/admin/AdminPage.tsx:85
 msgid "ETL console"
 msgstr "Console ETL"
 
-#: components/admin/AdminPage.tsx:85
+#: components/admin/AdminPage.tsx:86
 msgid "Access rights"
 msgstr "Gestion des droits"
 
-#: components/admin/AdminPage.tsx:86
+#: components/admin/AdminPage.tsx:87
 msgid "Media sources"
 msgstr "Sources médias"
 
-#: components/admin/AdminPage.tsx:87
+#: components/admin/AdminPage.tsx:88
 msgid "Institutions"
 msgstr "Établissements"
 
-#: components/admin/AdminPage.tsx:88
+#: components/admin/AdminPage.tsx:89
 #: components/dashboard/dashboardNav.ts:111
 #: components/researchers/CallsSection.tsx:99
 #: components/saas/PlanOffer.tsx:37
 msgid "Calls for proposals"
 msgstr "Appels à projets"
 
-#: components/admin/AdminPage.tsx:100
+#: components/admin/AdminPage.tsx:90
+msgid "Record sources"
+msgstr "Sources des fiches"
+
+#: components/admin/AdminPage.tsx:102
 msgid "Section reserved for administrators."
 msgstr "Rubrique réservée aux administrateurs."
 
-#: components/admin/AdminPage.tsx:122
+#: components/admin/AdminPage.tsx:124
 msgid "Regenerates structures.csv (from the Directory) then people.csv for cdb / SoVisu+ — outbound flow, nothing written to the Directory"
 msgstr "Régénère structures.csv (depuis l'Annuaire) puis people.csv pour cdb / SoVisu+ — flux sortant, aucune écriture dans l'Annuaire"
 
-#: components/admin/AdminPage.tsx:125
+#: components/admin/AdminPage.tsx:127
 msgid "Synchronise with SoVisu+"
 msgstr "Synchroniser avec SoVisu+"
 
-#: components/admin/AdminPage.tsx:132
+#: components/admin/AdminPage.tsx:134
 msgid "Last export to SoVisu+:"
 msgstr "Dernier export vers SoVisu+ :"
 
 #. placeholder {0}: exportStatus.structures.count
 #. placeholder {1}: formatStatusDate(exportStatus.structures.updatedAt)
-#: components/admin/AdminPage.tsx:134
+#: components/admin/AdminPage.tsx:136
 msgid "structures.csv — {0} structures, {1}"
 msgstr "structures.csv — {0} structures, {1}"
 
-#: components/admin/AdminPage.tsx:135
+#: components/admin/AdminPage.tsx:137
 msgid "structures.csv — never generated"
 msgstr "structures.csv — jamais généré"
 
 #. placeholder {0}: exportStatus.people.count
 #. placeholder {1}: formatStatusDate(exportStatus.people.updatedAt)
-#: components/admin/AdminPage.tsx:138
+#: components/admin/AdminPage.tsx:140
 msgid "people.csv — {0} people, {1}"
 msgstr "people.csv — {0} personnes, {1}"
 
-#: components/admin/AdminPage.tsx:139
+#: components/admin/AdminPage.tsx:141
 msgid "people.csv — never generated"
 msgstr "people.csv — jamais généré"
 
@@ -2439,6 +2445,57 @@ msgstr "Confirmer la suppression"
 #: components/reports/ReportsPage.tsx:200
 msgid "Delete"
 msgstr "Supprimer"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:88
+msgid "For each field, the record shows the value of the most trusted source that gives one. A correction typed in a record always wins and is not part of the order. Changing an order recomputes the records of the field: preview it first."
+msgstr "Pour chaque champ, la fiche affiche la valeur de la source la plus fiable qui en donne une. Une correction saisie dans une fiche l’emporte toujours et ne fait pas partie de l’ordre. Changer un ordre recalcule les fiches du champ : prévisualisez d’abord."
+
+#: components/admin/SourcePrioritiesAdmin.tsx:91
+msgid "Starting profile:"
+msgstr "Profil de départ :"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:92
+msgid "University with an LDAP directory"
+msgstr "Université avec un annuaire LDAP"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:93
+msgid "Without LDAP (HR export first)"
+msgstr "Sans LDAP (export RH d’abord)"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:95
+msgid "Export (JSON)"
+msgstr "Exporter (JSON)"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:116
+#: components/reports/ReportEditor.tsx:468
+msgid "Move up"
+msgstr "Monter"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:117
+#: components/reports/ReportEditor.tsx:469
+msgid "Move down"
+msgstr "Descendre"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:123
+msgid "Not ranked (come last):"
+msgstr "Non classées (en dernier) :"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:131
+#: components/dashboard/NewsletterPanel.tsx:422
+msgid "Preview"
+msgstr "Aperçu"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:134
+msgid "Save and recompute"
+msgstr "Enregistrer et recalculer"
+
+#: components/admin/SourcePrioritiesAdmin.tsx:140
+msgid "{n} of {total} records would change."
+msgstr "{n} fiches sur {total} changeraient."
+
+#: components/admin/SourcePrioritiesAdmin.tsx:148
+msgid "Saved: {m} records recomputed."
+msgstr "Enregistré : {m} fiches recalculées."
 
 #. placeholder {0}: d.year
 #. placeholder {1}: d.total.toLocaleString(numberLocale())
@@ -5971,10 +6028,6 @@ msgstr "Écarter"
 #: components/researchers/TasksPage.tsx:274
 msgid "Reopen"
 msgstr "Rouvrir"
-
-#: components/dashboard/NewsletterPanel.tsx:422
-msgid "Preview"
-msgstr "Aperçu"
 
 #. placeholder {0}: valides.length
 #: components/dashboard/NewsletterPanel.tsx:422
@@ -11181,14 +11234,6 @@ msgstr "Texte"
 #: components/reports/ReportEditor.tsx:453
 msgid "AI text"
 msgstr "Texte IA"
-
-#: components/reports/ReportEditor.tsx:468
-msgid "Move up"
-msgstr "Monter"
-
-#: components/reports/ReportEditor.tsx:469
-msgid "Move down"
-msgstr "Descendre"
 
 #: components/reports/ReportEditor.tsx:470
 msgid "Show in the PDF"
@@ -17479,10 +17524,10 @@ msgid "Indicator"
 msgstr "Indicateur"
 
 #. placeholder {0}: resp.status
-#: lib/directoryApi.ts:28
-#: lib/directoryApi.ts:37
-#: lib/directoryApi.ts:52
-#: lib/directoryApi.ts:73
+#: lib/directoryApi.ts:29
+#: lib/directoryApi.ts:38
+#: lib/directoryApi.ts:53
+#: lib/directoryApi.ts:74
 msgid "Directory unavailable ({resource}, HTTP {0})."
 msgstr "Annuaire indisponible ({resource}, HTTP {0})."
 

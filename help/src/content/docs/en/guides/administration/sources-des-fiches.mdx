@@ -1,0 +1,45 @@
+---
+title: "Set the order of the record sources"
+description: "Choose, field by field, which source to trust first: LDAP, HR file, partner directory, lab website, lab file."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrators (institution right)"
+	menu="Administration › Record sources"
+	disponibilite="instances on PostgreSQL"
+/>
+
+The civil status and the employment of a record (date of birth, grade, title, employment type, employer, employment
+dates) keep the value of **each source**: LDAP directory, HR file, partner directory, lab website, lab file. The record
+shows the value of the **most trusted source** that gives one. This page sets that order, field by field.
+
+## Change the order of a field
+
+1. Move the sources up or down with the arrows. A source that is **not ranked** (at the bottom of the card) comes after
+   all the others; the **+** button adds it to the order.
+2. Click **Preview**: Druid says how many records would change, with a few examples.
+3. Click **Save and recompute**: the records concerned are recomputed at once.
+
+A **starting profile** fills the order of every field at once: « University with an LDAP directory » (the default
+order) or « Without LDAP » (the HR export first). Each field still has to be previewed and saved.
+
+**Export (JSON)** downloads the orders in force, for example to reuse them on another instance.
+
+## What cannot be set
+
+- **A correction typed in a record always wins**, whatever the order: it is not part of it.
+- The rules of each field (precision of the dates, case of the grades) are the same everywhere.
+
+## What happens next
+
+The new order applies at once to the records and to every later import. It is written to the change log. Druid
+updates do not modify it.
+
+## See also
+
+- [Read a record](/en/guides/personnes/lire-une-fiche/#where-the-civil-status-and-employment-values-come-from)
+- [Tasks to process](/en/guides/personnes/taches-a-traiter/#source-conflicts)

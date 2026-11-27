@@ -285,6 +285,11 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!c.env.commands?.identifierSources) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
     return c.json({ identifiers: await c.env.commands.identifierSources(recordId, ctxOf(c)) }, 200, NO_STORE);
   });
+  // Order of the sources of the record fields (PostgreSQL, institution right; lot 5 of `docs/plan-maj-chercheurs.md`).
+  app.get('/source-priorities', async (c) => {
+    if (!c.env.commands?.sourceOrders) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    return c.json(await c.env.commands.sourceOrders(ctxOf(c)), 200, NO_STORE);
+  });
   app.get('/people/rows', async (c) => {
     const ids = String(c.req.query('ids') || '').split(',').filter(Boolean).map(Number);
     if (ids.length === 0 || ids.length > 500 || !ids.every((n) => Number.isInteger(n) && n > 0)) return c.json({ error: 'Invalid record identifiers' }, 400, NO_STORE);
@@ -342,6 +347,17 @@ export const createDirectoryApi = (): Hono<Env> => {
     if (!recordId) return c.json({ error: 'Invalid record' }, 400, NO_STORE);
     if (!c.env.commands!.dropFieldCorrection) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
     return c.json(await c.env.commands!.dropFieldCorrection(recordId, c.req.param('field'), ctxOf(c)), 200, NO_STORE);
+  });
+  // What a new order of sources would change (no write), then setting it (recomputes the records of the field).
+  writes.post('/source-priorities/:field/preview', async (c) => {
+    if (!c.env.commands!.previewSourceOrder) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const body = await c.req.json().catch(() => null) as { order?: unknown } | null;
+    return c.json(await c.env.commands!.previewSourceOrder(c.req.param('field'), body?.order, ctxOf(c)), 200, NO_STORE);
+  });
+  writes.put('/source-priorities/:field', async (c) => {
+    if (!c.env.commands!.setSourceOrder) return c.json({ error: 'Unknown API route' }, 404, NO_STORE);
+    const body = await c.req.json().catch(() => null) as { order?: unknown } | null;
+    return c.json(await c.env.commands!.setSourceOrder(c.req.param('field'), body?.order, ctxOf(c)), 200, NO_STORE);
   });
   writes.patch('/people/:recordId/openalex-id', async (c) => {
     const recordId = recordIdOf(c.req.param('recordId'));

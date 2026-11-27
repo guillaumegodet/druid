@@ -1,0 +1,46 @@
+---
+title: "Régler l'ordre des sources des fiches"
+description: "Choisir, champ par champ, à quelle source faire confiance d'abord : LDAP, fichier RH, annuaire partenaire, site, fichier d'un labo."
+sidebar:
+  order: 4
+---
+
+import QuiOu from '../../../../components/QuiOu.astro';
+
+<QuiOu
+	profils="Administrateurs (droit établissement)"
+	menu="Administration › Sources des fiches"
+	disponibilite="instances sur PostgreSQL"
+/>
+
+L'état civil et l'emploi d'une fiche (date de naissance, grade, civilité, type d'emploi, employeur, dates d'emploi)
+gardent la valeur de **chaque source** : annuaire LDAP, fichier RH, annuaire partenaire, site du labo, fichier d'un
+labo. La fiche affiche celle de la **source la plus fiable** qui en donne une. Cette page règle cet ordre, champ par
+champ.
+
+## Changer l'ordre d'un champ
+
+1. Montez ou descendez les sources avec les flèches. Une source **non classée** (en bas de la carte) passe après
+   toutes les autres ; le bouton **+** l'ajoute à l'ordre.
+2. Cliquez sur **Aperçu** : Druid indique combien de fiches changeraient de valeur, avec quelques exemples.
+3. Cliquez sur **Enregistrer et recalculer** : les fiches concernées sont recalculées tout de suite.
+
+Un **profil de départ** remplit l'ordre de tous les champs d'un coup : « Université avec un annuaire LDAP » (l'ordre
+par défaut) ou « Sans LDAP » (l'export RH d'abord). Il reste à prévisualiser et enregistrer chaque champ.
+
+**Exporter (JSON)** télécharge les ordres en vigueur, par exemple pour les reprendre sur une autre instance.
+
+## Ce qui ne se règle pas
+
+- **Une correction saisie dans une fiche l'emporte toujours**, quel que soit l'ordre : elle n'y figure pas.
+- Les règles de chaque champ (précision des dates, majuscules des grades) sont les mêmes partout.
+
+## Ce qui se passe ensuite
+
+Le nouvel ordre s'applique aussitôt aux fiches et à tous les imports suivants. Il est inscrit au journal des
+modifications. Les mises à jour de Druid ne le modifient pas.
+
+## Voir aussi
+
+- [Lire une fiche](/guides/personnes/lire-une-fiche/#doù-viennent-les-valeurs-détat-civil-et-demploi)
+- [Tâches à traiter](/guides/personnes/taches-a-traiter/#les-conflits-de-sources)
