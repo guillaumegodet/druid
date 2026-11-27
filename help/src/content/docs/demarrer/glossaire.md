@@ -36,8 +36,8 @@ détail.
   CRISalid. → [Appartenances et rattachement](/donnees/appartenances-rattachement/#rattachement-principal)
 - **Date imprécise** : une date saisie à l'année (`2022`), au mois (`2022-09`) ou au jour (`2022-09-01`) selon
   ce que l'on sait. → [Appartenances et rattachement](/donnees/appartenances-rattachement/#dates-imprécises)
-- **Doublon** : deux fiches qui portent le même uid : soit la même appartenance saisie deux fois (à
-  fusionner), soit une vraie double appartenance (à qualifier). → [Traiter un doublon](/guides/personnes/traiter-un-doublon/)
+- **Doublon** : deux fiches pour la même personne, sous deux uid (à fusionner) ; à distinguer
+  d'une vraie double appartenance, qui se qualifie (principale, secondaire, historique). → [Traiter un doublon](/guides/personnes/traiter-un-doublon/)
 - **Tâche** : une correction à faire hors de Druid (sur IdRef, ORCID, HAL…), suivie dans la rubrique
   *À traiter*. → [Suivre les tâches](/guides/personnes/taches-a-traiter/)
 

@@ -35,8 +35,8 @@ The other memberships are shown with a label:
 | **secondary** | Concurrent membership of another structure, ongoing. |
 | **former** | Former membership, now ended (the person moved to another laboratory). |
 
-These labels come from the qualification of multiple records: see
-[Handle a duplicate](/en/guides/personnes/traiter-un-doublon/).
+The primary membership is chosen in the record; the other ones become secondary or former
+depending on their end date: see [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/#choose-the-primary-membership).
 
 ## Membership types
 

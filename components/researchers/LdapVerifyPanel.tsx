@@ -9,7 +9,7 @@ import { Trans, Plural, useLingui } from '@lingui/react/macro';
  * lot 2): « À mettre à jour » sections (LDAP-authoritative fields that differ on existing
  * records, guard for validated records) and « Orphelins » (uid gone from LDAP), extracted from
  * the former « Revue de synchronisation LDAP » modal — same selection and write logic
- * (applyLdapUpdates). uid_dyna duplicates have their own page (DuplicatesPage, lot 3).
+ * (applyLdapUpdates). Rows sharing a uid_dyna are qualified from an « affiliations to qualify » task (rule appartenance_a_qualifier).
  */
 
 export interface LdapRunProgress { running: boolean; total?: number; done?: number; error?: string }

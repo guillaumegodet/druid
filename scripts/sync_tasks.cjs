@@ -52,6 +52,10 @@
  *                    closed once the record no longer says PhD student, or Druid counts the person gone or leaving),
  *                    annuaire_doctorant_these_ancienne when it
  *                    is older than a PhD lasts (IdRef of a namesake, or a second doctorate: to check)
+ *   appartenance_a_qualifier  person on several directory rows (same uid) not qualified yet — no single PRINCIPAL row
+ *                    with a role on every other one, nor an « à revoir » decision: the record shows as several records
+ *                    and refuses a new membership. One task per uid, qualified (or merged) from the task; closed once
+ *                    the group is qualified. Replaces the former « Doublons » tab.
  *   employeur_a_renseigner  closing-only rule (`review`, creates nothing) over the « employer to enter » tasks
  *                    of migration 002 (records validated EXTERNE without employer, release 1.6.0): such a task
  *                    only matters while the record carries an LDAP uid — without one (`ext_` or empty),
@@ -78,7 +82,7 @@ const schema = require('./lib/tasks_schema.cjs');
 const APPLY = common.hasFlag('apply');
 const AUTHOR = 'druid:regles';
 const PROGRESS_PATH = common.getArg('progress', 'tasks_detect_progress.json');
-const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these', 'employeur_a_renseigner'];
+const DEFAULT_RULES = ['orcid_deux_ids', 'hal_deux_idhal', 'scopus_deux_ids', 'rh_depart', 'annuaire_ids_partages', 'uid_ldap_disponible', 'hebergement_fin', 'parcours_depart', 'parcours_statut_incoherent', 'parcours_identifiant_suspect', 'doctorant_these', 'employeur_a_renseigner', 'appartenance_a_qualifier'];
 const RULES_ARG = String(common.getArg('rules', '') || '').split(',').map((s) => s.trim()).filter(Boolean);
 const today = common.today();
 const defaultSince = () => { const d = new Date(); d.setMonth(d.getMonth() - 12); return d.toISOString().slice(0, 10); };
@@ -350,6 +354,28 @@ const employerLabelRef = (ref, etablissements) => {
   if (name && normEmployer(name) !== 'NON RENSEIGNE') return name;
   return String(e.UAI || '').trim();
 };
+
+// ── Several directory rows of one person (same uid) ──────────────────────────────────────
+/**
+ * Groups of Annuaire rows sharing a uid that are not qualified — same test as lib/directory/duplicates.ts
+ * computeDuplicateGroups: qualified = exactly one PRINCIPAL row and a role on every row, or an « A_REVOIR » decision.
+ */
+function unqualifiedGroups(annuaire) {
+  const byUid = new Map();
+  for (const r of annuaire) {
+    const uid = String(r.fields.uid_dyna || '').trim();
+    if (uid) byUid.set(uid, [...(byUid.get(uid) || []), r]);
+  }
+  const out = [];
+  for (const rows of byUid.values()) {
+    if (rows.length < 2) continue;
+    const roles = rows.map((r) => String(r.fields.rattachement || '').trim().toUpperCase());
+    const qualified = (roles.filter((x) => x === 'PRINCIPAL').length === 1 && roles.every(Boolean))
+      || rows.some((r) => String(r.fields.doublon_decision || '').trim().toUpperCase().startsWith('A_REVOIR'));
+    if (!qualified) out.push(rows);
+  }
+  return out;
+}
 
 // ── « Employer to enter » tasks of migration 002 (release 1.6.0) ──────────────────────────
 const EMPLOYER_TASK_ORIGIN = 'migration:002-validated-presence';
@@ -672,6 +698,30 @@ const RULES = {
       return out;
     },
   },
+  appartenance_a_qualifier: {
+    type: 'annuaire_appartenance_a_qualifier',
+    sources: ['annuaire'],
+    detect(ctx) {
+      const out = [];
+      for (const rows of unqualifiedGroups(ctx.annuaire)) {
+        const f = rows[0].fields;
+        const labs = rows.map((r) => String(r.fields.LABO || '').trim() || '∅');
+        const sameLab = new Set(labs).size === 1;
+        out.push({
+          key: rows[0].key, rec: rows[0],
+          description: [
+            `${rows.length} lignes de l’Annuaire pour ${nameOf(f)} (${f.uid_dyna}), non qualifiées : ${rows.map((r, i) => `${labs[i]}${r.fields.rattachement ? ` (${r.fields.rattachement})` : ''}`).join(', ')}.`,
+            sameLab
+              ? 'Même labo sur chaque ligne : doublon probable, à fusionner depuis la tâche.'
+              : 'À faire depuis la tâche : choisir la ligne principale, puis appartenances simultanées (les autres deviennent secondaires) ou successives (historiques).',
+            'Tant que ce n’est pas fait, la personne apparaît en plusieurs fiches et l’ajout d’une appartenance est refusé.',
+          ].join('\n'),
+          lien: druidRecordUrl(rows[0].key),
+        });
+      }
+      return out;
+    },
+  },
   employeur_a_renseigner: {
     type: 'annuaire_employeur_a_renseigner',
     // Unreadable employer table ⇒ skipped (an entered employer would go unseen).
@@ -958,7 +1008,7 @@ async function main() {
   writeProgress({ running: false, total: rules.length, done, ...stats, startedAt: nowIso, finishedAt: new Date().toISOString() });
 }
 
-module.exports = { RULES, DEFAULT_RULES, employerTaskSettled, presenceOf, thesesByRow, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
+module.exports = { RULES, DEFAULT_RULES, unqualifiedGroups, employerTaskSettled, presenceOf, thesesByRow, endsByKey, plausible, openNantesAffiliations, nameMatch, sharedIdentifierGroups, ldapUidSwitches };
 
 if (require.main === module) {
   main().catch((e) => {

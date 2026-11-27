@@ -17,6 +17,7 @@ import { getUserInfo } from '../../lib/auth';
 import { StatCard, PixelBtn } from './alignAtoms';
 import { GristService } from '../../lib/gristService';
 import { BulkDepartureModal } from './BulkDepartureModal';
+import { DuplicateQualifyPanel, type QualifyMode } from './DuplicateQualifyPanel';
 
 interface Props {
   state: TasksState;
@@ -34,7 +35,13 @@ interface Props {
   onMergeSeries?: (pairs: [number, number][]) => void;
   /** After records were saved from this tab (departures reported in batch): reload of the researchers. */
   onResearchersChanged?: () => void;
+  /** Qualifies the rows of a person (« affiliations to qualify » task): main row, concurrent or successive. */
+  onQualify?: QualifyHandler;
 }
+
+type QualifyHandler = (args: { rowIds: number[]; principalRowId?: number; mode: QualifyMode; endDate?: string }) => Promise<void>;
+/** Rows of a person to qualify: one loaded record per unqualified directory row (lib/directory/people.ts groupQualifiedRows). */
+type QualifyRow = { gristRowId: number; name: string; labo: string; validated: boolean };
 
 type StatusFilter = 'open' | 'all' | TaskStatus;
 
@@ -52,7 +59,7 @@ const fmtDate = (iso: string): string => (iso ? new Date(iso).toLocaleString(num
 /** « À traiter › Tâches » tab (docs/archive/plan-chantiers-taches.md, lot 2): filters, table, inline detail
  * with the event log and the workflow actions. Statuses come from lib/tasks (same table as the
  * server: a forbidden transition is refused there too). */
-export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge, onUidSwitched, onMergeSeries, onResearchersChanged }) => {
+export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge, onUidSwitched, onMergeSeries, onResearchersChanged, onQualify }) => {
   const { t, i18n } = useLingui();
   const { tasks, loading, error, reload, transition, patch, create } = state;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
@@ -107,6 +114,14 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
     (x.chercheur ? researchers.find((r) => r.gristRowId === x.chercheur) : undefined)
     || (x.uid_dyna ? researchers.find((r) => r.uid === x.uid_dyna) : undefined);
   const rowIdOfUid = (uid: string): number | undefined => researchers.find((r) => r.uid === uid)?.gristRowId;
+  const qualifyRowsOf = (x: Task): QualifyRow[] => {
+    if (x.type !== 'annuaire_appartenance_a_qualifier' || !x.uid_dyna) return [];
+    const uid = x.uid_dyna.toLowerCase();
+    return researchers.filter((r) => r.gristRowId && String(r.uid || '').toLowerCase() === uid).map((r) => ({
+      gristRowId: r.gristRowId!, name: `${r.lastName.toUpperCase()} ${r.firstName}`.trim(),
+      labo: r.affiliations?.[0]?.structureName || '', validated: !!r.validation?.validated,
+    }));
+  };
 
   /** Open tasks per type, for the type filter (types without an open task are left out). */
   const openByType = useMemo(() => {
@@ -251,7 +266,8 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
                             <td colSpan={8} className="px-4 py-4">
                               <TaskDetail task={x} me={me} researcher={resolveResearcher(x)} onTransition={transition} onPatch={patch}
                                 mergePairs={onMerge ? mergePairsOf(x, rowIdOfUid) : []} onMerge={onMerge}
-                                onCreate={create} onUidSwitched={onUidSwitched} />
+                                onCreate={create} onUidSwitched={onUidSwitched}
+                                qualifyRows={qualifyRowsOf(x)} onQualify={onQualify} />
                             </td>
                           </tr>
                         )}
@@ -287,7 +303,10 @@ const TaskDetail: React.FC<{
   onMerge?: (rowIds: [number, number]) => void;
   onCreate: TasksState['create'];
   onUidSwitched?: () => void;
-}> = ({ task, me, researcher, onTransition, onPatch, mergePairs, onMerge, onCreate, onUidSwitched }) => {
+  /** « Affiliations to qualify » task: the person's rows, and the qualification. */
+  qualifyRows: QualifyRow[];
+  onQualify?: QualifyHandler;
+}> = ({ task, me, researcher, onTransition, onPatch, mergePairs, onMerge, onCreate, onUidSwitched, qualifyRows, onQualify }) => {
   const { t, i18n } = useLingui();
   const [events, setEvents] = useState<TaskEvent[] | null>(null);
   const [pending, setPending] = useState<PendingAction>(null);
@@ -337,6 +356,15 @@ const TaskDetail: React.FC<{
     setConfirmSwitch(false);
     onUidSwitched?.();
   });
+  const canQualify = !!onQualify && isOpenStatus(task.statut) && qualifyRows.length > 1;
+  const qualify = (args: { mode: QualifyMode; principalRowId?: number; endDate?: string }) => run(async () => {
+    await onQualify!({ rowIds: qualifyRows.map((r) => r.gristRowId), ...args });
+    const main = qualifyRows.find((r) => r.gristRowId === args.principalRowId);
+    await onTransition(task.id, 'fait', {
+      resolution: args.mode === 'a_revoir' ? t`Set aside (to review)` : args.mode === 'concomitant'
+        ? t`Concurrent affiliations, main row ${main?.labo || '∅'}` : t`Successive affiliations, main row ${main?.labo || '∅'}`,
+    });
+  });
   const confirmPending = () => {
     if (!pending) return;
     const extra = pending.statut === 'en_attente' ? { motif: text.trim() } : { resolution: text.trim() };
@@ -365,6 +393,12 @@ const TaskDetail: React.FC<{
               <ArrowRightLeft className="w-3.5 h-3.5" /> <Trans>Switch to the LDAP uid</Trans>
             </button>
           )}
+          {canQualify && onMerge && qualifyRows.length === 2 && (
+            <button type="button" onClick={() => onMerge([qualifyRows[0].gristRowId, qualifyRows[1].gristRowId])} className="btn-pill h-8 text-[12px]"
+              title={t`Same person entered twice in the same lab: merge the two rows instead of qualifying them`}>
+              <GitMerge className="w-3.5 h-3.5" /> <Trans>Open the merge assistant</Trans>
+            </button>
+          )}
           {onMerge && mergePairs.map((p) => (
             <button key={p.uids.join('+')} type="button" onClick={() => onMerge(p.rowIds)} className="btn-pill h-8 text-[12px]"
               title={t`The task closes itself at the next detection, once the records are merged`}>
@@ -372,6 +406,8 @@ const TaskDetail: React.FC<{
             </button>
           ))}
         </div>
+
+        {canQualify && <DuplicateQualifyPanel rows={qualifyRows} busy={busy} onQualify={qualify} />}
 
         {uidSwitch && confirmSwitch && (
           <div className="flex flex-col gap-2 rounded-2xl border border-ink/10 dark:border-white/10 p-3 bg-white/60 dark:bg-white/5">

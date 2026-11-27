@@ -40,7 +40,7 @@ Your **profile** determines the sections you see and the scope of the data.
 | **Laboratory member** | The laboratory or laboratories of **your own record** in the directory | View People and the Dashboard, correct the records of your lab. |
 | **Lab management** | The laboratories granted | Same, without depending on your own record. |
 | **Central services** | The whole institution | Structures, Alignment tools. |
-| **Druid administrator** | The whole institution | Groups, To process (duplicates and tasks), Report a correction, viewing rights. |
+| **Druid administrator** | The whole institution | Groups, To process (tasks and merge log), Report a correction, viewing rights. |
 | **Technical administrator** | Depending on their other profile | ETL console, hidden views of the dashboard; with access to the whole institution: Synchronise menu, creating records. |
 | **Communication officer** | — | Media sources of the news watch. |
 

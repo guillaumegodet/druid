@@ -41,6 +41,30 @@ interface AffiliationRowPlan {
   deletes: number[];
 }
 
+/** Role of a non-primary membership: HISTORIQUE once its end date is past, SECONDAIRE otherwise. */
+export const secondaryRoleOf = (endDate: string | undefined, todayIso: string): RattachementRole =>
+  (isFuzzyDatePast(normalizeFuzzyDate(endDate) ?? '', todayIso) ? 'HISTORIQUE' : 'SECONDAIRE');
+
+/**
+ * Qualification of a membership added to a person who already has some (a record created with a uid already in the
+ * directory): without it the person shows as two records, to qualify by hand before any edit. Returns the role of the
+ * new membership and the roles to set on the existing ones:
+ * - the existing memberships are qualified (one PRINCIPAL, a role on each) → the new one is SECONDAIRE / HISTORIQUE;
+ * - a single existing membership without role, within the writer's scope → it becomes PRINCIPAL, the new one
+ *   SECONDAIRE / HISTORIQUE;
+ * - otherwise (several unqualified memberships, or one outside the scope) → nothing set: the detection rule
+ *   `appartenance_a_qualifier` turns it into a task.
+ */
+export function qualifyAddedMembership(
+  existing: { id: number; role: string | null; inScope: boolean }[], newEndDate: string | undefined, todayIso: string,
+): { role: RattachementRole | null; patches: { id: number; role: RattachementRole }[] } {
+  if (existing.length === 0) return { role: null, patches: [] };
+  const newRole = secondaryRoleOf(newEndDate, todayIso);
+  if (existing.every((m) => !!m.role) && existing.filter((m) => m.role === 'PRINCIPAL').length === 1) return { role: newRole, patches: [] };
+  if (existing.length === 1 && !existing[0].role && existing[0].inScope) return { role: newRole, patches: [{ id: existing[0].id, role: 'PRINCIPAL' }] };
+  return { role: null, patches: [] };
+}
+
 /**
  * Maps the memberships edited in a record onto Annuaire rows: the primary one on the record's row,
  * each other one on its own row (same uid_dyna), qualified HISTORIQUE when its end date is past,
@@ -53,8 +77,7 @@ export function planAffiliationRows(
 ): AffiliationRowPlan {
   const primary = affiliations.find((a) => a.isPrimary) ?? affiliations[0];
   const others = affiliations.filter((a) => a !== primary);
-  const roleOf = (a: Affiliation): RattachementRole =>
-    isFuzzyDatePast(normalizeFuzzyDate(a.endDate) ?? '', todayIso) ? 'HISTORIQUE' : 'SECONDAIRE';
+  const roleOf = (a: Affiliation): RattachementRole => secondaryRoleOf(a.endDate, todayIso);
   const pool = qualifiedRowIds.filter((id) => id !== mainRowId);
   const patches: AffiliationRowPlan['patches'] = [];
   const pending: Affiliation[] = [];

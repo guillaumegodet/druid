@@ -62,10 +62,10 @@ export const DASHBOARD_TAB_HELP: Record<DashboardTab, string> = {
 
 /** Help page of each « À traiter » tab. */
 export const TODO_TAB_HELP: Record<TodoTab, string> = {
-  doublons: '/guides/personnes/traiter-un-doublon/',
   taches: '/guides/personnes/taches-a-traiter/',
   conflits: '/guides/personnes/taches-a-traiter/',
   sources: '/guides/personnes/taches-a-traiter/',
+  fusions: '/guides/personnes/traiter-un-doublon/',
 };
 
 /** Help page of each Administration tab (none for « My institution »: the hosted offer is not in the public help). */

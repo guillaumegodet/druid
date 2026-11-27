@@ -423,7 +423,7 @@ export const createGristDirectoryCommands = ({ grist, repository, today }: Grist
       if (plan.patches.length + plan.creates.length > 0) {
         if (!uid) throw new ApiError(400, 'Several affiliations can only be saved for a person with a directory identifier (uid_dyna).');
         if (qualified.length < siblings.length) {
-          throw new ApiError(409, 'This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation.');
+          throw new ApiError(409, 'This person has other directory rows not yet qualified: qualify them from the « Directory — affiliations to qualify » task (To do › Tasks) before adding an affiliation.');
         }
       }
       const wctx = await writeContext();

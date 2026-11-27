@@ -210,7 +210,7 @@ export const createDirectoryApi = (): Hono<Env> => {
   app.get('/institutions', async (c) => c.json(await c.env.repository.institutions(), 200, NO_STORE));
   app.get('/abes-exports', async (c) => c.json(await c.env.repository.abesExports(c.env.scope!), 200, NO_STORE));
 
-  // Merge history of the Duplicates page (« À traiter », admins): institution tool, never for a lab right.
+  // Merge history of the Merges tab (« À traiter », admins): institution tool, never for a lab right.
   app.get('/merges', async (c) => {
     if (!c.env.scope!.all) return c.json({ error: 'Forbidden' }, 403, NO_STORE);
     const limit = Math.min(Math.max(Number.parseInt(c.req.query('limit') || '50', 10) || 50, 1), MAX_MERGES);

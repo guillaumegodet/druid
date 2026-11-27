@@ -33,10 +33,12 @@ Voir [Rechercher et filtrer les personnels](/guides/personnes/rechercher-filtrer
 ## Étape 2 — Régler les doublons
 
 Une personne présente deux fois fausse tous les comptes. Dans **Personnel › À traiter ›
-Doublons**, traitez les groupes du laboratoire :
+Tâches**, filtrez par type et traitez les tâches du laboratoire :
 
-- **Même labo** et **Parking** : fusionnez ;
-- **Plusieurs labos** : qualifiez (concomitant ou successif).
+- **Annuaire — deux fiches pour la même personne** : fusionnez (**Fusionner en série** pour
+  les enchaîner) ;
+- **Annuaire — appartenances à qualifier** : choisissez la ligne principale (concomitant ou
+  successif).
 
 Voir [Traiter un doublon](/guides/personnes/traiter-un-doublon/). Réservé aux administrateurs
 Druid : sinon, transmettez la liste au [support](/guides/support/).

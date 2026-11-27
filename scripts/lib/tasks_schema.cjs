@@ -91,6 +91,8 @@ const TASK_TYPES = {
   // or, the thesis being too old for a current PhD student, an IdRef to check.
   annuaire_doctorant_docteur: { base: 'Annuaire', canal: 'interne', email: false },
   annuaire_doctorant_these_ancienne: { base: 'Annuaire', canal: 'interne', email: false },
+  // Person on several directory rows not qualified yet (rule appartenance_a_qualifier, formerly the « Doublons » tab).
+  annuaire_appartenance_a_qualifier: { base: 'Annuaire', canal: 'interne', email: false },
   autre: { base: 'Autre', canal: 'interne', email: false },
 };
 
@@ -145,6 +147,7 @@ const TITLES_FR = {
   annuaire_hebergement_fin: 'Compte LDAP hébergé en fermeture : départ probable ?',
   annuaire_doctorant_docteur: 'Doctorant ayant soutenu sa thèse : mettre à jour le statut',
   annuaire_doctorant_these_ancienne: 'Doctorant avec une thèse ancienne sur son IdRef : homonyme ?',
+  annuaire_appartenance_a_qualifier: 'Plusieurs appartenances à qualifier (ligne principale, simultanées ou successives)',
   autre: 'Autre',
 };
 

@@ -13,6 +13,17 @@ données à exécuter au déploiement).
 ## [Non publié]
 
 ### Ajouté
+- **Appartenance principale choisie dans la fiche** : dans la carte « Appartenances & historique », un clic sur la pastille grise
+  d'une appartenance en fait la principale ; les autres deviennent secondaires, ou historiques une fois leur date de
+  fin passée, à l'enregistrement.
+- **Tâche « Annuaire — appartenances à qualifier »** (règle nocturne `appartenance_a_qualifier`) : une personne dont
+  les appartenances ne sont pas qualifiées (plusieurs lignes sans principale) ; la tâche porte le panneau de
+  qualification (ligne principale, simultanées, successives, à revoir) et, pour deux lignes, l'assistant de fusion.
+- **À traiter › Tâches — actions en lot** : filtre par type de tâche (avec le nombre de tâches ouvertes) ; bouton
+  « Départs en lot » qui propose, pour chaque départ confirmé ou déclaré dans ORCID, la fin d'emploi suggérée par le
+  parcours (même date que le bouton de la fiche), à cocher puis reporter : chaque fiche est enregistrée comme depuis le
+  formulaire et sa tâche passe en « fait » ; bouton « Fusionner en série » qui ouvre l'assistant de fusion sur chaque
+  doublon « même personne », l'un après l'autre (chaque fusion reste relue et confirmée, « Passer » ouvre la suivante).
 - **Identifiants modifiés dans SoVisu+ repris dans Druid** (CRISalid, PostgreSQL) : le consommateur
   `scripts/graph_consume.ts` lit la file `druid-person-actions` du bus et applique à la fiche les retraits et ajouts
   faits par les chercheurs et les bibliothécaires dans SoVisu+ : un identifiant retiré est écarté (plus reproposé par
@@ -32,6 +43,16 @@ données à exécuter au déploiement).
   validée) ; un départ vu dans les seules publications cède devant un compte LDAP actif de l'établissement. Les deux
   règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
 
+### Modifié
+- **Création d'une fiche pour un uid déjà présent** (PostgreSQL) : la nouvelle appartenance est qualifiée aussitôt —
+  l'appartenance existante devient principale, la nouvelle secondaire (historique si elle est close) — au lieu de
+  laisser deux fiches à qualifier. Hors du périmètre de l'auteur, ou si plusieurs appartenances sont déjà en suspens,
+  rien n'est fixé et la règle `appartenance_a_qualifier` en fait une tâche.
+
+### Retiré
+- **Onglet « À traiter › Doublons »** : sur PostgreSQL un uid est unique et il ne restait aucun groupe à traiter. Le
+  journal des fusions (avec « Restaurer ») passe dans un onglet **Fusions**, présent sur toutes les instances ; les
+  anciens liens `?tab=doublons` ouvrent l'onglet Tâches.
 ### Corrigé
 - **Fiche — identifiants changés pendant l'édition** (PostgreSQL) : enregistrer une fiche ouverte avant qu'un
   identifiant ne change ailleurs (retrait ou ajout dans SoVisu+, job d'alignement, autre gestionnaire) ne remet plus

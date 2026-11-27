@@ -40,7 +40,8 @@ permettent de noter ce qu'il faut faire, qui s'en occupe et où on en est.
 
 ## Suivre une tâche
 
-Dans **À traiter › Tâches**, filtrez par statut, base ou canal, ou affichez **Les miennes**.
+Dans **À traiter › Tâches**, filtrez par statut, base, canal ou type de tâche (avec le nombre de
+tâches ouvertes de chaque type), ou affichez **Les miennes**.
 Sur une tâche :
 
 | Action | Effet |
@@ -77,7 +78,7 @@ pris. Selon les noms, la tâche est de l'un de ces trois types :
 
 | Type | Ce qu'il faut faire |
 |---|---|
-| **Deux fiches pour la même personne** | Fusionner : le bouton **Ouvrir l'assistant de fusion** ouvre la paire ; on y choisit l'uid à garder. |
+| **Deux fiches pour la même personne** | Fusionner : le bouton **Fusionner** ouvre la paire dans l'assistant ; on y choisit la fiche à garder. **Fusionner en série**, en haut de l'onglet, enchaîne toutes ces paires (voir [Traiter un doublon](/guides/personnes/traiter-un-doublon/)). |
 | **Identifiants communs : même personne ou homonymes ?** | Noms partiellement différents, ou noms identiques mais deux IdRef (ou ORCID…) différents. Vérifier : même personne sous un autre nom (nom d'usage, faute de saisie) ⇒ fusionner ; parents ou homonymes ⇒ retirer l'identifiant de la mauvaise fiche. |
 | **Identifiant porté par deux personnes** | Retirer l'identifiant de la fiche qui ne le porte pas à juste titre. Quand l'IdHAL désigne l'une des deux personnes, la tâche est rattachée à l'autre fiche. |
 
@@ -87,9 +88,22 @@ D'autres règles portent sur l'annuaire (voir [Statuts des personnes](/donnees/s
 |---|---|
 | **Compte LDAP trouvé par le n° agent : passer à l'uid LDAP** | La fiche est en `ext_…`, sur un compte étudiant `E…U` (étudiant ou doctorant devenu personnel) ou sans uid, alors que son n° agent est celui d'un compte LDAP qu'aucune fiche ne porte. Vérifiez les avertissements (uid qui ne ressemble pas au nom : n° agent sans doute erroné), puis **Passer à l'uid LDAP**. Si la fiche avait déjà un uid (`ext_…` ou `E…U`), une tâche **SoVisu+ : retirer les identifiants de l'ancienne personne** est créée : sans cela, SoVisu+ refuse le nouvel uid. |
 | **Compte LDAP hébergé en fermeture : départ probable ?** | Personne employée par un autre organisme dont le compte hébergé ferme. Druid n'en déduit pas un départ : vérifiez auprès du laboratoire, puis saisissez les dates de fin (la tâche se ferme seule) ou abandonnez la tâche. |
-| **Employeur à renseigner** | Fiche validée « externe » avant octobre 2026 sans employeur : renseignez l'employeur (CNRS, Inserm, CHU…). |
-| **Doctorant ayant soutenu sa thèse : mettre à jour le statut** | La fiche dit encore « doctorant » (type d'emploi ou grade) alors que son IdRef porte une thèse soutenue sur theses.fr. Mettez à jour l'emploi (post-doctorat, départ…) : la tâche se ferme seule quand la fiche ne dit plus « doctorant » ou que la personne est validée partie. |
+| **Employeur à renseigner** | Fiche validée « externe » avant octobre 2026 sans employeur : renseignez l'employeur (CNRS, Inserm, CHU…). La tâche se ferme seule si la fiche n'a pas d'uid LDAP (Druid la compte déjà externe), si un employeur est saisi ou si la personne est validée partie. |
+| **Doctorant ayant soutenu sa thèse : mettre à jour le statut** | La fiche dit encore « doctorant » (type d'emploi ou grade) alors que son IdRef porte une thèse soutenue sur theses.fr. Mettez à jour l'emploi (post-doctorat, départ…) : la tâche se ferme seule quand la fiche ne dit plus « doctorant » ou que Druid compte la personne partie ou sur le départ (compte LDAP fermé, dates de fin, présence validée). |
 | **Doctorant avec une thèse ancienne sur son IdRef : homonyme ?** | La thèse trouvée a plus de six ans : l'IdRef de la fiche est sans doute celui d'un homonyme. Vérifiez sur theses.fr (lien de la tâche) et corrigez l'IdRef. |
+| **Appartenances à qualifier** | La personne a plusieurs lignes d'annuaire sans appartenance principale : elle apparaît en plusieurs fiches. Dans la tâche, choisissez la ligne principale puis **Concomitant** ou **Successif** ; même labo sur les deux lignes ⇒ **Ouvrir l'assistant de fusion**. Voir [Traiter un doublon](/guides/personnes/traiter-un-doublon/#qualifier-des-appartenances-restées-en-suspens). |
+
+### Actions en lot
+
+Deux boutons, en haut de l'onglet, traitent plusieurs tâches d'un coup :
+
+- **Départs en lot** : pour les départs confirmés par plusieurs sources ou déclarés dans ORCID,
+  la fin d'emploi proposée par le parcours de chaque fiche (la même date que le bouton de la
+  fiche). Cochez les fiches à reporter (les départs confirmés le sont par défaut), puis
+  **Reporter** : chaque fiche est enregistrée comme depuis le formulaire et sa tâche passe en
+  « fait ». Les départs vus seulement dans les publications se traitent un par un.
+- **Fusionner en série** : ouvre l'assistant de fusion sur chaque paire « même personne »,
+  l'une après l'autre ; chaque fusion reste relue et confirmée.
 
 ## Les conflits de sources
 

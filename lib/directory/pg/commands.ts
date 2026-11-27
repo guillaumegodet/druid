@@ -21,7 +21,7 @@ import { parseFteCell, FTE_COLUMNS } from '../../fte';
 import { HR_ID_COLUMN } from '../../hrId';
 import { STATUT_DYNA_MAP } from '../../ldapCodes';
 import { fromGristDate, fromGristFuzzyDate, parseMultiLabel } from '../gristMapping';
-import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
+import { planAffiliationRows, qualifyAddedMembership, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
@@ -461,7 +461,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       assertLabsInScope(ctx.scope, [affiliation?.structureName || '']);
       const uid = String(researcher.uid || '').trim();
       // A uid already in the directory: the new record is a new membership of that person (a row of the same uid,
-      // as a second Grist row was; the Doublons page qualifies or merges it).
+      // as a second Grist row was), qualified at once when possible (annuaireWrite.ts qualifyAddedMembership).
       const existing = uid ? await trx.selectFrom('person').select(['id']).where(sql`lower(uid)`, '=', uid.toLowerCase()).executeTakeFirst() : undefined;
       let personId = existing?.id;
       if (!personId) {
@@ -482,7 +482,22 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
         await trx.updateTable('person').set({ extra: JSON.stringify(personExtra) as any }).where('id', '=', personId).execute();
         if (prefill?.date) await trx.insertInto('sync_state').values({ person_id: personId, source: 'ldap', last_run: isoDate(prefill.date), changed_fields: [] }).execute();
       }
-      const recordId = await addMembership(trx, personId, affiliation, null);
+      let role: string | null = null;
+      if (existing) {
+        const anchors = anchorsOf(ctx.scope);
+        const siblings = await trx.selectFrom('membership').select(['id', 'role', 'lab_label']).where('person_id', '=', personId).orderBy('id').execute();
+        const q = qualifyAddedMembership(siblings.map((m) => ({
+          id: Number(m.id), role: m.role, inScope: ctx.scope.all || anchors.has(normalizeAcronym(String(m.lab_label || ''))),
+        })), affiliation?.endDate, todayIso());
+        role = q.role;
+        const decision = `AUTO ${todayIso()} ${ctx.actor || 'druid'}`;
+        for (const p of q.patches) {
+          await trx.updateTable('membership').set({ role: p.role, duplicate_decision: decision }).where('id', '=', String(p.id)).execute();
+        }
+        if (q.patches.length) ctx.audit({ table: 'Annuaire', kind: 'update', rows: q.patches.map((p) => p.id), fields: ['rattachement', 'doublon_decision'], count: q.patches.length });
+      }
+      const recordId = await addMembership(trx, personId, affiliation, role);
+      if (role) await trx.updateTable('membership').set({ duplicate_decision: `AUTO ${todayIso()} ${ctx.actor || 'druid'}` }).where('id', '=', String(recordId)).execute();
       ctx.audit({ table: 'Annuaire', kind: 'create', rows: [recordId], count: 1 });
       return { recordId };
     }),
@@ -501,7 +516,7 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       // no uid_dyna needed, unlike the Grist store, whose rows only the uid ties together.
       if (plan.patches.length + plan.creates.length > 0) {
         if (qualified.length < siblings.length) {
-          throw new ApiError(409, 'This person has other directory rows not yet qualified: resolve them on the Duplicates page before adding an affiliation.');
+          throw new ApiError(409, 'This person has other directory rows not yet qualified: qualify them from the « Directory — affiliations to qualify » task (To do › Tasks) before adding an affiliation.');
         }
       }
       // Every check before the first write.

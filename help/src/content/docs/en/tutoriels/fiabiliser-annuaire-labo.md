@@ -30,11 +30,11 @@ See [Search and filter staff](/en/guides/personnes/rechercher-filtrer/).
 
 ## Step 2 — Sort out duplicates
 
-A person present twice distorts all the counts. In **People › To process › Duplicates**,
-handle the laboratory's groups:
+A person present twice distorts all the counts. In **People › To process › Tasks**, filter
+by type and handle the laboratory's tasks:
 
-- **Same lab** and **Holding area**: merge;
-- **Several labs**: qualify (concurrent or successive).
+- **Directory — two records for the same person**: merge (**Merge in series** to chain them);
+- **Directory — affiliations to qualify**: choose the main row (concurrent or successive).
 
 See [Handle a duplicate](/en/guides/personnes/traiter-un-doublon/). Reserved for Druid
 administrators: otherwise, send the list to [support](/en/guides/support/).
