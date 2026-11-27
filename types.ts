@@ -100,6 +100,17 @@ export interface FieldProvenance {
   correctedAt?: string | null;
 }
 
+/** One value of an identifier of a person with the sources that brought it (lot 4 b), for the record's panel. */
+export interface IdentifierSourceDetail {
+  value: string;
+  /** In the record's list (person_identifier); false = only known from its sources or set aside. */
+  shown: boolean;
+  primary: boolean;
+  sources: { source: string; by: string | null; at: string; lastSeen: string }[];
+  /** « Rejeté » / « Identité mêlée » for the alignment of its source: no longer proposed nor written back. */
+  setAside: { decision: string; by: string | null; at: string | null } | null;
+}
+
 /** One source of a field merged by source, as the record's « sources » panel shows it. */
 export interface FieldSourceDetail {
   source: string;

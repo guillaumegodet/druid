@@ -479,6 +479,21 @@ export interface PersonIdentifierCheck {
   scheme: string;
 }
 
+export interface PersonIdentifierSource {
+  asserted_at: Generated<Timestamp>;
+  asserted_by: string | null;
+  created_at: Generated<Timestamp>;
+  id: Generated<Int8>;
+  import_batch_id: Int8 | null;
+  note: string | null;
+  observed_at: Generated<Timestamp>;
+  person_id: string;
+  scheme: string;
+  source: string;
+  updated_at: Generated<Timestamp>;
+  value: string;
+}
+
 export interface PersonLink {
   created_at: Generated<Timestamp>;
   id: ColumnType<string, never, never>;
@@ -700,6 +715,7 @@ export interface DB {
   person_field_value: PersonFieldValue;
   person_identifier: PersonIdentifier;
   person_identifier_check: PersonIdentifierCheck;
+  person_identifier_source: PersonIdentifierSource;
   person_link: PersonLink;
   person_thesis: PersonThesis;
   person_thesis_check: PersonThesisCheck;

@@ -3,6 +3,7 @@ import { Lock, ExternalLink, AlertTriangle, Undo2, X } from 'lucide-react';
 import { Researcher, Affiliation, type FieldProvenance, type FieldSourceDetail } from '../../types';
 import { DirectoryApi } from '../../lib/directoryApi';
 import { SOURCE_LABELS } from '../../lib/fieldConflicts';
+import { IdentifierSourcesButton } from './IdentifierSourcesPanel';
 import { AffiliationsTable, TeamOption } from './AffiliationsTable';
 import { GradeSelect } from './GradeSelect';
 import { FuzzyDateInput } from './FuzzyDateInput';
@@ -207,7 +208,10 @@ export const GeneralTab: React.FC<GeneralTabProps> = ({
     <div className="contents">
        {/* Researcher identifiers — left column, stretches under the photo */}
        <div className="glass-card p-5 flex flex-col lg:col-start-1 lg:row-start-2">
-          <div className="section-label mb-4"><Trans>Researcher identifiers</Trans></div>
+          <div className="section-label mb-4 flex items-center justify-between gap-2">
+            <span><Trans>Researcher identifiers</Trans></span>
+            <IdentifierSourcesButton recordId={researcher.fieldProvenance ? researcher.gristRowId : undefined} />
+          </div>
           <div className="flex-1 flex flex-col gap-2.5">
              {/* ORCID */}
              <div className="flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-white/5 border border-ink/5 dark:border-white/10">

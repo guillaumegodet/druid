@@ -2,7 +2,7 @@
 // lot 1). The server reads the storage (Grist today, PostgreSQL later for the directory), maps it to the
 // Druid model and keeps only what the user's rights allow: the browser no longer reads the raw rows.
 import { t } from '@lingui/core/macro';
-import type { FieldProvenance, FieldSourceDetail, Researcher, Structure } from '../types';
+import type { FieldProvenance, FieldSourceDetail, IdentifierSourceDetail, Researcher, Structure } from '../types';
 import type { ValidationInfo } from './validation';
 import type { AnnuaireColumnMeta } from './directory/annuaireWrite';
 import type { InstitutionInput } from './directory/institutionWrite';
@@ -84,6 +84,9 @@ export const DirectoryApi = {
   /** Sources of the fields merged by source of a record (PostgreSQL, druid-internal `docs/plan-maj-chercheurs.md`). */
   fieldSources: (recordId: number) =>
     fetchJson<{ fields: Record<string, { value: string | null; source: string | null; sources: FieldSourceDetail[] }> }>(`people/${recordId}/field-sources`),
+  /** Identifiers of a record and the sources that brought them (PostgreSQL, lot 4 b). */
+  identifierSources: (recordId: number) =>
+    fetchJson<{ identifiers: Record<string, IdentifierSourceDetail[]> }>(`people/${recordId}/identifier-sources`),
   /** « Back to the sources »: removes the manual correction of a merged field (birth_date, corps_grade). */
   dropFieldCorrection: (recordId: number, field: string) =>
     send<{ value: string | null; provenance: FieldProvenance }>('POST', `people/${recordId}/field-sources/${encodeURIComponent(field)}/drop`),

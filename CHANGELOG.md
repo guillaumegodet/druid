@@ -12,6 +12,19 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **Provenance des identifiants** (PostgreSQL) : chaque ORCID, IdRef, IdHAL, IdHAL_i, Scopus et A-id OpenAlex garde
+  la source qui l'a apporté (alignement, import, fiche, traitement automatique), son auteur et sa date ; bouton
+  **Sources** dans la carte des identifiants de la fiche. Un identifiant **retiré dans la fiche** devient un « Rejeté »
+  pour l'alignement de sa source : `sync_openalex` (vérification et passe ORCID) et `sync_hal` ne le réécrivent plus.
+  Une application en lot de propositions d'alignement n'écarte rien (elle doit pouvoir être corrigée par un passage
+  suivant).
+  Ressaisir dans la fiche une valeur écartée lève le rejet.
+
+### Migration
+- `20261127090000_person_identifier_source` (dbmate) : table `person_identifier_source`, reprise des identifiants
+  actuels en source `legacy` (24 129 à Nantes).
+
 ## [2.22.0] — 2026-11-25
 
 ### Ajouté
