@@ -32,6 +32,12 @@ données à exécuter au déploiement).
   validée) ; un départ vu dans les seules publications cède devant un compte LDAP actif de l'établissement. Les deux
   règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
 
+### Corrigé
+- **Fiche — identifiants changés pendant l'édition** (PostgreSQL) : enregistrer une fiche ouverte avant qu'un
+  identifiant ne change ailleurs (retrait ou ajout dans SoVisu+, job d'alignement, autre gestionnaire) ne remet plus
+  l'ancienne valeur ni ne l'écarte comme un retrait manuel : un identifiant que la personne n'a pas touché dans le
+  formulaire garde sa valeur du moment ; celui qu'elle a modifié s'applique comme avant.
+
 ### Migration
 - `20261128150000_inbound_graph_action` (dbmate) : journal des messages reçus ; origine `sovisuplus` dans
   `graph_identifier_state`.

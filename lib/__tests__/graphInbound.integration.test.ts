@@ -2,9 +2,13 @@
 // docs/plan-retour-identifiants-sovisuplus.md), against a migrated database as the application role: effects on the
 // record, rejection, tasks, known state of the graph, journal and idempotence, dry-run then replay, failures. Needs
 // DATABASE_URL_APP: run by the « database » CI job and `npm run test:db`. Rolled back. Identifiers are fictitious.
+import { createRequire } from 'node:module';
 import { afterAll, describe, expect, it, vi } from 'vitest';
 import { sql, Transaction } from 'kysely';
 import { createDb, withActor, type DB } from '../db/client';
+import type { CommandContext } from '../directory/commands';
+import { createPgDirectoryCommands } from '../directory/pg/commands';
+import { createPgDirectoryRepository } from '../directory/pg/repository';
 import { planAndRecordGraphActions } from '../graph/pg';
 import { MAX_INBOUND_ATTEMPTS, processInboundMessage, recordInboundFailure, replayPlannedMessages } from '../graph/inboundPg';
 
@@ -49,6 +53,16 @@ const graphState = (trx: Transaction<DB>, uid: string) =>
   trx.selectFrom('graph_identifier_state').select(['type', 'value', 'origin']).where('uid', '=', uid).orderBy('type').execute();
 const tasks = (trx: Transaction<DB>, uid: string) =>
   trx.selectFrom('task').select(['type', 'origin', 'status', 'key']).where('uid', '=', uid).where('origin', '=', 'sovisuplus').orderBy('key').execute();
+
+// people.csv as the export builds it (server.cjs).
+const { buildPeopleCsv } = createRequire(import.meta.url)('../../server.cjs') as { buildPeopleCsv: (r: unknown[], s: unknown[]) => { csv: string } };
+const csvCell = (csv: string, uid: string, column: string) => {
+  const [header, ...rows] = csv.trim().split('\n');
+  const row = rows.find((r) => r.split(',')[3] === uid);
+  return row?.split(',')[header.split(',').indexOf(column)];
+};
+const ALL = { all: true, labAnchors: [] };
+const ctx: CommandContext = { scope: ALL, actor: 'manager-a', audit: () => {} };
 
 describe.skipIf(!url)('identifier actions from SoVisu+ (PostgreSQL)', () => {
   it('a removal is applied, set aside, journaled once, and leaves the known state of the graph', async () => {
@@ -153,6 +167,61 @@ describe.skipIf(!url)('identifier actions from SoVisu+ (PostgreSQL)', () => {
       expect(await journal(trx, 'a-8')).toMatchObject({ status: 'failed', attempts: MAX_INBOUND_ATTEMPTS });
       // A failed message delivered again is handled normally.
       expect((await processInboundMessage(trx, raw, 'on')).status).toBe('ignored');
+    });
+  });
+  describe('lot 4 — a SoVisu+ value is never written back by Druid', () => {
+    const record = async (trx: Transaction<DB>, uid: string) => {
+      const id = (await trx.insertInto('person').values({ uid, last_name: 'Lovelace', first_name: 'Ada' }).returning('id').executeTakeFirstOrThrow()).id;
+      const recordId = Number((await trx.insertInto('membership').values({ person_id: id, lab_label: 'LABX' } as any).returning('id').executeTakeFirstOrThrow()).id);
+      const repository = createPgDirectoryRepository({ db: trx });
+      const commands = createPgDirectoryCommands({ db: trx, repository, today: () => '2026-11-28' });
+      const read = async () => { repository.invalidate(); return (await repository.people(ALL)).items.find((p) => p.uid === uid)!; };
+      return { id, recordId, commands, read };
+    };
+
+    it('a record form opened before the SoVisu+ addition keeps it when saved, and people.csv carries it', async () => {
+      await inRollback(async (trx) => {
+        const { id, recordId, commands, read } = await record(trx, 'zz-ada-l');
+        const form = await read();   // opened by a manager, no IdRef yet
+        expect((await processInboundMessage(trx, message('b-1', 'ADD', 'zz-ada-l', 'idref', '12345678X'), 'on')).status).toBe('applied');
+        // The manager saves the old form after changing another field.
+        await commands.updatePerson(recordId, { ...form, firstName: 'Augusta Ada', baseIdentifiers: form.identifiers }, ctx);
+        const after = await read();
+        expect(after.firstName).toBe('Augusta Ada');
+        expect(after.identifiers.idref).toBe('12345678X');
+        const rejected = await trx.selectFrom('alignment_candidate').select('candidate_id').where('person_id', '=', id).execute();
+        expect(rejected).toEqual([]);
+        expect(csvCell(buildPeopleCsv([after], []).csv, 'zz-ada-l', 'idref')).toBe('12345678X');
+      });
+    });
+
+    it('a value the manager changes in the form wins (explicit decision), and a removal by the researcher does not come back', async () => {
+      await inRollback(async (trx) => {
+        const { recordId, commands, read } = await record(trx, 'zz-ada-l');
+        await processInboundMessage(trx, message('b-2', 'ADD', 'zz-ada-l', 'idref', '12345678X'), 'on');
+        const form = await read();
+        await commands.updatePerson(recordId, { ...form, identifiers: { ...form.identifiers, idref: '87654321X' }, baseIdentifiers: form.identifiers }, ctx);
+        expect((await read()).identifiers.idref).toBe('87654321X');
+
+        // The researcher removes it in SoVisu+ while a form with the value is open; the form saved later does not bring it back.
+        const stale = await read();
+        // Typed by the manager (source `manual`): removed anyway, with a task to review (D3).
+        expect((await processInboundMessage(trx, message('b-3', 'REMOVE', 'zz-ada-l', 'idref', '87654321X'), 'on')).status).toBe('task');
+        await commands.updatePerson(recordId, { ...stale, lastName: 'Byron', baseIdentifiers: stale.identifiers }, ctx);
+        const after = await read();
+        expect(after.identifiers.idref ?? '').toBe('');
+        expect(csvCell(buildPeopleCsv([after], []).csv, 'zz-ada-l', 'idref')).toBe('');
+      });
+    });
+
+    it('a save without the loaded identifiers (imports, older clients) writes the identifiers as before', async () => {
+      await inRollback(async (trx) => {
+        const { recordId, commands, read } = await record(trx, 'zz-ada-l');
+        const form = await read();
+        await processInboundMessage(trx, message('b-4', 'ADD', 'zz-ada-l', 'idref', '12345678X'), 'on');
+        await commands.updatePerson(recordId, { ...form, firstName: 'Augusta Ada' }, ctx);
+        expect((await read()).identifiers.idref ?? '').toBe('');
+      });
     });
   });
 });

@@ -69,6 +69,9 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
   const { t } = useLingui();
   // Local state for the form
   const [localResearcher, setLocalResearcher] = useState<Researcher>({...researcher});
+  // Identifiers as loaded with the form: sent with the save, so that a value changed meanwhile elsewhere (SoVisu+…) and
+  // left alone here is not written back to the old one.
+  const [baseIdentifiers] = useState<Researcher['identifiers']>(() => ({ ...(researcher.identifiers || {}) }));
   const [affiliations, setAffiliations] = useState<Affiliation[]>(researcher.affiliations || []);
 
   // Options of the affiliation dropdowns — limited to Grist values.
@@ -239,7 +242,8 @@ export const ResearcherDetail: React.FC<ResearcherDetailProps> = ({ researcher, 
     const updated: Researcher = {
       ...localResearcher,
       affiliations,
-      groups
+      groups,
+      ...(localResearcher.id.startsWith('NEW-') ? {} : { baseIdentifiers }),
     };
     onSave?.(updated);
   };
