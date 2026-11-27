@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 
 // The rules live in the CommonJS script (run by the server and by ofelia); requiring it only
 // defines them (main() runs under require.main === module).
-const { RULES, DEFAULT_RULES, thesesByRow, openNantesAffiliations, nameMatch, sharedIdentifierGroups, endsByKey } = createRequire(import.meta.url)('../../scripts/sync_tasks.cjs');
+const { RULES, DEFAULT_RULES, presenceOf, thesesByRow, openNantesAffiliations, nameMatch, sharedIdentifierGroups, endsByKey } = createRequire(import.meta.url)('../../scripts/sync_tasks.cjs');
 
 const rec = (id: number, fields: Record<string, unknown>) => ({ id, key: (fields.uid_dyna as string) || `g${id}`, fields });
 const cand = (extra: Record<string, unknown>) => ({ nameMatch: 'exact', score: 'moyen', evidence: ['site (Nantes Université)'], ...extra });
@@ -33,6 +33,8 @@ describe('scripts/sync_tasks.cjs rules (docs/archive/plan-chantiers-taches.md, l
         rec(40, { uid_dyna: 'blanc-c', TYPE_EMPLOI: 'DOCTORANT', validated_status: 'PARTI' }),   // gone
         rec(50, { uid_dyna: 'noir-e', TYPE_EMPLOI: 'DOCTORANT' }),   // no thesis known
       ],
+      ldap: { 'durand-l': { etat: 'N' }, 'petit-m': { etat: 'N' }, 'roux-a': { etat: 'N' }, 'blanc-c': { etat: 'N' }, 'noir-e': { etat: 'N' } },
+      etablissements: { 1: { Employeur: 'NANTES UNIVERSITE', UAI: '0442953W' } },
       theses,
     }));
     expect(out.map((x: { key: string; type: string }) => `${x.key}:${x.type}`)).toEqual([
@@ -42,6 +44,26 @@ describe('scripts/sync_tasks.cjs rules (docs/archive/plan-chantiers-taches.md, l
     expect(out[0].lien).toBe('/?page=RESEARCHER_DETAIL&id=durand-l');
     expect(out[2].description).toContain('homonyme');
     expect(out[2].lien).toBe('https://theses.fr/2004LYO10001');
+  });
+
+  it('doctorant_these: nothing to update once Druid counts the person gone, or leaving for a recent thesis', () => {
+    const year = Number(new Date().toISOString().slice(0, 4));
+    const theses = thesesByRow([
+      { id: 1, fields: { annuaire_rows: [1], nnt: `${year - 1}NANT1001`, defended_on: `${year - 1}` } },
+      { id: 2, fields: { annuaire_rows: [2], nnt: `${year - 1}NANT1002`, defended_on: `${year - 1}` } },
+      { id: 3, fields: { annuaire_rows: [3], nnt: '2004LYO10001', defended_on: '2004' } },
+      { id: 4, fields: { annuaire_rows: [4], nnt: `${year - 1}NANT1004`, defended_on: `${year - 1}` } },
+    ]);
+    const c = ctx({ theses, ldap: { 'b-b': { etat: 'D' }, 'c-c': { etat: 'D' } }, etablissements: {}, annuaire: [
+      rec(1, { uid_dyna: 'a-a', TYPE_EMPLOI: 'DOCTORANT' }),                       // LDAP account gone
+      rec(2, { uid_dyna: 'b-b', TYPE_EMPLOI: 'DOCTORANT' }),                       // closing, recent thesis
+      rec(3, { uid_dyna: 'c-c', TYPE_EMPLOI: 'DOCTORANT' }),                       // closing, old thesis: IdRef still to check
+      rec(4, { uid_dyna: 'ext_d-d', TYPE_EMPLOI: 'DOCTORANT' }),                   // no LDAP account, no end: kept
+    ] });
+    expect(RULES.doctorant_these.detect(c).map((x: { key: string; type: string }) => `${x.key}:${x.type}`))
+      .toEqual(['c-c:annuaire_doctorant_these_ancienne', 'ext_d-d:annuaire_doctorant_docteur']);
+    expect(RULES.doctorant_these.settled((c.annuaire as unknown[])[0], c, 'annuaire_doctorant_docteur')).toContain('partie (compte LDAP a-a disparu)');
+    expect(RULES.doctorant_these.settled((c.annuaire as unknown[])[1], c, 'annuaire_doctorant_docteur')).toContain('sur le départ');
   });
 
   it('orcid_deux_ids: two Nantes-affiliated exact-name profiles, or Annuaire ≠ IdRef record', () => {
@@ -319,13 +341,50 @@ describe('annuaire_ids_partages — records with different uid sharing an export
     const observed = { type: 'depart_observe', date: '2020', count: 4, destination: 'Université Beta' };
     it('parcours_depart: one task per record, typed by the strongest signal; ended records skipped', () => {
       const out = RULES.parcours_depart.detect(ctx({
-        annuaire: [rec(1, { uid_dyna: 'martin-p' }), rec(2, { uid_dyna: 'martin-p' }), rec(3, { uid_dyna: 'leroy-a' }), rec(4, { uid_dyna: 'petit-j', employment_end_date: '2021' })],
+        annuaire: [rec(1, { uid_dyna: 'martin-p' }), rec(2, { uid_dyna: 'martin-p' }), rec(3, { uid_dyna: 'leroy-a', Employeur: 2 }), rec(4, { uid_dyna: 'petit-j', employment_end_date: '2021' })],
         parcours: { 'martin-p': line([observed, confirmed]), 'leroy-a': line([observed]), 'petit-j': line([confirmed]) },
+        ldap: { 'martin-p': { etat: 'N' }, 'petit-j': { etat: 'N' } },
+        etablissements: { 2: { Employeur: 'CNRS', UAI: '0753639Y' } },
       }));
       expect(out.map((x: { key: string; type: string }) => [x.key, x.type])).toEqual([['martin-p', 'parcours_depart_confirme'], ['leroy-a', 'parcours_depart_observe']]);
       expect(out[0].description).toContain('Départ confirmé par ORCID + les publications : parti vers 2021-08, pour Université Beta');
       expect(out[0].description).toContain('aucune affiliée à l’établissement après 2020');
       expect(out[0].lien).toBe('/?page=RESEARCHER_DETAIL&id=martin-p');
+    });
+    it('parcours_depart: skipped when Druid already counts the person gone / leaving, or a publications-only signal meets an active home LDAP account', () => {
+      const etablissements = { 1: { Employeur: 'NANTES UNIVERSITE', UAI: '0442953W' }, 2: { Employeur: 'CNRS', UAI: '0753639Y' } };
+      const ldap = { 'a-a': { etat: 'N' }, 'b-b': { etat: 'D' }, 'd-d': { etat: 'N' }, 'e-e': { etat: 'N' }, 'f-f': { etat: 'N' } };
+      const parcours = Object.fromEntries(['a-a', 'b-b', 'c-c', 'e-e', 'f-f', 'ext_g-g'].map((k) => [k, line([observed])]));
+      parcours['d-d'] = line([confirmed]);
+      const c = ctx({ ldap, etablissements, parcours, annuaire: [
+        rec(1, { uid_dyna: 'a-a', Employeur: 1 }),                    // home, LDAP active, publications only
+        rec(2, { uid_dyna: 'b-b' }),                                  // LDAP closing ⇒ leaving
+        rec(3, { uid_dyna: 'c-c' }),                                  // LDAP account gone ⇒ gone
+        rec(4, { uid_dyna: 'd-d', Employeur: 1 }),                    // LDAP active but confirmed departure: kept
+        rec(5, { uid_dyna: 'e-e', Employeur: 2 }),                    // hosted account of another employer: kept
+        rec(6, { uid_dyna: 'f-f', validated: true, validation_scope: 'statut', validated_status: 'PARTI' }),
+        rec(7, { uid_dyna: 'ext_g-g' }),                              // no LDAP account: kept
+      ] });
+      expect(RULES.parcours_depart.detect(c).map((x: { key: string }) => x.key)).toEqual(['d-d', 'e-e', 'ext_g-g']);
+      const why = (id: number) => RULES.parcours_depart.settled((c.annuaire as { id: number }[]).find((r) => r.id === id), c);
+      expect(why(1)).toContain('Compte LDAP a-a actif');
+      expect(why(2)).toBe('Druid compte déjà la personne sur le départ (compte LDAP b-b en fermeture).');
+      expect(why(3)).toBe('Druid compte déjà la personne partie (compte LDAP c-c disparu).');
+      expect(why(6)).toContain('partie (présence validée');
+      expect(why(99)).toBe('');
+    });
+    it('presenceOf follows lib/presence.ts derivePresence', () => {
+      const c = ctx({ ldap: { 'a-a': { etat: 'N' } }, etablissements: { 2: { Employeur: 'CNRS', UAI: '0753639Y' } } });
+      const p = (f: Record<string, unknown>) => presenceOf(f, c).presence;
+      const soon = new Date(Date.now() + 30 * 86400e3).toISOString().slice(0, 10);
+      expect(p({ uid_dyna: 'a-a' })).toBe('PRESENT');
+      expect(p({ uid_dyna: 'z-z' })).toBe('PARTI');                                  // uid gone from LDAP
+      expect(p({ uid_dyna: 'z-z', Employeur: 2 })).toBe('PRESENT');                  // hosted account says nothing
+      expect(p({ uid_dyna: 'z-z', validated: true, validation_scope: 'statut,rattachement', validated_status: 'INTERNE' })).toBe('PRESENT');
+      expect(p({ uid_dyna: 'z-z', validated: true, validation_scope: 'rattachement', validated_status: 'PRESENT' })).toBe('PARTI');   // scope without status
+      expect(p({ uid_dyna: 'ext_x', employment_end_date: '2020' })).toBe('PARTI');
+      expect(p({ uid_dyna: 'ext_x', employment_end_date: soon })).toBe('DEPART');
+      expect(p({ uid_dyna: 'ext_x', employment_end_date: '2020', affiliation_end_date: '2020-06', validated: true, validation_scope: 'statut', validated_status: 'PRESENT' })).toBe('PARTI');   // both ends past win
     });
     it('a membership ends the record only when every row is ended', () => {
       const ends = endsByKey([rec(1, { uid_dyna: 'a', affiliation_end_date: '2020' }), rec(2, { uid_dyna: 'a' }), rec(3, { uid_dyna: 'b', affiliation_end_date: '2020' })]);

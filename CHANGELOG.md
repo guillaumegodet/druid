@@ -17,6 +17,11 @@ données à exécuter au déploiement).
   les ferme d'elle-même (« résolue auto », motif au fil de la tâche) quand la fiche n'a pas d'uid LDAP (`ext_` ou
   vide) — Druid la compte déjà externe sans employeur —, quand un employeur est saisi, quand la personne est validée
   partie ou quand la fiche a disparu. Nouvelle règle `employeur_a_renseigner`, qui ne crée ni ne rouvre aucune tâche.
+- **À traiter — départs et doctorants** : la détection nocturne ne signale plus, et ferme d'elle-même (« résolue
+  auto », motif au fil de la tâche), les tâches de départ (`parcours_depart_*`) et « doctorant ayant soutenu » d'une
+  personne que Druid compte déjà partie ou sur le départ (compte LDAP disparu ou en fermeture, dates de fin, présence
+  validée) ; un départ vu dans les seules publications cède devant un compte LDAP actif de l'établissement. Les deux
+  règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
 
 ## [2.24.0] — 2026-11-27
 
