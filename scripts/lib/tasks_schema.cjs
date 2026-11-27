@@ -78,6 +78,10 @@ const TASK_TYPES = {
   // SoVisu+ follow-up once the record has switched to the LDAP uid.
   annuaire_uid_ldap: { base: 'Annuaire', canal: 'interne', email: false },
   sovisu_ancienne_personne: { base: 'Annuaire', canal: 'interne', email: false },
+  // Identifier actions coming back from SoVisu+ (lib/graph/inboundPg.ts, druid-internal plan-retour-identifiants-sovisuplus.md).
+  sovisuplus_retrait_identifiant: { base: 'Annuaire', canal: 'interne', email: false },
+  sovisuplus_identifiant_remplace: { base: 'Annuaire', canal: 'interne', email: false },
+  sovisuplus_identifiant_different: { base: 'Annuaire', canal: 'interne', email: false },
   // Record validated « EXTERNE » without an employer: once validated_status holds the presence (D4),
   // the « not the institution » information only survives if the employer is entered.
   annuaire_employeur_a_renseigner: { base: 'Annuaire', canal: 'interne', email: false },
@@ -134,6 +138,9 @@ const TITLES_FR = {
   parcours_identifiant_suspect: 'Identifiants jamais affiliés à l’établissement : homonyme ?',
   annuaire_uid_ldap: 'Compte LDAP trouvé par le n° agent : passer la fiche sur l’uid LDAP',
   sovisu_ancienne_personne: 'SoVisu+ : retirer les identifiants de l’ancienne personne (uid changé)',
+  sovisuplus_retrait_identifiant: 'Identifiant retiré dans SoVisu+ : vérifier',
+  sovisuplus_identifiant_remplace: 'Identifiant remplacé par le chercheur : vérifier',
+  sovisuplus_identifiant_different: 'Identifiant différent dans SoVisu+ : choisir',
   annuaire_employeur_a_renseigner: 'Employeur à renseigner (fiche validée « externe »)',
   annuaire_hebergement_fin: 'Compte LDAP hébergé en fermeture : départ probable ?',
   annuaire_doctorant_docteur: 'Doctorant ayant soutenu sa thèse : mettre à jour le statut',

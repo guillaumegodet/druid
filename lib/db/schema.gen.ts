@@ -334,6 +334,25 @@ export interface ImportRow {
   resolved_by: string | null;
 }
 
+export interface InboundGraphAction {
+  action_type: string | null;
+  application: string | null;
+  attempts: Generated<number>;
+  authenticated: Generated<boolean>;
+  effects: Generated<Json>;
+  id: string;
+  identifier_type: string | null;
+  last_error: string | null;
+  payload: Json;
+  processed_at: Timestamp | null;
+  reason: string | null;
+  received_at: Generated<Timestamp>;
+  status: string;
+  uid: string | null;
+  updated_at: Generated<Timestamp>;
+  value: string | null;
+}
+
 export interface Membership {
   created_at: Generated<Timestamp>;
   duplicate_decision: string | null;
@@ -707,6 +726,7 @@ export interface DB {
   identifier_conflict: IdentifierConflict;
   import_batch: ImportBatch;
   import_row: ImportRow;
+  inbound_graph_action: InboundGraphAction;
   membership: Membership;
   membership_team: MembershipTeam;
   merge_log: MergeLog;

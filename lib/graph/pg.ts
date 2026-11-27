@@ -21,7 +21,7 @@ const OPEN_STATUSES = ['pending', 'blocked', 'failed'] as const;
 
 /** One writer of the outbox and the state at a time: two concurrent passes would queue the same removal (the unique
  * index would refuse it), a snapshot loaded during a pass would be planned against half a state. */
-const lockGraphActions = (trx: Transaction<DB>) => sql`SELECT pg_advisory_xact_lock(hashtext('druid.graph_actions'))`.execute(trx);
+export const lockGraphActions = (trx: Transaction<DB>) => sql`SELECT pg_advisory_xact_lock(hashtext('druid.graph_actions'))`.execute(trx);
 
 /** Above this many removals to send in one pass, the pass is refused: a wrong read of the directory must not turn
  * into a mass removal (each one deletes publications in the graph). Lifted on purpose with `force`. */
@@ -40,7 +40,10 @@ export const loadGraphPlanInput = async (db: Queryable) => {
       .select(['p.uid', 'pi.scheme', 'pi.value'])
       .where('pi.is_primary', '=', true).where('pi.scheme', 'in', SCHEMES).where('p.uid', 'is not', null).execute(),
     db.selectFrom('person').select('uid').where('uid', 'is not', null).execute(),
-    db.selectFrom('graph_identifier_state').select(['uid', 'type', 'value']).orderBy('uid').orderBy('type').execute(),
+    // A value SoVisu+ added (origin `sovisuplus`, lib/graph/inboundPg.ts) is a researcher's or a librarian's choice:
+    // never planned for removal, even when the directory holds another value (lot 4 of druid-internal
+    // docs/plan-retour-identifiants-sovisuplus.md). The next people.csv export replaces it once the record is settled.
+    db.selectFrom('graph_identifier_state').select(['uid', 'type', 'value']).where('origin', '<>', 'sovisuplus').orderBy('uid').orderBy('type').execute(),
     db.selectFrom('graph_action').select(['id', 'uid', 'type', 'value', 'status'])
       .where('action_type', '=', 'REMOVE').where('status', 'in', OPEN_STATUSES).execute(),
   ]);
