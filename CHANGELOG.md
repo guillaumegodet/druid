@@ -15,6 +15,18 @@ données à exécuter au déploiement).
 ## [2.25.0] — 2026-11-28
 
 ### Ajouté
+- **Identifiants modifiés dans SoVisu+ repris dans Druid** (CRISalid, PostgreSQL) : le consommateur
+  `scripts/graph_consume.ts` lit la file `druid-person-actions` du bus et applique à la fiche les retraits et ajouts
+  faits par les chercheurs et les bibliothécaires dans SoVisu+ : un identifiant retiré est écarté (plus reproposé par
+  les alignements), un ORCID ou un IdHAL authentifié devient principal, un ajout ne remplace jamais une autre valeur.
+  Les cas à trancher deviennent des tâches « À traiter » (identifiant retiré, remplacé, différent de la fiche, porté
+  par deux personnes). Chaque message est journalisé (`inbound_graph_action`) ; `DRUID_GRAPH_INBOUND=off|dry-run|on`,
+  désactivé par défaut. Le publieur des retraits ne propose plus de retirer du graphe une valeur posée par SoVisu+.
+- **Rapprochement nocturne avec SoVisu+** : `scripts/graph_reconcile_sovisuplus.ts` relit la table des actions de
+  SoVisu+ (rôle en lecture seule, `SOVISUPLUS_DATABASE_URL`) et rejoue, par le même code que le consommateur, les
+  retraits et ajouts d'identifiants que le bus n'a pas livrés à Druid (messages perdus par SoVisu+, consommateur
+  arrêté) ; une action dépassée par une action plus récente déjà traitée sur le même identifiant n'est pas rejouée.
+  Refus net si la table de SoVisu+ change de forme. Premier passage = rattrapage depuis la montée en CRISalid 1.7.
 - **Identifiants modifiés dans SoVisu+ : écrans et aide.** Dans la fiche, une pastille signale un identifiant
   authentifié par le chercheur, saisi ou retiré dans SoVisu+ (date au survol) ; le panneau **Sources** nomme SoVisu+.
   **Administration** : bloc « Identifiants modifiés dans SoVisu+ » (actions appliquées, tâches à trancher, échecs,
@@ -31,19 +43,6 @@ données à exécuter au déploiement).
   parcours (même date que le bouton de la fiche), à cocher puis reporter : chaque fiche est enregistrée comme depuis le
   formulaire et sa tâche passe en « fait » ; bouton « Fusionner en série » qui ouvre l'assistant de fusion sur chaque
   doublon « même personne », l'un après l'autre (chaque fusion reste relue et confirmée, « Passer » ouvre la suivante).
-- **Identifiants modifiés dans SoVisu+ repris dans Druid** (CRISalid, PostgreSQL) : le consommateur
-  `scripts/graph_consume.ts` lit la file `druid-person-actions` du bus et applique à la fiche les retraits et ajouts
-  faits par les chercheurs et les bibliothécaires dans SoVisu+ : un identifiant retiré est écarté (plus reproposé par
-  les alignements), un ORCID ou un IdHAL authentifié devient principal, un ajout ne remplace jamais une autre valeur.
-  Les cas à trancher deviennent des tâches « À traiter » (identifiant retiré, remplacé, différent de la fiche, porté
-  par deux personnes). Chaque message est journalisé (`inbound_graph_action`) ; `DRUID_GRAPH_INBOUND=off|dry-run|on`,
-  désactivé par défaut. Le publieur des retraits ne propose plus de retirer du graphe une valeur posée par SoVisu+.
-
-- **Rapprochement nocturne avec SoVisu+** : `scripts/graph_reconcile_sovisuplus.ts` relit la table des actions de
-  SoVisu+ (rôle en lecture seule, `SOVISUPLUS_DATABASE_URL`) et rejoue, par le même code que le consommateur, les
-  retraits et ajouts d'identifiants que le bus n'a pas livrés à Druid (messages perdus par SoVisu+, consommateur
-  arrêté) ; une action dépassée par une action plus récente déjà traitée sur le même identifiant n'est pas rejouée.
-  Refus net si la table de SoVisu+ change de forme. Premier passage = rattrapage depuis la montée en CRISalid 1.7.
 
 ### Modifié
 - **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
@@ -55,27 +54,30 @@ données à exécuter au déploiement).
   personne que Druid compte déjà partie ou sur le départ (compte LDAP disparu ou en fermeture, dates de fin, présence
   validée) ; un départ vu dans les seules publications cède devant un compte LDAP actif de l'établissement. Les deux
   règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
-
-### Modifié
 - **Création d'une fiche pour un uid déjà présent** (PostgreSQL) : la nouvelle appartenance est qualifiée aussitôt —
   l'appartenance existante devient principale, la nouvelle secondaire (historique si elle est close) — au lieu de
   laisser deux fiches à qualifier. Hors du périmètre de l'auteur, ou si plusieurs appartenances sont déjà en suspens,
   rien n'est fixé et la règle `appartenance_a_qualifier` en fait une tâche.
 
-### Retiré
-- **Onglet « À traiter › Doublons »** : sur PostgreSQL un uid est unique et il ne restait aucun groupe à traiter. Le
-  journal des fusions (avec « Restaurer ») passe dans un onglet **Fusions**, présent sur toutes les instances ; les
-  anciens liens `?tab=doublons` ouvrent l'onglet Tâches.
 ### Corrigé
 - **Fiche — identifiants changés pendant l'édition** (PostgreSQL) : enregistrer une fiche ouverte avant qu'un
   identifiant ne change ailleurs (retrait ou ajout dans SoVisu+, job d'alignement, autre gestionnaire) ne remet plus
   l'ancienne valeur ni ne l'écarte comme un retrait manuel : un identifiant que la personne n'a pas touché dans le
   formulaire garde sa valeur du moment ; celui qu'elle a modifié s'applique comme avant.
 
+### Retiré
+- **Onglet « À traiter › Doublons »** : sur PostgreSQL un uid est unique et il ne restait aucun groupe à traiter. Le
+  journal des fusions (avec « Restaurer ») passe dans un onglet **Fusions**, présent sur toutes les instances ; les
+  anciens liens `?tab=doublons` ouvrent l'onglet Tâches.
+
 ### Migration
 - `20261128150000_inbound_graph_action` (dbmate) : journal des messages reçus ; origine `sovisuplus` dans
   `graph_identifier_state`.
 - `20261128170000_inbound_graph_action_channel` (dbmate) : canal de réception (`bus` ou `reconcile`) des messages.
+- **Mise en service du retour SoVisu+** (hors image) : le consommateur et le rapprochement sont désactivés par
+  défaut (`DRUID_GRAPH_INBOUND=off`). Service compose `druid-graph-consume`, rôle en lecture seule sur la table
+  `Action` de SoVisu+ et job de nuit : procédure dans druid-internal `docs/plan-retour-identifiants-sovisuplus.md`
+  (lots 3 et 5), `dry-run` d'abord.
 
 ## [2.24.0] — 2026-11-27
 
