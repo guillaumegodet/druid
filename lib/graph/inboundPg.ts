@@ -171,6 +171,9 @@ export const updateGraphStateForAction = async (trx: Transaction<DB>, a: Inbound
 
 // ── Messages ────────────────────────────────────────────────────────────────────────────────────────────────────────
 
+/** How Druid received a message: from its queue, or replayed from the SoVisu+ action table (lot 5). */
+export type InboundChannel = 'bus' | 'reconcile';
+
 export interface InboundResult {
   id: string;
   status: 'planned' | 'applied' | 'task' | 'ignored' | 'duplicate';
@@ -194,7 +197,8 @@ const FINAL = new Set(['applied', 'task', 'ignored']);
  * Handles one message of the queue in one transaction. A message already handled (same id) is a duplicate: nothing is
  * done again. In dry-run mode the message is journaled `planned`; in `on` mode a `planned` message is applied.
  */
-export const processInboundMessage = async (db: Kysely<DB>, raw: string, mode: Exclude<InboundMode, 'off'>): Promise<InboundResult> => {
+export const processInboundMessage = async (db: Kysely<DB>, raw: string, mode: Exclude<InboundMode, 'off'>,
+  { channel = 'bus' }: { channel?: InboundChannel } = {}): Promise<InboundResult> => {
   const { payload, id } = readPayload(raw);
   const parsed = parseInboundMessage(raw);
   const actor = parsed.ok ? `sovisuplus:${parsed.action.personUid}` : 'job:graph_consume';
@@ -230,18 +234,18 @@ export const processInboundMessage = async (db: Kysely<DB>, raw: string, mode: E
       status, reason: plan.reason ?? (parsed.ok ? null : parsed.detail ?? null), effects: JSON.stringify(plan.effects),
       processed_at: new Date().toISOString(), last_error: null,
     };
-    await trx.insertInto('inbound_graph_action').values({ id, payload: JSON.stringify(payload), ...row } as any)
+    await trx.insertInto('inbound_graph_action').values({ id, payload: JSON.stringify(payload), channel, ...row } as any)
       .onConflict((oc) => oc.column('id').doUpdateSet(row as any)).execute();
     return { id, status, reason: plan.reason, label };
   });
 };
 
 /** Journals a failure of a message (outside the failed transaction); returns the number of attempts so far. */
-export const recordInboundFailure = async (db: Kysely<DB>, raw: string, error: unknown): Promise<number> => {
+export const recordInboundFailure = async (db: Kysely<DB>, raw: string, error: unknown, channel: InboundChannel = 'bus'): Promise<number> => {
   const { payload, id } = readPayload(raw);
   const message = (error instanceof Error ? error.message : String(error)).slice(0, 2000);
   const row = await db.insertInto('inbound_graph_action')
-    .values({ id, payload: JSON.stringify(payload), status: 'failed', attempts: 1, last_error: message } as any)
+    .values({ id, payload: JSON.stringify(payload), channel, status: 'failed', attempts: 1, last_error: message } as any)
     .onConflict((oc) => oc.column('id').doUpdateSet({
       status: 'failed', attempts: sql`inbound_graph_action.attempts + 1`, last_error: message,
     } as any))
@@ -267,8 +271,9 @@ export const handleInboundDelivery = async (db: Kysely<DB>, raw: string, mode: E
 
 /** Messages read in dry-run mode, applied in order once the mode is `on` (at the start of the consumer). */
 export const replayPlannedMessages = async (db: Kysely<DB>, log: (line: string) => void = console.log): Promise<number> => {
+  // In the order of the actions (a message replayed by the reconciliation arrives after the later ones of the queue).
   const rows = await db.selectFrom('inbound_graph_action').select(['id', 'payload']).where('status', '=', 'planned')
-    .orderBy('received_at').orderBy('id').execute();
+    .orderBy(sql`payload ->> 'timestamp' asc nulls last`).orderBy('received_at').orderBy('id').execute();
   for (const r of rows) {
     const verdict = await handleInboundDelivery(db, JSON.stringify(r.payload), 'on', log);
     if (verdict !== 'ack') log(`[graph_consume] replay of ${r.id} left for later`);
