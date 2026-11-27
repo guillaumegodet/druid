@@ -108,3 +108,84 @@ export const readIdentifierSources = async (db: Transaction<DB> | any, personId:
   for (const list of Object.values(out)) list.sort((a, b) => Number(b.primary) - Number(a.primary) || Number(b.shown) - Number(a.shown) || a.value.localeCompare(b.value));
   return out;
 };
+
+// ── Rejections and conflicts (lot 4 b, second part) ────────────────────────────────────────────────────────────────
+
+/** Scheme of an alignment source (inverse of ALIGN_SOURCE_OF_SCHEME). */
+const SCHEME_OF_ALIGN_SOURCE: Record<string, string> = Object.fromEntries(Object.entries(ALIGN_SOURCE_OF_SCHEME).map(([k, v]) => [v, k]));
+
+/** Values of a person set aside (« Rejeté »), as `scheme|value`. */
+export const rejectedValues = async (trx: Transaction<DB> | any, personId: string): Promise<Set<string>> =>
+  new Set((await trx.selectFrom('alignment_candidate').select(['source', 'candidate_id']).where('person_id', '=', personId)
+    .where('decision', '=', 'Rejeté').execute())
+    .map((r: any) => `${SCHEME_OF_ALIGN_SOURCE[r.source] ?? r.source}|${r.candidate_id}`));
+
+export type IdentifierConflictKind =
+  /** A source brought again a value a person set aside, after the decision: not written, to review. */
+  | 'brought_again'
+  /** The record still shows a value a person set aside (decision taken in a review before the provenance). */
+  | 'shown_but_rejected';
+
+export interface IdentifierConflict {
+  personId: string;
+  scheme: string;
+  value: string;
+  kind: IdentifierConflictKind;
+  rejectedBy: string | null;
+  rejectedAt: string | null;
+  /** The sources that brought it after the decision (brought_again). */
+  sources: { source: string; at: string }[];
+}
+
+/** Identifiers to review: set aside but brought again by a source since, or still shown. */
+export const listIdentifierConflicts = async (db: Transaction<DB> | any): Promise<IdentifierConflict[]> => {
+  const iso = (d: unknown) => (d ? new Date(d as any).toISOString() : null);
+  const decisions = await db.selectFrom('alignment_candidate').select(['person_id', 'source', 'candidate_id', 'decided_by', 'decided_at'])
+    .where('decision', '=', 'Rejeté').where('source', 'in', Object.keys(SCHEME_OF_ALIGN_SOURCE)).execute();
+  if (!decisions.length) return [];
+  const persons = [...new Set(decisions.map((d: any) => d.person_id))];
+  const [shown, brought] = await Promise.all([
+    db.selectFrom('person_identifier').select(['person_id', 'scheme', 'value']).where('person_id', 'in', persons).execute(),
+    db.selectFrom('person_identifier_source').select(['person_id', 'scheme', 'value', 'source', 'asserted_at'])
+      .where('person_id', 'in', persons).where('source', '<>', 'manual').where('source', '<>', 'legacy').execute(),
+  ]);
+  const shownKeys = new Set(shown.map((s: any) => `${s.person_id}|${s.scheme}|${s.value}`));
+  const out: IdentifierConflict[] = [];
+  for (const d of decisions) {
+    const scheme = SCHEME_OF_ALIGN_SOURCE[d.source];
+    const key = `${d.person_id}|${scheme}|${d.candidate_id}`;
+    const decidedAt = d.decided_at ? new Date(d.decided_at).getTime() : 0;
+    // A source that first gave the value after the decision (a re-import of the same value does not move asserted_at:
+    // once the rejection is kept, it is not raised again — case 6 of the plan).
+    const after = brought.filter((b: any) => `${b.person_id}|${b.scheme}|${b.value}` === key && new Date(b.asserted_at).getTime() > decidedAt);
+    const kind: IdentifierConflictKind | null = shownKeys.has(key) ? 'shown_but_rejected' : after.length ? 'brought_again' : null;
+    if (!kind) continue;
+    out.push({
+      personId: d.person_id, scheme, value: d.candidate_id, kind, rejectedBy: d.decided_by ?? null, rejectedAt: iso(d.decided_at),
+      sources: after.map((b: any) => ({ source: b.source, at: iso(b.asserted_at)! })),
+    });
+  }
+  return out;
+};
+
+/**
+ * Settles an identifier conflict. `keep`: the value stays set aside — removed from the record if still shown, the
+ * decision re-dated so that the sources seen so far no longer raise it. `accept`: the rejection is lifted and the value
+ * written (primary when the scheme has none, else secondary).
+ */
+export const resolveIdentifierConflict = async (trx: Transaction<DB>, personId: string, scheme: string, value: string,
+  action: 'keep' | 'accept', by: string): Promise<void> => {
+  const source = ALIGN_SOURCE_OF_SCHEME[scheme];
+  if (action === 'keep') {
+    await trx.deleteFrom('person_identifier').where('person_id', '=', personId).where('scheme', '=', scheme).where('value', '=', value).execute();
+    await trx.updateTable('alignment_candidate').set({ decided_by: by, decided_at: new Date().toISOString() } as any)
+      .where('person_id', '=', personId).where('source', '=', source).where('candidate_id', '=', value).execute();
+    return;
+  }
+  await liftRejection(trx, personId, scheme, [value]);
+  const hasPrimary = await trx.selectFrom('person_identifier').select('id').where('person_id', '=', personId).where('scheme', '=', scheme)
+    .where('is_primary', '=', true).executeTakeFirst();
+  await trx.insertInto('person_identifier').values({ person_id: personId, scheme, value, is_primary: !hasPrimary, source: 'record' } as any)
+    .onConflict((oc) => oc.columns(['person_id', 'scheme', 'value']).doNothing()).execute();
+  await recordIdentifierValues(trx, personId, scheme, [value], 'manual', by);
+};

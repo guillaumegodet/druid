@@ -25,7 +25,7 @@ import { planAffiliationRows, type AnnuaireColumnMeta } from '../annuaireWrite';
 import { structureCreateFields, structureUpdateFields } from '../structureWrite';
 import { prepareInstitutionWrite } from '../institutionWrite';
 import { buildMergeLogRow } from '../../mergeLog';
-import { actorOf, liftRejection, readIdentifierSources, recordIdentifierValues, rememberRemovedIdentifiers } from './identifierProvenance';
+import { actorOf, liftRejection, readIdentifierSources, recordIdentifierValues, rejectedValues, rememberRemovedIdentifiers } from './identifierProvenance';
 import { dropFieldCorrection as dropCorrection, moveFieldValues, readFieldSources, writeMergedField } from './fieldValues';
 import { FieldValueError, MERGED_FIELDS } from '../fieldMerge';
 import { resolveGrade } from '../../emeritus';
@@ -324,8 +324,15 @@ export const createPgDirectoryCommands = ({ db, repository, today }: PgDirectory
       const really = scheme === 'idhal_i' && keptSecondaries ? values.filter((v) => !keptSecondaries.includes(v)) : values;
       if (typedInRecord && really.length) await rememberRemovedIdentifiers(trx, personId, scheme, really, actor!);
     };
+    // A value a person set aside, brought by an import or a job: not written; recorded as that source's, it is a
+    // conflict to review (« To process › Source conflicts »).
+    const rejected = typedInRecord ? new Set<string>() : await rejectedValues(trx, personId);
     for (const [scheme, raw] of Object.entries(identifiersOf(r))) {
       const value = blank(raw) ? '' : String(raw).trim();
+      if (value && rejected.has(`${scheme}|${value}`) && !held.has(`${scheme}|${value}`)) {
+        await recordIdentifierValues(trx, personId, scheme, [value], source, actor);
+        continue;
+      }
       for (const k of EXTRA_OF_SCHEME[scheme] || []) delete extra[k];
       if (scheme === 'scopus') await trx.deleteFrom('person_identifier_check').where('person_id', '=', personId).where('scheme', '=', 'scopus').execute();
       const gone = await trx.deleteFrom('person_identifier').where('person_id', '=', personId).where('scheme', '=', scheme).where('is_primary', '=', true)

@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Check, FileX2, PencilLine, RefreshCw, RotateCw, Undo2 } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { FieldConflictsApi, MERGED_FIELD_LABELS, SOURCE_LABELS, type FieldConflict, type FieldConflictAction, type FieldImport } from '../../lib/fieldConflicts';
+import { FieldConflictsApi, MERGED_FIELD_LABELS, SOURCE_LABELS, type FieldConflict, type FieldConflictAction, type FieldImport, type IdentifierConflict } from '../../lib/fieldConflicts';
 
 interface Props {
   items: FieldConflict[];
+  /** Identifiers set aside but brought again by a source, or still shown (lot 4 b). */
+  identifiers?: IdentifierConflict[];
   onReload: () => Promise<void> | void;
   onOpenResearcher: (record: number, uid: string) => void;
   onResolved: () => void;
@@ -16,7 +18,7 @@ interface Props {
  * keep the correction (it then acknowledges what the sources say), go back to the sources (the most trusted one
  * wins), or type another value. Nothing is ever overwritten without one of these choices.
  */
-export const FieldConflictsPage: React.FC<Props> = ({ items, onReload, onOpenResearcher, onResolved }) => {
+export const FieldConflictsPage: React.FC<Props> = ({ items, identifiers = [], onReload, onOpenResearcher, onResolved }) => {
   const { t, i18n } = useLingui();
   const [busy, setBusy] = useState<string | null>(null);
   const [editing, setEditing] = useState<string | null>(null);
@@ -34,6 +36,26 @@ export const FieldConflictsPage: React.FC<Props> = ({ items, onReload, onOpenRes
     try { setImports((await FieldConflictsApi.imports()).items); } catch (e) { console.warn('Imports:', e); }
   }, []);
   useEffect(() => { loadImports(); }, [loadImports]);
+  const SCHEME_LABELS: Record<string, string> = { orcid: 'ORCID', idref: 'IdRef', idhal: 'IdHAL', idhal_i: 'IdHAL_i', scopus: 'Scopus', openalex: 'OpenAlex' };
+  const sourceName = (code: string) => {
+    if (!code.startsWith('align:')) return label(SOURCE_LABELS, code);
+    const name = code.slice(6);
+    return t`Alignment ${name}`;
+  };
+  const settleIdentifier = async (c: IdentifierConflict, action: 'keep' | 'accept') => {
+    const k = `id:${c.personId}|${c.scheme}|${c.value}`;
+    setBusy(k);
+    setError('');
+    try {
+      await FieldConflictsApi.resolveIdentifier(c.personId, c.scheme, c.value, action);
+      await onReload();
+      onResolved();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(null);
+    }
+  };
   const undo = async (imp: FieldImport) => {
     setBusy(`import:${imp.id}`);
     setError('');
@@ -86,7 +108,46 @@ export const FieldConflictsPage: React.FC<Props> = ({ items, onReload, onOpenRes
       </div>
       <div className="flex-1 overflow-auto px-4 md:px-7 pb-6 space-y-3" data-page-scroll>
         {error && <p className="text-[13px] font-semibold text-[#b23b3b] dark:text-[#f08c8c]">{error}</p>}
-        {items.length === 0 && (
+        {identifiers.length > 0 && (
+          <section className="space-y-3">
+            <h2 className="font-disp text-[15px] font-semibold text-ink dark:text-[#f5f2ea]"><Trans>Identifiers set aside</Trans></h2>
+            {identifiers.map((c) => {
+              const k = `id:${c.personId}|${c.scheme}|${c.value}`;
+              const by = c.rejectedBy ?? '';
+              const on = c.rejectedAt ? c.rejectedAt.slice(0, 10) : '';
+              const scheme = SCHEME_LABELS[c.scheme] ?? c.scheme;
+              const value = c.value;
+              const sources = c.sources.map((x) => `${sourceName(x.source)} (${x.at.slice(0, 10)})`).join(', ');
+              return (
+                <div key={k} className="rounded-2xl border border-ink/10 dark:border-white/10 bg-white/40 dark:bg-white/[.04] px-4 py-3 text-[13px]">
+                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    {c.recordId !== null
+                      ? <button type="button" onClick={() => onOpenResearcher(c.recordId!, c.uid)} className="font-semibold text-ink dark:text-[#f5f2ea] hover:underline">{c.name}</button>
+                      : <span className="font-semibold text-ink dark:text-[#f5f2ea]">{c.name}</span>}
+                    {c.labs.length > 0 && <span className="text-muted dark:text-[#8f897c]">{c.labs.join(', ')}</span>}
+                    <span className="px-1.5 py-0.5 rounded text-[11px] font-semibold bg-primary/10 text-primary dark:bg-primary-light/15 dark:text-primary-light">{scheme}</span>
+                  </div>
+                  <div className="mt-2">
+                    {c.kind === 'brought_again'
+                      ? <Trans><strong>{value}</strong> was set aside by {by} on {on}, and brought again by {sources}: not written.</Trans>
+                      : <Trans><strong>{value}</strong> was set aside by {by} on {on}, but the record still shows it.</Trans>}
+                  </div>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <button type="button" disabled={busy === k} onClick={() => settleIdentifier(c, 'keep')} className="btn-pill h-8 text-[12px]"
+                      title={t`The value stays set aside (and leaves the record if it still shows it).`}>
+                      <Check className="w-3.5 h-3.5" /> <Trans>Keep it set aside</Trans>
+                    </button>
+                    <button type="button" disabled={busy === k} onClick={() => settleIdentifier(c, 'accept')} className="btn-pill h-8 text-[12px]"
+                      title={t`The rejection is lifted and the value kept in the record.`}>
+                      <Undo2 className="w-3.5 h-3.5" /> <Trans>Accept the value</Trans>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </section>
+        )}
+        {items.length === 0 && identifiers.length === 0 && (
           <p className="text-[13px] text-muted dark:text-[#8f897c] py-8 text-center"><Trans>No source conflict.</Trans></p>
         )}
         {items.map((c) => {

@@ -17,7 +17,7 @@ import { HAL_ID_NUM_SECONDARY_COLUMN, joinHalIdNums, normalizeHalIdNum, secondar
 import { toGristEpoch } from '../annuaireWrite';
 import type { PgIdentifier, PgLink } from './directoryRows';
 import { MERGED_RECORD_FIELDS, writeMergedField } from './fieldValues';
-import { actorOf, identifierSourceOf, recordIdentifierValues } from './identifierProvenance';
+import { actorOf, identifierSourceOf, recordIdentifierValues, rejectedValues } from './identifierProvenance';
 
 /** Source of an OpenAlex author id typed in the record (the import uses the same tag). */
 export const OPENALEX_AUTHOR_SOURCE = 'grist:openalex_author_id';
@@ -187,6 +187,10 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
   }
   const provenance = (scheme: string, values: string[]) => recordIdentifierValues(trx, personId, scheme,
     confirms ? values : values.filter((v) => !before.get(scheme)?.has(v)), idSource, actor);
+  // A job never writes back a value a person set aside (sync_openalex / sync_hal filter them already): only recorded as
+  // its source's, a conflict to review. A person's write (record, alignment view) is a decision of its own.
+  const rejected = human ? new Set<string>() : await rejectedValues(trx, personId);
+  const setAside = (scheme: string, v: string) => rejected.has(`${scheme}|${v}`) && !before.get(scheme)?.has(v);
 
   for (const [field, value] of Object.entries(fields)) {
     if (field === 'id' || field === 'manualSort') continue;
@@ -266,7 +270,9 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
       }
       case 'doublon_decision': membership.duplicate_decision = blank(value) ? null : String(value); continue;
       case 'OpenAlex_ids': {
-        const list = blank(value) ? [] : String(value).split(/[|,;\s]+/).map((x) => x.trim()).filter(Boolean);
+        const brought = blank(value) ? [] : String(value).split(/[|,;\s]+/).map((x) => x.trim()).filter(Boolean);
+        const list = brought.filter((v) => !setAside('openalex', v));
+        if (list.length < brought.length) await recordIdentifierValues(trx, personId, 'openalex', brought.filter((v) => setAside('openalex', v)), idSource, actor);
         await trx.deleteFrom('person_identifier').where('person_id', '=', personId).where('scheme', '=', 'openalex')
           .where((eb) => eb.or([eb('source', 'is', null), eb('source', '<>', OPENALEX_AUTHOR_SOURCE)])).execute();
         for (const [i, v] of [...new Set(list)].entries()) {
@@ -303,6 +309,7 @@ export const writeRecordFields = async (trx: Transaction<DB>, personId: string, 
     if (IDENTIFIER_FIELDS[field]) {
       const scheme = IDENTIFIER_FIELDS[field];
       const v = blank(value) || value === 0 ? '' : typeof value === 'number' ? String(Math.round(value)) : String(value).trim();
+      if (v && setAside(scheme, v)) { await recordIdentifierValues(trx, personId, scheme, [v], idSource, actor); continue; }
       if (scheme === 'scopus') {
         await trx.deleteFrom('person_identifier_check').where('person_id', '=', personId).where('scheme', '=', 'scopus').execute();
         done('ID_SCOPUS');
