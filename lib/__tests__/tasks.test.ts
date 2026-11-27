@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { createRequire } from 'node:module';
 import { abesTaskTypes, type AbesRow } from '../abesExport';
-import { TASK_TYPES, TASK_TYPE_IDS, TRANSITIONS, TASK_STATUSES, TASK_BASES, CANAL_LABELS, EVENT_ACTION_LABELS, nextStatuses, taskKey, countOpenTasks, sharedIdTaskUids, mergePairsOf, uidSwitchOf, type Task } from '../tasks';
+import { TASK_TYPES, TASK_TYPE_IDS, TRANSITIONS, TASK_STATUSES, TASK_BASES, CANAL_LABELS, EVENT_ACTION_LABELS, nextStatuses, taskKey, countOpenTasks, sharedIdTaskUids, mergePairsOf, mergeSeriesOf, BATCH_DEPARTURE_TYPES, uidSwitchOf, type Task } from '../tasks';
 
 // The server validates with the CommonJS schema; the UI labels with the TS twin.
 const schema = createRequire(import.meta.url)('../../scripts/lib/tasks_schema.cjs');
@@ -46,6 +46,20 @@ describe('workflow helpers', () => {
     expect(mergePairsOf(t('annuaire_doublon', 'annuaire_doublon:a+b'), (u) => rows[u])).toEqual([{ uids: ['a', 'b'], rowIds: [1, 2] }]);
     expect(mergePairsOf(t('annuaire_doublon_a_verifier', 'annuaire_doublon_a_verifier:a+b+c+z'), (u) => rows[u]).map((x) => x.uids.join('+'))).toEqual(['a+b', 'a+c', 'b+c']);
     expect(mergePairsOf(t('annuaire_identifiant_partage', 'annuaire_identifiant_partage:a+b'), (u) => rows[u])).toEqual([]);
+  });
+  it('mergeSeriesOf: one pair per open « same person » duplicate, each record taken once', () => {
+    const t = (type: string, cle: string, statut: Task['statut'] = 'a_faire') => ({ type, cle, statut });
+    const rows: Record<string, number> = { a: 1, b: 2, c: 3, d: 4, e: 5, f: 6 };
+    expect(mergeSeriesOf([
+      t('annuaire_doublon', 'annuaire_doublon:a+b'),
+      t('annuaire_doublon', 'annuaire_doublon:b+c'),                     // b already taken by the first pair
+      t('annuaire_doublon', 'annuaire_doublon:c+d', 'fait'),             // closed
+      t('annuaire_doublon_a_verifier', 'annuaire_doublon_a_verifier:c+d'), // to check: one by one
+      t('annuaire_doublon', 'annuaire_doublon:e+z'),                     // record not loaded
+      t('annuaire_doublon', 'annuaire_doublon:e+f', 'en_cours'),
+    ], (u) => rows[u])).toEqual([[1, 2], [5, 6]]);
+    expect([...BATCH_DEPARTURE_TYPES].sort()).toEqual(['parcours_depart_confirme', 'parcours_depart_declare']);
+    for (const type of BATCH_DEPARTURE_TYPES) expect(TASK_TYPE_IDS).toContain(type);
   });
   it('taskKey and countOpenTasks', () => {
     expect(taskKey('orcid_deux_ids', '12345')).toBe('orcid_deux_ids:12345');

@@ -99,6 +99,16 @@ function App() {
   const [ldapDiff, setLdapDiff] = useState<LdapDiff | null>(null);
   /** Merge assistant: the two Annuaire rows (Grist rowIds) being merged. */
   const [mergeRowIds, setMergeRowIds] = useState<[number, number] | null>(null);
+  // « Merge in series » (Tasks tab of the to-do page): pairs still to show after the current one, and the total.
+  const [mergeQueue, setMergeQueue] = useState<{ rest: [number, number][]; total: number } | null>(null);
+  const openMergePair = (rowIds: [number, number]) => { setMergeQueue(null); setMergeRowIds(rowIds); };
+  /** Next pair of the series, or the end of it. */
+  const nextMergePair = () => {
+    if (!mergeQueue || !mergeQueue.rest.length) { setMergeQueue(null); setMergeRowIds(null); return; }
+    const [next, ...rest] = mergeQueue.rest;
+    setMergeQueue({ ...mergeQueue, rest });
+    setMergeRowIds(next);
+  };
   const [mergesRefreshKey, setFusionsRefreshKey] = useState(0);
 
   /** After a merge/restore: reload the data and, if the LDAP review page is open, its diff. */
@@ -1003,8 +1013,14 @@ function App() {
               me: getUserInfo().preferred_username,
               onNewTask: () => setTaskForm({ researcher: null }),
               onOpenResearcher: openTaskResearcher,
-              onMerge: (rowIds) => setMergeRowIds(rowIds),
+              onMerge: openMergePair,
               onUidSwitched: afterMergeChange,
+              onMergeSeries: writable ? (pairs) => {
+                if (!pairs.length) return;
+                setMergeQueue({ rest: pairs.slice(1), total: pairs.length });
+                setMergeRowIds(pairs[0]);
+              } : undefined,
+              onResearchersChanged: writable ? afterMergeChange : undefined,
             }}
           />
         );
@@ -1096,10 +1112,12 @@ function App() {
       {renderContent()}
       {mergeRowIds && (
         <MergeResearchersModal
+          key={mergeRowIds.join('-')}
           rowIds={mergeRowIds}
-          onClose={() => setMergeRowIds(null)}
+          onClose={() => { setMergeRowIds(null); setMergeQueue(null); }}
+          series={mergeQueue ? { position: mergeQueue.total - mergeQueue.rest.length, total: mergeQueue.total, onSkip: nextMergePair } : undefined}
           onMerged={({ keptRowId, droppedRowId }) => {
-            setMergeRowIds(null);
+            nextMergePair();
             if (selectedResearcher?.gristRowId === droppedRowId) setViewAndUrl(ViewState.RESEARCHERS_LIST);
             afterMergeChange();
             console.info(`[Fusion] G-${droppedRowId} absorbed into G-${keptRowId}`);

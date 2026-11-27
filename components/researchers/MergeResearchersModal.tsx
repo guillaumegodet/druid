@@ -12,6 +12,8 @@ interface MergeResearchersModalProps {
   onClose: () => void;
   /** Called after a successful merge (refresh the data, recompute the review…). */
   onMerged: (info: { keptRowId: number; droppedRowId: number; logId: number }) => void;
+  /** « Merge in series » (Tasks tab of the to-do page): position of this pair in the queue, and moving on without merging. */
+  series?: { position: number; total: number; onSkip: () => void };
 }
 
 /** Columns shown first in the comparison. */
@@ -26,7 +28,7 @@ const FIELD_ORDER = [
  * field (lib/mergeProposal.ts), lets the user arbitrate, then writes via
  * GristService.mergeAnnuaireRows (logged in Fusions_log, restorable).
  */
-export const MergeResearchersModal: React.FC<MergeResearchersModalProps> = ({ rowIds, onClose, onMerged }) => {
+export const MergeResearchersModal: React.FC<MergeResearchersModalProps> = ({ rowIds, onClose, onMerged, series }) => {
   const { t } = useLingui();
   const [rows, setRows] = useState<MergeRow[] | null>(null);
   const [columns, setColumns] = useState<AnnuaireColumnMeta[]>([]);
@@ -142,7 +144,10 @@ export const MergeResearchersModal: React.FC<MergeResearchersModalProps> = ({ ro
           <div className="flex items-center gap-3">
             <GitMerge className="w-5 h-5 text-ink dark:text-accent" />
             <div>
-              <h2 className="font-disp text-lg font-bold tracking-tight text-ink dark:text-[#f5f2ea]"><Trans>Merge two records</Trans></h2>
+              <h2 className="font-disp text-lg font-bold tracking-tight text-ink dark:text-[#f5f2ea]">
+                <Trans>Merge two records</Trans>
+                {series && <span className="ml-2 text-[13px] font-semibold text-muted dark:text-[#8f897c]"><Trans>pair {series.position} of {series.total}</Trans></span>}
+              </h2>
               <p className="text-[12px] text-muted-light dark:text-[#8f897c]"><Trans>The kept row is completed, then the other one is deleted. The operation is logged in the merge log and can be restored.</Trans></p>
             </div>
           </div>
@@ -287,6 +292,11 @@ export const MergeResearchersModal: React.FC<MergeResearchersModalProps> = ({ ro
             {effective && <Trans>Will be deleted: G-{effective.drop.rowId}. A trace is added to Data_source and Commentaires of G-{effective.keep.rowId}.</Trans>}
           </span>
           <div className="flex items-center gap-3">
+            {series && (
+              <button onClick={series.onSkip} disabled={saving} title={t`Leaves this pair as it is and opens the next one`} className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full font-disp font-semibold text-[13px] bg-white/75 dark:bg-white/10 border border-white/80 dark:border-white/15 text-ink dark:text-[#f5f2ea] hover:bg-white dark:hover:bg-white/15 shadow-soft transition-colors disabled:opacity-50">
+                <Trans>Skip</Trans>
+              </button>
+            )}
             <button onClick={onClose} disabled={saving} className="inline-flex items-center justify-center gap-2 h-10 px-5 rounded-full font-disp font-semibold text-[13px] bg-white/75 dark:bg-white/10 border border-white/80 dark:border-white/15 text-ink dark:text-[#f5f2ea] hover:bg-white dark:hover:bg-white/15 shadow-soft transition-colors disabled:opacity-50">
               <Trans>Cancel</Trans>
             </button>

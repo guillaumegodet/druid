@@ -12,6 +12,13 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Ajouté
+- **À traiter › Tâches — actions en lot** : filtre par type de tâche (avec le nombre de tâches ouvertes) ; bouton
+  « Départs en lot » qui propose, pour chaque départ confirmé ou déclaré dans ORCID, la fin d'emploi suggérée par le
+  parcours (même date que le bouton de la fiche), à cocher puis reporter : chaque fiche est enregistrée comme depuis le
+  formulaire et sa tâche passe en « fait » ; bouton « Fusionner en série » qui ouvre l'assistant de fusion sur chaque
+  doublon « même personne », l'un après l'autre (chaque fusion reste relue et confirmée, « Passer » ouvre la suivante).
+
 ### Modifié
 - **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
   les ferme d'elle-même (« résolue auto », motif au fil de la tâche) quand la fiche n'a pas d'uid LDAP (`ext_` ou

@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { RefreshCw, RotateCw, Plus, ExternalLink, User, ChevronDown, ChevronRight, MessageSquare, AlertTriangle, Mail, Copy, Check, Radar, GitMerge, ArrowRightLeft } from 'lucide-react';
+import { RefreshCw, RotateCw, Plus, ExternalLink, User, ChevronDown, ChevronRight, MessageSquare, AlertTriangle, Mail, Copy, Check, Radar, GitMerge, ArrowRightLeft, CalendarCheck } from 'lucide-react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { Researcher } from '../../types';
 import {
   TASK_TYPES, TASK_BASES, CANAL_LABELS, STATUS_LABELS, PRIORITY_LABELS, EVENT_ACTION_LABELS, TASK_STATUSES,
-  isTaskType, isOpenStatus, nextStatuses, mergePairsOf, uidSwitchOf, TasksApi,
+  isTaskType, isOpenStatus, nextStatuses, mergePairsOf, mergeSeriesOf, uidSwitchOf, TasksApi, BATCH_DEPARTURE_TYPES, TASK_TYPE_IDS,
   type Task, type TaskEvent, type TaskStatus, type TaskCanal, type TaskBase, type TaskEventAction,
 } from '../../lib/tasks';
 import type { TasksState } from '../../hooks/useTasks';
@@ -16,6 +16,7 @@ import { copyToClipboard } from '../../lib/clipboard';
 import { getUserInfo } from '../../lib/auth';
 import { StatCard, PixelBtn } from './alignAtoms';
 import { GristService } from '../../lib/gristService';
+import { BulkDepartureModal } from './BulkDepartureModal';
 
 interface Props {
   state: TasksState;
@@ -29,6 +30,10 @@ interface Props {
   onMerge?: (rowIds: [number, number]) => void;
   /** Called once a record has switched to its LDAP uid (reload of the researchers). */
   onUidSwitched?: () => void;
+  /** Opens the merge assistant on each pair in turn (open « same person » duplicates, lib/tasks.ts mergeSeriesOf). */
+  onMergeSeries?: (pairs: [number, number][]) => void;
+  /** After records were saved from this tab (departures reported in batch): reload of the researchers. */
+  onResearchersChanged?: () => void;
 }
 
 type StatusFilter = 'open' | 'all' | TaskStatus;
@@ -47,12 +52,14 @@ const fmtDate = (iso: string): string => (iso ? new Date(iso).toLocaleString(num
 /** « À traiter › Tâches » tab (docs/archive/plan-chantiers-taches.md, lot 2): filters, table, inline detail
  * with the event log and the workflow actions. Statuses come from lib/tasks (same table as the
  * server: a forbidden transition is refused there too). */
-export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge, onUidSwitched }) => {
+export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, onOpenResearcher, onMerge, onUidSwitched, onMergeSeries, onResearchersChanged }) => {
   const { t, i18n } = useLingui();
   const { tasks, loading, error, reload, transition, patch, create } = state;
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('open');
   const [baseFilter, setBaseFilter] = useState<'' | TaskBase>('');
   const [canalFilter, setCanalFilter] = useState<'' | TaskCanal>('');
+  const [typeFilter, setTypeFilter] = useState('');
+  const [bulkDepartures, setBulkDepartures] = useState<Task[] | null>(null);
   const [mine, setMine] = useState(false);
   const [query, setQuery] = useState('');
   const [openId, setOpenId] = useState<number | null>(null);
@@ -89,16 +96,29 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
       .filter((x) => (statusFilter === 'all' ? true : statusFilter === 'open' ? isOpenStatus(x.statut) : x.statut === statusFilter))
       .filter((x) => !baseFilter || x.base === baseFilter)
       .filter((x) => !canalFilter || x.canal === canalFilter)
+      .filter((x) => !typeFilter || x.type === typeFilter)
       .filter((x) => !mine || x.assignee === me || x.pris_par === me)
       .filter((x) => !q || `${x.titre} ${x.nom} ${x.labo} ${x.description} ${x.uid_dyna}`.toLowerCase().includes(q))
       .sort((a, b) => (isOpenStatus(a.statut) === isOpenStatus(b.statut) ? String(b.cree_le).localeCompare(String(a.cree_le)) : isOpenStatus(a.statut) ? -1 : 1));
-  }, [tasks, statusFilter, baseFilter, canalFilter, mine, me, query]);
+  }, [tasks, statusFilter, baseFilter, canalFilter, typeFilter, mine, me, query]);
 
   /** Directory record of a task (Grist row id first, uid_dyna fallback) — email, identifiers. */
   const resolveResearcher = (x: Task): Researcher | undefined =>
     (x.chercheur ? researchers.find((r) => r.gristRowId === x.chercheur) : undefined)
     || (x.uid_dyna ? researchers.find((r) => r.uid === x.uid_dyna) : undefined);
   const rowIdOfUid = (uid: string): number | undefined => researchers.find((r) => r.uid === uid)?.gristRowId;
+
+  /** Open tasks per type, for the type filter (types without an open task are left out). */
+  const openByType = useMemo(() => {
+    const c: Record<string, number> = {};
+    for (const x of tasks ?? []) if (isOpenStatus(x.statut)) c[x.type] = (c[x.type] || 0) + 1;
+    return c;
+  }, [tasks]);
+  const typeLabel = (type: string) => (isTaskType(type) ? i18n._(TASK_TYPES[type].label) : type);
+  const batchDepartures = useMemo(() => (tasks ?? []).filter((x) => BATCH_DEPARTURE_TYPES.has(x.type) && isOpenStatus(x.statut)), [tasks]);
+  const mergeSeries = useMemo(() => (onMergeSeries ? mergeSeriesOf(tasks ?? [], rowIdOfUid) : []),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- rowIdOfUid only reads researchers
+    [tasks, researchers, onMergeSeries]);
 
   const counts = useMemo(() => {
     const c: Record<TaskStatus, number> = { a_faire: 0, en_cours: 0, en_attente: 0, fait: 0, abandonnee: 0, resolue_auto: 0 };
@@ -123,6 +143,13 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
           <option value="">{t`All channels`}</option>
           {(Object.keys(CANAL_LABELS) as TaskCanal[]).map((c) => <option key={c} value={c}>{i18n._(CANAL_LABELS[c])}</option>)}
         </select>
+        <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className={`${selectCls} max-w-[18rem]`} aria-label={t`Task type`}>
+          <option value="">{t`All types`}</option>
+          {[...new Set([...TASK_TYPE_IDS, typeFilter].filter(Boolean))]
+            .filter((type) => openByType[type] || type === typeFilter)
+            .sort((a, b) => (openByType[b] || 0) - (openByType[a] || 0))
+            .map((type) => <option key={type} value={type}>{typeLabel(type)} ({openByType[type] || 0})</option>)}
+        </select>
         <label className="inline-flex items-center gap-1.5 text-[13px] text-ink dark:text-[#f5f2ea] cursor-pointer">
           <input type="checkbox" checked={mine} onChange={(e) => setMine(e.target.checked)} /> <Trans>Mine</Trans>
         </label>
@@ -135,6 +162,16 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
           {detect?.running ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Radar className="w-4 h-4" />}
           {detect?.running ? t`Detecting…` : t`Run detection`}
         </PixelBtn>
+        {onResearchersChanged && batchDepartures.length > 0 && (
+          <PixelBtn onClick={() => setBulkDepartures(batchDepartures)} title={t`Reports the end of employment proposed by the career path on the confirmed or declared departures, after review`}>
+            <CalendarCheck className="w-4 h-4" /> <Trans>Departures in batch ({batchDepartures.length})</Trans>
+          </PixelBtn>
+        )}
+        {onMergeSeries && mergeSeries.length > 0 && (
+          <PixelBtn onClick={() => onMergeSeries(mergeSeries)} title={t`Opens the merge assistant on each « same person » duplicate in turn: every merge is still reviewed and confirmed`}>
+            <GitMerge className="w-4 h-4" /> <Trans>Merge in series ({mergeSeries.length})</Trans>
+          </PixelBtn>
+        )}
         <PixelBtn onClick={onNewTask} tone="bg-ink text-white hover:bg-black dark:bg-accent dark:text-ink dark:hover:bg-accent-strong">
           <Plus className="w-4 h-4" /> <Trans>New task</Trans>
         </PixelBtn>
@@ -228,6 +265,10 @@ export const TasksPage: React.FC<Props> = ({ state, researchers, me, onNewTask, 
           </>
         )}
       </div>
+      {bulkDepartures && (
+        <BulkDepartureModal tasks={bulkDepartures} resolveResearcher={resolveResearcher} onTransition={transition}
+          onClose={() => setBulkDepartures(null)} onWritten={() => onResearchersChanged?.()} />
+      )}
     </div>
   );
 };
