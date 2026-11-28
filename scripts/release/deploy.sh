@@ -183,15 +183,18 @@ else
   fail "production unhealthy on $TAG, rolled back"
 fi
 
-# Data operations of this version (CHANGELOG « Migration »): reminded here, run by hand.
+# Data operations of this version (CHANGELOG « Migration »): reminded here, run by hand. awk reads the whole file
+# (no `exit` at the next section): stopping early would make `git show` die of SIGPIPE, which `set -o pipefail` turns
+# into a failure of the script, after production has switched (exit code 141 on v2.25.1, housekeeping skipped).
 MIGRATION=$(git -C "$SRC_REPO" show "$TAG:CHANGELOG.md" | awk -v v="## [$VERSION]" '
-  index($0, v) == 1 {on=1; next} on && /^## \[/ {exit} on && /^### / {mig = ($0 ~ /Migration/); next} on && mig')
+  index($0, v) == 1 {on=1; next} on && /^## \[/ {on=0; next} on && /^### / {mig = ($0 ~ /Migration/); next} on && mig')
 if [ -n "$(echo "$MIGRATION" | tr -d '[:space:]')" ]; then
   printf 'deploy: data operations to run now (CHANGELOG):\n%s\n' "$MIGRATION"
 fi
 
 # Housekeeping: keep the images (and checkouts) of the last KEEP_VERSIONS versions.
-docker image ls "$PROD_IMAGE" --format '{{.Tag}}' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -rV | tail -n +"$((KEEP_VERSIONS + 1))" |
+# `|| true`: no versioned image to list is not an error (grep exits 1, which pipefail would turn into a failure).
+docker image ls "$PROD_IMAGE" --format '{{.Tag}}' | { grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true; } | sort -rV | tail -n +"$((KEEP_VERSIONS + 1))" |
   while read -r old; do
     docker image rm "$PROD_IMAGE:$old" >/dev/null 2>&1 || true
     if [ -d "$RELEASES_DIR/$old" ]; then git -C "$SRC_REPO" worktree remove --force "$RELEASES_DIR/$old" 2>/dev/null || true; fi

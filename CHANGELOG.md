@@ -12,6 +12,12 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+### Corrigé
+- **Script de release `deploy.sh prod`** : il sortait en erreur (code 141) juste après la bascule, en lisant la
+  rubrique « Migration » du CHANGELOG (`git show | awk` interrompu, SIGPIPE sous `pipefail`) ; le rappel des opérations
+  de données et le ménage des anciennes images ne tournaient donc jamais. Le ménage ne casse plus non plus s'il n'y a
+  aucune image versionnée.
+
 ## [2.25.1] — 2026-11-28
 
 Version 2.25.0 complétée par une PR fusionnée après son tag (la 2.25.0 n'a pas été mise en production).
