@@ -12,6 +12,17 @@ données à exécuter au déploiement).
 
 ## [Non publié]
 
+## [2.25.1] — 2026-11-28
+
+Version 2.25.0 complétée par une PR fusionnée après son tag (la 2.25.0 n'a pas été mise en production).
+
+### Modifié
+- **À traiter — statuts incohérents et identifiants suspects** : la détection nocturne ne signale plus, et ferme
+  d'elle-même avec le motif, une fiche close qu'ORCID seul montre encore en poste quand une source fiable confirme le
+  départ (liste fiabilisée, compte LDAP fermé ou en fermeture : c'est le profil ORCID qui n'est pas à jour), ni des
+  identifiants « jamais affiliés à l'établissement » pour une personne employée par un autre établissement. Les deux
+  règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
+
 ## [2.25.0] — 2026-11-28
 
 ### Ajouté
@@ -45,11 +56,6 @@ données à exécuter au déploiement).
   doublon « même personne », l'un après l'autre (chaque fusion reste relue et confirmée, « Passer » ouvre la suivante).
 
 ### Modifié
-- **À traiter — statuts incohérents et identifiants suspects** : la détection nocturne ne signale plus, et ferme
-  d'elle-même avec le motif, une fiche close qu'ORCID seul montre encore en poste quand une source fiable confirme le
-  départ (liste fiabilisée, compte LDAP fermé ou en fermeture : c'est le profil ORCID qui n'est pas à jour), ni des
-  identifiants « jamais affiliés à l'établissement » pour une personne employée par un autre établissement. Les deux
-  règles sont sautées si le cache LDAP ou la table des employeurs est illisible.
 - **À traiter — tâches « Employeur à renseigner »** (créées par la migration 002 de la 1.6.0) : la détection nocturne
   les ferme d'elle-même (« résolue auto », motif au fil de la tâche) quand la fiche n'a pas d'uid LDAP (`ext_` ou
   vide) — Druid la compte déjà externe sans employeur —, quand un employeur est saisi, quand la personne est validée
